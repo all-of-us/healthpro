@@ -144,6 +144,4 @@ class ProblemComment
 
         return $this;
     }
-
-
 }

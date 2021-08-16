@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Command;
 
 use App\Service\EnvironmentService;
@@ -14,8 +15,8 @@ use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
 use Exception;
 
-class DeployCommand extends Command {
-
+class DeployCommand extends Command
+{
     /** GAE application IDs for production. */
     private static $PROD_APP_IDS = [
         'healthpro-prod'
@@ -102,9 +103,9 @@ class DeployCommand extends Command {
         $this->out = $output;
         $this->out->setFormatter(new OutputFormatter(true)); // color output
         $this->appId = $input->getOption('appId');
-        $this->local = (boolean) $input->getOption('local');
-        $this->noInteraction = (boolean) $input->getOption('no-interaction');
-        $this->port = (integer) $input->getOption('port');
+        $this->local = (bool) $input->getOption('local');
+        $this->noInteraction = (bool) $input->getOption('no-interaction');
+        $this->port = (int) $input->getOption('port');
         $this->release = $input->getOption('release');
 
         if (!$this->appId && !$this->local) {
@@ -167,11 +168,17 @@ class DeployCommand extends Command {
 
         $question = $this->getHelper('question');
         $this->exec("git status"); // display git status
-        $gitStatus = new ConfirmationQuestion("<comment>Does git status look good? (y/n)</comment> ",
-            false, '/^(y|yes)$/');
+        $gitStatus = new ConfirmationQuestion(
+            "<comment>Does git status look good? (y/n)</comment> ",
+            false,
+            '/^(y|yes)$/'
+        );
         $destinationText = $this->isProd() ? ' <error>TO PRODUCTION</error>!' : ' to ' . $this->determineEnv();
-        $reallyDeploy = new ConfirmationQuestion("<question>Do you REALLY want to deploy{$destinationText}? (y/n)</question> ",
-            false, '/^(y|yes)$/');
+        $reallyDeploy = new ConfirmationQuestion(
+            "<question>Do you REALLY want to deploy{$destinationText}? (y/n)</question> ",
+            false,
+            '/^(y|yes)$/'
+        );
         if ($this->local || ($question->ask($input, $output, $gitStatus) && $question->ask($input, $output, $reallyDeploy))) {
             $this->exec($cmd, true, true);
             if ($this->isTaggable()) {
@@ -184,8 +191,7 @@ class DeployCommand extends Command {
                 $output->writeln('');
                 $output->writeln('<error>Remember to attach deploy output to Jira ticket!</error>');
             }
-        }
-        else {
+        } else {
             $output->writeln('');
             $output->writeln('Fine then, be that way 😾'); // emoji :pouting_cat:
         }
@@ -193,7 +199,8 @@ class DeployCommand extends Command {
     }
 
     /** Determines the environment we are deploying to. */
-    public function determineEnv() {
+    public function determineEnv()
+    {
         if ($this->local) {
             return EnvironmentService::ENV_LOCAL;
         } elseif ($this->isDev()) {
@@ -441,7 +448,7 @@ class DeployCommand extends Command {
         $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);
         $run = $mustRun ? 'mustRun' : 'run';
-        $process->$run(function($type, $buffer) use ($raw) {
+        $process->$run(function ($type, $buffer) use ($raw) {
             if ($raw) {
                 $this->out->write($buffer, false, OutputInterface::OUTPUT_RAW);
             } else {
@@ -458,7 +465,7 @@ class DeployCommand extends Command {
         foreach ($vulnerabilities as $key => $vulnerability) {
             if (!empty($vulnerability['advisories'])) {
                 $advisories = $vulnerability['advisories'];
-                foreach($vulnerability['advisories'] as $advisoryKey => $advisory) {
+                foreach ($vulnerability['advisories'] as $advisoryKey => $advisory) {
                     if (!empty($advisory['link'])) {
                         if ($this->isVulnerabilityIgnored($ignoredVulnerabilities, $advisory['link'])) {
                             //Remove ignored advisories

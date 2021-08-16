@@ -95,7 +95,7 @@ class AuthService
     public function getGoogleLogoutUrl($route = 'symfony_home')
     {
         $dest = $this->generateUrl($route);
-        
+
         if ($this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth')) {
             return $this->env->values['isUnitTest'] ? null : $dest;
         }

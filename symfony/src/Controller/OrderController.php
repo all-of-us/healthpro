@@ -31,7 +31,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  */
 class OrderController extends AbstractController
 {
-
     protected $em;
     protected $orderService;
     protected $participantSummaryService;
@@ -106,7 +105,7 @@ class OrderController extends AbstractController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $order = new Order;
+        $order = new Order();
         $this->orderService->loadSamplesSchema($order);
         $createForm = $this->createForm(OrderCreateType::class, null, [
             'orderType' => $session->get('orderType'),
@@ -116,8 +115,10 @@ class OrderController extends AbstractController
         ]);
         $showCustom = false;
         $createForm->handleRequest($request);
-        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('orderCheck',
-                $request->request->get('csrf_token')))) {
+        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken(
+            'orderCheck',
+            $request->request->get('csrf_token')
+        ))) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if ($createForm->isSubmitted() && $createForm->isValid()) {
@@ -439,8 +440,10 @@ class OrderController extends AbstractController
                     $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
                 if (($order->getType() === 'kit' || $order->getType() === 'diversion') && $finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
-                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking($finalizeForm['fedexTracking']->getData(),
-                        $orderId);
+                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking(
+                        $finalizeForm['fedexTracking']->getData(),
+                        $orderId
+                    );
                     if (!empty($duplicateFedexTracking)) {
                         $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
                     }

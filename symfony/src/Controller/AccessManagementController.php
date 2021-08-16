@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AccessManagementController extends AbstractController
 {
-    const MEMBER_DOMAIN = '@pmi-ops.org';
+    public const MEMBER_DOMAIN = '@pmi-ops.org';
 
     private $googleGroupsService;
     private $loggerService;

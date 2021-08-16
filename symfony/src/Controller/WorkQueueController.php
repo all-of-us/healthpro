@@ -183,8 +183,10 @@ class WorkQueueController extends AbstractController
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output,
-                ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']);
+            fputcsv(
+                $output,
+                ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']
+            );
             fwrite($output, "\"\"\n");
 
             fputcsv($output, WorkQueue::getExportHeaders());
@@ -244,8 +246,10 @@ class WorkQueueController extends AbstractController
         }
 
         // Deny access if participant awardee does not belong to the allowed awardees or not a salivary participant (awardee = UNSET and sampleStatus1SAL2 = RECEIVED)
-        if (!(in_array($participant->awardee,
-                $this->siteService->getSuperUserAwardees()) || (empty($participant->awardee) && $participant->sampleStatus1SAL2 === 'RECEIVED'))) {
+        if (!(in_array(
+            $participant->awardee,
+            $this->siteService->getSuperUserAwardees()
+        ) || (empty($participant->awardee) && $participant->sampleStatus1SAL2 === 'RECEIVED'))) {
             throw $this->createAccessDeniedException();
         }
 
@@ -255,7 +259,7 @@ class WorkQueueController extends AbstractController
         $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id]);
 
         // Quanum Orders
-        $order = new Order;
+        $order = new Order();
         $orderService->loadSamplesSchema($order);
         $quanumOrders = $orderService->getOrdersByParticipant($participant->id);
         foreach ($quanumOrders as $quanumOrder) {

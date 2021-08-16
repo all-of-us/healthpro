@@ -69,8 +69,8 @@ class PatientStatusImport
      */
     private $organization;
 
-    const COMPLETE = 1;
-    const COMPLETE_WITH_ERRORS = 2;
+    public const COMPLETE = 1;
+    public const COMPLETE_WITH_ERRORS = 2;
 
     public function __construct()
     {

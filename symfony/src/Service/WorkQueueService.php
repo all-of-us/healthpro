@@ -11,7 +11,6 @@ use Pmi\Drc\CodeBook;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-
 class WorkQueueService
 {
     protected $participantSummaryService;
@@ -231,26 +230,53 @@ class WorkQueueService
             $row['activityStatus'] = WorkQueue::getActivityStatus($participant, $userTimezone);
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
-            $row['primaryConsent'] = WorkQueue::displayConsentStatus($participant->consentForStudyEnrollment,
-                $participant->consentForStudyEnrollmentAuthored, $userTimezone);
-            $row['firstPrimaryConsent'] = WorkQueue::displayFirstConsentStatusTime($participant->consentForStudyEnrollmentFirstYesAuthored,
-                $userTimezone);
+            $row['primaryConsent'] = WorkQueue::displayConsentStatus(
+                $participant->consentForStudyEnrollment,
+                $participant->consentForStudyEnrollmentAuthored,
+                $userTimezone
+            );
+            $row['firstPrimaryConsent'] = WorkQueue::displayFirstConsentStatusTime(
+                $participant->consentForStudyEnrollmentFirstYesAuthored,
+                $userTimezone
+            );
             $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate($participant, $userTimezone);
-            $row['firstEhrConsent'] = WorkQueue::displayFirstConsentStatusTime($participant->consentForElectronicHealthRecordsFirstYesAuthored,
-                $userTimezone, 'ehr');
-            $row['ehrConsent'] = WorkQueue::displayConsentStatus($participant->consentForElectronicHealthRecords,
-                $participant->consentForElectronicHealthRecordsAuthored, $userTimezone);
-            $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus($participant->ehrConsentExpireStatus,
-                $participant->consentForElectronicHealthRecords, $participant->ehrConsentExpireAuthored, $userTimezone);
-            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus($participant->consentForGenomicsROR,
-                $participant->consentForGenomicsRORAuthored, $userTimezone);
+            $row['firstEhrConsent'] = WorkQueue::displayFirstConsentStatusTime(
+                $participant->consentForElectronicHealthRecordsFirstYesAuthored,
+                $userTimezone,
+                'ehr'
+            );
+            $row['ehrConsent'] = WorkQueue::displayConsentStatus(
+                $participant->consentForElectronicHealthRecords,
+                $participant->consentForElectronicHealthRecordsAuthored,
+                $userTimezone
+            );
+            $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
+                $participant->ehrConsentExpireStatus,
+                $participant->consentForElectronicHealthRecords,
+                $participant->ehrConsentExpireAuthored,
+                $userTimezone
+            );
+            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
+                $participant->consentForGenomicsROR,
+                $participant->consentForGenomicsRORAuthored,
+                $userTimezone
+            );
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
-            $row['dvEhrStatus'] = WorkQueue::displayConsentStatus($participant->consentForDvElectronicHealthRecordsSharing,
-                $participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone);
-            $row['caborConsent'] = WorkQueue::displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored,
-                $userTimezone);
-            $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus($participant->retentionEligibleStatus,
-                $participant->retentionEligibleTime, $userTimezone);
+            $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
+                $participant->consentForDvElectronicHealthRecordsSharing,
+                $participant->consentForDvElectronicHealthRecordsSharingAuthored,
+                $userTimezone
+            );
+            $row['caborConsent'] = WorkQueue::displayConsentStatus(
+                $participant->consentForCABoR,
+                $participant->consentForCABoRAuthored,
+                $userTimezone
+            );
+            $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus(
+                $participant->retentionEligibleStatus,
+                $participant->retentionEligibleTime,
+                $userTimezone
+            );
             $row['retentionType'] = WorkQueue::getRetentionType($participant->retentionType);
             $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             $row['isEhrDataAvailable'] = WorkQueue::getEhrAvailableStatus($participant->isEhrDataAvailable);
@@ -275,21 +301,30 @@ class WorkQueueService
             }
             $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
             foreach (array_keys(WorkQueue::$surveys) as $field) {
-                $row["ppi{$field}"] = WorkQueue::displaySurveyStatus($participant->{'questionnaireOn' . $field},
-                    $participant->{'questionnaireOn' . $field . 'Authored'}, $userTimezone);
+                $row["ppi{$field}"] = WorkQueue::displaySurveyStatus(
+                    $participant->{'questionnaireOn' . $field},
+                    $participant->{'questionnaireOn' . $field . 'Authored'},
+                    $userTimezone
+                );
             }
 
             //In-Person Enrollment
             $row['pairedSite'] = $this->siteService->getSiteDisplayName($e($participant->siteSuffix));
             $row['pairedOrganization'] = $this->siteService->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = WorkQueue::displayStatus($participant->physicalMeasurementsStatus, 'COMPLETED', $userTimezone,
-                $participant->physicalMeasurementsFinalizedTime, false);
+            $row['physicalMeasurementsStatus'] = WorkQueue::displayStatus(
+                $participant->physicalMeasurementsStatus,
+                'COMPLETED',
+                $userTimezone,
+                $participant->physicalMeasurementsFinalizedTime,
+                false
+            );
             $row['evaluationFinalizedSite'] = $this->siteService->getSiteDisplayName($e($participant->evaluationFinalizedSite));
             $row['biobankDnaStatus'] = WorkQueue::displayStatus($participant->samplesToIsolateDNA, 'RECEIVED', $userTimezone);
             if ($participant->numBaselineSamplesArrived >= 7) {
                 $row['biobankSamples'] = WorkQueue::HTML_SUCCESS . ' ' . $e($participant->numBaselineSamplesArrived);
             } else {
-                $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);;
+                $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);
+                ;
             }
             $row['orderCreatedSite'] = $this->siteService->getSiteDisplayName($e($participant->orderCreatedSite));
             foreach (array_keys(WorkQueue::$samples) as $sample) {
@@ -300,8 +335,13 @@ class WorkQueueService
                         break;
                     }
                 }
-                $row["sample{$sample}"] = WorkQueue::displayStatus($participant->{'sampleStatus' . $newSample}, 'RECEIVED', $userTimezone,
-                    $participant->{'sampleStatus' . $newSample . 'Time'}, false);
+                $row["sample{$sample}"] = WorkQueue::displayStatus(
+                    $participant->{'sampleStatus' . $newSample},
+                    'RECEIVED',
+                    $userTimezone,
+                    $participant->{'sampleStatus' . $newSample . 'Time'},
+                    false
+                );
                 if ($sample === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
                     $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                 }

@@ -109,9 +109,9 @@ class HelpController extends AbstractController
             $client = new HttpClient();
             $response = $client->get($url, ['stream' => true]);
             $responseBody = $response->getBody();
-            $streamedResponse = new StreamedResponse(function() use ($responseBody) {
+            $streamedResponse = new StreamedResponse(function () use ($responseBody) {
                 while (!$responseBody->eof()) {
-                   echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
+                    echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
                 }
             });
             $streamedResponse->headers->set('Content-Type', 'application/pdf');
