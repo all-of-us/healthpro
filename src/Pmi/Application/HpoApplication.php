@@ -380,6 +380,7 @@ class HpoApplication extends AbstractApplication
     protected function beforeCallback(Request $request, AbstractApplication $app)
     {
         $app['twig']->addGlobal('confluenceResources', HelpService::$confluenceResources);
+        $app['twig']->addGlobal('feedback_url', HelpService::getFeedbackUrl());
 
         $app->log(Log::REQUEST);
 
