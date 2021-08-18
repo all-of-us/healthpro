@@ -76,4 +76,18 @@ class JiraService
 
         return $responseObject->key ?? null;
     }
+
+    public function createApprovalRequestComment(string $ticketId, string $comment): ?string
+    {
+        try {
+            $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
+                'json' => [
+                    'body' => $comment
+                ]
+            ]);
+            return $response && $response->getStatusCode() === 201 ? true : false;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }
