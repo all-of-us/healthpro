@@ -75,21 +75,25 @@ class AccessManagementController extends AbstractController
         if ($groupMemberForm->isSubmitted()) {
             if ($groupMemberForm->isValid()) {
                 $email = $groupMemberForm->get('email')->getData() . self::MEMBER_DOMAIN;
-                $result = $this->googleGroupsService->addMember($group->email, $email);
-                if ($result['status'] === 'success') {
-                    $this->addFlash('success', $result['message']);
-                    $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
-                        'member' => $email,
-                        'result' => 'success'
-                    ]);
-                    return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                if ($this->googleGroupsService->getUser($email)) {
+                    $result = $this->googleGroupsService->addMember($group->email, $email);
+                    if ($result['status'] === 'success') {
+                        $this->addFlash('success', $result['message']);
+                        $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
+                            'member' => $email,
+                            'result' => 'success'
+                        ]);
+                        return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                    }
+                    $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
+                } else {
+                    $errorMessage = 'User not registred.';
                 }
-                $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
                 $this->addFlash('error', $errorMessage);
                 $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
                     'member' => $email,
                     'result' => 'fail',
-                    'errorMessage' => $result['message']
+                    'errorMessage' => $result['message'] ?? $errorMessage
                 ]);
             } else {
                 $groupMemberForm->addError(new FormError('Please correct the errors below.'));
