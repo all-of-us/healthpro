@@ -33,19 +33,27 @@ class AuthController extends AbstractController
 
             if ($loginForm->isSubmitted() && $loginForm->isValid()) {
                 // Set mock user and token for local development
-                $userService->setMockUser($loginForm->get('userName')->getData());
-                $user = $userProvider->loadUserByUsername($loginForm->get('userName')->getData());
+                $email = $loginForm->get('userName')->getData();
+                $userService->setMockUser($email);
+                $user = $userProvider->loadUserByUsername($email);
+                if (empty($user->getGroups())) {
+                    $session->invalidate();
+                    return $this->render('error-auth.html.twig', [
+                        'email' => $email,
+                        'logoutUrl' => $this->generateUrl('logout')
+                    ]);
+                }
                 $authService->setMockAuthToken($user);
                 $session->set('isLoginReturn', true);
                 return $this->redirect('/s');
             }
 
-            return $this->render('mock-login.html.twig', [
+            return $this->render('login.html.twig', [
                 'loginForm' => $loginForm->createView()
             ]);
         }
 
-        return $this->redirectToRoute('login_start');
+        return $this->render('login.html.twig');
     }
 
     /**

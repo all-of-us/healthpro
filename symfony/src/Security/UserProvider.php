@@ -46,13 +46,30 @@ class UserProvider implements UserProviderInterface
         if ($this->session->has('googlegroups')) {
             $groups = $this->session->get('googlegroups');
         } else {
+            $manageGroups = [];
             if ($this->env->isLocal() && (($this->params->has('gaBypass') && $this->params->get('gaBypass')) || $this->env->values['isUnitTest'])) {
                 $groups = $this->mockGoogleGroups->getGroups($googleUser->getEmail());
             } else {
                 $groups = $this->googleGroups->getGroups($googleUser->getEmail());
+                if ($this->params->has('feature.manageusers') && $this->params->get('feature.manageusers')) {
+                    foreach ($groups as $group) {
+                        if (strpos($group->getEmail(), User::SITE_PREFIX) === 0) {
+                            $role = $this->googleGroups->getRole($googleUser->getEmail(), $group->getEmail());
+                            if (in_array($role, ['OWNER', 'MANAGER'])) {
+                                $manageGroups[] = $group->getEmail();
+                            }
+                        }
+                    }
+                    if ($this->params->has('feature.managegrouppilotsites') && $pilotSites = $this->params->get('feature.managegrouppilotsites')) {
+                        $pilotSites = explode(',', $pilotSites);
+                        foreach ($manageGroups as $key => $manageGroup) {
+                            if (!in_array($manageGroup, $pilotSites)) {
+                                unset($manageGroups[$key]);
+                            }
+                        }
+                    }
+                }
             }
-            // TODO: implement group management check
-            $manageGroups = [];
             $this->session->set('googlegroups', $groups);
             $this->session->set('managegroups', $manageGroups);
         }

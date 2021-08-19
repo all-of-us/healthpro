@@ -41,7 +41,12 @@ class SiteService
 
     public function isDvType(): bool
     {
-        return $this->session->get('siteType') === 'dv' ? true : false;
+        $site = $this->em->getRepository(Site::class)->findOneBy([
+            'deleted' => 0,
+            'googleGroup' => $this->getSiteId(),
+            'type' => 'DV'
+        ]);
+        return !empty($site);
     }
 
     public function getSiteId()
@@ -73,6 +78,15 @@ class SiteService
             'siteType' => $this->params->get('diversion_pouch_site')
         ]);
         return !empty($site);
+    }
+
+    public function isBloodDonorPmSite(): bool
+    {
+        if ($this->params->has('feature.blooddonorpmsites') && $sites = $this->params->get('feature.blooddonorpmsites')) {
+            $sites = explode(',', $sites);
+            return in_array($this->getSiteId(), $sites);
+        }
+        return false;
     }
 
     public function getSiteAwardee()
@@ -238,7 +252,7 @@ class SiteService
 
     protected function setNewRoles($user)
     {
-        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'), $this->session->get('managegroups'));
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'));
         if ($user->getAllRoles() != $userRoles) {
             $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this->tokenStorage->setToken($token);

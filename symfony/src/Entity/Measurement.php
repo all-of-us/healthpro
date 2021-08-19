@@ -585,7 +585,7 @@ class Measurement
 
     public function isEvaluationUnlocked()
     {
-        return !empty($this->getParticipantId()) && empty($this->getFinalizedTs());
+        return !empty($this->getParentId()) && empty($this->getFinalizedTs());
     }
 
     public function isEvaluationFailedToReachRDR()

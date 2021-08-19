@@ -131,3 +131,14 @@ ehr_protocol_banner_message:
 
 # Enables physical measurements blood donor protocol modification workflow for diversion pouch sites
 # feature.blooddonorpm: false
+
+# Enables physical measurements blood donor protocol modification workflow for these sites
+# feature.blooddonorpmsites: testSiteId
+
+# When set only these sites will be able to access managed access dashbaord
+# feature.managegrouppilotsites: hpo-site-test@pmi-ops.org, hpo-site-test2@pmi-ops.org
+
+# DRC support email address
+# feature.drcsupportemail:
+
+# backfill_order_limit: 1000
