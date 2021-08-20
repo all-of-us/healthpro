@@ -28,7 +28,7 @@ class GoogleGroupsService
             $client->setApplicationName($applicationName);
             $client->setAuthConfig(json_decode($authJson, true));
             $client->setSubject($adminEmail);
-            $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP);
+            $client->setScopes([GoogleDirectory::ADMIN_DIRECTORY_GROUP, GoogleDirectory::ADMIN_DIRECTORY_USER_READONLY]);
             $this->client = new GoogleDirectory($client);
             $this->domain = $params->get('gaDomain');
         }
@@ -138,6 +138,19 @@ class GoogleGroupsService
             return [];
         } catch (GoogleException $e) {
             return [];
+        }
+    }
+
+    public function getUser(string $user)
+    {
+        try {
+            $result = $this->callApi('users', 'get', [$user]);
+            if ($result) {
+                return $result;
+            }
+            return null;
+        } catch (GoogleException $e) {
+            return null;
         }
     }
 

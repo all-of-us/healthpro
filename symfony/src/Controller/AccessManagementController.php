@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AccessManagementController extends AbstractController
 {
     const MEMBER_DOMAIN = '@pmi-ops.org';
+    const RESET_PASSWORD_URL = 'https://admin.google.com';
 
     private $googleGroupsService;
     private $loggerService;
@@ -57,7 +58,8 @@ class AccessManagementController extends AbstractController
         $members = $this->googleGroupsService->getMembers($group->email);
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
-            'members' => $members
+            'members' => $members,
+            'resetPasswordUrl' => self::RESET_PASSWORD_URL
         ]);
     }
 
@@ -75,23 +77,28 @@ class AccessManagementController extends AbstractController
         if ($groupMemberForm->isSubmitted()) {
             if ($groupMemberForm->isValid()) {
                 $email = $groupMemberForm->get('email')->getData() . self::MEMBER_DOMAIN;
-                $result = $this->googleGroupsService->addMember($group->email, $email);
-                if ($result['status'] === 'success') {
-                    $this->addFlash('success', $result['message']);
-                    $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
-                        'member' => $email,
-                        'result' => 'success'
-                    ]);
-                    return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                if ($this->googleGroupsService->getUser($email)) {
+                    $result = $this->googleGroupsService->addMember($group->email, $email);
+                    if ($result['status'] === 'success') {
+                        $this->addFlash('success', $result['message']);
+                        $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
+                            'member' => $email,
+                            'result' => 'success'
+                        ]);
+                        return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                    }
+                    $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
+                } else {
+                    $errorMessage = 'User does not exist.';
                 }
-                $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
-                $this->addFlash('error', $errorMessage);
+                $groupMemberForm['email']->addError(new FormError($errorMessage));
                 $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
                     'member' => $email,
                     'result' => 'fail',
-                    'errorMessage' => $result['message']
+                    'errorMessage' => $result['message'] ?? $errorMessage
                 ]);
-            } else {
+            }
+            if (!$groupMemberForm->isValid()) {
                 $groupMemberForm->addError(new FormError('Please correct the errors below.'));
             }
         }
