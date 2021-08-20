@@ -148,9 +148,9 @@ class GoogleGroupsService
             if ($result) {
                 return $result;
             }
-            return [];
+            return null;
         } catch (GoogleException $e) {
-            return [];
+            return null;
         }
     }
 
