@@ -89,15 +89,16 @@ class AccessManagementController extends AbstractController
                     }
                     $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
                 } else {
-                    $errorMessage = 'User not registred.';
+                    $errorMessage = 'User not registered.';
                 }
-                $this->addFlash('error', $errorMessage);
+                $groupMemberForm['email']->addError(new FormError($errorMessage));
                 $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
                     'member' => $email,
                     'result' => 'fail',
                     'errorMessage' => $result['message'] ?? $errorMessage
                 ]);
-            } else {
+            }
+            if (!$groupMemberForm->isValid()) {
                 $groupMemberForm->addError(new FormError('Please correct the errors below.'));
             }
         }
