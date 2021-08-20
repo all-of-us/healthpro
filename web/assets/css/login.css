@@ -12,7 +12,7 @@ body {
 }
 #login-action-box {
     radius: 1rem;
-    margin-top: 3rem;
+    margin-top: 4rem;
     padding: 3rem;
     background-color: rgba(255, 255, 255, 0.9);
     text-align: center;
@@ -26,11 +26,12 @@ body {
     margin: 0 auto;
     max-width: 300px;
 }
-#login-button {
+#login-action {
+    min-height: 250px;
     margin-top: 5rem;
     margin-bottom: 10rem;
 }
-#login-button img {
+#login-action img {
     max-width: 250px;
 }
 #login-copyright {
@@ -49,6 +50,15 @@ body {
     top: 75px;
 }
 @media (max-width: 970px){
+    #login-logo {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    #login-action {
+        min-height: inherit;
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+    }
     #login-aou-banner {
         display: block;
         margin-right: auto;
