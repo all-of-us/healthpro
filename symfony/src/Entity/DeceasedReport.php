@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class DeceasedReport
 {
-    const MECHANISMS = [
+    public const MECHANISMS = [
         'EHR' => 'Electronic Health Record (EHR)',
         'ATTEMPTED_CONTACT' => 'Attempted to contact participant',
         'NEXT_KIN_HPO' => 'Next of kin contacted HPO',
@@ -14,13 +14,13 @@ class DeceasedReport
         'OTHER' => 'Other'
     ];
 
-    const STATUSES = [
+    public const STATUSES = [
         'preliminary' => 'Pending Acceptance',
         'cancelled' => 'Denied',
         'final' => 'Accepted'
     ];
 
-    const NK_RELATIONSHIPS = [
+    public const NK_RELATIONSHIPS = [
         'PRN' => 'Parent',
         'CHILD' => 'Child',
         'SIB' => 'Sibling',
@@ -28,7 +28,7 @@ class DeceasedReport
         'O' => 'Other'
     ];
 
-    const DENIAL_REASONS = [
+    public const DENIAL_REASONS = [
         'INCORRECT_PARTICIPANT' => 'Incorrect Participant',
         'MARKED_IN_ERROR' => 'Marked in Error',
         'INSUFFICENT_INFORMATION' => 'Insufficient Information',
@@ -322,7 +322,7 @@ class DeceasedReport
             && count($report->extension) > 0
         ) {
             foreach ($report->extension as $reportExtension) {
-                switch($reportExtension->url) {
+                switch ($reportExtension->url) {
                     case 'https://www.pmi-ops.org/observation-denial-reason':
                         $this->setDenialReason($reportExtension->valueReference->reference);
                         if (property_exists($reportExtension->valueReference, 'display')

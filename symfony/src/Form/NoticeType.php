@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Form;
 
 use App\Entity\Notice;
@@ -49,7 +50,7 @@ class NoticeType extends AbstractType
                     'Yes' => 1
                 ],
                 'constraints' => [
-                    new Constraints\Callback(function($isFullPage, $context) {
+                    new Constraints\Callback(function ($isFullPage, $context) {
                         if ($isFullPage) {
                             $url = $context->getObject()->getParent()->get('url')->getData();
                             if (preg_match('/^\/?admin/i', $url)) {

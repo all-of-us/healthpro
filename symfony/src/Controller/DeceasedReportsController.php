@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\DeceasedReport;
@@ -19,8 +20,8 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class DeceasedReportsController extends AbstractController
 {
-    const ORG_PENDING_CACHE_TTL = 500;
-    const ORG_PENDING_CACHE_KEY = 'deceased_reports.org-%s.pending.count';
+    public const ORG_PENDING_CACHE_TTL = 500;
+    public const ORG_PENDING_CACHE_KEY = 'deceased_reports.org-%s.pending.count';
 
     protected $cache;
 
@@ -32,7 +33,8 @@ class DeceasedReportsController extends AbstractController
     /**
      * @Route("/", name="deceased_reports_index")
      */
-    public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService) {
+    public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService)
+    {
         $statusFilter = $request->query->get('status', 'preliminary');
         $organizationId = $session->get('siteOrganizationId');
         if (!$organizationId) {
@@ -49,7 +51,8 @@ class DeceasedReportsController extends AbstractController
     /**
      * @Route("/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
      */
-    public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId) {
+    public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
+    {
         $organizationId = $session->get('siteOrganizationId');
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -87,7 +90,8 @@ class DeceasedReportsController extends AbstractController
     /**
      * @Route("/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
      */
-    public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId) {
+    public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId)
+    {
         $organizationId = $session->get('siteOrganizationId');
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -137,7 +141,8 @@ class DeceasedReportsController extends AbstractController
     /**
      * @Route("/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
      */
-    public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId) {
+    public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
+    {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');

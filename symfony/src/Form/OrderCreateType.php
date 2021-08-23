@@ -55,7 +55,6 @@ class OrderCreateType extends AbstractType
                     }
                 ]);
         }
-
     }
 
     public function configureOptions(OptionsResolver $resolver)

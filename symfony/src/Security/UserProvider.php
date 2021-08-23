@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use \Google_Service_Directory_Group as Group;
+use Google_Service_Directory_Group as Group;
 
 class UserProvider implements UserProviderInterface
 {

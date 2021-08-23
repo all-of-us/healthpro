@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class HelpService
 {
-
     protected $params;
 
     public function __construct(ParameterBagInterface $params)

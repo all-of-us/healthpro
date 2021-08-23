@@ -110,8 +110,10 @@ class RequestListener
                 $this->siteService->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
-            } elseif (!preg_match('/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
-                    $this->request->getPathInfo()) && !$this->isUpkeepRoute()) {
+            } elseif (!preg_match(
+                '/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
+                $this->request->getPathInfo()
+            ) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/s/site/select');
             }
         }
@@ -127,8 +129,10 @@ class RequestListener
 
     public function onKernelFinishRequest()
     {
-        if ($this->tokenStorage->getToken() && $this->request && !preg_match('/^(\/s)?\/(login|_wdt)($|\/).*/',
-                $this->request->getPathInfo()) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->tokenStorage->getToken() && $this->request && !preg_match(
+            '/^(\/s)?\/(login|_wdt)($|\/).*/',
+            $this->request->getPathInfo()
+        ) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->setSessionVariables();
         }
     }

@@ -19,7 +19,8 @@ class ProblemCommentRepository extends ServiceEntityRepository
         parent::__construct($registry, ProblemComment::class);
     }
 
-    public function findByProblemId($problemId) {
+    public function findByProblemId($problemId)
+    {
         return $this->createQueryBuilder('pc')
             ->where('pc.problem = :problemId')
             ->setParameter('problemId', $problemId)

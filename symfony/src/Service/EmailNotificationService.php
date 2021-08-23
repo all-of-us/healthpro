@@ -29,7 +29,8 @@ abstract class EmailNotificationService
 
     abstract protected function getSearchParams($id, $lastDeactivate);
 
-    protected function filterSummaries($summaries) {
+    protected function filterSummaries($summaries)
+    {
         return $summaries;
     }
 
@@ -115,7 +116,6 @@ abstract class EmailNotificationService
                     $results['status'] = $summary->resource->{$this->status};
                 }
                 $participants[] = $results;
-
             }
         } catch (\Exception $e) {
             // RDR error already logged
@@ -128,7 +128,7 @@ abstract class EmailNotificationService
         $insert = new \DateTime();
         foreach ($participants as $k => $participant) {
             try {
-                $log = new $this->logEntity;
+                $log = new $this->logEntity();
                 $log->setParticipantId($participant['id']);
                 $log->setInsertTs($insert);
                 $log->{'set' . $this->type . 'Ts'}(new \DateTime($participant['time']));

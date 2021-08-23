@@ -18,8 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AccessManagementController extends AbstractController
 {
-    const MEMBER_DOMAIN = '@pmi-ops.org';
-    const RESET_PASSWORD_URL = 'https://admin.google.com';
+    public const MEMBER_DOMAIN = '@pmi-ops.org';
+    public const RESET_PASSWORD_URL = 'https://admin.google.com';
 
     private $googleGroupsService;
     private $loggerService;

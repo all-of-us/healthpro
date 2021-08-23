@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints;
  */
 class ReviewController extends AbstractController
 {
-    const DATE_RANGE_LIMIT = 7;
+    public const DATE_RANGE_LIMIT = 7;
 
     protected $session;
 
@@ -132,7 +132,6 @@ class ReviewController extends AbstractController
         return $this->render('review/unfinalized_orders.html.twig', [
             'orders' => $orders
         ]);
-
     }
 
     /**

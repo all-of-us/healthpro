@@ -7,13 +7,13 @@ use Pmi\Entities\Configuration;
 
 class EnvironmentService
 {
-    const ENV_LOCAL = 'local'; // development environment (local GAE SDK)
-    const ENV_DEV = 'dev';   // development environment (deployed to GAE)
-    const ENV_STAGING = 'staging';  // staging environment
-    const ENV_STABLE = 'stable';  // security testing / training environment
-    const ENV_PROD = 'prod';  // production environment
-    const DEFAULT_TIMEZONE = 'America/New_York';
-    const DATASTORE_EMULATOR_HOST = 'localhost:8081';
+    public const ENV_LOCAL = 'local'; // development environment (local GAE SDK)
+    public const ENV_DEV = 'dev';   // development environment (deployed to GAE)
+    public const ENV_STAGING = 'staging';  // staging environment
+    public const ENV_STABLE = 'stable';  // security testing / training environment
+    public const ENV_PROD = 'prod';  // production environment
+    public const DEFAULT_TIMEZONE = 'America/New_York';
+    public const DATASTORE_EMULATOR_HOST = 'localhost:8081';
 
     protected $name;
     public $configuration = [];

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\Order;
@@ -174,7 +175,7 @@ class ReviewService
     {
         if ($row['h_type'] === Measurement::EVALUATION_CANCEL) {
             $status = 'Cancelled';
-        } elseif (!empty($row['parent_id']) && empty($row['rdr_id'])){
+        } elseif (!empty($row['parent_id']) && empty($row['rdr_id'])) {
             $status = 'Unlocked';
         } elseif (!empty($row['parent_id']) && !empty($row['rdr_id'])) {
             $status = 'Edited & Finalized';
