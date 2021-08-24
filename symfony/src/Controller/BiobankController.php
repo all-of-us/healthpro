@@ -104,7 +104,7 @@ class BiobankController extends AbstractController
                 ]);
             }
             // Quanum Orders
-            $order = new Order();
+            $order = new Order;
             $this->orderService->loadSamplesSchema($order);
             $quanumOrders = $this->orderService->getOrders([
                 'kitId' => $id,
