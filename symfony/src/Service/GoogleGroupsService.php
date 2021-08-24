@@ -173,7 +173,7 @@ class GoogleGroupsService
             if ($result && $email === $result->getEmail()) {
                 return [
                     'status' => 'success',
-                    'message' => 'Member added.'
+                    'message' => 'This member has been successfully added to the group.'
                 ];
             }
             return [
@@ -199,7 +199,7 @@ class GoogleGroupsService
             if ($result && $result->getStatusCode() === 204) {
                 return [
                     'status' => 'success',
-                    'message' => 'Member deleted.'
+                    'message' => 'This member has been successfully removed from the group.'
                 ];
             }
             return [
