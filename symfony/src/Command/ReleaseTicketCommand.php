@@ -38,9 +38,9 @@ class ReleaseTicketCommand extends Command
             ->setDescription('Create Jira release ticket')
             ->addOption(
                 'comment',
-                'i',
-                InputOption::VALUE_OPTIONAL,
-                'Comment'
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Comment type'
             );
     }
 
@@ -197,13 +197,10 @@ class ReleaseTicketCommand extends Command
 
         $comment = $input->getOption('comment');
 
-        if ($comment === 'approve') {
+        if ($comment === 'approval') {
             $this->io->section('Approval request comment');
             $ticketId = $this->io->ask('Enter ticket id');
-            if ($ticketId) {
-                $this->createApprovalRequestComment($ticketId);
-            }
-            return 1;
+            return $this->createApprovalRequestComment($ticketId);
         }
 
         $version = $this->selectVersion();
