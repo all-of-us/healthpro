@@ -28,7 +28,7 @@ class GoogleGroupsService
             $client->setApplicationName($applicationName);
             $client->setAuthConfig(json_decode($authJson, true));
             $client->setSubject($adminEmail);
-            $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP);
+            $client->setScopes([GoogleDirectory::ADMIN_DIRECTORY_GROUP, GoogleDirectory::ADMIN_DIRECTORY_USER_READONLY]);
             $this->client = new GoogleDirectory($client);
             $this->domain = $params->get('gaDomain');
         }
@@ -141,6 +141,19 @@ class GoogleGroupsService
         }
     }
 
+    public function getUser(string $user)
+    {
+        try {
+            $result = $this->callApi('users', 'get', [$user]);
+            if ($result) {
+                return $result;
+            }
+            return null;
+        } catch (GoogleException $e) {
+            return null;
+        }
+    }
+
     public function getMemberById(string $groupEmail, string $memeberId)
     {
         try {
@@ -160,7 +173,7 @@ class GoogleGroupsService
             if ($result && $email === $result->getEmail()) {
                 return [
                     'status' => 'success',
-                    'message' => 'Member added.'
+                    'message' => 'This member has been successfully added to the group.'
                 ];
             }
             return [
@@ -186,7 +199,7 @@ class GoogleGroupsService
             if ($result && $result->getStatusCode() === 204) {
                 return [
                     'status' => 'success',
-                    'message' => 'Member deleted.'
+                    'message' => 'This member has been successfully removed from the group.'
                 ];
             }
             return [

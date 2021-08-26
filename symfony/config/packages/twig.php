@@ -15,6 +15,7 @@ $container->loadFromExtension('twig', [
         'sessionTimeout' => $env->values['sessionTimeOut'],
         'sessionWarning' => $env->values['sessionWarning'],
         'timeZones' => $env->getTimeZones(),
-        'confluenceResources' => HelpService::$confluenceResources
+        'confluenceResources' => HelpService::$confluenceResources,
+        'feedback_url' => HelpService::getFeedbackUrl()
     ],
 ]);

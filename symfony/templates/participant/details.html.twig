@@ -497,7 +497,6 @@
                                                 {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
                                                 {{ form_errors(patientStatusForm) }}
                                                 {{ form_rest(patientStatusForm) }}
-                                                {{ form_widget(patientStatusForm.comments) }}
                                                 {% if orgPatientStatusData is not empty %}
                                                     <small class="text-warning">User must enter a reason for updating previous organization status.</small>
                                                     <br><br>

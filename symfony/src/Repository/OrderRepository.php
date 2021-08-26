@@ -29,6 +29,7 @@ class OrderRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('o')
             ->leftJoin('o.history', 'oh')
             ->where('o.finalizedTs is not null')
+            ->andWhere('o.mayoId is not null')
             ->andWhere('o.rdrId is null')
             ->andWhere('oh.type != :type OR oh.type is null')
             ->setParameter('type', 'cancel')

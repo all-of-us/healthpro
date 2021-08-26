@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+html {
+    background: url('/assets/img/login/login-background.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+body {
+    background-color: inherit;
+    font-family: 'Open Sans', sans-serif;
+}
+#login-action-box {
+    radius: 1rem;
+    margin-top: 4rem;
+    padding: 3rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    box-shadow: 10px 5px 5px rgba(255, 255, 255, 0.1);
+}
+#login-logo {
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
+#login-logo img {
+    margin: 0 auto;
+    max-width: 420px;
+}
+#login-action {
+    min-height: 250px;
+    margin-top: 5rem;
+    margin-bottom: 10rem;
+}
+#login-action img {
+    max-width: 250px;
+}
+#login-copyright {
+    font-size: 1rem;
+    position: absolute;
+    width: 100%;
+    bottom: 3rem;
+    text-align: right;
+    color: #fff;
+    padding: 1rem;
+}
+#login-aou-banner {
+    width: 200px;
+    position: absolute;
+    right: 0;
+    top: 75px;
+}
+@media (max-width: 970px){
+    #login-logo {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    #login-action {
+        min-height: inherit;
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+    }
+    #login-aou-banner {
+        display: block;
+        margin-right: auto;
+        margin-left: auto;
+        position: relative;
+        text-align: center;
+        z-index: 99;
+    }
+    #login-copyright {
+        position: inherit;
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+}
