@@ -1,0 +1,6 @@
+dbname:   hpo
+host:     127.0.0.1
+port:     3315
+user:     root
+password: somepassword
+driver:   pdo_mysql
