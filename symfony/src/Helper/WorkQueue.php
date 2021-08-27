@@ -595,6 +595,12 @@ class WorkQueue
             'DV-only EHR Sharing Date',
             'CABoR Consent Status',
             'CABoR Consent Date',
+            'Fitbit Consent',
+            'Fitbit Consent Date',
+            'Apple HealthKit Consent',
+            'Apple HealthKit Consent Date',
+            'Apple EHR Consent',
+            'Apple EHR Consent Date',
             'Retention Eligible',
             'Date of Retention Eligibility',
             'Retention Status',
@@ -661,5 +667,18 @@ class WorkQueue
             }
         }
         return self::HTML_DANGER;
+    }
+
+    public static function csvDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $displayDate = false, $userTimezone = null)
+    {
+        if ($digitalHealthSharingStatus) {
+            $digitalHealthSharingStatus = json_decode($digitalHealthSharingStatus, true);
+            if (!$displayDate) {
+                return isset($digitalHealthSharingStatus[$type]['status']) && $digitalHealthSharingStatus[$type]['status'] === 'YES' ? 1 : 0;
+            }
+            $authoredDate = $digitalHealthSharingStatus[$type]['history'][0]['authoredTime'] ?? '';
+            return self::dateFromString($authoredDate, $userTimezone);
+        }
+        return 0;
     }
 }
