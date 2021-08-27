@@ -412,6 +412,8 @@ class WorkQueueService
         $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreMinusPMTime, $userTimezone);
         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute1);
         $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute1Authored, $userTimezone);
+        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute2);
+        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute2Authored, $userTimezone);
         return $row;
     }
 
