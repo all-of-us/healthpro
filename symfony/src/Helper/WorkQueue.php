@@ -37,6 +37,9 @@ class WorkQueue
         'primaryLanguage',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
+        'digitalHealthSharingStatus',
+        'digitalHealthSharingStatus',
+        'digitalHealthSharingStatus',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -643,5 +646,20 @@ class WorkQueue
         $headers[] = 'Fall Minute PPI Survey Complete';
         $headers[] = 'Fall Minute PPI Survey Completion Date';
         return $headers;
+    }
+
+    public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
+    {
+        if ($digitalHealthSharingStatus) {
+            $digitalHealthSharingStatus = json_decode($digitalHealthSharingStatus, true);
+            if (isset($digitalHealthSharingStatus[$type]['status'])) {
+                $authoredDate = $digitalHealthSharingStatus[$type]['history'][0]['authoredTime'] ?? '';
+                if ($digitalHealthSharingStatus[$type]['status'] === 'YES') {
+                    return self::HTML_SUCCESS . ' ' . self::dateFromString($authoredDate, $userTimezone);
+                }
+                return self::HTML_DANGER . ' ' . self::dateFromString($authoredDate, $userTimezone);
+            }
+        }
+        return self::HTML_DANGER;
     }
 }

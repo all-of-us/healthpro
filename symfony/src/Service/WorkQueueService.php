@@ -249,6 +249,9 @@ class WorkQueueService
                 $participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone);
             $row['caborConsent'] = WorkQueue::displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored,
                 $userTimezone);
+            $row['fitbitConsent'] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'fitbit', $userTimezone);
+            $row['appleHealthKitConsent'] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleHealthKit', $userTimezone);
+            $row['appleEHRConsent'] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleEHR', $userTimezone);
             $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus($participant->retentionEligibleStatus,
                 $participant->retentionEligibleTime, $userTimezone);
             $row['retentionType'] = WorkQueue::getRetentionType($participant->retentionType);
