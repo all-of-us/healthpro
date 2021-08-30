@@ -341,6 +341,12 @@ class WorkQueue
         ]
     ];
 
+    public static $digitalHealthSharingTypes = [
+        'fitbit' => 'Fitbit Consent',
+        'appleHealthKit' => 'Apple HealthKit Consent',
+        'appleEHR' => 'Apple EHR Consent'
+    ];
+
     public static function dateFromString($string, $timezone, $displayTime = true)
     {
         if (!empty($string)) {
@@ -595,12 +601,6 @@ class WorkQueue
             'DV-only EHR Sharing Date',
             'CABoR Consent Status',
             'CABoR Consent Date',
-            'Fitbit Consent',
-            'Fitbit Consent Date',
-            'Apple HealthKit Consent',
-            'Apple HealthKit Consent Date',
-            'Apple EHR Consent',
-            'Apple EHR Consent Date',
             'Retention Eligible',
             'Date of Retention Eligibility',
             'Retention Status',
@@ -651,6 +651,10 @@ class WorkQueue
         $headers[] = 'Summer Minute PPI Survey Completion Date';
         $headers[] = 'Fall Minute PPI Survey Complete';
         $headers[] = 'Fall Minute PPI Survey Completion Date';
+        foreach (array_values(self::$digitalHealthSharingTypes) as $label) {
+            $headers[] = $label;
+            $headers[] = $label . ' Date';
+        }
         return $headers;
     }
 

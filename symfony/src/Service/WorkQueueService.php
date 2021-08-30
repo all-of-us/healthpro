@@ -249,9 +249,9 @@ class WorkQueueService
                 $participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone);
             $row['caborConsent'] = WorkQueue::displayConsentStatus($participant->consentForCABoR, $participant->consentForCABoRAuthored,
                 $userTimezone);
-            $row['fitbitConsent'] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'fitbit', $userTimezone);
-            $row['appleHealthKitConsent'] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleHealthKit', $userTimezone);
-            $row['appleEHRConsent'] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleEHR', $userTimezone);
+            foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+                $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
+            }
             $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus($participant->retentionEligibleStatus,
                 $participant->retentionEligibleTime, $userTimezone);
             $row['retentionType'] = WorkQueue::getRetentionType($participant->retentionType);
@@ -360,12 +360,6 @@ class WorkQueueService
             WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone),
             WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
             WorkQueue::dateFromString($participant->consentForCABoRAuthored, $userTimezone),
-            WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'fitbit'),
-            WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'fitbit', true, $userTimezone),
-            WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleHealthKit'),
-            WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleHealthKit', true, $userTimezone),
-            WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleEHR'),
-            WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, 'appleEHR', true, $userTimezone),
             $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0,
             WorkQueue::dateFromString($participant->retentionEligibleTime, $userTimezone),
             WorkQueue::csvRetentionType($participant->retentionType),
@@ -423,6 +417,10 @@ class WorkQueueService
         $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute1Authored, $userTimezone);
         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute2);
         $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute2Authored, $userTimezone);
+        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
+            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
+        }
         return $row;
     }
 

@@ -225,9 +225,13 @@ class Participant
 
         // Json decode digital health sharing status
         if (isset($participant->digitalHealthSharingStatus) && !empty($participant->digitalHealthSharingStatus)) {
-            $this->digitalHealthSharingStatus = json_decode($participant->digitalHealthSharingStatus, true);;
+            $digitalHealthSharingStatus = json_decode($participant->digitalHealthSharingStatus, true);
+            if (is_array($digitalHealthSharingStatus)) {
+                $this->digitalHealthSharingStatus = $digitalHealthSharingStatus;
+            } else {
+                $this->digitalHealthSharingStatus = [];
+            }
         }
-
     }
 
     public function getShortId()
