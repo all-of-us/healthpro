@@ -657,7 +657,6 @@ class WorkQueue
     public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
     {
         if ($digitalHealthSharingStatus) {
-            $digitalHealthSharingStatus = json_decode($digitalHealthSharingStatus, true);
             if (isset($digitalHealthSharingStatus[$type]['status'])) {
                 $authoredDate = $digitalHealthSharingStatus[$type]['history'][0]['authoredTime'] ?? '';
                 if ($digitalHealthSharingStatus[$type]['status'] === 'YES') {
@@ -672,7 +671,6 @@ class WorkQueue
     public static function csvDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $displayDate = false, $userTimezone = null)
     {
         if ($digitalHealthSharingStatus) {
-            $digitalHealthSharingStatus = json_decode($digitalHealthSharingStatus, true);
             if (!$displayDate) {
                 return isset($digitalHealthSharingStatus[$type]['status']) && $digitalHealthSharingStatus[$type]['status'] === 'YES' ? 1 : 0;
             }

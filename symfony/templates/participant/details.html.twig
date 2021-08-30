@@ -157,6 +157,10 @@
                                             <dd>{{ macros.displayConsentPanelStatus(participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}</dd>
                                             <dt>CABoR Consent</dt>
                                             <dd>{{ macros.displayConsentPanelStatus(participant.consentForCABoR, participant.consentForCABoRAuthored) }}</dd>
+                                            <dt>Digital Sharing</dt>
+                                            <dd>Fitbit {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, 'fitbit') }}</dd>
+                                            <dd>Apple HealthKit {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, 'appleHealthKit') }}</dd>
+                                            <dd>Apple EHR {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, 'appleEHR') }}</dd>
                                         </dl>
                                     </div>
                                 </div>
