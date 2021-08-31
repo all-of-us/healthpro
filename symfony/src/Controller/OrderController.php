@@ -253,6 +253,7 @@ class OrderController extends AbstractController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
+        $isProcessStepAvailable = in_array('process', $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -288,7 +289,11 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order collection updated');
-                return $this->redirectToRoute('order_collect', [
+                $redirectRoute = 'order_collect';
+                if (!$isProcessStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_process';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -313,6 +318,7 @@ class OrderController extends AbstractController
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
+        $isFinalizeStepAvailable = in_array('finalize', $order->getAvailableSteps());
         if (!in_array('process', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -377,7 +383,11 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order processing updated');
-                return $this->redirectToRoute('order_process', [
+                $redirectRoute = 'order_process';
+                if (!$isFinalizeStepAvailable && in_array('finalize', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_finalize';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -402,6 +412,7 @@ class OrderController extends AbstractController
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
+        $isPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
         if (!in_array('finalize', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -497,7 +508,11 @@ class OrderController extends AbstractController
                         $this->addFlash('error', 'Failed to finalize the order. Please try again.');
                     }
                 }
-                return $this->redirectToRoute('order_finalize', [
+                $redirectRoute = 'order_finalize';
+                if (!$isPrintRequisitionStepAvailable && in_array('print_requisition', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_print_requisition';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
