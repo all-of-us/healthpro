@@ -253,7 +253,7 @@ class OrderController extends AbstractController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $isProcessStepAvailable = in_array('process', $order->getAvailableSteps());
+        $this->orderService->isNextStepAvailable = in_array('process', $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -289,11 +289,7 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order collection updated');
-                $redirectRoute = 'order_collect';
-                if (!$isProcessStepAvailable && in_array('process', $order->getAvailableSteps())) {
-                    $redirectRoute = 'order_process';
-                }
-                return $this->redirectToRoute($redirectRoute, [
+                return $this->redirectToRoute($this->orderService->getRedirectRoute('collect', 'process'), [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -318,7 +314,7 @@ class OrderController extends AbstractController
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $isFinalizeStepAvailable = in_array('finalize', $order->getAvailableSteps());
+        $this->orderService->isNextStepAvailable = in_array('finalize', $order->getAvailableSteps());
         if (!in_array('process', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -383,11 +379,7 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order processing updated');
-                $redirectRoute = 'order_process';
-                if (!$isFinalizeStepAvailable && in_array('finalize', $order->getAvailableSteps())) {
-                    $redirectRoute = 'order_finalize';
-                }
-                return $this->redirectToRoute($redirectRoute, [
+                return $this->redirectToRoute($this->orderService->getRedirectRoute('process', 'finalize'), [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -412,7 +404,7 @@ class OrderController extends AbstractController
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $isPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
+        $this->orderService->isNextStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
         if (!in_array('finalize', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -508,11 +500,7 @@ class OrderController extends AbstractController
                         $this->addFlash('error', 'Failed to finalize the order. Please try again.');
                     }
                 }
-                $redirectRoute = 'order_finalize';
-                if (!$isPrintRequisitionStepAvailable && in_array('print_requisition', $order->getAvailableSteps())) {
-                    $redirectRoute = 'order_print_requisition';
-                }
-                return $this->redirectToRoute($redirectRoute, [
+                return $this->redirectToRoute($this->orderService->getRedirectRoute('finalize', 'print_requisition'), [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
