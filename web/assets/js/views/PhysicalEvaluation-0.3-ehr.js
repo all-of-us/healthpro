@@ -742,6 +742,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             'format': 'MM/DD/YYYY',
             'maxDate': today,
             'minDate': sixMonthsAgo,
+            'keepInvalid': true,
             'useCurrent': false
         });
     },
