@@ -27,8 +27,6 @@ class OrderService
     protected $order;
     protected $participant;
 
-    public $isNextStepAvailable;
-
     public function __construct(
         RdrApiService $rdrApiService,
         ParameterBagInterface $params,
@@ -764,13 +762,5 @@ class OrderService
             $this->order->setVersion($this->params->get('order_samples_version'));
         }
         return $this->order;
-    }
-
-    public function getRedirectRoute($currentStep, $nextStep): string
-    {
-        if (!$this->isNextStepAvailable && in_array($nextStep, $this->order->getAvailableSteps())) {
-            return "order_{$nextStep}";
-        }
-        return "order_{$currentStep}";
     }
 }

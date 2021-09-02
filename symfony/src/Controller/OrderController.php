@@ -253,7 +253,7 @@ class OrderController extends AbstractController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $this->orderService->isNextStepAvailable = in_array('process', $order->getAvailableSteps());
+        $wasProcessStepAvailable = in_array('process', $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -289,7 +289,11 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order collection updated');
-                return $this->redirectToRoute($this->orderService->getRedirectRoute('collect', 'process'), [
+                $redirectRoute = 'order_collect';
+                if (!$wasProcessStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_process';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -314,7 +318,7 @@ class OrderController extends AbstractController
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $this->orderService->isNextStepAvailable = in_array('finalize', $order->getAvailableSteps());
+        $wasFinalizeStepAvailable = in_array('finalize', $order->getAvailableSteps());
         if (!in_array('process', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -379,7 +383,11 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order processing updated');
-                return $this->redirectToRoute($this->orderService->getRedirectRoute('process', 'finalize'), [
+                $redirectRoute = 'order_process';
+                if (!$wasFinalizeStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_finalize';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -404,7 +412,7 @@ class OrderController extends AbstractController
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $this->orderService->isNextStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
+        $wasPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
         if (!in_array('finalize', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -500,7 +508,11 @@ class OrderController extends AbstractController
                         $this->addFlash('error', 'Failed to finalize the order. Please try again.');
                     }
                 }
-                return $this->redirectToRoute($this->orderService->getRedirectRoute('finalize', 'print_requisition'), [
+                $redirectRoute = 'order_finalize';
+                if (!$wasPrintRequisitionStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_print_requisition';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);

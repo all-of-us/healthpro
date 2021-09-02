@@ -22,7 +22,7 @@
                         <iframe name="labels" class="pdf pdf-labels" src="{{ path('order_labels_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
                     </div>
                 </div>
-                <div align="center">
+                <div class="text-center">
                     <a href="{{ path('order_collect', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-primary">Next</a>
                     <br><br>
                 </div>
