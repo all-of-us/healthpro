@@ -147,10 +147,10 @@
 {% endmacro %}
 
 {% macro displayDigitalSharing(digitalHealthSharingStatus, type) %}
-    {% if digitalHealthSharingStatus[type].status is defined %}
-        {% set authoredDate = digitalHealthSharingStatus[type].history[0].authoredTime is defined ? digitalHealthSharingStatus[type].history[0].authoredTime : '' %}
-        {% set authoredDate = authoredDate ? authoredDate|date('m/d/Y', app.user.timezone) %}
-        {% if digitalHealthSharingStatus[type].status == 'YES' %}
+    {% if attribute(digitalHealthSharingStatus, type).status is defined %}
+        {% set authoredDate = attribute(digitalHealthSharingStatus, type).history[0].authoredTime is defined ? attribute(digitalHealthSharingStatus, type).history[0].authoredTime : '' %}
+        {% set authoredDate = authoredDate ? authoredDate|date('n/j/Y g:ia', app.user.timezone) %}
+        {% if attribute(digitalHealthSharingStatus, type).status == 'YES' %}
             <i class="fa fa-check text-success" aria-hidden="true"></i> {{ authoredDate }}
         {% else %}
             <i class="fa fa-times text-danger" aria-hidden="true"></i> {{ authoredDate }}
