@@ -138,6 +138,7 @@ class WorkQueueController extends AbstractController
                 'filters' => $filters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
+                'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
                 'participants' => [],
                 'params' => $params,
                 'awardee' => $awardee,

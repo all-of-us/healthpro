@@ -272,6 +272,9 @@ class WorkQueueService
                 $participant->consentForCABoRAuthored,
                 $userTimezone
             );
+            foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+                $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
+            }
             $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus(
                 $participant->retentionEligibleStatus,
                 $participant->retentionEligibleTime,
@@ -452,6 +455,12 @@ class WorkQueueService
         $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreMinusPMTime, $userTimezone);
         $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute1);
         $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute1Authored, $userTimezone);
+        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute2);
+        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute2Authored, $userTimezone);
+        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
+            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
+        }
         return $row;
     }
 

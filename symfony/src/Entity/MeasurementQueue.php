@@ -43,7 +43,7 @@ class MeasurementQueue
     private $fhirVersion;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $queuedTs;
 
