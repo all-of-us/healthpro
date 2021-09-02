@@ -157,6 +157,10 @@
                                             <dd>{{ macros.displayConsentPanelStatus(participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}</dd>
                                             <dt>CABoR Consent</dt>
                                             <dd>{{ macros.displayConsentPanelStatus(participant.consentForCABoR, participant.consentForCABoRAuthored) }}</dd>
+                                            <dt>Digital Sharing</dt>
+                                            {% for type, label in digitalHealthSharingTypes %}
+                                                <dd>{{ label }} {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}</dd>
+                                            {% endfor %}
                                         </dl>
                                     </div>
                                 </div>

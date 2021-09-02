@@ -222,6 +222,16 @@ class Participant
         if (isset($participant->consentCohort)) {
             $this->consentCohortText = $this->getConsentCohortText($participant);
         }
+
+        // Json decode digital health sharing status
+        if (isset($participant->digitalHealthSharingStatus) && !empty($participant->digitalHealthSharingStatus)) {
+            $digitalHealthSharingStatus = json_decode($participant->digitalHealthSharingStatus, true);
+            if (is_array($digitalHealthSharingStatus)) {
+                $this->digitalHealthSharingStatus = $digitalHealthSharingStatus;
+            } else {
+                $this->digitalHealthSharingStatus = [];
+            }
+        }
     }
 
     public function getShortId()
