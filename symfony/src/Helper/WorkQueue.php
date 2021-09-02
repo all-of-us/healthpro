@@ -661,9 +661,9 @@ class WorkQueue
     public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
     {
         if ($digitalHealthSharingStatus) {
-            if (isset($digitalHealthSharingStatus[$type]['status'])) {
-                $authoredDate = $digitalHealthSharingStatus[$type]['history'][0]['authoredTime'] ?? '';
-                if ($digitalHealthSharingStatus[$type]['status'] === 'YES') {
+            if (isset($digitalHealthSharingStatus->{$type}->status)) {
+                $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
+                if ($digitalHealthSharingStatus->{$type}->status === 'YES') {
                     return self::HTML_SUCCESS . ' ' . self::dateFromString($authoredDate, $userTimezone);
                 }
                 return self::HTML_DANGER . ' ' . self::dateFromString($authoredDate, $userTimezone);
@@ -676,9 +676,9 @@ class WorkQueue
     {
         if ($digitalHealthSharingStatus) {
             if (!$displayDate) {
-                return isset($digitalHealthSharingStatus[$type]['status']) && $digitalHealthSharingStatus[$type]['status'] === 'YES' ? 1 : 0;
+                return isset($digitalHealthSharingStatus->{$type}->status) && $digitalHealthSharingStatus->{$type}->status === 'YES' ? 1 : 0;
             }
-            $authoredDate = $digitalHealthSharingStatus[$type]['history'][0]['authoredTime'] ?? '';
+            $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
             return self::dateFromString($authoredDate, $userTimezone);
         }
         return 0;
