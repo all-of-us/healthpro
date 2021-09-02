@@ -2,7 +2,8 @@
 
 namespace App\Service;
 
-class TimezoneService {
+class TimezoneService
+{
     public static $timezoneOptions = [
         'America/New_York' => 'Eastern Time',
         'America/Chicago' => 'Central Time',

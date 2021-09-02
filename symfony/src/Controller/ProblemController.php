@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\Problem;
@@ -144,7 +145,7 @@ class ProblemController extends AbstractController
                     } catch (\Exception $e) {
                         $this->addFlash('error', 'Failed to finalize report.');
                     }
-                // Create a new report (optionally finalize at creation)
+                    // Create a new report (optionally finalize at creation)
                 } else {
                     $problem->setUserId($this->getUser()->getId());
                     $problem->setSite($this->siteService->getSiteId());
@@ -159,7 +160,7 @@ class ProblemController extends AbstractController
                         } else {
                             $this->addFlash('notice', 'Report saved.');
                         }
-                    } catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         $this->addFlash('error', 'Failed to create new report.');
                     }
                 }

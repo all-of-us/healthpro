@@ -18,8 +18,8 @@ class MissingMeasurementsAndOrdersNotificationService
     protected $params;
     protected $twig;
 
-    const MEASUREMENT_TYPE = 'measurement';
-    const ORDER_TYPE = 'order';
+    public const MEASUREMENT_TYPE = 'measurement';
+    public const ORDER_TYPE = 'order';
 
     public function __construct(
         EntityManagerInterface $em,
@@ -35,7 +35,7 @@ class MissingMeasurementsAndOrdersNotificationService
         $this->twig = $twig;
     }
 
-    public function sendEmails() : void
+    public function sendEmails(): void
     {
         $missingEvaluations = $this->em->getRepository(Measurement::class)->getUnloggedMissingMeasurements();
         foreach ($missingEvaluations as $evaluation) {
@@ -62,9 +62,9 @@ class MissingMeasurementsAndOrdersNotificationService
         }
     }
 
-    public function insertRecords($id, $type) : void
+    public function insertRecords($id, $type): void
     {
-        $missingNotificationLog = new MissingNotificationLog;
+        $missingNotificationLog = new MissingNotificationLog();
         $missingNotificationLog->setType($type);
         $missingNotificationLog->setRecordId($id);
         $this->em->persist($missingNotificationLog);

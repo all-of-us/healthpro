@@ -19,7 +19,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class PatientStatus
 {
-
     public static $patientStatus = [
         'Yes: Confirmed in EHR system' => 'YES',
         'No: Not found in EHR system' => 'NO',

@@ -13,7 +13,7 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         parent::__construct($registry, WithdrawalLog::class);
     }
 
-    public function getWithdrawalNotifications() :array
+    public function getWithdrawalNotifications(): array
     {
         return $this->createQueryBuilder('w')
             ->select('count(w.id) as count, w.insertTs, w.hpoId, w.emailNotified as email')
@@ -24,7 +24,7 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getLatestAwardees() :array
+    public function getLatestAwardees(): array
     {
         return $this->createQueryBuilder('w')
             ->select('w.hpoId as awardeeId, max(w.withdrawalTs) as ts')

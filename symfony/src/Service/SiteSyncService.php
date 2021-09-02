@@ -99,7 +99,7 @@ class SiteSyncService
                         $siteData = $existingSites[$siteId];
                         $primaryId = $siteData->getId();
                     } else {
-                        $siteData = new Site;
+                        $siteData = new Site();
                     }
                     $siteData->setStatus(isset($site->enrollingStatus) && $site->enrollingStatus === 'ACTIVE' ? true : false);
                     $siteData->setName($site->displayName);
@@ -214,7 +214,7 @@ class SiteSyncService
         try {
             $awardeeRepository->deleteAwardees();
             foreach ($awardeesMap as $id => $name) {
-                $awardee = new Awardee;
+                $awardee = new Awardee();
                 $awardee->setId($id);
                 $awardee->setName($name);
                 $this->em->persist($awardee);
@@ -253,7 +253,7 @@ class SiteSyncService
         try {
             $organizationRepository->deleteOrganizations();
             foreach ($organizationsMap as $id => $name) {
-                $organization = new Organization;
+                $organization = new Organization();
                 $organization->setId($id);
                 $organization->setName($name);
                 $this->em->persist($organization);

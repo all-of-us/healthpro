@@ -38,7 +38,6 @@ class MeasurementService
         $this->siteService = $siteService;
         $this->params = $params;
         $this->loggerService = $loggerService;
-
     }
 
     public function load($measurement, $type = null)
@@ -208,8 +207,10 @@ class MeasurementService
             $measurementHistory->setCreatedTs(new \DateTime());
             $this->em->persist($measurementHistory);
             $this->em->flush();
-            $this->loggerService->log(Log::EVALUATION_HISTORY_CREATE,
-                ['id' => $measurementHistory->getId(), 'type' => $measurementHistory->getType()]);
+            $this->loggerService->log(
+                Log::EVALUATION_HISTORY_CREATE,
+                ['id' => $measurementHistory->getId(), 'type' => $measurementHistory->getType()]
+            );
 
             // Update history id in measurement entity
             $this->measurement->setHistory($measurementHistory);

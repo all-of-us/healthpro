@@ -12,14 +12,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Order
 {
-    const FIXED_ANGLE = 'fixed_angle';
-    const SWINGING_BUCKET = 'swinging_bucket';
-    const ORDER_ACTIVE = 'active';
-    const ORDER_CANCEL = 'cancel';
-    const ORDER_RESTORE = 'restore';
-    const ORDER_UNLOCK = 'unlock';
-    const ORDER_EDIT = 'edit';
-    const ORDER_REVERT = 'revert';
+    public const FIXED_ANGLE = 'fixed_angle';
+    public const SWINGING_BUCKET = 'swinging_bucket';
+    public const ORDER_ACTIVE = 'active';
+    public const ORDER_CANCEL = 'cancel';
+    public const ORDER_RESTORE = 'restore';
+    public const ORDER_UNLOCK = 'unlock';
+    public const ORDER_EDIT = 'edit';
+    public const ORDER_REVERT = 'revert';
 
     private $params;
     private $samples;

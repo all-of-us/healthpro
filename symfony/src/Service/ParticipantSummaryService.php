@@ -13,8 +13,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ParticipantSummaryService
 {
-    const CACHE_TIME = 300;
-    const DS_CLEAN_UP_LIMIT = 500;
+    public const CACHE_TIME = 300;
+    public const DS_CLEAN_UP_LIMIT = 500;
 
     protected $api;
     protected $nextToken;

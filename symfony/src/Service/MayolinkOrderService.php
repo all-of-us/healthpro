@@ -35,7 +35,6 @@ class MayolinkOrderService
         if (!$this->params->has('ml_mock_order')) {
             $this->setMayoCredentials();
         }
-
     }
 
     private function setMayoCredentials()

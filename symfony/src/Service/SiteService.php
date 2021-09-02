@@ -197,7 +197,7 @@ class SiteService
         }
         return $siteName;
     }
-    
+
     public function getSiteIdWithPrefix()
     {
         if ($this->getSiteId()) {

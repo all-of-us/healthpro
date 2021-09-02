@@ -19,5 +19,10 @@ ci/*.secret
 /docker-compose.override.yml
 .phpunit.result.cache
 
-
 /web/s
+
+###> friendsofphp/php-cs-fixer ###
+/tools/php-cs-fixer/vendor/
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###

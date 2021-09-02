@@ -19,9 +19,9 @@ class DeceasedLogRepository extends ServiceEntityRepository
         parent::__construct($registry, DeceasedLog::class);
     }
 
-     /**
-      * @return DeceasedLog[] Returns an array of DeceasedLog objects
-      */
+    /**
+     * @return DeceasedLog[] Returns an array of DeceasedLog objects
+     */
 
     public function getLatestOrganizations($status)
     {

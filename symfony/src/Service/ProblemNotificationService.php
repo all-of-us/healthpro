@@ -30,7 +30,8 @@ class ProblemNotificationService extends EmailNotificationService
         $this->logRepository = $this->em->getRepository(DeceasedLog::class);
     }
 
-    protected function getSearchParams($id, $lastDeactivate) {
+    protected function getSearchParams($id, $lastDeactivate)
+    {
         // Not implemented for ProblemNotificationService
     }
 

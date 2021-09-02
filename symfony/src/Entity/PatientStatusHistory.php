@@ -66,10 +66,10 @@ class PatientStatusHistory
      */
     private $patientStatusRecords;
 
-    const STATUS_SUCCESS = 1;
-    const STATUS_INVALID_PARTICIPANT_ID = 2;
-    const STATUS_RDR_INTERNAL_SERVER_ERROR = 3;
-    const STATUS_OTHER_RDR_ERRORS = 4;
+    public const STATUS_SUCCESS = 1;
+    public const STATUS_INVALID_PARTICIPANT_ID = 2;
+    public const STATUS_RDR_INTERNAL_SERVER_ERROR = 3;
+    public const STATUS_OTHER_RDR_ERRORS = 4;
 
     public function getId(): ?int
     {

@@ -21,9 +21,9 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-     /**
-      * @return Order[] Returns an array of Order objects
-      */
+    /**
+     * @return Order[] Returns an array of Order objects
+     */
     public function getMissingOrders()
     {
         return $this->createQueryBuilder('o')

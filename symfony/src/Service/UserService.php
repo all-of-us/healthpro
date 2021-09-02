@@ -75,7 +75,7 @@ class UserService
             }
         } while ($attempts < $maxAttempts);
         if (!$user) {
-            $user = new User;
+            $user = new User();
             $user->setEmail($googleUser->getEmail());
             $user->setGoogleId($googleUser->getUserId());
             $this->em->persist($user);
