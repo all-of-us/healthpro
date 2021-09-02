@@ -30,7 +30,9 @@ RUN export CLOUDSDK_PYTHON=/usr/bin/python \
       && tar -xzf google-cloud-sdk-267.0.0-linux-x86_64.tar.gz \
       && /opt/google-cloud-sdk/install.sh --quiet --path-update true \
       && /opt/google-cloud-sdk/bin/gcloud components install --quiet beta cloud-datastore-emulator \
-      && /opt/google-cloud-sdk/bin/gcloud config set project pmi-hpo-dev
+      && /opt/google-cloud-sdk/bin/gcloud config set project pmi-hpo-dev \
+      && curl -sL https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -o /usr/local/bin/cloud_sql_proxy \
+      && chmod +x /usr/local/bin/cloud_sql_proxy
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

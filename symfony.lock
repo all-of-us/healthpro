@@ -29,6 +29,9 @@
     "doctrine/dbal": {
         "version": "v2.10.1"
     },
+    "doctrine/deprecations": {
+        "version": "v0.5.3"
+    },
     "doctrine/doctrine-bundle": {
         "version": "2.0",
         "recipe": {
@@ -50,11 +53,11 @@
             "repo": "github.com/symfony/recipes",
             "branch": "master",
             "version": "1.2",
-            "ref": "c1431086fec31f17fbcfe6d6d7e92059458facc1"
+            "ref": "b609494a0ab33d79acf3ead2067e3f67c9a47bd2"
         },
         "files": [
             "config/packages/doctrine_migrations.yaml",
-            "src/Migrations/.gitignore"
+            "migrations/.gitignore"
         ]
     },
     "doctrine/event-manager": {
@@ -81,8 +84,14 @@
     "doctrine/reflection": {
         "version": "1.2.1"
     },
+    "doctrine/sql-formatter": {
+        "version": "1.1.1"
+    },
     "firebase/php-jwt": {
         "version": "v5.2.0"
+    },
+    "friendsofphp/proxy-manager-lts": {
+        "version": "v1.0.5"
     },
     "fzaninotto/faker": {
         "version": "v1.9.1"
@@ -143,6 +152,15 @@
     },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
+    },
+    "laminas/laminas-code": {
+        "version": "4.3.0"
+    },
+    "laminas/laminas-eventmanager": {
+        "version": "3.3.1"
+    },
+    "laminas/laminas-zendframework-bridge": {
+        "version": "1.2.0"
     },
     "maxmind-db/reader": {
         "version": "v1.6.0"
@@ -410,6 +428,9 @@
     "symfony/http-kernel": {
         "version": "v4.4.7"
     },
+    "symfony/inflector": {
+        "version": "v4.4.25"
+    },
     "symfony/intl": {
         "version": "v4.4.7"
     },
@@ -474,6 +495,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.18.1"
+    },
+    "symfony/polyfill-php81": {
+        "version": "v1.23.0"
     },
     "symfony/process": {
         "version": "v4.4.7"

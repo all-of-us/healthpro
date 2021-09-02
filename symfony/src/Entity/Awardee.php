@@ -12,7 +12,7 @@ class Awardee
 {
     /**
      * @ORM\Id()
-     * @ORM\Column(type="string", length=80)
+     * @ORM\Column(type="string", length=20)
      */
     private $id;
 

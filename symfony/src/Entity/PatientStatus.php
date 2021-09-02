@@ -8,6 +8,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PatientStatusRepository")
+ * @ORM\Table(uniqueConstraints={
+ *   @ORM\UniqueConstraint(
+ *     name="participant_organization_unique",
+ *     columns={"participant_id", "organization"})
+ *   },
+ *   indexes={
+ *     @ORM\Index(name="history_id", columns={"history_id"})
+ * })
  */
 class PatientStatus
 {

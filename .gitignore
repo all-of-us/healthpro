@@ -10,6 +10,8 @@ php.ini
 /cache/
 /dev_config/*
 !dev_config/config.yml.dist
+!dev_config/migrations-db.php
+!dev_config/migrations-staging.yml.dist
 .idea
 /bin/GeoLite2-Country.mmdb
 ci/*.secret
@@ -19,5 +21,3 @@ ci/*.secret
 
 
 /web/s
-
-
