@@ -361,6 +361,74 @@ class WorkQueueService
         return $rows;
     }
 
+    public function generateConsentTableRows($participants)
+    {
+        $e = function ($string) {
+            return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        };
+        $rows = [];
+        $userTimezone = $this->userService->getUser()->getTimezone();
+        foreach ($participants as $participant) {
+            $row = [];
+            //Identifiers and status
+            if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
+                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
+                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
+                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
+
+            } else {
+                $row['lastName'] = $e($participant->lastName);
+                $row['firstName'] = $e($participant->firstName);
+                $row['middleName'] = $e($participant->middleName);
+            }
+            if (!empty($participant->dob)) {
+                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
+            } else {
+                $row['dateOfBirth'] = '';
+            }
+            $row['participantId'] = $e($participant->id);
+            $row['primaryConsent'] = WorkQueue::displayConsentStatus(
+                $participant->consentForStudyEnrollment,
+                $participant->consentForStudyEnrollmentAuthored,
+                $userTimezone
+            );
+            $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate($participant, $userTimezone);
+            $row['ehrConsent'] = WorkQueue::displayConsentStatus(
+                $participant->consentForElectronicHealthRecords,
+                $participant->consentForElectronicHealthRecordsAuthored,
+                $userTimezone
+            );
+            $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
+                $participant->ehrConsentExpireStatus,
+                $participant->consentForElectronicHealthRecords,
+                $participant->ehrConsentExpireAuthored,
+                $userTimezone
+            );
+            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
+                $participant->consentForGenomicsROR,
+                $participant->consentForGenomicsRORAuthored,
+                $userTimezone
+            );
+            $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
+                $participant->consentForDvElectronicHealthRecordsSharing,
+                $participant->consentForDvElectronicHealthRecordsSharingAuthored,
+                $userTimezone
+            );
+            $row['caborConsent'] = WorkQueue::displayConsentStatus(
+                $participant->consentForCABoR,
+                $participant->consentForCABoRAuthored,
+                $userTimezone
+            );
+            foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+                $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
+            }
+            $row['consentCohort'] = $e($participant->consentCohortText);
+            $row['primaryLanguage'] = $e($participant->primaryLanguage);
+            array_push($rows, $row);
+        }
+        return $rows;
+    }
+
     public function generateExportRow($participant)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();

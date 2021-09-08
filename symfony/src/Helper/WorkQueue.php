@@ -234,6 +234,111 @@ class WorkQueue
         ]
     ];
 
+    public static $consentFilters = [
+        'activityStatus' => [
+            'label' => 'Activity Status',
+            'options' => [
+                'Active' => 'active',
+                'Deactivated' => 'deactivated',
+                'Withdrawn' => 'withdrawn',
+                'Not Withdrawn' => 'not_withdrawn',
+                'Deceased' => 'deceased',
+                'Deceased (Pending)' => 'deceased_pending'
+            ]
+        ],
+        'enrollmentStatus' => [
+            'label' => 'Participant Status',
+            'options' => [
+                'Participant' => 'INTERESTED',
+                'Participant + EHR Consent' => 'MEMBER',
+                'Core Participant' => 'FULL_PARTICIPANT',
+                'Core Participant Minus PM' => 'CORE_MINUS_PM'
+            ]
+        ],
+        'patientStatus' => [
+            'label' => 'Patient Status',
+            'options' => [
+                'Yes' => 'YES',
+                'No' => 'NO',
+                'No Access' => 'NO_ACCESS',
+                'Unknown' => 'UNKNOWN',
+                'Not Completed' => 'UNSET'
+            ]
+        ],
+        'ageRange' => [
+            'label' => 'Age',
+            'options' => [
+                '0-17' => '0-17',
+                '18-25' => '18-25',
+                '26-35' => '26-35',
+                '36-45' => '36-45',
+                '46-55' => '46-55',
+                '56-65' => '56-65',
+                '66-75' => '66-75',
+                '76-85' => '76-85',
+                '86+' => '86-'
+            ]
+        ],
+        'genderIdentity' => [
+            'label' => 'Gender Identity',
+            'options' => [
+                'Man' => 'GenderIdentity_Man',
+                'Woman' => 'GenderIdentity_Woman',
+                'Non-binary' => 'GenderIdentity_NonBinary',
+                'Transgender' => 'GenderIdentity_Transgender',
+                'More Than One Gender Identity' => 'GenderIdentity_MoreThanOne',
+                'Other' => 'GenderIdentity_AdditionalOptions'
+            ]
+        ],
+        'race' => [
+            'label' => 'Race',
+            'options' => [
+                'American Indian / Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
+                'Black or African American' => 'BLACK_OR_AFRICAN_AMERICAN',
+                'Asian' => 'ASIAN',
+                'Native Hawaiian or Other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
+                'White' => 'WHITE',
+                'Hispanic, Latino, or Spanish' => 'HISPANIC_LATINO_OR_SPANISH',
+                'Middle Eastern or North African' => 'MIDDLE_EASTERN_OR_NORTH_AFRICAN',
+                'H/L/S and White' => 'HLS_AND_WHITE',
+                'H/L/S and Black' => 'HLS_AND_BLACK',
+                'H/L/S and one other race' => 'HLS_AND_ONE_OTHER_RACE',
+                'H/L/S and more than one other race' => 'HLS_AND_MORE_THAN_ONE_OTHER_RACE',
+                'More than one race' => 'MORE_THAN_ONE_RACE',
+                'Other' => 'OTHER_RACE'
+            ]
+        ],
+        'participantOrigin' => [
+            'label' => 'Participant Origination',
+            'options' => [
+                'PTSC Portal' => 'vibrent',
+                'DV Pilot Portal' => 'careevolution'
+            ]
+        ],
+        'retentionEligibleStatus' => [
+            'label' => 'Retention Eligible',
+            'options' => [
+                'Yes' => 'ELIGIBLE',
+                'No' => 'NOT_ELIGIBLE'
+            ]
+        ],
+        'retentionType' => [
+            'label' => 'Retention Status',
+            'options' => [
+                'Active Only' => 'ACTIVE',
+                'Passive Only' => 'PASSIVE',
+                'Active and Passive' => 'ACTIVE_AND_PASSIVE',
+                'Not Retained' => 'UNSET'
+            ]
+        ],
+        'isEhrDataAvailable' => [
+            'label' => 'EHR Data Transfer',
+            'options' => [
+                'Yes' => 'yes',
+                'No' => 'no'
+            ]
+        ]
+    ];
 
     //These are currently not working in the RDR
     public static $filtersDisabled = [
