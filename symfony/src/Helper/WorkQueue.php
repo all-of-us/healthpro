@@ -788,6 +788,38 @@ class WorkQueue
         return $headers;
     }
 
+    public static function getConsentExportHeaders()
+    {
+        $headers = [
+            'Last Name',
+            'First Name',
+            'Middle Initial',
+            'Date of Birth',
+            'PMI ID',
+            'Primary Consent Status',
+            'Primary Consent Date',
+            'Program Update',
+            'Date of Program Update',
+            'EHR Consent Status',
+            'EHR Consent Date',
+            'EHR Expiration Status',
+            'EHR Expiration Date',
+            'gRoR Consent Status',
+            'gRoR Consent Date',
+            'DV-only EHR Sharing',
+            'DV-only EHR Sharing Date',
+            'CABoR Consent Status',
+            'CABoR Consent Date'
+        ];
+        foreach (array_values(self::$digitalHealthSharingTypes) as $label) {
+            $headers[] = $label;
+            $headers[] = $label . ' Date';
+        }
+        $headers[] = 'Consent Cohort';
+        $headers[] = 'Language of Primary Consent';
+        return $headers;
+    }
+
     public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
     {
         if ($digitalHealthSharingStatus) {

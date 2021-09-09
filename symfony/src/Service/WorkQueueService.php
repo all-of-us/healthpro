@@ -375,7 +375,6 @@ class WorkQueueService
                 $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
                 $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
                 $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-
             } else {
                 $row['lastName'] = $e($participant->lastName);
                 $row['firstName'] = $e($participant->firstName);
@@ -529,6 +528,40 @@ class WorkQueueService
             $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
             $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
         }
+        return $row;
+    }
+
+    public function generateConsentExportRow($participant)
+    {
+        $userTimezone = $this->userService->getUser()->getTimezone();
+        $row = [
+            $participant->lastName,
+            $participant->firstName,
+            $participant->middleName,
+            WorkQueue::csvDateFromObject($participant->dob),
+            $participant->id,
+            WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
+            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $userTimezone),
+            WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram),
+            WorkQueue::dateFromString($participant->questionnaireOnDnaProgramAuthored, $userTimezone),
+            WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
+            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $userTimezone),
+            WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords),
+            WorkQueue::dateFromString($participant->ehrConsentExpireAuthored, $userTimezone),
+            WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR),
+            WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $userTimezone),
+            $participant->primaryLanguage,
+            WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing),
+            WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone),
+            WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
+            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $userTimezone)
+        ];
+        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
+            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
+        }
+        $row[] = $participant->consentCohortText;
+        $row[] = $participant->primaryLanguage;
         return $row;
     }
 

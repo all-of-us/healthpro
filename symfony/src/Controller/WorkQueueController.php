@@ -179,8 +179,16 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
-
-        $stream = function () use ($params, $awardee, $limit, $pageSize) {
+        if (isset($params['exportType']) && $params['exportType'] === 'consents') {
+            $exportHeaders = WorkQueue::getConsentExportHeaders();
+            $exportRowMethod = 'generateConsentExportRow';
+            $fileName = 'workqueue_consents';
+        } else {
+            $exportHeaders = WorkQueue::getExportHeaders();
+            $exportRowMethod = 'generateExportRow';
+            $fileName = 'workqueue';
+        }
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -190,12 +198,12 @@ class WorkQueueController extends AbstractController
             );
             fwrite($output, "\"\"\n");
 
-            fputcsv($output, WorkQueue::getExportHeaders());
+            fputcsv($output, $exportHeaders);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->generateExportRow($participant));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {
@@ -206,7 +214,7 @@ class WorkQueueController extends AbstractController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-        $filename = "workqueue_{$awardee}_" . date('Ymd-His') . '.csv';
+        $filename = "{$fileName}_{$awardee}_" . date('Ymd-His') . '.csv';
 
         $loggerService->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
@@ -381,6 +389,7 @@ class WorkQueueController extends AbstractController
             }
             return $this->json($ajaxData, $responseCode);
         } else {
+            $params['exportType'] = 'consents';
             return $this->render('workqueue/consents.html.twig', [
                 'filters' => $filters,
                 'surveys' => WorkQueue::$surveys,
