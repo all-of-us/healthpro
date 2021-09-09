@@ -68,14 +68,14 @@ $(document).ready(function() {
         { name: 'primaryConsent', data: 'primaryConsent', class: 'text-center' },
         { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
         { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
-        { name: 'ehrConsentExpireStatus', visible: false, data: 'ehrConsentExpireStatus', class: 'text-center' },
+        { name: 'ehrConsentExpireStatus', data: 'ehrConsentExpireStatus', class: 'text-center' },
         { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
-        { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
-        { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' }
+        { name: 'dvEhrStatus', data: 'dvEhrStatus', class: 'text-center' },
+        { name: 'caborConsent', data: 'caborConsent', class: 'text-center' }
     );
     Object.keys(digitalHealthSharingTypes).forEach(function (key, _i) {
         tableColumns.push(
-            {name: key + 'Consent', visible: false, data: key + 'Consent', class: 'text-center', orderable: false}
+            {name: key + 'Consent', data: key + 'Consent', class: 'text-center', orderable: false}
         );
     });
     tableColumns.push(

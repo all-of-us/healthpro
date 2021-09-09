@@ -2,9 +2,7 @@
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    <div class="page-header">
-        <h2><i class="fa fa-table" aria-hidden="true"></i> Participant Work Queue</h2>
-    </div>
+    {% include 'workqueue/_page_heading.html.twig' %}
 
     {% if isRdrError %}
         <div class="alert alert-danger">
@@ -26,7 +24,7 @@
                 <br/>
             {% endif %}
             <p><strong>Filters</strong>
-                <small><a href="{{ path('workqueue_index') }}">reset</a></small>
+                <small><a href="{{ path('workqueue_consents') }}">reset</a></small>
             </p>
             <div class="form-inline">
                 {% for name, filter in filters if name != 'awardee' %}
@@ -56,18 +54,18 @@
             <th>Middle Initial</th>
             <th>Date of Birth</th>
             <th>PMI ID</th>
-            <th class="col-group-consent">Primary Consent</th>
-            <th class="col-group-consent">Program Update</th>
-            <th class="col-group-consent">EHR Consent</th>
-            <th class="col-group-consent">EHR Expiration Status</th>
-            <th class="col-group-consent">gRoR Consent</th>
-            <th class="col-group-consent">DV-only EHR Sharing <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
-            <th class="col-group-consent">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
+            <th class="col-consent">Primary Consent</th>
+            <th class="col-consent">Program Update</th>
+            <th class="col-consent">EHR Consent</th>
+            <th class="col-consent">EHR Expiration Status</th>
+            <th class="col-consent">gRoR Consent</th>
+            <th class="col-consent">DV-only EHR Sharing <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
+            <th class="col-consent">CABoR Consent <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
             {% for type, label in digitalHealthSharingTypes %}
-                <th class="col-group-consent">{{ label }}</th>
+                <th class="col-consent">{{ label }}</th>
             {% endfor %}
-            <th class="col-group-consent">Consent Cohort</th>
-            <th class="col-group-consent">Language of Primary Consent</th>
+            <th class="col-consent">Consent Cohort</th>
+            <th class="col-consent">Language of Primary Consent</th>
         </tr>
         </thead>
         <tbody id="participant_info"></tbody>

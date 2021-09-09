@@ -2,9 +2,7 @@
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    <div class="page-header">
-        <h2><i class="fa fa-table" aria-hidden="true"></i> Participant Work Queue</h2>
-    </div>
+    {% include 'workqueue/_page_heading.html.twig' %}
 
     {% if isRdrError %}
         <div class="alert alert-danger">

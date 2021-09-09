@@ -1,0 +1,9 @@
+<div class="page-header">
+    <h2><i class="fa fa-table" aria-hidden="true"></i> Work Queues</h2>
+</div>
+{% set current_route = app.request.get('_route') %}
+<ul class="nav nav-tabs">
+    <li role="presentation" {% if current_route == 'workqueue_index' %}class="active"{% endif %}><a href="{{ path('workqueue_index') }}">Participant Work Queue</a></li>
+    <li role="presentation" {% if current_route == 'workqueue_consents' %}class="active"{% endif %}><a href="{{ path('workqueue_consents') }}">Participant Consents</a></li>
+</ul>
+<br/>
