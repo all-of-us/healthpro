@@ -44,7 +44,7 @@ class WorkQueueService
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function participantSummarySearch($organization, &$params, $type = null)
+    public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null)
     {
         $rdrParams = [];
         $next = true;
@@ -56,7 +56,7 @@ class WorkQueueService
             // Pass sort params
             if (!empty($params['order'][0])) {
                 $sortColumnIndex = $params['order'][0]['column'];
-                $sortColumnName = WorkQueue::$sortColumns[$sortColumnIndex];
+                $sortColumnName = $sortColumns[$sortColumnIndex];
                 $sortDir = $params['order'][0]['dir'];
                 if ($sortDir === 'asc') {
                     $rdrParams['_sort'] = $sortColumnName;

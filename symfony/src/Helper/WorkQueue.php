@@ -95,6 +95,26 @@ class WorkQueue
         'education',
     ];
 
+    public static $consentSortColumns = [
+        'lastName',
+        'firstName',
+        'middleName',
+        'dateOfBirth',
+        'participantId',
+        'consentForStudyEnrollmentAuthored',
+        'questionnaireOnDnaProgramAuthored',
+        'consentForElectronicHealthRecordsAuthored',
+        'ehrConsentExpireStatus',
+        'consentForGenomicsRORAuthored',
+        'consentForDvElectronicHealthRecordsSharingAuthored',
+        'consentForCABoRAuthored',
+        'digitalHealthSharingStatus',
+        'digitalHealthSharingStatus',
+        'digitalHealthSharingStatus',
+        'consentCohort',
+        'primaryLanguage'
+    ];
+
     public static $filters = [
         'activityStatus' => [
             'label' => 'Activity Status',

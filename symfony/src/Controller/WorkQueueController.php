@@ -124,7 +124,7 @@ class WorkQueueController extends AbstractController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable');
+            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$sortColumns);
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
             $ajaxData['data'] = $this->workQueueService->generateTableRows($participants);
@@ -371,7 +371,7 @@ class WorkQueueController extends AbstractController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable');
+            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
             $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
