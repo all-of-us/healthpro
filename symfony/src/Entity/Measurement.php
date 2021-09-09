@@ -9,27 +9,30 @@ use App\Exception\MissingSchemaException;
 use App\Helper\Util;
 
 /**
- * @ORM\Table(name="evaluations")
+ * @ORM\Table(name="evaluations", indexes={
+ *   @ORM\Index(
+ *     columns={"participant_id"},
+ *     name="participant_id")
+ *   })
  * @ORM\Entity(repositoryClass="App\Repository\MeasurementRepository")
  */
 class Measurement
 {
-
-    const CURRENT_VERSION = '0.3.3';
-    const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
-    const EHR_CURRENT_VERSION = '0.3.3-ehr';
-    const LIMIT_TEXT_SHORT = 1000;
-    const LIMIT_TEXT_LONG = 10000;
-    const EVALUATION_ACTIVE = 'active';
-    const EVALUATION_CANCEL = 'cancel';
-    const EVALUATION_RESTORE = 'restore';
-    const BLOOD_DONOR = 'blood-donor';
-    const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
-    const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
-    const EHR_PROTOCOL_MODIFICATION = 'ehr';
-    const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
-    const EVALUATION_CANCEL_STATUS = 'entered-in-error';
-    const EVALUATION_RESTORE_STATUS = 'final';
+    public const CURRENT_VERSION = '0.3.3';
+    public const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
+    public const EHR_CURRENT_VERSION = '0.3.3-ehr';
+    public const LIMIT_TEXT_SHORT = 1000;
+    public const LIMIT_TEXT_LONG = 10000;
+    public const EVALUATION_ACTIVE = 'active';
+    public const EVALUATION_CANCEL = 'cancel';
+    public const EVALUATION_RESTORE = 'restore';
+    public const BLOOD_DONOR = 'blood-donor';
+    public const BLOOD_DONOR_PROTOCOL_MODIFICATION = 'blood-bank-donor';
+    public const BLOOD_DONOR_PROTOCOL_MODIFICATION_LABEL = 'Blood bank donor';
+    public const EHR_PROTOCOL_MODIFICATION = 'ehr';
+    public const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
+    public const EVALUATION_CANCEL_STATUS = 'entered-in-error';
+    public const EVALUATION_RESTORE_STATUS = 'final';
 
     private $currentVersion;
 
@@ -115,12 +118,12 @@ class Measurement
     private $parentId;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $createdTs;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $updatedTs;
 
@@ -140,7 +143,7 @@ class Measurement
     private $finalizedTs;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", nullable=false, length=10)
      */
     private $version;
 
@@ -599,12 +602,14 @@ class Measurement
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 
-    public function setFieldData($fieldData) {
+    public function setFieldData($fieldData)
+    {
         $this->fieldData = $fieldData;
         $this->normalizeData('save');
     }
 
-    public function getFieldData() {
+    public function getFieldData()
+    {
         return $this->fieldData;
     }
 

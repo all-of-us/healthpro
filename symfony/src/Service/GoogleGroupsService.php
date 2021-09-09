@@ -10,11 +10,12 @@ use Google_Service_Directory_Member as GoogleMember;
 
 class GoogleGroupsService
 {
-    const RETRY_LIMIT = 5;
+    public const RETRY_LIMIT = 5;
     private $domain;
     private $client;
 
-    public function __construct(ContainerBagInterface $params, EnvironmentService $env) {
+    public function __construct(ContainerBagInterface $params, EnvironmentService $env)
+    {
         if (!$env->values['isUnitTest']) {
             $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');
@@ -42,13 +43,13 @@ class GoogleGroupsService
     {
         $resource = $this->client->$resourceName;
         $method = new \ReflectionMethod(get_class($resource), $methodName);
-        $doRetry = false; $retryCount = 0;
+        $doRetry = false;
+        $retryCount = 0;
         do {
             try {
                 $response = $method->invokeArgs($resource, $params);
                 $doRetry = false;
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 // implies a rate-limiting error that we should retry
                 if ($e->getCode() == 403 && $retryCount < self::RETRY_LIMIT) {
                     $micros = self::calculateBackoff($retryCount);
@@ -58,8 +59,9 @@ class GoogleGroupsService
                     usleep($micros);
                     $doRetry = true;
                     $retryCount++;
+                } else {
+                    throw $e;
                 }
-                else { throw $e; }
             }
         } while ($doRetry);
         return $response;

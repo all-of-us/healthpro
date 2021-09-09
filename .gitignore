@@ -10,6 +10,8 @@ php.ini
 /cache/
 /dev_config/*
 !dev_config/config.yml.dist
+!dev_config/migrations-db.php
+!dev_config/migrations-staging.yml.dist
 .idea
 /bin/GeoLite2-Country.mmdb
 ci/*.secret
@@ -17,7 +19,10 @@ ci/*.secret
 /docker-compose.override.yml
 .phpunit.result.cache
 
-
 /web/s
 
-
+###> friendsofphp/php-cs-fixer ###
+/tools/php-cs-fixer/vendor/
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###

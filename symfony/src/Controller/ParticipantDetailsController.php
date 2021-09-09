@@ -170,6 +170,7 @@ class ParticipantDetailsController extends AbstractController
             'samples' => WorkQueue::$samples,
             'surveys' => WorkQueue::$surveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
+            'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
             'cancelRoute' => $cancelRoute,
             'patientStatusForm' => $patientStatusForm,
             'orgPatientStatusData' => $orgPatientStatusData,

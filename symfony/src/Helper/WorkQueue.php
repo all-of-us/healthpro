@@ -4,16 +4,16 @@ namespace App\Helper;
 
 class WorkQueue
 {
-    const LIMIT_EXPORT = 10000;
-    const LIMIT_EXPORT_PAGE_SIZE = 1000;
-    const FULL_DATA_ACCESS = 'full_data';
-    const LIMITED_DATA_ACCESS = 'limited_data';
-    const DOWNLOAD_DISABLED = 'disabled';
+    public const LIMIT_EXPORT = 10000;
+    public const LIMIT_EXPORT_PAGE_SIZE = 1000;
+    public const FULL_DATA_ACCESS = 'full_data';
+    public const LIMITED_DATA_ACCESS = 'limited_data';
+    public const DOWNLOAD_DISABLED = 'disabled';
 
-    const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
-    const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
-    const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
-    const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
+    public const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
+    public const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+    public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
+    public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
     public static $sortColumns = [
         'lastName',
@@ -37,6 +37,9 @@ class WorkQueue
         'primaryLanguage',
         'consentForDvElectronicHealthRecordsSharingAuthored',
         'consentForCABoRAuthored',
+        'digitalHealthSharingStatus',
+        'digitalHealthSharingStatus',
+        'digitalHealthSharingStatus',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -65,6 +68,7 @@ class WorkQueue
         'questionnaireOnCopeDecAuthored',
         'questionnaireOnCopeFebAuthored',
         'questionnaireOnCopeVaccineMinute1',
+        'questionnaireOnCopeVaccineMinute2',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -290,7 +294,8 @@ class WorkQueue
         'CopeNov' => 'COPE Nov',
         'CopeDec' => 'COPE Dec',
         'CopeFeb' => 'COPE Feb',
-        'CopeVaccineMinute1' => 'Summer Minute'
+        'CopeVaccineMinute1' => 'Summer Minute',
+        'CopeVaccineMinute2' => 'Fall Minute'
     ];
 
     public static $initialSurveys = [
@@ -334,6 +339,12 @@ class WorkQueue
         [
             '1SAL' => '1SAL2'
         ]
+    ];
+
+    public static $digitalHealthSharingTypes = [
+        'fitbit' => 'Fitbit Consent',
+        'appleHealthKit' => 'Apple HealthKit Consent',
+        'appleEHR' => 'Apple EHR Consent'
     ];
 
     public static function dateFromString($string, $timezone, $displayTime = true)
@@ -491,8 +502,10 @@ class WorkQueue
     {
         switch ($participant->activityStatus) {
             case 'withdrawn':
-                return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString($participant->withdrawalAuthored,
-                        $userTimezone);
+                return self::HTML_DANGER . '<span class="text-danger"> Withdrawn </span>' . self::dateFromString(
+                    $participant->withdrawalAuthored,
+                    $userTimezone
+                );
             case 'active':
                 return self::HTML_SUCCESS . ' Active';
             case 'deactivated':
@@ -500,8 +513,11 @@ class WorkQueue
             case 'deceased':
                 if ($participant->dateOfDeath) {
                     $dateOfDeath = date('n/j/Y', strtotime($participant->dateOfDeath));
-                    return sprintf(self::HTML_DANGER . ' %s %s',
-                        ($participant->deceasedStatus === 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased', $dateOfDeath);
+                    return sprintf(
+                        self::HTML_DANGER . ' %s %s',
+                        ($participant->deceasedStatus === 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased',
+                        $dateOfDeath
+                    );
                 }
                 return sprintf(self::HTML_DANGER . ' %s', ($participant->deceasedStatus === 'PENDING') ? 'Deceased (Pending Acceptance)' : 'Deceased');
             default:
@@ -638,6 +654,38 @@ class WorkQueue
         $headers[] = 'Core Participant Minus PM Date';
         $headers[] = 'Summer Minute PPI Survey Complete';
         $headers[] = 'Summer Minute PPI Survey Completion Date';
+        $headers[] = 'Fall Minute PPI Survey Complete';
+        $headers[] = 'Fall Minute PPI Survey Completion Date';
+        foreach (array_values(self::$digitalHealthSharingTypes) as $label) {
+            $headers[] = $label;
+            $headers[] = $label . ' Date';
+        }
         return $headers;
+    }
+
+    public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
+    {
+        if ($digitalHealthSharingStatus) {
+            if (isset($digitalHealthSharingStatus->{$type}->status)) {
+                $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
+                if ($digitalHealthSharingStatus->{$type}->status === 'YES') {
+                    return self::HTML_SUCCESS . ' ' . self::dateFromString($authoredDate, $userTimezone);
+                }
+                return self::HTML_DANGER . ' ' . self::dateFromString($authoredDate, $userTimezone);
+            }
+        }
+        return self::HTML_DANGER;
+    }
+
+    public static function csvDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $displayDate = false, $userTimezone = null)
+    {
+        if ($digitalHealthSharingStatus) {
+            if (!$displayDate) {
+                return isset($digitalHealthSharingStatus->{$type}->status) && $digitalHealthSharingStatus->{$type}->status === 'YES' ? 1 : 0;
+            }
+            $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
+            return self::dateFromString($authoredDate, $userTimezone);
+        }
+        return 0;
     }
 }

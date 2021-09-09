@@ -59,6 +59,7 @@ $(document).ready(function() {
     var surveys = $('#workqueue').data('surveys');
     var samples = $('#workqueue').data('samples');
     var isDvType = $('#workqueue').data('dv-type');
+    var digitalHealthSharingTypes = $('#workqueue').data('digital-health-sharing-types');
 
     var tableColumns = [];
     tableColumns.push(
@@ -82,7 +83,14 @@ $(document).ready(function() {
       { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
       { name: 'primaryLanguage', data: 'primaryLanguage' },
       { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
-      { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' },
+      { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' }
+    );
+    Object.keys(digitalHealthSharingTypes).forEach(function (key, _i) {
+        tableColumns.push(
+            {name: key + 'Consent', visible: false, data: key + 'Consent', class: 'text-center', orderable: false}
+        );
+    });
+    tableColumns.push(
       { name: 'retentionEligibleStatus', visible: false, data: 'retentionEligibleStatus', class: 'text-center' },
       { name: 'retentionType', visible: false, data: 'retentionType', class: 'text-center', orderable: false },
       { name: 'isEhrDataAvailable', visible: false, data: 'isEhrDataAvailable', class: 'text-center' },

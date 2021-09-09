@@ -56,4 +56,4 @@ Run local App Engine dev server:
 Configure your local development parameters by copying the `dev_config/config.yml.dist` file to `dev_config/config.yml`.  Edit `config.yml` as needed.  This file is .gitignore'd.  See comments in the `config.yml.dist` file for more details.
 
 #### MySQL database configuration
-Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, import the SQL scripts in `/sql` into the new database.
+Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, run `bin/console doctine:migrations:migrate` to build your local database.

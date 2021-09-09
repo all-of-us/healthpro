@@ -6,6 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\WithdrawalLogRepository")
+ * @ORM\Table(indexes={
+ *   @ORM\Index(
+ *     columns={"hpo_id"},
+ *     name="hpo_id"),
+ *   @ORM\Index(
+ *     columns={"participant_id"},
+ *     name="participant_id")
+ * })
  */
 class WithdrawalLog
 {

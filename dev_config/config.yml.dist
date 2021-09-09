@@ -118,6 +118,12 @@ diversion_pouch_site: ECDC DV Diversion Pouch
 #     change:
 #         - 1021
 #         - 1022
+#     business:
+#         - 1031
+#         - 1032
+#     security:
+#         - 1041
+#         - 1042
 
 #
 # Feature flags

@@ -11,11 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Problem
 {
-
-    const RELATED_BASELINE = 'related_baseline';
-    const UNRELATED_BASELINE = 'unrelated_baseline';
-    const OTHER = 'other';
-    const PROBLEM_TYPE_OPTIONS = ['Physical injury related to baseline appointment', 'Physical injury unrelated to baseline appointment', 'Other'];
+    public const RELATED_BASELINE = 'related_baseline';
+    public const UNRELATED_BASELINE = 'unrelated_baseline';
+    public const OTHER = 'other';
+    public const PROBLEM_TYPE_OPTIONS = ['Physical injury related to baseline appointment', 'Physical injury unrelated to baseline appointment', 'Other'];
 
     /**
      * @var int
@@ -330,31 +329,31 @@ class Problem
     /**
      * @return Collection|ProblemComment[]
      */
-     public function getProblemComments(): Collection
-     {
-         return $this->problemComments;
-     }
+    public function getProblemComments(): Collection
+    {
+        return $this->problemComments;
+    }
 
-     public function addProblemComment(ProblemComment $problemComment): self
-     {
-         if (!$this->problemComments->contains($problemComment)) {
-             $this->problemComments[] = $problemComment;
-             $problemComment->setProblem($this);
-         }
+    public function addProblemComment(ProblemComment $problemComment): self
+    {
+        if (!$this->problemComments->contains($problemComment)) {
+            $this->problemComments[] = $problemComment;
+            $problemComment->setProblem($this);
+        }
 
-         return $this;
-     }
+        return $this;
+    }
 
-     public function removeProblemComment(ProblemComment $problemComment): self
-     {
-         if ($this->problemComments->contains($problemComment)) {
-             $this->problemComments->removeElement($problemComment);
-             // set the owning side to null (unless already changed)
-             if ($problemComment->getProblem() === $this) {
-                 $problemComment->setProblem(null);
-             }
-         }
+    public function removeProblemComment(ProblemComment $problemComment): self
+    {
+        if ($this->problemComments->contains($problemComment)) {
+            $this->problemComments->removeElement($problemComment);
+            // set the owning side to null (unless already changed)
+            if ($problemComment->getProblem() === $this) {
+                $problemComment->setProblem(null);
+            }
+        }
 
-         return $this;
-     }
+        return $this;
+    }
 }

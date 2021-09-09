@@ -31,7 +31,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  */
 class OrderController extends AbstractController
 {
-
     protected $em;
     protected $orderService;
     protected $participantSummaryService;
@@ -106,7 +105,7 @@ class OrderController extends AbstractController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $order = new Order;
+        $order = new Order();
         $this->orderService->loadSamplesSchema($order);
         $createForm = $this->createForm(OrderCreateType::class, null, [
             'orderType' => $session->get('orderType'),
@@ -116,8 +115,10 @@ class OrderController extends AbstractController
         ]);
         $showCustom = false;
         $createForm->handleRequest($request);
-        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('orderCheck',
-                $request->request->get('csrf_token')))) {
+        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken(
+            'orderCheck',
+            $request->request->get('csrf_token')
+        ))) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if ($createForm->isSubmitted() && $createForm->isValid()) {
@@ -253,6 +254,7 @@ class OrderController extends AbstractController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
+        $wasProcessStepAvailable = in_array('process', $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -288,7 +290,11 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order collection updated');
-                return $this->redirectToRoute('order_collect', [
+                $redirectRoute = 'order_collect';
+                if (!$wasProcessStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_process';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -313,6 +319,7 @@ class OrderController extends AbstractController
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
+        $wasFinalizeStepAvailable = in_array('finalize', $order->getAvailableSteps());
         if (!in_array('process', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -377,7 +384,11 @@ class OrderController extends AbstractController
                 $this->em->flush();
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order processing updated');
-                return $this->redirectToRoute('order_process', [
+                $redirectRoute = 'order_process';
+                if (!$wasFinalizeStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_finalize';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
@@ -402,6 +413,7 @@ class OrderController extends AbstractController
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
+        $wasPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
         if (!in_array('finalize', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -439,8 +451,10 @@ class OrderController extends AbstractController
                     $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
                 if (($order->getType() === 'kit' || $order->getType() === 'diversion') && $finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
-                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking($finalizeForm['fedexTracking']->getData(),
-                        $orderId);
+                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking(
+                        $finalizeForm['fedexTracking']->getData(),
+                        $orderId
+                    );
                     if (!empty($duplicateFedexTracking)) {
                         $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
                     }
@@ -497,7 +511,11 @@ class OrderController extends AbstractController
                         $this->addFlash('error', 'Failed to finalize the order. Please try again.');
                     }
                 }
-                return $this->redirectToRoute('order_finalize', [
+                $redirectRoute = 'order_finalize';
+                if (!$wasPrintRequisitionStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                    $redirectRoute = 'order_print_requisition';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);

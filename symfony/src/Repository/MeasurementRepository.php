@@ -20,9 +20,9 @@ class MeasurementRepository extends ServiceEntityRepository
         parent::__construct($registry, Measurement::class);
     }
 
-     /**
-      * @return Measurement[] Returns an array of Measurement objects
-      */
+    /**
+     * @return Measurement[] Returns an array of Measurement objects
+     */
     public function getMissingMeasurements()
     {
         return $this->createQueryBuilder('m')

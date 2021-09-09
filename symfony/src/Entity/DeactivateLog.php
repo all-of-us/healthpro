@@ -6,6 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DeactivateLogRepository")
+ * @ORM\Table(uniqueConstraints={
+ *   @ORM\UniqueConstraint(
+ *     name="participant_id",
+ *     columns={"participant_id", "deactivate_ts"})
+ *   },
+ *   indexes={
+ *     @ORM\Index(name="hpo_id", columns={"hpo_id"})
+ *   })
  */
 class DeactivateLog
 {
@@ -22,7 +30,7 @@ class DeactivateLog
     private $participantId;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $insertTs;
 

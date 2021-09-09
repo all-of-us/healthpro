@@ -104,7 +104,7 @@ class BiobankController extends AbstractController
                 ]);
             }
             // Quanum Orders
-            $order = new Order;
+            $order = new Order();
             $this->orderService->loadSamplesSchema($order);
             $quanumOrders = $this->orderService->getOrders([
                 'kitId' => $id,
@@ -208,8 +208,13 @@ class BiobankController extends AbstractController
                         $result = $this->orderService->sendOrderToMayo($mayoClientId);
                         if ($result['status'] === 'success' && !empty($result['mayoId'])) {
                             // Check biobank changes
-                            $order->checkBiobankChanges($collectedTs, $finalizedTs, $samples, $finalizeForm['finalizedNotes']->getData(),
-                                $centrifugeType);
+                            $order->checkBiobankChanges(
+                                $collectedTs,
+                                $finalizedTs,
+                                $samples,
+                                $finalizeForm['finalizedNotes']->getData(),
+                                $centrifugeType
+                            );
                             // Save mayo id
                             $order->setMayoId($result['mayoId']);
                             $this->em->persist($order);
@@ -277,7 +282,7 @@ class BiobankController extends AbstractController
         }
         $participant = $participant[0];
 
-        $order = new Order;
+        $order = new Order();
         $this->orderService->loadSamplesSchema($order);
         $quanumOrder = $this->orderService->getOrder($participant->id, $orderId);
         $order = $this->orderService->loadFromJsonObject($quanumOrder);
@@ -337,7 +342,7 @@ class BiobankController extends AbstractController
         $orders = [];
         foreach ($quanumOrders as $quanumOrder) {
             if ($quanumOrder->origin === 'careevolution') {
-                $order = new Order;
+                $order = new Order();
                 $this->orderService->loadSamplesSchema($order);
                 $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
             }

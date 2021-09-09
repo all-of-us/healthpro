@@ -108,9 +108,9 @@ class ParticipantLookupController extends AbstractController
                     'participants' => $searchResults
                 ]);
             } catch (ParticipantSearchExceptionInterface $e) {
-                 $searchForm->addError(new FormError($e->getMessage()));
+                $searchForm->addError(new FormError($e->getMessage()));
             }
-         }
+        }
 
         return $this->render('participantlookup/participants.html.twig', [
             'searchForm' => $searchForm->createView(),

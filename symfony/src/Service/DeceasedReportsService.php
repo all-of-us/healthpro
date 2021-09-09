@@ -57,7 +57,8 @@ class DeceasedReportsService
      * @var array $data
      * @var User $actor
      */
-    public function buildDeceasedReportFhir(DeceasedReport $deceasedReport, User $actor) {
+    public function buildDeceasedReportFhir(DeceasedReport $deceasedReport, User $actor)
+    {
         $report = [
             'status' => 'preliminary',
             'code' => [
@@ -116,7 +117,8 @@ class DeceasedReportsService
      * @var array $data
      * @var User $actor
      */
-    public function buildDeceasedReportReviewFhir(DeceasedReport $deceasedReport, User $actor) {
+    public function buildDeceasedReportReviewFhir(DeceasedReport $deceasedReport, User $actor)
+    {
         $report = [
             'status' => $deceasedReport->getReportStatus(),
             'code' => [
