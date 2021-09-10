@@ -42,7 +42,8 @@
         "symfony/webpack-encore-bundle": "^1.7",
         "beberlei/doctrineextensions": "^1.2",
         "symfony/proxy-manager-bridge": "4.4.*",
-        "symfony/serializer": "4.4.*"
+        "symfony/serializer": "4.4.*",
+        "google/cloud-storage": "^1.24"
     },
     "config": {
         "platform": {
