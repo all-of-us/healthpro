@@ -9,6 +9,7 @@ use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
+use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
@@ -141,7 +142,7 @@ class MeasurementsController extends AbstractController
                             }
                             if ($rdrEvalId = $this->measurementService->createMeasurement($participant->id, $fhir)) {
                                 $measurement->setRdrId($rdrEvalId);
-                                $measurement->setFhirVersion(\Pmi\Evaluation\Fhir::CURRENT_VERSION);
+                                $measurement->setFhirVersion(Fhir::CURRENT_VERSION);
                             } else {
                                 $this->addFlash('error', 'Failed to finalize the physical measurements. Please try again');
                                 $rdrError = true;
