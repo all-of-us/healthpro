@@ -54,11 +54,17 @@ jobs:
     - run: npm install
     - run: npx encore prod
 
+    # Install PHP CS Fixer
+    - run: composer install --working-dir=./tools/php-cs-fixer
+
     # Database
     - run: ./ci/database.sh
 
     # Test
     - run: ./ci/test.sh
+
+    # PHP CS Fixer
+    - run: ./ci/php-cs-fixer.sh
 
     # Teardown
     - store_test_results:

@@ -8,8 +8,7 @@ use Symfony\Component\Form\FormError;
 
 class PatientStatusImportService
 {
-
-    const DEFAULT_CSV_ROWS_LIMIT = 5000;
+    public const DEFAULT_CSV_ROWS_LIMIT = 5000;
 
     public static $patientStatus = [
         'Yes: Confirmed in EHR system' => 'YES',

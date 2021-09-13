@@ -11,7 +11,6 @@ services:
         ports:
             - "53306:3306"
         volumes:
-            - ./sql/healthpro:/docker-entrypoint-initdb.d
             - healthpro-mysql-data:/var/lib/mysql
 
     web:

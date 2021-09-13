@@ -6,7 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PatientStatusImportRowRepository")
- * @ORM\Table(name="patient_status_import_rows")
+ * @ORM\Table(name="patient_status_import_rows", indexes={
+ *   @ORM\Index(name="import_id", columns={"import_id"})
+ * })
  */
 class PatientStatusImportRow
 {

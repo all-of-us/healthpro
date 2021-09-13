@@ -148,7 +148,7 @@ class PatientStatusService
             if (!empty($this->patientStatusId)) {
                 $patientStatus = $this->em->getRepository(PatientStatus::class)->find($this->patientStatusId);
             } else {
-                $patientStatus = new PatientStatus;
+                $patientStatus = new PatientStatus();
                 $patientStatus->setParticipantId($this->participantId);
                 $patientStatus->setOrganization($this->organizationId);
                 $patientStatus->setAwardee($this->awardeeId);
@@ -161,7 +161,7 @@ class PatientStatusService
             }
 
             //Create patient status history
-            $patientStatusHistory = new PatientStatusHistory;
+            $patientStatusHistory = new PatientStatusHistory();
             $patientStatusHistory->setUserId($this->userId);
             $patientStatusHistory->setSite($this->siteId);
             $patientStatusHistory->setComments($this->comments);

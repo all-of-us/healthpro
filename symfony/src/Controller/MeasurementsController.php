@@ -33,7 +33,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  */
 class MeasurementsController extends AbstractController
 {
-
     protected $em;
     protected $measurementService;
     protected $participantSummaryService;
@@ -67,8 +66,10 @@ class MeasurementsController extends AbstractController
             throw $this->createNotFoundException('Participant not found.');
         }
         $type = $request->query->get('type');
-        if (!$this->measurementService->canEdit($measurementId,
-                $participant) || $this->siteService->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($measurementId))) {
+        if (!$this->measurementService->canEdit(
+            $measurementId,
+            $participant
+        ) || $this->siteService->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($measurementId))) {
             throw $this->createAccessDeniedException();
         }
         if ($measurementId) {
@@ -81,7 +82,7 @@ class MeasurementsController extends AbstractController
             $measurement->canRestore = $measurement->canRestore();
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
-            $measurement = new Measurement;
+            $measurement = new Measurement();
             $this->measurementService->load($measurement, $type);
             if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
                 $measurement->setFieldData((object)[
@@ -149,8 +150,10 @@ class MeasurementsController extends AbstractController
                             foreach ($errors as $field) {
                                 if (is_array($field)) {
                                     list($field, $replicate) = $field;
-                                    $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage($field,
-                                        $replicate)));
+                                    $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage(
+                                        $field,
+                                        $replicate
+                                    )));
                                 } else {
                                     $measurementsForm->get($field)->addError(new FormError($measurement->getFormFieldErrorMessage($field)));
                                 }
@@ -178,8 +181,10 @@ class MeasurementsController extends AbstractController
                         if ($measurementId) {
                             $this->loggerService->log(Log::EVALUATION_CREATE, $measurementId);
                             if (empty($rdrError)) {
-                                $this->addFlash('notice',
-                                    !$request->request->has('copy') ? 'Physical measurements saved' : 'Physical measurements copied');
+                                $this->addFlash(
+                                    'notice',
+                                    !$request->request->has('copy') ? 'Physical measurements saved' : 'Physical measurements copied'
+                                );
                             }
 
                             // If finalization failed, new physical measurements are created, but
@@ -238,8 +243,10 @@ class MeasurementsController extends AbstractController
                 foreach ($errors as $field) {
                     if (is_array($field)) {
                         list($field, $replicate) = $field;
-                        $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage($field,
-                            $replicate)));
+                        $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage(
+                            $field,
+                            $replicate
+                        )));
                     } else {
                         $measurementsForm->get($field)->addError(new FormError($measurement->getFormFieldErrorMessage($field)));
                     }

@@ -48,12 +48,12 @@ class AuthController extends AbstractController
                 return $this->redirect('/s');
             }
 
-            return $this->render('mock-login.html.twig', [
+            return $this->render('login.html.twig', [
                 'loginForm' => $loginForm->createView()
             ]);
         }
 
-        return $this->redirectToRoute('login_start');
+        return $this->render('login.html.twig');
     }
 
     /**

@@ -11,3 +11,4 @@ symfony/.env.test
 symfony/.gitignore
 symfony/var/
 symfony/phpunit.xml.dist
+tools/

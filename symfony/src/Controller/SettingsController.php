@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Constraints;
  */
 class SettingsController extends AbstractController
 {
-
     /**
      * @Route("/", name="settings")
      */
@@ -46,5 +45,4 @@ class SettingsController extends AbstractController
             'settingsForm' => $settingsForm->createView()
         ]);
     }
-
 }

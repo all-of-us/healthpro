@@ -1,13 +1,14 @@
 <?php
+
 namespace App\Service;
 
 use Pmi\Mail\Mandrill;
 
 class Message
 {
-    const MANDRILL = 2;
-    const LOG_ONLY = 3;
-    const TEST_SUB_PREFIX = '[TEST] ';
+    public const MANDRILL = 2;
+    public const LOG_ONLY = 3;
+    public const TEST_SUB_PREFIX = '[TEST] ';
 
     protected $env;
     protected $logger;
@@ -117,7 +118,7 @@ class Message
         if (preg_match($regex, $content, $m)) {
             $content = trim(preg_replace($regex, '', $content));
             $subject = trim($m[1]);
-        } else{
+        } else {
             $subject = '';
         }
         $this->setSubject($subject);
@@ -135,7 +136,9 @@ class Message
     protected function localLog($method)
     {
         if ($this->env->isLocal()) {
-            $this->logger->log('Email', "Sending via {$method}:\n" .
+            $this->logger->log(
+                'Email',
+                "Sending via {$method}:\n" .
                 "\tFrom: {$this->from}\n" .
                 "\tTo: " . implode(', ', $this->to) . "\n" .
                 "\tSubject: {$this->subject}\n" .

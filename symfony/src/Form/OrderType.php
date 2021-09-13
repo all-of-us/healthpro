@@ -60,7 +60,8 @@ class OrderType extends AbstractType
                 ])
             ];
             if ($options['step'] === 'finalized') {
-                array_push($constraints,
+                array_push(
+                    $constraints,
                     new Constraints\GreaterThan([
                         'value' => $options['order']->getCollectedTs(),
                         'message' => 'Finalized Time is before Collection Time'
@@ -71,7 +72,8 @@ class OrderType extends AbstractType
                     $processedTs = new \DateTime();
                     $processedTs->setTimestamp(max($processedSamplesTs));
                     $processedTs->setTimezone(new \DateTimeZone($options['timeZone']));
-                    array_push($constraints,
+                    array_push(
+                        $constraints,
                         new Constraints\GreaterThan([
                             'value' => $processedTs,
                             'message' => 'Finalized Time is before Processing Time'
@@ -149,8 +151,6 @@ class OrderType extends AbstractType
                 'label' => false,
                 'disabled' => $disabled,
                 'entry_options' => [
-                    'date_widget' => 'single_text',
-                    'time_widget' => 'single_text',
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy h:mm a',
                     'view_timezone' => $options['timeZone'],

@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Service\JiraService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -34,7 +35,13 @@ class ReleaseTicketCommand extends Command
     {
         $this
             ->setName('pmi:jira')
-            ->setDescription('Create Jira release ticket');
+            ->setDescription('Create Jira release ticket')
+            ->addOption(
+                'comment',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Comment type'
+            );
     }
 
     private function selectVersion(): ?string
@@ -161,9 +168,40 @@ class ReleaseTicketCommand extends Command
         }
     }
 
+    private function createApprovalRequestComment($ticketId): ?string
+    {
+        $businessApprovalIds = $this->defaultAccountIds['business'];
+        $securityApprovalIds = $this->defaultAccountIds['security'];
+        $comment = $this->templating->render('jira/approval-request-comment.txt.twig', [
+            'businessApprovals' => $businessApprovalIds,
+            'securityApprovals' => $securityApprovalIds
+        ]);
+
+        $createResult = $this->jira->createApprovalRequestComment($ticketId, $comment);
+        if ($createResult) {
+            $this->io->success(sprintf(
+                'Approval request commented: %s/browse/%s',
+                JiraService::INSTANCE_URL,
+                $ticketId
+            ));
+            return 0;
+        } else {
+            $this->io->error('Failed to create approval request');
+            return 1;
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
+
+        $comment = $input->getOption('comment');
+
+        if ($comment === 'approval') {
+            $this->io->section('Approval request comment');
+            $ticketId = $this->io->ask('Enter ticket id');
+            return $this->createApprovalRequestComment($ticketId);
+        }
 
         $version = $this->selectVersion();
         if ($version === null) {

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Form;
 
 use App\Entity\Site;
@@ -11,11 +12,11 @@ use Symfony\Component\Validator\Validation;
 
 class SiteType extends AbstractType
 {
-    const FIXED_ANGLE = 'fixed_angle';
-    const SWINGING_BUCKET = 'swinging_bucket';
-    const FULL_DATA_ACCESS = 'full_data';
-    const LIMITED_DATA_ACCESS = 'limited_data';
-    const DOWNLOAD_DISABLED = 'disabled';
+    public const FIXED_ANGLE = 'fixed_angle';
+    public const SWINGING_BUCKET = 'swinging_bucket';
+    public const FULL_DATA_ACCESS = 'full_data';
+    public const LIMITED_DATA_ACCESS = 'limited_data';
+    public const DOWNLOAD_DISABLED = 'disabled';
 
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -84,7 +85,7 @@ class SiteType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Length(['max' => 512]),
-                    new Constraints\Callback(function($list, $context) {
+                    new Constraints\Callback(function ($list, $context) {
                         $list = trim($list);
                         if (empty($list)) {
                             return;

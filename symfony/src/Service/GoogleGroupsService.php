@@ -6,14 +6,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Google_Client as GoogleClient;
 use Google_Service_Directory as GoogleDirectory;
 use Google_Service_Exception as GoogleException;
+use Google_Service_Directory_Member as GoogleMember;
 
 class GoogleGroupsService
 {
-    const RETRY_LIMIT = 5;
+    public const RETRY_LIMIT = 5;
     private $domain;
     private $client;
 
-    public function __construct(ContainerBagInterface $params, EnvironmentService $env) {
+    public function __construct(ContainerBagInterface $params, EnvironmentService $env)
+    {
         if (!$env->values['isUnitTest']) {
             $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');
@@ -27,7 +29,7 @@ class GoogleGroupsService
             $client->setApplicationName($applicationName);
             $client->setAuthConfig(json_decode($authJson, true));
             $client->setSubject($adminEmail);
-            $client->setScopes(GoogleDirectory::ADMIN_DIRECTORY_GROUP_READONLY);
+            $client->setScopes([GoogleDirectory::ADMIN_DIRECTORY_GROUP, GoogleDirectory::ADMIN_DIRECTORY_USER_READONLY]);
             $this->client = new GoogleDirectory($client);
             $this->domain = $params->get('gaDomain');
         }
@@ -41,13 +43,13 @@ class GoogleGroupsService
     {
         $resource = $this->client->$resourceName;
         $method = new \ReflectionMethod(get_class($resource), $methodName);
-        $doRetry = false; $retryCount = 0;
+        $doRetry = false;
+        $retryCount = 0;
         do {
             try {
                 $response = $method->invokeArgs($resource, $params);
                 $doRetry = false;
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 // implies a rate-limiting error that we should retry
                 if ($e->getCode() == 403 && $retryCount < self::RETRY_LIMIT) {
                     $micros = self::calculateBackoff($retryCount);
@@ -57,8 +59,9 @@ class GoogleGroupsService
                     usleep($micros);
                     $doRetry = true;
                     $retryCount++;
+                } else {
+                    throw $e;
                 }
-                else { throw $e; }
             }
         } while ($doRetry);
         return $response;
@@ -124,6 +127,92 @@ class GoogleGroupsService
             }
         } catch (GoogleException $e) {
             return null;
+        }
+    }
+
+    public function getMembers(string $groupEmail)
+    {
+        try {
+            $result = $this->callApi('members', 'listMembers', [$groupEmail]);
+            if ($result) {
+                return $result->getMembers();
+            }
+            return [];
+        } catch (GoogleException $e) {
+            return [];
+        }
+    }
+
+    public function getUser(string $user)
+    {
+        try {
+            $result = $this->callApi('users', 'get', [$user]);
+            if ($result) {
+                return $result;
+            }
+            return null;
+        } catch (GoogleException $e) {
+            return null;
+        }
+    }
+
+    public function getMemberById(string $groupEmail, string $memeberId)
+    {
+        try {
+            return $this->callApi('members', 'get', [$groupEmail, $memeberId]);
+        } catch (GoogleException $e) {
+            return null;
+        }
+    }
+
+    public function addMember(string $groupEmail, string $email)
+    {
+        try {
+            $member = new GoogleMember();
+            $member->setEmail($email);
+            $member->setRole('MEMBER');
+            $result = $this->callApi('members', 'insert', [$groupEmail, $member]);
+            if ($result && $email === $result->getEmail()) {
+                return [
+                    'status' => 'success',
+                    'message' => 'This member has been successfully added to the group.'
+                ];
+            }
+            return [
+                'status' => 'error',
+                'message' => 'Error occurred. Please try again.'
+            ];
+        } catch (GoogleException $e) {
+            return [
+                'status' => 'error',
+                'code' => $e->getCode(),
+                'message' => $e->getErrors()[0]['message']
+            ];
+        }
+    }
+
+    public function removeMember(string $groupEmail, string $email)
+    {
+        try {
+            $member = new GoogleMember();
+            $member->setEmail($email);
+            $member->setRole('MEMBER');
+            $result = $this->callApi('members', 'delete', [$groupEmail, $email]);
+            if ($result && $result->getStatusCode() === 204) {
+                return [
+                    'status' => 'success',
+                    'message' => 'This member has been successfully removed from the group.'
+                ];
+            }
+            return [
+                'status' => 'error',
+                'message' => 'Error occurred. Please try again.'
+            ];
+        } catch (GoogleException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getErrors()[0]['message']
+            ];
         }
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use Pmi\Security\User;
-use \Google_Service_Directory_Group as Group;
+use Google_Service_Directory_Group as Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
@@ -31,7 +31,6 @@ class MockGoogleGroupsService
                 foreach ($this->params->get('gaBypassGroups') as $arr) {
                     $groups[] = new Group($arr);
                 }
-
             } else {
                 $groups = [
                     new Group(['email' => User::SITE_PREFIX . 'hogwarts@pmi-ops.io', 'name' => 'Hogwarts']),

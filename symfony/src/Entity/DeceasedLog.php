@@ -6,6 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\DeceasedLogRepository")
+ * @ORM\Table(uniqueConstraints={
+ *   @ORM\UniqueConstraint(
+ *     name="deceased_log_unique",
+ *     columns={"participant_id", "organization_id", "deceased_status"})
+ *   })
  */
 class DeceasedLog
 {
@@ -22,7 +27,7 @@ class DeceasedLog
     private $participantId;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
     private $insertTs;
 

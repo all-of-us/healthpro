@@ -303,12 +303,20 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
     handleWeightProtocol: function() {
         var selected = this.$('#form_weight-protocol-modification').val();
         if (selected === 'cannot-balance-on-scale' || selected === 'refusal' || selected === 'pandemic') {
-            this.$('#form_weight').valChange('').attr('disabled', true);
-            this.$('.field-weight').next('.alt-units-block').hide();
+            this.$('#form_weight, #form_weight-prepregnancy').each(function () {
+                $(this).valChange('').attr('disabled', true);
+            });
+            this.$('.field-weight, .field-weight-prepregnancy').each(function () {
+                $(this).next('.alt-units-block').hide();
+            });
         } else {
             if (!this.finalized) {
                 this.$('#form_weight').attr('disabled', false);
                 this.$('.field-weight').next('.alt-units-block').show();
+                if (this.$('#form_pregnant').val() == 1) {
+                    this.$('#form_weight-prepregnancy').attr('disabled', false);
+                    this.$('.field-weight-prepregnancy').next('.alt-units-block').show();
+                }
             }
         }
         if (selected === 'other') {
@@ -728,10 +736,16 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         this.finalized = obj.finalized;
         this.rendered = false;
         this.render();
-        $('.ehr-date').pmiDateTimePicker({
-            'format': 'MM/DD/YYYY',
-            'useCurrent': false
-        });
+        var today = new Date();
+        var sixMonthsAgo = (new Date()).setMonth(today.getMonth() - 6);
+        if (!this.finalized) {
+            $('input.ehr-date').pmiDateTimePicker({
+                'format': 'MM/DD/YYYY',
+                'maxDate': today,
+                'minDate': sixMonthsAgo,
+                'useCurrent': false
+            });
+        }
     },
     render: function() {
         var self = this;

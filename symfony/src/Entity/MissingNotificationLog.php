@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class MissingNotificationLog
 {
-    const MEASUREMENT_TYPE = 'measurement';
-    const ORDER_TYPE = 'order';
+    public const MEASUREMENT_TYPE = 'measurement';
+    public const ORDER_TYPE = 'order';
 
     /**
      * @ORM\Id()

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Measurement;
 
 use App\Entity\Measurement;
@@ -6,7 +7,7 @@ use App\Helper\Util;
 
 class Fhir
 {
-    const CURRENT_VERSION = 2;
+    public const CURRENT_VERSION = 2;
     protected $data;
     protected $schema;
     protected $patient;
@@ -604,7 +605,8 @@ class Fhir
                     'display' => self::ordinalLabel('heart rate', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('blood-pressure-source', $replicate)
         );
         if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
             $concept = [

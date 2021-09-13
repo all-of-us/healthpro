@@ -12,9 +12,9 @@ use Pmi\Audit\Log;
 
 class OrderService
 {
-    const ORDER_CANCEL_STATUS = 'CANCELLED';
-    const ORDER_RESTORE_STATUS = 'UNSET';
-    const ORDER_EDIT_STATUS = 'AMENDED';
+    public const ORDER_CANCEL_STATUS = 'CANCELLED';
+    public const ORDER_RESTORE_STATUS = 'UNSET';
+    public const ORDER_EDIT_STATUS = 'AMENDED';
 
     protected $rdrApiService;
     protected $params;
@@ -92,8 +92,11 @@ class OrderService
     {
         try {
             $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->put("rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", $orderObject,
-                ['headers' => ['If-Match' => $result->meta->versionId]]);
+            $response = $this->rdrApiService->put(
+                "rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}",
+                $orderObject,
+                ['headers' => ['If-Match' => $result->meta->versionId]]
+            );
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
                 return true;
@@ -141,8 +144,11 @@ class OrderService
     {
         try {
             $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}", $orderObject,
-                ['headers' => ['If-Match' => $result->meta->versionId]]);
+            $response = $this->rdrApiService->patch(
+                "rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}",
+                $orderObject,
+                ['headers' => ['If-Match' => $result->meta->versionId]]
+            );
             $result = json_decode($response->getBody()->getContents());
             $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
             if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
