@@ -15,6 +15,11 @@ class JiraService
     private const DESTINATION_PROJECT_KEY = 'PD';
     private const DESTINATION_ISSUE_TYPE_ID = '10000'; // 10000 = story
 
+    private static $appIds = [
+        'Stable' => 'pmi-hpo-test',
+        'Production' => 'healthpro-prod'
+    ];
+
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
         if (!$params->has('jira_api_user') || !$params->has('jira_api_token')) {
@@ -86,6 +91,32 @@ class JiraService
                 ]
             ]);
             return $response && $response->getStatusCode() === 201 ? true : false;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function attachDeployOutput(string $version, string $env, string $ticketId): ?string
+    {
+        $headers = [
+            'Accept' => 'application/json',
+            'X-Atlassian-Token' => 'no-check'
+        ];
+        // TODO
+        $path = __DIR__ . '/../../../deploy_20210910_142556.txt';
+        $appId = self::$appIds[$env];
+        try {
+            $response = $this->client->request('POST', "issue/{$ticketId}/attachments", [
+                'headers' => $headers,
+                'multipart' => [
+                    [
+                        'name' => 'file',
+                        'contents' => fopen($path, 'rb'),
+                        'filename' => "{$appId}.release-{$version}.txt"
+                    ]
+                ]
+            ]);
+            return $response && $response->getStatusCode() === 200 ? true : false;
         } catch (\Exception $e) {
             return false;
         }

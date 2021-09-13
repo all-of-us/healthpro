@@ -93,6 +93,11 @@ class ReleaseTicketCommand extends Command
         return $version;
     }
 
+    private function selectEnvironment(): ?string
+    {
+        return $this->io->choice('Please select environment', ['Stable', 'Production']);
+    }
+
     private function getIssues(string $version): ?array
     {
         $this->io->section(sprintf('Tickets for release %s', $version));
@@ -191,6 +196,22 @@ class ReleaseTicketCommand extends Command
         }
     }
 
+    private function attachDeployOutput($version, $env, $ticketId): ?string
+    {
+        $createResult = $this->jira->attachDeployOutput($version, $env, $ticketId);
+        if ($createResult) {
+            $this->io->success(sprintf(
+                'Deploy output attached: %s/browse/%s',
+                JiraService::INSTANCE_URL,
+                $ticketId
+            ));
+            return 0;
+        } else {
+            $this->io->error('Failed to attach deploy output');
+            return 1;
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
@@ -207,6 +228,18 @@ class ReleaseTicketCommand extends Command
         if ($version === null) {
             $this->io->warning('No version selected.');
             return 1;
+        }
+
+        $env = $this->selectEnvironment();
+        if ($env === null) {
+            $this->io->warning('No environment selected.');
+            return 1;
+        }
+
+        if ($comment === 'file') {
+            $this->io->section('Attach deploy output');
+            $ticketId = $this->io->ask('Enter ticket id');
+            return $this->attachDeployOutput($version, $env, $ticketId);
         }
 
         $issues = $this->getIssues($version);
