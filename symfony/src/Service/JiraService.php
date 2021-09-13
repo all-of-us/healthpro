@@ -96,14 +96,14 @@ class JiraService
         }
     }
 
-    public function attachDeployOutput(string $version, string $env, string $ticketId): ?string
+    public function attachDeployOutput(string $version, string $env, string $file, string $ticketId): ?string
     {
         $headers = [
             'Accept' => 'application/json',
             'X-Atlassian-Token' => 'no-check'
         ];
-        // TODO
-        $path = __DIR__ . '/../../../deploy_20210910_142556.txt';
+        $appDir = realpath(__DIR__ . '/../../..');
+        $path = $appDir . "/{$file}";
         $appId = self::$appIds[$env];
         try {
             $response = $this->client->request('POST', "issue/{$ticketId}/attachments", [

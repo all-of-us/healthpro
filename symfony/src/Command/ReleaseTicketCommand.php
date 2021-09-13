@@ -98,6 +98,16 @@ class ReleaseTicketCommand extends Command
         return $this->io->choice('Please select environment', ['Stable', 'Production']);
     }
 
+    private function selectDeployFile(): ?string
+    {
+        $deployFiles = preg_grep('~^deploy_.*\.txt~', scandir(realpath(__DIR__ . '/../../..')));
+        if (!empty($deployFiles)) {
+            rsort($deployFiles);
+            return $this->io->choice('Please select deploy file', $deployFiles, 0);
+        }
+        return null;
+    }
+
     private function getIssues(string $version): ?array
     {
         $this->io->section(sprintf('Tickets for release %s', $version));
@@ -196,9 +206,9 @@ class ReleaseTicketCommand extends Command
         }
     }
 
-    private function attachDeployOutput($version, $env, $ticketId): ?string
+    private function attachDeployOutput($version, $env, $file, $ticketId): ?string
     {
-        $createResult = $this->jira->attachDeployOutput($version, $env, $ticketId);
+        $createResult = $this->jira->attachDeployOutput($version, $env, $file, $ticketId);
         if ($createResult) {
             $this->io->success(sprintf(
                 'Deploy output attached: %s/browse/%s',
@@ -230,16 +240,18 @@ class ReleaseTicketCommand extends Command
             return 1;
         }
 
-        $env = $this->selectEnvironment();
-        if ($env === null) {
-            $this->io->warning('No environment selected.');
-            return 1;
-        }
-
         if ($comment === 'file') {
+            $file = $this->selectDeployFile();
+            if ($file === null) {
+                $this->io->warning('No deploy files found.');
+                return 1;
+            }
+
+            $env = $this->selectEnvironment();
+
             $this->io->section('Attach deploy output');
             $ticketId = $this->io->ask('Enter ticket id');
-            return $this->attachDeployOutput($version, $env, $ticketId);
+            return $this->attachDeployOutput($version, $env, $file, $ticketId);
         }
 
         $issues = $this->getIssues($version);
