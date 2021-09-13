@@ -1,7 +1,11 @@
 <?php
-use Pmi\Entities\Participant;
 
-class ParticipantTest extends PHPUnit\Framework\TestCase
+namespace App\Test\Helper;
+
+use App\Helper\Participant;
+use PHPUnit\Framework\TestCase;
+
+class ParticipantTest extends TestCase
 {
     public function testMayolinkDob()
     {
