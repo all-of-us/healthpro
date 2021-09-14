@@ -15,11 +15,6 @@ class JiraService
     private const DESTINATION_PROJECT_KEY = 'PD';
     private const DESTINATION_ISSUE_TYPE_ID = '10000'; // 10000 = story
 
-    private static $appIds = [
-        'Stable' => 'pmi-hpo-test',
-        'Production' => 'healthpro-prod'
-    ];
-
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
         if (!$params->has('jira_api_user') || !$params->has('jira_api_token')) {
@@ -82,7 +77,7 @@ class JiraService
         return $responseObject->key ?? null;
     }
 
-    public function createApprovalRequestComment(string $ticketId, string $comment): ?string
+    public function createComment(string $ticketId, string $comment): ?string
     {
         try {
             $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
@@ -96,23 +91,20 @@ class JiraService
         }
     }
 
-    public function attachDeployOutput(string $version, string $env, string $file, string $ticketId): ?string
+    public function attachFile(string $ticketId, string $path, string $fileName): ?string
     {
-        $headers = [
-            'Accept' => 'application/json',
-            'X-Atlassian-Token' => 'no-check'
-        ];
-        $appDir = realpath(__DIR__ . '/../../..');
-        $path = $appDir . "/{$file}";
-        $appId = self::$appIds[$env];
         try {
+            $headers = [
+                'Accept' => 'application/json',
+                'X-Atlassian-Token' => 'no-check'
+            ];
             $response = $this->client->request('POST', "issue/{$ticketId}/attachments", [
                 'headers' => $headers,
                 'multipart' => [
                     [
                         'name' => 'file',
                         'contents' => fopen($path, 'rb'),
-                        'filename' => "{$appId}.release-{$version}.txt"
+                        'filename' => $fileName
                     ]
                 ]
             ]);

@@ -21,6 +21,11 @@ class ReleaseTicketCommand extends Command
     private $defaultAccountIds = []; // defined by jira_account_ids config
     private $developerAccountIds = []; // all assignees of tickets
 
+    private static $appIds = [
+        'Stable' => 'pmi-hpo-test',
+        'Production' => 'healthpro-prod'
+    ];
+
     public function __construct(JiraService $jira, Templating $templating, ParameterBagInterface $params)
     {
         $this->jira = $jira;
@@ -192,7 +197,7 @@ class ReleaseTicketCommand extends Command
             'securityApprovals' => $securityApprovalIds
         ]);
 
-        $createResult = $this->jira->createApprovalRequestComment($ticketId, $comment);
+        $createResult = $this->jira->createComment($ticketId, $comment);
         if ($createResult) {
             $this->io->success(sprintf(
                 'Approval request commented: %s/browse/%s',
@@ -206,12 +211,31 @@ class ReleaseTicketCommand extends Command
         }
     }
 
+    private function createDeployComment($ticketId, $env, $deployFileName): ?string
+    {
+        $comment = $this->templating->render('jira/deploy-output-comment.txt.twig', [
+            'env' => $env,
+            'deployFileName' => $deployFileName
+        ]);
+        return $this->jira->createComment($ticketId, $comment);
+    }
+
     private function attachDeployOutput($version, $env, $file, $ticketId): ?string
     {
-        $createResult = $this->jira->attachDeployOutput($version, $env, $file, $ticketId);
-        if ($createResult) {
+        $appDir = realpath(__DIR__ . '/../../..');
+        $path = $appDir . "/{$file}";
+        $appId = self::$appIds[$env];
+        $deployFileName = "{$appId}.release-{$version}.txt";
+        $attachResult = $this->jira->attachFile($ticketId, $path, $deployFileName);
+        if ($attachResult) {
+            $createResult = $this->createDeployComment($ticketId, $env, $deployFileName);
+            if ($createResult) {
+                $message = 'Deploy output attached and comment created.';
+            } else {
+                $message = 'Deploy output attached but comment not created.';
+            }
             $this->io->success(sprintf(
-                'Deploy output attached: %s/browse/%s',
+                $message . ' %s/browse/%s',
                 JiraService::INSTANCE_URL,
                 $ticketId
             ));
