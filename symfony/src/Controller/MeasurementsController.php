@@ -232,7 +232,7 @@ class MeasurementsController extends AbstractController
                 } else {
                     $this->addFlash('error', 'Failed to finalize the physical measurements. Please try again');
                 }
-                return $this->redirectToRoute('evaluation', [
+                return $this->redirectToRoute('measurement', [
                     'participantId' => $participant->id,
                     'measurementId' => $measurementId
                 ]);
