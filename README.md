@@ -57,3 +57,11 @@ Configure your local development parameters by copying the `dev_config/config.ym
 
 #### MySQL database configuration
 Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, run `bin/console doctine:migrations:migrate` to build your local database.
+
+## Jira Release Process
+
+To create security approval comment
+`./bin/console pmi:jira --coment=apporval`
+
+To attach deploy output
+`./bin/console pmi:jira --coment=file`
