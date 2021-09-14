@@ -86,7 +86,7 @@
     <script>
         $(document).ready(function () {
             // Add badge for count of Deceased Participant Reports for review
-            if ($('deceased_report_block').length) {
+            if ($('#deceased_report_block').length) {
                 var deceasedReportCount = 0;
                 $.ajax({
                     url: '/s/deceased-reports/stats'
