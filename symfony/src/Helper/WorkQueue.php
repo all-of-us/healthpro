@@ -686,6 +686,6 @@ class WorkQueue
             $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
             return self::dateFromString($authoredDate, $userTimezone);
         }
-        return 0;
+        return !$displayDate ? 0 : '';
     }
 }
