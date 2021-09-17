@@ -21,6 +21,11 @@ class ReleaseTicketCommand extends Command
     private $defaultAccountIds = []; // defined by jira_account_ids config
     private $developerAccountIds = []; // all assignees of tickets
 
+    private static $appIds = [
+        'Stable' => 'pmi-hpo-test',
+        'Production' => 'healthpro-prod'
+    ];
+
     public function __construct(JiraService $jira, Templating $templating, ParameterBagInterface $params)
     {
         $this->jira = $jira;
@@ -91,6 +96,21 @@ class ReleaseTicketCommand extends Command
         }
 
         return $version;
+    }
+
+    private function selectEnvironment(): ?string
+    {
+        return $this->io->choice('Please select environment', ['Stable', 'Production']);
+    }
+
+    private function selectDeployFile(): ?string
+    {
+        $deployFiles = glob('deploy_*.txt');
+        if (!empty($deployFiles)) {
+            rsort($deployFiles);
+            return $this->io->choice('Please select deploy file', $deployFiles, 0);
+        }
+        return null;
     }
 
     private function getIssues(string $version): ?array
@@ -177,7 +197,7 @@ class ReleaseTicketCommand extends Command
             'securityApprovals' => $securityApprovalIds
         ]);
 
-        $createResult = $this->jira->createApprovalRequestComment($ticketId, $comment);
+        $createResult = $this->jira->createComment($ticketId, $comment);
         if ($createResult) {
             $this->io->success(sprintf(
                 'Approval request commented: %s/browse/%s',
@@ -187,6 +207,41 @@ class ReleaseTicketCommand extends Command
             return 0;
         } else {
             $this->io->error('Failed to create approval request');
+            return 1;
+        }
+    }
+
+    private function createDeployComment($ticketId, $env, $deployFileName): ?string
+    {
+        $comment = $this->templating->render('jira/deploy-output-comment.txt.twig', [
+            'env' => $env,
+            'deployFileName' => $deployFileName
+        ]);
+        return $this->jira->createComment($ticketId, $comment);
+    }
+
+    private function attachDeployOutput($version, $env, $file, $ticketId): ?string
+    {
+        $appDir = realpath(__DIR__ . '/../../..');
+        $path = $appDir . "/{$file}";
+        $appId = self::$appIds[$env];
+        $deployFileName = "{$appId}.release-{$version}.txt";
+        $attachResult = $this->jira->attachFile($ticketId, $path, $deployFileName);
+        if ($attachResult) {
+            $createResult = $this->createDeployComment($ticketId, $env, $deployFileName);
+            if ($createResult) {
+                $message = 'Deploy output attached and comment created.';
+            } else {
+                $message = 'Deploy output attached but comment not created.';
+            }
+            $this->io->success(sprintf(
+                $message . ' %s/browse/%s',
+                JiraService::INSTANCE_URL,
+                $ticketId
+            ));
+            return 0;
+        } else {
+            $this->io->error('Failed to attach deploy output');
             return 1;
         }
     }
@@ -207,6 +262,20 @@ class ReleaseTicketCommand extends Command
         if ($version === null) {
             $this->io->warning('No version selected.');
             return 1;
+        }
+
+        if ($comment === 'file') {
+            $file = $this->selectDeployFile();
+            if ($file === null) {
+                $this->io->warning('No deploy files found.');
+                return 1;
+            }
+
+            $env = $this->selectEnvironment();
+
+            $this->io->section('Attach deploy output');
+            $ticketId = $this->io->ask('Enter ticket id');
+            return $this->attachDeployOutput($version, $env, $file, $ticketId);
         }
 
         $issues = $this->getIssues($version);
