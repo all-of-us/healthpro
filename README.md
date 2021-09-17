@@ -61,7 +61,7 @@ Create a new MySQL for this application.  Configure the MySQL connection in `con
 ## Jira Release Process
 
 To create security approval comment
-`./bin/console pmi:jira --coment=apporval`
+`./bin/console pmi:jira --comment=approval`
 
 To attach deploy output
-`./bin/console pmi:jira --coment=file`
+`./bin/console pmi:jira --comment=file`
