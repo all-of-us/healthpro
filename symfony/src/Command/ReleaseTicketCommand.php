@@ -105,7 +105,7 @@ class ReleaseTicketCommand extends Command
 
     private function selectDeployFile(): ?string
     {
-        $deployFiles = preg_grep('~^deploy_.*\.txt~', scandir(realpath(__DIR__ . '/../../..')));
+        $deployFiles = glob('deploy_*.txt');
         if (!empty($deployFiles)) {
             rsort($deployFiles);
             return $this->io->choice('Please select deploy file', $deployFiles, 0);
