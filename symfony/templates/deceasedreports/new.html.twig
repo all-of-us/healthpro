@@ -81,7 +81,7 @@ $(document).ready(function () {
       trigger: "keyup change"
   });
   
-  $('#deceased_report_dateOfDeath').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: Date(), useCurrent: false});
+  $('#deceased_report_dateOfDeath').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: new Date().setHours(23,59,59,999), useCurrent: false});
 
   var reportMechanism = $('input[name="deceased_report[reportMechanism]"]')
   var reportMechanismChecked = $('input[name="deceased_report[reportMechanism]"]:checked')
