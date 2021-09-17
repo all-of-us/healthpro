@@ -95,9 +95,12 @@ class MeasurementType extends AbstractType
                 unset($fieldOptions['scale']);
                 $class = Type\DateType::class;
                 $minDate = new \DateTime('-6 months');
+                $minDate->modify('-1 day')->setTime(0, 0, 0);
                 $constraints[] = new Constraints\Range([
-                    'min' => $minDate->modify('-1 day')->setTime(0, 0, 0),
+                    'min' => $minDate,
                     'max' => new \DateTime('today'),
+                    'minMessage' => 'Date cannot be greater than six months in the past',
+                    'maxMessage' => 'Date cannot be in the future',
                     'notInRangeMessage' => 'Date cannot be greater than six months in the past and cannot be in the future'
                 ]);
                 $dateOptions = [
