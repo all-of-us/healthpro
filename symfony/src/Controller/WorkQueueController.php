@@ -28,12 +28,14 @@ class WorkQueueController extends AbstractController
     protected $session;
     protected $workQueueService;
     protected $siteService;
+    protected $displayParticipantConsentsTab;
 
-    public function __construct(SessionInterface $session, WorkQueueService $workQueueService, SiteService $siteService)
+    public function __construct(SessionInterface $session, WorkQueueService $workQueueService, SiteService $siteService, ParameterBagInterface $params)
     {
         $this->session = $session;
         $this->workQueueService = $workQueueService;
         $this->siteService = $siteService;
+        $this->displayParticipantConsentsTab = $params->has('feature.participantconsentsworkqueue') ? $params->get('feature.participantconsentsworkqueue') : false;
     }
 
     /**
@@ -145,7 +147,8 @@ class WorkQueueController extends AbstractController
                 'isRdrError' => $this->workQueueService->isRdrError(),
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
-                'exportConfiguration' => $this->workQueueService->getExportConfiguration()
+                'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
+                'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab
             ]);
         }
     }
@@ -179,7 +182,7 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
-        if (isset($params['exportType']) && $params['exportType'] === 'consents') {
+        if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
             $exportHeaders = WorkQueue::getConsentExportHeaders();
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
@@ -296,6 +299,9 @@ class WorkQueueController extends AbstractController
      */
     public function consentsAction(Request $request)
     {
+        if (!$this->displayParticipantConsentsTab) {
+            throw $this->createNotFoundException();
+        }
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
         }
