@@ -370,59 +370,49 @@ class WorkQueueService
         $userTimezone = $this->userService->getUser()->getTimezone();
         foreach ($participants as $participant) {
             $row = [];
-            //Identifiers and status
-            if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
-                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
-                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-            } else {
-                $row['lastName'] = $e($participant->lastName);
-                $row['firstName'] = $e($participant->firstName);
-                $row['middleName'] = $e($participant->middleName);
+            foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+                if (isset($columnDef['generateLink'])) {
+                    if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
+                        $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
+                    } else {
+                        $row[$field] = $e($participant->{$columnDef['rdrField']});
+                    }
+                } elseif (isset($columnDef['formatDate'])) {
+                    if (!empty($participant->{$columnDef['rdrField']})) {
+                        $row[$field] = $participant->{$columnDef['rdrField']}->format('m/d/Y');
+                    } else {
+                        $row[$field] = '';
+                    }
+                } elseif (isset($columnDef['method'])) {
+                    if (isset($columnDef['rdrDateField'])) {
+                        if (isset($columnDef['otherField'])) {
+                            $row[$field] = WorkQueue::{$columnDef['method']}(
+                                $participant->{$columnDef['rdrField']},
+                                $participant->{$columnDef['otherField']},
+                                $participant->{$columnDef['rdrDateField']},
+                                $userTimezone
+                            );
+                        } else {
+                            $row[$field] = WorkQueue::{$columnDef['method']}(
+                                $participant->{$columnDef['rdrField']},
+                                $participant->{$columnDef['rdrDateField']},
+                                $userTimezone
+                            );
+                        }
+                    } elseif (isset($columnDef['displayNames'])) {
+                        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+                            $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
+                        }
+                    } else {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant,
+                            $userTimezone
+                        );
+                    }
+                } else {
+                    $row[$field] = $e($participant->{$columnDef['rdrField']});
+                }
             }
-            if (!empty($participant->dob)) {
-                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
-            } else {
-                $row['dateOfBirth'] = '';
-            }
-            $row['participantId'] = $e($participant->id);
-            $row['primaryConsent'] = WorkQueue::displayConsentStatus(
-                $participant->consentForStudyEnrollment,
-                $participant->consentForStudyEnrollmentAuthored,
-                $userTimezone
-            );
-            $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate($participant, $userTimezone);
-            $row['ehrConsent'] = WorkQueue::displayConsentStatus(
-                $participant->consentForElectronicHealthRecords,
-                $participant->consentForElectronicHealthRecordsAuthored,
-                $userTimezone
-            );
-            $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
-                $participant->ehrConsentExpireStatus,
-                $participant->consentForElectronicHealthRecords,
-                $participant->ehrConsentExpireAuthored,
-                $userTimezone
-            );
-            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
-                $participant->consentForGenomicsROR,
-                $participant->consentForGenomicsRORAuthored,
-                $userTimezone
-            );
-            $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
-                $participant->consentForDvElectronicHealthRecordsSharing,
-                $participant->consentForDvElectronicHealthRecordsSharingAuthored,
-                $userTimezone
-            );
-            $row['caborConsent'] = WorkQueue::displayConsentStatus(
-                $participant->consentForCABoR,
-                $participant->consentForCABoRAuthored,
-                $userTimezone
-            );
-            foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
-                $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
-            }
-            $row['consentCohort'] = $e($participant->consentCohortText);
-            $row['primaryLanguage'] = $e($participant->primaryLanguage);
             array_push($rows, $row);
         }
         return $rows;

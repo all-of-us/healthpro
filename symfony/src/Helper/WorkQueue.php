@@ -15,6 +15,106 @@ class WorkQueue
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
+    public static $columnsDef = [
+        'lastName' => [
+            'displayName' => 'Last Name',
+            'rdrField' => 'lastName',
+            'sortField' => 'lastName',
+            'generateLink' => true,
+        ],
+        'firstName' => [
+            'displayName' => 'First Name',
+            'rdrField' => 'firstName',
+            'sortField' => 'firstName',
+            'generateLink' => true
+        ],
+        'middleName' => [
+            'displayName' => 'Middle Name',
+            'rdrField' => 'middleName',
+            'sortField' => 'firstName',
+            'generateLink' => true
+        ],
+        'dateOfBirth' => [
+            'displayName' => 'Date of Birth',
+            'rdrField' => 'dob',
+            'sortField' => 'dateOfBirth',
+            'formatDate' => true
+        ],
+        'participantId' => [
+            'displayName' => 'PM ID',
+            'rdrField' => 'id',
+            'sortField' => 'participantId'
+        ],
+        'primaryConsent' => [
+            'displayName' => 'Primary Consent',
+            'rdrField' => 'consentForStudyEnrollment',
+            'sortField' => 'consentForStudyEnrollmentAuthored',
+            'rdrDateField' => 'consentForStudyEnrollmentAuthored',
+            'method' => 'displayConsentStatus',
+        ],
+        'questionnaireOnDnaProgram' => [
+            'displayName' => 'Program Update',
+            'rdrField' => 'questionnaireOnDnaProgram',
+            'sortField' => 'questionnaireOnDnaProgramAuthored',
+            'method' => 'displayProgramUpdate'
+        ],
+        'ehrConsent' => [
+            'displayName' => 'EHR Consent',
+            'rdrField' => 'consentForElectronicHealthRecords',
+            'sortField' => 'consentForElectronicHealthRecordsAuthored',
+            'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
+            'method' => 'displayConsentStatus'
+        ],
+        'ehrConsentExpireStatus' => [
+            'displayName' => 'EHR Expiration Status',
+            'rdrField' => 'ehrConsentExpireStatus',
+            'sortField' => 'ehrConsentExpireStatus',
+            'rdrDateField' => 'ehrConsentExpireAuthored',
+            'otherField' => 'consentForElectronicHealthRecords',
+            'method' => 'displayEhrConsentExpireStatus'
+        ],
+        'gRoRConsent' => [
+            'displayName' => 'gRoR Consent',
+            'rdrField' => 'consentForGenomicsROR',
+            'sortField' => 'consentForGenomicsRORAuthored',
+            'rdrDateField' => 'consentForGenomicsRORAuthored',
+            'method' => 'displayGenomicsConsentStatus'
+        ],
+        'dvEhrStatus' => [
+            'displayName' => 'DV-only EHR Sharing',
+            'rdrField' => 'consentForDvElectronicHealthRecordsSharing',
+            'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
+            'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
+            'method' => 'displayConsentStatus'
+        ],
+        'caborConsent' => [
+            'displayName' => 'CABoR Consent',
+            'rdrField' => 'consentForCABoR',
+            'sortField' => 'consentForCABoRAuthored',
+            'rdrDateField' => 'consentForCABoRAuthored',
+            'method' => 'displayConsentStatus'
+        ],
+        'digitalHealthSharingStatus' => [
+            'displayNames' => [
+                'Fitbit Consent',
+                'Apple HealthKit Consent',
+                'Apple EHR Consent'
+            ],
+            'rdrField' => 'digitalHealthSharingStatus',
+            'method' => 'getDigitalHealthSharingStatus'
+        ],
+        'consentCohort' => [
+            'displayName' => 'Consent Cohort',
+            'rdrField' => 'consentCohortText',
+            'sortField' => 'consentCohort'
+        ],
+        'primaryLanguage' => [
+            'displayName' => 'Language of Primary Consent',
+            'rdrField' => 'primaryLanguage',
+            'sortField' => 'primaryLanguage'
+        ]
+    ];
+
     public static $sortColumns = [
         'lastName',
         'firstName',
