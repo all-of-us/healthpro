@@ -151,3 +151,6 @@ ehr_protocol_banner_message:
 # feature.drcsupportemail:
 
 # backfill_order_limit: 1000
+
+# Displays participant consents tab in work queue
+# feature.participantconsentsworkqueue: false
