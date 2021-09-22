@@ -100,9 +100,9 @@ class WorkQueue
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [
-                'Fitbit Consent',
-                'Apple HealthKit Consent',
-                'Apple EHR Consent'
+                'fitbit' => 'Fitbit Consent',
+                'appleHealthKit' => 'Apple HealthKit Consent',
+                'appleEHR' => 'Apple EHR Consent'
             ],
             'rdrField' => 'digitalHealthSharingStatus',
             'method' => 'getDigitalHealthSharingStatus',

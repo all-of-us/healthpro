@@ -405,7 +405,7 @@ class WorkQueueService
                             );
                         }
                     } elseif (isset($columnDef['displayNames'])) {
-                        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+                        foreach (array_keys($columnDef['displayNames']) as $type) {
                             $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
                         }
                     }
@@ -531,7 +531,7 @@ class WorkQueueService
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $participant->{$columnDef['otherField']});
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
                 } elseif (isset($columnDef['displayNames'])) {
-                    foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
+                    foreach (array_keys($columnDef['displayNames']) as $type) {
                         $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
                         $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
                     }
