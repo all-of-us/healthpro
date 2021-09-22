@@ -52,6 +52,7 @@ class WorkQueue
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
         ],
         'questionnaireOnDnaProgram' => [
             'displayName' => 'Program Update',
@@ -59,14 +60,16 @@ class WorkQueue
             'sortField' => 'questionnaireOnDnaProgramAuthored',
             'rdrDateField' => 'questionnaireOnDnaProgramAuthored',
             'otherField' => 'consentCohort',
-            'method' => 'displayProgramUpdate'
+            'method' => 'displayProgramUpdate',
+            'htmlClass' => 'text-center'
         ],
         'ehrConsent' => [
             'displayName' => 'EHR Consent',
             'rdrField' => 'consentForElectronicHealthRecords',
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
-            'method' => 'displayConsentStatus'
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
         ],
         'ehrConsentExpireStatus' => [
             'displayName' => 'EHR Expiration Status',
@@ -75,28 +78,32 @@ class WorkQueue
             'rdrDateField' => 'ehrConsentExpireAuthored',
             'otherField' => 'consentForElectronicHealthRecords',
             'method' => 'displayEhrConsentExpireStatus',
-            'csvMethod' => 'csvEhrConsentExpireStatus'
+            'csvMethod' => 'csvEhrConsentExpireStatus',
+            'htmlClass' => 'text-center'
         ],
         'gRoRConsent' => [
             'displayName' => 'gRoR Consent',
             'rdrField' => 'consentForGenomicsROR',
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
-            'method' => 'displayGenomicsConsentStatus'
+            'method' => 'displayGenomicsConsentStatus',
+            'htmlClass' => 'text-center'
         ],
         'dvEhrStatus' => [
             'displayName' => 'DV-only EHR Sharing',
             'rdrField' => 'consentForDvElectronicHealthRecordsSharing',
             'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
-            'method' => 'displayConsentStatus'
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
         ],
         'caborConsent' => [
             'displayName' => 'CABoR Consent',
             'rdrField' => 'consentForCABoR',
             'sortField' => 'consentForCABoRAuthored',
             'rdrDateField' => 'consentForCABoRAuthored',
-            'method' => 'displayConsentStatus'
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [
@@ -106,12 +113,15 @@ class WorkQueue
             ],
             'rdrField' => 'digitalHealthSharingStatus',
             'method' => 'getDigitalHealthSharingStatus',
-            'csvMethod' => 'csvDigitalHealthSharingStatus'
+            'csvMethod' => 'csvDigitalHealthSharingStatus',
+            'htmlClass' => 'text-center',
+            'orderable' => false
         ],
         'consentCohort' => [
             'displayName' => 'Consent Cohort',
             'rdrField' => 'consentCohortText',
-            'sortField' => 'consentCohort'
+            'sortField' => 'consentCohort',
+            'htmlClass' => 'text-center'
         ],
         'primaryLanguage' => [
             'displayName' => 'Language of Primary Consent',

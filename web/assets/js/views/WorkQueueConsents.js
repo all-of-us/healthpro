@@ -56,32 +56,33 @@ $(document).ready(function() {
 
     var url = window.location.href;
 
-    var digitalHealthSharingTypes = $('#workqueue_consents').data('digital-health-sharing-types');
+    var columnsDef = $('#workqueue_consents').data('columns-def');
+
+    var generateTableRow = function (field, columnDef) {
+        var row = {};
+        row.name = field;
+        row.data = field;
+        if (columnDef.hasOwnProperty('htmlClass')) {
+            row.class = columnDef['htmlClass']
+        }
+        if (columnDef.hasOwnProperty('orderable')) {
+            row.class = columnDef['orderable']
+        }
+        tableColumns.push(row);
+    };
+
 
     var tableColumns = [];
-    tableColumns.push(
-        { name: 'lastName', data: 'lastName' },
-        { name: 'firstName', data: 'firstName' },
-        { name: 'middleName', data: 'middleName' },
-        { name: 'dateOfBirth', data: 'dateOfBirth' },
-        { name: 'participantId', data: 'participantId' },
-        { name: 'primaryConsent', data: 'primaryConsent', class: 'text-center' },
-        { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
-        { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
-        { name: 'ehrConsentExpireStatus', data: 'ehrConsentExpireStatus', class: 'text-center' },
-        { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
-        { name: 'dvEhrStatus', data: 'dvEhrStatus', class: 'text-center' },
-        { name: 'caborConsent', data: 'caborConsent', class: 'text-center' }
-    );
-    Object.keys(digitalHealthSharingTypes).forEach(function (key, _i) {
-        tableColumns.push(
-            {name: key + 'Consent', data: key + 'Consent', class: 'text-center', orderable: false}
-        );
-    });
-    tableColumns.push(
-        { name: 'consentCohort', data: 'consentCohort', class: 'text-center' },
-        { name: 'primaryLanguage', data: 'primaryLanguage' },
-    );
+
+    for (const [field, columnDef] of Object.entries(columnsDef)) {
+        if (columnDef.hasOwnProperty('displayNames')) {
+            Object.keys(columnDef['displayNames']).forEach(function (key, _i) {
+                generateTableRow(key + 'Consent', columnDef)
+            });
+        } else {
+            generateTableRow(field, columnDef)
+        }
+    }
 
     $('#workqueue_consents').DataTable({
         processing: true,
