@@ -38,7 +38,8 @@ class WorkQueue
             'displayName' => 'Date of Birth',
             'rdrField' => 'dob',
             'sortField' => 'dateOfBirth',
-            'formatDate' => true
+            'formatDate' => true,
+            'csvMethod' => 'csvDateFromObject'
         ],
         'participantId' => [
             'displayName' => 'PM ID',
@@ -73,7 +74,8 @@ class WorkQueue
             'sortField' => 'ehrConsentExpireStatus',
             'rdrDateField' => 'ehrConsentExpireAuthored',
             'otherField' => 'consentForElectronicHealthRecords',
-            'method' => 'displayEhrConsentExpireStatus'
+            'method' => 'displayEhrConsentExpireStatus',
+            'csvMethod' => 'csvEhrConsentExpireStatus'
         ],
         'gRoRConsent' => [
             'displayName' => 'gRoR Consent',
@@ -103,7 +105,8 @@ class WorkQueue
                 'Apple EHR Consent'
             ],
             'rdrField' => 'digitalHealthSharingStatus',
-            'method' => 'getDigitalHealthSharingStatus'
+            'method' => 'getDigitalHealthSharingStatus',
+            'csvMethod' => 'csvDigitalHealthSharingStatus'
         ],
         'consentCohort' => [
             'displayName' => 'Consent Cohort',
