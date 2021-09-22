@@ -239,7 +239,12 @@ class WorkQueueService
                 $participant->consentForStudyEnrollmentFirstYesAuthored,
                 $userTimezone
             );
-            $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate($participant, $userTimezone);
+            $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate(
+                $participant->consentCohort,
+                $participant->questionnaireOnDnaProgram,
+                $participant->questionnaireOnDnaProgramAuthored,
+                $userTimezone
+            );
             $row['firstEhrConsent'] = WorkQueue::displayFirstConsentStatusTime(
                 $participant->consentForElectronicHealthRecordsFirstYesAuthored,
                 $userTimezone,
@@ -251,8 +256,8 @@ class WorkQueueService
                 $userTimezone
             );
             $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
-                $participant->ehrConsentExpireStatus,
                 $participant->consentForElectronicHealthRecords,
+                $participant->ehrConsentExpireStatus,
                 $participant->ehrConsentExpireAuthored,
                 $userTimezone
             );
@@ -387,8 +392,8 @@ class WorkQueueService
                     if (isset($columnDef['rdrDateField'])) {
                         if (isset($columnDef['otherField'])) {
                             $row[$field] = WorkQueue::{$columnDef['method']}(
-                                $participant->{$columnDef['rdrField']},
                                 $participant->{$columnDef['otherField']},
+                                $participant->{$columnDef['rdrField']},
                                 $participant->{$columnDef['rdrDateField']},
                                 $userTimezone
                             );
@@ -403,11 +408,6 @@ class WorkQueueService
                         foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
                             $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
                         }
-                    } else {
-                        $row[$field] = WorkQueue::{$columnDef['method']}(
-                            $participant,
-                            $userTimezone
-                        );
                     }
                 } else {
                     $row[$field] = $e($participant->{$columnDef['rdrField']});

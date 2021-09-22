@@ -56,6 +56,8 @@ class WorkQueue
             'displayName' => 'Program Update',
             'rdrField' => 'questionnaireOnDnaProgram',
             'sortField' => 'questionnaireOnDnaProgramAuthored',
+            'rdrDateField' => 'questionnaireOnDnaProgramAuthored',
+            'otherField' => 'consentCohort',
             'method' => 'displayProgramUpdate'
         ],
         'ehrConsent' => [
@@ -709,8 +711,8 @@ class WorkQueue
     }
 
     public static function displayEhrConsentExpireStatus(
-        $ehrConsentExpireStatus,
         $consentForElectronicHealthRecords,
+        $ehrConsentExpireStatus,
         $time,
         $userTimezone,
         $displayTime = true
@@ -750,12 +752,12 @@ class WorkQueue
         }
     }
 
-    public static function displayProgramUpdate($participant, $userTimezone)
+    public static function displayProgramUpdate($consentCohort, $questionnaireOnDnaProgram, $questionnaireOnDnaProgramAuthored, $userTimezone)
     {
-        if ($participant->consentCohort !== 'COHORT_2') {
+        if ($consentCohort !== 'COHORT_2') {
             return self::HTML_NOTICE . ' (not applicable) ';
-        } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $userTimezone);
+        } elseif ($questionnaireOnDnaProgram === 'SUBMITTED') {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($questionnaireOnDnaProgramAuthored, $userTimezone);
         } else {
             return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
