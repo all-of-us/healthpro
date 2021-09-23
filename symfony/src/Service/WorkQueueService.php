@@ -525,7 +525,7 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
-        foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+        foreach (array_values(WorkQueue::$columnsDef) as $columnDef) {
             if (isset($columnDef['csvMethod'])) {
                 if (isset($columnDef['otherField'])) {
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $participant->{$columnDef['otherField']});

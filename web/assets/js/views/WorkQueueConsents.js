@@ -58,29 +58,28 @@ $(document).ready(function() {
 
     var columnsDef = $('#workqueue_consents').data('columns-def');
 
+    var tableColumns = [];
+
     var generateTableRow = function (field, columnDef) {
         var row = {};
         row.name = field;
         row.data = field;
         if (columnDef.hasOwnProperty('htmlClass')) {
-            row.class = columnDef['htmlClass']
+            row.class = columnDef['htmlClass'];
         }
         if (columnDef.hasOwnProperty('orderable')) {
-            row.class = columnDef['orderable']
+            row.class = columnDef['orderable'];
         }
         tableColumns.push(row);
     };
 
-
-    var tableColumns = [];
-
     for (const [field, columnDef] of Object.entries(columnsDef)) {
         if (columnDef.hasOwnProperty('displayNames')) {
             Object.keys(columnDef['displayNames']).forEach(function (key, _i) {
-                generateTableRow(key + 'Consent', columnDef)
+                generateTableRow(key + 'Consent', columnDef);
             });
         } else {
-            generateTableRow(field, columnDef)
+            generateTableRow(field, columnDef);
         }
     }
 
