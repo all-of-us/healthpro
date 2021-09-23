@@ -77,7 +77,7 @@ class JiraService
         return $responseObject->key ?? null;
     }
 
-    public function createApprovalRequestComment(string $ticketId, string $comment): ?string
+    public function createComment(string $ticketId, string $comment): ?string
     {
         try {
             $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
@@ -86,6 +86,29 @@ class JiraService
                 ]
             ]);
             return $response && $response->getStatusCode() === 201 ? true : false;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function attachFile(string $ticketId, string $path, string $fileName): ?string
+    {
+        try {
+            $headers = [
+                'Accept' => 'application/json',
+                'X-Atlassian-Token' => 'no-check'
+            ];
+            $response = $this->client->request('POST', "issue/{$ticketId}/attachments", [
+                'headers' => $headers,
+                'multipart' => [
+                    [
+                        'name' => 'file',
+                        'contents' => fopen($path, 'rb'),
+                        'filename' => $fileName
+                    ]
+                ]
+            ]);
+            return $response && $response->getStatusCode() === 200 ? true : false;
         } catch (\Exception $e) {
             return false;
         }

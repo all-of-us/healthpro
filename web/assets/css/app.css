@@ -353,7 +353,7 @@ label.label-normal {
 .multiheader-metrics {
     background-color: #edb;
 }
-.multiheader-consent {
+.multiheader-consent, .col-consent {
     background-color: #efd;
 }
 .dataTables_processing {

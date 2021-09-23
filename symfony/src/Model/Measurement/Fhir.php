@@ -605,7 +605,8 @@ class Fhir
                     'display' => self::ordinalLabel('heart rate', $replicate),
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
-            ]
+            ],
+            $this->getEffectiveDateTime('blood-pressure-source', $replicate)
         );
         if ($this->data->{'irregular-heart-rate'}[$replicate - 1]) {
             $concept = [
