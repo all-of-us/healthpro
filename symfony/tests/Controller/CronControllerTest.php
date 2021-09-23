@@ -11,7 +11,7 @@ class CronControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/s/cron/ping-test');
 
-        $this->assertResponseStatusCodeSame('404', 'Returns a 404 without header set.');
+        $this->assertResponseStatusCodeSame(404, 'Returns a 404 without header set.');
     }
 
     public function testWitHeader()
