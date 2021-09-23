@@ -65,7 +65,7 @@ class MeasurementQueueService
                     'fhir_version' => Fhir::CURRENT_VERSION
                 ]);
             } else {
-                $measurementQueue->attemptedTs($now);
+                $measurementQueue->setAttemptedTs($now);
                 $this->em->persist($measurementQueue);
                 $this->em->flush();
                 $this->logger->error("#{$measurementId} failed sending to RDR: " . $this->measurementService->getLastError());
