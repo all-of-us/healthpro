@@ -130,10 +130,14 @@ class GoogleGroupsService
         }
     }
 
-    public function getMembers(string $groupEmail)
+    public function getMembers(string $groupEmail, $roles = [])
     {
+        $params = [];
+        if (!empty($roles)) {
+            $params['roles'] = join(',', $roles);
+        }
         try {
-            $result = $this->callApi('members', 'listMembers', [$groupEmail]);
+            $result = $this->callApi('members', 'listMembers', [$groupEmail, $params]);
             if ($result) {
                 return $result->getMembers();
             }

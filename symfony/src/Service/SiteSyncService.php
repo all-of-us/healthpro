@@ -21,11 +21,8 @@ class SiteSyncService
     private $normalizer;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
-    private $googleGroupsService;
     private $stopwatch;
     private $adminEmails = [];
-
-    public const MEMBER_DOMAIN = '@pmi-ops.org';
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -34,7 +31,6 @@ class SiteSyncService
         LoggerService $loggerService,
         ParameterBagInterface $params,
         NormalizerInterface $normalizer,
-        GoogleGroupsService $googleGroupsService,
         Stopwatch $stopwatch
     ) {
         $this->rdrApiService = $rdrApiService;
@@ -43,7 +39,6 @@ class SiteSyncService
         $this->loggerService = $loggerService;
         $this->params = $params;
         $this->normalizer = $normalizer;
-        $this->googleGroupsService = $googleGroupsService;
         $this->stopwatch = $stopwatch;
     }
 
@@ -142,29 +137,6 @@ class SiteSyncService
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
                     $siteData->setType($awardee->type);
                     $siteData->setSiteType(isset($site->siteType) ? $site->siteType : null);
-                    if ($this->env->isProd() || $this->env->isLocal()) {
-                        $siteAdmins = [];
-                        $this->stopwatch->start('siteemails', 'getMembers');
-                        $members = $this->googleGroupsService->getMembers($siteId . self::MEMBER_DOMAIN);
-                        $this->stopwatch->stop('siteemails', 'getMembers');
-                        foreach ($members as $member) {
-                            if ($member->role === 'MANAGER' && $member->status === 'ACTIVE') {
-                                if (isset($this->adminEmails[$member->email])) {
-                                    $siteAdmins[] = $member->recoveryEmail;
-                                    $this->adminEmails[$member->email] = $member->recoveryEmail;
-                                    continue;
-                                }
-                                $this->stopwatch->start('siteemails', 'getUser');
-                                $member = $this->googleGroupsService->getUser($member->email);
-                                $this->stopwatch->stop('siteemails', 'getUser');
-                                $siteAdmins[] = $member->recoveryEmail;
-                            }
-                        }
-                        $siteData->setEmail(null);
-                        if (!empty($siteAdmins)) {
-                            $siteData->setEmail(join(', ', $siteAdmins));
-                        }
-                    }
                     if (empty($siteData->getWorkqueueDownload())) {
                         $siteData->setWorkqueueDownload('full_data'); // default value for workqueue downlaod
                     }
