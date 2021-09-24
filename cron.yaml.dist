@@ -23,6 +23,10 @@ cron:
   url: /s/cron/sites
   schedule: every day 20:00
   timezone: America/Chicago
+- description: "Sync sites admin emails"
+  url: /s/cron/sites-email-sync
+  schedule: every day 21:00
+  timezone: America/Chicago
 - description: "Sync awardees and organizations"
   url: /s/cron/awardees-organizations
   schedule: every day 20:01

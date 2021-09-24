@@ -61,7 +61,7 @@ class CronController extends AbstractController
     /**
      * @Route("/sites-email-sync", name="cron_sites_email")
      */
-    public function sitesSyncEmail(KernelInterface $kernel): Response
+    public function sitesEmailSync(KernelInterface $kernel): Response
     {
         $application = new Application($kernel);
         $application->setAutoExit(false);
