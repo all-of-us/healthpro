@@ -407,7 +407,8 @@ class WorkQueueController extends AbstractController
                 'isRdrError' => $this->workQueueService->isRdrError(),
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
-                'exportConfiguration' => $this->workQueueService->getExportConfiguration()
+                'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
+                'columnsDef' => WorkQueue::$columnsDef
             ]);
         }
     }
