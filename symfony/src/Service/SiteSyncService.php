@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 class SiteSyncService
 {
@@ -21,8 +20,6 @@ class SiteSyncService
     private $normalizer;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
-    private $stopwatch;
-    private $adminEmails = [];
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -30,8 +27,7 @@ class SiteSyncService
         EnvironmentService $env,
         LoggerService $loggerService,
         ParameterBagInterface $params,
-        NormalizerInterface $normalizer,
-        Stopwatch $stopwatch
+        NormalizerInterface $normalizer
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->em = $em;
@@ -39,7 +35,6 @@ class SiteSyncService
         $this->loggerService = $loggerService;
         $this->params = $params;
         $this->normalizer = $normalizer;
-        $this->stopwatch = $stopwatch;
     }
 
     private function getAwardeeEntriesFromRdr()
