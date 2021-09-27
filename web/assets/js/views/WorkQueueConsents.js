@@ -83,7 +83,7 @@ $(document).ready(function() {
         }
     }
 
-    $('#workqueue_consents').DataTable({
+    var workQueueTable = $('#workqueue_consents').DataTable({
         processing: true,
         serverSide: true,
         scrollX: true,
@@ -131,4 +131,12 @@ $(document).ready(function() {
         }, 'slow');
         $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
+
+    $('.toggle-vis').on( 'click', function (e) {
+        // Get the column API object
+        var column = workQueueTable.column( $(this).attr('data-column') );
+
+        // Toggle the visibility
+        column.visible( ! column.visible() );
+    } );
 });
