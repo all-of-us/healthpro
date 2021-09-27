@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Form\DebugParticipantLookupType;
 use App\Form\MissingMeasurementsType;
 use App\Form\MissingOrdersType;
+use App\Model\Measurement\Fhir;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use App\Service\MeasurementService;
@@ -95,7 +96,7 @@ class DebugToolsController extends AbstractController
                     if ($rdrEvalId = $measurementsService->createMeasurement($measurement->getParticipantId(), $fhir)) {
                         $updateMeasurement = $repository->find($measurement->getId());
                         $updateMeasurement->setRdrId($rdrEvalId);
-                        $updateMeasurement->setFhirVersion(\Pmi\Evaluation\Fhir::CURRENT_VERSION);
+                        $updateMeasurement->setFhirVersion(Fhir::CURRENT_VERSION);
                         $em->flush();
                         $em->clear();
                         $this->addFlash('success', "#{$id} successfully sent to RDR");

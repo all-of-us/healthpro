@@ -51,7 +51,7 @@ class ReviewService
             'OR (o.processed_ts >= :startTime AND o.processed_ts < :endTime) ' .
             'OR (o.finalized_ts >= :startTime AND o.finalized_ts < :endTime) ' .
             'OR (oh.created_ts >= :startTime AND oh.created_ts < :endTime)) ';
-        $measurementsQuery = 'SELECT e.participant_id, \'evaluation\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, ' .
+        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, ' .
             'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
             'eh.type as h_type, ' .
             'null ' .
@@ -95,7 +95,7 @@ class ReviewService
                     $participants[$participantId]['orders'][] = $row;
                     $participants[$participantId]['ordersCount']++;
                     break;
-                case 'evaluation':
+                case 'measurement':
                     // Get physical measurements status
                     foreach (self::$measurementsStatus as $field => $status) {
                         if ($row[$field]) {

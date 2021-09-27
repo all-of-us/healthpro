@@ -93,9 +93,6 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.5"
     },
-    "fzaninotto/faker": {
-        "version": "v1.9.1"
-    },
     "geoip2/geoip2": {
         "version": "v2.10.0"
     },
@@ -254,9 +251,6 @@
             "tests/bootstrap.php"
         ]
     },
-    "pimple/pimple": {
-        "version": "v3.2.3"
-    },
     "psr/cache": {
         "version": "1.0.1"
     },
@@ -316,9 +310,6 @@
     },
     "sebastian/version": {
         "version": "3.0.2"
-    },
-    "silex/silex": {
-        "version": "v2.3.0"
     },
     "symfony/asset": {
         "version": "v4.4.11"

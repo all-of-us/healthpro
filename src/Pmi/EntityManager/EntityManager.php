@@ -7,13 +7,6 @@ class EntityManager
 {
     protected $dbal;
 
-    // Define custom repositories
-    protected $entities = [
-        'orders' => 'Order',
-        'evaluations' => 'Evaluation',
-        'problems' => 'Problem'
-    ];
-
     protected $timezone;
 
     public function setDbal($dbal)
@@ -25,12 +18,7 @@ class EntityManager
         if (!$this->dbal) {
             throw new \Exception('No DBAL available');
         }
-        if (isset($this->entities[$entity])) {
-            $repository = __NAMESPACE__ . '\\' . $this->entities[$entity] . 'Repository';
-            return new $repository($this->dbal, $entity, $this->getTimezone());
-        } else {
-            return new DoctrineRepository($this->dbal, $entity, $this->getTimezone());
-        }
+        return new DoctrineRepository($this->dbal, $entity, $this->getTimezone());
     }
 
     public function fetchAll($query, $parameters)
