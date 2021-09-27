@@ -28,12 +28,14 @@ class WorkQueueController extends AbstractController
     protected $session;
     protected $workQueueService;
     protected $siteService;
+    protected $displayParticipantConsentsTab;
 
-    public function __construct(SessionInterface $session, WorkQueueService $workQueueService, SiteService $siteService)
+    public function __construct(SessionInterface $session, WorkQueueService $workQueueService, SiteService $siteService, ParameterBagInterface $params)
     {
         $this->session = $session;
         $this->workQueueService = $workQueueService;
         $this->siteService = $siteService;
+        $this->displayParticipantConsentsTab = $params->has('feature.participantconsentsworkqueue') ? $params->get('feature.participantconsentsworkqueue') : false;
     }
 
     /**
@@ -124,7 +126,7 @@ class WorkQueueController extends AbstractController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable');
+            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$sortColumns);
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
             $ajaxData['data'] = $this->workQueueService->generateTableRows($participants);
@@ -145,7 +147,8 @@ class WorkQueueController extends AbstractController
                 'isRdrError' => $this->workQueueService->isRdrError(),
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
-                'exportConfiguration' => $this->workQueueService->getExportConfiguration()
+                'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
+                'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab
             ]);
         }
     }
@@ -179,8 +182,16 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
-
-        $stream = function () use ($params, $awardee, $limit, $pageSize) {
+        if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
+            $exportHeaders = WorkQueue::getConsentExportHeaders();
+            $exportRowMethod = 'generateConsentExportRow';
+            $fileName = 'workqueue_consents';
+        } else {
+            $exportHeaders = WorkQueue::getExportHeaders();
+            $exportRowMethod = 'generateExportRow';
+            $fileName = 'workqueue';
+        }
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -190,12 +201,12 @@ class WorkQueueController extends AbstractController
             );
             fwrite($output, "\"\"\n");
 
-            fputcsv($output, WorkQueue::getExportHeaders());
+            fputcsv($output, $exportHeaders);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->generateExportRow($participant));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {
@@ -206,7 +217,7 @@ class WorkQueueController extends AbstractController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-        $filename = "workqueue_{$awardee}_" . date('Ymd-His') . '.csv';
+        $filename = "{$fileName}_{$awardee}_" . date('Ymd-His') . '.csv';
 
         $loggerService->log(Log::WORKQUEUE_EXPORT, [
             'filter' => $params,
@@ -281,5 +292,123 @@ class WorkQueueController extends AbstractController
             'readOnly' => true,
             'biobankView' => true
         ]);
+    }
+
+    /**
+     * @Route("/consents", name="workqueue_consents")
+     */
+    public function consentsAction(Request $request)
+    {
+        if (!$this->displayParticipantConsentsTab) {
+            throw $this->createNotFoundException();
+        }
+        if ($this->isGranted('ROLE_USER')) {
+            $awardee = $this->siteService->getSiteAwardee();
+        }
+        if ($this->isGranted('ROLE_AWARDEE')) {
+            $awardees = $this->siteService->getSuperUserAwardees();
+            if (!empty($awardees)) {
+                if (($sessionAwardee = $this->session->get('awardeeOrganization')) && in_array($sessionAwardee, $awardees)) {
+                    $awardee = $sessionAwardee;
+                } else {
+                    // Default to first organization
+                    $awardee = $awardees[0];
+                }
+            }
+        }
+        if (empty($awardee)) {
+            return $this->render('workqueue/no-organization.html.twig');
+        }
+
+        $params = array_filter($request->query->all());
+        $filters = WorkQueue::$consentFilters;
+
+        if ($this->isGranted('ROLE_AWARDEE')) {
+            // Add awardees list to filters
+            $awardeesList = [];
+            $awardeesList['awardee']['label'] = 'Awardee';
+            foreach ($awardees as $awardee) {
+                $awardeesList['awardee']['options'][$this->siteService->getAwardeeDisplayName($awardee)] = $awardee;
+            }
+            $awardeesList['awardee']['options']['Salivary Pilot'] = 'salivary_pilot';
+            $filters = array_merge($filters, $awardeesList);
+
+            // Set to selected awardee
+            if (isset($params['awardee'])) {
+                // Check if the super user has access to this awardee
+                if ($params['awardee'] !== 'salivary_pilot' && !in_array($params['awardee'], $this->siteService->getSuperUserAwardees())) {
+                    throw $this->createAccessDeniedException();
+                }
+                $awardee = $params['awardee'];
+                unset($params['awardee']);
+            }
+            // Save selected (or default) awardee in session
+            $this->session->set('workQueueAwardee', $awardee);
+
+            // Remove patient status filter for awardee
+            unset($filters['patientStatus']);
+        }
+
+        // Display current organization in the default patient status filter drop down label
+        if (isset($filters['patientStatus'])) {
+            $filters['patientStatus']['label'] = 'Patient Status at ' . $this->siteService->getOrganizationDisplayName($this->siteService->getSiteOrganization());
+        }
+
+        $sites = $this->siteService->getAwardeeSites($awardee);
+        if (!empty($sites)) {
+            //Add sites filter
+            $sitesList = [];
+            $sitesList['site']['label'] = 'Paired Site';
+            foreach ($sites as $site) {
+                if (!empty($site->getGoogleGroup())) {
+                    $sitesList['site']['options'][$site->getName()] = $site->getGoogleGroup();
+                }
+            }
+            $sitesList['site']['options']['Unpaired'] = 'UNSET';
+            $filters = array_merge($filters, $sitesList);
+
+            //Add organization filter
+            $organizationsList = [];
+            $organizationsList['organization_id']['label'] = 'Paired Organization';
+            foreach ($sites as $site) {
+                if (!empty($site->getOrganizationId())) {
+                    $organizationsList['organization_id']['options'][$this->siteService->getOrganizationDisplayName($site->getOrganizationId())] = $site->getOrganizationId();
+                }
+            }
+            $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
+            $filters = array_merge($filters, $organizationsList);
+        }
+
+        //For ajax requests
+        if ($request->isXmlHttpRequest()) {
+            $params = array_merge($params, array_filter($request->request->all()));
+            if (!empty($params['patientStatus'])) {
+                $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
+            }
+            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
+            $ajaxData = [];
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
+            $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
+            $responseCode = 200;
+            if ($this->workQueueService->isRdrError()) {
+                $responseCode = 500;
+            }
+            return $this->json($ajaxData, $responseCode);
+        } else {
+            $params['exportType'] = 'consents';
+            return $this->render('workqueue/consents.html.twig', [
+                'filters' => $filters,
+                'surveys' => WorkQueue::$surveys,
+                'samples' => WorkQueue::$samples,
+                'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
+                'participants' => [],
+                'params' => $params,
+                'awardee' => $awardee,
+                'isRdrError' => $this->workQueueService->isRdrError(),
+                'samplesAlias' => WorkQueue::$samplesAlias,
+                'canExport' => $this->workQueueService->canExport(),
+                'exportConfiguration' => $this->workQueueService->getExportConfiguration()
+            ]);
+        }
     }
 }

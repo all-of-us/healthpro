@@ -55,3 +55,7 @@ cron:
   url: /s/cron/backfill-order-processed-time
   schedule: 29 of feb 00:00
   timezone: America/Chicago
+- description: "Resend physical measurements to RDR from evaluations queue table"
+  url: /s/cron/resend-measurements-rdr
+  schedule: 29 of feb 00:00
+  timezone: America/Chicago
