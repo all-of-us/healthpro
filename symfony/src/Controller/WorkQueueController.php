@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Problem;
+use App\Form\WorkQueueParticipantLookupIdType;
+use App\Form\WorkQueueParticipantLookupSearchType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -302,6 +304,8 @@ class WorkQueueController extends AbstractController
         if (!$this->displayParticipantConsentsTab) {
             throw $this->createNotFoundException();
         }
+        $searchForm = $this->createForm(WorkQueueParticipantLookupSearchType::class, null);
+        $idForm = $this->createForm(WorkQueueParticipantLookupIdType::class, null);
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
         }
@@ -408,7 +412,9 @@ class WorkQueueController extends AbstractController
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
-                'columnsDef' => WorkQueue::$columnsDef
+                'columnsDef' => WorkQueue::$columnsDef,
+                'searchForm' => $searchForm->createView(),
+                'idForm' => $idForm->createView()
             ]);
         }
     }

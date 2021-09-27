@@ -171,6 +171,18 @@ class WorkQueueService
             $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
+        // Participants consents tab participants lookup
+        if (isset($params['lastName']) && isset($params['dateOfBirth'])) {
+            $rdrParams['lastName'] = $params['lastName'];
+            $rdrParams['dateOfBirth'] = $params['dateOfBirth'];
+            if (isset($params['middleName'])) {
+                $rdrParams['middleName'] = $params['middleName'];
+            }
+        }
+        if (isset($params['participantId'])) {
+            $rdrParams['participantId'] = $params['participantId'];
+        }
+
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
             $ageRange = $params['ageRange'];

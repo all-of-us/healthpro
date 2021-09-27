@@ -60,7 +60,20 @@
         </div>
         <div id="collapseTwo" class="panel-collapse collapse">
             <div class="panel-body">
-                Search
+                <h4>Search by Name</h4>
+                {{ form_start(searchForm, { attr: { class: 'prevent-resubmit' }, method: 'GET' }) }}
+                {{ form_widget(searchForm) }}
+                <p>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </p>
+                {{ form_end(searchForm) }}
+                <h4>Find by ID</h4>
+                {{ form_start(idForm, { attr: { class: 'prevent-resubmit' }, method: 'GET' }) }}
+                {{ form_widget(idForm) }}
+                <p>
+                    <button type="submit" class="btn btn-primary">Go</button>
+                </p>
+                {{ form_end(idForm) }}
             </div>
         </div>
     </div>
