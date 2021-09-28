@@ -475,6 +475,91 @@ class WorkQueue
         ]
     ];
 
+    public static $consentAdvanceFilters = [
+        'consentForStudyEnrollment' => [
+            'label' => 'Primary Language',
+            'options' => [
+                'View All' => '',
+                'Consented' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Consent Not Completed' => 'UNSET'
+            ]
+        ],
+        'questionnaireOnDnaProgram' => [
+            'label' => 'Program Update',
+            'options' => [
+                'View All' => '',
+                'Completed' => 'SUBMITTED',
+                'Not Completed' => 'UNSET'
+            ]
+        ],
+        'consentForElectronicHealthRecords' => [
+            'label' => 'EHR Consent Status',
+            'options' => [
+                'View All' => '',
+                'Consented' => 'SUBMITTED',
+                'Refused consent' => 'SUBMITTED_NO_CONSENT',
+                'Consent not completed' => 'UNSET'
+            ]
+        ],
+        'ehrConsentExpireStatus' => [
+            'label' => 'EHR Expiration Status',
+            'options' => [
+                'View All' => '',
+                'Active' => 'ACTIVE',
+                'Expired' => 'EXPIRED'
+            ]
+        ],
+        'consentForGenomicsROR' => [
+            'label' => 'gRoR Consent Status',
+            'options' => [
+                'View All' => '',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET'
+            ]
+        ],
+        'consentForDvElectronicHealthRecordsSharing' => [
+            'label' => 'DV-Only EHR Sharing',
+            'options' => [
+                'View All' => '',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET'
+            ]
+        ],
+        'consentForCABoR' => [
+            'label' => 'CABoR Consent',
+            'options' => [
+                'View All' => '',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET'
+            ]
+        ],
+        'consentCohort' => [
+            'label' => 'Consent Cohort',
+            'options' => [
+                'View All' => '',
+                'Cohort 1' => 'COHORT_1',
+                'Cohort 2' => 'COHORT_2',
+                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
+                'Cohort 3' => 'COHORT_3'
+            ]
+        ],
+        'primaryLanguage' => [
+            'label' => 'Language of Primary Cosent',
+            'options' => [
+                'View All' => '',
+                'English' => 'en',
+                'Spanish' => 'es'
+            ]
+        ]
+    ];
+
     //These are currently not working in the RDR
     public static $filtersDisabled = [
         'language' => [

@@ -13,7 +13,7 @@ $(document).ready(function() {
         }
     };
     checkFilters();
-    $('#filters select').on('change', function() {
+    $('#filters select, #filters input[type=radio]').on('change', function() {
         checkFilters();
         $('#filters').submit();
     });

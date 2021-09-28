@@ -402,6 +402,7 @@ class WorkQueueController extends AbstractController
             $params['exportType'] = 'consents';
             return $this->render('workqueue/consents.html.twig', [
                 'filters' => $filters,
+                'advancedFilters' => WorkQueue::$consentAdvanceFilters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
                 'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,

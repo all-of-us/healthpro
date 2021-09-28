@@ -171,27 +171,41 @@ class WorkQueueService
             $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
+        if (!empty($params['consentForStudyEnrollment'])) {
+            $rdrParams['consentForStudyEnrollment'] = $params['consentForStudyEnrollment'];
+        }
+
         // Participants consents tab participants lookup
-        if (isset($params['lastName']) && isset($params['dateOfBirth'])) {
+        if (!empty($params['lastName']) && !empty($params['dateOfBirth'])) {
             $rdrParams['lastName'] = $params['lastName'];
             $rdrParams['dateOfBirth'] = $params['dateOfBirth'];
-            if (isset($params['middleName'])) {
+            if (!empty($params['middleName'])) {
                 $rdrParams['middleName'] = $params['middleName'];
             }
         }
-        if (isset($params['participantId'])) {
+        if (!empty($params['participantId'])) {
             $rdrParams['participantId'] = $params['participantId'];
+        }
+
+        if (!empty($params['ageRange']) || !empty($params['consentForStudyEnrollmentStartDate'])) {
+            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
             $ageRange = $params['ageRange'];
-            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
 
             $dateOfBirthFilters = CodeBook::ageRangeToDob($ageRange);
             foreach ($dateOfBirthFilters as $filter) {
                 $rdrParams .= '&dateOfBirth=' . rawurlencode($filter);
             }
+        }
+
+        if (!empty($params['consentForStudyEnrollmentStartDate'])) {
+            $rdrParams .= '&consentForStudyEnrollmentAuthored=gt' . $params['consentForStudyEnrollmentStartDate'];
+        }
+        if (!empty($params['consentForStudyEnrollmenEndDate'])) {
+            $rdrParams .= '&consentForStudyEnrollmentAuthored=lt' . $params['consentForStudyEnrollmenEndDate'];
         }
         $results = [];
         try {

@@ -9,9 +9,8 @@
             There was a problem with your request. Please refresh the page to try again.
         </div>
     {% endif %}
-
+    <form id="filters">
     <div class="well">
-        <form id="filters">
             {% if filters.awardee is defined %}
                 <p><strong>Awardee</strong></p>
                 <div class="form-inline">
@@ -36,7 +35,6 @@
                     </select>
                 {% endfor %}
             </div>
-        </form>
     </div>
     <div class="row" id="workqueue_consents_row">
         <div class="col-md-3">
@@ -81,6 +79,7 @@
             {% endif %}
         </div>
     </div>
+    </form>
 {% endblock %}
 
 {% block pagejs %}
