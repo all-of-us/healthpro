@@ -171,11 +171,21 @@ class WorkQueueService
             $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
+        // Participant consents tab advanced filters
         if (!empty($params['consentForStudyEnrollment'])) {
             $rdrParams['consentForStudyEnrollment'] = $params['consentForStudyEnrollment'];
         }
+        if (!empty($params['consentForDvElectronicHealthRecordsSharing'])) {
+            $rdrParams['consentForDvElectronicHealthRecordsSharing'] = $params['consentForDvElectronicHealthRecordsSharing'];
+        }
+        if (!empty($params['consentForCABoR'])) {
+            $rdrParams['consentForCABoR'] = $params['consentForCABoR'];
+        }
+        if (!empty($params['primaryLanguage'])) {
+            $rdrParams['primaryLanguage'] = $params['primaryLanguage'];
+        }
 
-        // Participants consents tab participants lookup
+        // Participant consents tab participants lookup
         if (!empty($params['lastName']) && !empty($params['dateOfBirth'])) {
             $rdrParams['lastName'] = $params['lastName'];
             $rdrParams['dateOfBirth'] = $params['dateOfBirth'];
@@ -187,7 +197,7 @@ class WorkQueueService
             $rdrParams['participantId'] = $params['participantId'];
         }
 
-        if (!empty($params['ageRange']) || !empty($params['consentForStudyEnrollmentStartDate'])) {
+        if (!empty($params['ageRange']) || WorkQueue::hasDateFields($params)) {
             $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
         }
 
@@ -201,12 +211,10 @@ class WorkQueueService
             }
         }
 
-        if (!empty($params['consentForStudyEnrollmentStartDate'])) {
-            $rdrParams .= '&consentForStudyEnrollmentAuthored=gt' . $params['consentForStudyEnrollmentStartDate'];
+        if (WorkQueue::hasDateFields($params)) {
+            $rdrParams .= WorkQueue::getDateFilterParams($params);
         }
-        if (!empty($params['consentForStudyEnrollmenEndDate'])) {
-            $rdrParams .= '&consentForStudyEnrollmentAuthored=lt' . $params['consentForStudyEnrollmenEndDate'];
-        }
+
         $results = [];
         try {
             $summaries = $this->participantSummaryService->listWorkQueueParticipantSummaries($rdrParams, $next);

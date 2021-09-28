@@ -18,6 +18,11 @@ $(document).ready(function() {
         $('#filters').submit();
     });
 
+    $('#filters .apply-date-filter').on('click', function () {
+        checkFilters();
+        $('#filters').submit();
+    });
+
     var exportLimit = $('#workqueue_consents').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {

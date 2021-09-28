@@ -477,13 +477,14 @@ class WorkQueue
 
     public static $consentAdvanceFilters = [
         'consentForStudyEnrollment' => [
-            'label' => 'Primary Language',
+            'label' => 'Primary Consent',
             'options' => [
                 'View All' => '',
                 'Consented' => 'SUBMITTED',
                 'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                 'Consent Not Completed' => 'UNSET'
-            ]
+            ],
+            'dateField' => 'consentForStudyEnrollmentAuthored'
         ],
         'questionnaireOnDnaProgram' => [
             'label' => 'Program Update',
@@ -491,7 +492,8 @@ class WorkQueue
                 'View All' => '',
                 'Completed' => 'SUBMITTED',
                 'Not Completed' => 'UNSET'
-            ]
+            ],
+            'dateField' => 'questionnaireOnDnaProgramAuthored'
         ],
         'consentForElectronicHealthRecords' => [
             'label' => 'EHR Consent Status',
@@ -500,7 +502,8 @@ class WorkQueue
                 'Consented' => 'SUBMITTED',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
                 'Consent not completed' => 'UNSET'
-            ]
+            ],
+            'dateField' => 'consentForElectronicHealthRecordsAuthored'
         ],
         'ehrConsentExpireStatus' => [
             'label' => 'EHR Expiration Status',
@@ -508,7 +511,8 @@ class WorkQueue
                 'View All' => '',
                 'Active' => 'ACTIVE',
                 'Expired' => 'EXPIRED'
-            ]
+            ],
+            'dateField' => 'ehrConsentExpireStatusAuthored'
         ],
         'consentForGenomicsROR' => [
             'label' => 'gRoR Consent Status',
@@ -518,7 +522,8 @@ class WorkQueue
                 'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                 'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
                 'Consent Not Completed' => 'UNSET'
-            ]
+            ],
+            'dateField' => 'consentForGenomicsRORAuthored'
         ],
         'consentForDvElectronicHealthRecordsSharing' => [
             'label' => 'DV-Only EHR Sharing',
@@ -528,7 +533,8 @@ class WorkQueue
                 'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                 'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
                 'Consent Not Completed' => 'UNSET'
-            ]
+            ],
+            'dateField' => 'consentForDvElectronicHealthRecordsSharingAuthored'
         ],
         'consentForCABoR' => [
             'label' => 'CABoR Consent',
@@ -538,7 +544,8 @@ class WorkQueue
                 'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                 'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
                 'Consent Not Completed' => 'UNSET'
-            ]
+            ],
+            'dateField' => 'consentForCABoRAuthored'
         ],
         'consentCohort' => [
             'label' => 'Consent Cohort',
@@ -1044,5 +1051,31 @@ class WorkQueue
             return self::dateFromString($authoredDate, $userTimezone);
         }
         return !$displayDate ? 0 : '';
+    }
+
+    public static function hasDateFields($params)
+    {
+        foreach (self::$consentAdvanceFilters as $advanceFilter) {
+            if (isset($advanceFilter['dateField']) && (!empty($params[$advanceFilter['dateField'] . 'StartDate']) || !empty($params[$advanceFilter['dateField'] . 'EndDate']))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function getDateFilterParams($params)
+    {
+        $rdrParams = '';
+        foreach (self::$consentAdvanceFilters as $advanceFilter) {
+            if (isset($advanceFilter['dateField'])) {
+                if (!empty($params[$advanceFilter['dateField'] . 'StartDate'])) {
+                    $rdrParams .= '&' . $advanceFilter['dateField'] . '=gt' . $params[$advanceFilter['dateField'] . 'StartDate'];
+                }
+                if (!empty($params[$advanceFilter['dateField'] . 'EndDate'])) {
+                    $rdrParams .= '&' . $advanceFilter['dateField'] . '=lt' . $params[$advanceFilter['dateField'] . 'EndDate'];
+                }
+            }
+        }
+        return $rdrParams;
     }
 }
