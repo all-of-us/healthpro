@@ -2,8 +2,8 @@
 {% block body %}
     <ol class="breadcrumb">
         <li><a href="{{ path('symfony_home') }}">Home</a></li>
-        <li><a href="{{ path('access_manage_dashboard') }}">Managed Access Dashboard</a></li>
-        <li><a href="{{ path('access_manage_user_groups') }}">My Groups</a></li>
+        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+        <li><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
         <li><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
         <li class="active">Add Member</li>
     </ol>
