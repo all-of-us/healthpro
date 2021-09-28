@@ -59,22 +59,6 @@ class CronController extends AbstractController
     }
 
     /**
-     * @Route("/sites-email-sync", name="cron_sites_email")
-     */
-    public function sitesEmailSync(KernelInterface $kernel): Response
-    {
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        $input = new ArrayInput([
-            'command' => 'pmi:sitesync:emails',
-        ]);
-        $application->run($input, new NullOutput());
-
-        return $this->json(['success' => true]);
-    }
-
-    /**
      * @Route("/awardees-organizations", name="cron_awardees_organizations")
      */
     public function awardeesAndOrganizationsAction(ParameterBagInterface $params, SiteSyncService $siteSyncService): Response

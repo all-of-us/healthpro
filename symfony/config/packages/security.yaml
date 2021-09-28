@@ -19,6 +19,7 @@ security:
     access_control:
         - { path: ^(/s)?/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/s/cloud-tasks/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/s/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
         - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }

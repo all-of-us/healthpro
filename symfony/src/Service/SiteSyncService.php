@@ -20,6 +20,10 @@ class SiteSyncService
     private $normalizer;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
+    private $googleGroupsService;
+    private $adminEmails = [];
+
+    private const MEMBER_DOMAIN = '@pmi-ops.org';
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -27,7 +31,8 @@ class SiteSyncService
         EnvironmentService $env,
         LoggerService $loggerService,
         ParameterBagInterface $params,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        GoogleGroupsService $googleGroupsService
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->em = $em;
@@ -35,6 +40,7 @@ class SiteSyncService
         $this->loggerService = $loggerService;
         $this->params = $params;
         $this->normalizer = $normalizer;
+        $this->googleGroupsService = $googleGroupsService;
     }
 
     private function getAwardeeEntriesFromRdr()
@@ -258,5 +264,41 @@ class SiteSyncService
             $connection->rollback();
             throw $e;
         }
+    }
+
+    public function syncSiteEmail(int $siteId)
+    {
+        $site = $this->em->getRepository(Site::class)->find($siteId);
+        if ($site) {
+            $site->setEmail(join(', ', $this->getSiteAdminEmails($site)));
+            $this->em->persist($site);
+            $this->em->flush();
+            return;
+        }
+        throw new \Exception('Site not found.');
+    }
+
+    public function getSiteAdminEmails(Site $site): array
+    {
+        $siteAdmins = [];
+        $members = $this->googleGroupsService->getMembers($site->getSiteId() . self::MEMBER_DOMAIN, ['OWNER', 'MANAGER']);
+        if (count($members) === 0) {
+            return $siteAdmins;
+        }
+        foreach ($members as $member) {
+            if (isset($this->adminEmails[$member->email])) {
+                $siteAdmins[] = $this->adminEmails[$member->email];
+                continue;
+            }
+            $user = $this->googleGroupsService->getUser($member->email);
+            foreach ($user->emails as $email) {
+                if (isset($email['type']) && $email['type'] === 'work') {
+                    $userEmail = $email['address'];
+                    $this->adminEmails[$member->email] = $userEmail;
+                    $siteAdmins[] = $userEmail;
+                }
+            }
+        }
+        return $siteAdmins;
     }
 }
