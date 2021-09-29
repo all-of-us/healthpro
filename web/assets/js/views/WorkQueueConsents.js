@@ -23,6 +23,20 @@ $(document).ready(function() {
         $('#filters').submit();
     });
 
+    $('#filters #participant_search').on('click', function () {
+        if ($('input[name=lastName]').val() && $('input[name=dateOfBirth]').val()) {
+            checkFilters();
+            $('#filters').submit();
+        }
+    });
+
+    $('#filters #participant_id_search').on('click', function () {
+        if ($('input[name=participantId]').val()) {
+            checkFilters();
+            $('#filters').submit();
+        }
+    });
+
     var exportLimit = $('#workqueue_consents').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {

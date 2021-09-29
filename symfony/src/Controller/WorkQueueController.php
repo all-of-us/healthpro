@@ -304,8 +304,6 @@ class WorkQueueController extends AbstractController
         if (!$this->displayParticipantConsentsTab) {
             throw $this->createNotFoundException();
         }
-        $searchForm = $this->createForm(WorkQueueParticipantLookupSearchType::class, null);
-        $idForm = $this->createForm(WorkQueueParticipantLookupIdType::class, null);
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
         }
@@ -413,9 +411,7 @@ class WorkQueueController extends AbstractController
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
-                'columnsDef' => WorkQueue::$columnsDef,
-                'searchForm' => $searchForm->createView(),
-                'idForm' => $idForm->createView()
+                'columnsDef' => WorkQueue::$columnsDef
             ]);
         }
     }

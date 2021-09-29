@@ -61,19 +61,29 @@
         <div id="collapseTwo" class="panel-collapse collapse">
             <div class="panel-body">
                 <h4>Search by Name</h4>
-                {{ form_start(searchForm, { attr: { class: 'prevent-resubmit' }, method: 'GET' }) }}
-                {{ form_widget(searchForm) }}
+                <div class="form-group">
+                    <label class="control-label required" for="lastName">Last name</label>
+                    <input type="text" name="lastName" required="required" class="form-control" value="{{ params['lastName']|default('') }}">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="lastName">First name</label>
+                    <input type="text" name="firstName" required="required" class="form-control" value="{{ params['firstName']|default('') }}">
+                </div>
+                <div class="form-group">
+                    <label class="control-label required" for="lastName">Date of Birth</label>
+                    <input type="text" name="dateOfBirth" required="required" class="form-control" value="{{ params['dateOfBirth']|default('') }}">
+                </div>
                 <p>
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="button" class="btn btn-primary" id="participant_search">Search</button>
                 </p>
-                {{ form_end(searchForm) }}
                 <h4>Find by ID</h4>
-                {{ form_start(idForm, { attr: { class: 'prevent-resubmit' }, method: 'GET' }) }}
-                {{ form_widget(idForm) }}
+                <div class="form-group">
+                    <label class="control-label required" for="lastName">Participant Id</label>
+                    <input type="text" name="participantId" required="required" class="form-control" value="{{ params['participantId']|default('') }}">
+                </div>
                 <p>
-                    <button type="submit" class="btn btn-primary">Go</button>
+                    <button type="button" class="btn btn-primary" id="participant_id_search">Go</button>
                 </p>
-                {{ form_end(idForm) }}
             </div>
         </div>
     </div>
