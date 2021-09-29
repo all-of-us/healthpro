@@ -33,9 +33,8 @@ class ParticipantDetailsController extends AbstractController
 {
     private const VALID_CONSENT_TYPES = [
         'primary' => 'consentForStudyEnrollmentFilePath',
-        'ehr' => 'consentForElectricHealthRecordsFilePath',
+        'ehr' => 'consentForElectronicHealthRecordsFilePath',
         'gror' => 'consentForGenomicsRORFilePath',
-        'dvonly' => 'consentForDvElectronicHealthRecordsSharingFilePath',
         'cabor' => 'consentForCABoRFilePath',
     ];
 
@@ -209,16 +208,16 @@ class ParticipantDetailsController extends AbstractController
         if (!in_array($consentType, array_keys(self::VALID_CONSENT_TYPES))) {
             throw $this->createNotFoundException(sprintf('Not a valid consent type: %s', $consentType));
         }
-        $participant = $participantSummaryService->getParticipantById($id, false);
+        $participant = $participantSummaryService->getParticipantById($id, true);
         $participantSummaryField = self::VALID_CONSENT_TYPES[$consentType];
-        $consentPath = $participant->{$participantSummaryField};
-        // @todo BEGIN remove
-        // $consentPath = 'test/test-file.pdf';
-        // @todo END remove
-        if (!$consentPath || $consentPath === 'UNSET') {
+        if (!$participant->{$participantSummaryField} || !preg_match('/(^[a-z0-9\-\_]+)\/(.*)/i', $participant->{$participantSummaryField}, $matches)) {
+            throw $this->createNotFoundException(sprintf('Invalid storage path: %s', $participant->{$participantSummaryField}));
+        }
+        $bucket = $matches[1];
+        $consentPath = $matches[2];
+        if (!$consentPath) {
             throw $this->createNotFoundException('Unable to load consent; Reason: Path not set.');
         }
-        $bucket = $this->getParameter('gcs_bucket_participant_consents');
         try {
             $object = $bucketService->getObjectFromPath($bucket, $consentPath);
             $response = new Response($object->downloadAsString());

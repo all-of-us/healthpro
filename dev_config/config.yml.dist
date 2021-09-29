@@ -102,9 +102,6 @@ reportKitUrl:
 # Set diversion pouch site name
 diversion_pouch_site: ECDC DV Diversion Pouch
 
-# GCS Bucket participant conents
-gcs_bucket_participant_consents: healthpro-participant-consents
-
 # Jira API credentials for release ticket creation
 # See https://id.atlassian.com/manage-profile/security/api-tokens
 # jira_api_user:
