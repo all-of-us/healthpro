@@ -194,7 +194,7 @@ class WorkQueueService
             }
         }
         if (!empty($params['participantId'])) {
-            $rdrParams['participantId'] = $params['participantId'];
+            $rdrParams['participantId'] = substr($params['participantId'], 1);
         }
 
         if (!empty($params['ageRange']) || WorkQueue::hasDateFields($params)) {

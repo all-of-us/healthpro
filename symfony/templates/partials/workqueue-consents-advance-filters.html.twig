@@ -128,7 +128,7 @@
                                             End Date <input type="text" name="{{ advancedFilter.dateField }}EndDate" value="{{ params[advancedFilter.dateField ~ 'EndDate']|default('') }}">
                                         </li>
                                         <li class="list-group-item text-center">
-                                            <button type="submit" class="btn btn-primary btn-small apply-date-filter">Apply</button>
+                                            <button type="button" class="btn btn-primary btn-small apply-date-filter" data-consent-date-field-name="{{ advancedFilter.dateField }}">Apply</button>
                                         </li>
                                     {% endif %}
                                 </ul>

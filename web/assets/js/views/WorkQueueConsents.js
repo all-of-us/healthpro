@@ -18,13 +18,10 @@ $(document).ready(function() {
         $('#filters').submit();
     });
 
-    $('#filters .apply-date-filter').on('click', function () {
-        checkFilters();
-        $('#filters').submit();
-    });
 
     $('#filters #participant_search').on('click', function () {
         if ($('input[name=lastName]').val() && $('input[name=dateOfBirth]').val()) {
+            $('input[name=participantId]').val('');
             checkFilters();
             $('#filters').submit();
         }
@@ -32,6 +29,15 @@ $(document).ready(function() {
 
     $('#filters #participant_id_search').on('click', function () {
         if ($('input[name=participantId]').val()) {
+            $('input[name=lastName], input[name=dateOfBirth]').val('');
+            checkFilters();
+            $('#filters').submit();
+        }
+    });
+
+    $('#filters .apply-date-filter').on('click', function () {
+        var dateFieldName = $(this).data('consent-date-field-name');
+        if ($('input[name=' + dateFieldName + 'StartDate]').val() !== '' || $('input[name=' + dateFieldName + 'EndDate]').val() !== '') {
             checkFilters();
             $('#filters').submit();
         }
