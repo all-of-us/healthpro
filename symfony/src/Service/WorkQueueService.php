@@ -605,21 +605,6 @@ class WorkQueueService
         return sprintf('<a href="%s">%s</a>', $url, $text);
     }
 
-    public function generateConsentLink($participant, $text, $type): string
-    {
-        switch ($type) {
-            case 'consentForStudyEnrollment':
-                $url = $this->urlGenerator->generate('participant_consent', [
-                    'id' => $participant->id,
-                    'consentType' => 'primary'
-                ]);
-                break;
-            default:
-                return $text;
-        }
-        return sprintf('<a href="%s">%s</a>', $url, $text);
-    }
-
     public function getPatientStatus($participant, $value, $type = 'wq')
     {
         // Clear patient status for withdrawn participants
