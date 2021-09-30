@@ -21,7 +21,41 @@ $(document).ready(function () {
         column.visible(!column.visible());
     };
 
+    var collapseFilters = function () {
+        $('#participant_lookup_group input[type=text]').each(function () {
+            if (this.value) {
+                $('#participant_lookup_group_label').trigger('click');
+                return false;
+            }
+        });
+        $('#filter_status_group input[type=radio]:checked').each(function () {
+            if (this.value) {
+                $('#filter_status_group_label').trigger('click');
+                return false;
+            }
+        });
+        $('#filter_status_group input[type=text]').each(function () {
+            if (this.value) {
+                $('#filter_status_group_label').trigger('click');
+                return false;
+            }
+        });
+        $('.filter-status-sub-group input[type=radio]:checked').each(function () {
+            if (this.value) {
+                var groupId = $(this).closest('.filter-status-sub-group').attr('id');
+                $('#' + groupId + '_label').trigger('click');
+            }
+        });
+        $('.filter-status-sub-group input[type=text]').each(function () {
+            if (this.value) {
+                var groupId = $(this).closest('.filter-status-sub-group').attr('id');
+                $('#' + groupId + '_label').trigger('click');
+            }
+        });
+    };
+
     checkFilters();
+    collapseFilters();
     $('#filters select, #filters input[type=radio]').on('change', function () {
         checkFilters();
         $('#filters').submit();

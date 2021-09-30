@@ -2,7 +2,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#columns_group">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#columns_group" id="columns_group_label">
                     <i class="fa fa-columns" aria-hidden="true"></i> Columns
                 </a>
                 <small><a id="columns_reset" data-group-id="columns_group">Reset</a></small>
@@ -54,7 +54,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#participant_lookup_group">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#participant_lookup_group" id="participant_lookup_group_label">
                     <i class="fa fa-search" aria-hidden="true"></i> Participant Lookup
                 </a>
                 <small><a id="participant_lookup_reset" data-group-id="participant_lookup_group">Reset</a></small>
@@ -92,7 +92,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_group">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_group" id="filter_status_group_label">
                     <i class="fa fa-filter" aria-hidden="true"></i> Filter by Status &amp; Date
                 </a>
                 <small><a id="filter_status_reset" data-group-id="filter_status_group">Reset</a></small>
@@ -104,13 +104,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_{{ name }}_group">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_{{ name }}_group" id="filter_status_{{ name }}_group_label">
                                     {{ advancedFilter.label }}
                                 </a>
                                 <small><a class="filter-status-sub-group-reset" data-group-id="filter_status_{{ name }}_group">Reset</a></small>
                             </h4>
                         </div>
-                        <div id="filter_status_{{ name }}_group" class="panel-collapse collapse">
+                        <div id="filter_status_{{ name }}_group" class="panel-collapse collapse filter-status-sub-group">
                             <div class="panel-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">
