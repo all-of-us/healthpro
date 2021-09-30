@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // Ignore non-workqeue pages.
     if (!$('#workqueue_consents').length) {
         return;
@@ -12,8 +12,17 @@ $(document).ready(function() {
             $('#filters select').prop('disabled', false);
         }
     };
+
+    var toggleColumns = function () {
+        // Get the column API object
+        var column = workQueueTable.column($(this).attr('data-column'));
+
+        // Toggle the visibility
+        column.visible(!column.visible());
+    };
+
     checkFilters();
-    $('#filters select, #filters input[type=radio]').on('change', function() {
+    $('#filters select, #filters input[type=radio]').on('change', function () {
         checkFilters();
         $('#filters').submit();
     });
@@ -41,6 +50,24 @@ $(document).ready(function() {
             checkFilters();
             $('#filters').submit();
         }
+    });
+
+    $('#columns_reset').on('click', function () {
+        $('#columns_group input[type=checkbox]').prop('checked', true);
+        toggleColumns();
+    });
+
+    $('#participant_lookup_reset').on('click', function () {
+        $('#participant_lookup_group input[type=text]').val('');
+        checkFilters();
+        $('#filters').submit();
+    });
+
+    $('#filter_status_reset').on('click', function () {
+        $('#filter_status_group input[type=text]').val('');
+        $('#filter_status_group input[type=radio][value=""]').prop('checked', true);
+        checkFilters();
+        $('#filters').submit();
     });
 
     var exportLimit = $('#workqueue_consents').data('export-limit');
@@ -120,7 +147,7 @@ $(document).ready(function() {
         dom: 'lrtip',
         columns: tableColumns,
         pageLength: 25,
-        createdRow: function(row, data) {
+        createdRow: function (row, data) {
             if (data.isWithdrawn === true) {
                 $(row).addClass('tr-withdrawn');
             }
@@ -128,7 +155,7 @@ $(document).ready(function() {
     });
 
     // Populate count in header
-    $('#workqueue_consents').on('init.dt', function(e, settings, json) {
+    $('#workqueue_consents').on('init.dt', function (e, settings, json) {
         var count = json.recordsFiltered;
         $('#heading-count .count').text(count);
         if (count == 1) {
@@ -144,12 +171,12 @@ $(document).ready(function() {
 
     // Display custom error message
     $.fn.dataTable.ext.errMode = 'none';
-    $('#workqueue_consents').on('error.dt', function(e) {
+    $('#workqueue_consents').on('error.dt', function (e) {
         alert('An error occurred please reload the page and try again');
     });
 
     // Scroll to top when performing pagination
-    $('#workqueue_consents').on('page.dt', function() {
+    $('#workqueue_consents').on('page.dt', function () {
         //Took reference from https://stackoverflow.com/a/21627503
         $('html').animate({
             scrollTop: $('#filters').offset().top
@@ -157,11 +184,7 @@ $(document).ready(function() {
         $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
 
-    $('.toggle-vis').on( 'click', function (e) {
-        // Get the column API object
-        var column = workQueueTable.column( $(this).attr('data-column') );
-
-        // Toggle the visibility
-        column.visible( ! column.visible() );
-    } );
+    $('.toggle-vis').on('click', function (e) {
+        toggleColumns();
+    });
 });

@@ -2,12 +2,13 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapseOne">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#columns_group">
                     <i class="fa fa-columns" aria-hidden="true"></i> Columns
                 </a>
+                <small><a id="columns_reset" data-group-id="columns_group">Reset</a></small>
             </h4>
         </div>
-        <div id="collapseOne" class="panel-collapse collapse">
+        <div id="columns_group" class="panel-collapse collapse">
             <div class="panel-body">
                 <ul class="list-group">
                     <li class="list-group-item">
@@ -53,12 +54,13 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapseTwo">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#participant_lookup_group">
                     <i class="fa fa-search" aria-hidden="true"></i> Participant Lookup
                 </a>
+                <small><a id="participant_lookup_reset" data-group-id="participant_lookup_group">Reset</a></small>
             </h4>
         </div>
-        <div id="collapseTwo" class="panel-collapse collapse">
+        <div id="participant_lookup_group" class="panel-collapse collapse">
             <div class="panel-body">
                 <h4>Search by Name</h4>
                 <div class="form-group">
@@ -90,12 +92,13 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapseThree">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_group">
                     <i class="fa fa-filter" aria-hidden="true"></i> Filter by Status &amp; Date
                 </a>
+                <small><a id="filter_status_reset" data-group-id="filter_status_group">Reset</a></small>
             </h4>
         </div>
-        <div id="collapseThree" class="panel-collapse collapse">
+        <div id="filter_status_group" class="panel-collapse collapse">
             <div class="panel-body">
                 {% for name, advancedFilter in advancedFilters %}
                     <div class="panel panel-default">
