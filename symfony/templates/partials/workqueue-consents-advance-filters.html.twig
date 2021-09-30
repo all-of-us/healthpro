@@ -104,12 +104,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse{{ name }}">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_{{ name }}_group">
                                     {{ advancedFilter.label }}
                                 </a>
+                                <small><a class="filter-status-sub-group-reset" data-group-id="filter_status_{{ name }}_group">Reset</a></small>
                             </h4>
                         </div>
-                        <div id="collapse{{ name }}" class="panel-collapse collapse">
+                        <div id="filter_status_{{ name }}_group" class="panel-collapse collapse">
                             <div class="panel-body">
                                 <ul class="list-group">
                                     <li class="list-group-item">

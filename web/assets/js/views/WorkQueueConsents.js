@@ -70,6 +70,14 @@ $(document).ready(function () {
         $('#filters').submit();
     });
 
+    $('.filter-status-sub-group-reset').on('click', function () {
+        var groupId = $(this).data('group-id');
+        $('#' + groupId + ' input[type=text]').val('');
+        $('#' + groupId + ' input[type=radio][value=""]').prop('checked', true);
+        checkFilters();
+        $('#filters').submit();
+    });
+
     var exportLimit = $('#workqueue_consents').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {
