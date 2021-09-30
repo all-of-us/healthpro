@@ -233,7 +233,14 @@ class WorkQueueService
             $row['primaryConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForStudyEnrollment,
                 $participant->consentForStudyEnrollmentAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                $participant->consentForStudyEnrollmentFilePath
+                    ? $this->generateLink('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'primary'
+                    ])
+                    : null
             );
             $row['firstPrimaryConsent'] = WorkQueue::displayFirstConsentStatusTime(
                 $participant->consentForStudyEnrollmentFirstYesAuthored,
@@ -248,7 +255,14 @@ class WorkQueueService
             $row['ehrConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForElectronicHealthRecords,
                 $participant->consentForElectronicHealthRecordsAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                $participant->consentForElectronicHealthRecordsFilePath
+                    ? $this->generateLink('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'ehr'
+                    ])
+                    : null
             );
             $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
                 $participant->ehrConsentExpireStatus,
@@ -259,7 +273,14 @@ class WorkQueueService
             $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
                 $participant->consentForGenomicsROR,
                 $participant->consentForGenomicsRORAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                $participant->consentForGenomicsRORFilePath
+                    ? $this->generateLink('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'gror'
+                    ])
+                    : null
             );
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
@@ -270,7 +291,14 @@ class WorkQueueService
             $row['caborConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForCABoR,
                 $participant->consentForCABoRAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                $participant->consentForCABoRFilePath
+                    ? $this->generateLink('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'cabor'
+                    ])
+                    : null
             );
             foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
                 $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
@@ -574,6 +602,21 @@ class WorkQueueService
         }
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
+        return sprintf('<a href="%s">%s</a>', $url, $text);
+    }
+
+    public function generateConsentLink($participant, $text, $type): string
+    {
+        switch ($type) {
+            case 'consentForStudyEnrollment':
+                $url = $this->urlGenerator->generate('participant_consent', [
+                    'id' => $participant->id,
+                    'consentType' => 'primary'
+                ]);
+                break;
+            default:
+                return $text;
+        }
         return sprintf('<a href="%s">%s</a>', $url, $text);
     }
 
