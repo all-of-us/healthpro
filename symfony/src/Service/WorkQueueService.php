@@ -236,7 +236,7 @@ class WorkQueueService
                 $userTimezone,
                 true,
                 $participant->consentForStudyEnrollmentFilePath
-                    ? $this->generateLink('participant_consent', [
+                    ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'primary'
                     ])
@@ -258,7 +258,7 @@ class WorkQueueService
                 $userTimezone,
                 true,
                 $participant->consentForElectronicHealthRecordsFilePath
-                    ? $this->generateLink('participant_consent', [
+                    ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'ehr'
                     ])
@@ -276,7 +276,7 @@ class WorkQueueService
                 $userTimezone,
                 true,
                 $participant->consentForGenomicsRORFilePath
-                    ? $this->generateLink('participant_consent', [
+                    ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'gror'
                     ])
@@ -294,7 +294,7 @@ class WorkQueueService
                 $userTimezone,
                 true,
                 $participant->consentForCABoRFilePath
-                    ? $this->generateLink('participant_consent', [
+                    ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'cabor'
                     ])
