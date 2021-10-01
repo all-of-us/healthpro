@@ -11,7 +11,7 @@
         <div id="columns_group" class="panel-collapse collapse">
             <div class="panel-body">
                 <ul class="list-group">
-                    {% set columNumber = 5 %}
+                    {% set columNumber = 0 %}
                     {% for name, columnDef in columnsDef %}
                         {% if columnDef.toggleColumn %}
                             {% if columnDef.displayNames is defined %}
@@ -27,6 +27,7 @@
                                 </li>
                             {% endif %}
                         {% endif %}
+                        {% set columNumber = columNumber + 1 %}
                     {% endfor %}
                 </ul>
             </div>
