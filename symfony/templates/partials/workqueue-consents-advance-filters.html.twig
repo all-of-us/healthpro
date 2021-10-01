@@ -11,42 +11,23 @@
         <div id="columns_group" class="panel-collapse collapse">
             <div class="panel-body">
                 <ul class="list-group">
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="5"/> Primary Consent
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="6"/> Program Update
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="7"/> EHR Consent
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="8"/> EHR Expiration
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="9"/> gRoR Consent
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="10"/> DV-Only EHR Sharing
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="11"/> CaBoR Consent
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="12"/> Fitbit Consent
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="13"/> Apple HealthKit Consent
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="14"/> Apple EHR Cohort
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="15"/> Consent Cohort
-                    </li>
-                    <li class="list-group-item">
-                        <input type="checkbox" checked class="toggle-vis" data-column="16"/> Language of Primary Consent
-                    </li>
+                    {% set columNumber = 5 %}
+                    {% for name, columnDef in columnsDef %}
+                        {% if columnDef.toggleColumn %}
+                            {% if columnDef.displayNames is defined %}
+                                {% for subFieldName, subFieldLabel in columnDef.displayNames %}
+                                    <li class="list-group-item">
+                                        <input type="checkbox" name="column{{ subFieldName }}" checked class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}
+                                    </li>
+                                    {% set columNumber = columNumber + 1 %}
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item">
+                                    <input type="checkbox" name="column{{ name }}" checked class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.displayName }}
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
         </div>

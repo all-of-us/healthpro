@@ -21,30 +21,35 @@ class WorkQueue
             'rdrField' => 'lastName',
             'sortField' => 'lastName',
             'generateLink' => true,
+            'toggleColumn' => false
         ],
         'firstName' => [
             'displayName' => 'First Name',
             'rdrField' => 'firstName',
             'sortField' => 'firstName',
-            'generateLink' => true
+            'generateLink' => true,
+            'toggleColumn' => false
         ],
         'middleName' => [
             'displayName' => 'Middle Name',
             'rdrField' => 'middleName',
             'sortField' => 'firstName',
-            'generateLink' => true
+            'generateLink' => true,
+            'toggleColumn' => false
         ],
         'dateOfBirth' => [
             'displayName' => 'Date of Birth',
             'rdrField' => 'dob',
             'sortField' => 'dateOfBirth',
             'formatDate' => true,
-            'csvMethod' => 'csvDateFromObject'
+            'csvMethod' => 'csvDateFromObject',
+            'toggleColumn' => false
         ],
         'participantId' => [
             'displayName' => 'PM ID',
             'rdrField' => 'id',
-            'sortField' => 'participantId'
+            'sortField' => 'participantId',
+            'toggleColumn' => false
         ],
         'primaryConsent' => [
             'displayName' => 'Primary Consent',
@@ -52,7 +57,8 @@ class WorkQueue
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'questionnaireOnDnaProgram' => [
             'displayName' => 'Program Update',
@@ -61,7 +67,8 @@ class WorkQueue
             'rdrDateField' => 'questionnaireOnDnaProgramAuthored',
             'otherField' => 'consentCohort',
             'method' => 'displayProgramUpdate',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'ehrConsent' => [
             'displayName' => 'EHR Consent',
@@ -69,7 +76,8 @@ class WorkQueue
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'ehrConsentExpireStatus' => [
             'displayName' => 'EHR Expiration Status',
@@ -79,7 +87,8 @@ class WorkQueue
             'otherField' => 'consentForElectronicHealthRecords',
             'method' => 'displayEhrConsentExpireStatus',
             'csvMethod' => 'csvEhrConsentExpireStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'gRoRConsent' => [
             'displayName' => 'gRoR Consent',
@@ -87,7 +96,8 @@ class WorkQueue
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
             'method' => 'displayGenomicsConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'dvEhrStatus' => [
             'displayName' => 'DV-only EHR Sharing',
@@ -95,7 +105,8 @@ class WorkQueue
             'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'caborConsent' => [
             'displayName' => 'CABoR Consent',
@@ -103,7 +114,8 @@ class WorkQueue
             'sortField' => 'consentForCABoRAuthored',
             'rdrDateField' => 'consentForCABoRAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [
@@ -115,18 +127,21 @@ class WorkQueue
             'method' => 'getDigitalHealthSharingStatus',
             'csvMethod' => 'csvDigitalHealthSharingStatus',
             'htmlClass' => 'text-center',
-            'orderable' => false
+            'orderable' => false,
+            'toggleColumn' => true
         ],
         'consentCohort' => [
             'displayName' => 'Consent Cohort',
             'rdrField' => 'consentCohortText',
             'sortField' => 'consentCohort',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'primaryLanguage' => [
             'displayName' => 'Language of Primary Consent',
             'rdrField' => 'primaryLanguage',
-            'sortField' => 'primaryLanguage'
+            'sortField' => 'primaryLanguage',
+            'toggleColumn' => true
         ]
     ];
 
