@@ -80,7 +80,7 @@ class DefaultController extends AbstractController
      */
     public function keepAliveAction(Request $request, LoggerService $loggerService)
     {
-        if ($this->isCsrfTokenValid('keepAlive', $request->request->get('csrf_token'))) {
+        if (!$this->isCsrfTokenValid('keepAlive', $request->request->get('csrf_token'))) {
             $loggerService->log(LoggerService::CSRF_TOKEN_MISMATCH, [
                 'submitted_token' => $request->request->get('csrf_token'),
                 'referrer' => $request->headers->get('referer')
