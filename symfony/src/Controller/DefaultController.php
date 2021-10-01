@@ -78,9 +78,13 @@ class DefaultController extends AbstractController
      * @Route("/keepalive", name="keep_alive")
      * Dummy action that serves to extend the user's session.
      */
-    public function keepAliveAction(Request $request)
+    public function keepAliveAction(Request $request, LoggerService $loggerService)
     {
-        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('keepAlive', $request->request->get('csrf_token')))) {
+        if ($this->isCsrfTokenValid('keepAlive', $request->request->get('csrf_token'))) {
+            $loggerService->log(LoggerService::CSRF_TOKEN_MISMATCH, [
+                'submitted_token' => $request->request->get('csrf_token'),
+                'referrer' => $request->headers->get('referer')
+            ]);
             throw $this->createAccessDeniedException();
         }
         $request->getSession()->set('pmiLastUsed', time());
