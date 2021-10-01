@@ -13,12 +13,12 @@ $(document).ready(function () {
         }
     };
 
-    var toggleColumns = function () {
-        // Get the column API object
-        var column = workQueueTable.column($(this).attr('data-column'));
+    var showColumns = function () {
+        // Get the columns API object
+        var columns = workQueueTable.columns();
 
         // Toggle the visibility
-        column.visible(!column.visible());
+        columns.visible(true);
     };
 
     var collapseFilters = function () {
@@ -88,7 +88,7 @@ $(document).ready(function () {
 
     $('#columns_reset').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
-        toggleColumns();
+        showColumns();
     });
 
     $('#participant_lookup_reset').on('click', function () {
@@ -226,7 +226,11 @@ $(document).ready(function () {
         $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
 
-    $('.toggle-vis').on('click', function (e) {
-        toggleColumns();
+    $('.toggle-vis').on('click', function () {
+        // Get the column API object
+        var column = workQueueTable.column($(this).attr('data-column'));
+
+        // Toggle the visibility
+        column.visible(!column.visible());
     });
 });
