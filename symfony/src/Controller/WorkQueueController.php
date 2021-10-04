@@ -185,7 +185,7 @@ class WorkQueueController extends AbstractController
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
         if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
-            $exportHeaders = WorkQueue::getConsentExportHeaders();
+            $exportHeaders = WorkQueue::getConsentExportHeaders($params);
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
         } else {
@@ -208,7 +208,7 @@ class WorkQueueController extends AbstractController
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $params));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {
