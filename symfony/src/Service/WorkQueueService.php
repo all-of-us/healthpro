@@ -419,13 +419,27 @@ class WorkQueueService
             $row['primaryConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForStudyEnrollment,
                 $participant->consentForStudyEnrollmentAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForStudyEnrollmentFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'primary'
+                    ])
+                    : null
             );
             $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate($participant, $userTimezone);
             $row['ehrConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForElectronicHealthRecords,
                 $participant->consentForElectronicHealthRecordsAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForElectronicHealthRecordsFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'ehr'
+                    ])
+                    : null
             );
             $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
                 $participant->ehrConsentExpireStatus,
@@ -436,7 +450,14 @@ class WorkQueueService
             $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
                 $participant->consentForGenomicsROR,
                 $participant->consentForGenomicsRORAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForGenomicsRORFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'gror'
+                    ])
+                    : null
             );
             $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
                 $participant->consentForDvElectronicHealthRecordsSharing,
@@ -446,7 +467,14 @@ class WorkQueueService
             $row['caborConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForCABoR,
                 $participant->consentForCABoRAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForCABoRFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'cabor'
+                    ])
+                    : null
             );
             foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
                 $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
