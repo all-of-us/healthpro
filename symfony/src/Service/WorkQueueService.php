@@ -23,6 +23,7 @@ class WorkQueueService
     protected $authorizationChecker;
     protected $urlGenerator;
     protected $rdrError = false;
+    protected $showConsentPDFs = false;
 
     public function __construct(
         ParticipantSummaryService $participantSummaryService,
@@ -42,6 +43,7 @@ class WorkQueueService
         $this->loggerService = $loggerService;
         $this->authorizationChecker = $authorizationChecker;
         $this->urlGenerator = $urlGenerator;
+        $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
     }
 
     public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null)
@@ -235,7 +237,7 @@ class WorkQueueService
                 $participant->consentForStudyEnrollmentAuthored,
                 $userTimezone,
                 true,
-                $participant->consentForStudyEnrollmentFilePath
+                ($this->showConsentPDFs && $participant->consentForStudyEnrollmentFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'primary'
@@ -257,7 +259,7 @@ class WorkQueueService
                 $participant->consentForElectronicHealthRecordsAuthored,
                 $userTimezone,
                 true,
-                $participant->consentForElectronicHealthRecordsFilePath
+                ($this->showConsentPDFs && $participant->consentForElectronicHealthRecordsFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'ehr'
@@ -275,7 +277,7 @@ class WorkQueueService
                 $participant->consentForGenomicsRORAuthored,
                 $userTimezone,
                 true,
-                $participant->consentForGenomicsRORFilePath
+                ($this->showConsentPDFs && $participant->consentForGenomicsRORFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'gror'
@@ -293,7 +295,7 @@ class WorkQueueService
                 $participant->consentForCABoRAuthored,
                 $userTimezone,
                 true,
-                $participant->consentForCABoRFilePath
+                ($this->showConsentPDFs && $participant->consentForCABoRFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
                         'consentType' => 'cabor'
