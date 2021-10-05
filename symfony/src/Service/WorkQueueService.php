@@ -240,7 +240,7 @@ class WorkQueueService
                 ($this->showConsentPDFs && $participant->consentForStudyEnrollmentFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
-                        'consentType' => 'primary'
+                        'consentType' => 'consentForStudyEnrollment'
                     ])
                     : null
             );
@@ -267,7 +267,7 @@ class WorkQueueService
                 ($this->showConsentPDFs && $participant->consentForElectronicHealthRecordsFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
-                        'consentType' => 'ehr'
+                        'consentType' => 'consentForElectronicHealthRecords'
                     ])
                     : null
             );
@@ -285,7 +285,7 @@ class WorkQueueService
                 ($this->showConsentPDFs && $participant->consentForGenomicsRORFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
-                        'consentType' => 'gror'
+                        'consentType' => 'consentForGenomicsROR'
                     ])
                     : null
             );
@@ -303,7 +303,7 @@ class WorkQueueService
                 ($this->showConsentPDFs && $participant->consentForCABoRFilePath)
                     ? $this->urlGenerator->generate('participant_consent', [
                         'id' => $participant->id,
-                        'consentType' => 'cabor'
+                        'consentType' => 'consentForCABoR'
                     ])
                     : null
             );
@@ -431,7 +431,14 @@ class WorkQueueService
                             $row[$field] = WorkQueue::{$columnDef['method']}(
                                 $participant->{$columnDef['rdrField']},
                                 $participant->{$columnDef['rdrDateField']},
-                                $userTimezone
+                                $userTimezone,
+                                true,
+                                (isset($columnDef['pdfPath']) && $participant->{$columnDef['pdfPath']})
+                                    ? $this->urlGenerator->generate('participant_consent', [
+                                        'id' => $participant->id,
+                                        'consentType' => $columnDef['rdrField']
+                                    ])
+                                    : null
                             );
                         }
                     } elseif (isset($columnDef['displayNames'])) {

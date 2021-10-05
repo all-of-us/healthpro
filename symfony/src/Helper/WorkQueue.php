@@ -52,7 +52,8 @@ class WorkQueue
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'pdfPath' => 'consentForStudyEnrollmentFilePath'
         ],
         'questionnaireOnDnaProgram' => [
             'displayName' => 'Program Update',
@@ -69,7 +70,8 @@ class WorkQueue
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
         ],
         'ehrConsentExpireStatus' => [
             'displayName' => 'EHR Expiration Status',
@@ -87,7 +89,8 @@ class WorkQueue
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
             'method' => 'displayGenomicsConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'pdfPath' => 'consentForGenomicsRORFilePath'
         ],
         'dvEhrStatus' => [
             'displayName' => 'DV-only EHR Sharing',
@@ -103,7 +106,8 @@ class WorkQueue
             'sortField' => 'consentForCABoRAuthored',
             'rdrDateField' => 'consentForCABoRAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'pdfPath' => 'consentForCABoRFilePath'
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [

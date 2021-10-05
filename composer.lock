@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "37545c3be0398fce93977644470705ba",
+    "content-hash": "a5164a49ccdef7fd7cff26271d0cc32f",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -1760,16 +1760,16 @@
         },
         {
             "name": "google/cloud-storage",
-            "version": "v1.25.0",
+            "version": "v1.25.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-cloud-php-storage.git",
-                "reference": "22dd587e5136248e31c8ce047c331acbe74ffbb7"
+                "reference": "8367aaaa6c541fcc95ff349e8f14d9ce9f631c16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/22dd587e5136248e31c8ce047c331acbe74ffbb7",
-                "reference": "22dd587e5136248e31c8ce047c331acbe74ffbb7",
+                "url": "https://api.github.com/repos/googleapis/google-cloud-php-storage/zipball/8367aaaa6c541fcc95ff349e8f14d9ce9f631c16",
+                "reference": "8367aaaa6c541fcc95ff349e8f14d9ce9f631c16",
                 "shasum": ""
             },
             "require": {
@@ -1808,9 +1808,9 @@
             ],
             "description": "Cloud Storage Client for PHP",
             "support": {
-                "source": "https://github.com/googleapis/google-cloud-php-storage/tree/v1.25.0"
+                "source": "https://github.com/googleapis/google-cloud-php-storage/tree/v1.25.1"
             },
-            "time": "2021-09-15T00:52:58+00:00"
+            "time": "2021-10-04T22:16:26+00:00"
         },
         {
             "name": "google/common-protos",

@@ -32,10 +32,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class ParticipantDetailsController extends AbstractController
 {
     private const VALID_CONSENT_TYPES = [
-        'primary' => 'consentForStudyEnrollmentFilePath',
-        'ehr' => 'consentForElectronicHealthRecordsFilePath',
-        'gror' => 'consentForGenomicsRORFilePath',
-        'cabor' => 'consentForCABoRFilePath',
+        'consentForStudyEnrollment' => 'consentForStudyEnrollmentFilePath',
+        'consentForElectronicHealthRecords' => 'consentForElectronicHealthRecordsFilePath',
+        'consentForGenomicsROR' => 'consentForGenomicsRORFilePath',
+        'consentForCABoR' => 'consentForCABoRFilePath',
     ];
 
     /**
