@@ -26,7 +26,7 @@ class SettingsController extends AbstractController
      */
     public function settings(Request $request, TimezoneService $timezeoneService, UserRepository $userRepository, EntityManagerInterface $em)
     {
-        $user = $userRepository->find($this->getUser()->getId()); // Silex to Symfony User Entity
+        $user = $userRepository->find($this->getUser()->getId());
         $settingsForm = $this->createForm(SettingsType::class, $user);
         $settingsForm->handleRequest($request);
         if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
