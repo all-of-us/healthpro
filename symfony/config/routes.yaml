@@ -1,21 +1,8 @@
-index:
-    path: /
-    controller: App\Controller\DefaultController::index
-
-# Legacy Silex Routes
-
+# 'home' route is still used in a lot of places so this redirect is left in place
+# to both continue functionality of that route without and also to redirect / to
+# the Symfony home page (/s/) when anyone goes straight to /
 home:
     path: /
-
-selectSite:
-    path: /site/select
-
-evaluation:
-    path: /participant/{participantId}/measurements/{evalId}
-    defaults: { evalId: null }
-
-evaluation_modify:
-    path: /participant/{participantId}/measurements/{evalId}/modify/{type}
-
-evaluationBloodDonorCheck:
-    path: /participant/{participantId}/measurements/blood/donor/check
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+    defaults:
+        route: 'symfony_home'

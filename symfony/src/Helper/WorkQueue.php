@@ -15,6 +15,121 @@ class WorkQueue
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
 
+    public static $columnsDef = [
+        'lastName' => [
+            'displayName' => 'Last Name',
+            'rdrField' => 'lastName',
+            'sortField' => 'lastName',
+            'generateLink' => true,
+        ],
+        'firstName' => [
+            'displayName' => 'First Name',
+            'rdrField' => 'firstName',
+            'sortField' => 'firstName',
+            'generateLink' => true
+        ],
+        'middleName' => [
+            'displayName' => 'Middle Name',
+            'rdrField' => 'middleName',
+            'sortField' => 'firstName',
+            'generateLink' => true
+        ],
+        'dateOfBirth' => [
+            'displayName' => 'Date of Birth',
+            'rdrField' => 'dob',
+            'sortField' => 'dateOfBirth',
+            'formatDate' => true,
+            'csvMethod' => 'csvDateFromObject'
+        ],
+        'participantId' => [
+            'displayName' => 'PM ID',
+            'rdrField' => 'id',
+            'sortField' => 'participantId'
+        ],
+        'primaryConsent' => [
+            'displayName' => 'Primary Consent',
+            'rdrField' => 'consentForStudyEnrollment',
+            'sortField' => 'consentForStudyEnrollmentAuthored',
+            'rdrDateField' => 'consentForStudyEnrollmentAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
+        ],
+        'questionnaireOnDnaProgram' => [
+            'displayName' => 'Program Update',
+            'rdrField' => 'questionnaireOnDnaProgram',
+            'sortField' => 'questionnaireOnDnaProgramAuthored',
+            'rdrDateField' => 'questionnaireOnDnaProgramAuthored',
+            'otherField' => 'consentCohort',
+            'method' => 'displayProgramUpdate',
+            'htmlClass' => 'text-center'
+        ],
+        'ehrConsent' => [
+            'displayName' => 'EHR Consent',
+            'rdrField' => 'consentForElectronicHealthRecords',
+            'sortField' => 'consentForElectronicHealthRecordsAuthored',
+            'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
+        ],
+        'ehrConsentExpireStatus' => [
+            'displayName' => 'EHR Expiration Status',
+            'rdrField' => 'ehrConsentExpireStatus',
+            'sortField' => 'ehrConsentExpireStatus',
+            'rdrDateField' => 'ehrConsentExpireAuthored',
+            'otherField' => 'consentForElectronicHealthRecords',
+            'method' => 'displayEhrConsentExpireStatus',
+            'csvMethod' => 'csvEhrConsentExpireStatus',
+            'htmlClass' => 'text-center'
+        ],
+        'gRoRConsent' => [
+            'displayName' => 'gRoR Consent',
+            'rdrField' => 'consentForGenomicsROR',
+            'sortField' => 'consentForGenomicsRORAuthored',
+            'rdrDateField' => 'consentForGenomicsRORAuthored',
+            'method' => 'displayGenomicsConsentStatus',
+            'htmlClass' => 'text-center'
+        ],
+        'dvEhrStatus' => [
+            'displayName' => 'DV-only EHR Sharing',
+            'rdrField' => 'consentForDvElectronicHealthRecordsSharing',
+            'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
+            'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
+        ],
+        'caborConsent' => [
+            'displayName' => 'CABoR Consent',
+            'rdrField' => 'consentForCABoR',
+            'sortField' => 'consentForCABoRAuthored',
+            'rdrDateField' => 'consentForCABoRAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center'
+        ],
+        'digitalHealthSharingStatus' => [
+            'displayNames' => [
+                'fitbit' => 'Fitbit Consent',
+                'appleHealthKit' => 'Apple HealthKit Consent',
+                'appleEHR' => 'Apple EHR Consent'
+            ],
+            'rdrField' => 'digitalHealthSharingStatus',
+            'method' => 'getDigitalHealthSharingStatus',
+            'csvMethod' => 'csvDigitalHealthSharingStatus',
+            'htmlClass' => 'text-center',
+            'orderable' => false
+        ],
+        'consentCohort' => [
+            'displayName' => 'Consent Cohort',
+            'rdrField' => 'consentCohortText',
+            'sortField' => 'consentCohort',
+            'htmlClass' => 'text-center'
+        ],
+        'primaryLanguage' => [
+            'displayName' => 'Language of Primary Consent',
+            'rdrField' => 'primaryLanguage',
+            'sortField' => 'primaryLanguage'
+        ]
+    ];
+
     public static $sortColumns = [
         'lastName',
         'firstName',
@@ -615,8 +730,8 @@ class WorkQueue
     }
 
     public static function displayEhrConsentExpireStatus(
-        $ehrConsentExpireStatus,
         $consentForElectronicHealthRecords,
+        $ehrConsentExpireStatus,
         $time,
         $userTimezone,
         $displayTime = true
@@ -656,12 +771,12 @@ class WorkQueue
         }
     }
 
-    public static function displayProgramUpdate($participant, $userTimezone)
+    public static function displayProgramUpdate($consentCohort, $questionnaireOnDnaProgram, $questionnaireOnDnaProgramAuthored, $userTimezone)
     {
-        if ($participant->consentCohort !== 'COHORT_2') {
+        if ($consentCohort !== 'COHORT_2') {
             return self::HTML_NOTICE . ' (not applicable) ';
-        } elseif ($participant->questionnaireOnDnaProgram === 'SUBMITTED') {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->questionnaireOnDnaProgramAuthored, $userTimezone);
+        } elseif ($questionnaireOnDnaProgram === 'SUBMITTED') {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($questionnaireOnDnaProgramAuthored, $userTimezone);
         } else {
             return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
