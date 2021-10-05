@@ -89,6 +89,7 @@ $(document).ready(function () {
     $('#columns_reset').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
         showColumns();
+        $.get("/s/workqueue/consent/columns", {reset: true});
     });
 
     $('#participant_lookup_reset').on('click', function () {

@@ -563,8 +563,10 @@ class WorkQueueService
             if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
                 if (isset($columnDef['csvMethod'])) {
                     if (isset($columnDef['otherField'])) {
-                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']},
-                            $participant->{$columnDef['otherField']});
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}(
+                            $participant->{$columnDef['rdrField']},
+                            $participant->{$columnDef['otherField']}
+                        );
                         $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
                     } elseif (isset($columnDef['displayNames'])) {
                         foreach (array_keys($columnDef['displayNames']) as $type) {
