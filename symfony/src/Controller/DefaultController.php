@@ -20,7 +20,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/", name="symfony_home")
+     * @Route("/", name="home")
      */
     public function index()
     {
@@ -67,7 +67,7 @@ class DefaultController extends AbstractController
                 return $this->render('site-select.html.twig', ['siteEmail' => $siteId]);
             }
             if ($siteService->switchSite($siteId)) {
-                return $this->redirectToRoute('symfony_home');
+                return $this->redirectToRoute('home');
             } else {
                 throw $this->createAccessDeniedException();
             }
@@ -147,6 +147,6 @@ class DefaultController extends AbstractController
         $loggerService->log(Log::LOGOUT);
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'symfony_home'));
+        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 }

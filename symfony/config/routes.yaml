@@ -1,8 +1,0 @@
-# 'home' route is still used in a lot of places so this redirect is left in place
-# to both continue functionality of that route without and also to redirect / to
-# the Symfony home page (/s/) when anyone goes straight to /
-home:
-    path: /
-    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
-    defaults:
-        route: 'symfony_home'

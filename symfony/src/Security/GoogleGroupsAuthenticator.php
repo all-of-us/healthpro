@@ -108,7 +108,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $this->userService->updateLastLogin();
         // Instead of using a service, the token should eventually contain the User entity (not Pmi\Security\User)
         // which will make updating the last login trivial.
-        return $this->redirectToRoute('symfony_home');
+        return $this->redirectToRoute('home');
     }
 
     public function start(Request $request, AuthenticationException $authException = null)
