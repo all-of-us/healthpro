@@ -400,6 +400,9 @@ label.label-normal {
 #workqueue_consents_row .panel-title small{
     color: #337ab7;
 }
+#workqueue_consents_row .list-group-item.radio{
+    margin-top: 0;
+}
 
 /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {
