@@ -452,7 +452,7 @@ class WorkQueueService
         return $rows;
     }
 
-    public function generateExportRow($participant, $params = null)
+    public function generateExportRow($participant, $workQueueColumns = null)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [
@@ -555,12 +555,12 @@ class WorkQueueService
         return $row;
     }
 
-    public function generateConsentExportRow($participant, $params)
+    public function generateConsentExportRow($participant, $workQueueConsentColumns)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
         foreach (WorkQueue::$columnsDef as $field => $columnDef) {
-            if (!$columnDef['toggleColumn'] || (isset($params["column{$field}"]) && $params["column{$field}"] === 'on')) {
+            if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
                 if (isset($columnDef['csvMethod'])) {
                     if (isset($columnDef['otherField'])) {
                         $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']},

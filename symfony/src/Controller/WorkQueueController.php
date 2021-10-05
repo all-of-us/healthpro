@@ -184,8 +184,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
+        $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');
         if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
-            $exportHeaders = WorkQueue::getConsentExportHeaders($params);
+            $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueConsentColumns);
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
         } else {
@@ -193,7 +194,7 @@ class WorkQueueController extends AbstractController
             $exportRowMethod = 'generateExportRow';
             $fileName = 'workqueue';
         }
-        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod) {
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueConsentColumns) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -208,7 +209,7 @@ class WorkQueueController extends AbstractController
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $params));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueConsentColumns));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {

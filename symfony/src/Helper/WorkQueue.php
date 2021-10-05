@@ -1053,12 +1053,12 @@ class WorkQueue
         return $headers;
     }
 
-    public static function getConsentExportHeaders($params)
+    public static function getConsentExportHeaders($workQueueConsentColumns)
     {
         $headers = [];
         foreach (self::$columnsDef as $field => $columnDef) {
             if ($columnDef['toggleColumn']) {
-                if (isset($params["column{$field}"]) && $params["column{$field}"] === 'on') {
+                if (in_array("column{$field}", $workQueueConsentColumns)) {
                     if (isset($columnDef['csvLabels'])) {
                         foreach ($columnDef['csvLabels'] as $csvLabel) {
                             $headers[] = $csvLabel;
