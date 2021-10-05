@@ -1125,4 +1125,21 @@ class WorkQueue
         }
         return $rdrParams;
     }
+
+    public static function getWorkQueueConsentColumns()
+    {
+        $workQueueConsentColumns = [];
+        foreach (self::$columnsDef as $field => $columnDef) {
+            if ($columnDef['toggleColumn']) {
+                if (isset($columnDef['displayNames'])) {
+                    foreach (array_keys($columnDef['displayNames']) as $subField) {
+                        $workQueueConsentColumns[] = 'column' . $subField;
+                    }
+                } else {
+                    $workQueueConsentColumns[] = 'column' . $field;
+                }
+            }
+        }
+        return $workQueueConsentColumns;
+    }
 }

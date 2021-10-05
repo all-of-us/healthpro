@@ -398,6 +398,10 @@ class WorkQueueController extends AbstractController
             return $this->json($ajaxData, $responseCode);
         } else {
             $params['exportType'] = 'consents';
+            if (!$this->session->has('workQueueConsentColumns')) {
+                $workQueueConsentColumns = WorkQueue::getWorkQueueConsentColumns();
+                $this->session->set('workQueueConsentColumns', $workQueueConsentColumns);
+            }
             return $this->render('workqueue/consents.html.twig', [
                 'filters' => $filters,
                 'advancedFilters' => WorkQueue::$consentAdvanceFilters,
@@ -414,5 +418,26 @@ class WorkQueueController extends AbstractController
                 'columnsDef' => WorkQueue::$columnsDef
             ]);
         }
+    }
+
+    /**
+     * @Route("/consent/columns", name="workqueue_consent_columns")
+     */
+    public function consentColumnsAction(Request $request)
+    {
+        if (!$this->displayParticipantConsentsTab) {
+            throw $this->createNotFoundException();
+        }
+        $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');
+        $columnName = $request->query->get('columnName');
+        if ($request->query->get('checked') === 'true') {
+            $workQueueConsentColumns[] = $columnName;
+        } else {
+            if (($key = array_search($columnName, $workQueueConsentColumns)) !== false) {
+                unset($workQueueConsentColumns[$key]);
+            }
+        }
+        $this->session->set('workQueueConsentColumns', $workQueueConsentColumns);
+        return $this->json(['success' => true]);
     }
 }

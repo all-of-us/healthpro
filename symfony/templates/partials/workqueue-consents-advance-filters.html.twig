@@ -11,23 +11,25 @@
         <div id="columns_group" class="panel-collapse collapse">
             <div class="panel-body">
                 <ul class="list-group">
-                    {% set columNumber = 0 %}
+                    {% set columNumber = 5 %}
                     {% for name, columnDef in columnsDef %}
                         {% if columnDef.toggleColumn %}
                             {% if columnDef.displayNames is defined %}
                                 {% for subFieldName, subFieldLabel in columnDef.displayNames %}
+                                    {% set checked = "column"~subFieldName in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
                                     <li class="list-group-item">
-                                        <input type="checkbox" name="column{{ subFieldName }}" checked class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}
+                                        <input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}
                                     </li>
                                     {% set columNumber = columNumber + 1 %}
                                 {% endfor %}
                             {% else %}
+                                {% set checked = "column"~name in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
                                 <li class="list-group-item">
-                                    <input type="checkbox" name="column{{ name }}" checked class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.displayName }}
+                                    <input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.displayName }}
                                 </li>
+                                {% set columNumber = columNumber + 1 %}
                             {% endif %}
                         {% endif %}
-                        {% set columNumber = columNumber + 1 %}
                     {% endfor %}
                 </ul>
             </div>

@@ -227,10 +227,19 @@ $(document).ready(function () {
     });
 
     $('.toggle-vis').on('click', function () {
-        // Get the column API object
         var column = workQueueTable.column($(this).attr('data-column'));
-
-        // Toggle the visibility
         column.visible(!column.visible());
+        var columnName = $(this).attr('name');
+        // Set column names in session
+        $.get("/s/workqueue/consent/columns", {columnName: columnName, checked: $(this).prop('checked')});
     });
+
+    var toggleColumns = function () {
+        $('#columns_group input[type=checkbox]').each(function () {
+            var column = workQueueTable.column($(this).attr('data-column'));
+            column.visible($(this).prop('checked'));
+        });
+    };
+
+    toggleColumns();
 });
