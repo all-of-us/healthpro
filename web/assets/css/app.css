@@ -403,6 +403,10 @@ label.label-normal {
 #workqueue_consents_row .list-group-item.radio{
     margin-top: 0;
 }
+#workqueue_consents_row .parsley-errors-list li {
+    list-style: none;
+    color: #a94442;
+}
 
 /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {

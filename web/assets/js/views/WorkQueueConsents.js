@@ -63,7 +63,9 @@ $(document).ready(function () {
 
 
     $('#filters #participant_search').on('click', function () {
-        if ($('input[name=lastName]').val() && $('input[name=dateOfBirth]').val()) {
+        var isValidLastName = $('#lastName').parsley().validate();
+        var isValidDateOfBirth = $('#dateOfBirth').parsley().validate();
+        if (isValidLastName === true && isValidDateOfBirth === true) {
             $('input[name=participantId]').val('');
             checkFilters();
             $('#filters').submit();
@@ -71,16 +73,23 @@ $(document).ready(function () {
     });
 
     $('#filters #participant_id_search').on('click', function () {
-        if ($('input[name=participantId]').val()) {
+        var isValidParticipantId = $('#participantId').parsley().validate();
+        if (isValidParticipantId === true) {
             $('input[name=lastName], input[name=dateOfBirth]').val('');
             checkFilters();
             $('#filters').submit();
         }
     });
 
+    var isValidStartEndDate = function (dateFieldName) {
+        var isValidStartDate = $('#' + dateFieldName + 'StartDate').parsley().validate();
+        var isValidEndDate = $('#' + dateFieldName + 'EndDate').parsley().validate();
+        return isValidStartDate === true && isValidEndDate === true;
+    };
+
     $('#filters .apply-date-filter').on('click', function () {
         var dateFieldName = $(this).data('consent-date-field-name');
-        if ($('input[name=' + dateFieldName + 'StartDate]').val() !== '' || $('input[name=' + dateFieldName + 'EndDate]').val() !== '') {
+        if (isValidStartEndDate(dateFieldName) && ($('input[name=' + dateFieldName + 'StartDate]').val() !== '' || $('input[name=' + dateFieldName + 'EndDate]').val() !== '')) {
             checkFilters();
             $('#filters').submit();
         }
@@ -243,4 +252,23 @@ $(document).ready(function () {
     };
 
     toggleColumns();
+
+    var validateDateFormat = function (value) {
+        var parts = value.split('/');
+        if (parts.length < 3) {
+            return false;
+        }
+        var dt = new Date(parts[2], parts[0] - 1, parts[1]);
+        return (dt && dt.getMonth() === parseInt(parts[0], 10) - 1)
+    };
+
+    window.Parsley.addValidator('dateMdy', {
+        validateString: function (value) {
+            return validateDateFormat(value);
+        },
+        messages: {
+            en: 'Invalid date format.'
+        },
+        priority: 32
+    });
 });

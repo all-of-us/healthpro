@@ -49,15 +49,15 @@
                 <h4>Search by Name</h4>
                 <div class="form-group">
                     <label class="control-label required" for="lastName">Last name</label>
-                    <input type="text" name="lastName" required="required" class="form-control" id="lastName" value="{{ params['lastName']|default('') }}">
+                    <input type="text" name="lastName" required="required" class="form-control" id="lastName" value="{{ params['lastName']|default('') }}" data-parsley-required>
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="firstName">First name</label>
-                    <input type="text" name="firstName" required="required" class="form-control" id="firstName" value="{{ params['firstName']|default('') }}">
+                    <input type="text" name="firstName" class="form-control" id="firstName" value="{{ params['firstName']|default('') }}">
                 </div>
                 <div class="form-group">
                     <label class="control-label required" for="dateOfBirth">Date of Birth</label>
-                    <input type="text" name="dateOfBirth" required="required" class="form-control" id="dateOfBirth" value="{{ params['dateOfBirth']|default('') }}" placeholder="MM/DD/YYYY">
+                    <input type="text" name="dateOfBirth" required="required" class="form-control" id="dateOfBirth" value="{{ params['dateOfBirth']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy data-parsley-required>
                 </div>
                 <p>
                     <button type="button" class="btn btn-primary" id="participant_search">Search</button>
@@ -65,10 +65,10 @@
                 <h4>Find by ID</h4>
                 <div class="form-group">
                     <label class="control-label required" for="participantId">Participant Id</label>
-                    <input type="text" name="participantId" required="required" class="form-control" id="participantId" value="{{ params['participantId']|default('') }}">
+                    <input type="text" name="participantId" required="required" class="form-control" id="participantId" value="{{ params['participantId']|default('') }}" data-parsley-required>
                 </div>
                 <p>
-                    <button type="button" class="btn btn-primary" id="participant_id_search">Go</button>
+                    <button type="button" class="btn btn-primary" id="participant_id_search">Search</button>
                 </p>
             </div>
         </div>
@@ -112,11 +112,11 @@
                                         <li class="list-group-item">
                                             <div class="form-group">
                                                 <label class="control-label" for="{{ advancedFilter.dateField }}StartDate">Start Date</label>
-                                                <input type="text" name="{{ advancedFilter.dateField }}StartDate" class="form-control" id="{{ advancedFilter.dateField }}StartDate"  value="{{ params[advancedFilter.dateField ~ 'StartDate']|default('') }}" placeholder="MM/DD/YYYY">
+                                                <input type="text" name="{{ advancedFilter.dateField }}StartDate" class="form-control" id="{{ advancedFilter.dateField }}StartDate" value="{{ params[advancedFilter.dateField ~ 'StartDate']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy>
                                             </div>
                                             <div class="form-group">
                                                 <label class="control-label" for="{{ advancedFilter.dateField }}EndDate">End Date</label>
-                                                <input type="text" name="{{ advancedFilter.dateField }}EndDate" class="form-control" id="{{ advancedFilter.dateField }}EndDate"  value="{{ params[advancedFilter.dateField ~ 'EndDate']|default('') }}" placeholder="MM/DD/YYYY">
+                                                <input type="text" name="{{ advancedFilter.dateField }}EndDate" class="form-control" id="{{ advancedFilter.dateField }}EndDate" value="{{ params[advancedFilter.dateField ~ 'EndDate']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy>
                                             </div>
                                             <p class="text-center">
                                                 <button type="button" class="btn btn-primary btn-small apply-date-filter" data-consent-date-field-name="{{ advancedFilter.dateField }}">Apply</button>
