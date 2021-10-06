@@ -1142,4 +1142,28 @@ class WorkQueue
         }
         return $workQueueConsentColumns;
     }
+
+    public static function isValidDate($date)
+    {
+        $dt = \DateTime::createFromFormat("m/d/Y", $date);
+        return $dt !== false && !array_sum($dt::getLastErrors());
+    }
+
+    public static function isValidDates($params)
+    {
+        if (!empty($params['dateOfBirth']) && !self::isValidDate($params['dateOfBirth'])) {
+            return false;
+        }
+        foreach (self::$columnsDef as $field => $columnDef) {
+            if (isset($columnDef['rdrDateField'])) {
+                if (!empty($params[$columnDef['rdrDateField'] . 'StartDate']) && !self::isValidDate($params[$columnDef['rdrDateField'] . 'StartDate'])) {
+                    return false;
+                }
+                if (!empty($params[$columnDef['rdrDateField'] . 'EndDate']) && !self::isValidDate($params[$columnDef['rdrDateField'] . 'EndDate'])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

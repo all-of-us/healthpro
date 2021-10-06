@@ -384,19 +384,25 @@ class WorkQueueController extends AbstractController
 
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
-            $params = array_merge($params, array_filter($request->request->all()));
-            if (!empty($params['patientStatus'])) {
-                $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
+            if (WorkQueue::isValidDates($params)) {
+                $params = array_merge($params, array_filter($request->request->all()));
+                if (!empty($params['patientStatus'])) {
+                    $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
+                }
+                $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
+                $ajaxData = [];
+                $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
+                $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
+                $responseCode = 200;
+                if ($this->workQueueService->isRdrError()) {
+                    $responseCode = 500;
+                }
+                return $this->json($ajaxData, $responseCode);
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
             $ajaxData = [];
-            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
-            $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
-            $responseCode = 200;
-            if ($this->workQueueService->isRdrError()) {
-                $responseCode = 500;
-            }
-            return $this->json($ajaxData, $responseCode);
+            $ajaxData['recordsTotal'] = 0;
+            $ajaxData['data'] = [];
+            return $this->json($ajaxData, 200);
         } else {
             $params['exportType'] = 'consents';
             if (!$this->session->has('workQueueConsentColumns')) {
