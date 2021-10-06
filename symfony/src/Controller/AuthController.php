@@ -23,7 +23,7 @@ class AuthController extends AbstractController
     public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session)
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('symfony_home');
+            return $this->redirectToRoute('home');
         }
 
         if ($env->isLocal() && $userService->canMockLogin()) {
