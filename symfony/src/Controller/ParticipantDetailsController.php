@@ -196,7 +196,7 @@ class ParticipantDetailsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{id}/consent-{consentType}", name="participant_consent")
+     * @Route("/participant/{id}/consent/{consentType}", name="participant_consent")
      */
     public function participantConsent(
         string $id,
