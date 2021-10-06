@@ -259,7 +259,7 @@ $(document).ready(function () {
             return false;
         }
         var dt = new Date(parts[2], parts[0] - 1, parts[1]);
-        return (dt && dt.getMonth() === parseInt(parts[0], 10) - 1)
+        return (dt && dt.getMonth() === parseInt(parts[0], 10) - 1 && dt.getFullYear() === parseInt(parts[2]));
     };
 
     window.Parsley.addValidator('dateMdy', {
