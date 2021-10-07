@@ -4,6 +4,8 @@ $(document).ready(function () {
         return;
     }
 
+    var columnsDef = $('#workqueue_consents').data('columns-def');
+
     var checkFilters = function () {
         if ($('#filters select[name=activityStatus]').val() == 'withdrawn') {
             $('#filters select').not('[name=activityStatus], [name=organization]').val('');
@@ -54,6 +56,29 @@ $(document).ready(function () {
         });
     };
 
+    var clearInvalidFields = function (type = null) {
+        if (type !== 'participantIdSearch') {
+            var dateOfBirthField = $('#dateOfBirth');
+            if (dateOfBirthField.parsley().validate() !== true) {
+                dateOfBirthField.val('');
+            }
+        }
+        for (const [field, columnDef] of Object.entries(columnsDef)) {
+            if (columnDef['toggleColumn'] && columnDef.hasOwnProperty('rdrDateField')) {
+                var starDateField = $('#' + columnDef['rdrDateField'] + 'StartDate');
+                if (starDateField.length !== 0) {
+                    var endDateField = $('#' + columnDef['rdrDateField'] + 'EndDate');
+                    if (starDateField.parsley().validate() !== true) {
+                        starDateField.val('');
+                    }
+                    if (endDateField.parsley().validate() !== true) {
+                        endDateField.val('');
+                    }
+                }
+            }
+        }
+    };
+
     checkFilters();
     collapseFilters();
     $('#filters select, #filters input[type=radio]').on('change', function () {
@@ -68,6 +93,7 @@ $(document).ready(function () {
         if (isValidLastName === true && isValidDateOfBirth === true) {
             $('input[name=participantId]').val('');
             checkFilters();
+            clearInvalidFields();
             $('#filters').submit();
         }
     });
@@ -77,6 +103,7 @@ $(document).ready(function () {
         if (isValidParticipantId === true) {
             $('input[name=lastName], input[name=dateOfBirth]').val('');
             checkFilters();
+            clearInvalidFields('participantIdSearch');
             $('#filters').submit();
         }
     });
@@ -91,6 +118,7 @@ $(document).ready(function () {
         var dateFieldName = $(this).data('consent-date-field-name');
         if (isValidStartEndDate(dateFieldName) && ($('input[name=' + dateFieldName + 'StartDate]').val() !== '' || $('input[name=' + dateFieldName + 'EndDate]').val() !== '')) {
             checkFilters();
+            clearInvalidFields();
             $('#filters').submit();
         }
     });
@@ -159,8 +187,6 @@ $(document).ready(function () {
     });
 
     var url = window.location.href;
-
-    var columnsDef = $('#workqueue_consents').data('columns-def');
 
     var tableColumns = [];
 
