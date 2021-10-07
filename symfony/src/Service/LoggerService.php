@@ -57,6 +57,7 @@ class LoggerService
     public const PATIENT_STATUS_HISTORY_EDIT = 'PATIENT_STATUS_HISTORY_EDIT';
     public const AWARDEE_ADD = 'AWARDEE_ADD';
     public const ORGANIZATION_ADD = 'ORGANIZATION_ADD';
+    public const CSRF_TOKEN_MISMATCH = 'CSRF_TOKEN_MISMATCH';
 
     public function __construct(
         LoggerInterface $logger,

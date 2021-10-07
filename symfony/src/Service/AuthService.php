@@ -92,7 +92,7 @@ class AuthService
         $this->tokenStorage->setToken($token);
     }
 
-    public function getGoogleLogoutUrl($route = 'symfony_home')
+    public function getGoogleLogoutUrl($route = 'home')
     {
         $dest = $this->generateUrl($route);
 

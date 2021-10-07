@@ -20,7 +20,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 class DefaultController extends AbstractController
 {
     /**
-     * @Route("/", name="symfony_home")
+     * @Route("/", name="home")
      */
     public function index()
     {
@@ -67,7 +67,7 @@ class DefaultController extends AbstractController
                 return $this->render('site-select.html.twig', ['siteEmail' => $siteId]);
             }
             if ($siteService->switchSite($siteId)) {
-                return $this->redirectToRoute('symfony_home');
+                return $this->redirectToRoute('home');
             } else {
                 throw $this->createAccessDeniedException();
             }
@@ -78,9 +78,13 @@ class DefaultController extends AbstractController
      * @Route("/keepalive", name="keep_alive")
      * Dummy action that serves to extend the user's session.
      */
-    public function keepAliveAction(Request $request)
+    public function keepAliveAction(Request $request, LoggerService $loggerService)
     {
-        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('keepAlive', $request->request->get('csrf_token')))) {
+        if (!$this->isCsrfTokenValid('keepAlive', $request->request->get('csrf_token'))) {
+            $loggerService->log(LoggerService::CSRF_TOKEN_MISMATCH, [
+                'submitted_token' => $request->request->get('csrf_token'),
+                'referrer' => $request->headers->get('referer')
+            ]);
             throw $this->createAccessDeniedException();
         }
         $request->getSession()->set('pmiLastUsed', time());
@@ -143,6 +147,6 @@ class DefaultController extends AbstractController
         $loggerService->log(Log::LOGOUT);
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'symfony_home'));
+        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 }
