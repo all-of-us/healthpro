@@ -1154,7 +1154,7 @@ class WorkQueue
         if (!empty($params['dateOfBirth']) && !self::isValidDate($params['dateOfBirth'])) {
             return false;
         }
-        foreach (self::$columnsDef as $field => $columnDef) {
+        foreach (array_values(self::$columnsDef) as $columnDef) {
             if (isset($columnDef['rdrDateField'])) {
                 if (!empty($params[$columnDef['rdrDateField'] . 'StartDate']) && !self::isValidDate($params[$columnDef['rdrDateField'] . 'StartDate'])) {
                     return false;

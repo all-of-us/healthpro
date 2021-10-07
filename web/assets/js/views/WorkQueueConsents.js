@@ -15,11 +15,26 @@ $(document).ready(function () {
         }
     };
 
-    var showColumns = function () {
-        // Get the columns API object
-        var columns = workQueueTable.columns();
+    var workQueueTable = $('#workqueue_consents').DataTable({
+        processing: true,
+        serverSide: true,
+        scrollX: true,
+        ajax: {
+            url: url,
+            type: "POST"
+        },
+        order: [[5, 'desc']],
+        dom: 'lrtip',
+        pageLength: 25,
+        createdRow: function (row, data) {
+            if (data.isWithdrawn === true) {
+                $(row).addClass('tr-withdrawn');
+            }
+        }
+    });
 
-        // Toggle the visibility
+    var showColumns = function () {
+        var columns = workQueueTable.columns();
         columns.visible(true);
     };
 
@@ -63,7 +78,7 @@ $(document).ready(function () {
                 dateOfBirthField.val('');
             }
         }
-        for (const [field, columnDef] of Object.entries(columnsDef)) {
+        for (const columnDef of Object.values(columnsDef)) {
             if (columnDef['toggleColumn'] && columnDef.hasOwnProperty('rdrDateField')) {
                 var starDateField = $('#' + columnDef['rdrDateField'] + 'StartDate');
                 if (starDateField.length !== 0) {
@@ -186,8 +201,6 @@ $(document).ready(function () {
         });
     });
 
-    var url = window.location.href;
-
     var tableColumns = [];
 
     var generateTableRow = function (field, columnDef) {
@@ -212,25 +225,6 @@ $(document).ready(function () {
             generateTableRow(field, columnDef);
         }
     }
-
-    var workQueueTable = $('#workqueue_consents').DataTable({
-        processing: true,
-        serverSide: true,
-        scrollX: true,
-        ajax: {
-            url: url,
-            type: "POST"
-        },
-        order: [[5, 'desc']],
-        dom: 'lrtip',
-        columns: tableColumns,
-        pageLength: 25,
-        createdRow: function (row, data) {
-            if (data.isWithdrawn === true) {
-                $(row).addClass('tr-withdrawn');
-            }
-        }
-    });
 
     // Populate count in header
     $('#workqueue_consents').on('init.dt', function (e, settings, json) {
