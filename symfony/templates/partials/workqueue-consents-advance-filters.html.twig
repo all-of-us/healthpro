@@ -8,7 +8,7 @@
                 <small><a id="columns_reset" data-group-id="columns_group">Reset</a></small>
             </h4>
         </div>
-        <div id="columns_group" class="panel-collapse collapse">
+        <div id="columns_group" class="panel-collapse collapse" data-consent-columns-url="{{ path('workqueue_consent_columns') }}">
             <div class="panel-body">
                 <ul class="list-group">
                     {% set columNumber = 5 %}
@@ -56,7 +56,7 @@
                     <input type="text" name="firstName" class="form-control" id="firstName" value="{{ params['firstName']|default('') }}">
                 </div>
                 <div class="form-group">
-                    <label class="control-label required" for="dateOfBirth">Date of Birth</label>
+                    <label class="control-label required" for="dateOfBirth">Date of birth</label>
                     <input type="text" name="dateOfBirth" required="required" class="form-control" id="dateOfBirth" value="{{ params['dateOfBirth']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy data-parsley-required>
                 </div>
                 <p>
@@ -64,7 +64,7 @@
                 </p>
                 <h4>Find by ID</h4>
                 <div class="form-group">
-                    <label class="control-label required" for="participantId">Participant Id</label>
+                    <label class="control-label required" for="participantId">Participant ID</label>
                     <input type="text" name="participantId" required="required" class="form-control" id="participantId" value="{{ params['participantId']|default('') }}" data-parsley-required>
                 </div>
                 <p>

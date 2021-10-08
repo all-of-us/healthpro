@@ -264,7 +264,8 @@ $(document).ready(function () {
         column.visible(!column.visible());
         var columnName = $(this).attr('name');
         // Set column names in session
-        $.get("/s/workqueue/consent/columns", {columnName: columnName, checked: $(this).prop('checked')});
+        var consentColumnsUrl = $('#columns_group').data('consent-columns-url');
+        $.get(consentColumnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
     });
 
     var toggleColumns = function () {
