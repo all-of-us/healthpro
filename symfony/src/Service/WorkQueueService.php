@@ -23,6 +23,7 @@ class WorkQueueService
     protected $authorizationChecker;
     protected $urlGenerator;
     protected $rdrError = false;
+    protected $showConsentPDFs = false;
 
     public function __construct(
         ParticipantSummaryService $participantSummaryService,
@@ -42,6 +43,7 @@ class WorkQueueService
         $this->loggerService = $loggerService;
         $this->authorizationChecker = $authorizationChecker;
         $this->urlGenerator = $urlGenerator;
+        $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
     }
 
     public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null)
@@ -267,7 +269,14 @@ class WorkQueueService
             $row['primaryConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForStudyEnrollment,
                 $participant->consentForStudyEnrollmentAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForStudyEnrollmentFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'consentForStudyEnrollment'
+                    ])
+                    : null
             );
             $row['firstPrimaryConsent'] = WorkQueue::displayFirstConsentStatusTime(
                 $participant->consentForStudyEnrollmentFirstYesAuthored,
@@ -287,7 +296,14 @@ class WorkQueueService
             $row['ehrConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForElectronicHealthRecords,
                 $participant->consentForElectronicHealthRecordsAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForElectronicHealthRecordsFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'consentForElectronicHealthRecords'
+                    ])
+                    : null
             );
             $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
                 $participant->consentForElectronicHealthRecords,
@@ -298,7 +314,14 @@ class WorkQueueService
             $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
                 $participant->consentForGenomicsROR,
                 $participant->consentForGenomicsRORAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForGenomicsRORFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'consentForGenomicsROR'
+                    ])
+                    : null
             );
             $row['primaryLanguage'] = $e($participant->primaryLanguage);
             $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
@@ -309,7 +332,14 @@ class WorkQueueService
             $row['caborConsent'] = WorkQueue::displayConsentStatus(
                 $participant->consentForCABoR,
                 $participant->consentForCABoRAuthored,
-                $userTimezone
+                $userTimezone,
+                true,
+                ($this->showConsentPDFs && $participant->consentForCABoRFilePath)
+                    ? $this->urlGenerator->generate('participant_consent', [
+                        'id' => $participant->id,
+                        'consentType' => 'consentForCABoR'
+                    ])
+                    : null
             );
             foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
                 $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
@@ -435,7 +465,14 @@ class WorkQueueService
                             $row[$field] = WorkQueue::{$columnDef['method']}(
                                 $participant->{$columnDef['rdrField']},
                                 $participant->{$columnDef['rdrDateField']},
-                                $userTimezone
+                                $userTimezone,
+                                true,
+                                (isset($columnDef['pdfPath']) && $participant->{$columnDef['pdfPath']})
+                                    ? $this->urlGenerator->generate('participant_consent', [
+                                        'id' => $participant->id,
+                                        'consentType' => $columnDef['rdrField']
+                                    ])
+                                    : null
                             );
                         }
                     } elseif (isset($columnDef['displayNames'])) {

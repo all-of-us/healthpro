@@ -43,7 +43,7 @@
                 </a>
             {% endif %}
             {% if type is not defined and readOnly is not defined and participant.activityStatus != 'deactivated' and participant.status %}
-                {% set evaluationUrl = evaluationUrl is defined ? evaluationUrl : 'evaluation' %}
+                {% set evaluationUrl = evaluationUrl is defined ? evaluationUrl : 'measurement' %}
                 <a href="{{ path(evaluationUrl, { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     {% if measurements|length > 0 %}

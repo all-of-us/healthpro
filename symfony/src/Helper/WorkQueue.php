@@ -67,7 +67,8 @@ class WorkQueue
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'method' => 'displayConsentStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForStudyEnrollmentFilePath'
         ],
         'questionnaireOnDnaProgram' => [
             'displayName' => 'Program Update',
@@ -94,7 +95,8 @@ class WorkQueue
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
             'method' => 'displayConsentStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
         ],
         'ehrConsentExpireStatus' => [
             'displayName' => 'EHR Expiration Status',
@@ -122,7 +124,8 @@ class WorkQueue
             'rdrDateField' => 'consentForGenomicsRORAuthored',
             'method' => 'displayGenomicsConsentStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForGenomicsRORFilePath'
         ],
         'dvEhrStatus' => [
             'displayName' => 'DV-only EHR Sharing',
@@ -148,7 +151,8 @@ class WorkQueue
             'rdrDateField' => 'consentForCABoRAuthored',
             'method' => 'displayConsentStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForCABoRFilePath'
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [
@@ -737,16 +741,22 @@ class WorkQueue
         'appleEHR' => 'Apple EHR Consent'
     ];
 
-    public static function dateFromString($string, $timezone, $displayTime = true)
+    public static function dateFromString($string, $timezone, $displayTime = true, $link = null)
     {
         if (!empty($string)) {
             try {
                 $date = new \DateTime($string);
                 $date->setTimezone(new \DateTimeZone($timezone));
                 if ($displayTime) {
-                    return $date->format('n/j/Y g:i a');
+                    return $link
+                        ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y g:i a') . '</a>'
+                        : $date->format('n/j/Y g:i a')
+                    ;
                 }
-                return $date->format('n/j/Y');
+                return $link
+                    ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y') . '</a>'
+                    : $date->format('n/j/Y')
+                ;
             } catch (\Exception $e) {
                 return '';
             }
@@ -831,17 +841,17 @@ class WorkQueue
         return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
-    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true)
+    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Refused Consent)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Responded Not Sure)';
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }

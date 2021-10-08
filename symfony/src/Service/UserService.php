@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Pmi\Service\MockUserService;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Security;
 

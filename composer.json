@@ -13,7 +13,6 @@
         "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "^6.2",
         "ramsey/uuid": "^3.5",
-        "silex/silex": "~2.0",
         "symfony/browser-kit": "^4.4",
         "symfony/config": "^4.4",
         "symfony/console": "^4.4",
@@ -26,7 +25,6 @@
         "symfony/validator": "^4.4",
         "symfony/yaml": "^4.4",
         "twig/twig": "^2.12",
-        "fzaninotto/faker": "^1.6",
         "google/cloud-datastore": "^1.5",
         "google/cloud-logging": "^1.18",
         "symfony/cache": "^4.4",
@@ -42,7 +40,9 @@
         "symfony/webpack-encore-bundle": "^1.7",
         "beberlei/doctrineextensions": "^1.2",
         "symfony/proxy-manager-bridge": "4.4.*",
-        "symfony/serializer": "4.4.*"
+        "symfony/serializer": "4.4.*",
+        "google/cloud-storage": "^1.25",
+        "symfony/expression-language": "4.4.*"
     },
     "config": {
         "platform": {
