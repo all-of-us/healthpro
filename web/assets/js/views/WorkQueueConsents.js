@@ -15,6 +15,52 @@ $(document).ready(function () {
         }
     };
 
+    var tableColumns = [];
+
+    var generateTableRow = function (field, columnDef) {
+        var row = {};
+        row.name = field;
+        row.data = field;
+        if (columnDef.hasOwnProperty('htmlClass')) {
+            row.class = columnDef['htmlClass'];
+        }
+        if (columnDef.hasOwnProperty('orderable')) {
+            row.class = columnDef['orderable'];
+        }
+        tableColumns.push(row);
+    };
+
+    for (const [field, columnDef] of Object.entries(columnsDef)) {
+        if (columnDef.hasOwnProperty('displayNames')) {
+            Object.keys(columnDef['displayNames']).forEach(function (key, _i) {
+                generateTableRow(key + 'Consent', columnDef);
+            });
+        } else {
+            generateTableRow(field, columnDef);
+        }
+    }
+
+    var url = window.location.href;
+
+    var workQueueTable = $('#workqueue_consents').DataTable({
+        processing: true,
+        serverSide: true,
+        scrollX: true,
+        ajax: {
+            url: url,
+            type: "POST"
+        },
+        order: [[5, 'desc']],
+        dom: 'lrtip',
+        columns: tableColumns,
+        pageLength: 25,
+        createdRow: function (row, data) {
+            if (data.isWithdrawn === true) {
+                $(row).addClass('tr-withdrawn');
+            }
+        }
+    });
+
     var showColumns = function () {
         var columns = workQueueTable.columns();
         columns.visible(true);
@@ -181,52 +227,6 @@ $(document).ready(function () {
             },
             btnTextTrue: 'Accept'
         });
-    });
-
-    var tableColumns = [];
-
-    var generateTableRow = function (field, columnDef) {
-        var row = {};
-        row.name = field;
-        row.data = field;
-        if (columnDef.hasOwnProperty('htmlClass')) {
-            row.class = columnDef['htmlClass'];
-        }
-        if (columnDef.hasOwnProperty('orderable')) {
-            row.class = columnDef['orderable'];
-        }
-        tableColumns.push(row);
-    };
-
-    for (const [field, columnDef] of Object.entries(columnsDef)) {
-        if (columnDef.hasOwnProperty('displayNames')) {
-            Object.keys(columnDef['displayNames']).forEach(function (key, _i) {
-                generateTableRow(key + 'Consent', columnDef);
-            });
-        } else {
-            generateTableRow(field, columnDef);
-        }
-    }
-
-    var url = window.location.href;
-
-    var workQueueTable = $('#workqueue_consents').DataTable({
-        processing: true,
-        serverSide: true,
-        scrollX: true,
-        ajax: {
-            url: url,
-            type: "POST"
-        },
-        order: [[5, 'desc']],
-        dom: 'lrtip',
-        columns: tableColumns,
-        pageLength: 25,
-        createdRow: function (row, data) {
-            if (data.isWithdrawn === true) {
-                $(row).addClass('tr-withdrawn');
-            }
-        }
     });
 
     // Populate count in header
