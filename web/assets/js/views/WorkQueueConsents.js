@@ -15,6 +15,8 @@ $(document).ready(function () {
         }
     };
 
+    var url = window.location.href;
+
     var workQueueTable = $('#workqueue_consents').DataTable({
         processing: true,
         serverSide: true,
