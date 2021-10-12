@@ -40,7 +40,7 @@ class ParticipantSummaryService
         $cacheEnabled = $this->params->has('rdr_disable_cache') ? !$this->params->get('rdr_disable_cache') : true;
         $cacheTime = $this->params->has('cache_time') ? intval($this->params->get('cache_time')) : self::CACHE_TIME;
         $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->has('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
-        $cache = new \Pmi\Cache\DatastoreAdapter($dsCleanUpLimit);
+        $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
         if ($cacheEnabled && !$refresh) {
             try {
                 $cacheItem = $cache->getItem($cacheKey);

@@ -5,7 +5,7 @@ namespace App\Service;
 use Google_Client as GoogleClient;
 use Google_Service_Oauth2 as GoogleServiceOauth2;
 use Psr\Log\LoggerInterface;
-use Pmi\Cache\DatastoreAdapter;
+use App\Cache\DatastoreAdapter;
 use Pmi\HttpClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;

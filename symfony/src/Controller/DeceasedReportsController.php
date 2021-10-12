@@ -7,7 +7,7 @@ use App\Form\DeceasedReportReviewType;
 use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
-use Pmi\Cache\DatastoreAdapter;
+use App\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;

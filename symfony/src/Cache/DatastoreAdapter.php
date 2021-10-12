@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Cache;
+
+namespace App\Cache;
 
 use App\Entities\Cache;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
@@ -37,7 +38,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
 
     protected function doHave($id)
     {
-        return (bool) $this->doFetch([$id]);
+        return (bool)$this->doFetch([$id]);
     }
 
     protected function doDelete(array $ids)
