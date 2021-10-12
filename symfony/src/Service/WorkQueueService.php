@@ -7,7 +7,7 @@ use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Helper\WorkQueue;
-use Pmi\Drc\CodeBook;
+use App\Drc\CodeBook;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 

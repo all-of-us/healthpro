@@ -1,5 +1,6 @@
 <?php
-use Pmi\Drc\CodeBook;
+
+use App\Drc\CodeBook;
 
 class CodeBookTest extends PHPUnit\Framework\TestCase
 {

@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Drc\Exception;
+
+namespace App\Drc\Exception;
 
 class InvalidDobException extends \Exception implements ParticipantSearchExceptionInterface
 {

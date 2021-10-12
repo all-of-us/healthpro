@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Drc;
+
+namespace App\Drc;
 
 class CodeBook
 {

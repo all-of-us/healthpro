@@ -3,7 +3,7 @@
 namespace App\Helper;
 
 use Pmi\Util;
-use Pmi\Drc\CodeBook;
+use App\Drc\CodeBook;
 
 class Participant
 {
