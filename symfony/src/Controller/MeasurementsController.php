@@ -17,7 +17,7 @@ use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Pmi\Evaluation\Evaluation;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

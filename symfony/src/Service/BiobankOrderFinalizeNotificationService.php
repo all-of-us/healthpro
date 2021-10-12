@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
 

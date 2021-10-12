@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Audit;
+
+namespace App\Audit;
 
 use Pmi\Entities\AuditLog;
 use Symfony\Component\HttpFoundation\Request;

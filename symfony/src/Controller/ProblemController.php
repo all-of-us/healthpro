@@ -13,7 +13,7 @@ use App\Service\ParticipantSummaryService;
 use App\Service\ProblemNotificationService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

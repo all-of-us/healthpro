@@ -6,7 +6,7 @@ use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

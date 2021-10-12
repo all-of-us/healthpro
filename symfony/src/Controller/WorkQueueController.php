@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Helper\WorkQueue;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 
 /**
  * @Route("/s/workqueue")

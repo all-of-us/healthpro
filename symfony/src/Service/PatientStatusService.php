@@ -7,7 +7,7 @@ use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
