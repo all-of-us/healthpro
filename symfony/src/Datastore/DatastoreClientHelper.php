@@ -4,7 +4,7 @@ namespace App\Datastore;
 
 use Google\Cloud\Datastore\DatastoreClient;
 use Google\Auth\HttpHandler\Guzzle6HttpHandler;
-use Pmi\HttpClient;
+use App\HttpClient;
 
 class DatastoreClientHelper
 {

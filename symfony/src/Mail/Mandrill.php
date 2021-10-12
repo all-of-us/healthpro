@@ -1,7 +1,8 @@
 <?php
-namespace Pmi\Mail;
 
-use Pmi\HttpClient;
+namespace App\Mail;
+
+use App\HttpClient;
 
 class Mandrill
 {
