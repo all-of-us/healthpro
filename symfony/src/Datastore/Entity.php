@@ -12,7 +12,7 @@ abstract class Entity
 
     protected $writeLimit = 500;
 
-    abstract static protected function getKind();
+    abstract protected static function getKind();
 
     public static function fetchBy()
     {

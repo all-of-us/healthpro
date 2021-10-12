@@ -8,7 +8,6 @@ use Pmi\HttpClient;
 
 class DatastoreClientHelper
 {
-
     protected $datastore;
 
     public function __construct()
