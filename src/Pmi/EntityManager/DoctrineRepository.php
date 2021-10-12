@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\EntityManager;
 
-use Pmi\Util;
+use App\Util;
 
 class DoctrineRepository extends EntityManager
 {

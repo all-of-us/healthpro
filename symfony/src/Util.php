@@ -1,5 +1,6 @@
 <?php
-namespace Pmi;
+
+namespace App;
 
 use Ramsey\Uuid\Uuid;
 

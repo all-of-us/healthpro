@@ -2,7 +2,7 @@
 
 namespace App\Helper;
 
-use Pmi\Util;
+use App\Util;
 use App\Drc\CodeBook;
 
 class Participant

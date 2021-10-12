@@ -1,5 +1,5 @@
 <?php
-use Pmi\Util;
+use App\Util;
 
 class UtilTest extends PHPUnit\Framework\TestCase
 {
