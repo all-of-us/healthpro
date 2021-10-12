@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Datastore\Exception;
+
+namespace App\Datastore\Exception;
 
 class UnknownEntityFieldException extends \Exception
 {

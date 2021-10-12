@@ -1,7 +1,8 @@
 <?php
-namespace Pmi\Datastore;
 
-use Pmi\Entities\Session;
+namespace App\Datastore;
+
+use App\Entities\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use DateTime;
 

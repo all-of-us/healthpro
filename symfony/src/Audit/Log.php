@@ -2,7 +2,7 @@
 
 namespace App\Audit;
 
-use Pmi\Entities\AuditLog;
+use App\Entities\AuditLog;
 use Symfony\Component\HttpFoundation\Request;
 
 class Log

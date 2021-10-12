@@ -1,7 +1,7 @@
 <?php
 namespace Pmi\Cache;
 
-use Pmi\Entities\Cache;
+use App\Entities\Cache;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\PruneableInterface;

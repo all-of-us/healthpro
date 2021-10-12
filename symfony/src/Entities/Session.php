@@ -1,14 +1,15 @@
 <?php
-namespace Pmi\Entities;
 
-use Pmi\Datastore\Entity;
+namespace App\Entities;
 
-class Cache extends Entity
+use App\Datastore\Entity;
+
+class Session extends Entity
 {
     protected $excludeIndexes = ['data'];
 
     protected static function getKind()
     {
-        return 'Cache';
+        return 'Session';
     }
 }

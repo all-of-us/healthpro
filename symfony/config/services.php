@@ -1,7 +1,7 @@
 <?php
 
 use App\Service\EnvironmentService;
-use Pmi\Entities\Configuration;
+use App\Entities\Configuration;
 
 $env = new EnvironmentService();
 

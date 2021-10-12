@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use Exception;
-use Pmi\Entities\Configuration;
+use App\Entities\Configuration;
 
 class EnvironmentService
 {

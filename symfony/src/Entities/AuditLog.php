@@ -1,7 +1,8 @@
 <?php
-namespace Pmi\Entities;
 
-use Pmi\Datastore\Entity;
+namespace App\Entities;
+
+use App\Datastore\Entity;
 
 class AuditLog extends Entity
 {

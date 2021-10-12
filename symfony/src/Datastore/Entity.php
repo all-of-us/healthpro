@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Datastore;
+
+namespace App\Datastore;
 
 abstract class Entity
 {
