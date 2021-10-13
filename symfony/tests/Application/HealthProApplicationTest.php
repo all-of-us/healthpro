@@ -3,7 +3,7 @@
 namespace App\Test\Application;
 
 use App\Service\MockGoogleGroupsService;
-use Pmi\Security\User;
+use App\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;

@@ -161,7 +161,7 @@ class WorkQueueService
         if (!empty($params['site'])) {
             $site = $params['site'];
             if ($site !== 'UNSET') {
-                $site = \Pmi\Security\User::SITE_PREFIX . $site;
+                $site = \App\Security\User::SITE_PREFIX . $site;
             }
             $rdrParams['site'] = $site;
         }

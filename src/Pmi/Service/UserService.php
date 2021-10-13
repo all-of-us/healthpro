@@ -2,7 +2,7 @@
 
 namespace Pmi\Service;
 
-use Pmi\Security\User;
+use App\Security\User;
 
 class UserService
 {

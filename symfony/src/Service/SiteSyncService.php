@@ -64,7 +64,7 @@ class SiteSyncService
 
     private static function getSiteSuffix($site)
     {
-        return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
+        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 
     public function dryRun()

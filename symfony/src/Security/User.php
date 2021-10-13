@@ -1,5 +1,6 @@
 <?php
-namespace Pmi\Security;
+
+namespace App\Security;
 
 use Pmi\Service\UserService;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -65,7 +66,7 @@ class User implements UserInterface
             if (strpos($group->getEmail(), self::SITE_PREFIX) === 0) {
                 $id = preg_replace('/@.*$/', '', $group->getEmail());
                 $id = str_replace(self::SITE_PREFIX, '', $id);
-                $sites[] = (object) [
+                $sites[] = (object)[
                     'email' => $group->getEmail(),
                     'name' => $group->getName(),
                     'id' => $id
@@ -83,7 +84,7 @@ class User implements UserInterface
             if (strpos($group->getEmail(), self::AWARDEE_PREFIX) === 0) {
                 $id = preg_replace('/@.*$/', '', $group->getEmail());
                 $id = str_replace(self::AWARDEE_PREFIX, '', $id);
-                $awardees[] = (object) [
+                $awardees[] = (object)[
                     'email' => $group->getEmail(),
                     'name' => $group->getName(),
                     'id' => $id
@@ -140,7 +141,6 @@ class User implements UserInterface
         }
         return $hasAccess;
     }
-
 
 
     public function hasTwoFactorAuth()

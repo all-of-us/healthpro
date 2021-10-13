@@ -387,7 +387,7 @@ class Participant
 
     private function getSiteSuffix($site)
     {
-        return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
+        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 
     private function getActivityStatus($participant)

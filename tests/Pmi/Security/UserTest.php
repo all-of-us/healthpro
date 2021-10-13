@@ -1,6 +1,6 @@
 <?php
 use App\Helper\MockUserHelper;
-use Pmi\Security\User;
+use App\Security\User;
 use Tests\Pmi\GoogleGroup;
 
 class UserTest extends PHPUnit\Framework\TestCase

@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Service\RdrApiService;
 use App\Entity\DeceasedReport;
-use Pmi\Security\User;
+use App\Security\User;
 
 class DeceasedReportsService
 {

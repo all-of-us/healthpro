@@ -250,7 +250,7 @@ class PatientStatusService
         $this->organizationId = $patientStatusHistory['organization'];
         $this->awardeeId = $patientStatusHistory['awardee'];
         $this->userEmail = $patientStatusHistory['user_email'];
-        $this->siteWithPrefix = \Pmi\Security\User::SITE_PREFIX . $patientStatusHistory['site'];
+        $this->siteWithPrefix = \App\Security\User::SITE_PREFIX . $patientStatusHistory['site'];
         $this->comments = $patientStatusHistory['comments'];
         $this->status = $patientStatusHistory['status'];
         $this->createdTs = new \DateTime($patientStatusHistory['authored']);
