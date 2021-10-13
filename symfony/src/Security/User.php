@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use Pmi\Service\UserService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
@@ -254,7 +253,7 @@ class User implements UserInterface
 
     public function getRoles()
     {
-        return UserService::getRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
+        return $this->getUserRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
 
     public function getPassword()
@@ -324,5 +323,26 @@ class User implements UserInterface
             }
         }
         return $site;
+    }
+
+    private function getUserRoles($roles, $site, $awardee)
+    {
+        if (!empty($site)) {
+            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        if (!empty($awardee)) {
+            if (($key = array_search('ROLE_USER', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+        return $roles;
     }
 }
