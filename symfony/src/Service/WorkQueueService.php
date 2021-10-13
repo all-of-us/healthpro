@@ -173,16 +173,50 @@ class WorkQueueService
             $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
 
+        // Participant consents tab advanced filters
+        if (!empty($params['consentForStudyEnrollment'])) {
+            $rdrParams['consentForStudyEnrollment'] = $params['consentForStudyEnrollment'];
+        }
+        if (!empty($params['consentForDvElectronicHealthRecordsSharing'])) {
+            $rdrParams['consentForDvElectronicHealthRecordsSharing'] = $params['consentForDvElectronicHealthRecordsSharing'];
+        }
+        if (!empty($params['consentForCABoR'])) {
+            $rdrParams['consentForCABoR'] = $params['consentForCABoR'];
+        }
+        if (!empty($params['primaryLanguage'])) {
+            $rdrParams['primaryLanguage'] = $params['primaryLanguage'];
+        }
+
+        // Participant consents tab participants lookup
+        if (!empty($params['lastName']) && !empty($params['dateOfBirth'])) {
+            $rdrParams['lastName'] = $params['lastName'];
+            $rdrParams['dateOfBirth'] = $params['dateOfBirth'];
+            if (!empty($params['middleName'])) {
+                $rdrParams['middleName'] = $params['middleName'];
+            }
+        }
+        if (!empty($params['participantId'])) {
+            $rdrParams['participantId'] = substr($params['participantId'], 1);
+        }
+
+        if (!empty($params['ageRange']) || WorkQueue::hasDateFields($params)) {
+            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
+        }
+
         // convert age range to dob filters - using string instead of array to support multiple params with same name
         if (isset($params['ageRange'])) {
             $ageRange = $params['ageRange'];
-            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
 
             $dateOfBirthFilters = CodeBook::ageRangeToDob($ageRange);
             foreach ($dateOfBirthFilters as $filter) {
                 $rdrParams .= '&dateOfBirth=' . rawurlencode($filter);
             }
         }
+
+        if (WorkQueue::hasDateFields($params)) {
+            $rdrParams .= WorkQueue::getDateFilterParams($params);
+        }
+
         $results = [];
         try {
             $summaries = $this->participantSummaryService->listWorkQueueParticipantSummaries($rdrParams, $next);
@@ -455,7 +489,7 @@ class WorkQueueService
         return $rows;
     }
 
-    public function generateExportRow($participant)
+    public function generateExportRow($participant, $workQueueColumns = null)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [
@@ -558,28 +592,33 @@ class WorkQueueService
         return $row;
     }
 
-    public function generateConsentExportRow($participant)
+    public function generateConsentExportRow($participant, $workQueueConsentColumns)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
-        foreach (array_values(WorkQueue::$columnsDef) as $columnDef) {
-            if (isset($columnDef['csvMethod'])) {
-                if (isset($columnDef['otherField'])) {
-                    $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $participant->{$columnDef['otherField']});
-                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                } elseif (isset($columnDef['displayNames'])) {
-                    foreach (array_keys($columnDef['displayNames']) as $type) {
-                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
-                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
+        foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+            if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
+                if (isset($columnDef['csvMethod'])) {
+                    if (isset($columnDef['otherField'])) {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}(
+                            $participant->{$columnDef['rdrField']},
+                            $participant->{$columnDef['otherField']}
+                        );
+                        $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                    } elseif (isset($columnDef['displayNames'])) {
+                        foreach (array_keys($columnDef['displayNames']) as $type) {
+                            $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
+                            $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
+                        }
+                    } else {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
                     }
+                } elseif (isset($columnDef['rdrDateField'])) {
+                    $row[] = WorkQueue::csvStatusFromSubmitted($participant->{$columnDef['rdrField']});
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
                 } else {
-                    $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
+                    $row[] = $participant->{$columnDef['rdrField']};
                 }
-            } elseif (isset($columnDef['rdrDateField'])) {
-                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{$columnDef['rdrField']});
-                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-            } else {
-                $row[] = $participant->{$columnDef['rdrField']};
             }
         }
         return $row;

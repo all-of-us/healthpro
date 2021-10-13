@@ -383,6 +383,33 @@ label.label-normal {
 #filters .form-inline select.form-control {
     margin-bottom: 4px;
 }
+#workqueue_consents_row .panel-heading .accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
+    content: "\e114"; /* adjust as needed, taken from bootstrap.css */
+    float: right;
+    color: grey;
+}
+#workqueue_consents_row .panel-heading .accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e080"; /* adjust as needed, taken from bootstrap.css */
+}
+#workqueue_consents_row .panel-title .accordion-toggle{
+    text-decoration: none;
+}
+#workqueue_consents_row .panel-title small{
+    color: #337ab7;
+}
+#workqueue_consents_row .list-group-item.radio{
+    margin-top: 0;
+}
+#workqueue_consents_row .parsley-errors-list {
+    margin-left: -36px
+}
+#workqueue_consents_row .parsley-errors-list li {
+    list-style: none;
+    color: #a94442;
+}
 
 /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {
