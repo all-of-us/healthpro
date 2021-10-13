@@ -6,17 +6,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
 {
-    const SITE_PREFIX = 'hpo-site-';
-    const AWARDEE_PREFIX = 'awardee-';
-    const ADMIN_GROUP = 'site-admin';
-    const TWOFACTOR_GROUP = 'mfa_exception';
-    const TWOFACTOR_PREFIX = 'x-site-';
-    const ADMIN_DV = 'dv-admin';
-    const BIOBANK_GROUP = 'biospecimen-non-pii';
-    const SCRIPPS_GROUP = 'scripps-non-pii';
-    const AWARDEE_SCRIPPS = 'stsi';
+    public const SITE_PREFIX = 'hpo-site-';
+    public const AWARDEE_PREFIX = 'awardee-';
+    public const ADMIN_GROUP = 'site-admin';
+    public const TWOFACTOR_GROUP = 'mfa_exception';
+    public const TWOFACTOR_PREFIX = 'x-site-';
+    public const ADMIN_DV = 'dv-admin';
+    public const BIOBANK_GROUP = 'biospecimen-non-pii';
+    public const SCRIPPS_GROUP = 'scripps-non-pii';
+    public const AWARDEE_SCRIPPS = 'stsi';
 
-    const DEFAULT_TIMEZONE = 'America/New_York';
+    public const DEFAULT_TIMEZONE = 'America/New_York';
 
     private $googleUser;
     private $groups;

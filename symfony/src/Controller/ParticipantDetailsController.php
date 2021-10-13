@@ -226,7 +226,7 @@ class ParticipantDetailsController extends AbstractController
         }
         $disposition = HeaderUtils::makeDisposition(
             HeaderUtils::DISPOSITION_INLINE,
-            sprintf('%s-%s.pdf', $id, $consentType),
+            sprintf('%s-%s.pdf', $id, $consentType)
         );
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', 'application/pdf');
