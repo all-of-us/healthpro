@@ -79,4 +79,24 @@ class SiteRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return Site[] Returns an array of Site objects
+     */
+    public function getSiteSyncQueue(string $type, int $limit = 100)
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->leftJoin('s.siteSync', 'ss')
+            ->setMaxResults($limit)
+        ;
+        switch ($type) {
+            case 'adminEmail':
+            default:
+                $qb->orderBy('ss.adminEmailsAt', 'ASC');
+                break;
+        }
+        return $qb->getQuery()
+            ->getResult()
+        ;
+    }
 }

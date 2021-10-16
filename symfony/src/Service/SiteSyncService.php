@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
+use App\Entity\SiteSync;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -272,6 +273,13 @@ class SiteSyncService
         if ($site) {
             $site->setEmail(join(', ', $this->getSiteAdminEmails($site)));
             $this->em->persist($site);
+            $siteSync = $site->getSiteSync();
+            if (!$siteSync) {
+                $siteSync = new SiteSync();
+                $siteSync->setSite($site);
+            }
+            $siteSync->setAdminEmailsAt(new \DateTime());
+            $this->em->persist($siteSync);
             $this->em->flush();
             return;
         }

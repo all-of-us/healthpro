@@ -101,6 +101,19 @@ class SitesController extends AbstractController
     }
 
     /**
+     * @Route("/site/{id}/emails", name="admin_site_emails")
+     */
+    public function siteAdminEmails(SiteRepository $siteRepository, SiteSyncService $siteSyncService, int $id)
+    {
+        $site = $siteRepository->find($id);
+        if (!$site) {
+            throw $this->createNotFoundException('Site not found.');
+        }
+        $emails = $siteSyncService->getSiteAdminEmails($site);
+        return $this->json($emails);
+    }
+
+    /**
      * @Route("/sync", name="admin_siteSync")
      */
     public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)

@@ -104,6 +104,11 @@ class Site
      */
     private $siteType;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\SiteSync", mappedBy="site", cascade={"persist", "remove"})
+     */
+    private $siteSync;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -309,6 +314,23 @@ class Site
     public function setSiteType(?string $siteType): self
     {
         $this->siteType = $siteType;
+
+        return $this;
+    }
+
+    public function getSiteSync(): ?SiteSync
+    {
+        return $this->siteSync;
+    }
+
+    public function setSiteSync(SiteSync $siteSync): self
+    {
+        $this->siteSync = $siteSync;
+
+        // set the owning side of the relation if necessary
+        if ($siteSync->getSite() !== $this) {
+            $siteSync->setSite($this);
+        }
 
         return $this;
     }
