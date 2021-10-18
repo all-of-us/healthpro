@@ -1,9 +1,12 @@
 <?php
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
 use App\Helper\MockUserHelper;
 use App\Security\User;
-use Tests\Pmi\GoogleGroup;
+use App\Tests\GoogleGroup;
 
-class UserTest extends PHPUnit\Framework\TestCase
+class UserTest extends WebTestCase
 {
     public function testEmail()
     {
