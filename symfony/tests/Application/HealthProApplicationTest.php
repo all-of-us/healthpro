@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Test\Application;
-
 use App\Service\MockGoogleGroupsService;
 use App\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
-use Tests\Pmi\GoogleGroup;
+use App\Tests\GoogleGroup;
 
 class HealthProApplicationTest extends WebTestCase
 {
@@ -117,7 +115,10 @@ class HealthProApplicationTest extends WebTestCase
 
     public function testForceSiteSelect()
     {
-        $this->logIn('testForceSiteSelect@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'), new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')]);
+        $this->logIn('testForceSiteSelect@example.com', [
+            new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')
+        ]);
         $this->client->followRedirects();
         $this->client->request('GET', '/s/participants');
         self::assertMatchesRegularExpression('/\/s\/site\/select$/', $this->client->getRequest()->getUri());
