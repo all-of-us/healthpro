@@ -14,9 +14,13 @@ use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pmi\Cache\DatastoreAdapter;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -64,6 +68,24 @@ class CronController extends AbstractController
         }
         $siteSyncService->syncAwardees();
         $siteSyncService->syncOrganizations();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/sites-email-sync", name="cron_sites_email")
+     */
+    public function sitesEmailSync(KernelInterface $kernel): Response
+    {
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $input = new ArrayInput([
+            'command' => 'pmi:sitesync:emails',
+            'limit' => 100,
+            // '--runLocal' => true,
+        ]);
+        $application->run($input, new NullOutput());
+
         return $this->json(['success' => true]);
     }
 

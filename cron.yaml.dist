@@ -31,6 +31,10 @@ cron:
   url: /s/cron/awardees-organizations
   schedule: every day 20:01
   timezone: America/Chicago
+- description: "Sync sites admin emails"
+  url: /s/cron/sites-email-sync
+  schedule: every 1 hours
+  timezone: America/Chicago
 - description: "Delete datastore session keys"
   url: /s/cron/delete-session-keys
   schedule: every 1 hours
