@@ -1,9 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "": "src/",
             "App\\": "symfony/src/",
-            "Tests\\": "tests/",
             "App\\Tests\\": "symfony/tests/"
         }
     },
