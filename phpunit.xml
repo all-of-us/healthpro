@@ -15,9 +15,6 @@
       <server name="APP_ENV" value="test" />
     </php>
     <testsuites>
-        <testsuite name="Silex Unit Tests">
-            <directory>tests/Pmi</directory>
-        </testsuite>
         <testsuite name="Symfony Test Suite">
             <directory>symfony/tests</directory>
         </testsuite>
