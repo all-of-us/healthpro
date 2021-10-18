@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Service\RdrApiService;
 use App\Entity\DeceasedReport;
 use App\Security\User;
 

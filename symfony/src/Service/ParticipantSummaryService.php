@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Site;
-use App\Service\RdrApiService;
 use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Drc\Exception\FailedRequestException;
