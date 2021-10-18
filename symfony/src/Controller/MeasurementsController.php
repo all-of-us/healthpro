@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Measurement;
-use App\Entity\Site;
 use App\Entity\User;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
@@ -13,21 +12,16 @@ use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
-use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Pmi\Evaluation\Evaluation;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Csrf\CsrfToken;
 
 /**
  * @Route("/s")
