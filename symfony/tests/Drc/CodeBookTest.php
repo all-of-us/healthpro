@@ -1,8 +1,10 @@
 <?php
 
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
 use App\Drc\CodeBook;
 
-class CodeBookTest extends PHPUnit\Framework\TestCase
+class CodeBookTest extends WebTestCase
 {
     public function testCodeBook()
     {
