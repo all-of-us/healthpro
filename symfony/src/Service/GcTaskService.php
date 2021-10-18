@@ -33,7 +33,7 @@ class GcTaskService
                 ])
             ];
         }
-        $this->cloudTaskClient = new CloudTasksClient();
+        $this->cloudTaskClient = new CloudTasksClient($clientConfig);
 
         if ($params->has('gc_task_project_id')) {
             $this->projectId = $params->get('gc_task_project_id');

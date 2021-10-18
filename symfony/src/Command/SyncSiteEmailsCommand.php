@@ -24,7 +24,6 @@ class SyncSiteEmailsCommand extends Command
     private $environmentService;
     private $em;
     private $router;
-    private $adminEmails = [];
 
     public function __construct(EnvironmentService $environmentService, SiteSyncService $siteSyncService, GcTaskService $gcTaskService, EntityManagerInterface $em, UrlGeneratorInterface $router)
     {
