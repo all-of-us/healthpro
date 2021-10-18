@@ -1,7 +1,10 @@
 <?php
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
 use App\Util;
 
-class UtilTest extends PHPUnit\Framework\TestCase
+class UtilTest extends WebTestCase
 {
     public function testUuid()
     {
