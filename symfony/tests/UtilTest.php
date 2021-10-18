@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests;
+
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use App\Util;

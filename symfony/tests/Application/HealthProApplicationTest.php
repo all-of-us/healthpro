@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Application;
+
 use App\Service\MockGoogleGroupsService;
 use App\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\CodeBook;
+
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use App\Drc\CodeBook;
