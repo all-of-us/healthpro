@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entities\Session;
+use App\Datastore\Entities\Session;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class SessionService

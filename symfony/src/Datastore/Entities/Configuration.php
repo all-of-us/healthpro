@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entities;
+namespace App\Datastore\Entities;
 
 use App\Datastore\Entity;
 

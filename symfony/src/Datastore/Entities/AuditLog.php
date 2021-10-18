@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Entities;
+namespace App\Datastore\Entities;
 
 use App\Datastore\Entity;
 
-class Session extends Entity
+class AuditLog extends Entity
 {
     protected $excludeIndexes = ['data'];
 
     protected static function getKind()
     {
-        return 'Session';
+        return 'AuditLog';
     }
 }

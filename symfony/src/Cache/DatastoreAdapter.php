@@ -2,7 +2,7 @@
 
 namespace App\Cache;
 
-use App\Entities\Cache;
+use App\Datastore\Entities\Cache;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\PruneableInterface;

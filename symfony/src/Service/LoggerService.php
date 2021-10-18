@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entities\AuditLog;
+use App\Datastore\Entities\AuditLog;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;

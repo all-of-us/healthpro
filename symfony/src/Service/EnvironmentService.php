@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use Exception;
-use App\Entities\Configuration;
+use App\Datastore\Entities\Configuration;
 
 class EnvironmentService
 {

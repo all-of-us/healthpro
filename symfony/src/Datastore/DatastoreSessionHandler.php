@@ -2,7 +2,7 @@
 
 namespace App\Datastore;
 
-use App\Entities\Session;
+use App\Datastore\Entities\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use DateTime;
 
