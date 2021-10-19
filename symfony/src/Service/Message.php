@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Pmi\Mail\Mandrill;
+use App\Mail\Mandrill;
 
 class Message
 {

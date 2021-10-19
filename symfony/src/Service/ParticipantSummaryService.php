@@ -3,12 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Site;
-use App\Service\RdrApiService;
 use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Drc\Exception\FailedRequestException;
-use Pmi\Drc\Exception\InvalidResponseException;
-use Pmi\Drc\Exception\InvalidDobException;
+use App\Drc\Exception\FailedRequestException;
+use App\Drc\Exception\InvalidResponseException;
+use App\Drc\Exception\InvalidDobException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ParticipantSummaryService
@@ -40,7 +39,7 @@ class ParticipantSummaryService
         $cacheEnabled = $this->params->has('rdr_disable_cache') ? !$this->params->get('rdr_disable_cache') : true;
         $cacheTime = $this->params->has('cache_time') ? intval($this->params->get('cache_time')) : self::CACHE_TIME;
         $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->has('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
-        $cache = new \Pmi\Cache\DatastoreAdapter($dsCleanUpLimit);
+        $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
         if ($cacheEnabled && !$refresh) {
             try {
                 $cacheItem = $cache->getItem($cacheKey);

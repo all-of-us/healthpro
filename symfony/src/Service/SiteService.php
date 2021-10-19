@@ -197,7 +197,7 @@ class SiteService
     public function getSiteIdWithPrefix()
     {
         if ($this->getSiteId()) {
-            return \Pmi\Security\User::SITE_PREFIX . $this->getSiteId();
+            return \App\Security\User::SITE_PREFIX . $this->getSiteId();
         }
         return null;
     }

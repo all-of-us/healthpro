@@ -7,7 +7,7 @@ use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Helper\WorkQueue;
-use Pmi\Drc\CodeBook;
+use App\Drc\CodeBook;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -161,7 +161,7 @@ class WorkQueueService
         if (!empty($params['site'])) {
             $site = $params['site'];
             if ($site !== 'UNSET') {
-                $site = \Pmi\Security\User::SITE_PREFIX . $site;
+                $site = \App\Security\User::SITE_PREFIX . $site;
             }
             $rdrParams['site'] = $site;
         }

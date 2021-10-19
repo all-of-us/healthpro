@@ -7,7 +7,7 @@ use App\Form\RemoveGroupMemberType;
 use App\Service\AccessManagementService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;

@@ -106,7 +106,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         $this->userService->updateLastLogin();
-        // Instead of using a service, the token should eventually contain the User entity (not Pmi\Security\User)
+        // Instead of using a service, the token should eventually contain the User entity (not App\Security\User)
         // which will make updating the last login trivial.
         return $this->redirectToRoute('home');
     }

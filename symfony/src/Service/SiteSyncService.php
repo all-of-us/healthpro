@@ -6,7 +6,7 @@ use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -64,7 +64,7 @@ class SiteSyncService
 
     private static function getSiteSuffix($site)
     {
-        return str_replace(\Pmi\Security\User::SITE_PREFIX, '', $site);
+        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 
     public function dryRun()

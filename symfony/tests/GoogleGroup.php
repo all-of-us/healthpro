@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test;
+namespace App\Tests;
 
 /** Simulates a Google API Group. */
 class GoogleGroup

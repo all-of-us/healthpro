@@ -8,7 +8,7 @@ use App\Model\Measurement\Fhir;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 
 class MeasurementQueueService
 {

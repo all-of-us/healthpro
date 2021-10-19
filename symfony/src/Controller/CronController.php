@@ -13,7 +13,7 @@ use App\Service\SessionService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Cache\DatastoreAdapter;
+use App\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;

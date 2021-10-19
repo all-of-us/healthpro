@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Form;
+namespace App\Tests\Form;
 
 use App\Entity\Measurement;
 use App\Form\MeasurementType;
