@@ -123,9 +123,6 @@
     "google/cloud-logging": {
         "version": "v1.20.0"
     },
-    "google/cloud-tasks": {
-        "version": "v1.9.1"
-    },
     "google/common-protos": {
         "version": "1.2"
     },

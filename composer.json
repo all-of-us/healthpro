@@ -41,8 +41,7 @@
         "beberlei/doctrineextensions": "^1.2",
         "symfony/proxy-manager-bridge": "4.4.*",
         "symfony/serializer": "4.4.*",
-        "symfony/expression-language": "4.4.*",
-        "google/cloud-tasks": "^1.9"
+        "symfony/expression-language": "4.4.*"
     },
     "config": {
         "platform": {
