@@ -267,25 +267,6 @@ class SiteSyncService
         }
     }
 
-    public function syncSiteEmail(int $siteId)
-    {
-        $site = $this->em->getRepository(Site::class)->find($siteId);
-        if ($site) {
-            $site->setEmail(join(', ', $this->getSiteAdminEmails($site)));
-            $this->em->persist($site);
-            $siteSync = $site->getSiteSync();
-            if (!$siteSync) {
-                $siteSync = new SiteSync();
-                $siteSync->setSite($site);
-            }
-            $siteSync->setAdminEmailsAt(new \DateTime());
-            $this->em->persist($siteSync);
-            $this->em->flush();
-            return;
-        }
-        throw new \Exception('Site not found.');
-    }
-
     public function getSiteAdminEmails(Site $site): array
     {
         $siteAdmins = [];

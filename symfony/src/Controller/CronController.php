@@ -82,7 +82,6 @@ class CronController extends AbstractController
         $input = new ArrayInput([
             'command' => 'pmi:sitesync:emails',
             'limit' => 100,
-            // '--runLocal' => true,
         ]);
         $application->run($input, new NullOutput());
 
