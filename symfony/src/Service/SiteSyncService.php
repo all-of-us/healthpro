@@ -24,7 +24,7 @@ class SiteSyncService
     private $googleGroupsService;
     private $adminEmails = [];
 
-    private const MEMBER_DOMAIN = '@pmi-ops.org';
+    const SITE_PREFIX = 'hpo-site-';
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -270,7 +270,7 @@ class SiteSyncService
     public function getSiteAdminEmails(Site $site): array
     {
         $siteAdmins = [];
-        $members = $this->googleGroupsService->getMembers($site->getSiteId() . self::MEMBER_DOMAIN, ['OWNER', 'MANAGER']);
+        $members = $this->googleGroupsService->getMembers(self::SITE_PREFIX . $site->getGoogleGroup() . $this->getGoogleGroupDomain(), ['OWNER', 'MANAGER']);
         if (count($members) === 0) {
             return $siteAdmins;
         }
@@ -289,5 +289,13 @@ class SiteSyncService
             }
         }
         return $siteAdmins;
+    }
+
+    private function getGoogleGroupDomain(): string
+    {
+        if ($this->env->isProd()) {
+            return '@prod.pmi-ops.org';
+        }
+        return '@staging.pmi-ops.org';
     }
 }
