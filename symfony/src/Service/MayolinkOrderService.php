@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Pmi\HttpClient;
+use App\HttpClient;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

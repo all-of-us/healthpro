@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
@@ -13,7 +14,6 @@ use App\Service\SessionService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Cache\DatastoreAdapter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Console\Input\ArrayInput;

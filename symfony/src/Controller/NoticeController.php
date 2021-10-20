@@ -7,7 +7,7 @@ use App\Form\NoticeType;
 use App\Repository\NoticeRepository;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;

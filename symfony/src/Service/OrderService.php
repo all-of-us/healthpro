@@ -8,7 +8,7 @@ use App\Entity\Site;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 
 class OrderService
 {

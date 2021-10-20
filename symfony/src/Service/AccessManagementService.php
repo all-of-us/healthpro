@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 
 class AccessManagementService
 {

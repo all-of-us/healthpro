@@ -9,17 +9,20 @@ use App\Entity\Problem;
 use App\Form\CrossOriginAgreeType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
+use App\Service\GcsBucketService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,6 +31,13 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ParticipantDetailsController extends AbstractController
 {
+    private const VALID_CONSENT_TYPES = [
+        'consentForStudyEnrollment' => 'consentForStudyEnrollmentFilePath',
+        'consentForElectronicHealthRecords' => 'consentForElectronicHealthRecordsFilePath',
+        'consentForGenomicsROR' => 'consentForGenomicsRORFilePath',
+        'consentForCABoR' => 'consentForCABoRFilePath',
+    ];
+
     /**
      * @Route("/participant/{id}", name="participant")
      */
@@ -183,5 +193,43 @@ class ParticipantDetailsController extends AbstractController
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl
         ]);
+    }
+
+    /**
+     * @Route("/participant/{id}/consent/{consentType}", name="participant_consent")
+     */
+    public function participantConsent(
+        string $id,
+        string $consentType,
+        ParticipantSummaryService $participantSummaryService,
+        GcsBucketService $bucketService,
+        Request $request
+    ): Response {
+        if (!in_array($consentType, array_keys(self::VALID_CONSENT_TYPES))) {
+            throw $this->createNotFoundException(sprintf('Not a valid consent type: %s', $consentType));
+        }
+        $participant = $participantSummaryService->getParticipantById($id, true);
+        $participantSummaryField = self::VALID_CONSENT_TYPES[$consentType];
+        if (!$participant->{$participantSummaryField} || !preg_match('/(^[a-z0-9\-\_]+)\/(.*)/i', $participant->{$participantSummaryField}, $matches)) {
+            throw $this->createNotFoundException(sprintf('Invalid storage path: %s', $participant->{$participantSummaryField}));
+        }
+        $bucket = $matches[1];
+        $consentPath = $matches[2];
+        if (!$consentPath) {
+            throw $this->createNotFoundException('Unable to load consent; Reason: Path not set.');
+        }
+        try {
+            $object = $bucketService->getObjectFromPath($bucket, $consentPath);
+            $response = new Response($object->downloadAsString());
+        } catch (\Exception $e) {
+            throw $this->createNotFoundException('Unable to load consent; Reason: ' . $e->getMessage());
+        }
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_INLINE,
+            sprintf('%s-%s.pdf', $id, $consentType)
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Content-Type', 'application/pdf');
+        return $response;
     }
 }

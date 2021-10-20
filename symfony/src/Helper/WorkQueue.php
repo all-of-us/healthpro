@@ -18,92 +18,141 @@ class WorkQueue
     public static $columnsDef = [
         'lastName' => [
             'displayName' => 'Last Name',
+            'csvLabel' => 'Last Name',
             'rdrField' => 'lastName',
             'sortField' => 'lastName',
             'generateLink' => true,
+            'toggleColumn' => false
         ],
         'firstName' => [
             'displayName' => 'First Name',
+            'csvLabel' => 'First Name',
             'rdrField' => 'firstName',
             'sortField' => 'firstName',
-            'generateLink' => true
+            'generateLink' => true,
+            'toggleColumn' => false
         ],
         'middleName' => [
             'displayName' => 'Middle Name',
+            'csvLabel' => 'Middle Name',
             'rdrField' => 'middleName',
             'sortField' => 'firstName',
-            'generateLink' => true
+            'generateLink' => true,
+            'toggleColumn' => false
         ],
         'dateOfBirth' => [
             'displayName' => 'Date of Birth',
+            'csvLabel' => 'Date of Birth',
             'rdrField' => 'dob',
             'sortField' => 'dateOfBirth',
             'formatDate' => true,
-            'csvMethod' => 'csvDateFromObject'
+            'csvMethod' => 'csvDateFromObject',
+            'toggleColumn' => false
         ],
         'participantId' => [
             'displayName' => 'PM ID',
+            'csvLabel' => 'PM ID',
             'rdrField' => 'id',
-            'sortField' => 'participantId'
+            'sortField' => 'participantId',
+            'toggleColumn' => false
         ],
         'primaryConsent' => [
             'displayName' => 'Primary Consent',
+            'csvLabels' => [
+                'Primary Consent Status',
+                'Primary Consent Status Date'
+            ],
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForStudyEnrollmentFilePath'
         ],
         'questionnaireOnDnaProgram' => [
             'displayName' => 'Program Update',
+            'csvLabels' => [
+                'Program Update',
+                'Date of Program Update'
+            ],
             'rdrField' => 'questionnaireOnDnaProgram',
             'sortField' => 'questionnaireOnDnaProgramAuthored',
             'rdrDateField' => 'questionnaireOnDnaProgramAuthored',
             'otherField' => 'consentCohort',
             'method' => 'displayProgramUpdate',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'ehrConsent' => [
             'displayName' => 'EHR Consent',
+            'csvLabels' => [
+                'EHR Consent Status',
+                'EHR Consent Status Date'
+            ],
             'rdrField' => 'consentForElectronicHealthRecords',
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
         ],
         'ehrConsentExpireStatus' => [
             'displayName' => 'EHR Expiration Status',
+            'csvLabels' => [
+                'EHR Expiration Status',
+                'EHR Expiration Date'
+            ],
             'rdrField' => 'ehrConsentExpireStatus',
             'sortField' => 'ehrConsentExpireStatus',
             'rdrDateField' => 'ehrConsentExpireAuthored',
             'otherField' => 'consentForElectronicHealthRecords',
             'method' => 'displayEhrConsentExpireStatus',
             'csvMethod' => 'csvEhrConsentExpireStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'gRoRConsent' => [
             'displayName' => 'gRoR Consent',
+            'csvLabels' => [
+                'gRoR Consent',
+                'gRoR Consent Date'
+            ],
             'rdrField' => 'consentForGenomicsROR',
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
             'method' => 'displayGenomicsConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForGenomicsRORFilePath'
         ],
         'dvEhrStatus' => [
             'displayName' => 'DV-only EHR Sharing',
+            'csvLabels' => [
+                'DV-only EHR Sharing',
+                'DV-only EHR Sharing Date'
+            ],
             'rdrField' => 'consentForDvElectronicHealthRecordsSharing',
             'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'caborConsent' => [
             'displayName' => 'CABoR Consent',
+            'csvLabels' => [
+                'CABoR Consent',
+                'CABoR Consent Date'
+            ],
             'rdrField' => 'consentForCABoR',
             'sortField' => 'consentForCABoRAuthored',
             'rdrDateField' => 'consentForCABoRAuthored',
             'method' => 'displayConsentStatus',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForCABoRFilePath'
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [
@@ -111,22 +160,35 @@ class WorkQueue
                 'appleHealthKit' => 'Apple HealthKit Consent',
                 'appleEHR' => 'Apple EHR Consent'
             ],
+            'csvLabels' => [
+                'Fitbit Consent',
+                'Fitbit Consent Date',
+                'Apple HealthKit  Consent',
+                'Apple HealthKit  Consent Date',
+                'Apple EHR Consent',
+                'Apple EHR Consent Date'
+            ],
             'rdrField' => 'digitalHealthSharingStatus',
             'method' => 'getDigitalHealthSharingStatus',
             'csvMethod' => 'csvDigitalHealthSharingStatus',
             'htmlClass' => 'text-center',
-            'orderable' => false
+            'orderable' => false,
+            'toggleColumn' => true
         ],
         'consentCohort' => [
             'displayName' => 'Consent Cohort',
+            'csvLabel' => 'Consent Cohort',
             'rdrField' => 'consentCohortText',
             'sortField' => 'consentCohort',
-            'htmlClass' => 'text-center'
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
         ],
         'primaryLanguage' => [
             'displayName' => 'Language of Primary Consent',
+            'csvLabel' => 'Language of Primary Consent',
             'rdrField' => 'primaryLanguage',
-            'sortField' => 'primaryLanguage'
+            'sortField' => 'primaryLanguage',
+            'toggleColumn' => true
         ]
     ];
 
@@ -475,6 +537,98 @@ class WorkQueue
         ]
     ];
 
+    public static $consentAdvanceFilters = [
+        'consentForStudyEnrollment' => [
+            'label' => 'Primary Consent',
+            'options' => [
+                'View All' => '',
+                'Consented' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Consent Not Completed' => 'UNSET'
+            ],
+            'dateField' => 'consentForStudyEnrollmentAuthored'
+        ],
+        'questionnaireOnDnaProgram' => [
+            'label' => 'Program Update',
+            'options' => [
+                'View All' => '',
+                'Completed' => 'SUBMITTED',
+                'Not Completed' => 'UNSET'
+            ],
+            'dateField' => 'questionnaireOnDnaProgramAuthored'
+        ],
+        'consentForElectronicHealthRecords' => [
+            'label' => 'EHR Consent Status',
+            'options' => [
+                'View All' => '',
+                'Consented' => 'SUBMITTED',
+                'Refused consent' => 'SUBMITTED_NO_CONSENT',
+                'Consent not completed' => 'UNSET'
+            ],
+            'dateField' => 'consentForElectronicHealthRecordsAuthored'
+        ],
+        'ehrConsentExpireStatus' => [
+            'label' => 'EHR Expiration Status',
+            'options' => [
+                'View All' => '',
+                'Active' => 'ACTIVE',
+                'Expired' => 'EXPIRED'
+            ],
+            'dateField' => 'ehrConsentExpireStatusAuthored'
+        ],
+        'consentForGenomicsROR' => [
+            'label' => 'gRoR Consent Status',
+            'options' => [
+                'View All' => '',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET'
+            ],
+            'dateField' => 'consentForGenomicsRORAuthored'
+        ],
+        'consentForDvElectronicHealthRecordsSharing' => [
+            'label' => 'DV-Only EHR Sharing',
+            'options' => [
+                'View All' => '',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET'
+            ],
+            'dateField' => 'consentForDvElectronicHealthRecordsSharingAuthored'
+        ],
+        'consentForCABoR' => [
+            'label' => 'CABoR Consent',
+            'options' => [
+                'View All' => '',
+                'Consented Yes' => 'SUBMITTED',
+                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                'Consent Not Completed' => 'UNSET'
+            ],
+            'dateField' => 'consentForCABoRAuthored'
+        ],
+        'consentCohort' => [
+            'label' => 'Consent Cohort',
+            'options' => [
+                'View All' => '',
+                'Cohort 1' => 'COHORT_1',
+                'Cohort 2' => 'COHORT_2',
+                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
+                'Cohort 3' => 'COHORT_3'
+            ]
+        ],
+        'primaryLanguage' => [
+            'label' => 'Language of Primary Cosent',
+            'options' => [
+                'View All' => '',
+                'English' => 'en',
+                'Spanish' => 'es'
+            ]
+        ]
+    ];
+
     //These are currently not working in the RDR
     public static $filtersDisabled = [
         'language' => [
@@ -587,16 +741,22 @@ class WorkQueue
         'appleEHR' => 'Apple EHR Consent'
     ];
 
-    public static function dateFromString($string, $timezone, $displayTime = true)
+    public static function dateFromString($string, $timezone, $displayTime = true, $link = null)
     {
         if (!empty($string)) {
             try {
                 $date = new \DateTime($string);
                 $date->setTimezone(new \DateTimeZone($timezone));
                 if ($displayTime) {
-                    return $date->format('n/j/Y g:i a');
+                    return $link
+                        ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y g:i a') . '</a>'
+                        : $date->format('n/j/Y g:i a')
+                    ;
                 }
-                return $date->format('n/j/Y');
+                return $link
+                    ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y') . '</a>'
+                    : $date->format('n/j/Y')
+                ;
             } catch (\Exception $e) {
                 return '';
             }
@@ -681,17 +841,17 @@ class WorkQueue
         return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
-    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true)
+    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Refused Consent)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Responded Not Sure)';
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
@@ -903,35 +1063,24 @@ class WorkQueue
         return $headers;
     }
 
-    public static function getConsentExportHeaders()
+    public static function getConsentExportHeaders($workQueueConsentColumns)
     {
-        $headers = [
-            'Last Name',
-            'First Name',
-            'Middle Initial',
-            'Date of Birth',
-            'PMI ID',
-            'Primary Consent Status',
-            'Primary Consent Date',
-            'Program Update',
-            'Date of Program Update',
-            'EHR Consent Status',
-            'EHR Consent Date',
-            'EHR Expiration Status',
-            'EHR Expiration Date',
-            'gRoR Consent Status',
-            'gRoR Consent Date',
-            'DV-only EHR Sharing',
-            'DV-only EHR Sharing Date',
-            'CABoR Consent Status',
-            'CABoR Consent Date'
-        ];
-        foreach (array_values(self::$digitalHealthSharingTypes) as $label) {
-            $headers[] = $label;
-            $headers[] = $label . ' Date';
+        $headers = [];
+        foreach (self::$columnsDef as $field => $columnDef) {
+            if ($columnDef['toggleColumn']) {
+                if (in_array("column{$field}", $workQueueConsentColumns)) {
+                    if (isset($columnDef['csvLabels'])) {
+                        foreach ($columnDef['csvLabels'] as $csvLabel) {
+                            $headers[] = $csvLabel;
+                        }
+                    } else {
+                        $headers[] = $columnDef['csvLabel'];
+                    }
+                }
+            } else {
+                $headers[] = $columnDef['csvLabel'];
+            }
         }
-        $headers[] = 'Consent Cohort';
-        $headers[] = 'Language of Primary Consent';
         return $headers;
     }
 
@@ -959,5 +1108,72 @@ class WorkQueue
             return self::dateFromString($authoredDate, $userTimezone);
         }
         return !$displayDate ? 0 : '';
+    }
+
+    public static function hasDateFields($params)
+    {
+        foreach (self::$consentAdvanceFilters as $advanceFilter) {
+            if (isset($advanceFilter['dateField']) && (!empty($params[$advanceFilter['dateField'] . 'StartDate']) || !empty($params[$advanceFilter['dateField'] . 'EndDate']))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function getDateFilterParams($params)
+    {
+        $rdrParams = '';
+        foreach (self::$consentAdvanceFilters as $advanceFilter) {
+            if (isset($advanceFilter['dateField'])) {
+                if (!empty($params[$advanceFilter['dateField'] . 'StartDate'])) {
+                    $rdrParams .= '&' . $advanceFilter['dateField'] . '=gt' . $params[$advanceFilter['dateField'] . 'StartDate'];
+                }
+                if (!empty($params[$advanceFilter['dateField'] . 'EndDate'])) {
+                    $rdrParams .= '&' . $advanceFilter['dateField'] . '=lt' . $params[$advanceFilter['dateField'] . 'EndDate'];
+                }
+            }
+        }
+        return $rdrParams;
+    }
+
+    public static function getWorkQueueConsentColumns()
+    {
+        $workQueueConsentColumns = [];
+        foreach (self::$columnsDef as $field => $columnDef) {
+            if ($columnDef['toggleColumn']) {
+                if (isset($columnDef['displayNames'])) {
+                    foreach (array_keys($columnDef['displayNames']) as $subField) {
+                        $workQueueConsentColumns[] = 'column' . $subField;
+                    }
+                } else {
+                    $workQueueConsentColumns[] = 'column' . $field;
+                }
+            }
+        }
+        return $workQueueConsentColumns;
+    }
+
+    public static function isValidDate($date)
+    {
+        $dt = \DateTime::createFromFormat("m/d/Y", $date);
+        return $dt !== false && !array_sum($dt::getLastErrors());
+    }
+
+    public static function isValidDates($params)
+    {
+        if (!empty($params['dateOfBirth']) && !self::isValidDate($params['dateOfBirth'])) {
+            return false;
+        }
+        foreach (array_values(self::$columnsDef) as $columnDef) {
+            if (isset($columnDef['rdrDateField'])) {
+                if (!empty($params[$columnDef['rdrDateField'] . 'StartDate']) && !self::isValidDate($params[$columnDef['rdrDateField'] . 'StartDate'])) {
+                    return false;
+                }
+                if (!empty($params[$columnDef['rdrDateField'] . 'EndDate']) && !self::isValidDate($params[$columnDef['rdrDateField'] . 'EndDate'])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
