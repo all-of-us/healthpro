@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Service\AuthService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -8,7 +8,7 @@ use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 
 class MissingMeasurementsAndOrdersNotificationService
 {

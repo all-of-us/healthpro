@@ -129,7 +129,7 @@
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
                 {% if measurement.history is empty or measurement.history.type != 'cancel' %}
-                    <button type="submit" class="btn btn-warning" name="copy" onclick="return confirm('Are you sure you want to copy these physical measurements?');">Copy</button>
+                    <button type="submit" class="btn btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
                 {% endif %}
             </p>
         {% else %}

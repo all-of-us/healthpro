@@ -203,11 +203,11 @@ class Fhir
                 'extension' => [
                     [
                         'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
-                        'valueString' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->createdSite
+                        'valueString' => 'Location/' . \App\Security\User::SITE_PREFIX . $this->createdSite
                     ],
                     [
                         'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
-                        'valueString' => 'Location/' . \Pmi\Security\User::SITE_PREFIX . $this->finalizedSite
+                        'valueString' => 'Location/' . \App\Security\User::SITE_PREFIX . $this->finalizedSite
                     ]
                 ],
             ]

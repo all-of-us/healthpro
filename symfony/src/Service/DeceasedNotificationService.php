@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Entity\DeceasedLog;
 use App\Entity\Site;
 use Doctrine\Persistence\ManagerRegistry;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
 

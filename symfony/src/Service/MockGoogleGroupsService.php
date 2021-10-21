@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Pmi\Security\User;
+use App\Security\User;
 use Google_Service_Directory_Group as Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 

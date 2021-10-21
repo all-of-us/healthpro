@@ -2,9 +2,8 @@
 
 namespace App\Service;
 
-use Pmi\Drc\GoogleUser;
+use App\Drc\GoogleUser;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Exception;

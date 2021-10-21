@@ -1,9 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "": "src/",
             "App\\": "symfony/src/",
-            "Tests\\": "tests/",
             "App\\Tests\\": "symfony/tests/"
         }
     },
@@ -41,6 +39,7 @@
         "beberlei/doctrineextensions": "^1.2",
         "symfony/proxy-manager-bridge": "4.4.*",
         "symfony/serializer": "4.4.*",
+        "google/cloud-storage": "^1.25",
         "symfony/expression-language": "4.4.*"
     },
     "config": {

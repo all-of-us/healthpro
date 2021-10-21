@@ -6,7 +6,7 @@ use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
-use Pmi\Security\User;
+use App\Security\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;

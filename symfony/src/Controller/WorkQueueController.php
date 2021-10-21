@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Problem;
+use App\Form\WorkQueueParticipantLookupIdType;
+use App\Form\WorkQueueParticipantLookupSearchType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -18,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Helper\WorkQueue;
-use Pmi\Audit\Log;
+use App\Audit\Log;
 
 /**
  * @Route("/s/workqueue")
@@ -182,8 +184,9 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
+        $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');
         if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
-            $exportHeaders = WorkQueue::getConsentExportHeaders();
+            $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueConsentColumns);
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
         } else {
@@ -191,7 +194,7 @@ class WorkQueueController extends AbstractController
             $exportRowMethod = 'generateExportRow';
             $fileName = 'workqueue';
         }
-        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod) {
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueConsentColumns) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -206,7 +209,7 @@ class WorkQueueController extends AbstractController
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueConsentColumns));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {
@@ -381,23 +384,34 @@ class WorkQueueController extends AbstractController
 
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
-            $params = array_merge($params, array_filter($request->request->all()));
-            if (!empty($params['patientStatus'])) {
-                $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
+            if (WorkQueue::isValidDates($params)) {
+                $params = array_merge($params, array_filter($request->request->all()));
+                if (!empty($params['patientStatus'])) {
+                    $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
+                }
+                $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
+                $ajaxData = [];
+                $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
+                $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
+                $responseCode = 200;
+                if ($this->workQueueService->isRdrError()) {
+                    $responseCode = 500;
+                }
+                return $this->json($ajaxData, $responseCode);
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
             $ajaxData = [];
-            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
-            $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
-            $responseCode = 200;
-            if ($this->workQueueService->isRdrError()) {
-                $responseCode = 500;
-            }
-            return $this->json($ajaxData, $responseCode);
+            $ajaxData['recordsTotal'] = 0;
+            $ajaxData['data'] = [];
+            return $this->json($ajaxData, 200);
         } else {
             $params['exportType'] = 'consents';
+            if (!$this->session->has('workQueueConsentColumns')) {
+                $workQueueConsentColumns = WorkQueue::getWorkQueueConsentColumns();
+                $this->session->set('workQueueConsentColumns', $workQueueConsentColumns);
+            }
             return $this->render('workqueue/consents.html.twig', [
                 'filters' => $filters,
+                'advancedFilters' => WorkQueue::$consentAdvanceFilters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
                 'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
@@ -411,5 +425,30 @@ class WorkQueueController extends AbstractController
                 'columnsDef' => WorkQueue::$columnsDef
             ]);
         }
+    }
+
+    /**
+     * @Route("/consent/columns", name="workqueue_consent_columns")
+     */
+    public function consentColumnsAction(Request $request)
+    {
+        if (!$this->displayParticipantConsentsTab) {
+            throw $this->createNotFoundException();
+        }
+        if ($request->query->has('reset')) {
+            $this->session->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
+            return $this->json(['success' => true]);
+        }
+        $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');
+        $columnName = $request->query->get('columnName');
+        if ($request->query->get('checked') === 'true') {
+            $workQueueConsentColumns[] = $columnName;
+        } else {
+            if (($key = array_search($columnName, $workQueueConsentColumns)) !== false) {
+                unset($workQueueConsentColumns[$key]);
+            }
+        }
+        $this->session->set('workQueueConsentColumns', $workQueueConsentColumns);
+        return $this->json(['success' => true]);
     }
 }

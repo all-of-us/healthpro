@@ -852,7 +852,7 @@ class Order
             $this->currentVersion = $params['order_samples_version'];
         }
         $this->params = $params;
-        $file = __DIR__ . "/../../../src/Pmi/Order/versions/{$this->currentVersion}.json";
+        $file = __DIR__ . "/../Order/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {
             throw new \Exception('Samples version file not found');
         }
@@ -982,7 +982,7 @@ class Order
     public function getOrderSite($site)
     {
         $site = $site ?: $this->getSite();
-        return \Pmi\Security\User::SITE_PREFIX . $site;
+        return \App\Security\User::SITE_PREFIX . $site;
     }
 
     public function getOrderUserSiteData($user, $site)
