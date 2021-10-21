@@ -53,6 +53,11 @@ class SyncSiteEmailsCommand extends Command
 
         // Get site list
         $sites = $this->em->getRepository(Site::class)->getSiteSyncQueue('adminEmail', $limit);
+        if (count($sites) === 0) {
+            $output->writeln('All Sites complete.');
+            return 0;
+        }
+
         foreach ($sites as $site) {
             $output->writeln($site->getName());
             $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);

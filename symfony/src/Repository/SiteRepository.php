@@ -86,13 +86,18 @@ class SiteRepository extends ServiceEntityRepository
     public function getSiteSyncQueue(string $type, int $limit = 100)
     {
         $qb = $this->createQueryBuilder('s')
+            ->where('s.status = 1')
+            ->where('s.deleted = 0')
             ->leftJoin('s.siteSync', 'ss')
             ->setMaxResults($limit)
         ;
         switch ($type) {
             case 'adminEmail':
             default:
-                $qb->orderBy('ss.adminEmailsAt', 'ASC');
+                $qb->orderBy('ss.adminEmailsAt', 'ASC')
+                    ->andWhere('ss.adminEmailsAt < :startDateTime')
+                    ->setParameter('startDateTime', new \DateTime('-1 day'))
+                ;
                 break;
         }
         return $qb->getQuery()
