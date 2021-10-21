@@ -137,6 +137,7 @@ $(document).ready(function() {
     var table = $('#workqueue').DataTable({
         processing: true,
         serverSide: true,
+        fixedHeader: true,
         scrollX: true,
         ajax: {
             url: url,
