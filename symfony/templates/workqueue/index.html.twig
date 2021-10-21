@@ -47,7 +47,7 @@
 
     {% if canExport %}
         <div class="text-right">
-            Page <select name="pageDropDown" id="page-drop-down"></select>of&nbsp;<span id="total-pages"></span></span>
+            Page <select name="pageDropDown" id="page_drop_down"></select>&nbsp;of&nbsp;<span id="total_pages"></span>
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
         </div>
     {% endif %}
