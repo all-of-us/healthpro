@@ -103,14 +103,33 @@ class SitesController extends AbstractController
     /**
      * @Route("/site/{id}/emails", name="admin_site_emails")
      */
-    public function siteAdminEmails(SiteRepository $siteRepository, SiteSyncService $siteSyncService, int $id)
+    public function siteAdminEmails(SiteRepository $siteRepository, EntityManagerInterface $em, EnvironmentService $env, SiteSyncService $siteSyncService, int $id)
     {
         $site = $siteRepository->find($id);
         if (!$site) {
             throw $this->createNotFoundException('Site not found.');
         }
-        $emails = $siteSyncService->getSiteAdminEmails($site);
-        return $this->json($emails);
+        $emails = join(', ', $siteSyncService->getSiteAdminEmails($site));
+
+        if (!$env->isProd() && !$env->isLocal()) {
+            $this->addFlash('error', sprintf(
+                'Cannot update emails in this environment. Value would have been: %s',
+                $emails ? $emails : '(empty)'
+            ));
+            return $this->redirectToRoute('admin_sites');
+        }
+
+        $site->setEmail($emails);
+        $em->persist($site);
+        $em->flush();
+
+        $this->addFlash('success', sprintf(
+            '%s (%s) email updated to: %s',
+            $site->getName(),
+            $site->getSiteId(),
+            $emails ? $emails : '(empty)'
+        ));
+        return $this->redirectToRoute('admin_sites');
     }
 
     /**
