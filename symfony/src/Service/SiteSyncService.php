@@ -2,13 +2,14 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
 use App\Entity\SiteSync;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SiteSyncService
@@ -102,7 +103,7 @@ class SiteSyncService
                     $primaryId = null;
                     $siteId = self::getSiteSuffix($site->id);
                     if (array_key_exists($siteId, $existingSites)) {
-                        $existingArray = $this->normalizer->normalize($existingSites[$siteId]);
+                        $existingArray = $this->normalizer->normalize($existingSites[$siteId], null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         $siteData = $existingSites[$siteId];
                         $primaryId = $siteData->getId();
                     } else {
@@ -143,7 +144,7 @@ class SiteSyncService
                         $siteData->setWorkqueueDownload('full_data'); // default value for workqueue downlaod
                     }
                     if ($existingArray) {
-                        $siteDataArray = $this->normalizer->normalize($siteData);
+                        $siteDataArray = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         if ($existingArray != $siteDataArray) {
                             $modified[] = [
                                 'old' => $existingArray,
@@ -160,7 +161,7 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $created[] = $this->normalizer->normalize($siteData);
+                        $created[] = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
