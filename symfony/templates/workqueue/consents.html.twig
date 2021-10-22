@@ -42,9 +42,12 @@
         </div>
         <div class="col-md-9">
             {% if canExport %}
-                <p class="text-right">
+                <div class="text-right">
+                    <div class="page-drop-down">
+                        Page <select name="pageDropDown" id="page_drop_down" class="input-sm"></select>&nbsp;of&nbsp;<span id="total_pages"></span>
+                    </div>
                     <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
-                </p>
+                </div>
             {% endif %}
             {# Not using siteAwardeeDisplayName field from session as the awardee/organization is variable for STSI users #}
             <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ awardee == 'salivary_pilot' ? 'Salivary Pilot' : siteInfo.awardeeDisplayName(awardee) }})</h4>

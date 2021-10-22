@@ -54,11 +54,27 @@ $(document).ready(function () {
         dom: 'lrtip',
         columns: tableColumns,
         pageLength: 25,
+        drawCallback: function () {
+            var pageInfo = workQueueTable.page.info();
+            $('#total_pages').text(pageInfo.pages);
+            var dropDownHtml = '';
+            for (var count = 1; count <= pageInfo.pages; count++) {
+                var pageNumber = count - 1;
+                dropDownHtml += '<option value="' + pageNumber + '">' + count + '</option>';
+            }
+            var pageDropDown = $('#page_drop_down');
+            pageDropDown.html(dropDownHtml);
+            pageDropDown.val(pageInfo.page);
+        },
         createdRow: function (row, data) {
             if (data.isWithdrawn === true) {
                 $(row).addClass('tr-withdrawn');
             }
         }
+    });
+
+    $('#page_drop_down').change(function (e) {
+        workQueueTable.page(parseInt($(this).val())).draw('page');
     });
 
     var showColumns = function () {
@@ -124,7 +140,7 @@ $(document).ready(function () {
 
     checkFilters();
     collapseFilters();
-    $('#filters select, #filters input[type=radio]').on('change', function () {
+    $('#filters select, #filters input[type=radio]').not('#page_drop_down').on('change', function () {
         checkFilters();
         $('#filters').submit();
     });
