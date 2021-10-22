@@ -270,7 +270,8 @@ class SiteSyncService
     public function getSiteAdminEmails(Site $site): array
     {
         $siteAdmins = [];
-        $members = $this->googleGroupsService->getMembers(self::SITE_PREFIX . $site->getGoogleGroup() . $this->getGoogleGroupDomain(), ['OWNER', 'MANAGER']);
+        $groupEmail = self::SITE_PREFIX . $site->getGoogleGroup() . '@' . $this->params->get('gaDomain');
+        $members = $this->googleGroupsService->getMembers($groupEmail, ['OWNER', 'MANAGER']);
         if (count($members) === 0) {
             return $siteAdmins;
         }
@@ -289,13 +290,5 @@ class SiteSyncService
             }
         }
         return $siteAdmins;
-    }
-
-    private function getGoogleGroupDomain(): string
-    {
-        if ($this->env->isProd()) {
-            return '@prod.pmi-ops.org';
-        }
-        return '@staging.pmi-ops.org';
     }
 }
