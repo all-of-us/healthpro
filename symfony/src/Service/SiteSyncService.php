@@ -24,7 +24,7 @@ class SiteSyncService
     private $googleGroupsService;
     private $adminEmails = [];
 
-    const SITE_PREFIX = 'hpo-site-';
+    public const SITE_PREFIX = 'hpo-site-';
 
     public function __construct(
         RdrApiService $rdrApiService,
