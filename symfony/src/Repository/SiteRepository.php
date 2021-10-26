@@ -95,7 +95,7 @@ class SiteRepository extends ServiceEntityRepository
             case 'adminEmail':
             default:
                 $qb->orderBy('ss.adminEmailsAt', 'ASC')
-                    ->andWhere('ss.adminEmailsAt < :startDateTime')
+                    ->andWhere('ss.adminEmailsAt IS NULL OR ss.adminEmailsAt < :startDateTime')
                     ->setParameter('startDateTime', new \DateTime('-1 day'))
                 ;
                 break;
