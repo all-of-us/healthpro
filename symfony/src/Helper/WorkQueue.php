@@ -237,6 +237,7 @@ class WorkQueue
         'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistoryAuthored',
         'questionnaireOnFamilyHealthAuthored',
+        'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
         'questionnaireOnHealthcareAccessAuthored',
         'questionnaireOnSocialDeterminantsOfHealthAuthored',
         'questionnaireOnCopeMayAuthored',
@@ -683,6 +684,7 @@ class WorkQueue
         'Lifestyle' => 'Lifestyle',
         'MedicalHistory' => 'Med History',
         'FamilyHealth' => 'Family History',
+        'FamilyHealthHistory' => 'Personal & Family Hx',
         'HealthcareAccess' => 'Access',
         'SocialDeterminantsOfHealth' => 'SDOH',
         'CopeMay' => 'COPE May',
@@ -1064,6 +1066,8 @@ class WorkQueue
             $headers[] = $label;
             $headers[] = $label . ' Date';
         }
+        $headers[] = 'Personal & Family Hx PPI Survey Complete';
+        $headers[] = 'Personal & Family Hx PPI Survey Completion Date';
         $headers[] = 'SDOH PPI Survey Complete';
         $headers[] = 'SDOH PPI Survey Completion Date';
         $headers[] = 'Winter Minute PPI Survey Complete';
