@@ -10,4 +10,4 @@ if (strpos($_SERVER['REQUEST_URI'], 'index.php') !== false) {
     exit('Not Found');
 }
 
-require '../symfony/public/index.php';
+require '../public/index.php';

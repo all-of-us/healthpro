@@ -222,7 +222,7 @@ class ReleaseTicketCommand extends Command
 
     private function attachDeployOutput($version, $env, $file, $ticketId): ?string
     {
-        $appDir = realpath(__DIR__ . '/../../..');
+        $appDir = realpath(__DIR__ . '/../..');
         $path = $appDir . "/{$file}";
         $appId = self::$appIds[$env];
         $deployFileName = "{$appId}.release-{$version}.txt";

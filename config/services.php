@@ -5,7 +5,7 @@ use App\Datastore\Entities\Configuration;
 
 $env = new EnvironmentService();
 
-$appDir = realpath(__DIR__ . '/../../');
+$appDir = realpath(__DIR__ . '/../');
 $configFile = $appDir . '/dev_config/config.yml';
 if ($env->isLocal() && file_exists($configFile)) {
     $yaml = new \Symfony\Component\Yaml\Parser();
