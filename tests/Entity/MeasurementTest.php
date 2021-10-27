@@ -123,7 +123,7 @@ class MeasurementTest extends TestCase
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
 
         // using string to string method so that diff is output (file to string just shows entire object)
-        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/tests/' . $filename), $json);
+        $this->assertJsonStringEqualsJsonString(file_get_contents(dirname(__DIR__) . '/' . $filename), $json);
     }
 
 
@@ -147,7 +147,7 @@ class MeasurementTest extends TestCase
         $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
-        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/tests/' . $filename), $json);
+        $this->assertJsonStringEqualsJsonString(file_get_contents(dirname(__DIR__) . '/' . $filename), $json);
     }
 
     /**
@@ -169,6 +169,6 @@ class MeasurementTest extends TestCase
         $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
-        $this->assertJsonStringEqualsJsonString(file_get_contents(__DIR__ . '/tests/' . $filename), $json);
+        $this->assertJsonStringEqualsJsonString(file_get_contents(dirname(__DIR__) . '/' . $filename), $json);
     }
 }
