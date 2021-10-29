@@ -589,6 +589,12 @@ class WorkQueueService
             $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
             $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
         }
+        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnPersonalAndFamilyHealthHistory);
+        $row[] = WorkQueue::dateFromString($participant->questionnaireOnPersonalAndFamilyHealthHistoryAuthored, $userTimezone);
+        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnSocialDeterminantsOfHealth);
+        $row[] = WorkQueue::dateFromString($participant->questionnaireOnSocialDeterminantsOfHealthAuthored, $userTimezone);
+        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute3);
+        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute3Authored, $userTimezone);
         return $row;
     }
 
