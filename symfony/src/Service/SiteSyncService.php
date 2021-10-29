@@ -282,6 +282,10 @@ class SiteSyncService
                 continue;
             }
             $user = $this->googleGroupsService->getUser($member->email);
+            if (is_null($user)) {
+                error_log('Unable to retrieve user details: ' . $member->email);
+                continue;
+            }
             foreach ($user->emails as $email) {
                 if (isset($email['type']) && $email['type'] === 'work') {
                     $userEmail = $email['address'];

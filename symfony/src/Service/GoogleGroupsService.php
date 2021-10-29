@@ -50,8 +50,9 @@ class GoogleGroupsService
                 $response = $method->invokeArgs($resource, $params);
                 $doRetry = false;
             } catch (\Exception $e) {
-                // implies a rate-limiting error that we should retry
-                if ($e->getCode() == 403 && $retryCount < self::RETRY_LIMIT) {
+                $message = json_decode($e->getMessage());
+                $reason = isset($message->error->errors[0]->reason) ? $message->error->errors[0]->reason : 'unknown';
+                if (in_array($e->getCode(), [403, 429]) && in_array($reason, ['userRateLimitExceeded', 'quotaExceeded', 'rateLimitExceeded']) && $retryCount < self::RETRY_LIMIT) {
                     $micros = self::calculateBackoff($retryCount);
                     error_log("$resourceName.$methodName was rate-limited; " .
                         "retrying in " . (round($micros / 1000000, 3)) .
