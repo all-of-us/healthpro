@@ -684,7 +684,7 @@ class WorkQueue
         'Lifestyle' => 'Lifestyle',
         'MedicalHistory' => 'Med History',
         'FamilyHealth' => 'Family History',
-        'FamilyHealthHistory' => 'Personal & Family Hx',
+        'PersonalAndFamilyHealthHistory' => 'Personal & Family Hx',
         'HealthcareAccess' => 'Access',
         'SocialDeterminantsOfHealth' => 'SDOH',
         'CopeMay' => 'COPE May',
