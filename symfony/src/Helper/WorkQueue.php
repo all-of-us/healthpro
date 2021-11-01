@@ -237,7 +237,9 @@ class WorkQueue
         'questionnaireOnLifestyleAuthored',
         'questionnaireOnMedicalHistoryAuthored',
         'questionnaireOnFamilyHealthAuthored',
+        'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
         'questionnaireOnHealthcareAccessAuthored',
+        'questionnaireOnSocialDeterminantsOfHealthAuthored',
         'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJulyAuthored',
@@ -246,6 +248,7 @@ class WorkQueue
         'questionnaireOnCopeFebAuthored',
         'questionnaireOnCopeVaccineMinute1',
         'questionnaireOnCopeVaccineMinute2',
+        'questionnaireOnCopeVaccineMinute3',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -681,7 +684,9 @@ class WorkQueue
         'Lifestyle' => 'Lifestyle',
         'MedicalHistory' => 'Med History',
         'FamilyHealth' => 'Family History',
+        'PersonalAndFamilyHealthHistory' => 'Personal & Family Hx',
         'HealthcareAccess' => 'Access',
+        'SocialDeterminantsOfHealth' => 'SDOH',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
@@ -689,7 +694,8 @@ class WorkQueue
         'CopeDec' => 'COPE Dec',
         'CopeFeb' => 'COPE Feb',
         'CopeVaccineMinute1' => 'Summer Minute',
-        'CopeVaccineMinute2' => 'Fall Minute'
+        'CopeVaccineMinute2' => 'Fall Minute',
+        'CopeVaccineMinute3' => 'Winter Minute'
     ];
 
     public static $initialSurveys = [
@@ -1060,6 +1066,12 @@ class WorkQueue
             $headers[] = $label;
             $headers[] = $label . ' Date';
         }
+        $headers[] = 'Personal & Family Hx PPI Survey Complete';
+        $headers[] = 'Personal & Family Hx PPI Survey Completion Date';
+        $headers[] = 'SDOH PPI Survey Complete';
+        $headers[] = 'SDOH PPI Survey Completion Date';
+        $headers[] = 'Winter Minute PPI Survey Complete';
+        $headers[] = 'Winter Minute PPI Survey Completion Date';
         return $headers;
     }
 
