@@ -148,13 +148,13 @@ $(document).ready(function() {
         pageLength: 25,
         drawCallback: function () {
             var pageInfo = table.page.info();
-            $('#total_pages').text(pageInfo.pages);
+            $('.total-pages').text(pageInfo.pages);
             var dropDownHtml = '';
             for (var count = 1; count <= pageInfo.pages; count++) {
                 var pageNumber = count - 1;
                 dropDownHtml += '<option value="' + pageNumber + '">' + count + '</option>';
             }
-            var pageDropDown = $('#page_drop_down');
+            var pageDropDown = $('.page-drop-down select');
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
         },
@@ -319,7 +319,7 @@ $(document).ready(function() {
         ]
     });
 
-    $('#page_drop_down').change(function () {
+    $('.page-drop-down select').change(function () {
         table.page(parseInt($(this).val())).draw('page');
     });
 

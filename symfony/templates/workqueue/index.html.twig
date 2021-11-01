@@ -48,7 +48,7 @@
     {% if canExport %}
         <div class="text-right">
             <div class="page-drop-down">
-                Page <select name="pageDropDown" id="page_drop_down" class="input-sm"></select>&nbsp;of&nbsp;<span id="total_pages"></span>
+                Page <select name="pageDropDown" class="input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
             </div>
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
         </div>
@@ -143,9 +143,13 @@
         <tbody id="participant_info"></tbody>
     </table>
     {% if canExport %}
-        <p class="text-right">
+        <div class="text-right">
+            <div class="page-drop-down">
+                Page <select name="pageDropDown" class="input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
+            </div>
             <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
-        </p>
+        </div>
+        <br>
     {% endif %}
 {% endblock %}
 
