@@ -41,9 +41,9 @@
             {% include 'partials/workqueue-consents-advance-filters.html.twig' %}
         </div>
         <div class="col-md-9">
-            <div class="text-right">
+            <div class="text-right form-inline">
                 <div class="page-drop-down">
-                    Page <select name="pageDropDown" class="input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
+                    Page <select name="pageDropDown" class="form-control input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
                 </div>
                 {% if canExport %}
                     <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
@@ -75,9 +75,9 @@
                 </thead>
                 <tbody id="participant_info"></tbody>
             </table>
-            <div class="text-right">
+            <div class="text-right form-inline">
                 <div class="page-drop-down">
-                    Page <select name="pageDropDown" class="input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
+                    Page <select name="pageDropDown" class="form-control input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
                 </div>
                 {% if canExport %}
                     <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
