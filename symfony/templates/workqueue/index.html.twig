@@ -45,15 +45,7 @@
         </form>
     </div>
 
-
-    <div class="text-right form-inline">
-        <div class="page-drop-down">
-            Page <select name="pageDropDown" class="form-control input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
-        </div>
-        {% if canExport %}
-            <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
-        {% endif %}
-    </div>
+    {% include 'partials/workqueue-drop-down-navigation-and-eport-button.html.twig' %}
 
     {# Not using siteAwardeeDisplayName field from session as the awardee/organization is variable for STSI users #}
     <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ awardee == 'salivary_pilot' ? 'Salivary Pilot' : siteInfo.awardeeDisplayName(awardee) }})</h4>
@@ -144,14 +136,7 @@
         </thead>
         <tbody id="participant_info"></tbody>
     </table>
-    <div class="text-right form-inline">
-        <div class="page-drop-down">
-            Page <select name="pageDropDown" class="form-control input-sm"></select>&nbsp;of&nbsp;<span class="total-pages"></span>
-        </div>
-        {% if canExport %}
-            <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
-        {% endif %}
-    </div>
+    {% include 'partials/workqueue-drop-down-navigation-and-eport-button.html.twig' %}
     <br>
 {% endblock %}
 
