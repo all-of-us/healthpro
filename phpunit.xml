@@ -16,7 +16,7 @@
     </php>
     <testsuites>
         <testsuite name="Symfony Test Suite">
-            <directory>symfony/tests</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

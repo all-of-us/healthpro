@@ -19,7 +19,7 @@ class GoogleGroupsService
         if (!$env->values['isUnitTest']) {
             $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');
-            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/googleapps_key.json';
+            $keyFile = realpath(__DIR__ . '/../../') . '/dev_config/googleapps_key.json';
             if ($env->isLocal() && file_exists($keyFile)) {
                 $authJson = file_get_contents($keyFile);
             } else {

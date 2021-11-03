@@ -27,7 +27,7 @@ class StackdriverHandler extends AbstractProcessingHandler
         $clientConfig = [];
         if ($this->env->isLocal()) {
             // Reuse service account key used for RDR auth
-            $keyFile = realpath(__DIR__ . '/../../../') . '/dev_config/rdr_key.json';
+            $keyFile = realpath(__DIR__ . '/../../') . '/dev_config/rdr_key.json';
             $clientConfig = [
                 'keyFilePath' => $keyFile
             ];

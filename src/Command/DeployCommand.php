@@ -57,7 +57,7 @@ class DeployCommand extends Command
 
     protected function configure()
     {
-        $appDir = realpath(__DIR__ . '/../../..');
+        $appDir = realpath(__DIR__ . '/../..');
         $this
             ->setName('pmi:deploy')
             ->setDescription('PMI Build and Deploy')

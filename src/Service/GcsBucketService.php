@@ -17,8 +17,8 @@ class GcsBucketService
         $this->storageClient = new StorageClient();
         $basePath = $appKernel->getProjectDir();
         // Note that when installed in ./symfony, the development credentials are a level down
-        if ($environment->isLocal() && file_exists($basePath . '/../dev_config/rdr_key.json')) {
-            $this->config['key_file'] = $basePath . '/../dev_config/rdr_key.json';
+        if ($environment->isLocal() && file_exists($basePath . '/dev_config/rdr_key.json')) {
+            $this->config['key_file'] = $basePath . '/dev_config/rdr_key.json';
             $this->storageClient = new StorageClient([
                 'keyFilePath' => $this->config['key_file']
             ]);

@@ -120,7 +120,7 @@ class EnvironmentService
         // default two-factor setting
         $this->configuration['enforce2fa'] = $this->isProd();
 
-        $appDir = realpath(__DIR__ . '/../../../');
+        $appDir = realpath(__DIR__ . '/../../');
         $configFile = $appDir . '/dev_config/config.yml';
         if ($this->isLocal() && file_exists($configFile)) {
             $yaml = new \Symfony\Component\Yaml\Parser();

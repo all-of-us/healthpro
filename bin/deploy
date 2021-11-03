@@ -5,7 +5,7 @@
 
 APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 LOG="${APP_DIR}/deploy_"`date +%Y%m%d`"_"`date +%H%M%S`".txt"
-cd $APP_DIR/symfony
+cd $APP_DIR
 script -k $LOG ./bin/console pmi:deploy "$@"
 
 # strip colors: http://unix.stackexchange.com/a/4529
