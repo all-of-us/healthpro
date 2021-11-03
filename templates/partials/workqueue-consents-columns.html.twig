@@ -1,0 +1,74 @@
+<div class="collapse navbar-collapse" id="navbar-collapse-1">
+    <ul class="nav navbar-nav">
+        <li class="dropdown">
+            <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+                <i class="fa fa-columns" aria-hidden="true"></i> Columns
+                <small>Reset</small>
+                <b class="caret"></b>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <ul class="list-group">
+                        {% set columNumber = 5 %}
+                        {% for name, columnDef in columnsDef %}
+                            {% if columnDef.toggleColumn %}
+                                {% if columnDef.displayNames is defined %}
+                                    {% for subFieldName, subFieldLabel in columnDef.displayNames %}
+                                        {% set checked = "column"~subFieldName in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
+                                        <li class="list-group-item checkbox">
+                                            <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
+                                        </li>
+                                        {% set columNumber = columNumber + 1 %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% set checked = "column"~name in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
+                                    <li class="list-group-item checkbox">
+                                        <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.displayName }}</label>
+                                    </li>
+                                    {% set columNumber = columNumber + 1 %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+                <i class="fa fa-search" aria-hidden="true"></i> Participant Lookup
+                <small>Reset</small>
+                <b class="caret"></b>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <div class="panel-body">
+                        <h4>Search by Name</h4>
+                        <div class="form-group">
+                            <label class="control-label required" for="lastName">Last name</label>
+                            <input type="text" name="lastName" required="required" class="form-control" id="lastName" value="{{ params['lastName']|default('') }}" data-parsley-required>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="firstName">First name</label>
+                            <input type="text" name="firstName" class="form-control" id="firstName" value="{{ params['firstName']|default('') }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label required" for="dateOfBirth">Date of birth</label>
+                            <input type="text" name="dateOfBirth" required="required" class="form-control" id="dateOfBirth" value="{{ params['dateOfBirth']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy data-parsley-required>
+                        </div>
+                        <p>
+                            <button type="button" class="btn btn-primary" id="participant_search">Search</button>
+                        </p>
+                        <h4>Find by ID</h4>
+                        <div class="form-group">
+                            <label class="control-label required" for="participantId">Participant ID</label>
+                            <input type="text" name="participantId" required="required" class="form-control" id="participantId" value="{{ params['participantId']|default('') }}" data-parsley-required>
+                        </div>
+                        <p>
+                            <button type="button" class="btn btn-primary" id="participant_id_search">Search</button>
+                        </p>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
