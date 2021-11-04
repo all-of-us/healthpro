@@ -459,8 +459,12 @@ label.label-normal {
     border-radius: 6px 0 6px 6px;
 }
 
-#workqueue_consents_row .dropdown-toggle {
-    margin: 10px
+#workqueue_consents_row  .dropdown{
+    padding-left: 15px;
+}
+
+.dropdown-menu {
+    width: 400px;
 }
 
     /* Today's participants */
