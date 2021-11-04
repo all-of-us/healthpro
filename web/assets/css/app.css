@@ -463,7 +463,11 @@ label.label-normal {
     padding-left: 15px;
 }
 
-.dropdown-menu {
+.consent-filters .dropdown-menu {
+    width: 300px;
+}
+
+.consent-columns .dropdown-menu {
     width: 400px;
 }
 

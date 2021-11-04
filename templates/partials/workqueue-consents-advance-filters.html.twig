@@ -1,135 +1,50 @@
-<div class="panel-group" id="accordion">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#columns_group" id="columns_group_label">
-                    <i class="fa fa-columns" aria-hidden="true"></i> Columns
-                </a>
-                <small><a id="columns_reset" data-group-id="columns_group">Reset</a></small>
-            </h4>
-        </div>
-        <div id="columns_group" class="panel-collapse collapse" data-consent-columns-url="{{ path('workqueue_consent_columns') }}">
-            <div class="panel-body">
-                <ul class="list-group">
-                    {% set columNumber = 5 %}
-                    {% for name, columnDef in columnsDef %}
-                        {% if columnDef.toggleColumn %}
-                            {% if columnDef.displayNames is defined %}
-                                {% for subFieldName, subFieldLabel in columnDef.displayNames %}
-                                    {% set checked = "column"~subFieldName in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
-                                    <li class="list-group-item checkbox">
-                                        <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
-                                    </li>
-                                    {% set columNumber = columNumber + 1 %}
-                                {% endfor %}
-                            {% else %}
-                                {% set checked = "column"~name in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
-                                <li class="list-group-item checkbox">
-                                    <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.displayName }}</label>
+<div class="collapse navbar-collapse consent-filters" id="navbar-collapse-1">
+    <ul class="nav navbar-nav">
+        {% for label, subAdvancedFilters in advancedFilters %}
+            <li class="dropdown">
+                <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+                    <i class="fa fa-columns" aria-hidden="true"></i> {{ label }}
+                    <b class="caret"></b>
+                </button>
+                <ul class="dropdown-menu">
+                    {% for name, advancedFilter in subAdvancedFilters %}
+                        <li class="dropdown dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ advancedFilter.label }}</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+                                            <b>Select Status</b>
+                                        </li>
+                                        {% for label, value in advancedFilter.options %}
+                                            <li class="list-group-item radio">
+                                                <label><input type="radio" {% if params[name]|default('') == value %} checked {% endif %} name="{{ name }}" value="{{ value }}"/> {{ label }}</label>
+                                            </li>
+                                        {% endfor %}
+                                        {% if advancedFilter.dateField is defined %}
+                                            <li class="list-group-item">
+                                                <b>Select Date(s)</b>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="{{ advancedFilter.dateField }}StartDate">Start Date</label>
+                                                    <input type="text" name="{{ advancedFilter.dateField }}StartDate" class="form-control" id="{{ advancedFilter.dateField }}StartDate" value="{{ params[advancedFilter.dateField ~ 'StartDate']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label" for="{{ advancedFilter.dateField }}EndDate">End Date</label>
+                                                    <input type="text" name="{{ advancedFilter.dateField }}EndDate" class="form-control" id="{{ advancedFilter.dateField }}EndDate" value="{{ params[advancedFilter.dateField ~ 'EndDate']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy>
+                                                </div>
+                                                <p class="text-center">
+                                                    <button type="button" class="btn btn-primary btn-small apply-date-filter" data-consent-date-field-name="{{ advancedFilter.dateField }}">Apply</button>
+                                                </p>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
                                 </li>
-                                {% set columNumber = columNumber + 1 %}
-                            {% endif %}
-                        {% endif %}
+                            </ul>
+                        </li>
                     {% endfor %}
                 </ul>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#participant_lookup_group" id="participant_lookup_group_label">
-                    <i class="fa fa-search" aria-hidden="true"></i> Participant Lookup
-                </a>
-                <small><a id="participant_lookup_reset" data-group-id="participant_lookup_group">Reset</a></small>
-            </h4>
-        </div>
-        <div id="participant_lookup_group" class="panel-collapse collapse">
-            <div class="panel-body">
-                <h4>Search by Name</h4>
-                <div class="form-group">
-                    <label class="control-label required" for="lastName">Last name</label>
-                    <input type="text" name="lastName" required="required" class="form-control" id="lastName" value="{{ params['lastName']|default('') }}" data-parsley-required>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="firstName">First name</label>
-                    <input type="text" name="firstName" class="form-control" id="firstName" value="{{ params['firstName']|default('') }}">
-                </div>
-                <div class="form-group">
-                    <label class="control-label required" for="dateOfBirth">Date of birth</label>
-                    <input type="text" name="dateOfBirth" required="required" class="form-control" id="dateOfBirth" value="{{ params['dateOfBirth']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy data-parsley-required>
-                </div>
-                <p>
-                    <button type="button" class="btn btn-primary" id="participant_search">Search</button>
-                </p>
-                <h4>Find by ID</h4>
-                <div class="form-group">
-                    <label class="control-label required" for="participantId">Participant ID</label>
-                    <input type="text" name="participantId" required="required" class="form-control" id="participantId" value="{{ params['participantId']|default('') }}" data-parsley-required>
-                </div>
-                <p>
-                    <button type="button" class="btn btn-primary" id="participant_id_search">Search</button>
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_group" id="filter_status_group_label">
-                    <i class="fa fa-filter" aria-hidden="true"></i> Filter by Status &amp; Date
-                </a>
-                <small><a id="filter_status_reset" data-group-id="filter_status_group">Reset</a></small>
-            </h4>
-        </div>
-        <div id="filter_status_group" class="panel-collapse collapse">
-            <div class="panel-body">
-                {% for name, advancedFilter in advancedFilters %}
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a class="accordion-toggle collapsed" data-toggle="collapse" href="#filter_status_{{ name }}_group" id="filter_status_{{ name }}_group_label">
-                                    {{ advancedFilter.label }}
-                                </a>
-                                <small><a class="filter-status-sub-group-reset" data-group-id="filter_status_{{ name }}_group">Reset</a></small>
-                            </h4>
-                        </div>
-                        <div id="filter_status_{{ name }}_group" class="panel-collapse collapse filter-status-sub-group">
-                            <div class="panel-body">
-                                <ul class="list-group">
-                                    <li class="list-group-item">
-                                        <b>Select Status</b>
-                                    </li>
-                                    {% for label, value in advancedFilter.options %}
-                                        <li class="list-group-item radio">
-                                            <label><input type="radio" {% if params[name]|default('') == value %} checked {% endif %} name="{{ name }}" value="{{ value }}"/> {{ label }}</label>
-                                        </li>
-                                    {% endfor %}
-                                    {% if advancedFilter.dateField is defined %}
-                                        <li class="list-group-item">
-                                            <b>Select Date(s)</b>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <div class="form-group">
-                                                <label class="control-label" for="{{ advancedFilter.dateField }}StartDate">Start Date</label>
-                                                <input type="text" name="{{ advancedFilter.dateField }}StartDate" class="form-control" id="{{ advancedFilter.dateField }}StartDate" value="{{ params[advancedFilter.dateField ~ 'StartDate']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label" for="{{ advancedFilter.dateField }}EndDate">End Date</label>
-                                                <input type="text" name="{{ advancedFilter.dateField }}EndDate" class="form-control" id="{{ advancedFilter.dateField }}EndDate" value="{{ params[advancedFilter.dateField ~ 'EndDate']|default('') }}" placeholder="MM/DD/YYYY" data-parsley-date-mdy>
-                                            </div>
-                                            <p class="text-center">
-                                                <button type="button" class="btn btn-primary btn-small apply-date-filter" data-consent-date-field-name="{{ advancedFilter.dateField }}">Apply</button>
-                                            </p>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+            </li>
+        {% endfor %}
+    </ul>
 </div>
