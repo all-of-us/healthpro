@@ -5,8 +5,9 @@
                 <i class="fa fa-columns" aria-hidden="true"></i> Columns
                 <b class="caret"></b>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" id="columns_group">
                 <li>
+                    <small class="pull-right filter-reset"><a id="columns_reset" data-group-id="columns_group">Reset</a></small>
                     <ul class="list-group">
                         {% set columNumber = 5 %}
                         {% for name, columnDef in columnsDef %}
@@ -37,8 +38,9 @@
                 <i class="fa fa-search" aria-hidden="true"></i> Participant Lookup
                 <b class="caret"></b>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" id="participant_lookup_group">
                 <li>
+                    <small class="pull-right filter-reset"><a id="participant_lookup_reset" data-group-id="participant_lookup_group">Reset</a></small>
                     <div class="panel-body">
                         <h4>Search by Name</h4>
                         <div class="form-group">

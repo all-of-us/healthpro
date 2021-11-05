@@ -6,7 +6,8 @@
                     <i class="fa fa-columns" aria-hidden="true"></i> {{ label }}
                     <b class="caret"></b>
                 </button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" id="filter_status_{{ label }}_group">
+                    <small class="pull-right filter-reset"><a class="filter-status-sub-group-reset" data-group-id="filter_status_{{ label }}_group">Reset</a></small>
                     {% for name, advancedFilter in subAdvancedFilters %}
                         <li class="dropdown dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ advancedFilter.label }}</a>
                             <ul class="dropdown-menu">

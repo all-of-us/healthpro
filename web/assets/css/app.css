@@ -479,6 +479,12 @@ label.label-normal {
     margin-bottom: 15px;
 }
 
+.filter-reset {
+    z-index: 1000;
+    position: relative;
+    padding-right: 10px;
+}
+
     /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {
     border-bottom-width: 1px;
