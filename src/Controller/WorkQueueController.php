@@ -358,18 +358,8 @@ class WorkQueueController extends AbstractController
         }
 
         $sites = $this->siteService->getAwardeeSites($awardee);
+        $consentAdvanceFilters = WorkQueue::$consentAdvanceFilters;
         if (!empty($sites)) {
-            //Add sites filter
-            $sitesList = [];
-            $sitesList['site']['label'] = 'Paired Site';
-            foreach ($sites as $site) {
-                if (!empty($site->getGoogleGroup())) {
-                    $sitesList['site']['options'][$site->getName()] = $site->getGoogleGroup();
-                }
-            }
-            $sitesList['site']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $sitesList);
-
             //Add organization filter
             $organizationsList = [];
             $organizationsList['organization_id']['label'] = 'Paired Organization';
@@ -379,7 +369,18 @@ class WorkQueueController extends AbstractController
                 }
             }
             $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $organizationsList);
+            $consentAdvanceFilters['Pairing'] = array_merge($consentAdvanceFilters['Pairing'], $organizationsList);
+
+            //Add sites filter
+            $sitesList = [];
+            $sitesList['site']['label'] = 'Paired Site';
+            foreach ($sites as $site) {
+                if (!empty($site->getGoogleGroup())) {
+                    $sitesList['site']['options'][$site->getName()] = $site->getGoogleGroup();
+                }
+            }
+            $sitesList['site']['options']['Unpaired'] = 'UNSET';
+            $consentAdvanceFilters['Pairing'] = array_merge($consentAdvanceFilters['Pairing'], $sitesList);
         }
 
         //For ajax requests
@@ -411,7 +412,7 @@ class WorkQueueController extends AbstractController
             }
             return $this->render('workqueue/consents.html.twig', [
                 'filters' => $filters,
-                'advancedFilters' => WorkQueue::$consentAdvanceFilters,
+                'advancedFilters' => $consentAdvanceFilters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
                 'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
