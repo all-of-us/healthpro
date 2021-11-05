@@ -464,11 +464,19 @@ label.label-normal {
 }
 
 .consent-filters .dropdown-menu {
-    width: 300px;
+    min-width: 250px;
 }
 
 .consent-columns .dropdown-menu {
-    width: 400px;
+    min-width: 400px;
+}
+
+.list-options li {
+    width: 100%
+}
+
+.list-options .form-group {
+    margin-bottom: 15px;
 }
 
     /* Today's participants */
