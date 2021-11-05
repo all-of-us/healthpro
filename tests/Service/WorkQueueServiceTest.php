@@ -2,12 +2,13 @@
 
 namespace App\Tests\Service;
 
+use App\Helper\Participant;
+use App\Helper\WorkQueue;
+use App\Security\User;
+use App\Service\WorkQueueService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use App\Helper\Participant;
-use App\Security\User;
-use App\Service\WorkQueueService;
 
 class WorkQueueServiceTest extends KernelTestCase
 {
@@ -71,6 +72,35 @@ class WorkQueueServiceTest extends KernelTestCase
         $this->assertStringContainsString('Active', $row2['activityStatus']);
         $this->assertSame('200 Main St, City2, AZ 20002', $row2['address']);
         $this->assertStringContainsString('text-danger', $row2['ppiTheBasics']);
+    }
+
+    public function testGenerateConsentExportRow()
+    {
+        $participants = $this->getParticipants();
+        $row = $this->service->generateConsentExportRow($participants[0], WorkQueue::getWorkQueueConsentColumns());
+        $this->assertSame([
+            'LN1',
+            'FN1',
+            'M1',
+            '01/01/1990',
+            'P100000001',
+            1,
+            '11/3/2021 2:08 pm',
+            0,
+            '',
+            1,
+            '11/3/2021 2:08 pm',
+            0,
+            '',
+            1,
+            '11/3/2021 2:08 pm',
+            0,
+            '',
+            0,
+            '',
+            'Cohort 3',
+            'English'
+        ], $row);
     }
 
     private function createTokenStorageWithMockUser()
