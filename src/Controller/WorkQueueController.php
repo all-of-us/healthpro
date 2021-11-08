@@ -437,8 +437,12 @@ class WorkQueueController extends AbstractController
         if (!$this->displayParticipantConsentsTab) {
             throw $this->createNotFoundException();
         }
-        if ($request->query->has('reset')) {
+        if ($request->query->has('select')) {
             $this->session->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
+            return $this->json(['success' => true]);
+        }
+        if ($request->query->has('deselect')) {
+            $this->session->set('workQueueConsentColumns', []);
             return $this->json(['success' => true]);
         }
         $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');

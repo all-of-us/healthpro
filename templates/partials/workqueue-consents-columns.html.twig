@@ -7,7 +7,10 @@
             </button>
             <ul class="dropdown-menu" id="columns_group">
                 <li>
-                    <small class="pull-right filter-reset"><a id="columns_reset" data-group-id="columns_group">Reset</a></small>
+                    <small class="pull-right filter-reset">
+                        <a id="columns_select_all" data-group-id="columns_group">Select All</a> |
+                        <a id="columns_deselect_all" data-group-id="columns_group">Deselect All</a>
+                    </small>
                     <ul class="list-group">
                         {% set columNumber = 5 %}
                         {% for name, columnDef in columnsDef %}

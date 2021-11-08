@@ -82,6 +82,13 @@ $(document).ready(function () {
         columns.visible(true);
     };
 
+    var hideColumns = function () {
+        for (let i = 5; i <= 16; i++) {
+            var column = workQueueTable.column(i);
+            column.visible(false);
+        }
+    };
+
     var showStatusIndicator = function () {
         $('.filter-status-group').each(function () {
             var id = $(this).attr('id');
@@ -174,10 +181,16 @@ $(document).ready(function () {
         }
     });
 
-    $('#columns_reset').on('click', function () {
+    $('#columns_select_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
         showColumns();
-        $.get("/s/workqueue/consent/columns", {reset: true});
+        $.get("/s/workqueue/consent/columns", {select: true});
+    });
+
+    $('#columns_deselect_all').on('click', function () {
+        $('#columns_group input[type=checkbox]').prop('checked', false);
+        hideColumns();
+        $.get("/s/workqueue/consent/columns", {deselect: true});
     });
 
     $('#participant_lookup_reset').on('click', function () {
