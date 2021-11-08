@@ -423,7 +423,8 @@ class WorkQueueController extends AbstractController
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
-                'columnsDef' => WorkQueue::$columnsDef
+                'columnsDef' => WorkQueue::$columnsDef,
+                'filterIcons' => WorkQueue::$filterIcons
             ]);
         }
     }

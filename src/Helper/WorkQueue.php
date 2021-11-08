@@ -747,6 +747,15 @@ class WorkQueue
         ]
     ];
 
+    public static $filterIcons = [
+        'Status' => 'fa-user-check',
+        'Consents' => 'fa-file-contract',
+        'Demographics' => 'fa-globe',
+        'EHR' => 'fa-laptop-medical',
+        'Retention' => 'fa-check-double',
+        'Pairing' => 'fa-building'
+    ];
+
     //These are currently not working in the RDR
     public static $filtersDisabled = [
         'language' => [
