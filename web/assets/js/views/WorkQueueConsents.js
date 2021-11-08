@@ -82,35 +82,27 @@ $(document).ready(function () {
         columns.visible(true);
     };
 
-    var collapseFilters = function () {
+    var showStatusIndicator = function () {
+        $('.filter-status-group').each(function () {
+            var id = $(this).attr('id');
+            $('#' + id + ' input[type=radio]:checked').each(function () {
+                if (this.value) {
+                    $('#' + id).find('.status-indicator').show();
+                    return false;
+                }
+            });
+            $('#' + id + ' input[type=text]').each(function () {
+                if (this.value) {
+                    $('#' + id).find('.status-indicator').show();
+                    return false;
+                }
+            });
+        });
+
         $('#participant_lookup_group input[type=text]').each(function () {
             if (this.value) {
-                $('#participant_lookup_group_label').trigger('click');
+                $('#participant_lookup_group').find('.status-indicator').show();
                 return false;
-            }
-        });
-        $('#filter_status_group input[type=radio]:checked').each(function () {
-            if (this.value) {
-                $('#filter_status_group_label').trigger('click');
-                return false;
-            }
-        });
-        $('#filter_status_group input[type=text]').each(function () {
-            if (this.value) {
-                $('#filter_status_group_label').trigger('click');
-                return false;
-            }
-        });
-        $('.filter-status-sub-group input[type=radio]:checked').each(function () {
-            if (this.value) {
-                var groupId = $(this).closest('.filter-status-sub-group').attr('id');
-                $('#' + groupId + '_label').trigger('click');
-            }
-        });
-        $('.filter-status-sub-group input[type=text]').each(function () {
-            if (this.value) {
-                var groupId = $(this).closest('.filter-status-sub-group').attr('id');
-                $('#' + groupId + '_label').trigger('click');
             }
         });
     };
@@ -139,7 +131,7 @@ $(document).ready(function () {
     };
 
     checkFilters();
-    collapseFilters();
+    showStatusIndicator();
     $('#filters select, #filters input[type=radio]').not('.page-drop-down select').on('change', function () {
         checkFilters();
         $('#filters').submit();

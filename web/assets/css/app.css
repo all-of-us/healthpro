@@ -485,6 +485,10 @@ label.label-normal {
     padding-right: 10px;
 }
 
+.status-indicator {
+    display: none;
+}
+
     /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {
     border-bottom-width: 1px;
