@@ -318,4 +318,6 @@ $(document).ready(function () {
         $(this).parent().siblings().removeClass('open');
         $(this).parent().toggleClass('open');
     });
+
+    $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
 });
