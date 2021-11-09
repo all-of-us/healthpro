@@ -423,6 +423,10 @@ label.label-normal {
     border-bottom: 1px solid #ddd;
 }
 
+#workqueue_consents_row .collapse {
+    display: block;
+}
+
 .dropdown-submenu {
     position: relative;
 }
