@@ -363,6 +363,7 @@ class WorkQueueController extends AbstractController
             //Add organization filter
             $organizationsList = [];
             $organizationsList['organization_id']['label'] = 'Paired Organization';
+            $organizationsList['organization_id']['options']['View All'] = '';
             foreach ($sites as $site) {
                 if (!empty($site->getOrganizationId())) {
                     $organizationsList['organization_id']['options'][$this->siteService->getOrganizationDisplayName($site->getOrganizationId())] = $site->getOrganizationId();
@@ -374,6 +375,7 @@ class WorkQueueController extends AbstractController
             //Add sites filter
             $sitesList = [];
             $sitesList['site']['label'] = 'Paired Site';
+            $sitesList['site']['options']['View All'] = '';
             foreach ($sites as $site) {
                 if (!empty($site->getGoogleGroup())) {
                     $sitesList['site']['options'][$site->getName()] = $site->getGoogleGroup();
