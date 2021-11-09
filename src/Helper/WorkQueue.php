@@ -545,6 +545,7 @@ class WorkQueue
             'enrollmentStatus' => [
                 'label' => 'Participant Status',
                 'options' => [
+                    'View All' => '',
                     'Participant' => 'INTERESTED',
                     'Participant + EHR Consent' => 'MEMBER',
                     'Core Participant' => 'FULL_PARTICIPANT',
@@ -554,6 +555,7 @@ class WorkQueue
             'activityStatus' => [
                 'label' => 'Activity Status',
                 'options' => [
+                    'View All' => '',
                     'Active' => 'active',
                     'Deactivated' => 'deactivated',
                     'Withdrawn' => 'withdrawn',
@@ -565,6 +567,7 @@ class WorkQueue
             'patientStatus' => [
                 'label' => 'Patient Status',
                 'options' => [
+                    'View All' => '',
                     'Yes' => 'YES',
                     'No' => 'NO',
                     'No Access' => 'NO_ACCESS',
@@ -659,6 +662,7 @@ class WorkQueue
             'ageRange' => [
                 'label' => 'Age',
                 'options' => [
+                    'View All' => '',
                     '0-17' => '0-17',
                     '18-25' => '18-25',
                     '26-35' => '26-35',
@@ -673,6 +677,7 @@ class WorkQueue
             'race' => [
                 'label' => 'Race',
                 'options' => [
+                    'View All' => '',
                     'American Indian / Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
                     'Black or African American' => 'BLACK_OR_AFRICAN_AMERICAN',
                     'Asian' => 'ASIAN',
@@ -691,6 +696,7 @@ class WorkQueue
             'genderIdentity' => [
                 'label' => 'Gender Identity',
                 'options' => [
+                    'View All' => '',
                     'Man' => 'GenderIdentity_Man',
                     'Woman' => 'GenderIdentity_Woman',
                     'Non-binary' => 'GenderIdentity_NonBinary',
@@ -704,6 +710,7 @@ class WorkQueue
             'isEhrDataAvailable' => [
                 'label' => 'EHR Data Transfer',
                 'options' => [
+                    'View All' => '',
                     'Yes' => 'yes',
                     'No' => 'no'
                 ]
@@ -722,6 +729,7 @@ class WorkQueue
             'retentionType' => [
                 'label' => 'Retention Status',
                 'options' => [
+                    'View All' => '',
                     'Active Only' => 'ACTIVE',
                     'Passive Only' => 'PASSIVE',
                     'Active and Passive' => 'ACTIVE_AND_PASSIVE',
@@ -731,6 +739,7 @@ class WorkQueue
             'retentionEligibleStatus' => [
                 'label' => 'Retention Eligible',
                 'options' => [
+                    'View All' => '',
                     'Yes' => 'ELIGIBLE',
                     'No' => 'NOT_ELIGIBLE'
                 ]
@@ -740,6 +749,7 @@ class WorkQueue
             'participantOrigin' => [
                 'label' => 'Participant Origination',
                 'options' => [
+                    'View All' => '',
                     'PTSC Portal' => 'vibrent',
                     'DV Pilot Portal' => 'careevolution'
                 ]
