@@ -423,23 +423,6 @@ label.label-normal {
     border-bottom: 1px solid #ddd;
 }
 
-.filter-navbar {
-    width: 90%;
-}
-
-.filter-group {
-    width: 15%;
-}
-
-.filter-group button {
-    width: 100%;
-}
-
-.filter-group .caret {
-    float: right;
-    margin-top: 9px;
-}
-
 .dropdown-submenu {
     position: relative;
 }
