@@ -94,13 +94,13 @@ $(document).ready(function () {
             var id = $(this).attr('id');
             $('#' + id + ' input[type=radio]:checked').each(function () {
                 if (this.value) {
-                    $('#' + id).find('.status-indicator').show();
+                    $('#' + id).find('button').addClass('btn-primary');
                     return false;
                 }
             });
             $('#' + id + ' input[type=text]').each(function () {
                 if (this.value) {
-                    $('#' + id).find('.status-indicator').show();
+                    $('#' + id).find('button').addClass('btn-primary');
                     return false;
                 }
             });
@@ -108,7 +108,7 @@ $(document).ready(function () {
 
         $('#participant_lookup_group input[type=text]').each(function () {
             if (this.value) {
-                $('#participant_lookup_group').find('.status-indicator').show();
+                $('#participant_lookup_group').find('button').addClass('btn-primary');
                 return false;
             }
         });

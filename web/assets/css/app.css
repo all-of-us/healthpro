@@ -497,13 +497,8 @@ label.label-normal {
     padding-right: 10px;
 }
 
-.status-indicator {
-    display: none;
-    color: #ffc107;
-}
-
 .bg-light {
-    background-color: #f8f9fa!important;
+    background-color: #f8f9fa !important;
 }
 
     /* Today's participants */
