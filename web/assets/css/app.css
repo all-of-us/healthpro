@@ -489,6 +489,10 @@ label.label-normal {
     display: none;
 }
 
+.bg-light {
+    background-color: #f8f9fa!important;
+}
+
     /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {
     border-bottom-width: 1px;
