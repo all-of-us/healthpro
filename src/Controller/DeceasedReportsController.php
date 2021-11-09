@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/deceased-reports")
+ * @Route("/deceased-reports")
  */
 class DeceasedReportsController extends AbstractController
 {

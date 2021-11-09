@@ -89,7 +89,7 @@ class RequestListener
             ->getActiveNotices($path);
 
         // If one of the notices is a full page notice, render the notice response and return
-        if (!preg_match('/^(\/s)?\/admin/', $path)) { // Ignore full page notices for admin urls
+        if (!preg_match('/^\/admin/', $path)) { // Ignore full page notices for admin urls
             foreach ($activeNotices as $notice) {
                 if ($notice->getFullPage()) {
                     return new Response($this->twig->render('full-page-notice.html.twig', [
@@ -111,10 +111,10 @@ class RequestListener
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
             } elseif (!preg_match(
-                '/^(\/s)?\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
+                '/^\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
                 $this->request->getPathInfo()
             ) && !$this->isUpkeepRoute()) {
-                return new RedirectResponse('/s/site/select');
+                return new RedirectResponse('/site/select');
             }
         }
     }
@@ -123,14 +123,14 @@ class RequestListener
     {
         // log the user out if their session is expired
         if ($this->userService->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
-            return new RedirectResponse('/s/logout?timeout=1');
+            return new RedirectResponse('/logout?timeout=1');
         }
     }
 
     public function onKernelFinishRequest()
     {
         if ($this->tokenStorage->getToken() && $this->request && !preg_match(
-            '/^(\/s)?\/(login|_wdt)($|\/).*/',
+            '/^\/(login|_wdt)($|\/).*/',
             $this->request->getPathInfo()
         ) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->setSessionVariables();

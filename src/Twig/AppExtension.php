@@ -50,7 +50,7 @@ class AppExtension extends AbstractExtension
     public function asset($asset)
     {
         $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
-        if (in_array($basePath, ['/web', '/s'])) {
+        if (in_array($basePath, ['/web'])) {
             // The combination of GAE's routing handlers and the Symfony Request object
             // base path logic results in an incorrect basepath for requests that start
             // with /web because the prefix is the same as the web root's directory name.

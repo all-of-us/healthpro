@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/admin/sites")
+ * @Route("/admin/sites")
  */
 class SitesController extends AbstractController
 {

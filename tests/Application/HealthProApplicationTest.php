@@ -24,8 +24,8 @@ class HealthProApplicationTest extends WebTestCase
     public function testController()
     {
         $this->client->followRedirects();
-        $this->client->request('GET', '/s');
-        self::assertMatchesRegularExpression('/\/s\/login$/', $this->client->getRequest()->getUri());
+        $this->client->request('GET', '/');
+        self::assertMatchesRegularExpression('/\/login$/', $this->client->getRequest()->getUri());
     }
 
     private function logIn($email, $groups)
@@ -56,21 +56,21 @@ class HealthProApplicationTest extends WebTestCase
     {
         $this->logIn('testLogin@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
-        $this->client->request('GET', '/s');
-        self::assertEquals('/s/', $this->client->getRequest()->getRequestUri());
+        $this->client->request('GET', '/');
+        self::assertEquals('/', $this->client->getRequest()->getRequestUri());
     }
 
     public function testUsageAgreement()
     {
         $this->logIn('testUsageAgreement@example.com', [new GoogleGroup('hpo-site-1@gapps.com', 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
-        $crawler = $this->client->request('GET', '/s');
+        $crawler = $this->client->request('GET', '/');
         self::assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
         $crawler = $this->client->reload();
         self::assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
 
-        $this->client->request('POST', '/s/agree', ['csrf_token' => self::$container->get('security.csrf.token_manager')->getToken('agreeUsage')]);
-        $crawler = $this->client->request('GET', '/s');
+        $this->client->request('POST', '/agree', ['csrf_token' => self::$container->get('security.csrf.token_manager')->getToken('agreeUsage')]);
+        $crawler = $this->client->request('GET', '/');
         self::assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
     }
 
@@ -80,7 +80,7 @@ class HealthProApplicationTest extends WebTestCase
         $this->logIn('testSiteAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
         self::assertSame(null, $this->session->get('site'));
-        $this->client->request('GET', '/s/participants');
+        $this->client->request('GET', '/participants');
         self::assertSame($groupEmail, $this->session->get('site')->email);
     }
 
@@ -90,9 +90,9 @@ class HealthProApplicationTest extends WebTestCase
         $this->logIn('testAwardeeAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
         self::assertSame(null, $this->session->get('awardee'));
-        $this->client->request('GET', '/s');
+        $this->client->request('GET', '/');
         self::assertSame($groupEmail, $this->session->get('awardee')->email);
-        self::assertEquals('/s/workqueue/', $this->client->getRequest()->getRequestUri());
+        self::assertEquals('/workqueue/', $this->client->getRequest()->getRequestUri());
     }
 
     public function testDvAdminAutoselect()
@@ -101,8 +101,8 @@ class HealthProApplicationTest extends WebTestCase
         $this->logIn('testDvAdminAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
         self::assertSame(null, $this->session->get('site'));
-        $this->client->request('GET', '/s');
-        self::assertEquals('/s/problem/reports', $this->client->getRequest()->getRequestUri());
+        $this->client->request('GET', '/');
+        self::assertEquals('/problem/reports', $this->client->getRequest()->getRequestUri());
     }
 
     public function testAdminAutoselect()
@@ -111,8 +111,8 @@ class HealthProApplicationTest extends WebTestCase
         $this->logIn('testAdminAutoselect@example.com', [new GoogleGroup($groupEmail, 'Test Group 1', 'lorem ipsum 1')]);
         $this->client->followRedirects();
         self::assertSame(null, $this->session->get('site'));
-        $this->client->request('GET', '/s');
-        self::assertEquals('/s/admin', $this->client->getRequest()->getRequestUri());
+        $this->client->request('GET', '/');
+        self::assertEquals('/admin', $this->client->getRequest()->getRequestUri());
     }
 
     public function testForceSiteSelect()
@@ -122,14 +122,14 @@ class HealthProApplicationTest extends WebTestCase
             new GoogleGroup('hpo-site-2@gapps.com', 'Test Group 2', 'lorem ipsum 2')
         ]);
         $this->client->followRedirects();
-        $this->client->request('GET', '/s/participants');
-        self::assertMatchesRegularExpression('/\/s\/site\/select$/', $this->client->getRequest()->getUri());
+        $this->client->request('GET', '/participants');
+        self::assertMatchesRegularExpression('/\/site\/select$/', $this->client->getRequest()->getUri());
     }
 
     public function testHeaders()
     {
         $this->client->followRedirects();
-        $this->client->request('GET', '/s');
+        $this->client->request('GET', '/');
         $xframeOptions = $this->client->getResponse()->headers->get('X-Frame-Options');
         self::assertSame('SAMEORIGIN', $xframeOptions);
     }

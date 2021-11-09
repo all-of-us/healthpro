@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/cron", condition="request.headers.get('X-Appengine-Cron') === 'true'")
+ * @Route("/cron", condition="request.headers.get('X-Appengine-Cron') === 'true'")
  */
 class CronController extends AbstractController
 {

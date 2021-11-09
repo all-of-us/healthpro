@@ -89,7 +89,7 @@
             if ($('#deceased_report_block').length) {
                 var deceasedReportCount = 0;
                 $.ajax({
-                    url: '/s/deceased-reports/stats'
+                    url: '/deceased-reports/stats'
                 }).done(function (data) {
                     deceasedReportCount = data.pending
                     if (deceasedReportCount > 0) {

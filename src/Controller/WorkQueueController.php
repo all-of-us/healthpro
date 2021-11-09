@@ -23,7 +23,7 @@ use App\Helper\WorkQueue;
 use App\Audit\Log;
 
 /**
- * @Route("/s/workqueue")
+ * @Route("/workqueue")
  */
 class WorkQueueController extends AbstractController
 {
