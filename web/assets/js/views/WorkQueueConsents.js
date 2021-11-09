@@ -90,7 +90,7 @@ $(document).ready(function () {
     };
 
     var showStatusIndicator = function () {
-        $('.filter-status-group').each(function () {
+        $('.filter-group').each(function () {
             var id = $(this).attr('id');
             $('#' + id + ' input[type=radio]:checked').each(function () {
                 if (this.value) {
@@ -206,7 +206,7 @@ $(document).ready(function () {
         $('#filters').submit();
     });
 
-    $('.filter-status-sub-group-reset').on('click', function () {
+    $('.filter-sub-group-reset').on('click', function () {
         var groupId = $(this).data('group-id');
         $('#' + groupId + ' input[type=text]').val('');
         $('#' + groupId + ' input[type=radio][value=""]').prop('checked', true);

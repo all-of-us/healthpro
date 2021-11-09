@@ -1,13 +1,13 @@
 <div class="collapse navbar-collapse consent-filters" id="navbar-collapse-1">
     <ul class="nav navbar-nav">
         {% for label, subAdvancedFilters in advancedFilters %}
-            <li class="dropdown filter-status-group" id="filter_status_{{ label }}_group">
+            <li class="dropdown filter-group" id="filter_{{ label }}_group">
                 <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
                     <i class="fa {{ filterIcons[label] }}" aria-hidden="true"></i> {{ label }} <i class="fas fa-star-half-alt text-danger status-indicator"></i>
                     <b class="caret"></b>
                 </button>
                 <ul class="dropdown-menu">
-                    <small class="pull-right filter-reset"><a class="filter-status-sub-group-reset" data-group-id="filter_status_{{ label }}_group">Reset</a></small>
+                    <small class="pull-right filter-reset"><a class="filter-sub-group-reset" data-group-id="filter_{{ label }}_group">Reset</a></small>
                     {% for name, advancedFilter in subAdvancedFilters %}
                         <li class="dropdown dropdown-submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ advancedFilter.label }}</a>
                             <ul class="dropdown-menu">
