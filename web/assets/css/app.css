@@ -415,6 +415,14 @@ label.label-normal {
     color: #a94442;
 }
 
+#workqueue_consents_row .filter-list-group-item {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
 .dropdown-submenu {
     position: relative;
 }
@@ -459,7 +467,7 @@ label.label-normal {
     border-radius: 6px 0 6px 6px;
 }
 
-#workqueue_consents_row  .dropdown{
+.filter-group, .columns-filter-group{
     padding-left: 15px;
 }
 
@@ -468,7 +476,7 @@ label.label-normal {
 }
 
 .consent-columns .dropdown-menu {
-    min-width: 400px;
+    min-width: 350px;
 }
 
 .list-options li {
