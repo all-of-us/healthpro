@@ -338,7 +338,7 @@ $(document).ready(function () {
         $(this).parent().toggleClass('open');
     });
 
-    $('#columns_group ul, #participant_lookup_group ul').on('click', function () {
+    $('#columns_group ul, #participant_lookup_group ul, #filter-sub-group').on('click', function () {
         event.stopPropagation();
     });
 
