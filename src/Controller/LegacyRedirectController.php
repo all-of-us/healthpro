@@ -12,6 +12,7 @@ class LegacyRedirectController extends AbstractController
      */
     public function legacyRedirectAction($url)
     {
-        return $this->redirect("/{$url}");
+        // Use 308 response code for permanent redirect that maintains request method
+        return $this->redirect("/{$url}", 308);
     }
 }
