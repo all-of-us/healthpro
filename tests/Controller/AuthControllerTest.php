@@ -7,14 +7,14 @@ use App\Tests\GoogleGroup;
 
 class AuthControllerTest extends AppWebTestCase
 {
-    public function testController()
+    public function testUnauthenticatedRedirectToLogin()
     {
         $this->client->followRedirects();
         $this->client->request('GET', '/');
-        $this->assertMatchesRegularExpression('/\/login$/', $this->client->getRequest()->getUri());
+        $this->assertSame('/login', $this->client->getRequest()->getRequestUri());
     }
 
-    public function testLogin()
+    public function testAuthenticatedDashboard()
     {
         $this->login('testLogin@example.com');
         $this->client->followRedirects();
@@ -91,7 +91,6 @@ class AuthControllerTest extends AppWebTestCase
     {
         $this->client->followRedirects();
         $this->client->request('GET', '/');
-        $xframeOptions = $this->client->getResponse()->headers->get('X-Frame-Options');
-        $this->assertSame('SAMEORIGIN', $xframeOptions);
+        $this->assertResponseHeaderSame('X-Frame-Options', 'SAMEORIGIN');
     }
 }
