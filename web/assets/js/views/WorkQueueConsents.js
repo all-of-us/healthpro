@@ -104,6 +104,20 @@ $(document).ready(function () {
                     return false;
                 }
             });
+            $('#' + id + ' .dropdown-submenu').each(function () {
+                $(this).find('input[type=radio]:checked').each(function () {
+                    if (this.value) {
+                        $(this).closest('.dropdown-menu').siblings('a').addClass('active');
+                        return false;
+                    }
+                });
+                $(this).find('input[type=text]').each(function () {
+                    if (this.value) {
+                        $(this).closest('.dropdown-menu').siblings('a').addClass('active');
+                        return false;
+                    }
+                });
+            });
         });
 
         $('#participant_lookup_group input[type=text]').each(function () {

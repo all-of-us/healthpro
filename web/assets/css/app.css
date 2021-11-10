@@ -501,6 +501,10 @@ label.label-normal {
     background-color: #f8f9fa !important;
 }
 
+.dropdown-toggle.active {
+    font-weight: bold !important;
+}
+
     /* Today's participants */
 #table-today>thead>tr>td, #table-today>thead>tr>th {
     border-bottom-width: 1px;
