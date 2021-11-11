@@ -54,4 +54,5 @@ if (!$env->values['isUnitTest'] && !$env->isPhpDevServer() && !$env->isLocal()) 
 if ($env->values['isUnitTest']) {
     $container->setParameter('local_mock_auth', true);
     $container->setParameter('gaBypass', false);
+    $container->setParameter('ds_clean_up_limit', 100);
 }

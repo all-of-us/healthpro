@@ -262,7 +262,7 @@ class WorkQueueService
             $row['participantId'] = $e($participant->id);
             $row['biobankId'] = $e($participant->biobankId);
             $row['participantOrigin'] = $e($participant->participantOrigin);
-            $row['participantStatus'] = $e($participant->enrollmentStatus) . $this->getEnrollementStatusTime($participant, $userTimezone);
+            $row['participantStatus'] = $e($participant->enrollmentStatus) . $this->getEnrollmentStatusTime($participant, $userTimezone);
             $row['activityStatus'] = WorkQueue::getActivityStatus($participant, $userTimezone);
             $row['withdrawalReason'] = $e($participant->withdrawalReason);
             $row['consentCohort'] = $e($participant->consentCohortText);
@@ -630,41 +630,6 @@ class WorkQueueService
         return $row;
     }
 
-    public function generateLink($id, $name)
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_USER')) {
-            $url = $this->urlGenerator->generate('participant', ['id' => $id]);
-        } else {
-            $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
-        }
-        $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-
-        return sprintf('<a href="%s">%s</a>', $url, $text);
-    }
-
-    public function getPatientStatus($participant, $value, $type = 'wq')
-    {
-        // Clear patient status for withdrawn participants
-        if ($participant->isWithdrawn) {
-            return '';
-        }
-        $organizations = [];
-        if (is_array($participant->patientStatus)) {
-            foreach ($participant->patientStatus as $patientStatus) {
-                if ($patientStatus->status === $value) {
-                    if ($type === 'export') {
-                        $organizations[] = $patientStatus->organization;
-                    } else {
-                        $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
-                    }
-                }
-            }
-            return implode('; ', $organizations);
-        }
-        return '';
-    }
-
-
     public function canExport()
     {
         if ($this->authorizationChecker->isGranted('ROLE_AWARDEE')) {
@@ -701,7 +666,41 @@ class WorkQueueService
         return $this->participantSummaryService->getNextToken();
     }
 
-    public function getEnrollementStatusTime($participant, $userTimezone)
+    private function generateLink($id, $name)
+    {
+        if ($this->authorizationChecker->isGranted('ROLE_USER')) {
+            $url = $this->urlGenerator->generate('participant', ['id' => $id]);
+        } else {
+            $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
+        }
+        $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        return sprintf('<a href="%s">%s</a>', $url, $text);
+    }
+
+    private function getPatientStatus($participant, $value, $type = 'wq')
+    {
+        // Clear patient status for withdrawn participants
+        if ($participant->isWithdrawn) {
+            return '';
+        }
+        $organizations = [];
+        if (is_array($participant->patientStatus)) {
+            foreach ($participant->patientStatus as $patientStatus) {
+                if ($patientStatus->status === $value) {
+                    if ($type === 'export') {
+                        $organizations[] = $patientStatus->organization;
+                    } else {
+                        $organizations[] = $this->siteService->getOrganizationDisplayName($patientStatus->organization);
+                    }
+                }
+            }
+            return implode('; ', $organizations);
+        }
+        return '';
+    }
+
+    private function getEnrollmentStatusTime($participant, $userTimezone)
     {
         if ($participant->isCoreParticipant) {
             $time = $participant->enrollmentStatusCoreStoredSampleTime;
