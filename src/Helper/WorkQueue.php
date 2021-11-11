@@ -541,95 +541,229 @@ class WorkQueue
     ];
 
     public static $consentAdvanceFilters = [
-        'consentForStudyEnrollment' => [
-            'label' => 'Primary Consent',
-            'options' => [
-                'View All' => '',
-                'Consented' => 'SUBMITTED',
-                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
-                'Consent Not Completed' => 'UNSET'
+        'Status' => [
+            'enrollmentStatus' => [
+                'label' => 'Participant Status',
+                'options' => [
+                    'View All' => '',
+                    'Participant' => 'INTERESTED',
+                    'Participant + EHR Consent' => 'MEMBER',
+                    'Core Participant' => 'FULL_PARTICIPANT',
+                    'Core Participant Minus PM' => 'CORE_MINUS_PM'
+                ]
             ],
-            'dateField' => 'consentForStudyEnrollmentAuthored'
-        ],
-        'questionnaireOnDnaProgram' => [
-            'label' => 'Program Update',
-            'options' => [
-                'View All' => '',
-                'Completed' => 'SUBMITTED',
-                'Not Completed' => 'UNSET'
+            'activityStatus' => [
+                'label' => 'Activity Status',
+                'options' => [
+                    'View All' => '',
+                    'Active' => 'active',
+                    'Deactivated' => 'deactivated',
+                    'Withdrawn' => 'withdrawn',
+                    'Not Withdrawn' => 'not_withdrawn',
+                    'Deceased' => 'deceased',
+                    'Deceased (Pending)' => 'deceased_pending'
+                ]
             ],
-            'dateField' => 'questionnaireOnDnaProgramAuthored'
-        ],
-        'consentForElectronicHealthRecords' => [
-            'label' => 'EHR Consent Status',
-            'options' => [
-                'View All' => '',
-                'Consented' => 'SUBMITTED',
-                'Refused consent' => 'SUBMITTED_NO_CONSENT',
-                'Consent not completed' => 'UNSET'
-            ],
-            'dateField' => 'consentForElectronicHealthRecordsAuthored'
-        ],
-        'ehrConsentExpireStatus' => [
-            'label' => 'EHR Expiration Status',
-            'options' => [
-                'View All' => '',
-                'Active' => 'ACTIVE',
-                'Expired' => 'EXPIRED'
-            ],
-            'dateField' => 'ehrConsentExpireStatusAuthored'
-        ],
-        'consentForGenomicsROR' => [
-            'label' => 'gRoR Consent Status',
-            'options' => [
-                'View All' => '',
-                'Consented Yes' => 'SUBMITTED',
-                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
-                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
-                'Consent Not Completed' => 'UNSET'
-            ],
-            'dateField' => 'consentForGenomicsRORAuthored'
-        ],
-        'consentForDvElectronicHealthRecordsSharing' => [
-            'label' => 'DV-Only EHR Sharing',
-            'options' => [
-                'View All' => '',
-                'Consented Yes' => 'SUBMITTED',
-                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
-                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
-                'Consent Not Completed' => 'UNSET'
-            ],
-            'dateField' => 'consentForDvElectronicHealthRecordsSharingAuthored'
-        ],
-        'consentForCABoR' => [
-            'label' => 'CABoR Consent',
-            'options' => [
-                'View All' => '',
-                'Consented Yes' => 'SUBMITTED',
-                'Refused Consent' => 'SUBMITTED_NO_CONSENT',
-                'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
-                'Consent Not Completed' => 'UNSET'
-            ],
-            'dateField' => 'consentForCABoRAuthored'
-        ],
-        'consentCohort' => [
-            'label' => 'Consent Cohort',
-            'options' => [
-                'View All' => '',
-                'Cohort 1' => 'COHORT_1',
-                'Cohort 2' => 'COHORT_2',
-                'Cohort 2 Pilot' => 'COHORT_2_PILOT',
-                'Cohort 3' => 'COHORT_3'
+            'patientStatus' => [
+                'label' => 'Patient Status',
+                'options' => [
+                    'View All' => '',
+                    'Yes' => 'YES',
+                    'No' => 'NO',
+                    'No Access' => 'NO_ACCESS',
+                    'Unknown' => 'UNKNOWN',
+                    'Not Completed' => 'UNSET'
+                ]
             ]
         ],
-        'primaryLanguage' => [
-            'label' => 'Language of Primary Cosent',
-            'options' => [
-                'View All' => '',
-                'English' => 'en',
-                'Spanish' => 'es'
+        'Consents' => [
+            'consentForStudyEnrollment' => [
+                'label' => 'Primary Consent',
+                'options' => [
+                    'View All' => '',
+                    'Consented' => 'SUBMITTED',
+                    'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                    'Consent Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForStudyEnrollmentAuthored'
+            ],
+            'questionnaireOnDnaProgram' => [
+                'label' => 'Program Update',
+                'options' => [
+                    'View All' => '',
+                    'Completed' => 'SUBMITTED',
+                    'Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'questionnaireOnDnaProgramAuthored'
+            ],
+            'consentForElectronicHealthRecords' => [
+                'label' => 'EHR Consent Status',
+                'options' => [
+                    'View All' => '',
+                    'Consented' => 'SUBMITTED',
+                    'Refused consent' => 'SUBMITTED_NO_CONSENT',
+                    'Consent not completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForElectronicHealthRecordsAuthored'
+            ],
+            'consentForGenomicsROR' => [
+                'label' => 'gRoR Consent Status',
+                'options' => [
+                    'View All' => '',
+                    'Consented Yes' => 'SUBMITTED',
+                    'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                    'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                    'Consent Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForGenomicsRORAuthored'
+            ],
+            'consentForDvElectronicHealthRecordsSharing' => [
+                'label' => 'DV-Only EHR Sharing',
+                'options' => [
+                    'View All' => '',
+                    'Consented Yes' => 'SUBMITTED',
+                    'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                    'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                    'Consent Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForDvElectronicHealthRecordsSharingAuthored'
+            ],
+            'consentForCABoR' => [
+                'label' => 'CABoR Consent',
+                'options' => [
+                    'View All' => '',
+                    'Consented Yes' => 'SUBMITTED',
+                    'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                    'Responded Not Sure' => 'SUBMITTED_NOT_SURE',
+                    'Consent Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForCABoRAuthored'
+            ],
+            'consentCohort' => [
+                'label' => 'Consent Cohort',
+                'options' => [
+                    'View All' => '',
+                    'Cohort 1' => 'COHORT_1',
+                    'Cohort 2' => 'COHORT_2',
+                    'Cohort 2 Pilot' => 'COHORT_2_PILOT',
+                    'Cohort 3' => 'COHORT_3'
+                ]
+            ],
+            'primaryLanguage' => [
+                'label' => 'Language of Primary Cosent',
+                'options' => [
+                    'View All' => '',
+                    'English' => 'en',
+                    'Spanish' => 'es'
+                ]
             ]
+        ],
+        'Demographics' => [
+            'ageRange' => [
+                'label' => 'Age',
+                'options' => [
+                    'View All' => '',
+                    '0-17' => '0-17',
+                    '18-25' => '18-25',
+                    '26-35' => '26-35',
+                    '36-45' => '36-45',
+                    '46-55' => '46-55',
+                    '56-65' => '56-65',
+                    '66-75' => '66-75',
+                    '76-85' => '76-85',
+                    '86+' => '86-'
+                ]
+            ],
+            'race' => [
+                'label' => 'Race',
+                'options' => [
+                    'View All' => '',
+                    'American Indian / Alaska Native' => 'AMERICAN_INDIAN_OR_ALASKA_NATIVE',
+                    'Black or African American' => 'BLACK_OR_AFRICAN_AMERICAN',
+                    'Asian' => 'ASIAN',
+                    'Native Hawaiian or Other Pacific Islander' => 'NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER',
+                    'White' => 'WHITE',
+                    'Hispanic, Latino, or Spanish' => 'HISPANIC_LATINO_OR_SPANISH',
+                    'Middle Eastern or North African' => 'MIDDLE_EASTERN_OR_NORTH_AFRICAN',
+                    'H/L/S and White' => 'HLS_AND_WHITE',
+                    'H/L/S and Black' => 'HLS_AND_BLACK',
+                    'H/L/S and one other race' => 'HLS_AND_ONE_OTHER_RACE',
+                    'H/L/S and more than one other race' => 'HLS_AND_MORE_THAN_ONE_OTHER_RACE',
+                    'More than one race' => 'MORE_THAN_ONE_RACE',
+                    'Other' => 'OTHER_RACE'
+                ]
+            ],
+            'genderIdentity' => [
+                'label' => 'Gender Identity',
+                'options' => [
+                    'View All' => '',
+                    'Man' => 'GenderIdentity_Man',
+                    'Woman' => 'GenderIdentity_Woman',
+                    'Non-binary' => 'GenderIdentity_NonBinary',
+                    'Transgender' => 'GenderIdentity_Transgender',
+                    'More Than One Gender Identity' => 'GenderIdentity_MoreThanOne',
+                    'Other' => 'GenderIdentity_AdditionalOptions'
+                ]
+            ]
+        ],
+        'EHR' => [
+            'isEhrDataAvailable' => [
+                'label' => 'EHR Data Transfer',
+                'options' => [
+                    'View All' => '',
+                    'Yes' => 'yes',
+                    'No' => 'no'
+                ]
+            ],
+            'ehrConsentExpireStatus' => [
+                'label' => 'EHR Expiration Status',
+                'options' => [
+                    'View All' => '',
+                    'Active' => 'ACTIVE',
+                    'Expired' => 'EXPIRED'
+                ],
+                'dateField' => 'ehrConsentExpireStatusAuthored'
+            ]
+        ],
+        'Retention' => [
+            'retentionType' => [
+                'label' => 'Retention Status',
+                'options' => [
+                    'View All' => '',
+                    'Active Only' => 'ACTIVE',
+                    'Passive Only' => 'PASSIVE',
+                    'Active and Passive' => 'ACTIVE_AND_PASSIVE',
+                    'Not Retained' => 'UNSET'
+                ]
+            ],
+            'retentionEligibleStatus' => [
+                'label' => 'Retention Eligible',
+                'options' => [
+                    'View All' => '',
+                    'Yes' => 'ELIGIBLE',
+                    'No' => 'NOT_ELIGIBLE'
+                ]
+            ]
+        ],
+        'Pairing' => [
+            'participantOrigin' => [
+                'label' => 'Participant Origination',
+                'options' => [
+                    'View All' => '',
+                    'PTSC Portal' => 'vibrent',
+                    'DV Pilot Portal' => 'careevolution'
+                ]
+            ],
         ]
+    ];
+
+    public static $filterIcons = [
+        'Status' => 'fa-user-check',
+        'Consents' => 'fa-file-contract',
+        'Demographics' => 'fa-globe',
+        'EHR' => 'fa-laptop-medical',
+        'Retention' => 'fa-check-double',
+        'Pairing' => 'fa-building'
     ];
 
     //These are currently not working in the RDR
