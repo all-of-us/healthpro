@@ -383,6 +383,10 @@ label.label-normal {
 #filters .form-inline select.form-control {
     margin-bottom: 4px;
 }
+.page-drop-down {
+    display: inline-block;
+    margin-right: 30px;
+}
 #workqueue_consents_row .panel-heading .accordion-toggle:after {
     /* symbol for "opening" panels */
     font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
