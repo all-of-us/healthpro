@@ -147,7 +147,19 @@ $(document).ready(function() {
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
-        createdRow: function(row, data) {
+        drawCallback: function () {
+            var pageInfo = table.page.info();
+            $('.total-pages').text(pageInfo.pages);
+            var dropDownHtml = '';
+            for (var count = 1; count <= pageInfo.pages; count++) {
+                var pageNumber = count - 1;
+                dropDownHtml += '<option value="' + pageNumber + '">' + count + '</option>';
+            }
+            var pageDropDown = $('.page-drop-down select');
+            pageDropDown.html(dropDownHtml);
+            pageDropDown.val(pageInfo.page);
+        },
+        createdRow: function (row, data) {
             if (data.isWithdrawn === true) {
                 $(row).addClass('tr-withdrawn');
             }
@@ -306,6 +318,10 @@ $(document).ready(function() {
                 columns: ':not(.col-group-name)'
             }
         ]
+    });
+
+    $('.page-drop-down select').change(function () {
+        table.page(parseInt($(this).val())).draw('page');
     });
 
     // Populate count in header
