@@ -228,6 +228,13 @@ $(document).ready(function () {
         $('#filters').submit();
     });
 
+    $('.date-filter-reset').on('click', function () {
+        var groupId = $(this).data('group-id');
+        $('#' + groupId + ' input[type=text]').val('');
+        checkFilters();
+        $('#filters').submit();
+    });
+
     var exportLimit = $('#workqueue_consents').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {
