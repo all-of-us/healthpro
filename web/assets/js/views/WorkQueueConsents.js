@@ -188,7 +188,7 @@ $(document).ready(function () {
 
     $('#filters .apply-date-filter').on('click', function () {
         var dateFieldName = $(this).data('consent-date-field-name');
-        if (isValidStartEndDate(dateFieldName)) {
+        if (isValidStartEndDate(dateFieldName) && ($('input[name=' + dateFieldName + 'StartDate]').val() !== '' || $('input[name=' + dateFieldName + 'EndDate]').val() !== '')) {
             checkFilters();
             clearInvalidFields();
             $('#filters').submit();
