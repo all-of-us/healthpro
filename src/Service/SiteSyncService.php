@@ -2,12 +2,14 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
+use App\Entity\SiteSync;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SiteSyncService
@@ -20,6 +22,10 @@ class SiteSyncService
     private $normalizer;
     private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
     private $entries;
+    private $googleGroupsService;
+    private $adminEmails = [];
+
+    public const SITE_PREFIX = 'hpo-site-';
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -27,7 +33,8 @@ class SiteSyncService
         EnvironmentService $env,
         LoggerService $loggerService,
         ParameterBagInterface $params,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        GoogleGroupsService $googleGroupsService
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->em = $em;
@@ -35,6 +42,7 @@ class SiteSyncService
         $this->loggerService = $loggerService;
         $this->params = $params;
         $this->normalizer = $normalizer;
+        $this->googleGroupsService = $googleGroupsService;
     }
 
     private function getAwardeeEntriesFromRdr()
@@ -95,7 +103,7 @@ class SiteSyncService
                     $primaryId = null;
                     $siteId = self::getSiteSuffix($site->id);
                     if (array_key_exists($siteId, $existingSites)) {
-                        $existingArray = $this->normalizer->normalize($existingSites[$siteId]);
+                        $existingArray = $this->normalizer->normalize($existingSites[$siteId], null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         $siteData = $existingSites[$siteId];
                         $primaryId = $siteData->getId();
                     } else {
@@ -132,18 +140,11 @@ class SiteSyncService
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
                     $siteData->setType($awardee->type);
                     $siteData->setSiteType(isset($site->siteType) ? $site->siteType : null);
-                    if ($this->env->isProd()) {
-                        if (isset($site->adminEmails) && is_array($site->adminEmails)) {
-                            $siteData->setEmail(join(', ', $site->adminEmails));
-                        } else {
-                            $siteData->setEmail(null);
-                        }
-                    }
                     if (empty($siteData->getWorkqueueDownload())) {
                         $siteData->setWorkqueueDownload('full_data'); // default value for workqueue downlaod
                     }
                     if ($existingArray) {
-                        $siteDataArray = $this->normalizer->normalize($siteData);
+                        $siteDataArray = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         if ($existingArray != $siteDataArray) {
                             $modified[] = [
                                 'old' => $existingArray,
@@ -160,7 +161,7 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $created[] = $this->normalizer->normalize($siteData);
+                        $created[] = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
@@ -265,5 +266,34 @@ class SiteSyncService
             $connection->rollback();
             throw $e;
         }
+    }
+
+    public function getSiteAdminEmails(Site $site): array
+    {
+        $siteAdmins = [];
+        $groupEmail = self::SITE_PREFIX . $site->getGoogleGroup() . '@' . $this->params->get('gaDomain');
+        $members = $this->googleGroupsService->getMembers($groupEmail, ['OWNER', 'MANAGER']);
+        if (count($members) === 0) {
+            return $siteAdmins;
+        }
+        foreach ($members as $member) {
+            if (isset($this->adminEmails[$member->email])) {
+                $siteAdmins[] = $this->adminEmails[$member->email];
+                continue;
+            }
+            $user = $this->googleGroupsService->getUser($member->email);
+            if (is_null($user)) {
+                error_log('Unable to retrieve user details: ' . $member->email);
+                continue;
+            }
+            foreach ($user->emails as $email) {
+                if (isset($email['type']) && $email['type'] === 'work') {
+                    $userEmail = $email['address'];
+                    $this->adminEmails[$member->email] = $userEmail;
+                    $siteAdmins[] = $userEmail;
+                }
+            }
+        }
+        return $siteAdmins;
     }
 }
