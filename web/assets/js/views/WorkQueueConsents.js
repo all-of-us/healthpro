@@ -188,7 +188,7 @@ $(document).ready(function () {
 
     $('#filters .apply-date-filter').on('click', function () {
         var dateFieldName = $(this).data('consent-date-field-name');
-        if (isValidStartEndDate(dateFieldName)) {
+        if (isValidStartEndDate(dateFieldName) && ($('input[name=' + dateFieldName + 'StartDate]').val() !== '' || $('input[name=' + dateFieldName + 'EndDate]').val() !== '')) {
             checkFilters();
             clearInvalidFields();
             $('#filters').submit();
@@ -224,6 +224,13 @@ $(document).ready(function () {
         var groupId = $(this).data('group-id');
         $('#' + groupId + ' input[type=text]').val('');
         $('#' + groupId + ' input[type=radio][value=""]').prop('checked', true);
+        checkFilters();
+        $('#filters').submit();
+    });
+
+    $('.date-filter-reset').on('click', function () {
+        var groupId = $(this).data('group-id');
+        $('#' + groupId + ' input[type=text]').val('');
         checkFilters();
         $('#filters').submit();
     });
