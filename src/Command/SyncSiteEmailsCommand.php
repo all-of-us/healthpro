@@ -2,31 +2,39 @@
 
 namespace App\Command;
 
+use App\Audit\Log;
 use App\Entity\Site;
 use App\Entity\SiteSync;
 use App\Service\EnvironmentService;
+use App\Service\LoggerService;
 use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SyncSiteEmailsCommand extends Command
 {
     private $siteSyncService;
     private $environmentService;
+    private $loggerService;
+    private $normalizer;
     private $em;
     private $router;
 
-    public function __construct(EnvironmentService $environmentService, SiteSyncService $siteSyncService, EntityManagerInterface $em, UrlGeneratorInterface $router)
+    public function __construct(EnvironmentService $environmentService, SiteSyncService $siteSyncService, LoggerService $loggerService, NormalizerInterface $normalizer, EntityManagerInterface $em, UrlGeneratorInterface $router)
     {
         $this->environmentService = $environmentService;
         $this->siteSyncService = $siteSyncService;
+        $this->loggerService = $loggerService;
+        $this->normalizer = $normalizer;
         $this->router = $router;
         $this->em = $em;
         parent::__construct();
@@ -59,6 +67,7 @@ class SyncSiteEmailsCommand extends Command
         }
 
         foreach ($sites as $site) {
+            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
             $output->writeln($site->getName());
             $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
             if (count($siteAdmins) > 0) {
@@ -66,6 +75,12 @@ class SyncSiteEmailsCommand extends Command
             }
             $site->setEmail(join(', ', $siteAdmins));
             $this->em->persist($site);
+            $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+            $this->loggerService->log(Log::SITE_EDIT, [
+                'id' => $site->getId(),
+                'old' => $existingArray,
+                'new' => $siteDataArray
+            ]);
             $siteSync = $site->getSiteSync();
             if (!$siteSync) {
                 $siteSync = new SiteSync();
