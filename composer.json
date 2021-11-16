@@ -44,7 +44,7 @@
         "doctrine/doctrine-bundle": "^2",
         "doctrine/doctrine-migrations-bundle": "^2",
         "doctrine/orm": "^2",
-        "symfony/twig-bundle": "4.4.*",
+        "symfony/twig-bundle": "*",
         "twig/extra-bundle": "^2.12|^3.0"
     },
     "config": {
@@ -59,8 +59,8 @@
         "phpstan/phpstan-symfony": "^0.12.36",
         "phpstan/phpstan-doctrine": "^0.12.39",
         "phpstan/extension-installer": "^1.1",
-        "symfony/stopwatch": "^4.4",
-        "symfony/web-profiler-bundle": "^4.4"
+        "symfony/stopwatch": "*",
+        "symfony/web-profiler-bundle": "*"
     },
     "extra": {
         "root-dir": "symfony",
