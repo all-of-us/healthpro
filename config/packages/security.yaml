@@ -17,15 +17,15 @@ security:
 
     # Note: The *first* access control that matches will be used
     access_control:
-        - { path: ^(/s)?/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/s/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/s/admin($|\/).*, roles: ROLE_ADMIN }
-        - { path: ^/s/problem($|\/).*, roles: ROLE_DV_ADMIN }
-        - { path: ^/s/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
-        - { path: ^/s/site($|\/), roles: [ROLE_USER, ROLE_AWARDEE] }
-        - { path: ^/s/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
-        - { path: ^/s/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
-        - { path: ^/s/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
-        - { path: ^/s/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
-        - { path: ^/s/access/manage($|\/).*, roles: ROLE_MANAGE_USERS }
-        - { path: ^/s/.*\S$, roles: ROLE_USER }
+        - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
+        - { path: ^/problem($|\/).*, roles: ROLE_DV_ADMIN }
+        - { path: ^/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
+        - { path: ^/site($|\/), roles: [ROLE_USER, ROLE_AWARDEE] }
+        - { path: ^/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
+        - { path: ^/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
+        - { path: ^/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
+        - { path: ^/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
+        - { path: ^/access/manage($|\/).*, roles: ROLE_MANAGE_USERS }
+        - { path: ^/.*\S$, roles: ROLE_USER }

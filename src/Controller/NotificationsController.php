@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/admin/notifications")
+ * @Route("/admin/notifications")
  */
 class NotificationsController extends AbstractController
 {

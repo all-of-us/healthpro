@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * @Route("/s/admin/debug")
+ * @Route("/admin/debug")
  */
 class DebugToolsController extends AbstractController
 {

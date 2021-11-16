@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\HttpClient;
 
 /**
- * @Route("/s/help")
+ * @Route("/help")
  */
 class HelpController extends AbstractController
 {

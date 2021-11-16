@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/access/manage")
+ * @Route("/access/manage")
  */
 class AccessManagementController extends AbstractController
 {

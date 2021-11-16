@@ -14,9 +14,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
-/**
- * @Route("/s")
- */
 class DefaultController extends AbstractController
 {
     /**
