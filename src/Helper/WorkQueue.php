@@ -1258,7 +1258,7 @@ class WorkQueue
 
     public static function hasDateFields($params)
     {
-        foreach (self::$consentAdvanceFilters as $advanceFilter) {
+        foreach (self::$consentAdvanceFilters['Consents'] as $advanceFilter) {
             if (isset($advanceFilter['dateField']) && (!empty($params[$advanceFilter['dateField'] . 'StartDate']) || !empty($params[$advanceFilter['dateField'] . 'EndDate']))) {
                 return true;
             }
@@ -1269,7 +1269,7 @@ class WorkQueue
     public static function getDateFilterParams($params)
     {
         $rdrParams = '';
-        foreach (self::$consentAdvanceFilters as $advanceFilter) {
+        foreach (self::$consentAdvanceFilters['Consents'] as $advanceFilter) {
             if (isset($advanceFilter['dateField'])) {
                 if (!empty($params[$advanceFilter['dateField'] . 'StartDate'])) {
                     $rdrParams .= '&' . $advanceFilter['dateField'] . '=gt' . $params[$advanceFilter['dateField'] . 'StartDate'];
