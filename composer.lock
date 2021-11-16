@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04ea59c8420be4d6a430ca36ec495c68",
+    "content-hash": "8ccf2d70464c1b6feb62ba1fe791785f",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -1928,16 +1928,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.221.0",
+            "version": "v0.222.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "55fb77c4dcb7ec2b41128d41815b3aac65ddfadb"
+                "reference": "5a3a9a48b71a009a9dd973b01ca0c4c3ea6b13fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/55fb77c4dcb7ec2b41128d41815b3aac65ddfadb",
-                "reference": "55fb77c4dcb7ec2b41128d41815b3aac65ddfadb",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/5a3a9a48b71a009a9dd973b01ca0c4c3ea6b13fc",
+                "reference": "5a3a9a48b71a009a9dd973b01ca0c4c3ea6b13fc",
                 "shasum": ""
             },
             "require": {
@@ -1966,9 +1966,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.221.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.222.0"
             },
-            "time": "2021-11-06T11:26:11+00:00"
+            "time": "2021-11-14T12:26:33+00:00"
         },
         {
             "name": "google/auth",
@@ -10657,42 +10657,42 @@
         },
         {
             "name": "symfony/maker-bundle",
-            "version": "v1.34.1",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/maker-bundle.git",
-                "reference": "c9ae401f3fa2b42881120d33ad79416630d1f2be"
+                "reference": "40b9b55c5d50825995820190f814936c06237b48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/c9ae401f3fa2b42881120d33ad79416630d1f2be",
-                "reference": "c9ae401f3fa2b42881120d33ad79416630d1f2be",
+                "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/40b9b55c5d50825995820190f814936c06237b48",
+                "reference": "40b9b55c5d50825995820190f814936c06237b48",
                 "shasum": ""
             },
             "require": {
                 "doctrine/inflector": "^1.2|^2.0",
                 "nikic/php-parser": "^4.11",
                 "php": ">=7.1.3",
-                "symfony/config": "^4.0|^5.0",
-                "symfony/console": "^4.0|^5.0",
-                "symfony/dependency-injection": "^4.0|^5.0",
+                "symfony/config": "^4.4|^5.0|^6.0",
+                "symfony/console": "^4.4|^5.0|^6.0",
+                "symfony/dependency-injection": "^4.4|^5.0|^6.0",
                 "symfony/deprecation-contracts": "^2.2",
-                "symfony/filesystem": "^4.0|^5.0",
-                "symfony/finder": "^4.0|^5.0",
-                "symfony/framework-bundle": "^4.0|^5.0",
-                "symfony/http-kernel": "^4.0|^5.0"
+                "symfony/filesystem": "^4.4|^5.0|^6.0",
+                "symfony/finder": "^4.4|^5.0|^6.0",
+                "symfony/framework-bundle": "^4.4|^5.0|^6.0",
+                "symfony/http-kernel": "^4.4|^5.0|^6.0"
             },
             "require-dev": {
-                "composer/semver": "^3.0@dev",
-                "doctrine/doctrine-bundle": "^1.8|^2.0",
+                "composer/semver": "^3.0",
+                "doctrine/doctrine-bundle": "^1.12.3|^2.0",
                 "doctrine/orm": "^2.3",
-                "friendsofphp/php-cs-fixer": "^3.0",
-                "friendsoftwig/twigcs": "^4.1.0|^5.0.0",
-                "symfony/http-client": "^4.3|^5.0",
-                "symfony/phpunit-bridge": "^4.3|^5.0",
-                "symfony/process": "^4.0|^5.0",
-                "symfony/security-core": "^4.0|^5.0",
-                "symfony/yaml": "^4.0|^5.0"
+                "symfony/http-client": "^4.4|^5.0|^6.0",
+                "symfony/phpunit-bridge": "^4.4|^5.0|^6.0",
+                "symfony/polyfill-php80": "^1.16.0",
+                "symfony/process": "^4.4|^5.0|^6.0",
+                "symfony/security-core": "^4.4|^5.0|^6.0",
+                "symfony/yaml": "^4.4|^5.0|^6.0",
+                "twig/twig": "^2.0|^3.0"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -10725,7 +10725,7 @@
             ],
             "support": {
                 "issues": "https://github.com/symfony/maker-bundle/issues",
-                "source": "https://github.com/symfony/maker-bundle/tree/v1.34.1"
+                "source": "https://github.com/symfony/maker-bundle/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -10741,7 +10741,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-13T15:58:56+00:00"
+            "time": "2021-11-16T13:52:26+00:00"
         },
         {
             "name": "symfony/web-profiler-bundle",
