@@ -31,6 +31,7 @@
                 <th>Type</th>
                 <th>Site Type</th>
                 <th>Email</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -46,6 +47,7 @@
                     <td>{{ site.type }}</td>
                     <td>{{ site.siteType }}</td>
                     <td>{{ site.email|length > 30 ? site.email|slice(0, 30) ~ '...' : site.email }}</td>
+                    <td><a href="{{ path('admin_site_emails', { id: site.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Sync Site Email with Google"><i class="fa fa-envelope fa-fw"></i><i class="fa fa-refresh fa-fw"></i></a></td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -650,7 +650,7 @@ class WorkQueue
                 ]
             ],
             'primaryLanguage' => [
-                'label' => 'Language of Primary Cosent',
+                'label' => 'Language of Primary Consent',
                 'options' => [
                     'View All' => '',
                     'English' => 'en',

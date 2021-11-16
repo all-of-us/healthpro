@@ -23,8 +23,9 @@
                                         {% if advancedFilter.dateField is defined %}
                                             <li class="list-group-item bg-light">
                                                 <b>Select Date(s)</b>
+                                                <small class="pull-right"><a class="date-filter-reset" data-group-id="filter_{{ label }}_date_group">Reset</a></small>
                                             </li>
-                                            <li class="list-group-item">
+                                            <li class="list-group-item" id="filter_{{ label }}_date_group">
                                                 <div class="form-group">
                                                     <label class="control-label" for="{{ advancedFilter.dateField }}StartDate">Start Date</label>
                                                     <input type="text" name="{{ advancedFilter.dateField }}StartDate" class="form-control date-filter" id="{{ advancedFilter.dateField }}StartDate" value="{{ params[advancedFilter.dateField ~ 'StartDate']|default('') }}" placeholder="MM/DD/YYYY" autocomplete="off" data-parsley-date-mdy>
