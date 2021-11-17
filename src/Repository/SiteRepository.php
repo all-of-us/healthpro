@@ -79,4 +79,29 @@ class SiteRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return Site[] Returns an array of Site objects
+     */
+    public function getSiteSyncQueue(string $type, int $limit = 100)
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->where('s.status = 1')
+            ->where('s.deleted = 0')
+            ->leftJoin('s.siteSync', 'ss')
+            ->setMaxResults($limit)
+        ;
+        switch ($type) {
+            case 'adminEmail':
+            default:
+                $qb->orderBy('ss.adminEmailsAt', 'ASC')
+                    ->andWhere('ss.adminEmailsAt IS NULL OR ss.adminEmailsAt < :startDateTime')
+                    ->setParameter('startDateTime', new \DateTime('-1 day'))
+                ;
+                break;
+        }
+        return $qb->getQuery()
+            ->getResult()
+        ;
+    }
 }
