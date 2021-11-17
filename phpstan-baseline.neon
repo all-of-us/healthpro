@@ -1,7 +1,22 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to static method getNormalizedFhir\\(\\) on an unknown class App\\\\Test\\\\Entity\\\\MeasurementTest\\.$#"
+			message: "#^Service \"gaAdminEmail\" is not registered in the container\\.$#"
 			count: 1
-			path: symfony/src/Controller/MeasurementsController.php
+			path: src/Service/GoogleGroupsService.php
+
+		-
+			message: "#^Service \"gaApplicationName\" is not registered in the container\\.$#"
+			count: 1
+			path: src/Service/GoogleGroupsService.php
+
+		-
+			message: "#^Service \"gaAuthJson\" is not registered in the container\\.$#"
+			count: 1
+			path: src/Service/GoogleGroupsService.php
+
+		-
+			message: "#^Service \"gaDomain\" is not registered in the container\\.$#"
+			count: 1
+			path: src/Service/GoogleGroupsService.php
 
