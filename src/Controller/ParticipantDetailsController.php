@@ -26,9 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/s")
- */
 class ParticipantDetailsController extends AbstractController
 {
     private const VALID_CONSENT_TYPES = [

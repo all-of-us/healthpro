@@ -1,26 +1,26 @@
 cron:
 - description: "Used to verify cron functionality in test sites"
-  url: /s/cron/ping-test
+  url: /cron/ping-test
   schedule: 29 of feb 00:00
   timezone: America/Chicago
 - description: "Withdrawal notification"
-  url: /s/cron/withdrawal
+  url: /cron/withdrawal
   schedule: every day 07:00
   timezone: America/Chicago
 - description: "Deactivate notification"
-  url: /s/cron/deactivate
+  url: /cron/deactivate
   schedule: every day 07:01
   timezone: America/Chicago
 - description: "Missing measurements/orders notification"
-  url: /s/cron/missing-measurements-orders
+  url: /cron/missing-measurements-orders
   schedule: every day 08:00
   timezone: America/Chicago
 - description: "Delete datastore cache keys"
-  url: /s/cron/delete-cache-keys
+  url: /cron/delete-cache-keys
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Sync sites meta data"
-  url: /s/cron/sites
+  url: /cron/sites
   schedule: every day 20:00
   timezone: America/Chicago
 - description: "Sync sites admin emails"
@@ -28,38 +28,38 @@ cron:
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Sync awardees and organizations"
-  url: /s/cron/awardees-organizations
+  url: /cron/awardees-organizations
   schedule: every day 20:01
   timezone: America/Chicago
 - description: "Delete datastore session keys"
-  url: /s/cron/delete-session-keys
+  url: /cron/delete-session-keys
   schedule: every 1 hours
   timezone: America/Chicago
 - description: "Send patient status to RDR"
-  url: /s/cron/send-patient-status-rdr
+  url: /cron/send-patient-status-rdr
   schedule: every 5 mins
   timezone: America/Chicago
 - description: "Delete patient status imports unconfirmed data"
-  url: /s/cron/delete-unconfirmed-patient-status-import-data
+  url: /cron/delete-unconfirmed-patient-status-import-data
   schedule: every day 02:00
   timezone: America/Chicago
 - description: "Deceased status pending"
-  url: /s/cron/deceased/pending
+  url: /cron/deceased/pending
   schedule: every day 07:05
   timezone: America/Chicago
 - description: "Deceased status approved"
-  url: /s/cron/deceased/approved
+  url: /cron/deceased/approved
   schedule: every day 07:10
   timezone: America/Chicago
 - description: "Ehr Withdrawal Notifications"
-  url: /s/cron/ehr-withdrawal
+  url: /cron/ehr-withdrawal
   schedule: every day 07:15
   timezone: America/Chicago
 - description: "Used to backfill orders processed timestamp"
-  url: /s/cron/backfill-order-processed-time
+  url: /cron/backfill-order-processed-time
   schedule: 29 of feb 00:00
   timezone: America/Chicago
 - description: "Resend physical measurements to RDR from evaluations queue table"
-  url: /s/cron/resend-measurements-rdr
+  url: /cron/resend-measurements-rdr
   schedule: 29 of feb 00:00
   timezone: America/Chicago
