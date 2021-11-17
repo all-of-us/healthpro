@@ -65,6 +65,26 @@ class RemoveGroupMemberType extends AbstractType
                         }
                     })
                 ]
+            ])
+            ->add('attestation', Type\ChoiceType::class, [
+                'label' => 'Please select one',
+                'required' => false,
+                'expanded' => true,
+                'multiple' => false,
+                'placeholder' => false,
+                'choices' => [
+                    'I attest that this user has left the All of Us Research Program in good standing' => 'yes',
+                    'This user has been terminated for cause and has not left the All of Us Research Program in good standing' => 'no'
+                ],
+                'constraints' => [
+                    new Constraints\Callback(function ($attestation, $context) {
+                        $confirmRemove = $context->getObject()->getParent()->get('confirm')->getData();
+                        $reason = $context->getObject()->getParent()->get('reason')->getData();
+                        if ($confirmRemove === 'yes' && $reason === 'no' && empty($attestation)) {
+                            $context->buildViolation('Please select one')->addViolation();
+                        }
+                    })
+                ]
             ]);
     }
 }
