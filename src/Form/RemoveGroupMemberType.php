@@ -5,6 +5,7 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
 class RemoveGroupMemberType extends AbstractType
@@ -72,10 +73,7 @@ class RemoveGroupMemberType extends AbstractType
                 'expanded' => true,
                 'multiple' => false,
                 'placeholder' => false,
-                'choices' => [
-                    'I attest that this user has left the All of Us Research Program in good standing' => 'yes',
-                    'This user has been terminated for cause and has not left the All of Us Research Program in good standing' => 'no'
-                ],
+                'choices' => $options['attestations'],
                 'constraints' => [
                     new Constraints\Callback(function ($attestation, $context) {
                         $confirmRemove = $context->getObject()->getParent()->get('confirm')->getData();
@@ -86,5 +84,12 @@ class RemoveGroupMemberType extends AbstractType
                     })
                 ]
             ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'attestations' => null
+        ]);
     }
 }
