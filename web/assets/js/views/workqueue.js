@@ -158,6 +158,7 @@ $(document).ready(function() {
             var pageDropDown = $('.page-drop-down select');
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
+            table.columns.adjust().draw();
         },
         createdRow: function (row, data) {
             if (data.isWithdrawn === true) {
@@ -334,6 +335,11 @@ $(document).ready(function() {
             $('#heading-count .plural').show();
         }
         $('#heading-count').show();
+    });
+
+    // Fix clipping of table header when more columns added
+    $('#workqueue').on('column-visibility.dt', function ( e, settings, column, state ) {
+      $('.dataTables_scrollHeadInner').css({height: $('.dataTables_scrollHeadInner tr').height()})
     });
 
     table.buttons().container().find('.btn').addClass('btn-sm');
