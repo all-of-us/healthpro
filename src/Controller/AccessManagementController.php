@@ -21,8 +21,8 @@ class AccessManagementController extends AbstractController
     public const MEMBER_DOMAIN = '@pmi-ops.org';
     public const RESET_PASSWORD_URL = 'https://admin.google.com';
     public const ATTESTATIONS = [
-        'I attest that this user has left the All of Us Research Program in good standing' => 'yes',
-        'This user has been terminated for cause and has not left the All of Us Research Program in good standing' => 'no'
+        'I attest that this user has left the All of Us Research Program in good standing.' => 'yes',
+        'This user has been terminated for cause and has not left the All of Us Research Program in good standing.' => 'no'
     ];
 
     private $googleGroupsService;
