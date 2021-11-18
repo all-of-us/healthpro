@@ -20,10 +20,6 @@ class AccessManagementController extends AbstractController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
     public const RESET_PASSWORD_URL = 'https://admin.google.com';
-    public const ATTESTATIONS = [
-        'I attest that this user has left the All of Us Research Program in good standing.' => 'yes',
-        'This user has been terminated for cause and has not left the All of Us Research Program in good standing.' => 'no'
-    ];
 
     private $googleGroupsService;
     private $loggerService;
@@ -125,7 +121,7 @@ class AccessManagementController extends AbstractController
         if (empty($member) || $member->getRole() !== 'MEMBER') {
             throw $this->createNotFoundException();
         }
-        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class, null, ['attestations' => self::ATTESTATIONS]);
+        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class);
         $removeGoupMemberForm->handleRequest($request);
         if ($removeGoupMemberForm->isSubmitted()) {
             if ($removeGoupMemberForm->isValid()) {
@@ -135,7 +131,7 @@ class AccessManagementController extends AbstractController
                     if ($result['status'] === 'success') {
                         if ($removeGoupMemberForm->get('reason')->getData() === 'no') {
                             $currentTime = new \DateTime("now");
-                            $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), self::ATTESTATIONS);
+                            $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), RemoveGroupMemberType::ATTESTATIONS);
                             $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime, $attestation);
                         }
                         $this->addFlash('success', $result['message']);
