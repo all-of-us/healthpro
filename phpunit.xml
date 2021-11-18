@@ -1,4 +1,4 @@
-<phpunit bootstrap="vendor/autoload.php" 
+<phpunit bootstrap="tests/bootstrap.php"
          backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
@@ -16,7 +16,7 @@
     </php>
     <testsuites>
         <testsuite name="Symfony Test Suite">
-            <directory>symfony/tests</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

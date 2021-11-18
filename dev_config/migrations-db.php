@@ -3,15 +3,16 @@
 use Symfony\Component\Yaml\Parser;
 
 // Determine migration target from loaded environment variable, set at runtime
-$migrationTarget = isset($_ENV['MIGRATION_TARGET']) ? $_ENV['MIGRATION_TARGET'] : null;
+$migrationTarget = getenv('MIGRATION_TARGET');
 if (!$migrationTarget) {
     throw new \Exception('Must prefix command with `MIGRATION_TARGET=<environment>`, see ' . __FILE__);
 }
 
 $filename = basename(sprintf('migrations-%s.yml', $migrationTarget));
-if (file_exists(dirname(__FIlE__) . '/' .$filename)) {
+if (file_exists(dirname(__FILE__) . '/' . $filename)) {
+    echo 'Loaded configuration: ' . $filename . PHP_EOL;
     $yaml = new Parser();
-    return $yaml->parse(file_get_contents(dirname(__FIlE__) . '/' . $filename));
+    return $yaml->parse(file_get_contents(dirname(__FILE__) . '/' . $filename));
 }
 
 // If file not found, show additional help instructions

@@ -6,9 +6,8 @@ nbproject/
 dev_config/
 external/
 deploy_*
-symfony/.env.local
-symfony/.env.test
-symfony/.gitignore
-symfony/var/
-symfony/phpunit.xml.dist
+.env.local
+.env.test
+var/
+phpunit.xml.dist
 tools/
