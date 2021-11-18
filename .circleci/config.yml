@@ -66,6 +66,9 @@ jobs:
     # PHP CS Fixer
     - run: ./ci/php-cs-fixer.sh
 
+    # PHPStan
+    - run: ./ci/phpstan.sh
+
     # Teardown
     - store_test_results:
         path: /tmp/circleci-test-results
