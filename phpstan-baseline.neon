@@ -1,22 +1,2 @@
 parameters:
 	ignoreErrors:
-		-
-			message: "#^Service \"gaAdminEmail\" is not registered in the container\\.$#"
-			count: 1
-			path: src/Service/GoogleGroupsService.php
-
-		-
-			message: "#^Service \"gaApplicationName\" is not registered in the container\\.$#"
-			count: 1
-			path: src/Service/GoogleGroupsService.php
-
-		-
-			message: "#^Service \"gaAuthJson\" is not registered in the container\\.$#"
-			count: 1
-			path: src/Service/GoogleGroupsService.php
-
-		-
-			message: "#^Service \"gaDomain\" is not registered in the container\\.$#"
-			count: 1
-			path: src/Service/GoogleGroupsService.php
-
