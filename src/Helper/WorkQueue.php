@@ -192,6 +192,440 @@ class WorkQueue
         ]
     ];
 
+    public static $mainColumnsDef = [
+        'lastName' => [
+            'displayName' => 'Last Name',
+            'csvLabel' => 'Last Name',
+            'rdrField' => 'lastName',
+            'sortField' => 'lastName',
+            'generateLink' => true,
+            'toggleColumn' => false
+        ],
+        'firstName' => [
+            'displayName' => 'First Name',
+            'csvLabel' => 'First Name',
+            'rdrField' => 'firstName',
+            'sortField' => 'firstName',
+            'generateLink' => true,
+            'toggleColumn' => false
+        ],
+        'middleName' => [
+            'displayName' => 'Middle Name',
+            'csvLabel' => 'Middle Name',
+            'rdrField' => 'middleName',
+            'sortField' => 'firstName',
+            'generateLink' => true,
+            'toggleColumn' => false
+        ],
+        'dateOfBirth' => [
+            'displayName' => 'Date of Birth',
+            'csvLabel' => 'Date of Birth',
+            'rdrField' => 'dob',
+            'sortField' => 'dateOfBirth',
+            'formatDate' => true,
+            'csvMethod' => 'csvDateFromObject',
+            'toggleColumn' => false
+        ],
+        'participantId' => [
+            'displayName' => 'PM ID',
+            'csvLabel' => 'PM ID',
+            'rdrField' => 'id',
+            'sortField' => 'participantId',
+            'toggleColumn' => false
+        ],
+        'biobankId' => [
+            'displayName' => 'Biobank ID',
+            'csvLabel' => 'Biobank ID',
+            'rdrField' => 'biobankId',
+            'sortField' => 'biobankId',
+            'toggleColumn' => true
+        ],
+        'participantStatus' => [
+            'displayName' => 'Participant Status',
+            'csvLabel' => 'Participant Status',
+            'rdrField' => 'enrollmentStatus',
+            'sortField' => 'enrollmentStatus',
+            'toggleColumn' => true
+        ],
+        'activityStatus' => [
+            'displayName' => 'Activity Status',
+            'csvLabel' => 'Activity Status',
+            'rdrField' => 'activityStatus',
+            'sortField' => 'activityStatus',
+            'toggleColumn' => true
+        ],
+        'withdrawalReason' => [
+            'displayName' => 'Withdrawal Reason',
+            'csvLabel' => 'Withdrawal Reason',
+            'rdrField' => 'withdrawalReason',
+            'sortField' => 'withdrawalReason',
+            'toggleColumn' => true
+        ],
+        'participantOrigin' => [
+            'displayName' => 'Participant Origination',
+            'csvLabel' => 'Participant Origination',
+            'rdrField' => 'participantOrigin',
+            'sortField' => 'participantOrigin',
+            'toggleColumn' => true
+        ],
+        'consentCohort' => [
+            'displayName' => 'Consent Cohort',
+            'csvLabel' => 'Consent Cohort',
+            'rdrField' => 'consentCohortText',
+            'sortField' => 'consentCohort',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'firstPrimaryConsent' => [
+            'displayName' => 'First Primary Consent',
+            'csvLabel' => 'Date of First Primary Consent',
+            'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'rdrDateField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'method' => 'displayFirstConsentStatusTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'primaryConsent' => [
+            'displayName' => 'Primary Consent',
+            'csvLabels' => [
+                'Primary Consent Status',
+                'Primary Consent Status Date'
+            ],
+            'rdrField' => 'consentForStudyEnrollment',
+            'sortField' => 'consentForStudyEnrollmentAuthored',
+            'rdrDateField' => 'consentForStudyEnrollmentAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForStudyEnrollmentFilePath'
+        ],
+        'questionnaireOnDnaProgram' => [
+            'displayName' => 'Program Update',
+            'csvLabels' => [
+                'Program Update',
+                'Date of Program Update'
+            ],
+            'rdrField' => 'questionnaireOnDnaProgram',
+            'sortField' => 'questionnaireOnDnaProgramAuthored',
+            'rdrDateField' => 'questionnaireOnDnaProgramAuthored',
+            'otherField' => 'consentCohort',
+            'method' => 'displayProgramUpdate',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'firstEhrConsent' => [
+            'displayName' => 'First EHR Consent',
+            'csvLabel' => 'Date of First EHR Consent',
+            'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'rdrDateField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'method' => 'displayFirstConsentStatusTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'ehrConsent' => [
+            'displayName' => 'EHR Consent',
+            'csvLabels' => [
+                'EHR Consent Status',
+                'EHR Consent Status Date'
+            ],
+            'rdrField' => 'consentForElectronicHealthRecords',
+            'sortField' => 'consentForElectronicHealthRecordsAuthored',
+            'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForElectronicHealthRecordsFilePath'
+        ],
+        'ehrConsentExpireStatus' => [
+            'displayName' => 'EHR Expiration Status',
+            'csvLabels' => [
+                'EHR Expiration Status',
+                'EHR Expiration Date'
+            ],
+            'rdrField' => 'ehrConsentExpireStatus',
+            'sortField' => 'ehrConsentExpireStatus',
+            'rdrDateField' => 'ehrConsentExpireAuthored',
+            'otherField' => 'consentForElectronicHealthRecords',
+            'method' => 'displayEhrConsentExpireStatus',
+            'csvMethod' => 'csvEhrConsentExpireStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'gRoRConsent' => [
+            'displayName' => 'gRoR Consent',
+            'csvLabels' => [
+                'gRoR Consent',
+                'gRoR Consent Date'
+            ],
+            'rdrField' => 'consentForGenomicsROR',
+            'sortField' => 'consentForGenomicsRORAuthored',
+            'rdrDateField' => 'consentForGenomicsRORAuthored',
+            'method' => 'displayGenomicsConsentStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForGenomicsRORFilePath'
+        ],
+        'primaryLanguage' => [
+            'displayName' => 'Language of Primary Consent',
+            'csvLabel' => 'Language of Primary Consent',
+            'rdrField' => 'primaryLanguage',
+            'sortField' => 'primaryLanguage',
+            'toggleColumn' => true
+        ],
+        'dvEhrStatus' => [
+            'displayName' => 'DV-only EHR Sharing',
+            'csvLabels' => [
+                'DV-only EHR Sharing',
+                'DV-only EHR Sharing Date'
+            ],
+            'rdrField' => 'consentForDvElectronicHealthRecordsSharing',
+            'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
+            'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'caborConsent' => [
+            'displayName' => 'CABoR Consent',
+            'csvLabels' => [
+                'CABoR Consent',
+                'CABoR Consent Date'
+            ],
+            'rdrField' => 'consentForCABoR',
+            'sortField' => 'consentForCABoRAuthored',
+            'rdrDateField' => 'consentForCABoRAuthored',
+            'method' => 'displayConsentStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForCABoRFilePath'
+        ],
+        'digitalHealthSharingStatus' => [
+            'displayNames' => [
+                'fitbit' => 'Fitbit Consent',
+                'appleHealthKit' => 'Apple HealthKit Consent',
+                'appleEHR' => 'Apple EHR Consent'
+            ],
+            'csvLabels' => [
+                'Fitbit Consent',
+                'Fitbit Consent Date',
+                'Apple HealthKit  Consent',
+                'Apple HealthKit  Consent Date',
+                'Apple EHR Consent',
+                'Apple EHR Consent Date'
+            ],
+            'rdrField' => 'digitalHealthSharingStatus',
+            'method' => 'getDigitalHealthSharingStatus',
+            'csvMethod' => 'csvDigitalHealthSharingStatus',
+            'htmlClass' => 'text-center',
+            'orderable' => false,
+            'toggleColumn' => true
+        ],
+        'retentionEligibleStatus' => [
+            'displayName' => 'Retention Eligible',
+            'csvLabels' => [
+                'Retention Eligible',
+                'Date of Retention Eligible'
+            ],
+            'rdrField' => 'retentionEligibleStatus',
+            'sortField' => 'retentionEligibleStatus',
+            'rdrDateField' => 'retentionEligibleTime',
+            'method' => 'getRetentionEligibleStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'retentionType' => [
+            'displayName' => 'Retention Status',
+            'csvLabel' => 'Retention Status',
+            'rdrField' => 'retentionType',
+            'sortField' => 'retentionType',
+            'method' => 'getRetentionType',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'ehrDataTransfer' => [
+            'displayName' => 'EHR Data Transfer',
+            'csvLabel' => 'EHR Data Transfer',
+            'rdrField' => 'isEhrDataAvailable',
+            'sortField' => 'isEhrDataAvailable',
+            'method' => 'getEhrAvailableStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'mostRecentEhrReceipt' => [
+            'displayName' => 'Most Recent EHR Receipt',
+            'csvLabel' => 'Most Recent EHR Receipt',
+            'rdrField' => 'latestEhrReceiptTime',
+            'sortField' => 'latestEhrReceiptTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'contactMethod' => [
+            'displayName' => 'Contact Method',
+            'csvLabel' => 'Contact Method',
+            'rdrField' => 'recontactMethod',
+            'sortField' => 'recontactMethod',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'address' => [
+            'displayName' => 'Address',
+            'csvLabel' => 'Contact Method',
+            'rdrField' => 'address',
+            'sortField' => 'address',
+            'participantMethod' => 'getAddress',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'email' => [
+            'displayName' => 'Email',
+            'csvLabel' => 'Email',
+            'rdrField' => 'email',
+            'sortField' => 'email',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'loginPhone' => [
+            'displayName' => 'Login Phone',
+            'csvLabel' => 'Login Phone',
+            'rdrField' => 'loginPhoneNumber',
+            'sortField' => 'loginPhoneNumber',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'contactPhone' => [
+            'displayName' => 'Contact Phone',
+            'csvLabel' => 'Contact Phone',
+            'rdrField' => 'phoneNumber',
+            'sortField' => 'phoneNumber',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'ppiStatus' => [
+            'displayName' => 'Required Complete',
+            'csvLabel' => 'Required PPI Surveys Complete',
+            'rdrField' => 'numCompletedBaselinePPIModules',
+            'sortField' => 'numCompletedBaselinePPIModules',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'ppiSurveys' => [
+            'displayName' => 'Completed Surveys',
+            'csvLabel' => 'Completed Surveys',
+            'rdrField' => 'numCompletedPPIModules',
+            'sortField' => 'numCompletedPPIModules',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'pairedSite' => [
+            'displayName' => 'Paired Site',
+            'csvLabel' => 'Paired Site',
+            'rdrField' => 'siteSuffix',
+            'sortField' => 'siteSuffix',
+            'method' => 'getSiteDisplayName',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'pairedOrganization' => [
+            'displayName' => 'Paired Organization',
+            'csvLabel' => 'Paired Organization',
+            'rdrField' => 'organization',
+            'sortField' => 'organization',
+            'method' => 'getOrganizationDisplayName',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'physicalMeasurementsStatus' => [
+            'displayName' => 'Phys Measurements',
+            'csvLabels' => [
+                'Physical Measurements Status',
+                'Physical Measurements Completion Date'
+            ],
+            'rdrField' => 'physicalMeasurementsStatus',
+            'sortField' => 'physicalMeasurementsStatus',
+            'rdrDateField' => 'physicalMeasurementsFinalizedTime',
+            'method' => 'displayStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'physicalMeasurementsSite' => [
+            'displayName' => 'Phys Meas Site',
+            'csvLabel' => 'Physical Measurements Site',
+            'rdrField' => 'evaluationFinalizedSite',
+            'sortField' => 'evaluationFinalizedSite',
+            'method' => 'getSiteDisplayName',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'biobankDnaStatus' => [
+            'displayName' => 'Samples to Isolate DNA?',
+            'csvLabel' => 'Samples to Isolate DNA',
+            'rdrField' => 'samplesToIsolateDNA',
+            'sortField' => 'samplesToIsolateDNA',
+            'method' => 'displayStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'biobankSamples' => [
+            'displayName' => 'Baseline Samples',
+            'csvLabel' => 'Baseline Samples',
+            'rdrField' => 'numBaselineSamplesArrived',
+            'sortField' => 'numBaselineSamplesArrived',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'orderCreatedSite' => [
+            'displayName' => 'Bio-specimens Site',
+            'csvLabel' => 'Biospecimens Site',
+            'rdrField' => 'orderCreatedSite',
+            'sortField' => 'orderCreatedSite',
+            'method' => 'getSiteDisplayName',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'age' => [
+            'displayName' => 'Age',
+            'csvLabel' => 'Age',
+            'rdrField' => 'age',
+            'sortField' => 'age',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'sex' => [
+            'displayName' => 'Sex',
+            'csvLabel' => 'Sex',
+            'rdrField' => 'sex',
+            'sortField' => 'sex',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'genderIdentity' => [
+            'displayName' => 'Gender Identity',
+            'csvLabel' => 'Gender Identity',
+            'rdrField' => 'genderIdentity',
+            'sortField' => 'genderIdentity',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'race' => [
+            'displayName' => 'Race/Ethnicity',
+            'csvLabel' => 'Race/Ethnicity',
+            'rdrField' => 'race',
+            'sortField' => 'race',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'education' => [
+            'displayName' => 'Education',
+            'csvLabel' => 'Education',
+            'rdrField' => 'education',
+            'sortField' => 'education',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ]
+    ];
+
     public static $sortColumns = [
         'lastName',
         'firstName',
