@@ -67,20 +67,21 @@ class SyncSiteEmailsCommand extends Command
         }
 
         foreach ($sites as $site) {
-            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
             $output->writeln($site->getName());
+            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
             $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
-            if (count($siteAdmins) > 0) {
-                $output->writeln(' └ Setting: ' . join(', ', $siteAdmins));
+            if ($site->getEmail() !== join(', ', $siteAdmins)) {
+                $output->writeln(' └ Old: ' . $site->getEmail());
+                $output->writeln(' └ New: ' . join(', ', $siteAdmins));
+                $site->setEmail(join(', ', $siteAdmins));
+                $this->em->persist($site);
+                $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+                $this->loggerService->log(Log::SITE_EDIT, [
+                    'id' => $site->getId(),
+                    'old' => $existingArray,
+                    'new' => $siteDataArray
+                ]);
             }
-            $site->setEmail(join(', ', $siteAdmins));
-            $this->em->persist($site);
-            $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
-            $this->loggerService->log(Log::SITE_EDIT, [
-                'id' => $site->getId(),
-                'old' => $existingArray,
-                'new' => $siteDataArray
-            ]);
             $siteSync = $site->getSiteSync();
             if (!$siteSync) {
                 $siteSync = new SiteSync();
