@@ -1,7 +1,2 @@
 parameters:
 	ignoreErrors:
-		-
-			message: "#^Call to static method getNormalizedFhir\\(\\) on an unknown class App\\\\Test\\\\Entity\\\\MeasurementTest\\.$#"
-			count: 1
-			path: symfony/src/Controller/MeasurementsController.php
-

@@ -18,8 +18,7 @@ ci/*.secret
 /deploy_*.txt
 /docker-compose.override.yml
 .phpunit.result.cache
-
-/web/s
+phpstan.neon
 
 ###> friendsofphp/php-cs-fixer ###
 /tools/php-cs-fixer/vendor/

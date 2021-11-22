@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/admin/notices")
+ * @Route("/admin/notices")
  */
 class NoticeController extends AbstractController
 {

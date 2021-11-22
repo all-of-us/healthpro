@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/review")
+ * @Route("/review")
  */
 class ReviewController extends AbstractController
 {

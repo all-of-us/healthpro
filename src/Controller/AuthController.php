@@ -12,9 +12,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-/**
- * @Route("/s")
- */
 class AuthController extends AbstractController
 {
     /**
@@ -45,7 +42,7 @@ class AuthController extends AbstractController
                 }
                 $authService->setMockAuthToken($user);
                 $session->set('isLoginReturn', true);
-                return $this->redirect('/s');
+                return $this->redirect('/');
             }
 
             return $this->render('login.html.twig', [
