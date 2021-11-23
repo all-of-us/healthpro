@@ -335,25 +335,25 @@ label.label-normal {
 .secondaryheader {
     border-top: 0 !important;
 }
-.multiheader-survey {
+.multiheader-survey, .btn-col-group-ppi {
     background-color: #dde;
 }
-.multiheader-inperson {
+.multiheader-inperson, .btn-col-group-inperson {
     background-color: #eec;
 }
-.multiheader-demographics {
+.multiheader-demographics, .btn-col-group-demographics {
     background-color: #ded;
 }
-.multiheader-contact {
+.multiheader-contact, .btn-col-group-contact {
     background-color: #edd;
 }
-.multiheader-patient-status {
+.multiheader-patient-status, .btn-col-group-patient-status {
     background-color: #ffd;
 }
-.multiheader-metrics {
+.multiheader-metrics, .btn-col-group-metrics {
     background-color: #edb;
 }
-.multiheader-consent, .col-consent {
+.multiheader-consent, .col-consent, .btn-col-group-consent {
     background-color: #efd;
 }
 .dataTables_processing {

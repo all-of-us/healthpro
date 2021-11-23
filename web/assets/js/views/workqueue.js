@@ -180,7 +180,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-default'
             },
             {
                 extend: 'colvisGroup',
@@ -197,7 +198,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-consent'
             },
             {
                 extend: 'colvisGroup',
@@ -213,7 +215,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-ppi'
             },
             {
                 extend: 'colvisGroup',
@@ -229,7 +232,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-inperson'
             },
             {
                 extend: 'colvisGroup',
@@ -245,7 +249,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-demographics'
             },
             {
                 extend: 'colvisGroup',
@@ -264,7 +269,8 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-contact',
                     '.col-group-metrics:not(.col-group-metrics-ehr)'
-                ]
+                ],
+                className: 'btn-col-group-patient-status'
             },
             {
                 extend: 'colvisGroup',
@@ -287,8 +293,8 @@ $(document).ready(function() {
                     '.col-group-language-primary-consent',
                     '.col-group-ehr-expire-status',
                     '.col-group-consent'
-
-                ]
+                ],
+                className: 'btn-col-group-contact'
             },
             {
                 extend: 'colvisGroup',
@@ -306,12 +312,14 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-patient-status',
                     '.col-group-contact'
-                ]
+                ],
+                className: 'btn-col-group-metrics'
             },
             {
                 extend: 'colvisGroup',
                 text: 'Show all',
-                show: ':hidden'
+                show: ':hidden',
+                className: 'btn-col-group-all'
             },
             {
                 extend: 'colvis',
