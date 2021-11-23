@@ -122,7 +122,7 @@ class WorkQueue
             'rdrField' => 'consentForGenomicsROR',
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
-            'method' => 'displayGenomicsConsentStatus',
+            'method' => 'displayConsentStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForGenomicsRORFilePath'
