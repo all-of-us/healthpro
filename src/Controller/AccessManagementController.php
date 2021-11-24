@@ -55,7 +55,12 @@ class AccessManagementController extends AbstractController
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
-        $members = $this->googleGroupsService->getMembers($group->email);
+        try {
+            $members = $this->googleGroupsService->getMembers($group->email);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Unable to retrieve member list for group.');
+            $members = [];
+        }
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
             'members' => $members,
