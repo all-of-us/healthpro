@@ -68,8 +68,8 @@ class SyncSiteEmailsCommand extends Command
 
         $returnCode = 0;
         foreach ($sites as $site) {
-            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
             $output->writeln($site->getName());
+            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
             try {
                 $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
             } catch (\Exception $e) {
@@ -77,17 +77,18 @@ class SyncSiteEmailsCommand extends Command
                 $returnCode = 1;
                 continue;
             }
-            if (count($siteAdmins) > 0) {
-                $output->writeln(' └ Setting: ' . join(', ', $siteAdmins));
+            if ($site->getEmail() !== join(', ', $siteAdmins)) {
+                $output->writeln(' └ Old: ' . $site->getEmail());
+                $output->writeln(' └ New: ' . join(', ', $siteAdmins));
+                $site->setEmail(join(', ', $siteAdmins));
+                $this->em->persist($site);
+                $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+                $this->loggerService->log(Log::SITE_EDIT, [
+                    'id' => $site->getId(),
+                    'old' => $existingArray,
+                    'new' => $siteDataArray
+                ]);
             }
-            $site->setEmail(join(', ', $siteAdmins));
-            $this->em->persist($site);
-            $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
-            $this->loggerService->log(Log::SITE_EDIT, [
-                'id' => $site->getId(),
-                'old' => $existingArray,
-                'new' => $siteDataArray
-            ]);
             $siteSync = $site->getSiteSync();
             if (!$siteSync) {
                 $siteSync = new SiteSync();
