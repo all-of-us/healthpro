@@ -66,10 +66,17 @@ class SyncSiteEmailsCommand extends Command
             return 0;
         }
 
+        $returnCode = 0;
         foreach ($sites as $site) {
             $output->writeln($site->getName());
             $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
-            $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
+            try {
+                $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
+            } catch (\Exception $e) {
+                $output->writeln('ERROR: ' . $e->getMessage());
+                $returnCode = 1;
+                continue;
+            }
             if ($site->getEmail() !== join(', ', $siteAdmins)) {
                 $output->writeln(' └ Old: ' . $site->getEmail());
                 $output->writeln(' └ New: ' . join(', ', $siteAdmins));
@@ -92,6 +99,6 @@ class SyncSiteEmailsCommand extends Command
         }
         $this->em->flush();
         $output->writeln('');
-        return 0;
+        return $returnCode;
     }
 }

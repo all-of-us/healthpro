@@ -9,6 +9,11 @@ use Symfony\Component\Validator\Constraints;
 
 class RemoveGroupMemberType extends AbstractType
 {
+    public const ATTESTATIONS = [
+        'I attest that this user has left the All of Us Research Program in good standing.' => 'yes',
+        'This user has been terminated for cause and has not left the All of Us Research Program in good standing.' => 'no'
+    ];
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -62,6 +67,23 @@ class RemoveGroupMemberType extends AbstractType
                         $confirmRemove = $context->getObject()->getParent()->get('confirm')->getData();
                         if ($confirmRemove === 'yes' && empty($removeReason)) {
                             $context->buildViolation('Please select reason')->addViolation();
+                        }
+                    })
+                ]
+            ])
+            ->add('attestation', Type\ChoiceType::class, [
+                'label' => 'Please select one',
+                'required' => false,
+                'expanded' => true,
+                'multiple' => false,
+                'placeholder' => false,
+                'choices' => self::ATTESTATIONS,
+                'constraints' => [
+                    new Constraints\Callback(function ($attestation, $context) {
+                        $confirmRemove = $context->getObject()->getParent()->get('confirm')->getData();
+                        $reason = $context->getObject()->getParent()->get('reason')->getData();
+                        if ($confirmRemove === 'yes' && $reason === 'no' && empty($attestation)) {
+                            $context->buildViolation('Please select one')->addViolation();
                         }
                     })
                 ]

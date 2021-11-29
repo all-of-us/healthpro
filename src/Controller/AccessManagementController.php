@@ -55,7 +55,12 @@ class AccessManagementController extends AbstractController
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
-        $members = $this->googleGroupsService->getMembers($group->email);
+        try {
+            $members = $this->googleGroupsService->getMembers($group->email);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Unable to retrieve member list for group.');
+            $members = [];
+        }
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
             'members' => $members,
@@ -131,7 +136,8 @@ class AccessManagementController extends AbstractController
                     if ($result['status'] === 'success') {
                         if ($removeGoupMemberForm->get('reason')->getData() === 'no') {
                             $currentTime = new \DateTime("now");
-                            $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime);
+                            $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), RemoveGroupMemberType::ATTESTATIONS);
+                            $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime, $attestation);
                         }
                         $this->addFlash('success', $result['message']);
                         $this->loggerService->log(Log::GROUP_MEMBER_REMOVE, [
