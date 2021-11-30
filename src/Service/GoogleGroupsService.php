@@ -61,6 +61,7 @@ class GoogleGroupsService
                     $doRetry = true;
                     $retryCount++;
                 } else {
+                    error_log($e->getMessage());
                     throw $e;
                 }
             }
@@ -137,15 +138,11 @@ class GoogleGroupsService
         if (!empty($roles)) {
             $params['roles'] = join(',', $roles);
         }
-        try {
-            $result = $this->callApi('members', 'listMembers', [$groupEmail, $params]);
-            if ($result) {
-                return $result->getMembers();
-            }
-            return [];
-        } catch (GoogleException $e) {
-            return [];
+        $result = $this->callApi('members', 'listMembers', [$groupEmail, $params]);
+        if ($result) {
+            return $result->getMembers();
         }
+        return [];
     }
 
     public function getUser(string $user)
