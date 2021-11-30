@@ -13,7 +13,8 @@
                     </small>
                     <ul class="list-group">
                         {% set columNumber = 5 %}
-                        {% for name, columnDef in columnsDef %}
+                        {% for name in consentColumns %}
+                            {% set columnDef = columnsDef[name] %}
                             {% if columnDef.toggleColumn %}
                                 {% if columnDef.displayNames is defined %}
                                     {% for subFieldName, subFieldLabel in columnDef.displayNames %}

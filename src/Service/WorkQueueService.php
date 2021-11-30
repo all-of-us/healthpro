@@ -439,7 +439,8 @@ class WorkQueueService
         $userTimezone = $this->userService->getUser()->getTimezone();
         foreach ($participants as $participant) {
             $row = [];
-            foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+            foreach (WorkQueue::$consentColumns as $field) {
+                $columnDef = WorkQueue::$columnsDef[$field];
                 if (isset($columnDef['generateLink'])) {
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
                         $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
@@ -602,7 +603,8 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
-        foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+        foreach (WorkQueue::$consentColumns as $field) {
+            $columnDef = WorkQueue::$columnsDef[$field];
             if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
                 if (isset($columnDef['csvMethod'])) {
                     if (isset($columnDef['otherField'])) {

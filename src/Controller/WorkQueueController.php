@@ -426,6 +426,7 @@ class WorkQueueController extends AbstractController
                 'canExport' => $this->workQueueService->canExport(),
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
                 'columnsDef' => WorkQueue::$columnsDef,
+                'consentColumns' => WorkQueue::$consentColumns,
                 'filterIcons' => WorkQueue::$filterIcons
             ]);
         }
