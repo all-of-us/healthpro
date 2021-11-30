@@ -347,7 +347,7 @@ $(document).ready(function() {
 
     // Fix clipping of table header when more columns added
     $('#workqueue').on('column-visibility.dt', function ( e, settings, column, state ) {
-      $('.dataTables_scrollHeadInner').css({height: $('.dataTables_scrollHeadInner tr').height()})
+      $('.dataTables_scrollHeadInner').css({height: $('.dataTables_scrollHeadInner tr').height()});
     });
 
     table.buttons().container().find('.btn').addClass('btn-sm');
