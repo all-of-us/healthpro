@@ -611,6 +611,150 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
+        '1SST8' => [
+            'displayName' => '8 mL SST',
+            'csvLabels' => [
+                '8 mL SST Received',
+                '8 mL SST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1SST8',
+            'sortField' => 'sampleStatus1SST8Time',
+            'rdrDateField' => 'sampleStatus1SST8Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1PST8' => [
+            'displayName' => '8 mL PST',
+            'csvLabels' => [
+                '8 mL PST Received',
+                '8 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PST8',
+            'sortField' => 'sampleStatus1PST8Time',
+            'rdrDateField' => 'sampleStatus1PST8Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1HEP4' => [
+            'displayName' => '4 mL Na-Hep',
+            'csvLabels' => [
+                '4 mL Na-Hep Received',
+                '4 mL Na-Hep Received Date'
+            ],
+            'rdrField' => 'sampleStatus1HEP4',
+            'sortField' => 'sampleStatus1HEP4Time',
+            'rdrDateField' => 'sampleStatus1HEP4Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1ED02' => [
+            'displayName' => '2 mL EDTA',
+            'csvLabels' => [
+                '2 mL EDTA Received',
+                '2 mL EDTA Received Date'
+            ],
+            'rdrField' => 'sampleStatus1ED02',
+            'sortField' => 'sampleStatus1ED02Time',
+            'rdrDateField' => 'sampleStatus1ED02Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1ED04' => [
+            'displayName' => '4 mL EDTA',
+            'csvLabels' => [
+                '4 mL EDTA Received',
+                '4 mL EDTA Received Date'
+            ],
+            'rdrField' => 'sampleStatus1ED04',
+            'sortField' => 'sampleStatus1ED04Time',
+            'rdrDateField' => 'sampleStatus1ED04Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1ED10' => [
+            'displayName' => '1st 10 mL EDTA',
+            'csvLabels' => [
+                '1st 10 mL EDTA Received',
+                '1st 10 mL EDTA Received Date'
+            ],
+            'rdrField' => 'sampleStatus1ED10',
+            'sortField' => 'sampleStatus1ED10Time',
+            'rdrDateField' => 'sampleStatus1ED10Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '2ED10' => [
+            'displayName' => '2nd 10 mL EDTA',
+            'csvLabels' => [
+                '2nd 10 mL EDTA Received',
+                '2nd 10 mL EDTA Received Date'
+            ],
+            'rdrField' => 'sampleStatus2ED10',
+            'sortField' => 'sampleStatus2ED10Time',
+            'rdrDateField' => 'sampleStatus2ED10Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1CFD9' => [
+            'displayName' => 'Cell-Free DNA',
+            'csvLabels' => [
+                'Cell-Free DNA Received',
+                'Cell-Free DNA Received Date'
+            ],
+            'rdrField' => 'sampleStatus1CFD9',
+            'sortField' => 'sampleStatus1CFD9Time',
+            'rdrDateField' => 'sampleStatus1CFD9Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1PXR2' => [
+            'displayName' => 'Paxgene RNA',
+            'csvLabels' => [
+                'Paxgene RNA Received',
+                'Paxgene RNA Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PXR2',
+            'sortField' => 'sampleStatus1PXR2Time',
+            'rdrDateField' => 'sampleStatus1PXR2Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1UR10' => [
+            'displayName' => 'Urine 10 mL',
+            'csvLabels' => [
+                'Urine 10 mL Received',
+                'Urine 10 mL Received Date'
+            ],
+            'rdrField' => 'sampleStatus1UR10',
+            'sortField' => 'sampleStatus1UR10Time',
+            'rdrDateField' => 'sampleStatus1UR10Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1UR90' => [
+            'displayName' => 'Urine 90 mL',
+            'csvLabels' => [
+                'Urine 90 mL Received',
+                'Urine 90 mL Received Date'
+            ],
+            'rdrField' => 'sampleStatus1UR90',
+            'sortField' => 'sampleStatus1UR90Time',
+            'rdrDateField' => 'sampleStatus1UR90Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        '1SAL' => [
+            'displayName' => 'Saliva',
+            'csvLabels' => [
+                'Saliva Received',
+                'Saliva Received Date'
+            ],
+            'rdrField' => 'sampleStatus1SAL',
+            'sortField' => 'sampleStatus1SALTime',
+            'rdrDateField' => 'sampleStatus1SALTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
         'age' => [
             'displayName' => 'Age',
             'csvLabel' => 'Age',
