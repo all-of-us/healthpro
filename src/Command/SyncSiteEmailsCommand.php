@@ -66,21 +66,29 @@ class SyncSiteEmailsCommand extends Command
             return 0;
         }
 
+        $returnCode = 0;
         foreach ($sites as $site) {
-            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
             $output->writeln($site->getName());
-            $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
-            if (count($siteAdmins) > 0) {
-                $output->writeln(' └ Setting: ' . join(', ', $siteAdmins));
+            $existingArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+            try {
+                $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
+            } catch (\Exception $e) {
+                $output->writeln('ERROR: ' . $e->getMessage());
+                $returnCode = 1;
+                continue;
             }
-            $site->setEmail(join(', ', $siteAdmins));
-            $this->em->persist($site);
-            $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
-            $this->loggerService->log(Log::SITE_EDIT, [
-                'id' => $site->getId(),
-                'old' => $existingArray,
-                'new' => $siteDataArray
-            ]);
+            if ($site->getEmail() !== join(', ', $siteAdmins)) {
+                $output->writeln(' └ Old: ' . $site->getEmail());
+                $output->writeln(' └ New: ' . join(', ', $siteAdmins));
+                $site->setEmail(join(', ', $siteAdmins));
+                $this->em->persist($site);
+                $siteDataArray = $this->normalizer->normalize($site, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+                $this->loggerService->log(Log::SITE_EDIT, [
+                    'id' => $site->getId(),
+                    'old' => $existingArray,
+                    'new' => $siteDataArray
+                ]);
+            }
             $siteSync = $site->getSiteSync();
             if (!$siteSync) {
                 $siteSync = new SiteSync();
@@ -91,6 +99,6 @@ class SyncSiteEmailsCommand extends Command
         }
         $this->em->flush();
         $output->writeln('');
-        return 0;
+        return $returnCode;
     }
 }
