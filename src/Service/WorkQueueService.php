@@ -311,7 +311,7 @@ class WorkQueueService
                 $participant->ehrConsentExpireAuthored,
                 $userTimezone
             );
-            $row['gRoRConsent'] = WorkQueue::displayConsentStatus(
+            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
                 $participant->consentForGenomicsROR,
                 $participant->consentForGenomicsRORAuthored,
                 $userTimezone,
