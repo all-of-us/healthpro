@@ -122,7 +122,7 @@ class WorkQueue
             'rdrField' => 'consentForGenomicsROR',
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
-            'method' => 'displayConsentStatus',
+            'method' => 'displayGenomicsConsentStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForGenomicsRORFilePath'
@@ -990,6 +990,23 @@ class WorkQueue
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
                 return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+            case 'SUBMITTED_INVALID':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+            default:
+                return self::HTML_DANGER . ' (Consent Not Completed)';
+        }
+    }
+
+    public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
+    {
+        switch ($value) {
+            // Note the icons differ from ::displayConsentStatus
+            case 'SUBMITTED':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+            case 'SUBMITTED_NO_CONSENT':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+            case 'SUBMITTED_NOT_SURE':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
             default:
