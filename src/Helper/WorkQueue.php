@@ -341,6 +341,210 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
+        'TheBasics' => [
+            'displayName' => 'Basics',
+            'csvLabels' => [
+                'Basics PPI Survey Complete',
+                'Basics PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnTheBasics',
+            'sortField' => 'questionnaireOnTheBasicsAuthored',
+            'rdrDateField' => 'questionnaireOnTheBasicsAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'OverallHealth' => [
+            'displayName' => 'Health',
+            'csvLabels' => [
+                'Health PPI Survey Complete',
+                'Health PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnOverallHealth',
+            'sortField' => 'questionnaireOnOverallHealthAuthored',
+            'rdrDateField' => 'questionnaireOnOverallHealthAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'Lifestyle' => [
+            'displayName' => 'Lifestyle',
+            'csvLabels' => [
+                'Lifestyle PPI Survey Complete',
+                'Lifestyle PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnLifestyle',
+            'sortField' => 'questionnaireOnLifestyleAuthored',
+            'rdrDateField' => 'questionnaireOnLifestyleAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'MedicalHistory' => [
+            'displayName' => 'Med History',
+            'csvLabels' => [
+                'Med History PPI Survey Complete',
+                'Med History PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnMedicalHistory',
+            'sortField' => 'questionnaireOnMedicalHistoryAuthored',
+            'rdrDateField' => 'questionnaireOnMedicalHistoryAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'FamilyHealth' => [
+            'displayName' => 'Family History',
+            'csvLabels' => [
+                'Family History PPI Survey Complete',
+                'Family History PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnFamilyHealth',
+            'sortField' => 'questionnaireOnFamilyHealthAuthored',
+            'rdrDateField' => 'questionnaireOnFamilyHealthAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'PersonalAndFamilyHealthHistory' => [
+            'displayName' => 'Personal & Family Hx',
+            'csvLabels' => [
+                'Personal & Family Hx PPI Survey Complete',
+                'Personal & Family Hx PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnPersonalAndFamilyHealthHistory',
+            'sortField' => 'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
+            'rdrDateField' => 'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'HealthcareAccess' => [
+            'displayName' => 'Access',
+            'csvLabels' => [
+                'Access PPI Survey Complete',
+                'Access PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnHealthcareAccess',
+            'sortField' => 'questionnaireOnHealthcareAccessAuthored',
+            'rdrDateField' => 'questionnaireOnHealthcareAccessAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'SocialDeterminantsOfHealth' => [
+            'displayName' => 'SDOH',
+            'csvLabels' => [
+                'SDOH PPI Survey Complete',
+                'SDOH PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnSocialDeterminantsOfHealth',
+            'sortField' => 'questionnaireOnSocialDeterminantsOfHealthAuthored',
+            'rdrDateField' => 'questionnaireOnSocialDeterminantsOfHealthAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeMay' => [
+            'displayName' => 'COPE May',
+            'csvLabels' => [
+                'COPE May PPI Survey Complete',
+                'COPE May PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeMay',
+            'sortField' => 'questionnaireOnCopeMayAuthored',
+            'rdrDateField' => 'questionnaireOnCopeMayAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeJune' => [
+            'displayName' => 'COPE June',
+            'csvLabels' => [
+                'COPE June PPI Survey Complete',
+                'COPE June PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeJune',
+            'sortField' => 'questionnaireOnCopeJuneAuthored',
+            'rdrDateField' => 'questionnaireOnCopeJuneAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeJuly' => [
+            'displayName' => 'COPE July',
+            'csvLabels' => [
+                'COPE July PPI Survey Complete',
+                'COPE July PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeJuly',
+            'sortField' => 'questionnaireOnCopeJulyAuthored',
+            'rdrDateField' => 'questionnaireOnCopeJulyAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeNov' => [
+            'displayName' => 'COPE Nov',
+            'csvLabels' => [
+                'COPE Nov PPI Survey Complete',
+                'COPE Nov PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeNov',
+            'sortField' => 'questionnaireOnCopeNovAuthored',
+            'rdrDateField' => 'questionnaireOnCopeNovAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeDec' => [
+            'displayName' => 'COPE Dec',
+            'csvLabels' => [
+                'COPE Dec PPI Survey Complete',
+                'COPE Dec PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeDec',
+            'sortField' => 'questionnaireOnCopeDecAuthored',
+            'rdrDateField' => 'questionnaireOnCopeDecAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeFeb' => [
+            'displayName' => 'COPE Feb',
+            'csvLabels' => [
+                'COPE Feb PPI Survey Complete',
+                'COPE Feb PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeFeb',
+            'sortField' => 'questionnaireOnCopeFebAuthored',
+            'rdrDateField' => 'questionnaireOnCopeFebAuthored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeVaccineMinute1' => [
+            'displayName' => 'Summer Minute',
+            'csvLabels' => [
+                'Summer Minute PPI Survey Complete',
+                'Summer Minute PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeVaccineMinute1',
+            'sortField' => 'questionnaireOnCopeVaccineMinute1Authored',
+            'rdrDateField' => 'questionnaireOnCopeVaccineMinute1Authored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeVaccineMinute2' => [
+            'displayName' => 'Fall Minute',
+            'csvLabels' => [
+                'Fall Minute PPI Survey Complete',
+                'Fall Minute PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeVaccineMinute2',
+            'sortField' => 'questionnaireOnCopeVaccineMinute2Authored',
+            'rdrDateField' => 'questionnaireOnCopeVaccineMinute2Authored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
+        'CopeVaccineMinute3' => [
+            'displayName' => 'Winter Minute',
+            'csvLabels' => [
+                'Winter Minute PPI Survey Complete',
+                'Winter Minute PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeVaccineMinute3',
+            'sortField' => 'questionnaireOnCopeVaccineMinute3Authored',
+            'rdrDateField' => 'questionnaireOnCopeVaccineMinute3Authored',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true
+        ],
         'pairedSite' => [
             'displayName' => 'Paired Site',
             'csvLabel' => 'Paired Site',
