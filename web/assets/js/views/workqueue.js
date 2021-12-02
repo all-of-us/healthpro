@@ -109,7 +109,7 @@ $(document).ready(function() {
     );
     Object.keys(surveys).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'ppi'+key, visible: false, data: 'ppi'+key, class: 'text-center' }
+        { name: key, visible: false, data: key, class: 'text-center' }
       );
     });
     tableColumns.push(

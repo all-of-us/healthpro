@@ -267,7 +267,7 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
-        'ehrDataTransfer' => [
+        'isEhrDataAvailable' => [
             'displayName' => 'EHR Data Transfer',
             'csvLabel' => 'EHR Data Transfer',
             'rdrField' => 'isEhrDataAvailable',
@@ -276,13 +276,37 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
-        'mostRecentEhrReceipt' => [
+        'latestEhrReceiptTime' => [
             'displayName' => 'Most Recent EHR Receipt',
             'csvLabel' => 'Most Recent EHR Receipt',
             'rdrField' => 'latestEhrReceiptTime',
             'sortField' => 'latestEhrReceiptTime',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
+        ],
+        'patientStatusYes' => [
+            'displayName' => 'Yes',
+            'method' => 'getPatientStatus',
+            'type' => 'patientStatus',
+            'value' => 'YES'
+        ],
+        'patientStatusNo' => [
+            'displayName' => 'No',
+            'method' => 'getPatientStatus',
+            'type' => 'patientStatus',
+            'value' => 'NO'
+        ],
+        'patientStatusNoAccess' => [
+            'displayName' => 'No Access',
+            'method' => 'getPatientStatus',
+            'type' => 'patientStatus',
+            'value' => 'NO_ACCESS'
+        ],
+        'patientStatusUnknown' => [
+            'displayName' => 'Unknown',
+            'method' => 'getPatientStatus',
+            'type' => 'patientStatus',
+            'value' => 'UNKNOWN'
         ],
         'contactMethod' => [
             'displayName' => 'Contact Method',
@@ -317,7 +341,7 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
-        'contactPhone' => [
+        'phone' => [
             'displayName' => 'Contact Phone',
             'csvLabel' => 'Contact Phone',
             'rdrField' => 'phoneNumber',
@@ -350,8 +374,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnTheBasics',
             'sortField' => 'questionnaireOnTheBasicsAuthored',
             'rdrDateField' => 'questionnaireOnTheBasicsAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'OverallHealth' => [
             'displayName' => 'Health',
@@ -362,8 +388,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnOverallHealth',
             'sortField' => 'questionnaireOnOverallHealthAuthored',
             'rdrDateField' => 'questionnaireOnOverallHealthAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'Lifestyle' => [
             'displayName' => 'Lifestyle',
@@ -374,8 +402,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnLifestyle',
             'sortField' => 'questionnaireOnLifestyleAuthored',
             'rdrDateField' => 'questionnaireOnLifestyleAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'MedicalHistory' => [
             'displayName' => 'Med History',
@@ -386,8 +416,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnMedicalHistory',
             'sortField' => 'questionnaireOnMedicalHistoryAuthored',
             'rdrDateField' => 'questionnaireOnMedicalHistoryAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'FamilyHealth' => [
             'displayName' => 'Family History',
@@ -398,8 +430,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnFamilyHealth',
             'sortField' => 'questionnaireOnFamilyHealthAuthored',
             'rdrDateField' => 'questionnaireOnFamilyHealthAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'PersonalAndFamilyHealthHistory' => [
             'displayName' => 'Personal & Family Hx',
@@ -410,8 +444,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnPersonalAndFamilyHealthHistory',
             'sortField' => 'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
             'rdrDateField' => 'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'HealthcareAccess' => [
             'displayName' => 'Access',
@@ -422,8 +458,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnHealthcareAccess',
             'sortField' => 'questionnaireOnHealthcareAccessAuthored',
             'rdrDateField' => 'questionnaireOnHealthcareAccessAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'SocialDeterminantsOfHealth' => [
             'displayName' => 'SDOH',
@@ -434,8 +472,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnSocialDeterminantsOfHealth',
             'sortField' => 'questionnaireOnSocialDeterminantsOfHealthAuthored',
             'rdrDateField' => 'questionnaireOnSocialDeterminantsOfHealthAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeMay' => [
             'displayName' => 'COPE May',
@@ -446,8 +486,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeMay',
             'sortField' => 'questionnaireOnCopeMayAuthored',
             'rdrDateField' => 'questionnaireOnCopeMayAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeJune' => [
             'displayName' => 'COPE June',
@@ -458,8 +500,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeJune',
             'sortField' => 'questionnaireOnCopeJuneAuthored',
             'rdrDateField' => 'questionnaireOnCopeJuneAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeJuly' => [
             'displayName' => 'COPE July',
@@ -470,8 +514,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeJuly',
             'sortField' => 'questionnaireOnCopeJulyAuthored',
             'rdrDateField' => 'questionnaireOnCopeJulyAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeNov' => [
             'displayName' => 'COPE Nov',
@@ -482,8 +528,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeNov',
             'sortField' => 'questionnaireOnCopeNovAuthored',
             'rdrDateField' => 'questionnaireOnCopeNovAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeDec' => [
             'displayName' => 'COPE Dec',
@@ -494,8 +542,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeDec',
             'sortField' => 'questionnaireOnCopeDecAuthored',
             'rdrDateField' => 'questionnaireOnCopeDecAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeFeb' => [
             'displayName' => 'COPE Feb',
@@ -506,8 +556,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeFeb',
             'sortField' => 'questionnaireOnCopeFebAuthored',
             'rdrDateField' => 'questionnaireOnCopeFebAuthored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeVaccineMinute1' => [
             'displayName' => 'Summer Minute',
@@ -518,8 +570,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeVaccineMinute1',
             'sortField' => 'questionnaireOnCopeVaccineMinute1Authored',
             'rdrDateField' => 'questionnaireOnCopeVaccineMinute1Authored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeVaccineMinute2' => [
             'displayName' => 'Fall Minute',
@@ -530,8 +584,10 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeVaccineMinute2',
             'sortField' => 'questionnaireOnCopeVaccineMinute2Authored',
             'rdrDateField' => 'questionnaireOnCopeVaccineMinute2Authored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'CopeVaccineMinute3' => [
             'displayName' => 'Winter Minute',
@@ -542,15 +598,17 @@ class WorkQueue
             'rdrField' => 'questionnaireOnCopeVaccineMinute3',
             'sortField' => 'questionnaireOnCopeVaccineMinute3Authored',
             'rdrDateField' => 'questionnaireOnCopeVaccineMinute3Authored',
+            'method' => 'displaySurveyStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'survey'
         ],
         'pairedSite' => [
             'displayName' => 'Paired Site',
             'csvLabel' => 'Paired Site',
             'rdrField' => 'siteSuffix',
             'sortField' => 'siteSuffix',
-            'method' => 'getSiteDisplayName',
+            'serviceMethod' => 'getSiteDisplayName',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
@@ -559,7 +617,7 @@ class WorkQueue
             'csvLabel' => 'Paired Organization',
             'rdrField' => 'organization',
             'sortField' => 'organization',
-            'method' => 'getOrganizationDisplayName',
+            'serviceMethod' => 'getOrganizationDisplayName',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
@@ -574,14 +632,15 @@ class WorkQueue
             'rdrDateField' => 'physicalMeasurementsFinalizedTime',
             'method' => 'displayStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'statusText' => 'COMPLETED'
         ],
-        'physicalMeasurementsSite' => [
+        'evaluationFinalizedSite' => [
             'displayName' => 'Phys Meas Site',
             'csvLabel' => 'Physical Measurements Site',
             'rdrField' => 'evaluationFinalizedSite',
             'sortField' => 'evaluationFinalizedSite',
-            'method' => 'getSiteDisplayName',
+            'serviceMethod' => 'getSiteDisplayName',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
@@ -592,7 +651,8 @@ class WorkQueue
             'sortField' => 'samplesToIsolateDNA',
             'method' => 'displayStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'statusText' => 'RECEIVED'
         ],
         'biobankSamples' => [
             'displayName' => 'Baseline Samples',
@@ -607,7 +667,7 @@ class WorkQueue
             'csvLabel' => 'Biospecimens Site',
             'rdrField' => 'orderCreatedSite',
             'sortField' => 'orderCreatedSite',
-            'method' => 'getSiteDisplayName',
+            'serviceMethod' => 'getSiteDisplayName',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
@@ -621,7 +681,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1SST8Time',
             'rdrDateField' => 'sampleStatus1SST8Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1PST8' => [
             'displayName' => '8 mL PST',
@@ -633,7 +694,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1PST8Time',
             'rdrDateField' => 'sampleStatus1PST8Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1HEP4' => [
             'displayName' => '4 mL Na-Hep',
@@ -645,7 +707,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1HEP4Time',
             'rdrDateField' => 'sampleStatus1HEP4Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1ED02' => [
             'displayName' => '2 mL EDTA',
@@ -657,7 +720,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1ED02Time',
             'rdrDateField' => 'sampleStatus1ED02Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1ED04' => [
             'displayName' => '4 mL EDTA',
@@ -669,7 +733,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1ED04Time',
             'rdrDateField' => 'sampleStatus1ED04Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1ED10' => [
             'displayName' => '1st 10 mL EDTA',
@@ -681,7 +746,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1ED10Time',
             'rdrDateField' => 'sampleStatus1ED10Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '2ED10' => [
             'displayName' => '2nd 10 mL EDTA',
@@ -693,7 +759,8 @@ class WorkQueue
             'sortField' => 'sampleStatus2ED10Time',
             'rdrDateField' => 'sampleStatus2ED10Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1CFD9' => [
             'displayName' => 'Cell-Free DNA',
@@ -705,7 +772,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1CFD9Time',
             'rdrDateField' => 'sampleStatus1CFD9Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1PXR2' => [
             'displayName' => 'Paxgene RNA',
@@ -717,7 +785,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1PXR2Time',
             'rdrDateField' => 'sampleStatus1PXR2Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1UR10' => [
             'displayName' => 'Urine 10 mL',
@@ -729,7 +798,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1UR10Time',
             'rdrDateField' => 'sampleStatus1UR10Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1UR90' => [
             'displayName' => 'Urine 90 mL',
@@ -741,7 +811,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1UR90Time',
             'rdrDateField' => 'sampleStatus1UR90Time',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         '1SAL' => [
             'displayName' => 'Saliva',
@@ -753,7 +824,8 @@ class WorkQueue
             'sortField' => 'sampleStatus1SALTime',
             'rdrDateField' => 'sampleStatus1SALTime',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'sample'
         ],
         'age' => [
             'displayName' => 'Age',
