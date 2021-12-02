@@ -337,7 +337,7 @@ class WorkQueueService
                                     : null
                             );
                         }
-                    } elseif (isset($columnDef['statusText'])){
+                    } elseif (isset($columnDef['statusText'])) {
                         $row[$field] = WorkQueue::{$columnDef['method']}(
                             $participant->{$columnDef['rdrField']},
                             $columnDef['statusText'],
