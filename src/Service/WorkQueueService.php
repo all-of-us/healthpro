@@ -275,12 +275,6 @@ class WorkQueueService
                         if ($field === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
                             $row[$field] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                         }
-                    } elseif ($columnDef['type'] === 'survey') {
-                        $row[$field] = WorkQueue::{$columnDef['method']}(
-                            $participant->{$columnDef['rdrField']},
-                            $participant->{$columnDef['rdrDateField']},
-                            $userTimezone
-                        );
                     } elseif ($columnDef['type'] === 'participantStatus') {
                         $row[$field] = $e($participant->{$columnDef['rdrField']}) . $this->getEnrollmentStatusTime($participant, $userTimezone);
                     } elseif ($columnDef['type'] === 'patientStatus') {
@@ -323,19 +317,34 @@ class WorkQueueService
                                 $participant->{$columnDef['rdrDateField']},
                                 false
                             );
-                        } else {
-                            $row[$field] = WorkQueue::{$columnDef['method']}(
-                                $participant->{$columnDef['rdrField']},
-                                $participant->{$columnDef['rdrDateField']},
-                                $userTimezone,
-                                true,
-                                (isset($columnDef['pdfPath']) && $participant->{$columnDef['pdfPath']})
-                                    ? $this->urlGenerator->generate('participant_consent', [
-                                    'id' => $participant->id,
-                                    'consentType' => $columnDef['rdrField']
-                                ])
-                                    : null
-                            );
+                        } elseif (isset($columnDef['params'])) {
+                            if ($columnDef['params'] === 5) {
+                                $row[$field] = WorkQueue::{$columnDef['method']}(
+                                    $participant->{$columnDef['rdrField']},
+                                    $participant->{$columnDef['rdrDateField']},
+                                    $userTimezone,
+                                    $columnDef['displayTime'],
+                                    (isset($columnDef['pdfPath']) && $participant->{$columnDef['pdfPath']})
+                                        ? $this->urlGenerator->generate('participant_consent', [
+                                        'id' => $participant->id,
+                                        'consentType' => $columnDef['rdrField']
+                                    ])
+                                        : null
+                                );
+                            } elseif ($columnDef['params'] === 4) {
+                                $row[$field] = WorkQueue::{$columnDef['method']}(
+                                    $participant->{$columnDef['rdrField']},
+                                    $participant->{$columnDef['rdrDateField']},
+                                    $userTimezone,
+                                    $columnDef['displayTime']
+                                );
+                            } elseif ($columnDef['params'] === 3) {
+                                $row[$field] = WorkQueue::{$columnDef['method']}(
+                                    $participant->{$columnDef['rdrField']},
+                                    $participant->{$columnDef['rdrDateField']},
+                                    $userTimezone
+                                );
+                            }
                         }
                     } elseif (isset($columnDef['statusText'])) {
                         $row[$field] = WorkQueue::{$columnDef['method']}(

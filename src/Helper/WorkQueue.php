@@ -122,6 +122,8 @@ class WorkQueue
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'method' => 'displayConsentStatus',
+            'params' => 5,
+            'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForStudyEnrollmentFilePath'
@@ -160,6 +162,8 @@ class WorkQueue
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
             'method' => 'displayConsentStatus',
+            'params' => 5,
+            'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath'
@@ -175,6 +179,8 @@ class WorkQueue
             'rdrDateField' => 'ehrConsentExpireAuthored',
             'otherField' => 'consentForElectronicHealthRecords',
             'method' => 'displayEhrConsentExpireStatus',
+            'params' => 4,
+            'displayTime' => false,
             'csvMethod' => 'csvEhrConsentExpireStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
@@ -189,6 +195,8 @@ class WorkQueue
             'sortField' => 'consentForGenomicsRORAuthored',
             'rdrDateField' => 'consentForGenomicsRORAuthored',
             'method' => 'displayGenomicsConsentStatus',
+            'params' => 5,
+            'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForGenomicsRORFilePath'
@@ -210,6 +218,8 @@ class WorkQueue
             'sortField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'rdrDateField' => 'consentForDvElectronicHealthRecordsSharingAuthored',
             'method' => 'displayConsentStatus',
+            'params' => 5,
+            'displayTime' => false,
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
@@ -223,6 +233,8 @@ class WorkQueue
             'sortField' => 'consentForCABoRAuthored',
             'rdrDateField' => 'consentForCABoRAuthored',
             'method' => 'displayConsentStatus',
+            'params' => 5,
+            'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForCABoRFilePath'
@@ -258,6 +270,7 @@ class WorkQueue
             'sortField' => 'retentionEligibleStatus',
             'rdrDateField' => 'retentionEligibleTime',
             'method' => 'getRetentionEligibleStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
@@ -381,9 +394,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnTheBasicsAuthored',
             'rdrDateField' => 'questionnaireOnTheBasicsAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'OverallHealth' => [
             'displayName' => 'Health',
@@ -395,9 +408,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnOverallHealthAuthored',
             'rdrDateField' => 'questionnaireOnOverallHealthAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'Lifestyle' => [
             'displayName' => 'Lifestyle',
@@ -409,9 +422,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnLifestyleAuthored',
             'rdrDateField' => 'questionnaireOnLifestyleAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'MedicalHistory' => [
             'displayName' => 'Med History',
@@ -423,9 +436,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnMedicalHistoryAuthored',
             'rdrDateField' => 'questionnaireOnMedicalHistoryAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'FamilyHealth' => [
             'displayName' => 'Family History',
@@ -437,9 +450,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnFamilyHealthAuthored',
             'rdrDateField' => 'questionnaireOnFamilyHealthAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'PersonalAndFamilyHealthHistory' => [
             'displayName' => 'Personal & Family Hx',
@@ -451,9 +464,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
             'rdrDateField' => 'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'HealthcareAccess' => [
             'displayName' => 'Access',
@@ -465,9 +478,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnHealthcareAccessAuthored',
             'rdrDateField' => 'questionnaireOnHealthcareAccessAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'SocialDeterminantsOfHealth' => [
             'displayName' => 'SDOH',
@@ -479,9 +492,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnSocialDeterminantsOfHealthAuthored',
             'rdrDateField' => 'questionnaireOnSocialDeterminantsOfHealthAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeMay' => [
             'displayName' => 'COPE May',
@@ -493,9 +506,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeMayAuthored',
             'rdrDateField' => 'questionnaireOnCopeMayAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeJune' => [
             'displayName' => 'COPE June',
@@ -507,9 +520,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeJuneAuthored',
             'rdrDateField' => 'questionnaireOnCopeJuneAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeJuly' => [
             'displayName' => 'COPE July',
@@ -521,9 +534,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeJulyAuthored',
             'rdrDateField' => 'questionnaireOnCopeJulyAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeNov' => [
             'displayName' => 'COPE Nov',
@@ -535,9 +548,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeNovAuthored',
             'rdrDateField' => 'questionnaireOnCopeNovAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeDec' => [
             'displayName' => 'COPE Dec',
@@ -549,9 +562,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeDecAuthored',
             'rdrDateField' => 'questionnaireOnCopeDecAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeFeb' => [
             'displayName' => 'COPE Feb',
@@ -563,9 +576,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeFebAuthored',
             'rdrDateField' => 'questionnaireOnCopeFebAuthored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeVaccineMinute1' => [
             'displayName' => 'Summer Minute',
@@ -577,9 +590,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeVaccineMinute1Authored',
             'rdrDateField' => 'questionnaireOnCopeVaccineMinute1Authored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeVaccineMinute2' => [
             'displayName' => 'Fall Minute',
@@ -591,9 +604,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeVaccineMinute2Authored',
             'rdrDateField' => 'questionnaireOnCopeVaccineMinute2Authored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'CopeVaccineMinute3' => [
             'displayName' => 'Winter Minute',
@@ -605,9 +618,9 @@ class WorkQueue
             'sortField' => 'questionnaireOnCopeVaccineMinute3Authored',
             'rdrDateField' => 'questionnaireOnCopeVaccineMinute3Authored',
             'method' => 'displaySurveyStatus',
+            'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'survey'
+            'toggleColumn' => true
         ],
         'pairedSite' => [
             'displayName' => 'Paired Site',
