@@ -265,7 +265,7 @@ class WorkQueueService
                                 break;
                             }
                         }
-                        $row["sample{$field}"] = WorkQueue::displayStatus(
+                        $row[$field] = WorkQueue::displayStatus(
                             $participant->{'sampleStatus' . $newSample},
                             'RECEIVED',
                             $userTimezone,
@@ -273,7 +273,7 @@ class WorkQueueService
                             false
                         );
                         if ($field === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
-                            $row["sample{$field}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
+                            $row[$field] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                         }
                     } elseif ($columnDef['type'] === 'survey') {
                         $row[$field] = WorkQueue::{$columnDef['method']}(
@@ -281,8 +281,30 @@ class WorkQueueService
                             $participant->{$columnDef['rdrDateField']},
                             $userTimezone
                         );
+                    } elseif ($columnDef['type'] === 'participantStatus') {
+                        $row[$field] = $e($participant->{$columnDef['rdrField']}) . $this->getEnrollmentStatusTime($participant, $userTimezone);
                     } elseif ($columnDef['type'] === 'patientStatus') {
                         $row[$field] = $this->{$columnDef['method']}($participant, $columnDef['value']);
+                    } elseif ($columnDef['type'] === 'activityStatus') {
+                        $row[$field] = WorkQueue::{$columnDef['method']}($participant, $userTimezone);
+                    } elseif ($columnDef['type'] === 'firstEhrConsent') {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant->{$columnDef['rdrField']},
+                            $userTimezone,
+                            'ehr'
+                        );
+                    } elseif ($columnDef['type'] === 'address') {
+                        if ($participant->{$columnDef['participantMethod']}()) {
+                            $row[$field] = $e($participant->{$columnDef['participantMethod']}());
+                        } else {
+                            $row[$field] = '';
+                        }
+                    } elseif ($columnDef['type'] === 'ppiStatus') {
+                        if ($participant->{$columnDef['rdrField']} == 3) {
+                            $row[$field] = WorkQueue::HTML_SUCCESS;
+                        } else {
+                            $row[$field] = WorkQueue::HTML_DANGER;
+                        }
                     }
                 } elseif (isset($columnDef['method'])) {
                     if (isset($columnDef['rdrDateField'])) {
@@ -325,11 +347,13 @@ class WorkQueueService
                         foreach (array_keys($columnDef['displayNames']) as $type) {
                             $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
                         }
-                    } else {
+                    } elseif (isset($columnDef['userTimezone'])) {
                         $row[$field] = WorkQueue::{$columnDef['method']}(
                             $participant->{$columnDef['rdrField']},
                             $userTimezone
                         );
+                    } else {
+                        $row[$field] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']});
                     }
                 } else {
                     $row[$field] = $e($participant->{$columnDef['rdrField']});
@@ -337,7 +361,6 @@ class WorkQueueService
             }
             array_push($rows, $row);
         }
-        error_log(print_r($rows, true));
         return $rows;
     }
 

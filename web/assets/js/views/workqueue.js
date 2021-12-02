@@ -123,7 +123,7 @@ $(document).ready(function() {
     );
     Object.keys(samples).forEach(function(key, _i) {
       tableColumns.push(
-        { name: 'sample'+key, visible: false, data: 'sample'+key, class: 'text-center' }
+        { name: key, visible: false, data: key, class: 'text-center' }
       );
     });
     tableColumns.push(

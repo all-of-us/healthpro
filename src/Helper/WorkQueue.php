@@ -68,14 +68,17 @@ class WorkQueue
             'csvLabel' => 'Participant Status',
             'rdrField' => 'enrollmentStatus',
             'sortField' => 'enrollmentStatus',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'participantStatus'
         ],
         'activityStatus' => [
             'displayName' => 'Activity Status',
             'csvLabel' => 'Activity Status',
             'rdrField' => 'activityStatus',
             'sortField' => 'activityStatus',
-            'toggleColumn' => true
+            'method' => 'getActivityStatus',
+            'toggleColumn' => true,
+            'type' => 'activityStatus'
         ],
         'withdrawalReason' => [
             'displayName' => 'Withdrawal Reason',
@@ -104,10 +107,10 @@ class WorkQueue
             'csvLabel' => 'Date of First Primary Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'rdrDateField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'method' => 'displayFirstConsentStatusTime',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'userTimezone' => true
         ],
         'primaryConsent' => [
             'displayName' => 'Primary Consent',
@@ -142,10 +145,10 @@ class WorkQueue
             'csvLabel' => 'Date of First EHR Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'rdrDateField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'method' => 'displayFirstConsentStatusTime',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'firstEhrConsent'
         ],
         'ehrConsent' => [
             'displayName' => 'EHR Consent',
@@ -282,7 +285,8 @@ class WorkQueue
             'rdrField' => 'latestEhrReceiptTime',
             'sortField' => 'latestEhrReceiptTime',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'userTimezone' => true
         ],
         'patientStatusYes' => [
             'displayName' => 'Yes',
@@ -323,7 +327,8 @@ class WorkQueue
             'sortField' => 'address',
             'participantMethod' => 'getAddress',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'address'
         ],
         'email' => [
             'displayName' => 'Email',
@@ -355,7 +360,8 @@ class WorkQueue
             'rdrField' => 'numCompletedBaselinePPIModules',
             'sortField' => 'numCompletedBaselinePPIModules',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'type' => 'ppiStatus'
         ],
         'ppiSurveys' => [
             'displayName' => 'Completed Surveys',
