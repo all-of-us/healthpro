@@ -1863,7 +1863,6 @@ class WorkQueue
                         : $date->format('n/j/Y');
                 }
                 return date('n/j/Y', strtotime($string));
-
             } catch (\Exception $e) {
                 return '';
             }
