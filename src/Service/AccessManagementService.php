@@ -28,7 +28,7 @@ class AccessManagementService
         $this->userService = $userService;
     }
 
-    public function sendEmail($group, $member, $memberLastDay, $currentTime): void
+    public function sendEmail($group, $member, $memberLastDay, $currentTime, $attestation = null): void
     {
         $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
         if ($this->params->has('feature.drcsupportemail') && $this->params->get('feature.drcsupportemail')) {
@@ -39,7 +39,8 @@ class AccessManagementService
                     'member' => $member,
                     'memberLastDay' => $memberLastDay->format('m/d/Y'),
                     'loggedUser' => $this->userService->getUser()->getEmail(),
-                    'currentTime' => $currentTime->format('Y-m-d H:i:s e')
+                    'currentTime' => $currentTime->format('Y-m-d H:i:s e'),
+                    'attestation' => $attestation
                 ])
                 ->send();
             $this->loggerService->log(Log::GROUP_MEMBER_REMOVE_NOTIFY, [

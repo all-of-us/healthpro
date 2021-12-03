@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/s/admin/sites")
+ * @Route("/admin/sites")
  */
 class SitesController extends AbstractController
 {
@@ -109,7 +109,16 @@ class SitesController extends AbstractController
         if (!$site) {
             throw $this->createNotFoundException('Site not found.');
         }
-        $emails = join(', ', $siteSyncService->getSiteAdminEmails($site));
+        try {
+            $emails = join(', ', $siteSyncService->getSiteAdminEmails($site));
+        } catch (\Exception $e) {
+            $this->addFlash('error', sprintf(
+                'Unable to retrieve email for %s (%s)',
+                $site->getName(),
+                $site->getSiteId(),
+            ));
+            return $this->redirectToRoute('admin_sites');
+        }
 
         if (!$env->isProd() && !$env->isLocal()) {
             $this->addFlash('error', sprintf(

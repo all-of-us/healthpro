@@ -198,13 +198,13 @@ $(document).ready(function () {
     $('#columns_select_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
         showColumns();
-        $.get("/s/workqueue/consent/columns", {select: true});
+        $.get("/workqueue/consent/columns", {select: true});
     });
 
     $('#columns_deselect_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', false);
         hideColumns();
-        $.get("/s/workqueue/consent/columns", {deselect: true});
+        $.get("/workqueue/consent/columns", {deselect: true});
     });
 
     $('#participant_lookup_reset').on('click', function () {

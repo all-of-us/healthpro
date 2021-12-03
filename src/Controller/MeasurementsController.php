@@ -23,9 +23,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/s")
- */
 class MeasurementsController extends AbstractController
 {
     protected $em;
@@ -475,7 +472,7 @@ class MeasurementsController extends AbstractController
         }
         $fhir = $measurement->getFhir($date, $parentRdrId);
         if ($isTest) {
-            $fhir = \App\Test\Entity\MeasurementTest::getNormalizedFhir($fhir);
+            $fhir = \App\Tests\Entity\MeasurementTest::getNormalizedFhir($fhir);
             $response = new JsonResponse($fhir);
             $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
         } else {

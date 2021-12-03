@@ -43,7 +43,7 @@ class ProblemController extends AbstractController
     }
 
     /**
-     * @Route("/s/problem/reports", name="problem_reports")
+     * @Route("/problem/reports", name="problem_reports")
      * IsGranted("ROLE_DV_ADMIN")
      */
     public function reports(Request $request, ProblemRepository $problemRepository): Response
@@ -58,7 +58,7 @@ class ProblemController extends AbstractController
     }
 
     /**
-     * @Route("/s/problem/details/{problemId}", name="problem_details")
+     * @Route("/problem/details/{problemId}", name="problem_details")
      * IsGranted("ROLE_DV_ADMIN")
      */
     public function detail($problemId, Request $request, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
@@ -84,8 +84,8 @@ class ProblemController extends AbstractController
     }
 
     /**
-     * @Route("/s/participant/{participantId}/problem", name="problem_form_new")
-     * @Route("/s/participant/{participantId}/problem/{problemId}", name="problem_form")
+     * @Route("/participant/{participantId}/problem", name="problem_form_new")
+     * @Route("/participant/{participantId}/problem/{problemId}", name="problem_form")
      */
     public function problemForm($participantId, $problemId=null, Request $request, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
     {
@@ -193,7 +193,7 @@ class ProblemController extends AbstractController
     }
 
     /**
-     * @Route("/s/participant/{participantId}/problem/{problemId}/comment", name="problem_comment", methods={"POST"})
+     * @Route("/participant/{participantId}/problem/{problemId}/comment", name="problem_comment", methods={"POST"})
      */
     public function problemComment($participantId, $problemId, Request $request, LoggerService $loggerService, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository): Response
     {

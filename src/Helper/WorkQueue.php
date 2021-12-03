@@ -997,6 +997,23 @@ class WorkQueue
         }
     }
 
+    public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
+    {
+        switch ($value) {
+            // Note the icons differ from ::displayConsentStatus
+            case 'SUBMITTED':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+            case 'SUBMITTED_NO_CONSENT':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+            case 'SUBMITTED_NOT_SURE':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+            case 'SUBMITTED_INVALID':
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+            default:
+                return self::HTML_DANGER . ' (Consent Not Completed)';
+        }
+    }
+
     public static function displayFirstConsentStatusTime($time, $userTimezone, $type = 'primary', $displayTime = true)
     {
         if (!empty($time)) {
@@ -1005,22 +1022,6 @@ class WorkQueue
             return self::HTML_DANGER . ' (never consented yes)';
         }
         return '';
-    }
-
-    public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true)
-    {
-        switch ($value) {
-            case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Consented Yes)';
-            case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Refused Consent)';
-            case 'SUBMITTED_NOT_SURE':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Responded Not Sure)';
-            case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime) . ' (Invalid)';
-            default:
-                return self::HTML_DANGER . ' (Consent Not Completed)';
-        }
     }
 
     public static function displayEhrConsentExpireStatus(

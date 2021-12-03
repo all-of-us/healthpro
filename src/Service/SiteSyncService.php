@@ -273,6 +273,7 @@ class SiteSyncService
         $siteAdmins = [];
         $groupEmail = self::SITE_PREFIX . $site->getGoogleGroup() . '@' . $this->params->get('gaDomain');
         $members = $this->googleGroupsService->getMembers($groupEmail, ['OWNER', 'MANAGER']);
+
         if (count($members) === 0) {
             return $siteAdmins;
         }
