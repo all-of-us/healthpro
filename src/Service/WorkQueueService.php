@@ -437,109 +437,67 @@ class WorkQueueService
     public function generateExportRow($participant, $workQueueColumns = null)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
-        $row = [
-            $participant->lastName,
-            $participant->firstName,
-            $participant->middleName,
-            WorkQueue::csvDateFromObject($participant->dob),
-            $participant->id,
-            $participant->biobankId,
-            $participant->enrollmentStatus,
-            WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $userTimezone),
-            $participant->isWithdrawn ? '1' : '0',
-            WorkQueue::dateFromString($participant->withdrawalAuthored, $userTimezone),
-            $participant->withdrawalReason,
-            $participant->isSuspended ? '1' : '0',
-            WorkQueue::dateFromString($participant->suspensionTime, $userTimezone),
-            WorkQueue::csvDeceasedStatus($participant->deceasedStatus),
-            $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '',
-            $participant->deceasedStatus === 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $userTimezone, false) : '',
-            $participant->participantOrigin,
-            $participant->consentCohortText,
-            WorkQueue::dateFromString($participant->consentForStudyEnrollmentFirstYesAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram),
-            WorkQueue::dateFromString($participant->questionnaireOnDnaProgramAuthored, $userTimezone),
-            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsFirstYesAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $userTimezone),
-            WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords),
-            WorkQueue::dateFromString($participant->ehrConsentExpireAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR),
-            WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $userTimezone),
-            $participant->primaryLanguage,
-            WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing),
-            WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
-            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $userTimezone),
-            $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0,
-            WorkQueue::dateFromString($participant->retentionEligibleTime, $userTimezone),
-            WorkQueue::csvRetentionType($participant->retentionType),
-            $participant->isEhrDataAvailable ? 1 : 0,
-            WorkQueue::dateFromString($participant->latestEhrReceiptTime, $userTimezone),
-            $this->getPatientStatus($participant, 'YES', 'export'),
-            $this->getPatientStatus($participant, 'NO', 'export'),
-            $this->getPatientStatus($participant, 'NO ACCESS', 'export'),
-            $this->getPatientStatus($participant, 'UNKNOWN', 'export'),
-            $participant->streetAddress,
-            !empty($participant->streetAddress2) ? $participant->streetAddress2 : '',
-            $participant->city,
-            $participant->state,
-            $participant->zipCode,
-            $participant->email,
-            $participant->loginPhoneNumber,
-            $participant->phoneNumber,
-            $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
-            $participant->numCompletedPPIModules,
-        ];
-        foreach (array_keys(WorkQueue::$surveys) as $survey) {
-            if (in_array($survey, WorkQueue::$initialSurveys)) {
-                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $userTimezone);
-            }
-        }
-        $row[] = $participant->siteSuffix;
-        $row[] = $participant->organization;
-        $row[] = $participant->physicalMeasurementsStatus === 'COMPLETED' ? '1' : '0';
-        $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $userTimezone, false);
-        $row[] = $participant->evaluationFinalizedSite;
-        $row[] = $participant->samplesToIsolateDNA === 'RECEIVED' ? '1' : '0';
-        $row[] = $participant->numBaselineSamplesArrived;
-        $row[] = $participant->orderCreatedSite;
-        foreach (array_keys(WorkQueue::$samples) as $sample) {
-            $newSample = $sample;
-            foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} === 'RECEIVED') {
-                    $newSample = $sampleAlias[$sample];
-                    break;
+        $row = [];
+        foreach (WorkQueue::$exportColumns as $field) {
+            $columnDef = WorkQueue::$columnsDef[$field];
+            if ($field === 'dateOfDeath') {
+                $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
+            } elseif (isset($columnDef['type']) && $columnDef['type'] === 'patientStatus') {
+                $row[] = $this->{$columnDef['method']}($participant, $columnDef['value'], 'export');
+            } elseif (isset($columnDef['type']) && $columnDef['type'] === 'sample') {
+                $newSample = $field;
+                foreach (WorkQueue::$samplesAlias as $sampleAlias) {
+                    if (array_key_exists($field, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$field]} === 'RECEIVED') {
+                        $newSample = $sampleAlias[$field];
+                        break;
+                    }
                 }
+                $row[] = $participant->{"sampleStatus{$newSample}"} === 'RECEIVED' ? '1' : '0';
+                $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimezone, false);
+            } elseif (isset($columnDef['csvStatusText'])) {
+                if (isset($columnDef['csvLabels'])) {
+                    $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? 1 : 0;
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                } else {
+                    if (isset($columnDef['rdrDateField'])) {
+                        $row[] = $participant->{$columnDef['rdrDateField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']},
+                            $userTimezone, false) : '';
+                    } else {
+                        $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? '1' : '0';
+                    }
+                }
+            } elseif (isset($columnDef['csvMethod'])) {
+                if (isset($columnDef['otherField'])) {
+                    $row[] = WorkQueue::{$columnDef['csvMethod']}(
+                        $participant->{$columnDef['rdrField']},
+                        $participant->{$columnDef['otherField']}
+                    );
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                } elseif (isset($columnDef['displayNames'])) {
+                    foreach (array_keys($columnDef['displayNames']) as $type) {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
+                    }
+                } else {
+                    $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
+                }
+            } elseif (isset($columnDef['rdrDateField'])) {
+                if (isset($columnDef['csvLabels'])) {
+                    if (isset($columnDef['fieldCheck'])) {
+                        $row[] = $participant->{$columnDef['rdrField']} ? '1' : '0';
+                    } else {
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{$columnDef['rdrField']});
+                    }
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                } else {
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                }
+            } elseif (isset($columnDef['csvRdrField'])) {
+                $row[] = $participant->{$columnDef['csvRdrField']};
+            } else {
+                $row[] = $participant->{$columnDef['rdrField']};
             }
-            $row[] = $participant->{"sampleStatus{$newSample}"} === 'RECEIVED' ? '1' : '0';
-            $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimezone, false);
         }
-        $row[] = $participant->sample1SAL2CollectionMethod;
-        $row[] = $participant->sex;
-        $row[] = $participant->genderIdentity;
-        $row[] = $participant->race;
-        $row[] = $participant->education;
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeFeb);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeFebAuthored, $userTimezone);
-        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreMinusPMTime, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute1);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute1Authored, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute2);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute2Authored, $userTimezone);
-        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
-            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
-            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
-        }
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnPersonalAndFamilyHealthHistory);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnPersonalAndFamilyHealthHistoryAuthored, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnSocialDeterminantsOfHealth);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnSocialDeterminantsOfHealthAuthored, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute3);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute3Authored, $userTimezone);
         return $row;
     }
 

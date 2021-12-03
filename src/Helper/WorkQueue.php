@@ -71,6 +71,18 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'participantStatus'
         ],
+        'coreParticipant' => [
+            'displayName' => 'Core Participant Date',
+            'csvLabel' => 'Core Participant Date',
+            'rdrDateField' => 'enrollmentStatusCoreStoredSampleTime',
+            'sortField' => 'enrollmentStatus',
+            'toggleColumn' => true
+        ],
+        'enrollmentStatusCoreMinusPMTime' => [
+            'displayName' => 'Core Participant Minus PM Date',
+            'csvLabel' => 'Core Participant Minus PM Date',
+            'rdrDateField' => 'enrollmentStatusCoreMinusPMTime',
+        ],
         'activityStatus' => [
             'displayName' => 'Activity Status',
             'csvLabel' => 'Activity Status',
@@ -80,12 +92,49 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'activityStatus'
         ],
+        'withdrawalStatus' => [
+            'displayName' => 'Withdrawal Status',
+            'csvLabels' => [
+                'Withdrawal Status',
+                'Withdrawal Date'
+            ],
+            'rdrField' => 'isWithdrawn',
+            'rdrDateField' => 'withdrawalAuthored',
+            'fieldCheck' => true
+        ],
         'withdrawalReason' => [
             'displayName' => 'Withdrawal Reason',
             'csvLabel' => 'Withdrawal Reason',
             'rdrField' => 'withdrawalReason',
             'sortField' => 'withdrawalReason',
             'toggleColumn' => true
+        ],
+        'deactivationStatus' => [
+            'displayName' => 'Deactivation Status',
+            'csvLabels' => [
+                'Deactivation Status',
+                'Deactivation Date'
+            ],
+            'rdrField' => 'isSuspended',
+            'rdrDateField' => 'suspensionTime',
+            'fieldCheck' => true
+        ],
+        'deceasedStatus' => [
+            'displayName' => 'Deceased',
+            'csvLabel' => 'Deceased',
+            'rdrField' => 'deceasedStatus',
+            'csvMethod' => 'csvDeceasedStatus'
+        ],
+        'dateOfdeath' => [
+            'displayName' => 'Date of Death',
+            'csvLabel' => 'Date of Death',
+            'rdrDateField' => 'dateOfdeath',
+        ],
+        'dateOfdeathApproval' => [
+            'displayName' => 'Date of Death Approval',
+            'csvLabel' => 'Date of Death Approval',
+            'rdrDateField' => 'deceasedAuthored',
+            'csvStatusText' => 'APPROVED'
         ],
         'participantOrigin' => [
             'displayName' => 'Participant Origination',
@@ -291,7 +340,8 @@ class WorkQueue
             'sortField' => 'isEhrDataAvailable',
             'method' => 'getEhrAvailableStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'fieldCheck' => true
         ],
         'latestEhrReceiptTime' => [
             'displayName' => 'Most Recent EHR Receipt',
@@ -336,16 +386,34 @@ class WorkQueue
         ],
         'address' => [
             'displayName' => 'Address',
-            'csvLabel' => [
-                'Street Address',
-                'Street Address2'
-            ],
+            'csvLabel' => 'Street Address',
             'rdrField' => 'address',
             'sortField' => 'address',
             'participantMethod' => 'getAddress',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'address'
+            'type' => 'address',
+            'csvRdrField' => 'streetAddress'
+        ],
+        'address2' => [
+            'displayName' => 'Address2',
+            'csvLabel' => 'Street Address2',
+            'csvRdrField' => 'streetAddress2'
+        ],
+        'city' => [
+            'displayName' => 'City',
+            'csvLabel' => 'City',
+            'csvRdrField' => 'city'
+        ],
+        'state' => [
+            'displayName' => 'State',
+            'csvLabel' => 'State',
+            'csvRdrField' => 'state'
+        ],
+        'zip' => [
+            'displayName' => 'Zip',
+            'csvLabel' => 'Zip',
+            'csvRdrField' => 'zip'
         ],
         'email' => [
             'displayName' => 'Email',
@@ -378,7 +446,8 @@ class WorkQueue
             'sortField' => 'numCompletedBaselinePPIModules',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'ppiStatus'
+            'type' => 'ppiStatus',
+            'csvStatusText' => 3
         ],
         'ppiSurveys' => [
             'displayName' => 'Completed Surveys',
@@ -852,6 +921,11 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample'
         ],
+        'sample1SAL2CollectionMethod' => [
+            'displayName' => 'Saliva Collection',
+            'csvLabel' => 'Saliva Collection',
+            'rdrField' => 'sample1SAL2CollectionMethod'
+        ],
         'age' => [
             'displayName' => 'Age',
             'csvLabel' => 'Age',
@@ -1001,8 +1075,13 @@ class WorkQueue
         'participantId',
         'biobankId',
         'participantStatus',
-        'activityStatus',
+        'coreParticipant',
+        'withdrawalStatus',
         'withdrawalReason',
+        'deactivationStatus',
+        'deceasedStatus',
+        'dateOfdeath',
+        'dateOfdeathApproval',
         'participantOrigin',
         'consentCohort',
         'firstPrimaryConsent',
@@ -1023,12 +1102,14 @@ class WorkQueue
         'patientStatusNo',
         'patientStatusNoAccess',
         'patientStatusUnknown',
-        'recontactMethod',
-        'streetAddress',
-        'streetAddress2',
+        'address',
+        'address2',
+        'city',
+        'state',
+        'zip',
         'email',
         'loginPhone',
-        'contactPhone',
+        'phone',
         'ppiStatus',
         'ppiSurveys',
         'TheBasics',
@@ -1066,14 +1147,14 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'questionnaireOnCopeFeb',
+        'CopeFeb',
         'enrollmentStatusCoreMinusPMTime',
-        'questionnaireOnCopeVaccineMinute1',
-        'questionnaireOnCopeVaccineMinute2',
+        'CopeVaccineMinute1',
+        'CopeVaccineMinute2',
         'digitalHealthSharingStatus',
-        'questionnaireOnPersonalAndFamilyHealthHistory',
-        'questionnaireOnSocialDeterminantsOfHealth',
-        'questionnaireOnCopeVaccineMinute3'
+        'PersonalAndFamilyHealthHistory',
+        'SocialDeterminantsOfHealth',
+        'CopeVaccineMinute3'
     ];
 
     public static $sortColumns = [
@@ -1765,22 +1846,24 @@ class WorkQueue
         'appleEHR' => 'Apple EHR Consent'
     ];
 
-    public static function dateFromString($string, $timezone, $displayTime = true, $link = null)
+    public static function dateFromString($string, $timezone = null, $displayTime = true, $link = null)
     {
         if (!empty($string)) {
             try {
-                $date = new \DateTime($string);
-                $date->setTimezone(new \DateTimeZone($timezone));
-                if ($displayTime) {
+                if ($timezone) {
+                    $date = new \DateTime($string);
+                    $date->setTimezone(new \DateTimeZone($timezone));
+                    if ($displayTime) {
+                        return $link
+                            ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y g:i a') . '</a>'
+                            : $date->format('n/j/Y g:i a');
+                    }
                     return $link
-                        ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y g:i a') . '</a>'
-                        : $date->format('n/j/Y g:i a')
-                    ;
+                        ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y') . '</a>'
+                        : $date->format('n/j/Y');
                 }
-                return $link
-                    ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y') . '</a>'
-                    : $date->format('n/j/Y')
-                ;
+                return date('n/j/Y', strtotime($string));
+
             } catch (\Exception $e) {
                 return '';
             }
