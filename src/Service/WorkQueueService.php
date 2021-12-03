@@ -241,7 +241,8 @@ class WorkQueueService
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
-            foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+            foreach (WorkQueue::$columns as $field) {
+                $columnDef = WorkQueue::$columnsDef[$field];
                 if (isset($columnDef['generateLink'])) {
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
                         $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
