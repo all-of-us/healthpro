@@ -7,6 +7,7 @@ use App\Service\AuthService;
 use App\Service\EnvironmentService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,12 +18,13 @@ class AuthController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session)
+    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session, ParameterBagInterface $params)
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('home');
         }
 
+        $dashboardUrl = $params->has('dashboard_url') ? $params->get('dashboard_url') : null;
         if ($env->isLocal() && $userService->canMockLogin()) {
             $loginForm = $this->createForm(MockLoginType::class);
 
@@ -46,11 +48,14 @@ class AuthController extends AbstractController
             }
 
             return $this->render('login.html.twig', [
-                'loginForm' => $loginForm->createView()
+                'loginForm' => $loginForm->createView(),
+                'dashboardUrl' => $dashboardUrl
             ]);
         }
 
-        return $this->render('login.html.twig');
+        return $this->render('login.html.twig', [
+            'dashboardUrl' => $dashboardUrl
+        ]);
     }
 
     /**

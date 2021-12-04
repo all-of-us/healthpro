@@ -34,6 +34,14 @@ body {
 #login-action img {
     max-width: 250px;
 }
+#login-action hr {
+    border-top: 2px solid #ddd;
+    width: 75%;
+    margin: 40px auto;
+}
+#login-action .links {
+    font-size: 1.8rem;
+}
 #login-copyright {
     font-size: 1rem;
     position: absolute;

@@ -18,19 +18,28 @@
                 </div>
                 <div id="login-action">
                     {% if loginForm is not defined %}
-                    <a href="{{ path('login_start') }}">
-                        <img src="/assets/img/login/sign-in-with-google.svg" alt="Sign in with Google" />
-                    </a>
+                        <div>
+                            <a href="{{ path('login_start') }}">
+                                <img src="/assets/img/login/sign-in-with-google.svg" alt="Sign in with Google" />
+                            </a>
+                        </div>
                     {% else %}
-                    <div class="text-left">
-                        <h4><i class="fa fa-sign-in" aria-hidden="true"></i> Mock Login</h4>
-                        {{ form_start(loginForm, { attr: { class: 'prevent-resubmit' } }) }}
-                        {{ form_widget(loginForm) }}
-                        <p>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </p>
-                        {{ form_end(loginForm) }}
-                    </div>
+                        <div class="text-left">
+                            <h4><i class="fa fa-sign-in" aria-hidden="true"></i> Mock Login</h4>
+                            {{ form_start(loginForm, { attr: { class: 'prevent-resubmit' } }) }}
+                            {{ form_widget(loginForm) }}
+                            <p>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </p>
+                            {{ form_end(loginForm) }}
+                        </div>
+                    {% endif %}
+
+                    {% if dashboardUrl %}
+                        <hr />
+                        <div class="links">
+                            <i class="fas fa-chart-line fa-fw"></i> <a href="{{ dashboardUrl }}">HealthPro Dashboards</a>
+                        </div>
                     {% endif %}
                 </div>
                 <div id="login-help">
