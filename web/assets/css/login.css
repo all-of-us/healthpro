@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 html {
-    background: url('/assets/img/login/login-background.jpg') no-repeat center center fixed;
+    background: url('../img/login/login-background.jpg') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
