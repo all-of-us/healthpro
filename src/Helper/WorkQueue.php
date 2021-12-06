@@ -61,7 +61,8 @@ class WorkQueue
             'csvLabel' => 'Biobank ID',
             'rdrField' => 'biobankId',
             'sortField' => 'biobankId',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'participantStatus' => [
             'displayName' => 'Participant Status',
@@ -90,7 +91,8 @@ class WorkQueue
             'sortField' => 'activityStatus',
             'method' => 'getActivityStatus',
             'toggleColumn' => true,
-            'type' => 'activityStatus'
+            'type' => 'activityStatus',
+            'visible' => false
         ],
         'withdrawalStatus' => [
             'displayName' => 'Withdrawal Status',
@@ -107,7 +109,8 @@ class WorkQueue
             'csvLabel' => 'Withdrawal Reason',
             'rdrField' => 'withdrawalReason',
             'sortField' => 'withdrawalReason',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'deactivationStatus' => [
             'displayName' => 'Deactivation Status',
@@ -141,7 +144,8 @@ class WorkQueue
             'csvLabel' => 'Participant Origination',
             'rdrField' => 'participantOrigin',
             'sortField' => 'participantOrigin',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'checkDvVisibility' => true
         ],
         'consentCohort' => [
             'displayName' => 'Consent Cohort',
@@ -159,7 +163,8 @@ class WorkQueue
             'method' => 'displayFirstConsentStatusTime',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'userTimezone' => true
+            'userTimezone' => true,
+            'visible' => false
         ],
         'primaryConsent' => [
             'displayName' => 'Primary Consent',
@@ -199,7 +204,8 @@ class WorkQueue
             'method' => 'displayFirstConsentStatusTime',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'firstEhrConsent'
+            'type' => 'firstEhrConsent',
+            'visible' => false
         ],
         'ehrConsent' => [
             'displayName' => 'EHR Consent',
@@ -232,7 +238,8 @@ class WorkQueue
             'displayTime' => false,
             'csvMethod' => 'csvEhrConsentExpireStatus',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'gRoRConsent' => [
             'displayName' => 'gRoR Consent',
@@ -270,7 +277,8 @@ class WorkQueue
             'params' => 5,
             'displayTime' => false,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'caborConsent' => [
             'displayName' => 'CABoR Consent',
@@ -286,7 +294,8 @@ class WorkQueue
             'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'pdfPath' => 'consentForCABoRFilePath'
+            'pdfPath' => 'consentForCABoRFilePath',
+            'visible' => false
         ],
         'digitalHealthSharingStatus' => [
             'displayNames' => [
@@ -307,7 +316,8 @@ class WorkQueue
             'csvMethod' => 'csvDigitalHealthSharingStatus',
             'htmlClass' => 'text-center',
             'orderable' => false,
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'retentionEligibleStatus' => [
             'displayName' => 'Retention Eligible',
@@ -322,7 +332,8 @@ class WorkQueue
             'params' => 3,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'csvStatusText' => 'ELIGIBLE'
+            'csvStatusText' => 'ELIGIBLE',
+            'visible' => false
         ],
         'retentionType' => [
             'displayName' => 'Retention Status',
@@ -331,7 +342,8 @@ class WorkQueue
             'sortField' => 'retentionType',
             'method' => 'getRetentionType',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'isEhrDataAvailable' => [
             'displayName' => 'EHR Data Transfer',
@@ -341,7 +353,8 @@ class WorkQueue
             'method' => 'getEhrAvailableStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'fieldCheck' => true
+            'fieldCheck' => true,
+            'visible' => false
         ],
         'latestEhrReceiptTime' => [
             'displayName' => 'Most Recent EHR Receipt',
@@ -350,31 +363,36 @@ class WorkQueue
             'sortField' => 'latestEhrReceiptTime',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'userTimezone' => true
+            'userTimezone' => true,
+            'visible' => false
         ],
         'patientStatusYes' => [
             'displayName' => 'Yes',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
-            'value' => 'YES'
+            'value' => 'YES',
+            'visible' => false
         ],
         'patientStatusNo' => [
             'displayName' => 'No',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
-            'value' => 'NO'
+            'value' => 'NO',
+            'visible' => false
         ],
         'patientStatusNoAccess' => [
             'displayName' => 'No Access',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
-            'value' => 'NO_ACCESS'
+            'value' => 'NO_ACCESS',
+            'visible' => false
         ],
         'patientStatusUnknown' => [
             'displayName' => 'Unknown',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
-            'value' => 'UNKNOWN'
+            'value' => 'UNKNOWN',
+            'visible' => false
         ],
         'contactMethod' => [
             'displayName' => 'Contact Method',
@@ -382,7 +400,8 @@ class WorkQueue
             'rdrField' => 'recontactMethod',
             'sortField' => 'recontactMethod',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'address' => [
             'displayName' => 'Address',
@@ -393,7 +412,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'type' => 'address',
-            'csvRdrField' => 'streetAddress'
+            'csvRdrField' => 'streetAddress',
+            'visible' => false
         ],
         'address2' => [
             'displayName' => 'Address2',
@@ -421,7 +441,8 @@ class WorkQueue
             'rdrField' => 'email',
             'sortField' => 'email',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'loginPhone' => [
             'displayName' => 'Login Phone',
@@ -429,7 +450,8 @@ class WorkQueue
             'rdrField' => 'loginPhoneNumber',
             'sortField' => 'loginPhoneNumber',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'phone' => [
             'displayName' => 'Contact Phone',
@@ -437,7 +459,8 @@ class WorkQueue
             'rdrField' => 'phoneNumber',
             'sortField' => 'phoneNumber',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'ppiStatus' => [
             'displayName' => 'Required Complete',
@@ -469,7 +492,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'OverallHealth' => [
             'displayName' => 'Health',
@@ -483,7 +507,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'Lifestyle' => [
             'displayName' => 'Lifestyle',
@@ -497,7 +522,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'MedicalHistory' => [
             'displayName' => 'Med History',
@@ -511,7 +537,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'FamilyHealth' => [
             'displayName' => 'Family History',
@@ -525,7 +552,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'PersonalAndFamilyHealthHistory' => [
             'displayName' => 'Personal & Family Hx',
@@ -539,7 +567,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'HealthcareAccess' => [
             'displayName' => 'Access',
@@ -553,7 +582,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'SocialDeterminantsOfHealth' => [
             'displayName' => 'SDOH',
@@ -567,7 +597,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeMay' => [
             'displayName' => 'COPE May',
@@ -581,7 +612,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeJune' => [
             'displayName' => 'COPE June',
@@ -595,7 +627,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeJuly' => [
             'displayName' => 'COPE July',
@@ -609,7 +642,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeNov' => [
             'displayName' => 'COPE Nov',
@@ -623,7 +657,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeDec' => [
             'displayName' => 'COPE Dec',
@@ -637,7 +672,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeFeb' => [
             'displayName' => 'COPE Feb',
@@ -651,7 +687,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeVaccineMinute1' => [
             'displayName' => 'Summer Minute',
@@ -665,7 +702,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeVaccineMinute2' => [
             'displayName' => 'Fall Minute',
@@ -679,7 +717,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'CopeVaccineMinute3' => [
             'displayName' => 'Winter Minute',
@@ -693,7 +732,8 @@ class WorkQueue
             'method' => 'displaySurveyStatus',
             'params' => 3,
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'pairedSite' => [
             'displayName' => 'Paired Site',
@@ -735,7 +775,8 @@ class WorkQueue
             'sortField' => 'evaluationFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'biobankDnaStatus' => [
             'displayName' => 'Samples to Isolate DNA?',
@@ -763,7 +804,8 @@ class WorkQueue
             'sortField' => 'orderCreatedSite',
             'serviceMethod' => 'getSiteDisplayName',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         '1SST8' => [
             'displayName' => '8 mL SST',
@@ -776,7 +818,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1SST8Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1PST8' => [
             'displayName' => '8 mL PST',
@@ -789,7 +832,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1PST8Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1HEP4' => [
             'displayName' => '4 mL Na-Hep',
@@ -802,7 +846,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1HEP4Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1ED02' => [
             'displayName' => '2 mL EDTA',
@@ -815,7 +860,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1ED02Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1ED04' => [
             'displayName' => '4 mL EDTA',
@@ -828,7 +874,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1ED04Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1ED10' => [
             'displayName' => '1st 10 mL EDTA',
@@ -841,7 +888,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1ED10Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '2ED10' => [
             'displayName' => '2nd 10 mL EDTA',
@@ -854,7 +902,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus2ED10Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1CFD9' => [
             'displayName' => 'Cell-Free DNA',
@@ -867,7 +916,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1CFD9Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1PXR2' => [
             'displayName' => 'Paxgene RNA',
@@ -880,7 +930,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1PXR2Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1UR10' => [
             'displayName' => 'Urine 10 mL',
@@ -893,7 +944,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1UR10Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1UR90' => [
             'displayName' => 'Urine 90 mL',
@@ -906,7 +958,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1UR90Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         '1SAL' => [
             'displayName' => 'Saliva',
@@ -919,7 +972,8 @@ class WorkQueue
             'rdrDateField' => 'sampleStatus1SALTime',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'type' => 'sample'
+            'type' => 'sample',
+            'visible' => false
         ],
         'sample1SAL2CollectionMethod' => [
             'displayName' => 'Saliva Collection',
@@ -932,7 +986,8 @@ class WorkQueue
             'rdrField' => 'age',
             'sortField' => 'age',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'sex' => [
             'displayName' => 'Sex',
@@ -940,7 +995,8 @@ class WorkQueue
             'rdrField' => 'sex',
             'sortField' => 'sex',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'genderIdentity' => [
             'displayName' => 'Gender Identity',
@@ -948,7 +1004,8 @@ class WorkQueue
             'rdrField' => 'genderIdentity',
             'sortField' => 'genderIdentity',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'race' => [
             'displayName' => 'Race/Ethnicity',
@@ -956,7 +1013,8 @@ class WorkQueue
             'rdrField' => 'race',
             'sortField' => 'race',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ],
         'education' => [
             'displayName' => 'Education',
@@ -964,7 +1022,8 @@ class WorkQueue
             'rdrField' => 'education',
             'sortField' => 'education',
             'htmlClass' => 'text-center',
-            'toggleColumn' => true
+            'toggleColumn' => true,
+            'visible' => false
         ]
     ];
 

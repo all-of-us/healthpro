@@ -58,11 +58,7 @@ $(document).ready(function() {
 
     var wQColumns = $('#workqueue').data('wq-columns');
     var columnsDef = $('#workqueue').data('columns-def');
-
-    var surveys = $('#workqueue').data('surveys');
-    var samples = $('#workqueue').data('samples');
     var isDvType = $('#workqueue').data('dv-type');
-    var digitalHealthSharingTypes = $('#workqueue').data('digital-health-sharing-types');
 
     var tableColumns = [];
 
@@ -75,6 +71,12 @@ $(document).ready(function() {
         }
         if (columnDef.hasOwnProperty('orderable')) {
             row.class = columnDef['orderable'];
+        }
+        if (columnDef.hasOwnProperty('visible')) {
+            row.visible = columnDef['visible'];
+        }
+        if (columnDef.hasOwnProperty('checkDvVisibility')) {
+            row.visible = !!isDvType;
         }
         tableColumns.push(row);
     };
