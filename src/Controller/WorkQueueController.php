@@ -150,7 +150,9 @@ class WorkQueueController extends AbstractController
                 'samplesAlias' => WorkQueue::$samplesAlias,
                 'canExport' => $this->workQueueService->canExport(),
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
-                'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab
+                'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab,
+                'columns' => WorkQueue::$columns,
+                'columnsDef' => WorkQueue::$columnsDef
             ]);
         }
     }
