@@ -368,6 +368,7 @@ class WorkQueue
         ],
         'patientStatusYes' => [
             'displayName' => 'Yes',
+            'csvLabel' => 'Patient Status: Yes',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'YES',
@@ -375,6 +376,7 @@ class WorkQueue
         ],
         'patientStatusNo' => [
             'displayName' => 'No',
+            'csvLabel' => 'Patient Status: No',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'NO',
@@ -382,6 +384,7 @@ class WorkQueue
         ],
         'patientStatusNoAccess' => [
             'displayName' => 'No Access',
+            'csvLabel' => 'Patient Status: No Access',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'NO_ACCESS',
@@ -389,6 +392,7 @@ class WorkQueue
         ],
         'patientStatusUnknown' => [
             'displayName' => 'Unknown',
+            'csvLabel' => 'Patient Status: Unknown',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'UNKNOWN',
@@ -2136,102 +2140,17 @@ class WorkQueue
 
     public static function getExportHeaders()
     {
-        $headers = [
-            'Last Name',
-            'First Name',
-            'Middle Initial',
-            'Date of Birth',
-            'PMI ID',
-            'Biobank ID',
-            'Participant Status',
-            'Core Participant Date',
-            'Withdrawal Status',
-            'Withdrawal Date',
-            'Withdrawal Reason',
-            'Deactivation Status',
-            'Deactivation Date',
-            'Deceased',
-            'Date of Death',
-            'Date of Death Approval',
-            'Participant Origination',
-            'Consent Cohort',
-            'Date of First Primary Consent',
-            'Primary Consent Status',
-            'Primary Consent Date',
-            'Program Update',
-            'Date of Program Update',
-            'Date of First EHR Consent',
-            'EHR Consent Status',
-            'EHR Consent Date',
-            'EHR Expiration Status',
-            'EHR Expiration Date',
-            'gRoR Consent Status',
-            'gRoR Consent Date',
-            'Language of Primary Consent',
-            'DV-only EHR Sharing',
-            'DV-only EHR Sharing Date',
-            'CABoR Consent Status',
-            'CABoR Consent Date',
-            'Retention Eligible',
-            'Date of Retention Eligibility',
-            'Retention Status',
-            'EHR Data Transfer',
-            'Most Recent EHR Receipt',
-            'Patient Status: Yes',
-            'Patient Status: No',
-            'Patient Status: No Access',
-            'Patient Status: Unknown',
-            'Street Address',
-            'Street Address2',
-            'City',
-            'State',
-            'ZIP',
-            'Email',
-            'Login Phone',
-            'Phone',
-            'Required PPI Surveys Complete',
-            'Completed Surveys'
-        ];
-        foreach (self::$surveys as $survey => $label) {
-            if (in_array($survey, self::$initialSurveys, true)) {
-                $headers[] = $label . ' PPI Survey Complete';
-                $headers[] = $label . ' PPI Survey Completion Date';
+        $headers = [];
+        foreach (self::$exportColumns as $field) {
+            $columnDef = self::$columnsDef[$field];
+            if (isset($columnDef['csvLabels'])) {
+                foreach ($columnDef['csvLabels'] as $csvLabel) {
+                    $headers[] = $csvLabel;
+                }
+            } else {
+                $headers[] = $columnDef['csvLabel'];
             }
         }
-        $headers[] = 'Paired Site';
-        $headers[] = 'Paired Organization';
-        $headers[] = 'Physical Measurements Status';
-        $headers[] = 'Physical Measurements Completion Date';
-        $headers[] = 'Physical Measurements Site';
-        $headers[] = 'Samples to Isolate DNA';
-        $headers[] = 'Baseline Samples';
-        $headers[] = 'Biospecimens Site';
-        foreach (self::$samples as $label) {
-            $headers[] = $label . ' Received';
-            $headers[] = $label . ' Received Date';
-        }
-        $headers[] = 'Saliva Collection';
-        $headers[] = 'Sex';
-        $headers[] = 'Gender Identity';
-        $headers[] = 'Race/Ethnicity';
-        $headers[] = 'Education';
-        $headers[] = 'COPE Feb PPI Survey Complete';
-        $headers[] = 'COPE Feb PPI Survey Completion Date';
-        $headers[] = 'Core Participant Minus PM Date';
-        $headers[] = 'Summer Minute PPI Survey Complete';
-        $headers[] = 'Summer Minute PPI Survey Completion Date';
-        $headers[] = 'Fall Minute PPI Survey Complete';
-        $headers[] = 'Fall Minute PPI Survey Completion Date';
-        foreach (array_values(self::$digitalHealthSharingTypes) as $label) {
-            $headers[] = $label;
-            $headers[] = $label . ' Date';
-        }
-        $headers[] = 'Personal & Family Hx PPI Survey Complete';
-        $headers[] = 'Personal & Family Hx PPI Survey Completion Date';
-        $headers[] = 'SDOH PPI Survey Complete';
-        $headers[] = 'SDOH PPI Survey Completion Date';
-        $headers[] = 'Winter Minute PPI Survey Complete';
-        $headers[] = 'Winter Minute PPI Survey Completion Date';
         return $headers;
     }
 
