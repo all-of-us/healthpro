@@ -33,8 +33,8 @@ $(document).ready(function () {
 
     consentColumns.forEach(function (field) {
         var columnDef = columnsDef[field];
-        if (columnDef.hasOwnProperty('displayNames')) {
-            Object.keys(columnDef['displayNames']).forEach(function (key) {
+        if (columnDef.hasOwnProperty('names')) {
+            Object.keys(columnDef['names']).forEach(function (key) {
                 generateTableRow(key + 'Consent', columnDef);
             });
         } else {

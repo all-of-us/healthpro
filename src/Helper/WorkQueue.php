@@ -17,32 +17,28 @@ class WorkQueue
 
     public static $columnsDef = [
         'lastName' => [
-            'displayName' => 'Last Name',
-            'csvLabel' => 'Last Name',
+            'name' => 'Last Name',
             'rdrField' => 'lastName',
             'sortField' => 'lastName',
             'generateLink' => true,
             'toggleColumn' => false
         ],
         'firstName' => [
-            'displayName' => 'First Name',
-            'csvLabel' => 'First Name',
+            'name' => 'First Name',
             'rdrField' => 'firstName',
             'sortField' => 'firstName',
             'generateLink' => true,
             'toggleColumn' => false
         ],
         'middleName' => [
-            'displayName' => 'Middle Name',
-            'csvLabel' => 'Middle Name',
+            'name' => 'Middle Name',
             'rdrField' => 'middleName',
             'sortField' => 'firstName',
             'generateLink' => true,
             'toggleColumn' => false
         ],
         'dateOfBirth' => [
-            'displayName' => 'Date of Birth',
-            'csvLabel' => 'Date of Birth',
+            'name' => 'Date of Birth',
             'rdrField' => 'dob',
             'sortField' => 'dateOfBirth',
             'formatDate' => true,
@@ -50,43 +46,37 @@ class WorkQueue
             'toggleColumn' => false
         ],
         'participantId' => [
-            'displayName' => 'PM ID',
-            'csvLabel' => 'PM ID',
+            'name' => 'PM ID',
             'rdrField' => 'id',
             'sortField' => 'participantId',
             'toggleColumn' => false
         ],
         'biobankId' => [
-            'displayName' => 'Biobank ID',
-            'csvLabel' => 'Biobank ID',
+            'name' => 'Biobank ID',
             'rdrField' => 'biobankId',
             'sortField' => 'biobankId',
             'toggleColumn' => true,
             'visible' => false
         ],
         'participantStatus' => [
-            'displayName' => 'Participant Status',
-            'csvLabel' => 'Participant Status',
+            'name' => 'Participant Status',
             'rdrField' => 'enrollmentStatus',
             'sortField' => 'enrollmentStatus',
             'toggleColumn' => true,
             'type' => 'participantStatus'
         ],
         'coreParticipant' => [
-            'displayName' => 'Core Participant Date',
-            'csvLabel' => 'Core Participant Date',
+            'name' => 'Core Participant Date',
             'rdrDateField' => 'enrollmentStatusCoreStoredSampleTime',
             'sortField' => 'enrollmentStatus',
             'toggleColumn' => true
         ],
         'enrollmentStatusCoreMinusPMTime' => [
-            'displayName' => 'Core Participant Minus PM Date',
-            'csvLabel' => 'Core Participant Minus PM Date',
+            'name' => 'Core Participant Minus PM Date',
             'rdrDateField' => 'enrollmentStatusCoreMinusPMTime',
         ],
         'activityStatus' => [
-            'displayName' => 'Activity Status',
-            'csvLabel' => 'Activity Status',
+            'name' => 'Activity Status',
             'rdrField' => 'activityStatus',
             'sortField' => 'activityStatus',
             'method' => 'getActivityStatus',
@@ -95,8 +85,8 @@ class WorkQueue
             'visible' => false
         ],
         'withdrawalStatus' => [
-            'displayName' => 'Withdrawal Status',
-            'csvLabels' => [
+            'name' => 'Withdrawal Status',
+            'csvNames' => [
                 'Withdrawal Status',
                 'Withdrawal Date'
             ],
@@ -105,16 +95,15 @@ class WorkQueue
             'fieldCheck' => true
         ],
         'withdrawalReason' => [
-            'displayName' => 'Withdrawal Reason',
-            'csvLabel' => 'Withdrawal Reason',
+            'name' => 'Withdrawal Reason',
             'rdrField' => 'withdrawalReason',
             'sortField' => 'withdrawalReason',
             'toggleColumn' => true,
             'visible' => false
         ],
         'deactivationStatus' => [
-            'displayName' => 'Deactivation Status',
-            'csvLabels' => [
+            'name' => 'Deactivation Status',
+            'csvNames' => [
                 'Deactivation Status',
                 'Deactivation Date'
             ],
@@ -123,41 +112,36 @@ class WorkQueue
             'fieldCheck' => true
         ],
         'deceasedStatus' => [
-            'displayName' => 'Deceased',
-            'csvLabel' => 'Deceased',
+            'name' => 'Deceased',
             'rdrField' => 'deceasedStatus',
             'csvMethod' => 'csvDeceasedStatus'
         ],
         'dateOfdeath' => [
-            'displayName' => 'Date of Death',
-            'csvLabel' => 'Date of Death',
+            'name' => 'Date of Death',
             'rdrDateField' => 'dateOfdeath',
         ],
         'dateOfdeathApproval' => [
-            'displayName' => 'Date of Death Approval',
-            'csvLabel' => 'Date of Death Approval',
+            'name' => 'Date of Death Approval',
             'rdrDateField' => 'deceasedAuthored',
             'csvStatusText' => 'APPROVED'
         ],
         'participantOrigin' => [
-            'displayName' => 'Participant Origination',
-            'csvLabel' => 'Participant Origination',
+            'name' => 'Participant Origination',
             'rdrField' => 'participantOrigin',
             'sortField' => 'participantOrigin',
             'toggleColumn' => true,
             'checkDvVisibility' => true
         ],
         'consentCohort' => [
-            'displayName' => 'Consent Cohort',
-            'csvLabel' => 'Consent Cohort',
+            'name' => 'Consent Cohort',
             'rdrField' => 'consentCohortText',
             'sortField' => 'consentCohort',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
         'firstPrimaryConsent' => [
-            'displayName' => 'First Primary Consent',
-            'csvLabel' => 'Date of First Primary Consent',
+            'name' => 'First Primary Consent',
+            'csvName' => 'Date of First Primary Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'method' => 'displayFirstConsentStatusTime',
@@ -167,8 +151,8 @@ class WorkQueue
             'visible' => false
         ],
         'primaryConsent' => [
-            'displayName' => 'Primary Consent',
-            'csvLabels' => [
+            'name' => 'Primary Consent',
+            'csvNames' => [
                 'Primary Consent Status',
                 'Primary Consent Status Date'
             ],
@@ -183,8 +167,8 @@ class WorkQueue
             'pdfPath' => 'consentForStudyEnrollmentFilePath'
         ],
         'questionnaireOnDnaProgram' => [
-            'displayName' => 'Program Update',
-            'csvLabels' => [
+            'name' => 'Program Update',
+            'csvNames' => [
                 'Program Update',
                 'Date of Program Update'
             ],
@@ -197,8 +181,8 @@ class WorkQueue
             'toggleColumn' => true
         ],
         'firstEhrConsent' => [
-            'displayName' => 'First EHR Consent',
-            'csvLabel' => 'Date of First EHR Consent',
+            'name' => 'First EHR Consent',
+            'csvName' => 'Date of First EHR Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
             'method' => 'displayFirstConsentStatusTime',
@@ -208,8 +192,8 @@ class WorkQueue
             'visible' => false
         ],
         'ehrConsent' => [
-            'displayName' => 'EHR Consent',
-            'csvLabels' => [
+            'name' => 'EHR Consent',
+            'csvNames' => [
                 'EHR Consent Status',
                 'EHR Consent Status Date'
             ],
@@ -224,8 +208,8 @@ class WorkQueue
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath'
         ],
         'ehrConsentExpireStatus' => [
-            'displayName' => 'EHR Expiration Status',
-            'csvLabels' => [
+            'name' => 'EHR Expiration Status',
+            'csvNames' => [
                 'EHR Expiration Status',
                 'EHR Expiration Date'
             ],
@@ -242,8 +226,8 @@ class WorkQueue
             'visible' => false
         ],
         'gRoRConsent' => [
-            'displayName' => 'gRoR Consent',
-            'csvLabels' => [
+            'name' => 'gRoR Consent',
+            'csvNames' => [
                 'gRoR Consent',
                 'gRoR Consent Date'
             ],
@@ -258,15 +242,14 @@ class WorkQueue
             'pdfPath' => 'consentForGenomicsRORFilePath'
         ],
         'primaryLanguage' => [
-            'displayName' => 'Language of Primary Consent',
-            'csvLabel' => 'Language of Primary Consent',
+            'name' => 'Language of Primary Consent',
             'rdrField' => 'primaryLanguage',
             'sortField' => 'primaryLanguage',
             'toggleColumn' => true
         ],
         'dvEhrStatus' => [
-            'displayName' => 'DV-only EHR Sharing',
-            'csvLabels' => [
+            'name' => 'DV-only EHR Sharing',
+            'csvNames' => [
                 'DV-only EHR Sharing',
                 'DV-only EHR Sharing Date'
             ],
@@ -281,8 +264,8 @@ class WorkQueue
             'visible' => false
         ],
         'caborConsent' => [
-            'displayName' => 'CABoR Consent',
-            'csvLabels' => [
+            'name' => 'CABoR Consent',
+            'csvNames' => [
                 'CABoR Consent',
                 'CABoR Consent Date'
             ],
@@ -298,12 +281,12 @@ class WorkQueue
             'visible' => false
         ],
         'digitalHealthSharingStatus' => [
-            'displayNames' => [
+            'names' => [
                 'fitbit' => 'Fitbit Consent',
                 'appleHealthKit' => 'Apple HealthKit Consent',
                 'appleEHR' => 'Apple EHR Consent'
             ],
-            'csvLabels' => [
+            'csvNames' => [
                 'Fitbit Consent',
                 'Fitbit Consent Date',
                 'Apple HealthKit  Consent',
@@ -320,8 +303,8 @@ class WorkQueue
             'visible' => false
         ],
         'retentionEligibleStatus' => [
-            'displayName' => 'Retention Eligible',
-            'csvLabels' => [
+            'name' => 'Retention Eligible',
+            'csvNames' => [
                 'Retention Eligible',
                 'Date of Retention Eligible'
             ],
@@ -336,8 +319,7 @@ class WorkQueue
             'visible' => false
         ],
         'retentionType' => [
-            'displayName' => 'Retention Status',
-            'csvLabel' => 'Retention Status',
+            'name' => 'Retention Status',
             'rdrField' => 'retentionType',
             'sortField' => 'retentionType',
             'method' => 'getRetentionType',
@@ -346,8 +328,7 @@ class WorkQueue
             'visible' => false
         ],
         'isEhrDataAvailable' => [
-            'displayName' => 'EHR Data Transfer',
-            'csvLabel' => 'EHR Data Transfer',
+            'name' => 'EHR Data Transfer',
             'rdrField' => 'isEhrDataAvailable',
             'sortField' => 'isEhrDataAvailable',
             'method' => 'getEhrAvailableStatus',
@@ -357,8 +338,7 @@ class WorkQueue
             'visible' => false
         ],
         'latestEhrReceiptTime' => [
-            'displayName' => 'Most Recent EHR Receipt',
-            'csvLabel' => 'Most Recent EHR Receipt',
+            'name' => 'Most Recent EHR Receipt',
             'rdrField' => 'latestEhrReceiptTime',
             'sortField' => 'latestEhrReceiptTime',
             'htmlClass' => 'text-center',
@@ -367,40 +347,39 @@ class WorkQueue
             'visible' => false
         ],
         'patientStatusYes' => [
-            'displayName' => 'Yes',
-            'csvLabel' => 'Patient Status: Yes',
+            'name' => 'Yes',
+            'csvName' => 'Patient Status: Yes',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'YES',
             'visible' => false
         ],
         'patientStatusNo' => [
-            'displayName' => 'No',
-            'csvLabel' => 'Patient Status: No',
+            'name' => 'No',
+            'csvName' => 'Patient Status: No',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'NO',
             'visible' => false
         ],
         'patientStatusNoAccess' => [
-            'displayName' => 'No Access',
-            'csvLabel' => 'Patient Status: No Access',
+            'name' => 'No Access',
+            'csvName' => 'Patient Status: No Access',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'NO_ACCESS',
             'visible' => false
         ],
         'patientStatusUnknown' => [
-            'displayName' => 'Unknown',
-            'csvLabel' => 'Patient Status: Unknown',
+            'name' => 'Unknown',
+            'csvName' => 'Patient Status: Unknown',
             'method' => 'getPatientStatus',
             'type' => 'patientStatus',
             'value' => 'UNKNOWN',
             'visible' => false
         ],
         'contactMethod' => [
-            'displayName' => 'Contact Method',
-            'csvLabel' => 'Contact Method',
+            'name' => 'Contact Method',
             'rdrField' => 'recontactMethod',
             'sortField' => 'recontactMethod',
             'htmlClass' => 'text-center',
@@ -408,8 +387,8 @@ class WorkQueue
             'visible' => false
         ],
         'address' => [
-            'displayName' => 'Address',
-            'csvLabel' => 'Street Address',
+            'name' => 'Address',
+            'csvName' => 'Street Address',
             'rdrField' => 'address',
             'sortField' => 'address',
             'participantMethod' => 'getAddress',
@@ -420,28 +399,24 @@ class WorkQueue
             'visible' => false
         ],
         'address2' => [
-            'displayName' => 'Address2',
-            'csvLabel' => 'Street Address2',
+            'name' => 'Address2',
+            'csvName' => 'Street Address2',
             'csvRdrField' => 'streetAddress2'
         ],
         'city' => [
-            'displayName' => 'City',
-            'csvLabel' => 'City',
+            'name' => 'City',
             'csvRdrField' => 'city'
         ],
         'state' => [
-            'displayName' => 'State',
-            'csvLabel' => 'State',
+            'name' => 'State',
             'csvRdrField' => 'state'
         ],
         'zip' => [
-            'displayName' => 'Zip',
-            'csvLabel' => 'Zip',
+            'name' => 'Zip',
             'csvRdrField' => 'zip'
         ],
         'email' => [
-            'displayName' => 'Email',
-            'csvLabel' => 'Email',
+            'name' => 'Email',
             'rdrField' => 'email',
             'sortField' => 'email',
             'htmlClass' => 'text-center',
@@ -449,8 +424,7 @@ class WorkQueue
             'visible' => false
         ],
         'loginPhone' => [
-            'displayName' => 'Login Phone',
-            'csvLabel' => 'Login Phone',
+            'name' => 'Login Phone',
             'rdrField' => 'loginPhoneNumber',
             'sortField' => 'loginPhoneNumber',
             'htmlClass' => 'text-center',
@@ -458,8 +432,7 @@ class WorkQueue
             'visible' => false
         ],
         'phone' => [
-            'displayName' => 'Contact Phone',
-            'csvLabel' => 'Contact Phone',
+            'name' => 'Contact Phone',
             'rdrField' => 'phoneNumber',
             'sortField' => 'phoneNumber',
             'htmlClass' => 'text-center',
@@ -467,8 +440,8 @@ class WorkQueue
             'visible' => false
         ],
         'ppiStatus' => [
-            'displayName' => 'Required Complete',
-            'csvLabel' => 'Required PPI Surveys Complete',
+            'name' => 'Required Complete',
+            'csvName' => 'Required PPI Surveys Complete',
             'rdrField' => 'numCompletedBaselinePPIModules',
             'sortField' => 'numCompletedBaselinePPIModules',
             'htmlClass' => 'text-center',
@@ -477,16 +450,15 @@ class WorkQueue
             'csvStatusText' => 3
         ],
         'ppiSurveys' => [
-            'displayName' => 'Completed Surveys',
-            'csvLabel' => 'Completed Surveys',
+            'name' => 'Completed Surveys',
             'rdrField' => 'numCompletedPPIModules',
             'sortField' => 'numCompletedPPIModules',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
         'TheBasics' => [
-            'displayName' => 'Basics',
-            'csvLabels' => [
+            'name' => 'Basics',
+            'csvNames' => [
                 'Basics PPI Survey Complete',
                 'Basics PPI Survey Completion Date'
             ],
@@ -500,8 +472,8 @@ class WorkQueue
             'visible' => false
         ],
         'OverallHealth' => [
-            'displayName' => 'Health',
-            'csvLabels' => [
+            'name' => 'Health',
+            'csvNames' => [
                 'Health PPI Survey Complete',
                 'Health PPI Survey Completion Date'
             ],
@@ -515,8 +487,8 @@ class WorkQueue
             'visible' => false
         ],
         'Lifestyle' => [
-            'displayName' => 'Lifestyle',
-            'csvLabels' => [
+            'name' => 'Lifestyle',
+            'csvNames' => [
                 'Lifestyle PPI Survey Complete',
                 'Lifestyle PPI Survey Completion Date'
             ],
@@ -530,8 +502,8 @@ class WorkQueue
             'visible' => false
         ],
         'MedicalHistory' => [
-            'displayName' => 'Med History',
-            'csvLabels' => [
+            'name' => 'Med History',
+            'csvNames' => [
                 'Med History PPI Survey Complete',
                 'Med History PPI Survey Completion Date'
             ],
@@ -545,8 +517,8 @@ class WorkQueue
             'visible' => false
         ],
         'FamilyHealth' => [
-            'displayName' => 'Family History',
-            'csvLabels' => [
+            'name' => 'Family History',
+            'csvNames' => [
                 'Family History PPI Survey Complete',
                 'Family History PPI Survey Completion Date'
             ],
@@ -560,8 +532,8 @@ class WorkQueue
             'visible' => false
         ],
         'PersonalAndFamilyHealthHistory' => [
-            'displayName' => 'Personal & Family Hx',
-            'csvLabels' => [
+            'name' => 'Personal & Family Hx',
+            'csvNames' => [
                 'Personal & Family Hx PPI Survey Complete',
                 'Personal & Family Hx PPI Survey Completion Date'
             ],
@@ -575,8 +547,8 @@ class WorkQueue
             'visible' => false
         ],
         'HealthcareAccess' => [
-            'displayName' => 'Access',
-            'csvLabels' => [
+            'name' => 'Access',
+            'csvNames' => [
                 'Access PPI Survey Complete',
                 'Access PPI Survey Completion Date'
             ],
@@ -590,8 +562,8 @@ class WorkQueue
             'visible' => false
         ],
         'SocialDeterminantsOfHealth' => [
-            'displayName' => 'SDOH',
-            'csvLabels' => [
+            'name' => 'SDOH',
+            'csvNames' => [
                 'SDOH PPI Survey Complete',
                 'SDOH PPI Survey Completion Date'
             ],
@@ -605,8 +577,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeMay' => [
-            'displayName' => 'COPE May',
-            'csvLabels' => [
+            'name' => 'COPE May',
+            'csvNames' => [
                 'COPE May PPI Survey Complete',
                 'COPE May PPI Survey Completion Date'
             ],
@@ -620,8 +592,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeJune' => [
-            'displayName' => 'COPE June',
-            'csvLabels' => [
+            'name' => 'COPE June',
+            'csvNames' => [
                 'COPE June PPI Survey Complete',
                 'COPE June PPI Survey Completion Date'
             ],
@@ -635,8 +607,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeJuly' => [
-            'displayName' => 'COPE July',
-            'csvLabels' => [
+            'name' => 'COPE July',
+            'csvNames' => [
                 'COPE July PPI Survey Complete',
                 'COPE July PPI Survey Completion Date'
             ],
@@ -650,8 +622,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeNov' => [
-            'displayName' => 'COPE Nov',
-            'csvLabels' => [
+            'name' => 'COPE Nov',
+            'csvNames' => [
                 'COPE Nov PPI Survey Complete',
                 'COPE Nov PPI Survey Completion Date'
             ],
@@ -665,8 +637,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeDec' => [
-            'displayName' => 'COPE Dec',
-            'csvLabels' => [
+            'name' => 'COPE Dec',
+            'csvNames' => [
                 'COPE Dec PPI Survey Complete',
                 'COPE Dec PPI Survey Completion Date'
             ],
@@ -680,8 +652,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeFeb' => [
-            'displayName' => 'COPE Feb',
-            'csvLabels' => [
+            'name' => 'COPE Feb',
+            'csvNames' => [
                 'COPE Feb PPI Survey Complete',
                 'COPE Feb PPI Survey Completion Date'
             ],
@@ -695,8 +667,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeVaccineMinute1' => [
-            'displayName' => 'Summer Minute',
-            'csvLabels' => [
+            'name' => 'Summer Minute',
+            'csvNames' => [
                 'Summer Minute PPI Survey Complete',
                 'Summer Minute PPI Survey Completion Date'
             ],
@@ -710,8 +682,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeVaccineMinute2' => [
-            'displayName' => 'Fall Minute',
-            'csvLabels' => [
+            'name' => 'Fall Minute',
+            'csvNames' => [
                 'Fall Minute PPI Survey Complete',
                 'Fall Minute PPI Survey Completion Date'
             ],
@@ -725,8 +697,8 @@ class WorkQueue
             'visible' => false
         ],
         'CopeVaccineMinute3' => [
-            'displayName' => 'Winter Minute',
-            'csvLabels' => [
+            'name' => 'Winter Minute',
+            'csvNames' => [
                 'Winter Minute PPI Survey Complete',
                 'Winter Minute PPI Survey Completion Date'
             ],
@@ -740,8 +712,7 @@ class WorkQueue
             'visible' => false
         ],
         'pairedSite' => [
-            'displayName' => 'Paired Site',
-            'csvLabel' => 'Paired Site',
+            'name' => 'Paired Site',
             'rdrField' => 'siteSuffix',
             'sortField' => 'siteSuffix',
             'serviceMethod' => 'getSiteDisplayName',
@@ -749,8 +720,7 @@ class WorkQueue
             'toggleColumn' => true
         ],
         'pairedOrganization' => [
-            'displayName' => 'Paired Organization',
-            'csvLabel' => 'Paired Organization',
+            'name' => 'Paired Organization',
             'rdrField' => 'organization',
             'sortField' => 'organization',
             'serviceMethod' => 'getOrganizationDisplayName',
@@ -758,8 +728,8 @@ class WorkQueue
             'toggleColumn' => true
         ],
         'physicalMeasurementsStatus' => [
-            'displayName' => 'Phys Measurements',
-            'csvLabels' => [
+            'name' => 'Phys Measurements',
+            'csvNames' => [
                 'Physical Measurements Status',
                 'Physical Measurements Completion Date'
             ],
@@ -773,8 +743,8 @@ class WorkQueue
             'csvStatusText' => 'COMPLETED'
         ],
         'evaluationFinalizedSite' => [
-            'displayName' => 'Phys Meas Site',
-            'csvLabel' => 'Physical Measurements Site',
+            'name' => 'Phys Meas Site',
+            'csvName' => 'Physical Measurements Site',
             'rdrField' => 'evaluationFinalizedSite',
             'sortField' => 'evaluationFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
@@ -783,8 +753,8 @@ class WorkQueue
             'visible' => false
         ],
         'biobankDnaStatus' => [
-            'displayName' => 'Samples to Isolate DNA?',
-            'csvLabel' => 'Samples to Isolate DNA',
+            'name' => 'Samples to Isolate DNA?',
+            'csvName' => 'Samples to Isolate DNA',
             'rdrField' => 'samplesToIsolateDNA',
             'sortField' => 'samplesToIsolateDNA',
             'method' => 'displayStatus',
@@ -794,16 +764,15 @@ class WorkQueue
             'csvStatusText' => 'RECEIVED'
         ],
         'biobankSamples' => [
-            'displayName' => 'Baseline Samples',
-            'csvLabel' => 'Baseline Samples',
+            'name' => 'Baseline Samples',
             'rdrField' => 'numBaselineSamplesArrived',
             'sortField' => 'numBaselineSamplesArrived',
             'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
         'orderCreatedSite' => [
-            'displayName' => 'Bio-specimens Site',
-            'csvLabel' => 'Biospecimens Site',
+            'name' => 'Bio-specimens Site',
+            'csvName' => 'Biospecimens Site',
             'rdrField' => 'orderCreatedSite',
             'sortField' => 'orderCreatedSite',
             'serviceMethod' => 'getSiteDisplayName',
@@ -812,8 +781,8 @@ class WorkQueue
             'visible' => false
         ],
         '1SST8' => [
-            'displayName' => '8 mL SST',
-            'csvLabels' => [
+            'name' => '8 mL SST',
+            'csvNames' => [
                 '8 mL SST Received',
                 '8 mL SST Received Date'
             ],
@@ -826,8 +795,8 @@ class WorkQueue
             'visible' => false
         ],
         '1PST8' => [
-            'displayName' => '8 mL PST',
-            'csvLabels' => [
+            'name' => '8 mL PST',
+            'csvNames' => [
                 '8 mL PST Received',
                 '8 mL PST Received Date'
             ],
@@ -840,8 +809,8 @@ class WorkQueue
             'visible' => false
         ],
         '1HEP4' => [
-            'displayName' => '4 mL Na-Hep',
-            'csvLabels' => [
+            'name' => '4 mL Na-Hep',
+            'csvNames' => [
                 '4 mL Na-Hep Received',
                 '4 mL Na-Hep Received Date'
             ],
@@ -854,8 +823,8 @@ class WorkQueue
             'visible' => false
         ],
         '1ED02' => [
-            'displayName' => '2 mL EDTA',
-            'csvLabels' => [
+            'name' => '2 mL EDTA',
+            'csvNames' => [
                 '2 mL EDTA Received',
                 '2 mL EDTA Received Date'
             ],
@@ -868,8 +837,8 @@ class WorkQueue
             'visible' => false
         ],
         '1ED04' => [
-            'displayName' => '4 mL EDTA',
-            'csvLabels' => [
+            'name' => '4 mL EDTA',
+            'csvNames' => [
                 '4 mL EDTA Received',
                 '4 mL EDTA Received Date'
             ],
@@ -882,8 +851,8 @@ class WorkQueue
             'visible' => false
         ],
         '1ED10' => [
-            'displayName' => '1st 10 mL EDTA',
-            'csvLabels' => [
+            'name' => '1st 10 mL EDTA',
+            'csvNames' => [
                 '1st 10 mL EDTA Received',
                 '1st 10 mL EDTA Received Date'
             ],
@@ -896,8 +865,8 @@ class WorkQueue
             'visible' => false
         ],
         '2ED10' => [
-            'displayName' => '2nd 10 mL EDTA',
-            'csvLabels' => [
+            'name' => '2nd 10 mL EDTA',
+            'csvNames' => [
                 '2nd 10 mL EDTA Received',
                 '2nd 10 mL EDTA Received Date'
             ],
@@ -910,8 +879,8 @@ class WorkQueue
             'visible' => false
         ],
         '1CFD9' => [
-            'displayName' => 'Cell-Free DNA',
-            'csvLabels' => [
+            'name' => 'Cell-Free DNA',
+            'csvNames' => [
                 'Cell-Free DNA Received',
                 'Cell-Free DNA Received Date'
             ],
@@ -924,8 +893,8 @@ class WorkQueue
             'visible' => false
         ],
         '1PXR2' => [
-            'displayName' => 'Paxgene RNA',
-            'csvLabels' => [
+            'name' => 'Paxgene RNA',
+            'csvNames' => [
                 'Paxgene RNA Received',
                 'Paxgene RNA Received Date'
             ],
@@ -938,8 +907,8 @@ class WorkQueue
             'visible' => false
         ],
         '1UR10' => [
-            'displayName' => 'Urine 10 mL',
-            'csvLabels' => [
+            'name' => 'Urine 10 mL',
+            'csvNames' => [
                 'Urine 10 mL Received',
                 'Urine 10 mL Received Date'
             ],
@@ -952,8 +921,8 @@ class WorkQueue
             'visible' => false
         ],
         '1UR90' => [
-            'displayName' => 'Urine 90 mL',
-            'csvLabels' => [
+            'name' => 'Urine 90 mL',
+            'csvNames' => [
                 'Urine 90 mL Received',
                 'Urine 90 mL Received Date'
             ],
@@ -966,8 +935,8 @@ class WorkQueue
             'visible' => false
         ],
         '1SAL' => [
-            'displayName' => 'Saliva',
-            'csvLabels' => [
+            'name' => 'Saliva',
+            'csvNames' => [
                 'Saliva Received',
                 'Saliva Received Date'
             ],
@@ -980,13 +949,11 @@ class WorkQueue
             'visible' => false
         ],
         'sample1SAL2CollectionMethod' => [
-            'displayName' => 'Saliva Collection',
-            'csvLabel' => 'Saliva Collection',
+            'name' => 'Saliva Collection',
             'rdrField' => 'sample1SAL2CollectionMethod'
         ],
         'age' => [
-            'displayName' => 'Age',
-            'csvLabel' => 'Age',
+            'name' => 'Age',
             'rdrField' => 'age',
             'sortField' => 'age',
             'htmlClass' => 'text-center',
@@ -994,8 +961,7 @@ class WorkQueue
             'visible' => false
         ],
         'sex' => [
-            'displayName' => 'Sex',
-            'csvLabel' => 'Sex',
+            'name' => 'Sex',
             'rdrField' => 'sex',
             'sortField' => 'sex',
             'htmlClass' => 'text-center',
@@ -1003,8 +969,7 @@ class WorkQueue
             'visible' => false
         ],
         'genderIdentity' => [
-            'displayName' => 'Gender Identity',
-            'csvLabel' => 'Gender Identity',
+            'name' => 'Gender Identity',
             'rdrField' => 'genderIdentity',
             'sortField' => 'genderIdentity',
             'htmlClass' => 'text-center',
@@ -1012,8 +977,7 @@ class WorkQueue
             'visible' => false
         ],
         'race' => [
-            'displayName' => 'Race/Ethnicity',
-            'csvLabel' => 'Race/Ethnicity',
+            'name' => 'Race/Ethnicity',
             'rdrField' => 'race',
             'sortField' => 'race',
             'htmlClass' => 'text-center',
@@ -1021,8 +985,7 @@ class WorkQueue
             'visible' => false
         ],
         'education' => [
-            'displayName' => 'Education',
-            'csvLabel' => 'Education',
+            'name' => 'Education',
             'rdrField' => 'education',
             'sortField' => 'education',
             'htmlClass' => 'text-center',
@@ -2143,12 +2106,14 @@ class WorkQueue
         $headers = [];
         foreach (self::$exportColumns as $field) {
             $columnDef = self::$columnsDef[$field];
-            if (isset($columnDef['csvLabels'])) {
-                foreach ($columnDef['csvLabels'] as $csvLabel) {
-                    $headers[] = $csvLabel;
+            if (isset($columnDef['csvNames'])) {
+                foreach ($columnDef['csvNames'] as $csvName) {
+                    $headers[] = $csvName;
                 }
+            } elseif (isset($columnDef['csvName'])) {
+                $headers[] = $columnDef['csvName'];
             } else {
-                $headers[] = $columnDef['csvLabel'];
+                $headers[] = $columnDef['name'];
             }
         }
         return $headers;
@@ -2161,16 +2126,18 @@ class WorkQueue
             $columnDef = self::$columnsDef[$field];
             if ($columnDef['toggleColumn']) {
                 if (in_array("column{$field}", $sessionConsentColumns)) {
-                    if (isset($columnDef['csvLabels'])) {
-                        foreach ($columnDef['csvLabels'] as $csvLabel) {
-                            $headers[] = $csvLabel;
+                    if (isset($columnDef['csvNames'])) {
+                        foreach ($columnDef['csvNames'] as $csvName) {
+                            $headers[] = $csvName;
                         }
+                    } elseif (isset($columnDef['csvName'])) {
+                        $headers[] = $columnDef['csvName'];
                     } else {
-                        $headers[] = $columnDef['csvLabel'];
+                        $headers[] = $columnDef['name'];
                     }
                 }
             } else {
-                $headers[] = $columnDef['csvLabel'];
+                $headers[] = $columnDef['csvName'];
             }
         }
         return $headers;
@@ -2234,8 +2201,8 @@ class WorkQueue
         foreach (self::$consentColumns as $field) {
             $columnDef = self::$columnsDef[$field];
             if ($columnDef['toggleColumn']) {
-                if (isset($columnDef['displayNames'])) {
-                    foreach (array_keys($columnDef['displayNames']) as $subField) {
+                if (isset($columnDef['names'])) {
+                    foreach (array_keys($columnDef['names']) as $subField) {
                         $workQueueConsentColumns[] = 'column' . $subField;
                     }
                 } else {

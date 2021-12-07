@@ -353,8 +353,8 @@ class WorkQueueService
                             $columnDef['statusText'],
                             $userTimezone
                         );
-                    } elseif (isset($columnDef['displayNames'])) {
-                        foreach (array_keys($columnDef['displayNames']) as $type) {
+                    } elseif (isset($columnDef['names'])) {
+                        foreach (array_keys($columnDef['names']) as $type) {
                             $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
                         }
                     } elseif (isset($columnDef['userTimezone'])) {
@@ -420,8 +420,8 @@ class WorkQueueService
                                     : null
                             );
                         }
-                    } elseif (isset($columnDef['displayNames'])) {
-                        foreach (array_keys($columnDef['displayNames']) as $type) {
+                    } elseif (isset($columnDef['names'])) {
+                        foreach (array_keys($columnDef['names']) as $type) {
                             $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
                         }
                     }
@@ -455,7 +455,7 @@ class WorkQueueService
                 $row[] = $participant->{"sampleStatus{$newSample}"} === 'RECEIVED' ? '1' : '0';
                 $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimezone, false);
             } elseif (isset($columnDef['csvStatusText'])) {
-                if (isset($columnDef['csvLabels'])) {
+                if (isset($columnDef['csvNames'])) {
                     $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? 1 : 0;
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
                 } else {
@@ -476,8 +476,8 @@ class WorkQueueService
                         $participant->{$columnDef['otherField']}
                     );
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                } elseif (isset($columnDef['displayNames'])) {
-                    foreach (array_keys($columnDef['displayNames']) as $type) {
+                } elseif (isset($columnDef['names'])) {
+                    foreach (array_keys($columnDef['names']) as $type) {
                         $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
                         $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
                     }
@@ -485,7 +485,7 @@ class WorkQueueService
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
                 }
             } elseif (isset($columnDef['rdrDateField'])) {
-                if (isset($columnDef['csvLabels'])) {
+                if (isset($columnDef['csvNames'])) {
                     if (isset($columnDef['fieldCheck'])) {
                         $row[] = $participant->{$columnDef['rdrField']} ? '1' : '0';
                     } else {
@@ -518,8 +518,8 @@ class WorkQueueService
                             $participant->{$columnDef['otherField']}
                         );
                         $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                    } elseif (isset($columnDef['displayNames'])) {
-                        foreach (array_keys($columnDef['displayNames']) as $type) {
+                    } elseif (isset($columnDef['names'])) {
+                        foreach (array_keys($columnDef['names']) as $type) {
                             $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
                             $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
                         }
