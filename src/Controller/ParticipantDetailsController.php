@@ -100,7 +100,7 @@ class ParticipantDetailsController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $measurements = $em->getRepository(Measurement::class)->findBy(['participantId' => $id], ['id' => 'desc']);
+        $measurements = $em->getRepository(Measurement::class)->getMeasurementsWithoutParent($id);
         $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
         $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
 
