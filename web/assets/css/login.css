@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 html {
-    background: url('/assets/img/login/login-background.jpg') no-repeat center center fixed;
+    background: url('../img/login/login-background.jpg') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -33,6 +33,14 @@ body {
 }
 #login-action img {
     max-width: 250px;
+}
+#login-action hr {
+    border-top: 2px solid #ddd;
+    width: 75%;
+    margin: 40px auto;
+}
+#login-action .links {
+    font-size: 1.8rem;
 }
 #login-copyright {
     font-size: 1rem;
