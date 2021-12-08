@@ -148,7 +148,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'userTimezone' => true,
-            'visible' => false
+            'visible' => false,
+            'csvFormatDate' => true
         ],
         'primaryConsent' => [
             'name' => 'Primary Consent',
@@ -189,7 +190,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'type' => 'firstEhrConsent',
-            'visible' => false
+            'visible' => false,
+            'csvFormatDate' => true
         ],
         'ehrConsent' => [
             'name' => 'EHR Consent',

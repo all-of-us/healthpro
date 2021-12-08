@@ -491,10 +491,10 @@ class WorkQueueService
                     } else {
                         $row[] = WorkQueue::csvStatusFromSubmitted($participant->{$columnDef['rdrField']});
                     }
-                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                } else {
-                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
                 }
+                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+            } elseif (isset($columnDef['csvFormatDate'])) {
+                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrField']}, $userTimezone);
             } elseif (isset($columnDef['csvRdrField'])) {
                 $row[] = $participant->{$columnDef['csvRdrField']};
             } else {
