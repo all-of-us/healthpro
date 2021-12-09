@@ -124,4 +124,24 @@ class MeasurementRepository extends ServiceEntityRepository
         ;
         return !empty($measurement) ? $measurement[0] : null;
     }
+
+    public function getMeasurementsWithoutParent($participantId): array
+    {
+        $parentIds = $this->createQueryBuilder('m')
+            ->select('m.parentId')
+            ->where('m.parentId is not null')
+            ->getQuery()
+            ->getResult();
+        $queryParams = ['participantId' => $participantId];
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->where('m.participantId = :participantId');
+        if (!empty($parentIds)) {
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('m.id', ':parentIds'));
+            $queryParams['parentIds'] = $parentIds;
+        }
+        return $queryBuilder
+            ->setParameters($queryParams)
+            ->getQuery()
+            ->getResult();
+    }
 }
