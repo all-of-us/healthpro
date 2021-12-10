@@ -66,10 +66,11 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentPanelStatus(value, time, filePath, participantId, showConsentPDFs, consentType) %}
+{% macro displayConsentPanelStatus(participant, field, showConsentPDFs = '') %}
     {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
-    {% if value in consentValues %}
-        {{ time ? _self.displayConsent(time, filePath, consentType, participantId, showConsentPDFs) : '--' }}
+    {% if attribute(participant, field) in consentValues %}
+        {% set time = attribute(participant, field ~ 'Authored') %}
+        {{ time ? _self.displayConsent(time, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) : '--' }}
     {% else %}
         (not completed)
     {% endif %}
@@ -87,8 +88,10 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayFirstConsentPanelStatus(value, time, firstTime, filePath, participantId, showConsentPDFs, type = 'primary') %}
+{% macro displayFirstConsentPanelStatus(participant, field, showConsentPDFs, type = 'primary') %}
     {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
+    {% set value = attribute(participant, field) %}
+    {% set firstTime = attribute(participant, field ~ 'FirstYesAuthored') %}
     {% if value in consentValues %}
         {% if firstTime %}
             {{ firstTime|date('n/j/Y g:ia', app.user.timezone) }} {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>
@@ -98,8 +101,8 @@
         {% else %}
             <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {% endif %}
-        {% set consentType = type == 'primary' ? 'consentForStudyEnrollment' : 'consentForElectronicHealthRecords' %}
-        {{ time ? _self.displayConsent(time, filePath, consentType, participantId, showConsentPDFs, 'yes') : '--' }}
+        {% set time = attribute(participant, field ~ 'Authored') %}
+        {{ time ? _self.displayConsent(time, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs, 'yes') : '--' }}
     {% else %}
         (not completed)
     {% endif %}

@@ -139,12 +139,12 @@
                                             <dt>Language of Primary Consent</dt>
                                             <dd>{{ participant.primaryLanguage|default('--') }}</dd>
                                             <dt>Primary Consent</dt>
-                                            <dd>{{ macros.displayFirstConsentPanelStatus(participant.consentForStudyEnrollment, participant.consentForStudyEnrollmentAuthored, participant.consentForStudyEnrollmentFirstYesAuthored, participant.consentForStudyEnrollmentFilePath, participant.id, showConsentPDFs) }}</dd>
+                                            <dd>{{ macros.displayFirstConsentPanelStatus(participant, 'consentForStudyEnrollment', showConsentPDFs) }}</dd>
                                             <dt>Program Update</dt>
                                             <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
                                             <dt>EHR Consent</dt>
                                             <dd>
-                                                {{ macros.displayFirstConsentPanelStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.consentForElectronicHealthRecordsFirstYesAuthored, participant.consentForElectronicHealthRecordsFilePath, participant.id, showConsentPDFs,  'ehr') }}
+                                                {{ macros.displayFirstConsentPanelStatus(participant, 'consentForElectronicHealthRecords', showConsentPDFs,  'ehr') }}
                                                 {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
                                                     (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.user.timezone) : '--' }})
                                                 {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
@@ -152,11 +152,11 @@
                                                 {% endif %}
                                             </dd>
                                             <dt>gRoR Consent</dt>
-                                            <dd>{{ macros.displayConsentPanelStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored, participant.consentForGenomicsRORFilePath, participant.id, showConsentPDFs, 'consentForGenomicsROR') }}</dd>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}</dd>
                                             <dt>DV-only EHR Sharing</dt>
-                                            <dd>{{ macros.displayConsentPanelStatus(participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}</dd>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForDvElectronicHealthRecordsSharing') }}</dd>
                                             <dt>CABoR Consent</dt>
-                                            <dd>{{ macros.displayConsentPanelStatus(participant.consentForCABoR, participant.consentForCABoRAuthored, participant.consentForCABoRFilePath, participant.id, showConsentPDFs, 'consentForCABoR') }}</dd>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForCABoR', showConsentPDFs) }}</dd>
                                             <dt>Digital Sharing</dt>
                                             {% for type, label in digitalHealthSharingTypes %}
                                                 <dd>{{ label }} {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}</dd>
