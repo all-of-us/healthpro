@@ -188,7 +188,8 @@ class ParticipantDetailsController extends AbstractController
             'displayPatientStatusBlock' => !$isDVType,
             'canEdit' => $participant->status || $participant->editExistingOnly,
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
-            'evaluationUrl' => $evaluationUrl
+            'evaluationUrl' => $evaluationUrl,
+            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue')
         ]);
     }
 
