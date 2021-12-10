@@ -137,6 +137,7 @@ $(document).ready(function() {
     var table = $('#workqueue').DataTable({
         processing: true,
         serverSide: true,
+        fixedHeader: true,
         scrollX: true,
         ajax: {
             url: url,
@@ -157,6 +158,7 @@ $(document).ready(function() {
             var pageDropDown = $('.page-drop-down select');
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
+            table.columns.adjust().draw();
         },
         createdRow: function (row, data) {
             if (data.isWithdrawn === true) {
@@ -178,7 +180,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-default'
             },
             {
                 extend: 'colvisGroup',
@@ -195,7 +198,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-consent'
             },
             {
                 extend: 'colvisGroup',
@@ -211,7 +215,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-ppi'
             },
             {
                 extend: 'colvisGroup',
@@ -227,7 +232,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-inperson'
             },
             {
                 extend: 'colvisGroup',
@@ -243,7 +249,8 @@ $(document).ready(function() {
                     '.col-group-contact',
                     '.col-group-patient-status',
                     '.col-group-metrics'
-                ]
+                ],
+                className: 'btn-col-group-demographics'
             },
             {
                 extend: 'colvisGroup',
@@ -262,7 +269,8 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-contact',
                     '.col-group-metrics:not(.col-group-metrics-ehr)'
-                ]
+                ],
+                className: 'btn-col-group-patient-status'
             },
             {
                 extend: 'colvisGroup',
@@ -285,8 +293,8 @@ $(document).ready(function() {
                     '.col-group-language-primary-consent',
                     '.col-group-ehr-expire-status',
                     '.col-group-consent'
-
-                ]
+                ],
+                className: 'btn-col-group-contact'
             },
             {
                 extend: 'colvisGroup',
@@ -304,12 +312,14 @@ $(document).ready(function() {
                     '.col-group-ppi',
                     '.col-group-patient-status',
                     '.col-group-contact'
-                ]
+                ],
+                className: 'btn-col-group-metrics'
             },
             {
                 extend: 'colvisGroup',
                 text: 'Show all',
-                show: ':hidden'
+                show: ':hidden',
+                className: 'btn-col-group-all'
             },
             {
                 extend: 'colvis',
@@ -333,6 +343,11 @@ $(document).ready(function() {
             $('#heading-count .plural').show();
         }
         $('#heading-count').show();
+    });
+
+    // Fix clipping of table header when more columns added
+    $('#workqueue').on('column-visibility.dt', function ( e, settings, column, state ) {
+      $('.dataTables_scrollHeadInner').css({height: $('.dataTables_scrollHeadInner tr').height()});
     });
 
     table.buttons().container().find('.btn').addClass('btn-sm');

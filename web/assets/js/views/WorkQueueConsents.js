@@ -46,6 +46,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         scrollX: true,
+        fixedHeader: true,
         ajax: {
             url: url,
             type: "POST"
