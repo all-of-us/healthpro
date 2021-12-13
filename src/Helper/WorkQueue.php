@@ -184,8 +184,8 @@ class WorkQueue
         'firstEhrConsent' => [
             'name' => 'First EHR Consent',
             'csvName' => 'Date of First EHR Consent',
-            'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'rdrField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
+            'sortField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
             'method' => 'displayFirstConsentStatusTime',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
