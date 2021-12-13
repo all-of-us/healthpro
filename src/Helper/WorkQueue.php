@@ -82,8 +82,7 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'method' => 'getActivityStatus',
             'toggleColumn' => true,
-            'type' => 'activityStatus',
-            'visible' => false
+            'type' => 'activityStatus'
         ],
         'withdrawalStatus' => [
             'name' => 'Withdrawal Status',
