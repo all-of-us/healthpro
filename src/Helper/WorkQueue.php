@@ -79,6 +79,7 @@ class WorkQueue
             'name' => 'Activity Status',
             'rdrField' => 'activityStatus',
             'sortField' => 'activityStatus',
+            'htmlClass' => 'text-center',
             'method' => 'getActivityStatus',
             'toggleColumn' => true,
             'type' => 'activityStatus',
@@ -384,7 +385,6 @@ class WorkQueue
             'name' => 'Contact Method',
             'rdrField' => 'recontactMethod',
             'sortField' => 'recontactMethod',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -394,7 +394,6 @@ class WorkQueue
             'rdrField' => 'address',
             'sortField' => 'address',
             'participantMethod' => 'getAddress',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'type' => 'address',
             'csvRdrField' => 'streetAddress',
@@ -421,7 +420,6 @@ class WorkQueue
             'name' => 'Email',
             'rdrField' => 'email',
             'sortField' => 'email',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -429,7 +427,6 @@ class WorkQueue
             'name' => 'Login Phone',
             'rdrField' => 'loginPhoneNumber',
             'sortField' => 'loginPhoneNumber',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -437,7 +434,6 @@ class WorkQueue
             'name' => 'Contact Phone',
             'rdrField' => 'phoneNumber',
             'sortField' => 'phoneNumber',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -718,7 +714,6 @@ class WorkQueue
             'rdrField' => 'siteSuffix',
             'sortField' => 'siteSuffix',
             'serviceMethod' => 'getSiteDisplayName',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
         'pairedOrganization' => [
@@ -726,7 +721,6 @@ class WorkQueue
             'rdrField' => 'organization',
             'sortField' => 'organization',
             'serviceMethod' => 'getOrganizationDisplayName',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true
         ],
         'physicalMeasurementsStatus' => [
@@ -750,7 +744,6 @@ class WorkQueue
             'rdrField' => 'evaluationFinalizedSite',
             'sortField' => 'evaluationFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -778,7 +771,6 @@ class WorkQueue
             'rdrField' => 'orderCreatedSite',
             'sortField' => 'orderCreatedSite',
             'serviceMethod' => 'getSiteDisplayName',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -958,7 +950,6 @@ class WorkQueue
             'name' => 'Age',
             'rdrField' => 'age',
             'sortField' => 'age',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -966,7 +957,6 @@ class WorkQueue
             'name' => 'Sex',
             'rdrField' => 'sex',
             'sortField' => 'sex',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -974,7 +964,6 @@ class WorkQueue
             'name' => 'Gender Identity',
             'rdrField' => 'genderIdentity',
             'sortField' => 'genderIdentity',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -982,7 +971,6 @@ class WorkQueue
             'name' => 'Race/Ethnicity',
             'rdrField' => 'race',
             'sortField' => 'race',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ],
@@ -990,7 +978,6 @@ class WorkQueue
             'name' => 'Education',
             'rdrField' => 'education',
             'sortField' => 'education',
-            'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
         ]
