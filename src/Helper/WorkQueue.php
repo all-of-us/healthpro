@@ -735,7 +735,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'statusText' => 'COMPLETED',
-            'csvStatusText' => 'COMPLETED'
+            'csvStatusText' => 'COMPLETED',
+            'csvDisplayTime' => false
         ],
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',

@@ -459,7 +459,8 @@ class WorkQueueService
             } elseif (isset($columnDef['csvStatusText'])) {
                 if (isset($columnDef['csvNames'])) {
                     $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? 1 : 0;
-                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                    $displayTime = isset($columnDef['csvDisplayTime']) ? $columnDef['csvDisplayTime'] : true;
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone, $displayTime);
                 } else {
                     if (isset($columnDef['rdrDateField'])) {
                         $row[] = $participant->{$columnDef['rdrDateField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString(
