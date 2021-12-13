@@ -369,6 +369,7 @@ class WorkQueueService
                     $row[$field] = $e($participant->{$columnDef['rdrField']});
                 }
             }
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             array_push($rows, $row);
         }
         return $rows;
@@ -429,6 +430,7 @@ class WorkQueueService
                     $row[$field] = $e($participant->{$columnDef['rdrField']});
                 }
             }
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             array_push($rows, $row);
         }
         return $rows;
