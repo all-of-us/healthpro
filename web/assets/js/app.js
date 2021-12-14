@@ -15,8 +15,6 @@ require('datatables.net-responsive-bs/js/responsive.bootstrap.js');
 require('datatables.net-buttons/js/dataTables.buttons.js');
 require('datatables.net-buttons/js/buttons.colVis.js');
 require('datatables.net-buttons-bs/js/buttons.bootstrap.js');
-require('datatables.net-fixedheader');
-require('datatables.net-fixedheader-bs');
 require('jsbarcode/dist/barcodes/JsBarcode.code128.min.js');
 require('inputmask/dist/jquery.inputmask.bundle.js');
 require('bootstrap-toggle/js/bootstrap-toggle.js');
@@ -36,7 +34,6 @@ require('eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.mi
 require('datatables.net-bs/css/dataTables.bootstrap.css');
 require('datatables.net-responsive-bs/css/responsive.bootstrap.css');
 require('datatables.net-buttons-bs/css/buttons.bootstrap.css');
-require('datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.css');
 require('bootstrap-toggle/css/bootstrap-toggle.css');
 require('../css/app.css');
 
