@@ -323,25 +323,39 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     updateConversion: function(e) {
         var field = $(e.currentTarget).closest('.field').data('field');
-        this.calculateConversion(field);
+        var replicate = $(e.currentTarget).closest('.field').data('replicate');
+        var index = null;
+        if (replicate) {
+            index = parseInt(replicate) - 1;
+        }
+        this.calculateConversion(field, index);
     },
-    calculateConversion: function(field) {
+    calculateConversion: function(field, index = null) {
         var input = this.$('.field-' + field).find('input');
-        if (input.length > 1) {
-            // replicate conversions are handled in calculateMean method
+        var hipWaistFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
+        if ($.inArray(field, hipWaistFields) === -1 && input.length > 1) {
+            // replicate conversions are handled in calculateMean method except for hip & waist circumference fields
             return;
+        }
+        var convertFieldId = '#convert-' + field;
+        if (index !== null) {
+            input = this.$('#form_' + field + '_' + index);
+            convertFieldId = '#convert-' + field + '_' + index;
         }
         if (this.conversions[field]) {
             var val = parseFloat(input.val());
             if (val) {
                 var converted = this.convert(this.conversions[field], val);
                 if (converted) {
-                    this.$('#convert-' + field).text('('+converted+')');
+                    this.$(convertFieldId).text('(' + converted + ')');
                 } else {
-                    this.$('#convert-' + field).text('');
+                    this.$(convertFieldId).text('');
                 }
             } else {
-                this.$('#convert-' + field).text('');
+                this.$(convertFieldId).text('');
             }
         }
     },
