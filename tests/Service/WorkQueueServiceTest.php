@@ -63,7 +63,7 @@ class WorkQueueServiceTest extends KernelTestCase
         $this->assertSame('Participant + EHR Consent', $row1['participantStatus']);
         $this->assertStringContainsString('Active', $row1['activityStatus']);
         $this->assertSame('100 Main St, City1, AL 10001', $row1['address']);
-        $this->assertStringContainsString('11/3/2021 2:08 pm', $row1['ppiTheBasics']);
+        $this->assertStringContainsString('11/3/2021 2:08 pm', $row1['TheBasics']);
 
         $row2 = $rows[1];
         $this->assertEmpty($row2['patientStatusYes']);
@@ -71,7 +71,7 @@ class WorkQueueServiceTest extends KernelTestCase
         $this->assertSame('Participant', $row2['participantStatus']);
         $this->assertStringContainsString('Active', $row2['activityStatus']);
         $this->assertSame('200 Main St, City2, AZ 20002', $row2['address']);
-        $this->assertStringContainsString('text-danger', $row2['ppiTheBasics']);
+        $this->assertStringContainsString('text-danger', $row2['TheBasics']);
     }
 
     public function testGenerateConsentExportRow()

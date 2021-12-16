@@ -56,83 +56,41 @@ $(document).ready(function() {
 
     var url = window.location.href;
 
-    var surveys = $('#workqueue').data('surveys');
-    var samples = $('#workqueue').data('samples');
+    var wQColumns = $('#workqueue').data('wq-columns');
+    var columnsDef = $('#workqueue').data('columns-def');
     var isDvType = $('#workqueue').data('dv-type');
-    var digitalHealthSharingTypes = $('#workqueue').data('digital-health-sharing-types');
 
     var tableColumns = [];
-    tableColumns.push(
-      { name: 'lastName', data: 'lastName' },
-      { name: 'firstName', data: 'firstName' },
-      { name: 'middleName', data: 'middleName' },
-      { name: 'dateOfBirth', data: 'dateOfBirth' },
-      { name: 'participantId', data: 'participantId' },
-      { name: 'biobankId', visible: false, data: 'biobankId' },
-      { name: 'participantStatus', data: 'participantStatus' },
-      { name: 'activityStatus', data: 'activityStatus', class: 'text-center', orderable: false },
-      { name: 'withdrawalReason', visible: false, data: 'withdrawalReason', class: 'text-center' },
-      { name: 'participantOrigin', data: 'participantOrigin', visible: !!isDvType },
-      { name: 'consentCohort', data: 'consentCohort', class: 'text-center' },
-      { name: 'firstPrimaryConsent', visible: false, data: 'firstPrimaryConsent', class: 'text-center' },
-      { name: 'primaryConsent', data: 'primaryConsent', class: 'text-center' },
-      { name: 'questionnaireOnDnaProgram', data: 'questionnaireOnDnaProgram', class: 'text-center' },
-      { name: 'firstEhrConsent', visible: false, data: 'firstEhrConsent', class: 'text-center' },
-      { name: 'ehrConsent', data: 'ehrConsent', class: 'text-center' },
-      { name: 'ehrConsentExpireStatus', visible: false, data: 'ehrConsentExpireStatus', class: 'text-center' },
-      { name: 'gRoRConsent', data: 'gRoRConsent', class: 'text-center' },
-      { name: 'primaryLanguage', data: 'primaryLanguage' },
-      { name: 'dvEhrStatus', visible: false, data: 'dvEhrStatus', class: 'text-center' },
-      { name: 'caborConsent', visible: false, data: 'caborConsent', class: 'text-center' }
-    );
-    Object.keys(digitalHealthSharingTypes).forEach(function (key, _i) {
-        tableColumns.push(
-            {name: key + 'Consent', visible: false, data: key + 'Consent', class: 'text-center', orderable: false}
-        );
+
+    var generateTableRow = function (field, columnDef) {
+        var row = {};
+        row.name = field;
+        row.data = field;
+        if (columnDef.hasOwnProperty('htmlClass')) {
+            row.class = columnDef['htmlClass'];
+        }
+        if (columnDef.hasOwnProperty('orderable')) {
+            row.class = columnDef['orderable'];
+        }
+        if (columnDef.hasOwnProperty('visible')) {
+            row.visible = columnDef['visible'];
+        }
+        if (columnDef.hasOwnProperty('checkDvVisibility')) {
+            row.visible = !!isDvType;
+        }
+        tableColumns.push(row);
+    };
+
+    wQColumns.forEach(function (field) {
+        var columnDef = columnsDef[field];
+        if (columnDef.hasOwnProperty('names')) {
+            Object.keys(columnDef['names']).forEach(function (key) {
+                generateTableRow(key + 'Consent', columnDef);
+            });
+        } else {
+            generateTableRow(field, columnDef);
+        }
     });
-    tableColumns.push(
-      { name: 'retentionEligibleStatus', visible: false, data: 'retentionEligibleStatus', class: 'text-center' },
-      { name: 'retentionType', visible: false, data: 'retentionType', class: 'text-center', orderable: false },
-      { name: 'isEhrDataAvailable', visible: false, data: 'isEhrDataAvailable', class: 'text-center' },
-      { name: 'latestEhrReceiptTime', visible: false, data: 'latestEhrReceiptTime', class: 'text-center' },
-      { name: 'patientStatusYes', visible: false, data: 'patientStatusYes', orderable: false },
-      { name: 'patientStatusNo', visible: false, data: 'patientStatusNo', orderable: false },
-      { name: 'patientStatusUnknown', visible: false, data: 'patientStatusUnknown', orderable: false },
-      { name: 'patientStatusNoAccess', visible: false, data: 'patientStatusNoAccess', orderable: false },
-      { name: 'contactMethod', visible: false, data: 'contactMethod', orderable: false },
-      { name: 'address', visible: false, data: 'address'},
-      { name: 'email', visible: false, data: 'email' },
-      { name: 'loginPhone', visible: false, data: 'loginPhone' },
-      { name: 'phone', visible: false, data: 'phone' },
-      { name: 'ppiStatus', data: 'ppiStatus', class: 'text-center' },
-      { name: 'ppiSurveys', data: 'ppiSurveys', class: 'text-center' }
-    );
-    Object.keys(surveys).forEach(function(key, _i) {
-      tableColumns.push(
-        { name: 'ppi'+key, visible: false, data: 'ppi'+key, class: 'text-center' }
-      );
-    });
-    tableColumns.push(
-      { name: 'pairedSite', data: 'pairedSite' },
-      { name: 'pairedOrganization', data: 'pairedOrganization' },
-      { name: 'physicalMeasurementsStatus', data: 'physicalMeasurementsStatus', class: 'text-center' },
-      { name: 'evaluationFinalizedSite', visible: false, data: 'evaluationFinalizedSite', orderable: false },
-      { name: 'biobankDnaStatus', data: 'biobankDnaStatus', class: 'text-center' },
-      { name: 'biobankSamples', data: 'biobankSamples', class: 'text-center'},
-      { name: 'orderCreatedSite', visible: false, data: 'orderCreatedSite', orderable: false }
-    );
-    Object.keys(samples).forEach(function(key, _i) {
-      tableColumns.push(
-        { name: 'sample'+key, visible: false, data: 'sample'+key, class: 'text-center' }
-      );
-    });
-    tableColumns.push(
-      { name: 'age', visible: false, data: 'age' },
-      { name: 'sex', visible: false, data: 'sex', orderable: false },
-      { name: 'genderIdentity', visible: false, data: 'genderIdentity' },
-      { name: 'race', visible: false, data: 'race' },
-      { name: 'education', visible: false, data: 'education', orderable: false }
-    );
 
     var table = $('#workqueue').DataTable({
         processing: true,
