@@ -332,11 +332,7 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
     },
     calculateConversion: function(field, index = null) {
         var input = this.$('.field-' + field).find('input');
-        var hipWaistFields = [
-            'hip-circumference',
-            'waist-circumference'
-        ];
-        if ($.inArray(field, hipWaistFields) === -1 && input.length > 1) {
+        if ($.inArray(field, this.hipWaistFields) === -1 && input.length > 1) {
             // replicate conversions are handled in calculateMean method except for hip & waist circumference fields
             return;
         }
@@ -661,6 +657,10 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
         this.rendered = false;
+        this.hipWaistFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
         this.render();
     },
     render: function() {
@@ -678,7 +678,14 @@ PMI.views['PhysicalEvaluation-0.3'] = Backbone.View.extend({
         });
 
         _.each(_.keys(this.conversions), function(field) {
-            self.calculateConversion(field);
+            if ($.inArray(field, self.hipWaistFields) !== -1) {
+                var replicates = $('.field-' + field).length;
+                for (var i = 0; i < replicates; i++) {
+                    self.calculateConversion(field, i);
+                }
+            } else {
+                self.calculateConversion(field);
+            }
         });
         this.showModifications();
         this.displayWarnings();
