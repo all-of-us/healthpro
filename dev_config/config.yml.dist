@@ -151,3 +151,6 @@ ehr_protocol_banner_message:
 
 # Displays participant consents tab in work queue
 # feature.participantconsentsworkqueue: false
+
+# Dashboard URL displayed on the login page
+# dashboard_url:

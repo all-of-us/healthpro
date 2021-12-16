@@ -323,7 +323,7 @@ class MeasurementsController extends AbstractController
                 $this->addFlash('error', 'Please correct the errors below');
             }
         }
-        $measurements = $this->em->getRepository(Measurement::class)->findBy(['participantId' => $participantId]);
+        $measurements = $this->em->getRepository(Measurement::class)->getMeasurementsWithoutParent($participantId);
         return $this->render('measurement/modify.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,

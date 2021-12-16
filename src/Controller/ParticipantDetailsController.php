@@ -100,7 +100,7 @@ class ParticipantDetailsController extends AbstractController
                 'organization' => $participant->hpoId
             ]);
         }
-        $measurements = $em->getRepository(Measurement::class)->findBy(['participantId' => $id], ['id' => 'desc']);
+        $measurements = $em->getRepository(Measurement::class)->getMeasurementsWithoutParent($id);
         $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
         $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
 
@@ -188,7 +188,8 @@ class ParticipantDetailsController extends AbstractController
             'displayPatientStatusBlock' => !$isDVType,
             'canEdit' => $participant->status || $participant->editExistingOnly,
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
-            'evaluationUrl' => $evaluationUrl
+            'evaluationUrl' => $evaluationUrl,
+            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue')
         ]);
     }
 
