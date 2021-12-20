@@ -58,12 +58,7 @@
 
         {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
             <div class="btn-group pull-right">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-cog"></i><span class="sr-only">Additional Options</span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a></li>
-                </ul>
+                <a class="btn btn-default" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
             </div>
         {% endif %}
 
