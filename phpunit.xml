@@ -14,6 +14,9 @@
       <server name="PMI_ENV" value="local" />
       <server name="APP_ENV" value="test" />
     </php>
+    <extensions>
+        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
     <testsuites>
         <testsuite name="Symfony Test Suite">
             <directory>tests</directory>
