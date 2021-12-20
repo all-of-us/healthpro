@@ -178,35 +178,25 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
     },
     updateConversion: function(e) {
         var field = $(e.currentTarget).closest('.field').data('field');
-        var replicate = $(e.currentTarget).closest('.field').data('replicate');
-        var index = null;
-        if (replicate) {
-            index = parseInt(replicate) - 1;
-        }
-        this.calculateConversion(field, index);
+        this.calculateConversion(field);
     },
-    calculateConversion: function(field, index = null) {
+    calculateConversion: function(field) {
         var input = this.$('.field-' + field).find('input');
-        if ($.inArray(field, this.hipWaistFields) === -1 && input.length > 1) {
-            // replicate conversions are handled in calculateMean method except for hip & waist circumference fields
+        if (input.length > 1) {
+            // replicate conversions are handled in calculateMean method
             return;
-        }
-        var convertFieldId = '#convert-' + field;
-        if (index !== null) {
-            input = this.$('#form_' + field + '_' + index);
-            convertFieldId = '#convert-' + field + '_' + index;
         }
         if (this.conversions[field]) {
             var val = parseFloat(input.val());
             if (val) {
                 var converted = this.convert(this.conversions[field], val);
                 if (converted) {
-                    this.$(convertFieldId).text('(' + converted + ')');
+                    this.$('#convert-' + field).text('('+converted+')');
                 } else {
-                    this.$(convertFieldId).text('');
+                    this.$('#convert-' + field).text('');
                 }
             } else {
-                this.$(convertFieldId).text('');
+                this.$('#convert-' + field).text('');
             }
         }
     },
@@ -400,10 +390,6 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
         this.rendered = false;
-        this.hipWaistFields = [
-            'hip-circumference',
-            'waist-circumference'
-        ];
         this.render();
     },
     render: function() {
@@ -419,14 +405,7 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         });
 
         _.each(_.keys(this.conversions), function(field) {
-            if ($.inArray(field, self.hipWaistFields) !== -1) {
-                var replicates = $('.field-' + field).length;
-                for (var i = 0; i < replicates; i++) {
-                    self.calculateConversion(field, i);
-                }
-            } else {
-                self.calculateConversion(field);
-            }
+            self.calculateConversion(field);
         });
         this.showModifications();
         this.displayWarnings();
