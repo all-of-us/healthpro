@@ -34,10 +34,34 @@ class SiteRepositoryTest extends KernelTestCase
             ->setWorkqueueDownload('');
         $this->em->persist($site);
         $this->em->flush();
-        $organizations = $this->repo->getOrganizations();
+
         $found = false;
-        foreach ($organizations as $organization) {
+        foreach ($this->repo->getOrganizations() as $organization) {
             if ($organization['organizationId'] === $orgId) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found);
+    }
+
+    public function testGetAwardees(): void
+    {
+        $id = uniqid();
+        $awardeeId = 'TEST_AWARDEE_' . $id;
+        $siteId = 'test-'  . $id;
+        $site = new Site();
+        $site->setStatus(true)
+            ->setName('Test Site ' . $id)
+            ->setAwardeeId($awardeeId)
+            ->setSiteId($siteId)
+            ->setGoogleGroup($siteId)
+            ->setWorkqueueDownload('');
+        $this->em->persist($site);
+        $this->em->flush();
+
+        $found = false;
+        foreach ($this->repo->getAwardees() as $awardee) {
+            if ($awardee['awardeeId'] === $awardeeId) {
                 $found = true;
             }
         }
