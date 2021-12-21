@@ -13,6 +13,8 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class SiteService
 {
+    const CABOR_STATE = 'CA';
+
     private $params;
     private $session;
     private $em;
@@ -268,6 +270,7 @@ class SiteService
             $this->session->set('currentSiteDisplayName', $site->getName());
             $this->session->set('siteType', $this->getSiteType());
             $this->session->set('orderType', $this->getOrderType());
+            $this->session->set('siteState', $site->getState());
         } else {
             $this->session->remove('siteOrganization');
             $this->session->remove('siteOrganizationId');
@@ -278,6 +281,7 @@ class SiteService
             $this->session->remove('currentSiteDisplayName');
             $this->session->remove('siteType');
             $this->session->remove('orderType');
+            $this->session->remove('siteState');
         }
     }
 
@@ -302,5 +306,10 @@ class SiteService
     public function getSiteType()
     {
         return $this->isDVType() ? 'dv' : 'hpo';
+    }
+
+    public function displayCaborConsent(): bool
+    {
+        return $this->session->get('siteState') === self::CABOR_STATE ? false : true;
     }
 }
