@@ -13,10 +13,11 @@
                     </small>
                     <ul class="list-group">
                         {% set columNumber = 5 %}
-                        {% for name, columnDef in columnsDef %}
+                        {% for name in consentColumns %}
+                            {% set columnDef = columnsDef[name] %}
                             {% if columnDef.toggleColumn %}
-                                {% if columnDef.displayNames is defined %}
-                                    {% for subFieldName, subFieldLabel in columnDef.displayNames %}
+                                {% if columnDef.names is defined %}
+                                    {% for subFieldName, subFieldLabel in columnDef.names %}
                                         {% set checked = "column"~subFieldName in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
                                         <li class="filter-list-group-item checkbox">
                                             <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
@@ -26,7 +27,7 @@
                                 {% else %}
                                     {% set checked = "column"~name in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
                                     <li class="filter-list-group-item checkbox">
-                                        <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.displayName }}</label>
+                                        <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.name }}</label>
                                     </li>
                                     {% set columNumber = columNumber + 1 %}
                                 {% endif %}

@@ -241,190 +241,135 @@ class WorkQueueService
         foreach ($participants as $participant) {
             $row = [];
             //Identifiers and status
-            if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
-                $row['lastName'] = $this->generateLink($participant->id, $participant->lastName);
-                $row['middleName'] = $this->generateLink($participant->id, $participant->middleName);
-                $row['firstName'] = $this->generateLink($participant->id, $participant->firstName);
-            } else {
-                $row['lastName'] = $e($participant->lastName);
-                $row['firstName'] = $e($participant->firstName);
-                $row['middleName'] = $e($participant->middleName);
-            }
-            if (!empty($participant->dob)) {
-                $row['dateOfBirth'] = $participant->dob->format('m/d/Y');
-            } else {
-                $row['dateOfBirth'] = '';
-            }
-            $row['patientStatusYes'] = $this->getPatientStatus($participant, 'YES');
-            $row['patientStatusNo'] = $this->getPatientStatus($participant, 'NO');
-            $row['patientStatusUnknown'] = $this->getPatientStatus($participant, 'NO_ACCESS');
-            $row['patientStatusNoAccess'] = $this->getPatientStatus($participant, 'UNKNOWN');
-            $row['participantId'] = $e($participant->id);
-            $row['biobankId'] = $e($participant->biobankId);
-            $row['participantOrigin'] = $e($participant->participantOrigin);
-            $row['participantStatus'] = $e($participant->enrollmentStatus) . $this->getEnrollmentStatusTime($participant, $userTimezone);
-            $row['activityStatus'] = WorkQueue::getActivityStatus($participant, $userTimezone);
-            $row['withdrawalReason'] = $e($participant->withdrawalReason);
-            $row['consentCohort'] = $e($participant->consentCohortText);
-            $row['primaryConsent'] = WorkQueue::displayConsentStatus(
-                $participant->consentForStudyEnrollment,
-                $participant->consentForStudyEnrollmentAuthored,
-                $userTimezone,
-                true,
-                ($this->showConsentPDFs && $participant->consentForStudyEnrollmentFilePath)
-                    ? $this->urlGenerator->generate('participant_consent', [
-                        'id' => $participant->id,
-                        'consentType' => 'consentForStudyEnrollment'
-                    ])
-                    : null
-            );
-            $row['firstPrimaryConsent'] = WorkQueue::displayFirstConsentStatusTime(
-                $participant->consentForStudyEnrollmentFirstYesAuthored,
-                $userTimezone
-            );
-            $row['questionnaireOnDnaProgram'] = WorkQueue::displayProgramUpdate(
-                $participant->consentCohort,
-                $participant->questionnaireOnDnaProgram,
-                $participant->questionnaireOnDnaProgramAuthored,
-                $userTimezone
-            );
-            $row['firstEhrConsent'] = WorkQueue::displayFirstConsentStatusTime(
-                $participant->consentForElectronicHealthRecordsFirstYesAuthored,
-                $userTimezone,
-                'ehr'
-            );
-            $row['ehrConsent'] = WorkQueue::displayConsentStatus(
-                $participant->consentForElectronicHealthRecords,
-                $participant->consentForElectronicHealthRecordsAuthored,
-                $userTimezone,
-                true,
-                ($this->showConsentPDFs && $participant->consentForElectronicHealthRecordsFilePath)
-                    ? $this->urlGenerator->generate('participant_consent', [
-                        'id' => $participant->id,
-                        'consentType' => 'consentForElectronicHealthRecords'
-                    ])
-                    : null
-            );
-            $row['ehrConsentExpireStatus'] = WorkQueue::displayEhrConsentExpireStatus(
-                $participant->consentForElectronicHealthRecords,
-                $participant->ehrConsentExpireStatus,
-                $participant->ehrConsentExpireAuthored,
-                $userTimezone
-            );
-            $row['gRoRConsent'] = WorkQueue::displayGenomicsConsentStatus(
-                $participant->consentForGenomicsROR,
-                $participant->consentForGenomicsRORAuthored,
-                $userTimezone,
-                true,
-                ($this->showConsentPDFs && $participant->consentForGenomicsRORFilePath)
-                    ? $this->urlGenerator->generate('participant_consent', [
-                        'id' => $participant->id,
-                        'consentType' => 'consentForGenomicsROR'
-                    ])
-                    : null
-            );
-            $row['primaryLanguage'] = $e($participant->primaryLanguage);
-            $row['dvEhrStatus'] = WorkQueue::displayConsentStatus(
-                $participant->consentForDvElectronicHealthRecordsSharing,
-                $participant->consentForDvElectronicHealthRecordsSharingAuthored,
-                $userTimezone
-            );
-            $row['caborConsent'] = WorkQueue::displayConsentStatus(
-                $participant->consentForCABoR,
-                $participant->consentForCABoRAuthored,
-                $userTimezone,
-                true,
-                ($this->showConsentPDFs && $participant->consentForCABoRFilePath)
-                    ? $this->urlGenerator->generate('participant_consent', [
-                        'id' => $participant->id,
-                        'consentType' => 'consentForCABoR'
-                    ])
-                    : null
-            );
-            foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
-                $row["{$type}Consent"] = WorkQueue::getDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, $userTimezone);
-            }
-            $row['retentionEligibleStatus'] = WorkQueue::getRetentionEligibleStatus(
-                $participant->retentionEligibleStatus,
-                $participant->retentionEligibleTime,
-                $userTimezone
-            );
-            $row['retentionType'] = WorkQueue::getRetentionType($participant->retentionType);
-            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
-            $row['isEhrDataAvailable'] = WorkQueue::getEhrAvailableStatus($participant->isEhrDataAvailable);
-            $row['latestEhrReceiptTime'] = WorkQueue::dateFromString($participant->latestEhrReceiptTime, $userTimezone);
-
-            //Contact
-            $row['contactMethod'] = $e($participant->recontactMethod);
-            if ($participant->getAddress()) {
-                $row['address'] = $e($participant->getAddress());
-            } else {
-                $row['address'] = '';
-            }
-            $row['email'] = $e($participant->email);
-            $row['loginPhone'] = $e($participant->loginPhoneNumber);
-            $row['phone'] = $e($participant->phoneNumber);
-
-            //PPI Surveys
-            if ($participant->numCompletedBaselinePPIModules == 3) {
-                $row['ppiStatus'] = WorkQueue::HTML_SUCCESS;
-            } else {
-                $row['ppiStatus'] = WorkQueue::HTML_DANGER;
-            }
-            $row['ppiSurveys'] = $e($participant->numCompletedPPIModules);
-            foreach (array_keys(WorkQueue::$surveys) as $field) {
-                $row["ppi{$field}"] = WorkQueue::displaySurveyStatus(
-                    $participant->{'questionnaireOn' . $field},
-                    $participant->{'questionnaireOn' . $field . 'Authored'},
-                    $userTimezone
-                );
-            }
-
-            //In-Person Enrollment
-            $row['pairedSite'] = $this->siteService->getSiteDisplayName($e($participant->siteSuffix));
-            $row['pairedOrganization'] = $this->siteService->getOrganizationDisplayName($e($participant->organization));
-            $row['physicalMeasurementsStatus'] = WorkQueue::displayStatus(
-                $participant->physicalMeasurementsStatus,
-                'COMPLETED',
-                $userTimezone,
-                $participant->physicalMeasurementsFinalizedTime,
-                false
-            );
-            $row['evaluationFinalizedSite'] = $this->siteService->getSiteDisplayName($e($participant->evaluationFinalizedSite));
-            $row['biobankDnaStatus'] = WorkQueue::displayStatus($participant->samplesToIsolateDNA, 'RECEIVED', $userTimezone);
-            if ($participant->numBaselineSamplesArrived >= 7) {
-                $row['biobankSamples'] = WorkQueue::HTML_SUCCESS . ' ' . $e($participant->numBaselineSamplesArrived);
-            } else {
-                $row['biobankSamples'] = $e($participant->numBaselineSamplesArrived);
-                ;
-            }
-            $row['orderCreatedSite'] = $this->siteService->getSiteDisplayName($e($participant->orderCreatedSite));
-            foreach (array_keys(WorkQueue::$samples) as $sample) {
-                $newSample = $sample;
-                foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                    if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} === 'RECEIVED') {
-                        $newSample = $sampleAlias[$sample];
-                        break;
+            foreach (WorkQueue::$columns as $field) {
+                $columnDef = WorkQueue::$columnsDef[$field];
+                if (isset($columnDef['generateLink'])) {
+                    if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
+                        $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
+                    } else {
+                        $row[$field] = $e($participant->{$columnDef['rdrField']});
                     }
-                }
-                $row["sample{$sample}"] = WorkQueue::displayStatus(
-                    $participant->{'sampleStatus' . $newSample},
-                    'RECEIVED',
-                    $userTimezone,
-                    $participant->{'sampleStatus' . $newSample . 'Time'},
-                    false
-                );
-                if ($sample === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
-                    $row["sample{$sample}"] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
+                } elseif (isset($columnDef['formatDate'])) {
+                    if (!empty($participant->{$columnDef['rdrField']})) {
+                        $row[$field] = $participant->{$columnDef['rdrField']}->format('m/d/Y');
+                    } else {
+                        $row[$field] = '';
+                    }
+                } elseif (isset($columnDef['serviceMethod'])) {
+                    $row[$field] = $this->siteService->{$columnDef['serviceMethod']}($e($participant->{$columnDef['rdrField']}));
+                } elseif (isset($columnDef['type'])) {
+                    if ($columnDef['type'] === 'sample') {
+                        $newSample = $field;
+                        foreach (WorkQueue::$samplesAlias as $sampleAlias) {
+                            if (array_key_exists($field, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$field]} === 'RECEIVED') {
+                                $newSample = $sampleAlias[$field];
+                                break;
+                            }
+                        }
+                        $row[$field] = WorkQueue::displayStatus(
+                            $participant->{'sampleStatus' . $newSample},
+                            'RECEIVED',
+                            $userTimezone,
+                            $participant->{'sampleStatus' . $newSample . 'Time'},
+                            false
+                        );
+                        if ($field === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
+                            $row[$field] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
+                        }
+                    } elseif ($columnDef['type'] === 'participantStatus') {
+                        $row[$field] = $e($participant->{$columnDef['rdrField']}) . $this->getEnrollmentStatusTime($participant, $userTimezone);
+                    } elseif ($columnDef['type'] === 'patientStatus') {
+                        $row[$field] = $this->{$columnDef['method']}($participant, $columnDef['value']);
+                    } elseif ($columnDef['type'] === 'activityStatus') {
+                        $row[$field] = WorkQueue::{$columnDef['method']}($participant, $userTimezone);
+                    } elseif ($columnDef['type'] === 'firstEhrConsent') {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant->{$columnDef['rdrField']},
+                            $userTimezone,
+                            'ehr'
+                        );
+                    } elseif ($columnDef['type'] === 'address') {
+                        if ($participant->{$columnDef['participantMethod']}()) {
+                            $row[$field] = $e($participant->{$columnDef['participantMethod']}());
+                        } else {
+                            $row[$field] = '';
+                        }
+                    } elseif ($columnDef['type'] === 'ppiStatus') {
+                        if ($participant->{$columnDef['rdrField']} == 3) {
+                            $row[$field] = WorkQueue::HTML_SUCCESS;
+                        } else {
+                            $row[$field] = WorkQueue::HTML_DANGER;
+                        }
+                    }
+                } elseif (isset($columnDef['method'])) {
+                    if (isset($columnDef['rdrDateField'])) {
+                        if (isset($columnDef['otherField'])) {
+                            $row[$field] = WorkQueue::{$columnDef['method']}(
+                                $participant->{$columnDef['otherField']},
+                                $participant->{$columnDef['rdrField']},
+                                $participant->{$columnDef['rdrDateField']},
+                                $userTimezone
+                            );
+                        } elseif (isset($columnDef['statusText'])) {
+                            $row[$field] = WorkQueue::{$columnDef['method']}(
+                                $participant->{$columnDef['rdrField']},
+                                $columnDef['statusText'],
+                                $userTimezone,
+                                $participant->{$columnDef['rdrDateField']},
+                                false
+                            );
+                        } elseif (isset($columnDef['params'])) {
+                            if ($columnDef['params'] === 5) {
+                                $row[$field] = WorkQueue::{$columnDef['method']}(
+                                    $participant->{$columnDef['rdrField']},
+                                    $participant->{$columnDef['rdrDateField']},
+                                    $userTimezone,
+                                    $columnDef['displayTime'],
+                                    (isset($columnDef['pdfPath']) && $participant->{$columnDef['pdfPath']})
+                                        ? $this->urlGenerator->generate('participant_consent', [
+                                        'id' => $participant->id,
+                                        'consentType' => $columnDef['rdrField']
+                                    ])
+                                        : null
+                                );
+                            } elseif ($columnDef['params'] === 4) {
+                                $row[$field] = WorkQueue::{$columnDef['method']}(
+                                    $participant->{$columnDef['rdrField']},
+                                    $participant->{$columnDef['rdrDateField']},
+                                    $userTimezone,
+                                    $columnDef['displayTime']
+                                );
+                            } elseif ($columnDef['params'] === 3) {
+                                $row[$field] = WorkQueue::{$columnDef['method']}(
+                                    $participant->{$columnDef['rdrField']},
+                                    $participant->{$columnDef['rdrDateField']},
+                                    $userTimezone
+                                );
+                            }
+                        }
+                    } elseif (isset($columnDef['statusText'])) {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant->{$columnDef['rdrField']},
+                            $columnDef['statusText'],
+                            $userTimezone
+                        );
+                    } elseif (isset($columnDef['names'])) {
+                        foreach (array_keys($columnDef['names']) as $type) {
+                            $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
+                        }
+                    } elseif (isset($columnDef['userTimezone'])) {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant->{$columnDef['rdrField']},
+                            $userTimezone
+                        );
+                    } else {
+                        $row[$field] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']});
+                    }
+                } else {
+                    $row[$field] = $e($participant->{$columnDef['rdrField']});
                 }
             }
-
-            //Demographics
-            $row['age'] = $e($participant->age);
-            $row['sex'] = $e($participant->sex);
-            $row['genderIdentity'] = $e($participant->genderIdentity);
-            $row['race'] = $e($participant->race);
-            $row['education'] = $e($participant->education);
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             array_push($rows, $row);
         }
         return $rows;
@@ -439,7 +384,8 @@ class WorkQueueService
         $userTimezone = $this->userService->getUser()->getTimezone();
         foreach ($participants as $participant) {
             $row = [];
-            foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+            foreach (WorkQueue::$consentColumns as $field) {
+                $columnDef = WorkQueue::$columnsDef[$field];
                 if (isset($columnDef['generateLink'])) {
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
                         $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
@@ -475,8 +421,8 @@ class WorkQueueService
                                     : null
                             );
                         }
-                    } elseif (isset($columnDef['displayNames'])) {
-                        foreach (array_keys($columnDef['displayNames']) as $type) {
+                    } elseif (isset($columnDef['names'])) {
+                        foreach (array_keys($columnDef['names']) as $type) {
                             $row["{$type}Consent"] = WorkQueue::{$columnDef['method']}($participant->{$columnDef['rdrField']}, $type, $userTimezone);
                         }
                     }
@@ -484,6 +430,7 @@ class WorkQueueService
                     $row[$field] = $e($participant->{$columnDef['rdrField']});
                 }
             }
+            $row['isWithdrawn'] = $participant->isWithdrawn; // Used to add withdrawn class in the data tables
             array_push($rows, $row);
         }
         return $rows;
@@ -492,109 +439,71 @@ class WorkQueueService
     public function generateExportRow($participant, $workQueueColumns = null)
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
-        $row = [
-            $participant->lastName,
-            $participant->firstName,
-            $participant->middleName,
-            WorkQueue::csvDateFromObject($participant->dob),
-            $participant->id,
-            $participant->biobankId,
-            $participant->enrollmentStatus,
-            WorkQueue::dateFromString($participant->enrollmentStatusCoreStoredSampleTime, $userTimezone),
-            $participant->isWithdrawn ? '1' : '0',
-            WorkQueue::dateFromString($participant->withdrawalAuthored, $userTimezone),
-            $participant->withdrawalReason,
-            $participant->isSuspended ? '1' : '0',
-            WorkQueue::dateFromString($participant->suspensionTime, $userTimezone),
-            WorkQueue::csvDeceasedStatus($participant->deceasedStatus),
-            $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '',
-            $participant->deceasedStatus === 'APPROVED' ? WorkQueue::dateFromString($participant->deceasedAuthored, $userTimezone, false) : '',
-            $participant->participantOrigin,
-            $participant->consentCohortText,
-            WorkQueue::dateFromString($participant->consentForStudyEnrollmentFirstYesAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForStudyEnrollment),
-            WorkQueue::dateFromString($participant->consentForStudyEnrollmentAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnDnaProgram),
-            WorkQueue::dateFromString($participant->questionnaireOnDnaProgramAuthored, $userTimezone),
-            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsFirstYesAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForElectronicHealthRecords),
-            WorkQueue::dateFromString($participant->consentForElectronicHealthRecordsAuthored, $userTimezone),
-            WorkQueue::csvEhrConsentExpireStatus($participant->ehrConsentExpireStatus, $participant->consentForElectronicHealthRecords),
-            WorkQueue::dateFromString($participant->ehrConsentExpireAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForGenomicsROR),
-            WorkQueue::dateFromString($participant->consentForGenomicsRORAuthored, $userTimezone),
-            $participant->primaryLanguage,
-            WorkQueue::csvStatusFromSubmitted($participant->consentForDvElectronicHealthRecordsSharing),
-            WorkQueue::dateFromString($participant->consentForDvElectronicHealthRecordsSharingAuthored, $userTimezone),
-            WorkQueue::csvStatusFromSubmitted($participant->consentForCABoR),
-            WorkQueue::dateFromString($participant->consentForCABoRAuthored, $userTimezone),
-            $participant->retentionEligibleStatus === 'ELIGIBLE' ? 1 : 0,
-            WorkQueue::dateFromString($participant->retentionEligibleTime, $userTimezone),
-            WorkQueue::csvRetentionType($participant->retentionType),
-            $participant->isEhrDataAvailable ? 1 : 0,
-            WorkQueue::dateFromString($participant->latestEhrReceiptTime, $userTimezone),
-            $this->getPatientStatus($participant, 'YES', 'export'),
-            $this->getPatientStatus($participant, 'NO', 'export'),
-            $this->getPatientStatus($participant, 'NO ACCESS', 'export'),
-            $this->getPatientStatus($participant, 'UNKNOWN', 'export'),
-            $participant->streetAddress,
-            !empty($participant->streetAddress2) ? $participant->streetAddress2 : '',
-            $participant->city,
-            $participant->state,
-            $participant->zipCode,
-            $participant->email,
-            $participant->loginPhoneNumber,
-            $participant->phoneNumber,
-            $participant->numCompletedBaselinePPIModules == 3 ? '1' : '0',
-            $participant->numCompletedPPIModules,
-        ];
-        foreach (array_keys(WorkQueue::$surveys) as $survey) {
-            if (in_array($survey, WorkQueue::$initialSurveys)) {
-                $row[] = WorkQueue::csvStatusFromSubmitted($participant->{"questionnaireOn{$survey}"});
-                $row[] = WorkQueue::dateFromString($participant->{"questionnaireOn{$survey}Authored"}, $userTimezone);
-            }
-        }
-        $row[] = $participant->siteSuffix;
-        $row[] = $participant->organization;
-        $row[] = $participant->physicalMeasurementsStatus === 'COMPLETED' ? '1' : '0';
-        $row[] = WorkQueue::dateFromString($participant->physicalMeasurementsFinalizedTime, $userTimezone, false);
-        $row[] = $participant->evaluationFinalizedSite;
-        $row[] = $participant->samplesToIsolateDNA === 'RECEIVED' ? '1' : '0';
-        $row[] = $participant->numBaselineSamplesArrived;
-        $row[] = $participant->orderCreatedSite;
-        foreach (array_keys(WorkQueue::$samples) as $sample) {
-            $newSample = $sample;
-            foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                if (array_key_exists($sample, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$sample]} === 'RECEIVED') {
-                    $newSample = $sampleAlias[$sample];
-                    break;
+        $row = [];
+        foreach (WorkQueue::$exportColumns as $field) {
+            $columnDef = WorkQueue::$columnsDef[$field];
+            if ($field === 'dateOfDeath') {
+                $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
+            } elseif (isset($columnDef['type']) && $columnDef['type'] === 'patientStatus') {
+                $row[] = $this->{$columnDef['method']}($participant, $columnDef['value'], 'export');
+            } elseif (isset($columnDef['type']) && $columnDef['type'] === 'sample') {
+                $newSample = $field;
+                foreach (WorkQueue::$samplesAlias as $sampleAlias) {
+                    if (array_key_exists($field, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$field]} === 'RECEIVED') {
+                        $newSample = $sampleAlias[$field];
+                        break;
+                    }
                 }
+                $row[] = $participant->{"sampleStatus{$newSample}"} === 'RECEIVED' ? '1' : '0';
+                $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimezone, false);
+            } elseif (isset($columnDef['csvStatusText'])) {
+                if (isset($columnDef['csvNames'])) {
+                    $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? 1 : 0;
+                    $displayTime = isset($columnDef['csvDisplayTime']) ? $columnDef['csvDisplayTime'] : true;
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone, $displayTime);
+                } else {
+                    if (isset($columnDef['rdrDateField'])) {
+                        $row[] = $participant->{$columnDef['rdrDateField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString(
+                            $participant->{$columnDef['rdrDateField']},
+                            $userTimezone,
+                            false
+                        ) : '';
+                    } else {
+                        $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? '1' : '0';
+                    }
+                }
+            } elseif (isset($columnDef['csvMethod'])) {
+                if (isset($columnDef['otherField'])) {
+                    $row[] = WorkQueue::{$columnDef['csvMethod']}(
+                        $participant->{$columnDef['rdrField']},
+                        $participant->{$columnDef['otherField']}
+                    );
+                    $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                } elseif (isset($columnDef['names'])) {
+                    foreach (array_keys($columnDef['names']) as $type) {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
+                    }
+                } else {
+                    $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
+                }
+            } elseif (isset($columnDef['rdrDateField'])) {
+                if (isset($columnDef['csvNames'])) {
+                    if (isset($columnDef['fieldCheck'])) {
+                        $row[] = $participant->{$columnDef['rdrField']} ? '1' : '0';
+                    } else {
+                        $row[] = WorkQueue::csvStatusFromSubmitted($participant->{$columnDef['rdrField']});
+                    }
+                }
+                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+            } elseif (isset($columnDef['csvFormatDate'])) {
+                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrField']}, $userTimezone);
+            } elseif (isset($columnDef['csvRdrField'])) {
+                $row[] = $participant->{$columnDef['csvRdrField']};
+            } else {
+                $row[] = $participant->{$columnDef['rdrField']};
             }
-            $row[] = $participant->{"sampleStatus{$newSample}"} === 'RECEIVED' ? '1' : '0';
-            $row[] = WorkQueue::dateFromString($participant->{"sampleStatus{$newSample}Time"}, $userTimezone, false);
         }
-        $row[] = $participant->sample1SAL2CollectionMethod;
-        $row[] = $participant->sex;
-        $row[] = $participant->genderIdentity;
-        $row[] = $participant->race;
-        $row[] = $participant->education;
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeFeb);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeFebAuthored, $userTimezone);
-        $row[] = WorkQueue::dateFromString($participant->enrollmentStatusCoreMinusPMTime, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute1);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute1Authored, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute2);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute2Authored, $userTimezone);
-        foreach (array_keys(WorkQueue::$digitalHealthSharingTypes) as $type) {
-            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type);
-            $row[] = WorkQueue::csvDigitalHealthSharingStatus($participant->digitalHealthSharingStatus, $type, true, $userTimezone);
-        }
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnPersonalAndFamilyHealthHistory);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnPersonalAndFamilyHealthHistoryAuthored, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnSocialDeterminantsOfHealth);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnSocialDeterminantsOfHealthAuthored, $userTimezone);
-        $row[] = WorkQueue::csvStatusFromSubmitted($participant->questionnaireOnCopeVaccineMinute3);
-        $row[] = WorkQueue::dateFromString($participant->questionnaireOnCopeVaccineMinute3Authored, $userTimezone);
         return $row;
     }
 
@@ -602,7 +511,8 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
-        foreach (WorkQueue::$columnsDef as $field => $columnDef) {
+        foreach (WorkQueue::$consentColumns as $field) {
+            $columnDef = WorkQueue::$columnsDef[$field];
             if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
                 if (isset($columnDef['csvMethod'])) {
                     if (isset($columnDef['otherField'])) {
@@ -611,8 +521,8 @@ class WorkQueueService
                             $participant->{$columnDef['otherField']}
                         );
                         $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                    } elseif (isset($columnDef['displayNames'])) {
-                        foreach (array_keys($columnDef['displayNames']) as $type) {
+                    } elseif (isset($columnDef['names'])) {
+                        foreach (array_keys($columnDef['names']) as $type) {
                             $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
                             $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
                         }

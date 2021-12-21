@@ -34,7 +34,7 @@
             <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ awardee == 'salivary_pilot' ? 'Salivary Pilot' : siteInfo.awardeeDisplayName(awardee) }})</h4>
             {% include 'partials/workqueue-consents-columns.html.twig' %}
             {% include 'partials/workqueue-page-export.html.twig' %}
-            <table class="table table-striped table-bordered table-small" id="workqueue_consents" width="100%" data-columns-def="{{ columnsDef|json_encode() }}">
+            <table class="table table-striped table-bordered table-small" id="workqueue_consents" width="100%" data-columns-def="{{ columnsDef|json_encode() }}" data-consent-columns="{{ consentColumns|json_encode() }}">
                 <thead>
                 <tr>
                     <th>Last Name</th>

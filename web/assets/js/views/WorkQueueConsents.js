@@ -5,6 +5,7 @@ $(document).ready(function () {
     }
 
     var columnsDef = $('#workqueue_consents').data('columns-def');
+    var consentColumns = $('#workqueue_consents').data('consent-columns');
 
     var checkFilters = function () {
         if ($('#filters select[name=activityStatus]').val() == 'withdrawn') {
@@ -30,15 +31,16 @@ $(document).ready(function () {
         tableColumns.push(row);
     };
 
-    for (const [field, columnDef] of Object.entries(columnsDef)) {
-        if (columnDef.hasOwnProperty('displayNames')) {
-            Object.keys(columnDef['displayNames']).forEach(function (key, _i) {
+    consentColumns.forEach(function (field) {
+        var columnDef = columnsDef[field];
+        if (columnDef.hasOwnProperty('names')) {
+            Object.keys(columnDef['names']).forEach(function (key) {
                 generateTableRow(key + 'Consent', columnDef);
             });
         } else {
             generateTableRow(field, columnDef);
         }
-    }
+    });
 
     var url = window.location.href;
 
@@ -135,7 +137,8 @@ $(document).ready(function () {
                 dateOfBirthField.val('');
             }
         }
-        for (const columnDef of Object.values(columnsDef)) {
+        consentColumns.forEach(function (field) {
+            var columnDef = columnsDef[field];
             if (columnDef['toggleColumn'] && columnDef.hasOwnProperty('rdrDateField')) {
                 var starDateField = $('#' + columnDef['rdrDateField'] + 'StartDate');
                 if (starDateField.length !== 0) {
@@ -148,7 +151,7 @@ $(document).ready(function () {
                     }
                 }
             }
-        }
+        });
     };
 
     checkFilters();

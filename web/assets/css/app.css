@@ -361,7 +361,7 @@ label.label-normal {
     color: #fff;
     background-color: #337ab7;
 }
-#workqueue tr.tr-withdrawn {
+#workqueue tr.tr-withdrawn, #workqueue_consents_row tr.tr-withdrawn {
     background: repeating-linear-gradient(
         -45deg,
         transparent,
@@ -371,7 +371,7 @@ label.label-normal {
     );
     opacity: 0.7;
 }
-#workqueue tr.tr-withdrawn.odd {
+#workqueue tr.tr-withdrawn.odd, #workqueue_consents_row tr.tr-withdrawn.odd {
     background: repeating-linear-gradient(
         -45deg,
         #f9f9f9,

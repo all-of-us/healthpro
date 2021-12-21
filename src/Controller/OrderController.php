@@ -509,7 +509,7 @@ class OrderController extends AbstractController
                     }
                 }
                 $redirectRoute = 'order_finalize';
-                if (!$wasPrintRequisitionStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                if ($order->getType() !== 'kit' && !$wasPrintRequisitionStepAvailable && in_array('process', $order->getAvailableSteps())) {
                     $redirectRoute = 'order_print_requisition';
                 }
                 return $this->redirectToRoute($redirectRoute, [
