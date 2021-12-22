@@ -34,7 +34,7 @@ class SiteServiceTest extends ServiceTestCase
             ->setSiteId($siteId)
             ->setGoogleGroup($siteId)
             ->setWorkqueueDownload('')
-            ->setState('CA');
+            ->setState(SiteService::CABOR_STATE);
         $em->persist($site);
         $em->flush();
     }
