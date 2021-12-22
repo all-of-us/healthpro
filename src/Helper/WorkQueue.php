@@ -32,6 +32,7 @@ class WorkQueue
         ],
         'middleName' => [
             'name' => 'Middle Name',
+            'csvName' => 'Middle Initial',
             'rdrField' => 'middleName',
             'sortField' => 'firstName',
             'generateLink' => true,
@@ -46,7 +47,7 @@ class WorkQueue
             'toggleColumn' => false
         ],
         'participantId' => [
-            'name' => 'PM ID',
+            'name' => 'PMI ID',
             'rdrField' => 'id',
             'sortField' => 'participantId',
             'toggleColumn' => false
@@ -155,7 +156,7 @@ class WorkQueue
             'name' => 'Primary Consent',
             'csvNames' => [
                 'Primary Consent Status',
-                'Primary Consent Status Date'
+                'Primary Consent Date'
             ],
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
@@ -197,7 +198,7 @@ class WorkQueue
             'name' => 'EHR Consent',
             'csvNames' => [
                 'EHR Consent Status',
-                'EHR Consent Status Date'
+                'EHR Consent Date'
             ],
             'rdrField' => 'consentForElectronicHealthRecords',
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
@@ -230,7 +231,7 @@ class WorkQueue
         'gRoRConsent' => [
             'name' => 'gRoR Consent',
             'csvNames' => [
-                'gRoR Consent',
+                'gRoR Consent Status',
                 'gRoR Consent Date'
             ],
             'rdrField' => 'consentForGenomicsROR',
@@ -268,7 +269,7 @@ class WorkQueue
         'caborConsent' => [
             'name' => 'CABoR Consent',
             'csvNames' => [
-                'CABoR Consent',
+                'CABoR Consent Status',
                 'CABoR Consent Date'
             ],
             'rdrField' => 'consentForCABoR',
@@ -291,8 +292,8 @@ class WorkQueue
             'csvNames' => [
                 'Fitbit Consent',
                 'Fitbit Consent Date',
-                'Apple HealthKit  Consent',
-                'Apple HealthKit  Consent Date',
+                'Apple HealthKit Consent',
+                'Apple HealthKit Consent Date',
                 'Apple EHR Consent',
                 'Apple EHR Consent Date'
             ],
@@ -308,7 +309,7 @@ class WorkQueue
             'name' => 'Retention Eligible',
             'csvNames' => [
                 'Retention Eligible',
-                'Date of Retention Eligible'
+                'Date of Retention Eligibility'
             ],
             'rdrField' => 'retentionEligibleStatus',
             'sortField' => 'retentionEligibleStatus',
@@ -431,6 +432,7 @@ class WorkQueue
         ],
         'phone' => [
             'name' => 'Contact Phone',
+            'csvName' => 'Phone',
             'rdrField' => 'phoneNumber',
             'sortField' => 'phoneNumber',
             'toggleColumn' => true,
