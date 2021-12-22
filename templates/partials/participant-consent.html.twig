@@ -21,11 +21,13 @@
         {{ macros.displayConsentStatus(participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}
         <br/>
     </div>
-    <div class="status-block">
-        <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
-        {{ macros.displayConsentStatus(participant.consentForCABoR, participant.consentForCABoRAuthored) }}
-        <br/>
-    </div>
+    {% if siteInfo.displayCaborConsent %}
+        <div class="status-block">
+            <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
+            {{ macros.displayConsentStatus(participant.consentForCABoR, participant.consentForCABoRAuthored) }}
+            <br/>
+        </div>
+    {% endif %}
     {% if displayPatientStatusBlock %}
         <div class="status-block patient-status-block">
             <strong>Patient Status</strong>

@@ -149,8 +149,10 @@
                                             <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}</dd>
                                             <dt>DV-only EHR Sharing</dt>
                                             <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForDvElectronicHealthRecordsSharing') }}</dd>
-                                            <dt>CABoR Consent</dt>
-                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForCABoR', showConsentPDFs) }}</dd>
+                                            {% if siteInfo.displayCaborConsent %}
+                                                <dt>CABoR Consent</dt>
+                                                <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForCABoR', showConsentPDFs) }}</dd>
+                                            {% endif %}
                                             <dt>Digital Sharing</dt>
                                             {% for type, label in digitalHealthSharingTypes %}
                                                 <dd>{{ label }} {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}</dd>
