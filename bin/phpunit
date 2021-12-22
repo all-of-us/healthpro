@@ -3,4 +3,4 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 APP_DIR="$DIR/.."
 
-$APP_DIR/vendor/phpunit/phpunit/phpunit -c $APP_DIR/phpunit.xml "$@"
+$APP_DIR/vendor/phpunit/phpunit/phpunit "$@"
