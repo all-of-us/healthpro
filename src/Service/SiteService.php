@@ -13,7 +13,7 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 class SiteService
 {
-    const CABOR_STATE = 'CA';
+    public const CABOR_STATE = 'CA';
 
     private $params;
     private $session;
