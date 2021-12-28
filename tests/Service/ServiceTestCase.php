@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use App\Tests\GoogleGroup;
 
-class ServiceTestCase extends KernelTestCase
+abstract class ServiceTestCase extends KernelTestCase
 {
     public const GROUP_DOMAIN = 'healthpro-test.pmi-ops.org';
     protected $session;

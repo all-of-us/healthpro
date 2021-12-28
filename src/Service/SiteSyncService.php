@@ -140,7 +140,7 @@ class SiteSyncService
                     $siteData->setTimezone(isset($site->timeZoneId) ? $site->timeZoneId : null);
                     $siteData->setType($awardee->type);
                     $siteData->setSiteType(isset($site->siteType) ? $site->siteType : null);
-                    if (isset($site->address->state)) {
+                    if (isset($site->address) && isset($site->address->state)) {
                         $siteData->setState($site->address->state);
                     }
                     if (empty($siteData->getWorkqueueDownload())) {

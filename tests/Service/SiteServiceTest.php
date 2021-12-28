@@ -22,7 +22,7 @@ class SiteServiceTest extends ServiceTestCase
         self::assertFalse($this->service->displayCaborConsent());
     }
 
-    public function createSite(): void
+    private function createSite(): void
     {
         $em = static::$container->get(EntityManagerInterface::class);
         $orgId = 'TEST_ORG_' . $this->id;
