@@ -14,27 +14,33 @@ class SiteServiceTest extends ServiceTestCase
     public function testCaborConsentDisplay(): void
     {
         $this->id = uniqid();
-        $site = 'hpo-site-test' . $this->id;
-        $this->login('test@example.com', [$site]);
-        $this->createSite();
+        $caborSite = 'hpo-site-test' . SiteService::CABOR_STATE . $this->id;
+        $nonCaborSite = 'hpo-site-testTN' . $this->id;
+        $this->login('test@example.com', [$caborSite, $nonCaborSite]);
         $this->service = static::$container->get(SiteService::class);
-        $this->service->switchSite($site . '@' . self::GROUP_DOMAIN);
+
+        $this->createSite(SiteService::CABOR_STATE);
+        $this->service->switchSite($caborSite . '@' . self::GROUP_DOMAIN);
         self::assertTrue($this->service->displayCaborConsent());
+
+        $this->createSite('TN');
+        $this->service->switchSite($nonCaborSite . '@' . self::GROUP_DOMAIN);
+        self::assertFalse($this->service->displayCaborConsent());
     }
 
-    private function createSite(): void
+    private function createSite($state): void
     {
         $em = static::$container->get(EntityManagerInterface::class);
-        $orgId = 'TEST_ORG_' . $this->id;
-        $siteId = 'test' . $this->id;
+        $orgId = 'TEST_ORG_' . $state . $this->id;
+        $siteId = 'test' . $state . $this->id;
         $site = new Site();
         $site->setStatus(true)
-            ->setName('Test Site ' . $this->id)
+            ->setName('Test Site ' . $state . $this->id)
             ->setOrganizationId($orgId)
             ->setSiteId($siteId)
             ->setGoogleGroup($siteId)
             ->setWorkqueueDownload('')
-            ->setState(SiteService::CABOR_STATE);
+            ->setState($state);
         $em->persist($site);
         $em->flush();
     }
