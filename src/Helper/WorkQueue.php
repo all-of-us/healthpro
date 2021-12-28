@@ -326,6 +326,7 @@ class WorkQueue
             'rdrField' => 'retentionType',
             'sortField' => 'retentionType',
             'method' => 'getRetentionType',
+            'csvMethod' => 'csvRetentionType',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false
