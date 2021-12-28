@@ -19,7 +19,7 @@ class SiteServiceTest extends ServiceTestCase
         $this->createSite();
         $this->service = static::$container->get(SiteService::class);
         $this->service->switchSite($site . '@' . self::GROUP_DOMAIN);
-        self::assertFalse($this->service->displayCaborConsent());
+        self::assertTrue($this->service->displayCaborConsent());
     }
 
     private function createSite(): void

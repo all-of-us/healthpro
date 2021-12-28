@@ -310,6 +310,6 @@ class SiteService
 
     public function displayCaborConsent(): bool
     {
-        return $this->session->get('siteState') === self::CABOR_STATE ? false : true;
+        return $this->session->get('siteState') === self::CABOR_STATE ? true : false;
     }
 }
