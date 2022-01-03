@@ -415,7 +415,7 @@ class WorkQueue
         ],
         'zip' => [
             'name' => 'Zip',
-            'csvRdrField' => 'zip'
+            'csvRdrField' => 'zipCode'
         ],
         'email' => [
             'name' => 'Email',
