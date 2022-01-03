@@ -156,7 +156,7 @@ class WorkQueueServiceTest extends KernelTestCase
             null,
             'City1',
             'AL',
-            null,
+            '10001',
             'p1@example.com',
             null,
             '8885551001',
