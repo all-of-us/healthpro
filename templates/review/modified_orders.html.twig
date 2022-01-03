@@ -11,6 +11,7 @@
     <thead>
     <tr>
       <th>Participant ID</th>
+      <th>Name</th>
       <th>Order ID</th>
       <th>Created</th>
       <th>Collected</th>
@@ -26,6 +27,13 @@
         <td>
           <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant_id }}</a>
         </td>
+          {% if order.participant is defined %}
+            <td class="align-middle">
+              <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a>
+            </td>
+          {% else %}
+            <td></td>
+          {% endif %}
         <td>
           <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
         </td>

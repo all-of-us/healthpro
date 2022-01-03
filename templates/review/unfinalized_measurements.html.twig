@@ -11,6 +11,7 @@
     <thead>
       <tr>
         <th>Participant ID</th>
+        <th>Name</th>
         <th>Created</th>
         <th>Finalized</th>
         <th></th>
@@ -22,6 +23,13 @@
         <td>
           <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
         </td>
+        {% if measurement.participant is defined %}
+          <td class="align-middle">
+            <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant.lastName|default('') }}, {{ measurement.participant.firstName|default('') }}</a>
+          </td>
+        {% else %}
+          <td></td>
+        {% endif %}
         <td>
           {{ today.displayDate(measurement, 'created_ts') }}
         </td>
