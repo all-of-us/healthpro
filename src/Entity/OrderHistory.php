@@ -128,6 +128,6 @@ class OrderHistory
     public function getReasonDisplayText()
     {
         $reasonDisplayText = array_search($this->getReason(), Order::$cancelReasons);
-        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other (' . $this->getReason() . ')';
     }
 }

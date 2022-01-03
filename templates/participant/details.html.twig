@@ -37,12 +37,11 @@
         {% if cacheEnabled %}
             <div class="row">
                 <div class="col-sm-12 text-center">
-                    <small>
-                        Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
-                        <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
-                    </small>
+                    Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
+                    <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px" class="btn btn-primary btn-xs"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
                 </div>
             </div>
+            <br/>
         {% endif %}
 
         {% if participant.status or canViewDetails %}
@@ -59,12 +58,7 @@
 
         {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
             <div class="btn-group pull-right">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-cog"></i><span class="sr-only">Additional Options</span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a></li>
-                </ul>
+                <a class="btn btn-default" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
             </div>
         {% endif %}
 
@@ -155,8 +149,10 @@
                                             <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}</dd>
                                             <dt>DV-only EHR Sharing</dt>
                                             <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForDvElectronicHealthRecordsSharing') }}</dd>
-                                            <dt>CABoR Consent</dt>
-                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForCABoR', showConsentPDFs) }}</dd>
+                                            {% if siteInfo.displayCaborConsent %}
+                                                <dt>CABoR Consent</dt>
+                                                <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForCABoR', showConsentPDFs) }}</dd>
+                                            {% endif %}
                                             <dt>Digital Sharing</dt>
                                             {% for type, label in digitalHealthSharingTypes %}
                                                 <dd>{{ label }} {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}</dd>

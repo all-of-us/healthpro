@@ -105,6 +105,11 @@ class Site
     private $siteType;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $state;
+
+    /**
      * @ORM\OneToOne(targetEntity="App\Entity\SiteSync", mappedBy="site", cascade={"persist", "remove"})
      */
     private $siteSync;
@@ -314,6 +319,18 @@ class Site
     public function setSiteType(?string $siteType): self
     {
         $this->siteType = $siteType;
+
+        return $this;
+    }
+
+    public function getState(): ?string
+    {
+        return $this->state;
+    }
+
+    public function setState(?string $state): self
+    {
+        $this->state = $state;
 
         return $this;
     }

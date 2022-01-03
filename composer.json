@@ -60,10 +60,10 @@
         "phpstan/phpstan-doctrine": "^0.12.39",
         "phpstan/extension-installer": "^1.1",
         "symfony/stopwatch": "*",
-        "symfony/web-profiler-bundle": "*"
+        "symfony/web-profiler-bundle": "*",
+        "dama/doctrine-test-bundle": "^6.7"
     },
     "extra": {
-        "root-dir": "symfony",
         "symfony": {
             "require": "4.4.*"
         }

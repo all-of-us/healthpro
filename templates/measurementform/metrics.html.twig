@@ -39,6 +39,9 @@
     {% set name = definition.name %}
     <div data-field="{{ name }}" data-replicate="{{ i + 1 }}" class="field field-{{ name }} form-group{% if not form[name][i].vars.valid or form[name][i].vars.errors|length > 0 %} has-error{% endif %}">
         {{ form_label(form[name][i]) }}
+        {% if definition.convert is defined %}
+            <span id="convert-{{ name ~ '_' ~ i }}" class="pull-right convert"></span>
+        {% endif %}
         {% if definition.unit is defined %}
             <div class="input-group">
                 {#Set max and min limits for Blood Donor 2nd blood pressure reading#}
