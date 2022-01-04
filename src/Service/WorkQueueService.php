@@ -496,6 +496,8 @@ class WorkQueueService
                     }
                 }
                 $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+            } elseif (isset($columnDef['fieldCheck'])) {
+                $row[] = $participant->{$columnDef['rdrField']} ? '1' : '0';
             } elseif (isset($columnDef['csvFormatDate'])) {
                 $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrField']}, $userTimezone);
             } elseif (isset($columnDef['csvRdrField'])) {

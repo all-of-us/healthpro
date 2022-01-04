@@ -146,7 +146,7 @@ class WorkQueueServiceTest extends KernelTestCase
             0,
             '',
             0,
-            false,
+            '0',
             '',
             'AZ_TUCSON_BANNER_HEALTH',
             '',
