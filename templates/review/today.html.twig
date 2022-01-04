@@ -21,7 +21,7 @@
 <div class="text-center text-warning">
     <strong>{{ displayMessage }}</strong>
 </div>
-<table class="table table-bordered table-small" id="table-today" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
+<table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
   <thead>
     <tr>
       <th rowspan="2">Participant ID</th>
@@ -140,4 +140,5 @@
 
 {% block pagejs %}
     {{ encore_entry_script_tags('today') }}
+    {{ encore_entry_script_tags('review') }}
 {% endblock %}
