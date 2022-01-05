@@ -23,7 +23,7 @@
             {% for measurement in measurements %}
                 <tr>
                     <td>
-                        <a href="{{ path('measurement', { participantId: measurement.participant_id, evalId: measurement.id }) }}">{{ measurement.participant_id }}</a>
+                        <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
                     </td>
                     {% if measurement.participant is defined %}
                         <td class="align-middle">
