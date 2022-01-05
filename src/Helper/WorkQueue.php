@@ -345,10 +345,12 @@ class WorkQueue
             'name' => 'Most Recent EHR Receipt',
             'rdrField' => 'latestEhrReceiptTime',
             'sortField' => 'latestEhrReceiptTime',
+            'method' => 'dateFromString',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'userTimezone' => true,
-            'visible' => false
+            'visible' => false,
+            'csvFormatDate' => true
         ],
         'patientStatusYes' => [
             'name' => 'Yes',
@@ -415,7 +417,7 @@ class WorkQueue
         ],
         'zip' => [
             'name' => 'Zip',
-            'csvRdrField' => 'zip'
+            'csvRdrField' => 'zipCode'
         ],
         'email' => [
             'name' => 'Email',
