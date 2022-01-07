@@ -16,7 +16,11 @@
     {% set route = app.request.get('_route') %}
     {% set return = path(route, params) %}
     {% if order.canUnlock %}
-        <a href="{{ path('order_modify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
+        {% if order.type == 'kit' %}
+            <a href="{{ path('order_modify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary">Unlock for Editing</a>
+        {% else %}
+            <a data-href="{{ path('order_modify', { participantId: participant.id, orderId: order.id, type: 'unlock', return: return }) }}" class="btn btn-sm btn-primary" id="unlock-order">Unlock for Editing</a>
+        {% endif %}
     {% endif %}
     {% if order.canCancel %}
         <a href="{{ path('order_modify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a>
@@ -140,3 +144,17 @@
 {% if active in ['collect', 'process', 'finalize'] %}
     <p><strong>Your time zone</strong>: {{ timezone_display(app.user.timezone) }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
 {% endif %}
+
+<div class="modal fade" id="unlockWarningModal" tabindex="-1" role="dialog" aria-labelledby="unlockWarningModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                Unlocking this order will result in the loss of the test requisition. If you wish to <strong>continue</strong>, the requisition cannot be regenerated for edited and finalized orders. Click <strong>cancel</strong> if you do not wish to continue or need to print the test requisition.
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="unlock-continue">Continue</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
