@@ -11,6 +11,8 @@ use App\Audit\Log;
 
 class LoggerService
 {
+    private const PMI_AUDIT_PREFIX = 'PMI_AUDIT_';
+
     protected $logger;
     protected $session;
     protected $userService;
@@ -60,7 +62,7 @@ class LoggerService
         $syslogData[] = $logArray['ip'];
         $syslogData[] = $logArray['user'];
         $syslogData[] = $logArray['site'];
-        $syslogData[] = '[' . Log::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
+        $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
         if ($logArray['data']) {
             $syslogData[] = json_encode($logArray['data']);
         }

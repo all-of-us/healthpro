@@ -4,8 +4,6 @@ namespace App\Audit;
 
 class Log
 {
-    public const PMI_AUDIT_PREFIX = 'PMI_AUDIT_';
-
     // Actions
     public const REQUEST = 'REQUEST';
     public const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
