@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class JiraService
 {
     public const INSTANCE_URL = 'https://precisionmedicineinitiative.atlassian.net';
+    public  const DESTINATION_COMPONENT_ID = '10074';
 
     private $client;
     private const SOURCE_PROJECT_KEY = 'HPRO';
@@ -112,5 +113,13 @@ class JiraService
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    public function getComponents(): ?array
+    {
+        $endpoint = sprintf('project/%s/components', self::DESTINATION_PROJECT_KEY);
+        $response = $this->client->request('GET', $endpoint);
+        $responseObject = json_decode($response->getBody()->getContents());
+        return $responseObject ?? [];
     }
 }
