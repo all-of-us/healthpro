@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class JiraService
 {
     public const INSTANCE_URL = 'https://precisionmedicineinitiative.atlassian.net';
-    public  const DESTINATION_COMPONENT_ID = '10074';
+    public const DESTINATION_COMPONENT_ID = '10074';
 
     private $client;
     private const SOURCE_PROJECT_KEY = 'HPRO';
@@ -57,20 +57,26 @@ class JiraService
         return $responseObject->issues ?? [];
     }
 
-    public function createReleaseTicket(string $title, string $description): ?string
+    public function createReleaseTicket(string $title, string $description, string $componentId): ?string
     {
+        $fields = [
+            'summary' => $title,
+            'description' => $description,
+            'project' => [
+                'key' => self::DESTINATION_PROJECT_KEY
+            ],
+            'issuetype' => [
+                'id' => self::DESTINATION_ISSUE_TYPE_ID
+            ]
+        ];
+        if ($componentId) {
+            $fields['components'] = [
+                ['id' => $componentId]
+            ];
+        }
         $response = $this->client->request('POST', 'issue', [
             'json' => [
-                'fields' => [
-                    'summary' => $title,
-                    'description' => $description,
-                    'project' => [
-                        'key' => self::DESTINATION_PROJECT_KEY
-                    ],
-                    'issuetype' => [
-                        'id' => self::DESTINATION_ISSUE_TYPE_ID
-                    ]
-                ]
+                'fields' => $fields
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());

@@ -311,6 +311,6 @@ class ReleaseTicketCommand extends Command
             return 1;
         }
 
-        return $this->createTicket($version, $issues);
+        return $this->createTicket($version, $issues, $componentId);
     }
 }
