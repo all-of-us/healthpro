@@ -1,66 +1,90 @@
 {% extends 'base.html.twig' %}
 {% block title %}Orders - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
 {% import 'review/_macros.html.twig' as today %}
 
 {% block body %}
-{% include 'review/_page_heading.html.twig' %}
+    {% include 'review/_page_heading.html.twig' %}
 
-<div class="container">
-  <table class="table table-striped table-bordered">
-    <thead>
-    <tr>
-    <th>Order ID</th>
-    <th>Created</th>
-    <th>Collected</th>
-    <th>Processed</th>
-    <th>Finalized</th>
-    <th>Modified</th>
-    <th>Status</th>
-    </tr>
-    </thead>
-    <tbody>
-      {% for order in orders %}
-      <tr>
-        <td>
-          <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
-        </td>
-        <td>
-          {{ today.displayDate(order, 'created_ts') }}
-        </td>
-        <td>
-          {{ today.displayDate(order, 'collected_ts') }}
-        </td>
-        <td>
-          {{ today.displayDate(order, 'processed_ts') }}
-        </td>
-        <td>
-          {% if order.oh_type != 'unlock' %}
-          {{ today.displayDate(order, 'finalized_ts') }}
-          {% else %}
-          <i class="fa fa-times text-danger" aria-hidden="true"></i>
-          {% endif %}
-        </td>
-        <td>
-          {{ today.displayDate(order, 'oh_created_ts') }}
-        </td>
-        <td align="center">
-          {% if order.oh_type == 'edit' %}
-          <span class="label label-success">Edited &amp; Finalized</span>
-          {% elseif order.oh_type == 'cancel' %}
-          <span class="label label-danger">Cancelled</span>
-          {% elseif order.oh_type == 'unlock'%}
-          <span class="label label-primary">Unlocked</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% else %}
-      <tr>
-        <td colspan="14" align="center">No records found</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+    <div class="container">
+        <table class="table table-striped table-bordered table-review" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
+            <thead>
+            <tr>
+                <th>Participant ID</th>
+                <th>Name</th>
+                <th>Order ID</th>
+                <th>Created</th>
+                <th>Collected</th>
+                <th>Processed</th>
+                <th>Finalized</th>
+                <th>Modified</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>
+                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant_id }}</a>
+                    </td>
+                    {% if order.participant is defined %}
+                        <td class="align-middle">
+                            {% if order.participant %}
+                                <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a>
+                            {% else %}
+                                {{ missingName }}
+                            {% endif %}
+                        </td>
+                    {% else %}
+                        <td data-participant-id="{{ order.participant_id }}" data-href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}" class="load-name align-middle">
+                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                            <span class="sr-only">Loading...</span>
+                        </td>
+                    {% endif %}
+                    <td>
+                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                    </td>
+                    <td>
+                        {{ today.displayDate(order, 'created_ts') }}
+                    </td>
+                    <td>
+                        {{ today.displayDate(order, 'collected_ts') }}
+                    </td>
+                    <td>
+                        {{ today.displayDate(order, 'processed_ts') }}
+                    </td>
+                    <td>
+                        {% if order.oh_type != 'unlock' %}
+                            {{ today.displayDate(order, 'finalized_ts') }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ today.displayDate(order, 'oh_created_ts') }}
+                    </td>
+                    <td align="center">
+                        {% if order.oh_type == 'edit' %}
+                            <span class="label label-success">Edited &amp; Finalized</span>
+                        {% elseif order.oh_type == 'cancel' %}
+                            <span class="label label-danger">Cancelled</span>
+                        {% elseif order.oh_type == 'unlock' %}
+                            <span class="label label-primary">Unlocked</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="14" align="center">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('review') }}
 {% endblock %}

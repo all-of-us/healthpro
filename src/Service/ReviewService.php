@@ -9,10 +9,12 @@ use Doctrine\ORM\EntityManagerInterface;
 class ReviewService
 {
     protected $em;
+    protected $participantSummaryService;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, ParticipantSummaryService $participantSummaryService)
     {
         $this->em = $em;
+        $this->participantSummaryService = $participantSummaryService;
     }
 
     public static $orderStatus = [
@@ -183,5 +185,16 @@ class ReviewService
             $status = 'Created';
         }
         return $status;
+    }
+
+    public function loadFirstFiveParticipantNames(&$results): void
+    {
+        $count = 0;
+        foreach ($results as $key => $result) {
+            $results[$key]['participant'] = $this->participantSummaryService->getParticipantById($result['participant_id']);
+            if (++$count >= 5) {
+                break;
+            }
+        }
     }
 }

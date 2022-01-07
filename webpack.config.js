@@ -35,6 +35,7 @@ Encore
     .addEntry('physical-measurements-0.3-ehr', './web/assets/js/views/PhysicalEvaluation-0.3-ehr.js')
     .addEntry('today', './web/assets/js/views/today.js')
     .addEntry('video', './web/assets/js/views/video.js')
+    .addEntry('review', './web/assets/js/views/review.js')
     .addEntry('group-member-remove', './web/assets/js/views/GroupMemberRemove.js')
 
     .splitEntryChunks()

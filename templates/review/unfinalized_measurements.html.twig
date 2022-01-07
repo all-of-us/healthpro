@@ -1,51 +1,72 @@
 {% extends 'base.html.twig' %}
 {% block title %}Unfinalized Measurements - Participant Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
 {% import 'review/_macros.html.twig' as today %}
 
 {% block body %}
-{% include 'review/_page_heading.html.twig' %}
+    {% include 'review/_page_heading.html.twig' %}
 
-<div class="container">
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>Participant ID</th>
-        <th>Created</th>
-        <th>Finalized</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for measurement in measurements %}
-      <tr>
-        <td>
-          <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
-        </td>
-        <td>
-          {{ today.displayDate(measurement, 'created_ts') }}
-        </td>
-        <td>
-          {% if measurement.parent_id is empty %}
-          {{ today.displayDate(measurement, 'finalized_ts') }}
-          {% else %}
-          <i class="fa fa-times text-danger" aria-hidden="true"></i>
-          <span class="badge">Unlocked</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if measurement.parent_id is empty %}
-          <a href="{{ path('measurement_modify', { participantId: measurement.participant_id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Physical Measurements</a>
-          {% endif %}
-        </td>
-      </tr>
-      {% else %}
-      <tr>
-        <td colspan="99" align="center">No records found</td>
-      </tr>
-      {% endfor %}
+    <div class="container">
+        <table class="table table-striped table-bordered table-review" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
+            <thead>
+            <tr>
+                <th>Participant ID</th>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Finalized</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for measurement in measurements %}
+                <tr>
+                    <td>
+                        <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
+                    </td>
+                    {% if measurement.participant is defined %}
+                        <td class="align-middle">
+                            {% if measurement.participant %}
+                                <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant.lastName|default('') }}, {{ measurement.participant.firstName|default('') }}</a>
+                            {% else %}
+                                {{ missingName }}
+                            {% endif %}
+                        </td>
+                    {% else %}
+                        <td data-participant-id="{{ measurement.participant_id }}" data-href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}" class="load-name align-middle">
+                            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                            <span class="sr-only">Loading...</span>
+                        </td>
+                    {% endif %}
+                    <td>
+                        {{ today.displayDate(measurement, 'created_ts') }}
+                    </td>
+                    <td>
+                        {% if measurement.parent_id is empty %}
+                            {{ today.displayDate(measurement, 'finalized_ts') }}
+                        {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                            <span class="badge">Unlocked</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if measurement.parent_id is empty %}
+                            <a href="{{ path('measurement_modify', { participantId: measurement.participant_id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Physical Measurements</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="99" align="center">No records found</td>
+                </tr>
+            {% endfor %}
 
-    </tbody>
-  </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('review') }}
+{% endblock %}
+
