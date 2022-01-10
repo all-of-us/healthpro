@@ -209,9 +209,9 @@ class ProblemController extends AbstractController
         }
         if ($problemId) {
             $problem = $problemRepository->findOneBy(['id' => $problemId, 'participantId' => $participantId]);
-            if (!$problem && !$problem->getFinalizedTs()) {
-                throw $this->createNotFoundException('Problem report not found.');
-            }
+        }
+        if (empty($problem) || !$problem->getFinalizedTs()) {
+            throw $this->createNotFoundException('Problem report not found.');
         }
 
         $problemComment = new ProblemComment();
