@@ -175,7 +175,7 @@ class SiteSyncService
             }
         }
         $deleted = array_values($deleted);
-        if (!$preview) {
+        if (!$preview && !empty($siteData)) {
             if ($sitesCount === 0) {
                 throw new \Exception('No sites found');
             }
