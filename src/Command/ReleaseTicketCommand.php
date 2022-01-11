@@ -98,6 +98,31 @@ class ReleaseTicketCommand extends Command
         return $version;
     }
 
+    private function selectComponent(): ?string
+    {
+        $this->io->section('Components List');
+        $components = $this->jira->getComponents();
+        if (empty($components)) {
+            $this->io->warning('Could not retrieve components');
+            return '';
+        }
+        $defaultComponent = null;
+        $tableHeaders = ['Id', 'Component Name'];
+        $tableRows = [];
+        foreach ($components as $component) {
+            $tableRows[] = [
+                $component->id,
+                $component->name
+            ];
+            if ($component->id === JiraService::DESTINATION_COMPONENT_ID) {
+                $defaultComponent = JiraService::DESTINATION_COMPONENT_ID;
+            }
+        }
+        $this->io->table($tableHeaders, $tableRows);
+        $component = $this->io->ask('Please select a component', $defaultComponent);
+        return $component;
+    }
+
     private function selectEnvironment(): ?string
     {
         return $this->io->choice('Please select environment', ['Stable', 'Production']);
@@ -151,7 +176,7 @@ class ReleaseTicketCommand extends Command
         }
     }
 
-    private function createTicket(string $version, array $issues): ?string
+    private function createTicket(string $version, array $issues, string $componentId): ?string
     {
         if (!$this->targetReleaseDate) {
             $this->io->text('No release date has been specified for this release.');
@@ -174,7 +199,7 @@ class ReleaseTicketCommand extends Command
             'testers' => $testerIds
         ]);
 
-        $createResult = $this->jira->createReleaseTicket("HealthPro Release {$version}", $description);
+        $createResult = $this->jira->createReleaseTicket("HealthPro Release {$version}", $description, $componentId);
         if ($createResult) {
             $this->io->success(sprintf(
                 'Created release ticket: %s/browse/%s',
@@ -264,6 +289,8 @@ class ReleaseTicketCommand extends Command
             return 1;
         }
 
+        $componentId = $this->selectComponent();
+
         if ($comment === 'file') {
             $file = $this->selectDeployFile();
             if ($file === null) {
@@ -284,6 +311,6 @@ class ReleaseTicketCommand extends Command
             return 1;
         }
 
-        return $this->createTicket($version, $issues);
+        return $this->createTicket($version, $issues, $componentId);
     }
 }
