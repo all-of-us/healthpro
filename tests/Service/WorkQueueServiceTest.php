@@ -247,7 +247,7 @@ class WorkQueueServiceTest extends KernelTestCase
     {
         $user = $this->createMock(User::class);
         $user->method('getTimezone')->willReturn('America/Chicago');
-        $token = new PreAuthenticatedToken($user, null, 'main', ['ROLE_USER']);
+        $token = new PreAuthenticatedToken($user, 'main', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
