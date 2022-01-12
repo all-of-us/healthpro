@@ -240,6 +240,8 @@ class WorkQueueServiceTest extends KernelTestCase
             '',
             0,
             '',
+            1,
+            '1/12/2022 1:09 pm',
         ], $row);
     }
 

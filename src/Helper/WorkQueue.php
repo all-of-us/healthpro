@@ -713,6 +713,21 @@ class WorkQueue
             'toggleColumn' => true,
             'visible' => false
         ],
+        'CopeVaccineMinute4' => [
+            'name' => 'New Year Minute',
+            'csvNames' => [
+                'New Year Minute PPI Survey Complete',
+                'New Year Minute PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnCopeVaccineMinute4',
+            'sortField' => 'questionnaireOnCopeVaccineMinute4Authored',
+            'rdrDateField' => 'questionnaireOnCopeVaccineMinute4Authored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false
+        ],
         'pairedSite' => [
             'name' => 'Paired Site',
             'rdrField' => 'siteSuffix',
@@ -1043,6 +1058,7 @@ class WorkQueue
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'CopeVaccineMinute3',
+        'CopeVaccineMinute4',
         'pairedSite',
         'pairedOrganization',
         'physicalMeasurementsStatus',
@@ -1174,7 +1190,8 @@ class WorkQueue
         'digitalHealthSharingStatus',
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
-        'CopeVaccineMinute3'
+        'CopeVaccineMinute3',
+        'CopeVaccineMinute4'
     ];
 
     public static $sortColumns = [
@@ -1234,6 +1251,7 @@ class WorkQueue
         'questionnaireOnCopeVaccineMinute1',
         'questionnaireOnCopeVaccineMinute2',
         'questionnaireOnCopeVaccineMinute3',
+        'questionnaireOnCopeVaccineMinute4',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -1814,7 +1832,8 @@ class WorkQueue
         'CopeFeb' => 'COPE Feb',
         'CopeVaccineMinute1' => 'Summer Minute',
         'CopeVaccineMinute2' => 'Fall Minute',
-        'CopeVaccineMinute3' => 'Winter Minute'
+        'CopeVaccineMinute3' => 'Winter Minute',
+        'CopeVaccineMinute4' => 'New Year Minute'
     ];
 
     public static $initialSurveys = [
