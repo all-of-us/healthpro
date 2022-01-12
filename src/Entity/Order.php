@@ -30,7 +30,7 @@ class Order
     private $currentVersion;
     private $origin;
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
@@ -1233,6 +1233,9 @@ class Order
         if ($this->getType() === 'kit') {
             unset($columns['print_labels']);
             unset($columns['print_requisition']);
+        }
+        if ($this->getType() === 'saliva') {
+            unset($columns['process']);
         }
         $steps = [];
         foreach ($columns as $name => $column) {
