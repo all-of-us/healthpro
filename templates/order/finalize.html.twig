@@ -95,21 +95,10 @@
             $('input.sample-disabled').closest('label').addClass('text-warning');
             var html;
             var collected = $(name).attr('collected');
-            var processed = $(name).attr('processed');
-            var error = $(name).attr('error');
             if (typeof collected !== 'undefined') {
                 html = '<label><b>Collected:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i> '+collected+'</span>';
             } else {
                 html = '<label><b>Collected:</b></label> <span class="label-normal text-danger">Not collected</span></span>';
-            }
-            if (typeof processed !== 'undefined') {
-                if (typeof error !== 'undefined') {
-                    html += '<label><b>Processed:</b></label> <span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="'+error+'"></i> '+processed+'</span>';
-                } else {
-                    html += '<label><b>Processed:</b></label> <i class="fa fa-check text-success" aria-hidden="true"></i> '+processed+'</span>';
-                }
-            } else {
-                html += '<label><b>Processed:</b></label> <span class="label-normal text-danger">Not processed</span></span>';
             }
             $(name).closest('div.checkbox').append('<span class="saliva-info">'+html+'</span>');
             {% else %}
