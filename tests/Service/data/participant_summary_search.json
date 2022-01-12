@@ -78,6 +78,8 @@
             "questionnaireOnCopeVaccineMinute1": "UNSET",
             "questionnaireOnCopeVaccineMinute2": "UNSET",
             "questionnaireOnCopeVaccineMinute3": "UNSET",
+            "questionnaireOnCopeVaccineMinute4": "SUBMITTED",
+            "questionnaireOnCopeVaccineMinute4Authored": "2022-01-12T19:09:37",
             "questionnaireOnDnaProgram": "UNSET",
             "numCompletedBaselinePPIModules": 3,
             "numCompletedPPIModules": 4,
