@@ -1207,6 +1207,9 @@ class Order
             unset($columns['print_labels']);
             unset($columns['print_requisition']);
         }
+        if ($this->getType() === 'saliva') {
+            unset($columns['process']);
+        }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
             if (!$this->{'get' . $column . 'Ts'}()) {
