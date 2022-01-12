@@ -207,10 +207,8 @@ class ProblemController extends AbstractController
         if (!$participant->status || $this->siteService->isTestSite()) {
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
-        if ($problemId) {
-            $problem = $problemRepository->findOneBy(['id' => $problemId, 'participantId' => $participantId]);
-        }
-        if (empty($problem) || !$problem->getFinalizedTs()) {
+        $problem = $problemRepository->findOneBy(['id' => $problemId, 'participantId' => $participantId]);
+        if (!$problem && !$problem->getFinalizedTs()) {
             throw $this->createNotFoundException('Problem report not found.');
         }
 
