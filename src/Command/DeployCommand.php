@@ -463,7 +463,7 @@ class DeployCommand extends Command
         $newVulnerabilities = $vulnerabilities;
         $ignoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'composerignore.json'), true);
         foreach ($vulnerabilities as $key => $vulnerability) {
-            if (!empty($vulnerability['advisories'])) {
+            if (isset($vulnerability['advisories']) && is_array($vulnerability['advisories'])) {
                 $advisories = $vulnerability['advisories'];
                 foreach ($vulnerability['advisories'] as $advisoryKey => $advisory) {
                     if (!empty($advisory['link'])) {

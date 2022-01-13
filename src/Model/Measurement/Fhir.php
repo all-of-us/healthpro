@@ -69,6 +69,7 @@ class Fhir
                     continue;
                 }
             }
+            $modification = '';
             if (!preg_match('/protocol-modification/', $field->name)) {
                 switch ($field->name) {
                     case 'blood-pressure-systolic':

@@ -5,6 +5,18 @@ namespace App\Helper;
 use App\Util;
 use App\Drc\CodeBook;
 
+/**
+ * Define magic properties to fix phpstan errors
+ * @property string $streetAddress
+ * @property string $city
+ * @property string $state
+ * @property string $zipCode
+ * @property string $email
+ * @property string $lastName
+ * @property string $firstName
+ * @property string $phoneNumber
+ */
+
 class Participant
 {
     public $status = true;
@@ -25,6 +37,7 @@ class Participant
     public $isWithdrawn = false;
     public $consentCohortText;
     public $editExistingOnly = false;
+    public $siteSuffix;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
