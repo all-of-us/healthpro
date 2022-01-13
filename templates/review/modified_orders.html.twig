@@ -52,7 +52,7 @@
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(order, 'processed_ts') }}
+                        {{ order.type != 'saliva' ? today.displayDate(order, 'processed_ts') : '--'}}
                     </td>
                     <td>
                         {% if order.oh_type != 'unlock' %}

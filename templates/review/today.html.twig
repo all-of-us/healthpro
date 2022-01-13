@@ -105,7 +105,7 @@
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ today.displayDate(order, 'processed_ts') }}
+                        {{ order.order_type != 'saliva' ? today.displayDate(order, 'processed_ts') : '--'}}
                     </td>
                     <td>
                         {% if order %}
