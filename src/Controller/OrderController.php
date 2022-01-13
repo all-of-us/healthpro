@@ -251,7 +251,8 @@ class OrderController extends AbstractController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $wasProcessStepAvailable = in_array('process', $order->getAvailableSteps());
+        $nextStep = $order->getType() === 'saliva' ? 'finalize' : 'process';
+        $wasNextStepAvailable = in_array($nextStep, $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
@@ -288,8 +289,8 @@ class OrderController extends AbstractController
                 $this->loggerService->log(Log::ORDER_EDIT, $orderId);
                 $this->addFlash('notice', 'Order collection updated');
                 $redirectRoute = 'order_collect';
-                if (!$wasProcessStepAvailable && in_array('process', $order->getAvailableSteps())) {
-                    $redirectRoute = 'order_process';
+                if (!$wasNextStepAvailable && in_array($nextStep, $order->getAvailableSteps())) {
+                    $redirectRoute = "order_{$nextStep}";
                 }
                 return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $participantId,
