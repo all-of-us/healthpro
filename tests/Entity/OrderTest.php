@@ -82,6 +82,45 @@ class OrderTest extends TestCase
         $this->assertSame('collect', $order->getCurrentStep());
     }
 
+    public function testSalivaOrderAvailableSteps()
+    {
+        $orderData = $this->getOrderData();
+        $orderData['type'] = 'saliva';
+        $order = $this->createOrder($orderData);
+        $order->setCreatedTs(new \DateTime('2022-01-01 08:00:00'));
+        $order->setPrintedTs(new \DateTime('2022-01-01 09:00:00'));
+        $order->setCollectedTs(new \DateTime('2022-01-01 10:00:00'));
+        self::assertContains('finalize', $order->getAvailableSteps());
+        // Process step should not be present
+        self::assertNotContains('process', $order->getAvailableSteps());
+    }
+
+    public function testSalivaOrderSteps()
+    {
+        $orderData = $this->getOrderData();
+        $orderData['type'] = 'saliva';
+        $order = $this->createOrder($orderData);
+        self::assertSame('print_labels', $order->getCurrentStep());
+
+        $order->setCreatedTs(new \DateTime('2022-01-01 08:00:00'));
+        $order->setPrintedTs(new \DateTime('2022-01-01 09:00:00'));
+        self::assertSame('collect', $order->getCurrentStep());
+
+        //Next step after collect is finalize
+        $order->setCollectedTs(new \DateTime('2022-01-01 10:00:00'));
+        self::assertSame('finalize', $order->getCurrentStep());
+
+        $order->setFinalizedTs(new \DateTime('2022-01-01 12:00:00'));
+        self::assertSame('finalize', $order->getCurrentStep());
+
+        $order = $this->createOrder([
+            'createdTs' => new \DateTime('2022-01-01 08:00:00'),
+        ]);
+        $orderHistory = $this->createOrderHistory(['type' => 'cancel']);
+        $order->setHistory($orderHistory);
+        self::assertSame('collect', $order->getCurrentStep());
+    }
+
     public function testRdrObject()
     {
         $orderData = $this->getOrderData();
