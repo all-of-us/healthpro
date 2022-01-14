@@ -20,14 +20,19 @@ class GoogleGroupsService
             $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');
             $keyFile = realpath(__DIR__ . '/../../') . '/dev_config/googleapps_key.json';
+            $authJson = null;
             if ($env->isLocal() && file_exists($keyFile)) {
                 $authJson = file_get_contents($keyFile);
-            } else {
+            } elseif ($params->has('gaAuthJson')) {
                 $authJson = $params->get('gaAuthJson');
             }
             $client = new GoogleClient();
             $client->setApplicationName($applicationName);
-            $client->setAuthConfig(json_decode($authJson, true));
+            if ($authJson) {
+                $client->setAuthConfig(json_decode($authJson, true));
+            } else {
+                $client->useApplicationDefaultCredentials();
+            }
             $client->setSubject($adminEmail);
             $client->setScopes([GoogleDirectory::ADMIN_DIRECTORY_GROUP, GoogleDirectory::ADMIN_DIRECTORY_USER_READONLY]);
             $this->client = new GoogleDirectory($client);
