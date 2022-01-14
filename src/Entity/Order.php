@@ -1417,7 +1417,8 @@ class Order
             $biobankChanges['collected']['site'] = $this->getSite();
             $biobankChanges['collected']['samples'] = $collectedSamplesDiff;
         }
-        if (empty($processedSamplesTs)) {
+        // Do not set processed time for saliva orders
+        if ($this->type !== 'saliva' && empty($processedSamplesTs)) {
             $this->setProcessedTs($finalizedTs);
             $this->setProcessedUser(null);
             $biobankChanges['processed'] = [
