@@ -110,8 +110,9 @@ $(document).ready(function () {
         //Display warning message
         var confirmMessage = 'Are you sure you want to finalize this order?';
         var message = confirmMessage;
+        var siteWarning;
         if (userSite !== orderSite) {
-            var siteWarning = 'The order creation site and finalization site do not match. ';
+            siteWarning = 'The order creation site and finalization site do not match. ';
             message = 'Warning! ' + siteWarning + confirmMessage;
         }
         $('input[name="order[finalizedSamples][]"]').each(function () {
