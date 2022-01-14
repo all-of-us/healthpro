@@ -935,8 +935,14 @@ class Order
         $createdSite = $this->getOrderSite($this->getSite());
         $collectedUser = $this->getOrderUser($this->getCollectedUser());
         $collectedSite = $this->getOrderSite($this->getCollectedSite());
-        $processedUser = $this->getOrderUser($this->getProcessedUser());
-        $processedSite = $this->getOrderSite($this->getProcessedSite());
+        // Set processed user and site info to collected for saliva orders
+        if ($this->getType() !== 'saliva') {
+            $processedUser = $this->getOrderUser($this->getProcessedUser());
+            $processedSite = $this->getOrderSite($this->getProcessedSite());
+        } else {
+            $processedUser = $collectedUser;
+            $processedSite = $collectedSite;
+        }
         $finalizedUser = $this->getOrderUser($this->getFinalizedUser());
         $finalizedSite = $this->getOrderSite($this->getFinalizedSite());
         $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
