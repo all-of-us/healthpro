@@ -73,7 +73,7 @@ class UserService
                 $attempts++;
             }
         } while ($attempts < $maxAttempts);
-        if (!empty($user)) {
+        if (empty($user)) {
             $user = new User();
             $user->setEmail($googleUser->getEmail());
             $user->setGoogleId($googleUser->getUserId());
