@@ -799,6 +799,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         this.toggleThirdWaistCircumference();
         if (this.finalized) {
             this.$('.modification-toggle').hide();
+            this.$('.alt-units-block').hide();
         }
         this.triggerEqualize();
         this.displayEhrDate();

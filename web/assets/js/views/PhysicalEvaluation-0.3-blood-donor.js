@@ -418,6 +418,7 @@ PMI.views['PhysicalEvaluation-0.3-blood-donor'] = Backbone.View.extend({
         this.hideWholeBloodModification();
         if (this.finalized) {
             this.$('.modification-toggle').hide();
+            this.$('.alt-units-block').hide();
         }
         this.triggerEqualize();
         this.rendered = true;
