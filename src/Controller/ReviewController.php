@@ -11,7 +11,6 @@ use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -21,17 +20,14 @@ class ReviewController extends AbstractController
 {
     public const DATE_RANGE_LIMIT = 7;
 
-    protected $session;
-
     protected $participantSummaryService;
 
     protected $reviewService;
 
     protected $siteService;
 
-    public function __construct(SessionInterface $session, ParticipantSummaryService $participantSummaryService, ReviewService $reviewService, SiteService $siteService)
+    public function __construct(ParticipantSummaryService $participantSummaryService, ReviewService $reviewService, SiteService $siteService)
     {
-        $this->session = $session;
         $this->participantSummaryService = $participantSummaryService;
         $this->reviewService = $reviewService;
         $this->siteService = $siteService;

@@ -7,8 +7,8 @@ use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -21,7 +21,7 @@ class RequestListener
     private $logger;
     private $em;
     private $twig;
-    private $session;
+    private $requestStack;
     private $userService;
     private $siteService;
     private $authorizationChecker;
@@ -34,7 +34,7 @@ class RequestListener
         LoggerService $logger,
         EntityManagerInterface $em,
         TwigEnvironment $twig,
-        SessionInterface $session,
+        RequestStack $requestStack,
         UserService $userService,
         SiteService $siteService,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -44,7 +44,7 @@ class RequestListener
         $this->logger = $logger;
         $this->em = $em;
         $this->twig = $twig;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->authorizationChecker = $authorizationChecker;
@@ -104,7 +104,7 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        if (!$this->session->has('site') && !$this->session->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
+        if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
             $user = $this->userService->getUser();
             if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($user->getSites()[0]->email)) {
                 $this->siteService->switchSite($user->getSites()[0]->email);
@@ -121,7 +121,7 @@ class RequestListener
 
     private function checkLoginExpired()
     {
-        // log the user out if their session is expired
+        // log the user out if their requestStack->getSession() is expired
         if ($this->userService->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
             return new RedirectResponse('/logout?timeout=1');
         }
@@ -164,14 +164,14 @@ class RequestListener
 
     private function setSessionVariables(): void
     {
-        $this->session->set('isLoginReturn', false);
-        if (!$this->session->has('userSiteDisplayNames')) {
+        $this->requestStack->getSession()->set('isLoginReturn', false);
+        if (!$this->requestStack->getSession()->has('userSiteDisplayNames')) {
             if (!empty($userSites = $this->userService->getUser()->getSites())) {
                 $userSiteDisplayNames = [];
                 foreach ($userSites as $userSite) {
                     $userSiteDisplayNames[$userSite->id] = $this->siteService->getSiteDisplayName($userSite->id, false);
                 }
-                $this->session->set('userSiteDisplayNames', $userSiteDisplayNames);
+                $this->requestStack->getSession()->set('userSiteDisplayNames', $userSiteDisplayNames);
             }
         }
     }

@@ -8,8 +8,8 @@ use App\Service\UserService;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -27,11 +27,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     private $params;
     private $env;
     private $twig;
-    private $session;
+    private $requestStack;
     private $authEmail;
     private $authFailureReason;
 
-    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService, Environment $twig, SessionInterface $session)
+    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService, Environment $twig, RequestStack $requestStack)
     {
         $this->auth = $auth;
         $this->urlGenerator = $urlGenerator;
@@ -39,7 +39,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $this->env = $env;
         $this->userService = $userService;
         $this->twig = $twig;
-        $this->session= $session;
+        $this->requestStack= $requestStack;
     }
 
     public function supports(Request $request)
@@ -99,7 +99,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             'email' => $this->authEmail,
             'logoutUrl' => $this->auth->getGoogleLogoutUrl()
         ]));
-        $this->session->invalidate();
+        $this->requestStack->getSession()->invalidate();
         return $response;
     }
 

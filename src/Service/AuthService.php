@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Drc\GoogleUser;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Exception;
 use Google_Client as GoogleClient;
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class AuthService
 {
     private $params;
-    private $session;
+    private $requestStack;
     private $urlGenerator;
     private $callbackUrl;
     private $tokenStorage;
@@ -22,13 +22,13 @@ class AuthService
 
     public function __construct(
         ContainerBagInterface $params,
-        SessionInterface $session,
+        RequestStack $requestStack,
         UrlGeneratorInterface $urlGenerator,
         TokenStorageInterface $tokenStorage,
         EnvironmentService $env
     ) {
         $this->params = $params;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->urlGenerator = $urlGenerator;
         $this->callbackUrl = $this->generateUrl('login_callback');
         $this->tokenStorage = $tokenStorage;
@@ -48,12 +48,12 @@ class AuthService
 
     private function setSessionState(string $state): void
     {
-        $this->session->set('auth_state', $state);
+        $this->requestStack->getSession()->set('auth_state', $state);
     }
 
     private function getSessionState(): ?string
     {
-        return $this->session->get('auth_state');
+        return $this->requestStack->getSession()->get('auth_state');
     }
 
     public function getAuthUrl(): string
@@ -80,7 +80,7 @@ class AuthService
             throw new Exception('Could not verify token');
         }
         $user = new GoogleUser($idToken['sub'], $idToken['email']);
-        $this->session->set('googleUser', $user);
+        $this->requestStack->getSession()->set('googleUser', $user);
 
         return $user;
     }

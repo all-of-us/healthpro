@@ -6,14 +6,12 @@ use App\Datastore\Entities\AuditLog;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class LoggerService
 {
     protected $logger;
-    protected $session;
-    protected $userService;
     protected $requestStack;
+    protected $userService;
     protected $env;
     protected $action;
     protected $data;
@@ -61,13 +59,11 @@ class LoggerService
 
     public function __construct(
         LoggerInterface $logger,
-        SessionInterface $session,
         UserService $userService,
         RequestStack $requestStack,
         EnvironmentService $env
     ) {
         $this->logger = $logger;
-        $this->session = $session;
         $this->userService = $userService;
         $this->requestStack = $requestStack;
         $this->env = $env;
@@ -139,7 +135,7 @@ class LoggerService
         }
 
         try {
-            if (($siteObj = $this->session->get('site')) && isset($siteObj->id)) {
+            if (($siteObj = $this->requestStack->getSession()->get('site')) && isset($siteObj->id)) {
                 $site = $siteObj->id;
             }
         } catch (\Exception $e) {

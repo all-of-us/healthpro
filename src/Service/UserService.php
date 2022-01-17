@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Helper\MockUserHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use App\Entity\User;
@@ -16,7 +16,7 @@ class UserService
     private $em;
     private $params;
     private $env;
-    private $session;
+    private $requestStack;
     private $security;
     private $authorizationChecker;
 
@@ -24,14 +24,14 @@ class UserService
         EntityManagerInterface $em,
         ContainerBagInterface $params,
         EnvironmentService $env,
-        SessionInterface $session,
+        RequestStack $requestStack,
         Security $security,
         AuthorizationCheckerInterface $authorizationChecker
     ) {
         $this->em = $em;
         $this->params = $params;
         $this->env = $env;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->security = $security;
         $this->authorizationChecker = $authorizationChecker;
     }
@@ -39,9 +39,9 @@ class UserService
     public function getGoogleUser()
     {
         if ($this->canMockLogin()) {
-            return $this->session->get('mockUser');
+            return $this->requestStack->getSession()->get('mockUser');
         }
-        return $this->session->get('googleUser');
+        return $this->requestStack->getSession()->get('googleUser');
     }
 
     public function canMockLogin()
@@ -135,13 +135,13 @@ class UserService
                 $this->em->flush();
             }
         }
-        $this->session->set('isLoginReturn', true);
+        $this->requestStack->getSession()->set('isLoginReturn', true);
     }
 
     public function setMockUser($email): void
     {
         MockUserHelper::switchCurrentUser($email);
-        $this->session->set('mockUser', MockUserHelper::getCurrentUser());
+        $this->requestStack->getSession()->set('mockUser', MockUserHelper::getCurrentUser());
     }
 
     /** Is the user's session expired? */
@@ -149,7 +149,7 @@ class UserService
     {
         $time = time();
         // custom "last used" session time updated on keepAliveAction
-        $idle = $time - $this->session->get('pmiLastUsed', $time);
+        $idle = $time - $this->requestStack->getSession()->get('pmiLastUsed', $time);
         $remaining = $this->env->values['sessionTimeOut'] - $idle;
         return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }

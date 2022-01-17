@@ -20,21 +20,18 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProblemController extends AbstractController
 {
-    protected $session;
     protected $logger;
     protected $params;
     protected $em;
     protected $problemNotificationService;
     protected $siteService;
 
-    public function __construct(SessionInterface $sessionInterface, LoggerService $loggerService, ParameterBagInterface $parameterBag, EntityManagerInterface $entityManager, ProblemNotificationService $problemNotificationService, SiteService $siteService)
+    public function __construct(LoggerService $loggerService, ParameterBagInterface $parameterBag, EntityManagerInterface $entityManager, ProblemNotificationService $problemNotificationService, SiteService $siteService)
     {
-        $this->session = $sessionInterface;
         $this->logger = $loggerService;
         $this->params = $parameterBag;
         $this->em = $entityManager;
