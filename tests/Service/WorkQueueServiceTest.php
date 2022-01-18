@@ -4,21 +4,16 @@ namespace App\Tests\Service;
 
 use App\Helper\Participant;
 use App\Helper\WorkQueue;
-use App\Security\User;
 use App\Service\WorkQueueService;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
-class WorkQueueServiceTest extends KernelTestCase
+class WorkQueueServiceTest extends ServiceTestCase
 {
     protected $service;
 
-    public function setup(): void
+    public function setUp(): void
     {
-        self::bootKernel();
-        $tokenStorage = $this->createTokenStorageWithMockUser();
-        self::$container->set('security.token_storage', $tokenStorage);
+        parent::setUp();
+        $this->login('test@example.com', ['hpo-site-test'], 'America/Chicago');
         $this->service = static::$container->get(WorkQueueService::class);
     }
 
@@ -241,17 +236,6 @@ class WorkQueueServiceTest extends KernelTestCase
             0,
             '',
         ], $row);
-    }
-
-    private function createTokenStorageWithMockUser()
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getTimezone')->willReturn('America/Chicago');
-        $token = new PreAuthenticatedToken($user, 'main', ['ROLE_USER']);
-        $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken($token);
-
-        return $tokenStorage;
     }
 
     private function getParticipants()

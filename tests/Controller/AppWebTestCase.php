@@ -53,7 +53,7 @@ class AppWebTestCase extends WebTestCase
         }
 
         $user = $userProvider->loadUserByUsername($email);
-        $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
+        $token = new PreAuthenticatedToken($user, 'main', $user->getRoles());
         $tokenStorage->setToken($token);
 
         $this->session->set('_security_main', serialize($token));

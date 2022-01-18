@@ -87,7 +87,7 @@ class AuthService
 
     public function setMockAuthToken($user)
     {
-        $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
+        $token = new PreAuthenticatedToken($user, 'main', $user->getRoles());
         $this->tokenStorage->setToken($token);
     }
 

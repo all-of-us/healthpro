@@ -30,7 +30,7 @@ abstract class ServiceTestCase extends KernelTestCase
         $this->requestStack->push($this->request);
     }
 
-    protected function login(string $email, array $groups = ['hpo-site-test'])
+    protected function login(string $email, array $groups = ['hpo-site-test'], string $timezone = null)
     {
         $userService = self::$container->get(UserService::class);
         $tokenStorage = self::$container->get(TokenStorageInterface::class);
@@ -50,7 +50,10 @@ abstract class ServiceTestCase extends KernelTestCase
         }
 
         $user = $userProvider->loadUserByUsername($email);
-        $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
+        if ($timezone) {
+            $user->setTimezone('America/Chicago');
+        }
+        $token = new PreAuthenticatedToken($user, 'main', $user->getRoles());
         $tokenStorage->setToken($token);
 
         $this->session->set('_security_main', serialize($token));
