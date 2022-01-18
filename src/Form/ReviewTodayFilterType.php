@@ -20,6 +20,7 @@ class ReviewTodayFilterType extends AbstractType
                 'label' => 'Start Date',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy',
+                'html5' => false,
                 'model_timezone' => $options['timezone'],
                 'view_timezone' => $options['timezone'],
                 'constraints' => [
@@ -35,6 +36,7 @@ class ReviewTodayFilterType extends AbstractType
                 'label' => 'End Date',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy',
+                'html5' => false,
                 'model_timezone' => $options['timezone'],
                 'view_timezone' => $options['timezone'],
                 'constraints' => [
