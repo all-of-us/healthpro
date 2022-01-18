@@ -30,7 +30,7 @@ class AppExtension extends AbstractExtension
         $this->params = $params;
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('path_exists', [$this, 'checkPath']),

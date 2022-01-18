@@ -42,7 +42,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $this->requestStack= $requestStack;
     }
 
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
         if ($request->attributes->get('_route') === 'login_callback' && !$this->userService->canMockLogin()) {
             return true;
@@ -50,6 +50,9 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return false;
     }
 
+    /**
+     @return mixed
+    */
     public function getCredentials(Request $request)
     {
         if (!$request->query->has('state') || !$request->query->has('state')) {
@@ -61,7 +64,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         ];
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
     {
         try {
             $user = $this->auth->processAuth($credentials['state'], $credentials['code']);
@@ -72,7 +75,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return $userProvider->loadUserByUsername($user->getEmail());
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
         if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
             return true; // Bypass groups auth
@@ -87,7 +90,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return count($user->getGroups()) > 0 && $valid2fa;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $template = 'error-auth.html.twig';
         if ($this->authFailureReason === '2fa') {
@@ -103,7 +106,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return $response;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
         $this->userService->updateLastLogin();
         // Instead of using a service, the token should eventually contain the User entity (not App\Security\User)
@@ -111,12 +114,12 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return $this->redirectToRoute('home');
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         return $this->redirectToRoute('login');
     }
 
-    public function supportsRememberMe()
+    public function supportsRememberMe(): bool
     {
         return false;
     }

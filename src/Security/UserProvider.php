@@ -37,7 +37,7 @@ class UserProvider implements UserProviderInterface
         $this->params = $params;
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): UserInterface
     {
         $googleUser = $this->userService->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
@@ -83,7 +83,7 @@ class UserProvider implements UserProviderInterface
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
@@ -92,7 +92,7 @@ class UserProvider implements UserProviderInterface
         return $this->loadUserByUsername($user->getUsername());
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return User::class === $class;
     }
