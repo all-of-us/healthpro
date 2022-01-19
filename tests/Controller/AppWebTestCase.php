@@ -4,7 +4,6 @@ namespace App\Tests\Controller;
 
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
-use App\Security\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
