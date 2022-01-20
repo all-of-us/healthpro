@@ -66,7 +66,7 @@ class GoogleGroupsService
                 }
             }
         } while ($doRetry);
-        return $response;
+        return !empty($response) ? $response : '';
     }
 
     /**

@@ -48,6 +48,7 @@ class WorkQueueController extends AbstractController
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
         }
+        $awardees = [];
         if ($this->isGranted('ROLE_AWARDEE')) {
             $awardees = $this->siteService->getSuperUserAwardees();
             if (!empty($awardees)) {
@@ -310,6 +311,7 @@ class WorkQueueController extends AbstractController
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
         }
+        $awardees = [];
         if ($this->isGranted('ROLE_AWARDEE')) {
             $awardees = $this->siteService->getSuperUserAwardees();
             if (!empty($awardees)) {

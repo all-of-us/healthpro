@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Audit\Log;
 use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -79,7 +80,7 @@ class RequestListener
 
     private function logRequest()
     {
-        $this->logger->log(LoggerService::REQUEST);
+        $this->logger->log(Log::REQUEST);
     }
 
     private function checkPageNotices()

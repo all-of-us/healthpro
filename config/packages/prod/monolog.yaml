@@ -1,10 +1,20 @@
 monolog:
     handlers:
+        filter_syslog_errors:
+            type: fingers_crossed
+            handler: syslog_handler
+            action_level: info
+            excluded_http_codes: [404]
+        filter_stackdriver_errors:
+            type: fingers_crossed
+            handler: stackdriver_handler
+            action_level: info
+            excluded_http_codes: [404]
         syslog_handler:
             type: syslog
             ident: false
             facility: !php/const LOG_USER
             level: info
-        service:
+        stackdriver_handler:
             type: service
             id: App\Service\StackdriverHandler

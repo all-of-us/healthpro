@@ -2,17 +2,8 @@
 
 namespace App\Audit;
 
-use App\Datastore\Entities\AuditLog;
-use Symfony\Component\HttpFoundation\Request;
-
 class Log
 {
-    protected $app;
-    protected $action;
-    protected $data;
-
-    public const PMI_AUDIT_PREFIX = 'PMI_AUDIT_';
-
     // Actions
     public const REQUEST = 'REQUEST';
     public const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -59,53 +50,5 @@ class Log
     public const GROUP_MEMBER_ADD = 'GROUP_MEMBER_ADD';
     public const GROUP_MEMBER_REMOVE = 'GROUP_MEMBER_REMOVE';
     public const GROUP_MEMBER_REMOVE_NOTIFY = 'GROUP_MEMBER_REMOVE_NOTIFY';
-
-    public function __construct($app, $action, $data)
-    {
-        $this->app = $app;
-        $this->action = $action;
-        $this->data = $data;
-    }
-
-    protected function buildLogArray()
-    {
-        $logArray = [];
-        $logArray['action'] = $this->action;
-        $logArray['data'] = $this->data;
-        $logArray['ts'] = new \DateTime();
-        $logArray = array_merge($logArray, $this->app->getLogMetadata());
-        return $logArray;
-    }
-
-    public function logSyslog()
-    {
-        $logArray = $this->buildLogArray();
-        $syslogData = [];
-        $syslogData[] = $logArray['ip'];
-        $syslogData[] = $logArray['user'];
-        $syslogData[] = $logArray['site'];
-        $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
-        if ($logArray['data']) {
-            $syslogData[] = json_encode($logArray['data']);
-        }
-        $this->app['logger']->info(implode(' ', $syslogData));
-    }
-
-    public function logDatastore()
-    {
-        $logArray = $this->buildLogArray();
-        $data = [
-            'action' => $logArray['action'],
-            'timestamp' => $logArray['ts'],
-            'user' => $logArray['user'],
-            'site' => $logArray['site'],
-            'ip' => $logArray['ip']
-        ];
-        if ($logArray['data']) {
-            $data['data'] = json_encode($logArray['data']);
-        }
-        $auditLog = new AuditLog();
-        $auditLog->setData($data);
-        $auditLog->save();
-    }
+    public const CSRF_TOKEN_MISMATCH = 'CSRF_TOKEN_MISMATCH';
 }
