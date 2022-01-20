@@ -123,6 +123,7 @@ class ReviewController extends AbstractController
         $unlockedOrders = $orderRepository->getSiteUnlockedOrders($site);
         $unfinalizedOrders = $orderRepository->getSiteUnfinalizedOrders($site);
         $orders = array_merge($unlockedOrders, $unfinalizedOrders);
+        $this->reviewService->loadFirstFiveParticipantNames($orders);
         return $this->render('review/unfinalized_orders.html.twig', [
             'orders' => $orders
         ]);
@@ -139,7 +140,7 @@ class ReviewController extends AbstractController
             return $this->redirectToRoute('home');
         }
         $measurements = $measurementRepository->getSiteUnfinalizedEvaluations($site);
-
+        $this->reviewService->loadFirstFiveParticipantNames($measurements);
         return $this->render('review/unfinalized_measurements.html.twig', [
             'measurements' => $measurements
         ]);
@@ -156,6 +157,7 @@ class ReviewController extends AbstractController
             return $this->redirectToRoute('home');
         }
         $recentModifyOrders = $orderRepository->getSiteRecentModifiedOrders($site);
+        $this->reviewService->loadFirstFiveParticipantNames($recentModifyOrders);
         return $this->render('review/modified_orders.html.twig', [
             'orders' => $recentModifyOrders
         ]);
@@ -172,6 +174,7 @@ class ReviewController extends AbstractController
             return $this->redirectToRoute('home');
         }
         $recentModifyMeasurements = $measurementRepository->getSiteRecentModifiedEvaluations($site);
+        $this->reviewService->loadFirstFiveParticipantNames($recentModifyMeasurements);
         return $this->render('review/modified_measurements.html.twig', [
             'measurements' => $recentModifyMeasurements
         ]);
