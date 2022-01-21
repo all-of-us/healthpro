@@ -65,14 +65,16 @@
                     Collect
                 </a>
             </li>
-            <li role="presentation">
-                <a href="#process" aria-controls="process" role="tab" data-toggle="tab">
-                    {% if order.collectedTs is not empty and order.processedTs is not empty %}
-                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
-                    {% endif %}
-                    Process
-                </a>
-            </li>
+            {% if order.type != 'saliva' %}
+                <li role="presentation">
+                    <a href="#process" aria-controls="process" role="tab" data-toggle="tab">
+                        {% if order.collectedTs is not empty and order.processedTs is not empty %}
+                            <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                        {% endif %}
+                        Process
+                    </a>
+                </li>
+            {% endif %}
             <li role="presentation">
                 <a href="#finalize" aria-controls="finalize" role="tab" data-toggle="tab">
                     {% if order.finalizedTs is not empty %}
@@ -87,9 +89,11 @@
             <div role="tabpanel" class="tab-pane" id="collect">
                 {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'collected' } %}
             </div>
-            <div role="tabpanel" class="tab-pane" id="process">
-                {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'processed' } %}
-            </div>
+            {% if order.type != 'saliva' %}
+                <div role="tabpanel" class="tab-pane" id="process">
+                    {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'processed' } %}
+                </div>
+            {% endif %}
             <div role="tabpanel" class="tab-pane" id="finalize">
                 {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
             </div>

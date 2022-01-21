@@ -26,7 +26,7 @@ class BiobankOrderFinalizeNotificationService
         $this->twig = $twig;
     }
 
-    public function sendEmails(array $info, string $emails): void
+    public function sendEmails(array $info, ?string $emails): void
     {
         if (!empty($emails)) {
             $emails = explode(',', $emails);

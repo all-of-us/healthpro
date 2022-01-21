@@ -30,7 +30,7 @@ class Order
     private $currentVersion;
     private $origin;
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', '1SAL', '1SAL2'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
 
@@ -935,8 +935,14 @@ class Order
         $createdSite = $this->getOrderSite($this->getSite());
         $collectedUser = $this->getOrderUser($this->getCollectedUser());
         $collectedSite = $this->getOrderSite($this->getCollectedSite());
-        $processedUser = $this->getOrderUser($this->getProcessedUser());
-        $processedSite = $this->getOrderSite($this->getProcessedSite());
+        // Set processed user and site info to collected for saliva orders
+        if ($this->getType() !== 'saliva') {
+            $processedUser = $this->getOrderUser($this->getProcessedUser());
+            $processedSite = $this->getOrderSite($this->getProcessedSite());
+        } else {
+            $processedUser = $collectedUser;
+            $processedSite = $collectedSite;
+        }
         $finalizedUser = $this->getOrderUser($this->getFinalizedUser());
         $finalizedSite = $this->getOrderSite($this->getFinalizedSite());
         $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
@@ -1207,6 +1213,9 @@ class Order
             unset($columns['print_labels']);
             unset($columns['print_requisition']);
         }
+        if ($this->getType() === 'saliva') {
+            unset($columns['process']);
+        }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
             if (!$this->{'get' . $column . 'Ts'}()) {
@@ -1233,6 +1242,9 @@ class Order
         if ($this->getType() === 'kit') {
             unset($columns['print_labels']);
             unset($columns['print_requisition']);
+        }
+        if ($this->getType() === 'saliva') {
+            unset($columns['process']);
         }
         $steps = [];
         foreach ($columns as $name => $column) {
@@ -1411,7 +1423,8 @@ class Order
             $biobankChanges['collected']['site'] = $this->getSite();
             $biobankChanges['collected']['samples'] = $collectedSamplesDiff;
         }
-        if (empty($processedSamplesTs)) {
+        // Do not set processed time for saliva orders
+        if ($this->type !== 'saliva' && empty($processedSamplesTs)) {
             $this->setProcessedTs($finalizedTs);
             $this->setProcessedUser(null);
             $biobankChanges['processed'] = [

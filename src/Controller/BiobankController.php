@@ -227,7 +227,7 @@ class BiobankController extends AbstractController
                                 'biobankId' => $biobankId,
                                 'orderId' => $order->getOrderId()
                             ];
-                            $emails = !empty($site) ? $site->getEmail() : null;
+                            $emails = !empty($site) ? $site->getEmail() : '';
                             $biobankOrderFinalizeNotificationService->sendEmails($info, $emails);
                         } else {
                             $this->addFlash('error', $result['errorMessage']);
