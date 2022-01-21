@@ -588,12 +588,14 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
             block.find('.modification-manual input:checkbox').each(function () {
                 $(this).prop('checked', false).attr('disabled', true);
             });
+            block.find('.alt-units-block').hide();
         } else {
             block.find('.modification-affected input:text, .modification-affected select, .modification-manual input:checkbox').each(function() {
                 if (!self.finalized) {
                     $(this).attr('disabled', false);
                 }
             });
+            block.find('.alt-units-block').show();
         }
         if (modification === 'other') {
             block.find('.modification-notes').show();
@@ -797,6 +799,7 @@ PMI.views['PhysicalEvaluation-0.3-ehr'] = Backbone.View.extend({
         this.toggleThirdWaistCircumference();
         if (this.finalized) {
             this.$('.modification-toggle').hide();
+            this.$('.alt-units-block').hide();
         }
         this.triggerEqualize();
         this.displayEhrDate();
