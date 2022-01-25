@@ -61,7 +61,7 @@ class GoogleGroupsService
                     $doRetry = true;
                     $retryCount++;
                 } else {
-                    error_log($e->getMessage());
+                    error_log($e->getCode() . '-' . $reason);
                     throw $e;
                 }
             }
@@ -145,7 +145,10 @@ class GoogleGroupsService
             }
             return [];
         } catch (GoogleException $e) {
-            return [];
+            if ($e->getCode() === 404) {
+                return [];
+            }
+            throw $e;
         }
     }
 
