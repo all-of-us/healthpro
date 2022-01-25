@@ -138,11 +138,15 @@ class GoogleGroupsService
         if (!empty($roles)) {
             $params['roles'] = join(',', $roles);
         }
-        $result = $this->callApi('members', 'listMembers', [$groupEmail, $params]);
-        if ($result) {
-            return $result->getMembers();
+        try {
+            $result = $this->callApi('members', 'listMembers', [$groupEmail, $params]);
+            if ($result) {
+                return $result->getMembers();
+            }
+            return [];
+        } catch (GoogleException $e) {
+            return [];
         }
-        return [];
     }
 
     public function getUser(string $user)
