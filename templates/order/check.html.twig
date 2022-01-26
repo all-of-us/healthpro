@@ -24,13 +24,25 @@
     </ul>
     <br/>
 
-    <h3>In the past week has the participant donated blood (e.g. Blood Bank, Red Cross), platelets, or plasma?</h3>
     <form method="post" action="{{ path('order_create', { participantId: participant.id }) }}" id="safety-checks" class="prevent-resubmit">
-        <div class="radio">
-            <label><input type="radio" name="donate" value="yes"/> Yes</label>
+        <div>
+            <h3>Has the participant ever felt dizzy, nauseous, or lost consciousness when having blood drawn?</h3>
+            <div class="radio">
+                <label><input type="radio" name="syncope" value="yes"/> Yes</label>
+            </div>
+            <div class="radio">
+                <label><input type="radio" name="syncope" value="no"/> No</label>
+            </div>
         </div>
-        <div class="radio">
-            <label><input type="radio" name="donate" value="no"/> No</label>
+
+        <div>
+            <h3>In the past week has the participant donated blood (e.g. Blood Bank, Red Cross), platelets, or plasma?</h3>
+            <div class="radio">
+                <label><input type="radio" name="donate" value="yes"/> Yes</label>
+            </div>
+            <div class="radio">
+                <label><input type="radio" name="donate" value="no"/> No</label>
+            </div>
         </div>
 
         <div id="transfusion">
@@ -74,6 +86,10 @@
         </div>
         <div class="alert alert-danger" style="display:none;" id="order-info-text">
             {% set displayText = app.session.get('siteType') == 'dv' ? 'Urine' : 'Saliva and urine ' %}
+            <span id="info-text-0">
+                Caution! In order to minimize risk to participants, those who experience syncope should be offered saliva and urine collection instead.
+                <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
+            </span>
             <span id="info-text-1">
                 Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week.
                 <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
