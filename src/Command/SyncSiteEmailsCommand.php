@@ -73,7 +73,7 @@ class SyncSiteEmailsCommand extends Command
             try {
                 $siteAdmins = $this->siteSyncService->getSiteAdminEmails($site);
             } catch (\Exception $e) {
-                $output->writeln('ERROR: ' . $e->getMessage());
+                $output->writeln('ERROR: ' . $e->getCode());
                 $returnCode = 1;
                 continue;
             }
