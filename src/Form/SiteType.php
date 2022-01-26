@@ -17,6 +17,7 @@ class SiteType extends AbstractType
     public const FULL_DATA_ACCESS = 'full_data';
     public const LIMITED_DATA_ACCESS = 'limited_data';
     public const DOWNLOAD_DISABLED = 'disabled';
+    public const DV_HYBRID = 'hybrid';
 
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -78,6 +79,15 @@ class SiteType extends AbstractType
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $options['isDisabled'],
+            ])
+            ->add('dv_module', Type\ChoiceType::class, [
+                'label' => 'DV Module Configuration',
+                'required' => false,
+                'choices' => [
+                    'Default (Based on HOS selection)' => null,
+                    'DV Hybrid (Abbreviated PM Form + Kit)' => self::DV_HYBRID
+                ],
+                'multiple' => false
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
