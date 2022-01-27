@@ -80,6 +80,7 @@ class SiteType extends AbstractType
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $options['isDisabled'],
             ]);
+
         if ($builder->getData() && $builder->getData()->getType() === 'DV') {
             $builder->add('dv_module', Type\ChoiceType::class, [
                 'label' => 'DV Module Configuration',
@@ -91,6 +92,7 @@ class SiteType extends AbstractType
                 'multiple' => false
             ]);
         }
+
         $builder
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
