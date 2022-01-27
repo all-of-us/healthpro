@@ -79,8 +79,9 @@ class SiteType extends AbstractType
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $options['isDisabled'],
-            ])
-            ->add('dv_module', Type\ChoiceType::class, [
+            ]);
+        if ($builder->getData() && $builder->getData()->getType() === 'DV') {
+            $builder->add('dv_module', Type\ChoiceType::class, [
                 'label' => 'DV Module Configuration',
                 'required' => false,
                 'choices' => [
@@ -88,7 +89,9 @@ class SiteType extends AbstractType
                     'DV Hybrid (Abbreviated PM Form + Kit)' => self::DV_HYBRID
                 ],
                 'multiple' => false
-            ])
+            ]);
+        }
+        $builder
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
                 'required' => false,
