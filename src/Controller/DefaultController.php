@@ -93,7 +93,7 @@ class DefaultController extends AbstractController
      */
     public function agreeUsageAction(Request $request)
     {
-        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('agreeUsage', $request->request->get('csrf_token')))) {
+        if (!$this->isCsrfTokenValid('agreeUsage', $request->request->get('csrf_token'))) {
             throw $this->createAccessDeniedException();
         }
         $request->getSession()->set('isUsageAgreed', true);

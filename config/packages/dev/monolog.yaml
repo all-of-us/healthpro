@@ -1,13 +1,19 @@
 monolog:
+    channels: [deprecation]
     handlers:
+        deprecation:
+            type: stream
+            channels: [deprecation]
+            path: "%kernel.logs_dir%/%kernel.environment%.deprecations.log"
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ["!event"]
+            channels: ["!event", "!deprecation"]
         syslog_handler:
             type: syslog
             ident: false
             facility: !php/const LOG_USER
             level: info
             logopts: !php/const LOG_PERROR
+            channels: ["!deprecation"]

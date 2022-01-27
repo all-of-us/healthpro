@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Helper\WorkQueue;
@@ -27,14 +27,14 @@ use App\Audit\Log;
  */
 class WorkQueueController extends AbstractController
 {
-    protected $session;
+    protected $requestStack;
     protected $workQueueService;
     protected $siteService;
     protected $displayParticipantConsentsTab;
 
-    public function __construct(SessionInterface $session, WorkQueueService $workQueueService, SiteService $siteService, ParameterBagInterface $params)
+    public function __construct(RequestStack $requestStack, WorkQueueService $workQueueService, SiteService $siteService, ParameterBagInterface $params)
     {
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->workQueueService = $workQueueService;
         $this->siteService = $siteService;
         $this->displayParticipantConsentsTab = $params->has('feature.participantconsentsworkqueue') ? $params->get('feature.participantconsentsworkqueue') : false;
@@ -52,7 +52,7 @@ class WorkQueueController extends AbstractController
         if ($this->isGranted('ROLE_AWARDEE')) {
             $awardees = $this->siteService->getSuperUserAwardees();
             if (!empty($awardees)) {
-                if (($sessionAwardee = $this->session->get('awardeeOrganization')) && in_array($sessionAwardee, $awardees)) {
+                if (($sessionAwardee = $this->requestStack->getSession()->get('awardeeOrganization')) && in_array($sessionAwardee, $awardees)) {
                     $awardee = $sessionAwardee;
                 } else {
                     // Default to first organization
@@ -86,8 +86,8 @@ class WorkQueueController extends AbstractController
                 $awardee = $params['awardee'];
                 unset($params['awardee']);
             }
-            // Save selected (or default) awardee in session
-            $this->session->set('workQueueAwardee', $awardee);
+            // Save selected (or default) awardee in requestStack->getSession()
+            $this->requestStack->getSession()->set('workQueueAwardee', $awardee);
 
             // Remove patient status filter for awardee
             unset($filters['patientStatus']);
@@ -167,7 +167,7 @@ class WorkQueueController extends AbstractController
             throw $this->createAccessDeniedException();
         }
         if ($this->isGranted('ROLE_AWARDEE')) {
-            $awardee = $this->session->get('workQueueAwardee');
+            $awardee = $this->requestStack->getSession()->get('workQueueAwardee');
             $site = $this->siteService->getAwardeeId();
         } else {
             $awardee = $this->siteService->getSiteAwardee();
@@ -187,7 +187,7 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
-        $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');
+        $workQueueConsentColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
         if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
             $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueConsentColumns);
             $exportRowMethod = 'generateConsentExportRow';
@@ -315,7 +315,7 @@ class WorkQueueController extends AbstractController
         if ($this->isGranted('ROLE_AWARDEE')) {
             $awardees = $this->siteService->getSuperUserAwardees();
             if (!empty($awardees)) {
-                if (($sessionAwardee = $this->session->get('awardeeOrganization')) && in_array($sessionAwardee, $awardees)) {
+                if (($sessionAwardee = $this->requestStack->getSession()->get('awardeeOrganization')) && in_array($sessionAwardee, $awardees)) {
                     $awardee = $sessionAwardee;
                 } else {
                     // Default to first organization
@@ -350,7 +350,7 @@ class WorkQueueController extends AbstractController
                 unset($params['awardee']);
             }
             // Save selected (or default) awardee in session
-            $this->session->set('workQueueAwardee', $awardee);
+            $this->requestStack->getSession()->set('workQueueAwardee', $awardee);
 
             // Remove patient status filter for awardee
             unset($filters['patientStatus']);
@@ -412,9 +412,9 @@ class WorkQueueController extends AbstractController
             return $this->json($ajaxData, 200);
         } else {
             $params['exportType'] = 'consents';
-            if (!$this->session->has('workQueueConsentColumns')) {
+            if (!$this->requestStack->getSession()->has('workQueueConsentColumns')) {
                 $workQueueConsentColumns = WorkQueue::getWorkQueueConsentColumns();
-                $this->session->set('workQueueConsentColumns', $workQueueConsentColumns);
+                $this->requestStack->getSession()->set('workQueueConsentColumns', $workQueueConsentColumns);
             }
             return $this->render('workqueue/consents.html.twig', [
                 'filters' => $filters,
@@ -445,14 +445,14 @@ class WorkQueueController extends AbstractController
             throw $this->createNotFoundException();
         }
         if ($request->query->has('select')) {
-            $this->session->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
+            $this->requestStack->getSession()->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
             return $this->json(['success' => true]);
         }
         if ($request->query->has('deselect')) {
-            $this->session->set('workQueueConsentColumns', []);
+            $this->requestStack->getSession()->set('workQueueConsentColumns', []);
             return $this->json(['success' => true]);
         }
-        $workQueueConsentColumns = $this->session->get('workQueueConsentColumns');
+        $workQueueConsentColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
         $columnName = $request->query->get('columnName');
         if ($request->query->get('checked') === 'true') {
             $workQueueConsentColumns[] = $columnName;
@@ -461,7 +461,7 @@ class WorkQueueController extends AbstractController
                 unset($workQueueConsentColumns[$key]);
             }
         }
-        $this->session->set('workQueueConsentColumns', $workQueueConsentColumns);
+        $this->requestStack->getSession()->set('workQueueConsentColumns', $workQueueConsentColumns);
         return $this->json(['success' => true]);
     }
 }

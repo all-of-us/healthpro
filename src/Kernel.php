@@ -52,7 +52,7 @@ class Kernel extends BaseKernel
         $routes->import($confDir.'/{routes}'.self::CONFIG_EXTS, '/', 'glob');
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         if ($this->environment === 'prod') {
             return sys_get_temp_dir();
@@ -60,7 +60,7 @@ class Kernel extends BaseKernel
         return parent::getCacheDir();
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         if ($this->environment === 'prod') {
             return sys_get_temp_dir();
