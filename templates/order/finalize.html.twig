@@ -15,18 +15,12 @@
          data-order-collect-time="{{ order.collectedTs.format('n/j/Y g:ia') }}"
          data-user-site="{{ siteInfo.siteId }}">
         {{ form_label(finalizeForm.finalizedTs) }}
-        <span class="toggle-help-image" data-caption="Finalized time help text placeholder.">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                </span>
         {{ form_widget(finalizeForm.finalizedTs) }}
         {{ form_errors(finalizeForm.finalizedTs) }}
     </div>
 
     <div class="form-group{% if not finalizeForm.finalizedSamples.vars.valid %} has-error{% endif %}">
         {{ form_label(finalizeForm.finalizedSamples) }}
-        <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
         {% if order.type == 'saliva' %}
             {{ form_widget(finalizeForm.finalizedSamples) }}
         {% else %}

@@ -11,9 +11,6 @@
     {% if processForm.processedSamples is defined %}
         <div class="form-group{% if not processForm.processedSamples.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processedSamples) }}
-            <span class="toggle-help-image" data-caption="Processed samples help text placeholder.">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                </span>
             {% if order.type == 'saliva' %}
                 {{ form_widget(processForm.processedSamples) }}
             {% else %}
@@ -25,9 +22,6 @@
     {% if order.type != 'saliva' and processForm.processedCentrifugeType is defined %}
         <div class="form-group{% if not processForm.processedCentrifugeType.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processedCentrifugeType) }}
-            <span class="toggle-help-image" data-caption="Centrifuge type help text placeholder.">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                </span>
             {{ form_widget(processForm.processedCentrifugeType) }}
             {{ form_errors(processForm.processedCentrifugeType) }}
         </div>
