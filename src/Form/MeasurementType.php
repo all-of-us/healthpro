@@ -106,6 +106,7 @@ class MeasurementType extends AbstractType
                 $dateOptions = [
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy',
+                    'html5' => false,
                     'required' => false
                 ];
                 $fieldOptions = array_merge($fieldOptions, $dateOptions);

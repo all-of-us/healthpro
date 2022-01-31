@@ -65,6 +65,7 @@ class NoticeType extends AbstractType
                 'label' => 'Start Time (optional)',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
                 'view_timezone' => $options['timezone'],
                 'model_timezone' => 'UTC',
                 'constraints' => [
@@ -76,6 +77,7 @@ class NoticeType extends AbstractType
                 'label' => 'End Time (optional)',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
                 'view_timezone' => $options['timezone'],
                 'model_timezone' => 'UTC',
                 'constraints' => [

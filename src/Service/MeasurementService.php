@@ -9,12 +9,12 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MeasurementService
 {
     protected $em;
-    protected $session;
+    protected $requestStack;
     protected $userService;
     protected $rdrApiService;
     protected $siteService;
@@ -24,7 +24,7 @@ class MeasurementService
 
     public function __construct(
         EntityManagerInterface $em,
-        SessionInterface $session,
+        RequestStack $requestStack,
         UserService $userService,
         RdrApiService $rdrApiService,
         SiteService $siteService,
@@ -32,7 +32,7 @@ class MeasurementService
         LoggerService $loggerService
     ) {
         $this->em = $em;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->userService = $userService;
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
@@ -55,7 +55,7 @@ class MeasurementService
             $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUserId() : $this->userService->getUser()->getId();
             $finalizedUser = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
             $finalizedUserEmail = $finalizedUser->getEmail();
-            $finalizedSite = $measurement->getFinalizedTs() ? $measurement->getSite() : $this->session->get('site')->id;
+            $finalizedSite = $measurement->getFinalizedTs() ? $measurement->getSite() : $this->requestStack->getSession()->get('site')->id;
         } else {
             $finalizedUserEmail = $measurement->getFinalizedUser()->getEmail();
             $finalizedSite = $measurement->getFinalizedSite();
@@ -95,7 +95,7 @@ class MeasurementService
 
     public function requireBloodDonorCheck()
     {
-        return $this->session->get('siteType') === 'dv' && ($this->siteService->isDiversionPouchSite() || $this->siteService->isBloodDonorPmSite());
+        return $this->requestStack->getSession()->get('siteType') === 'dv' && ($this->siteService->isDiversionPouchSite() || $this->siteService->isBloodDonorPmSite());
     }
 
     public function getCurrentVersion($type)
