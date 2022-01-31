@@ -87,7 +87,7 @@ class SiteRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s')
             ->where('s.status = 1')
-            ->where('s.deleted = 0')
+            ->andWhere('s.deleted = 0')
             ->leftJoin('s.siteSync', 'ss')
             ->setMaxResults($limit)
         ;
