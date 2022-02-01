@@ -1145,6 +1145,16 @@ class Order
         return false;
     }
 
+    public function getUrineSample()
+    {
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::$nonBloodSamples)) {
+                return $sample;
+            }
+        }
+        return null;
+    }
+
     // Returns sample's code and display text
     public function getCustomRequestedSamples()
     {
