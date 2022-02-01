@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    const dateTypes = ['evaluation_created_ts', 'evaluation_finalized_ts', 'order_created_ts', 'order_collected_ts', 'order_processed_ts', 'order_finalized_ts'];
+    const dateTypes = ['measurement_created_ts', 'measurement_finalized_ts', 'order_created_ts', 'order_collected_ts', 'order_processed_ts', 'order_finalized_ts'];
 
     // Display total count for each step in the date column headers
     for (const dateType of dateTypes) {
