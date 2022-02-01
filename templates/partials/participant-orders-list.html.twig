@@ -43,6 +43,8 @@
                             <span class="label label-default">Collected</span> {{ order.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% endif %}
                     </small>
+                    {% if order.collectedTs %} <br/> {% endif %}
+                    <small>Order Type: {{ order.orderTypeDisplayText }}</small>
                     </a>
             {% endfor %}
             {% if type is not defined and orders|length > 5 %}
