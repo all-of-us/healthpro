@@ -40,6 +40,7 @@
 {% endblock %}
 
 {% block pagejs %}
+    {{ encore_entry_script_tags('order-sub') }}
     <script>
         $(document).ready(function () {
             $('#requisition-loaded').hide();
@@ -56,6 +57,9 @@
                     // https://github.com/mozilla/pdf.js/issues/5397
                     $('#requisition-loading-widget').hide();
                 }
+            });
+            new PMI.views['OrderSubPage']({
+                el: $("body")
             });
         });
     </script>
