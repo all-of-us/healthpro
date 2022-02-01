@@ -57,7 +57,7 @@
                     {{ _self.displayDate(order.collectedTs) }}
                 </td>
                 <td data-order="{{ order.processedTs ? order.processedTs|date('Y-m-d H:i:s', false) : '' }}">
-                    {{ _self.displayDate(order.processedTs) }}
+                    {{ order.type != 'saliva' ? _self.displayDate(order.processedTs) : '--' }}
                 </td>
                 <td data-order="{{ order.finalizedTs ? order.finalizedTs|date('Y-m-d H:i:s', false) : '' }}">
                     {{ _self.displayDate(order.finalizedTs) }}
