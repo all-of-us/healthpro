@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
+use App\Form\SiteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -84,11 +85,13 @@ class SiteService
 
     public function isBloodDonorPmSite(): bool
     {
-        if ($this->params->has('feature.blooddonorpmsites') && $sites = $this->params->get('feature.blooddonorpmsites')) {
-            $sites = explode(',', $sites);
-            return in_array($this->getSiteId(), $sites);
-        }
-        return false;
+        $site = $this->em->getRepository(Site::class)->findOneBy([
+            'deleted' => 0,
+            'googleGroup' => $this->getSiteId(),
+            'type' => 'DV',
+            'dvModule' => SiteType::DV_HYBRID
+        ]);
+        return !empty($site);
     }
 
     public function getSiteAwardee()
