@@ -7,17 +7,7 @@ PMI.views['OrderSubPage'] = Backbone.View.extend({
         "click #unlock-order": "displayUnlockWarningModal",
     },
     displayHelpModal: function(e) {
-        var image = $(e.currentTarget).data('img');
-        var caption = $(e.currentTarget).data('caption');
-        var html = '';
-        if (image) {
-            html += '<img src="' + image + '" class="img-responsive" />';
-        }
-        if (caption) {
-            html += caption;
-        }
-        this.$('#helpModal .modal-body').html(html);
-        this.$('#helpModal').modal();
+        this.$('#orderHelpModal').modal();
     },
     displayUnlockWarningModal: function (e) {
         var url = $(e.currentTarget).data('href');
