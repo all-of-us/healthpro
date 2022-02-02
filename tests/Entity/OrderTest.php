@@ -397,4 +397,28 @@ class OrderTest extends TestCase
         $orderHistory->setType('active');
         $this->assertSame(true, $order->canUnlock());
     }
+
+    public function testOrderTypeDisplayText()
+    {
+        $orderData = $this->getOrderData();
+        $order = $this->createOrder($orderData);
+
+        // DV Kit orders
+        $order->setType('kit');
+        self::assertEquals('Full Kit', $order->getOrderTypeDisplayText());
+        $order->setRequestedSamples('["1UR10"]');
+        self::assertEquals('Urine', $order->getOrderTypeDisplayText());
+
+        // HPO orders
+        $order->setType(null);
+        $order->setRequestedSamples('["1SS08", "1PS08", "1UR10"]');
+        self::assertEquals('Custom HPO', $order->getOrderTypeDisplayText());
+        $order->setRequestedSamples(null);
+        self::assertEquals('Full HPO', $order->getOrderTypeDisplayText());
+        $order->setType('saliva');
+        self::assertEquals('Saliva', $order->getOrderTypeDisplayText());
+        $order->setType(null);
+        $order->setRequestedSamples('["1UR10"]');
+        self::assertEquals('Urine', $order->getOrderTypeDisplayText());
+    }
 }

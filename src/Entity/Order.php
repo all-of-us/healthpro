@@ -1490,7 +1490,7 @@ class Order
     public function isUrineOrder(): bool
     {
         $requestedSamples = json_decode($this->requestedSamples, true);
-        return count($requestedSamples) === 1 && empty(array_diff($requestedSamples, self::$urineSamples));
+        return is_array($requestedSamples) && empty(array_diff($requestedSamples, self::$urineSamples));
     }
 
     public function getOrderTypeDisplayText(): string
