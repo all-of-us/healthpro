@@ -32,7 +32,7 @@
             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
         </span>
         {{ form_widget(processForm.processedNotes) }}
-        <small class="text-warning">Comments entered in this field must be transmitted to the Biobank via reconciliation reporting. You may not enter any participant identifying information here.</small>
+        <small class="text-warning">Comments entered in this field are transmitted to the Biobank via reconciliation reporting. Do not enter any participant identifying information here.</small>
         {{ form_errors(processForm.processedNotes) }}
     </div>
     {{ form_rest(processForm) }}
