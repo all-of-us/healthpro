@@ -19,6 +19,31 @@ class SiteType extends AbstractType
     public const DOWNLOAD_DISABLED = 'disabled';
     public const DV_HYBRID = 'hybrid';
 
+    public static $siteChoices = [
+        'status' => [
+            'Active'=> 1,
+            'Inactive' => 0
+        ],
+        'dv_module' => [
+            'Default (Based on HOS selection)' => null,
+            'DV Hybrid (Abbreviated PM Form + Kit)' => self::DV_HYBRID
+        ],
+        'centrifuge_type' => [
+            '-- Select centrifuge type --' => null,
+            'Fixed Angle' => self::FIXED_ANGLE,
+            'Swinging Bucket' => self::SWINGING_BUCKET
+        ],
+        'workqueue_download' => [
+            'Full Data Access' => self::FULL_DATA_ACCESS,
+            'Limited Data Access (No PII)' => self::LIMITED_DATA_ACCESS,
+            'Download Disabled' => self::DOWNLOAD_DISABLED
+        ],
+        'ehr_modification_protocol' => [
+            'Yes' => 1,
+            'No' => 0
+        ]
+    ];
+
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
