@@ -8,12 +8,12 @@ use DateTime;
 
 class DatastoreSessionHandler extends AbstractSessionHandler
 {
-    public function close()
+    public function close(): bool
     {
         return true;
     }
 
-    public function doDestroy($id)
+    public function doDestroy($id): bool
     {
         try {
             $session = Session::fetchOneById($id);
@@ -34,12 +34,12 @@ class DatastoreSessionHandler extends AbstractSessionHandler
      * This noop method is required since the AbstractSessionHandler
      * class implements SessionUpdateTimestampHandlerInterface
      */
-    public function updateTimestamp($id, $data)
+    public function updateTimestamp($id, $data): bool
     {
         return true;
     }
 
-    public function gc($maxlifetime)
+    public function gc($maxlifetime): bool
     {
         $modified = new DateTime("-{$maxlifetime} seconds");
         $session = new Session();
@@ -48,7 +48,7 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function doRead($id)
+    public function doRead($id): string
     {
         try {
             $session = Session::fetchOneById($id);
@@ -64,7 +64,7 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         }
     }
 
-    public function doWrite($id, $sessionData)
+    public function doWrite($id, $sessionData): bool
     {
         try {
             $data = [

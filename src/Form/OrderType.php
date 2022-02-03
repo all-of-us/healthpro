@@ -85,6 +85,7 @@ class OrderType extends AbstractType
                 'label' => $tsLabel,
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
                 'required' => false,
                 'disabled' => $disabled,
                 'view_timezone' => $options['timeZone'],
@@ -153,6 +154,7 @@ class OrderType extends AbstractType
                 'entry_options' => [
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy h:mm a',
+                    'html5' => false,
                     'view_timezone' => $options['timeZone'],
                     'model_timezone' => 'UTC',
                     'label' => false,

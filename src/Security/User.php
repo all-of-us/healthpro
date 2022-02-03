@@ -251,22 +251,22 @@ class User implements UserInterface
         return $roles;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->getUserRoles($this->getAllRoles(), $this->sessionInfo['site'], $this->sessionInfo['awardee']);
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return null;
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }
 
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->googleUser->getEmail();
     }

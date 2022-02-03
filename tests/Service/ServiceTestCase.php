@@ -5,6 +5,8 @@ namespace App\Tests\Service;
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -15,14 +17,20 @@ abstract class ServiceTestCase extends KernelTestCase
 {
     public const GROUP_DOMAIN = 'healthpro-test.pmi-ops.org';
     protected $session;
+    protected $request;
+    protected $requestStack;
 
     public function setUp(): void
     {
         self::bootKernel();
         $this->session = self::$container->get(SessionInterface::class);
+        $this->requestStack = self::$container->get(RequestStack::class);
+        $this->request = new Request();
+        $this->request->setSession($this->session);
+        $this->requestStack->push($this->request);
     }
 
-    protected function login(string $email, array $groups = ['hpo-site-test'])
+    protected function login(string $email, array $groups = ['hpo-site-test'], string $timezone = null)
     {
         $userService = self::$container->get(UserService::class);
         $tokenStorage = self::$container->get(TokenStorageInterface::class);
@@ -42,7 +50,10 @@ abstract class ServiceTestCase extends KernelTestCase
         }
 
         $user = $userProvider->loadUserByUsername($email);
-        $token = new PreAuthenticatedToken($user, null, 'main', $user->getRoles());
+        if ($timezone) {
+            $user->setTimezone('America/Chicago');
+        }
+        $token = new PreAuthenticatedToken($user, 'main', $user->getRoles());
         $tokenStorage->setToken($token);
 
         $this->session->set('_security_main', serialize($token));

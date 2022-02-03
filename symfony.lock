@@ -278,6 +278,9 @@
     "psr/container": {
         "version": "1.0.0"
     },
+    "psr/event-dispatcher": {
+        "version": "1.0.0"
+    },
     "psr/http-message": {
         "version": "1.0.1"
     },
@@ -490,6 +493,9 @@
     "symfony/options-resolver": {
         "version": "v4.4.7"
     },
+    "symfony/password-hasher": {
+        "version": "v5.4.2"
+    },
     "symfony/polyfill-ctype": {
         "version": "v1.15.0"
     },
@@ -560,6 +566,18 @@
         "files": [
             "config/packages/security.yaml"
         ]
+    },
+    "symfony/security-core": {
+        "version": "v5.4.2"
+    },
+    "symfony/security-csrf": {
+        "version": "v5.4.0"
+    },
+    "symfony/security-guard": {
+        "version": "v5.4.0"
+    },
+    "symfony/security-http": {
+        "version": "v5.4.2"
     },
     "symfony/serializer": {
         "version": "v4.4.15"

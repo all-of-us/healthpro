@@ -38,7 +38,7 @@ jobs:
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
 
     # Dependencies
-    - run: sudo composer self-update --1
+    - run: sudo composer self-update --2
     - restore_cache: # special step to restore the dependency cache if `composer.lock` does not change
         keys:
           - composer-v1-{{ checksum "composer.lock" }}

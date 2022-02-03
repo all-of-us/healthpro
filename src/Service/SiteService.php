@@ -7,7 +7,7 @@ use App\Entity\Organization;
 use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
@@ -16,7 +16,7 @@ class SiteService
     public const CABOR_STATE = 'CA';
 
     private $params;
-    private $session;
+    private $requestStack;
     private $em;
     private $userService;
     private $env;
@@ -25,10 +25,10 @@ class SiteService
     protected $organizationNameMapper = [];
     protected $awardeeNameMapper = [];
 
-    public function __construct(ParameterBagInterface $params, SessionInterface $session, EntityManagerInterface $em, UserService $userService, EnvironmentService $env, TokenStorageInterface $tokenStorage)
+    public function __construct(ParameterBagInterface $params, RequestStack $requestStack, EntityManagerInterface $em, UserService $userService, EnvironmentService $env, TokenStorageInterface $tokenStorage)
     {
         $this->params = $params;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->em = $em;
         $this->userService = $userService;
         $this->env = $env;
@@ -37,7 +37,7 @@ class SiteService
 
     public function isTestSite(): bool
     {
-        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->session->get('siteAwardeeId') === 'TEST';
+        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->requestStack->getSession()->get('siteAwardeeId') === 'TEST';
     }
 
 
@@ -53,7 +53,7 @@ class SiteService
 
     public function getSiteId()
     {
-        if ($site = $this->session->get('site')) {
+        if ($site = $this->requestStack->getSession()->get('site')) {
             return $site->id;
         }
         return null;
@@ -63,7 +63,7 @@ class SiteService
     //Super user ex: STSI
     public function getAwardeeId()
     {
-        if ($awardee = $this->session->get('awardee')) {
+        if ($awardee = $this->requestStack->getSession()->get('awardee')) {
             return $awardee->id;
         }
         return null;
@@ -93,13 +93,13 @@ class SiteService
 
     public function getSiteAwardee()
     {
-        return $this->session->get('siteOrganization');
+        return $this->requestStack->getSession()->get('siteOrganization');
     }
 
 
     public function getSiteOrganization()
     {
-        return $this->session->get('siteOrganizationId');
+        return $this->requestStack->getSession()->get('siteOrganizationId');
     }
 
     public function getSuperUserAwardees()
@@ -231,14 +231,14 @@ class SiteService
     {
         $user = $this->userService->getUser();
         if ($user && $user->belongsToSite($email)) {
-            $this->session->set('site', $user->getSite($email));
-            $this->session->remove('awardee');
+            $this->requestStack->getSession()->set('site', $user->getSite($email));
+            $this->requestStack->getSession()->remove('awardee');
             $this->setNewRoles($user);
             $this->saveSiteMetaDataInSession();
             return true;
         } elseif ($user && $user->belongsToAwardee($email)) {
-            $this->session->set('awardee', $user->getAwardee($email));
-            $this->session->remove('site');
+            $this->requestStack->getSession()->set('awardee', $user->getAwardee($email));
+            $this->requestStack->getSession()->remove('site');
             $this->setNewRoles($user);
             // Clears previously set site meta data
             $this->saveSiteMetaDataInSession();
@@ -250,7 +250,7 @@ class SiteService
 
     protected function setNewRoles($user)
     {
-        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->session->get('site'), $this->session->get('awardee'));
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
         if ($user->getAllRoles() != $userRoles) {
             $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
             $this->tokenStorage->setToken($token);
@@ -261,27 +261,27 @@ class SiteService
     {
         $site = $this->getSiteEntity();
         if (!empty($site)) {
-            $this->session->set('siteOrganization', $site->getOrganization());
-            $this->session->set('siteOrganizationId', $site->getOrganizationId());
-            $this->session->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site->getOrganizationId()));
-            $this->session->set('siteAwardee', $site->getAwardee());
-            $this->session->set('siteAwardeeId', $site->getAwardeeId());
-            $this->session->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site->getAwardeeId()));
-            $this->session->set('currentSiteDisplayName', $site->getName());
-            $this->session->set('siteType', $this->getSiteType());
-            $this->session->set('orderType', $this->getOrderType());
-            $this->session->set('siteState', $site->getState());
+            $this->requestStack->getSession()->set('siteOrganization', $site->getOrganization());
+            $this->requestStack->getSession()->set('siteOrganizationId', $site->getOrganizationId());
+            $this->requestStack->getSession()->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site->getOrganizationId()));
+            $this->requestStack->getSession()->set('siteAwardee', $site->getAwardee());
+            $this->requestStack->getSession()->set('siteAwardeeId', $site->getAwardeeId());
+            $this->requestStack->getSession()->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site->getAwardeeId()));
+            $this->requestStack->getSession()->set('currentSiteDisplayName', $site->getName());
+            $this->requestStack->getSession()->set('siteType', $this->getSiteType());
+            $this->requestStack->getSession()->set('orderType', $this->getOrderType());
+            $this->requestStack->getSession()->set('siteState', $site->getState());
         } else {
-            $this->session->remove('siteOrganization');
-            $this->session->remove('siteOrganizationId');
-            $this->session->remove('siteOrganizationDisplayName');
-            $this->session->remove('siteAwardee');
-            $this->session->remove('siteAwardeeId');
-            $this->session->remove('siteAwardeeDisplayName');
-            $this->session->remove('currentSiteDisplayName');
-            $this->session->remove('siteType');
-            $this->session->remove('orderType');
-            $this->session->remove('siteState');
+            $this->requestStack->getSession()->remove('siteOrganization');
+            $this->requestStack->getSession()->remove('siteOrganizationId');
+            $this->requestStack->getSession()->remove('siteOrganizationDisplayName');
+            $this->requestStack->getSession()->remove('siteAwardee');
+            $this->requestStack->getSession()->remove('siteAwardeeId');
+            $this->requestStack->getSession()->remove('siteAwardeeDisplayName');
+            $this->requestStack->getSession()->remove('currentSiteDisplayName');
+            $this->requestStack->getSession()->remove('siteType');
+            $this->requestStack->getSession()->remove('orderType');
+            $this->requestStack->getSession()->remove('siteState');
         }
     }
 
@@ -310,6 +310,6 @@ class SiteService
 
     public function displayCaborConsent(): bool
     {
-        return $this->session->get('siteState') === self::CABOR_STATE ? true : false;
+        return $this->requestStack->getSession()->get('siteState') === self::CABOR_STATE ? true : false;
     }
 }
