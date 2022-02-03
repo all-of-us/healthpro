@@ -38,6 +38,7 @@ Encore
     .addEntry('video', './web/assets/js/views/video.js')
     .addEntry('review', './web/assets/js/views/review.js')
     .addEntry('group-member-remove', './web/assets/js/views/GroupMemberRemove.js')
+    .addEntry('participant-lookup', './web/assets/js/views/ParticipantLookup.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

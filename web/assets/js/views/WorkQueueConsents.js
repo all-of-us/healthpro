@@ -353,4 +353,6 @@ $(document).ready(function () {
     });
 
     $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
+
+    $('#dateOfBirth').inputmask("99/99/9999");
 });
