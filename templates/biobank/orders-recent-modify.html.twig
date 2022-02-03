@@ -57,10 +57,10 @@
                     {{ macros.displaySite(order.collected_site_name, order.collected_site) }}
                 </td>
                 <td data-order="{{ order.processed_ts }}">
-                    {{ macros.displayDate(order, 'processed_ts') }}
+                    {{ order.type != 'saliva' ? macros.displayDate(order, 'processed_ts') : '--' }}
                 </td>
                 <td>
-                    {{ macros.displaySite(order.processed_site_name, order.processed_site) }}
+                    {{ order.type != 'saliva' ? macros.displaySite(order.processed_site_name, order.processed_site) : '--' }}
                 </td>
                 <td data-order="{{ order.finalized_ts }}">
                     {% if order.oh_type != 'unlock' %}
