@@ -24,7 +24,7 @@ class ReviewTodayFilterType extends AbstractType
                 'model_timezone' => $options['timezone'],
                 'view_timezone' => $options['timezone'],
                 'constraints' => [
-                    new Constraints\DateTime(),
+                    new Constraints\Type('datetime'),
                     new Constraints\LessThanOrEqual([
                         'value' => $constraintDate,
                         'message' => 'Date cannot be in the future'
@@ -40,7 +40,7 @@ class ReviewTodayFilterType extends AbstractType
                 'model_timezone' => $options['timezone'],
                 'view_timezone' => $options['timezone'],
                 'constraints' => [
-                    new Constraints\DateTime(),
+                    new Constraints\Type('datetime'),
                     new Constraints\GreaterThanOrEqual([
                         'propertyPath' => 'parent.all[start_date].data',
                         'message' => 'End date should be greater than start date'
@@ -60,7 +60,8 @@ class ReviewTodayFilterType extends AbstractType
     {
         $resolver->setDefaults([
             'timezone' => null,
-            'unmapped' => true
+            'unmapped' => true,
+            'data_class'=>null
         ]);
     }
 }
