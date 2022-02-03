@@ -38,7 +38,7 @@ class RemoveGroupMemberType extends AbstractType
                 'format' => 'MM/dd/yyyy',
                 'attr' => ['autocomplete' => 'off'],
                 'constraints' => [
-                    new Constraints\DateTime(),
+                    new Constraints\Type('datetime'),
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'

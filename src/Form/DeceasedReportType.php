@@ -27,7 +27,7 @@ class DeceasedReportType extends AbstractType
                 'format' => 'MM/dd/yyyy',
                 'help' => 'Do NOT prompt report for this information and only enter if offered.',
                 'constraints' => [
-                    new Constraints\DateTime(),
+                    new Constraints\Type('datetime'),
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'

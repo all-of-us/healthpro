@@ -69,7 +69,7 @@ class NoticeType extends AbstractType
                 'view_timezone' => $options['timezone'],
                 'model_timezone' => 'UTC',
                 'constraints' => [
-                    new Constraints\DateTime()
+                    new Constraints\Type('datetime')
                 ]
             ])
             ->add('end_ts', Type\DateTimeType::class, [
@@ -81,7 +81,7 @@ class NoticeType extends AbstractType
                 'view_timezone' => $options['timezone'],
                 'model_timezone' => 'UTC',
                 'constraints' => [
-                    new Constraints\DateTime()
+                    new Constraints\Type('datetime')
                 ]
             ]);
 
