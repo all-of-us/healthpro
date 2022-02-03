@@ -60,8 +60,7 @@ class ReviewTodayFilterType extends AbstractType
     {
         $resolver->setDefaults([
             'timezone' => null,
-            'unmapped' => true,
-            'data_class'=>null
+            'unmapped' => true
         ]);
     }
 }
