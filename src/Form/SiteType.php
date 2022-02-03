@@ -29,7 +29,6 @@ class SiteType extends AbstractType
             'DV Hybrid (Abbreviated PM Form + Kit)' => self::DV_HYBRID
         ],
         'centrifuge_type' => [
-            '-- Select centrifuge type --' => null,
             'Fixed Angle' => self::FIXED_ANGLE,
             'Swinging Bucket' => self::SWINGING_BUCKET
         ],
@@ -149,7 +148,8 @@ class SiteType extends AbstractType
                 'label' => 'Centrifuge type',
                 'required' => false,
                 'choices' => self::$siteChoices['centrifuge_type'],
-                'multiple' => false
+                'multiple' => false,
+                'placeholder' => '-- Select centrifuge type --'
             ])
             ->add('workqueue_download', Type\ChoiceType::class, [
                 'label' => 'Work Queue Download',
