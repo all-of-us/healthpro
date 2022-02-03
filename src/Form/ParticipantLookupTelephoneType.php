@@ -21,7 +21,6 @@ class ParticipantLookupTelephoneType extends AbstractType
                 ],
                 'attr' => [
                     'placeholder' => '(999) 999-9999',
-                    'class' => 'loginPhone',
                     'pattern' => '^\(?\d{3}\)? ?\d{3}-?\d{4}$',
                     'data-parsley-error-message' => 'This value should be a 10 digit phone number.'
                 ]
