@@ -398,27 +398,28 @@ class OrderTest extends TestCase
         $this->assertSame(true, $order->canUnlock());
     }
 
-    public function testOrderTypeDisplayText()
+    /**
+     * @dataProvider orderTypeProvider
+     */
+    public function testOrderTypeDisplayText($orderDisplayText, $orderType, $requestedSamples)
     {
         $orderData = $this->getOrderData();
         $order = $this->createOrder($orderData);
 
-        // DV Kit orders
-        $order->setType('kit');
-        self::assertEquals('Full Kit', $order->getOrderTypeDisplayText());
-        $order->setRequestedSamples('["1UR10"]');
-        self::assertEquals('Urine', $order->getOrderTypeDisplayText());
+        $order->setType($orderType);
+        $order->setRequestedSamples($requestedSamples);
+        self::assertEquals($orderDisplayText, $order->getOrderTypeDisplayText());
+    }
 
-        // HPO orders
-        $order->setType(null);
-        $order->setRequestedSamples('["1SS08", "1PS08", "1UR10"]');
-        self::assertEquals('Custom HPO', $order->getOrderTypeDisplayText());
-        $order->setRequestedSamples(null);
-        self::assertEquals('Full HPO', $order->getOrderTypeDisplayText());
-        $order->setType('saliva');
-        self::assertEquals('Saliva', $order->getOrderTypeDisplayText());
-        $order->setType(null);
-        $order->setRequestedSamples('["1UR10"]');
-        self::assertEquals('Urine', $order->getOrderTypeDisplayText());
+    public function orderTypeProvider(): array
+    {
+        return [
+            ['Full Kit', 'kit', null],
+            ['Urine', 'kit', '["1UR10"]'],
+            ['Custom HPO', null, '["1SS08", "1PS08", "1UR10"]'],
+            ['Full HPO', null, null],
+            ['Saliva', 'saliva', null],
+            ['Urine', null, '["1UR10"]']
+        ];
     }
 }
