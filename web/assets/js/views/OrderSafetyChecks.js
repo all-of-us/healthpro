@@ -87,22 +87,17 @@ $(document).ready(function () {
     };
 
     var applyBranchingLogic = function () {
-        var isDonateChecked = $('input:radio[name=donate]').is(':checked');
-        var isTransfusionChecked = $('input:radio[name=transfusion]').is(':checked');
-
         // Continue only when both Q1 and Q2 are checked
-        if (!isDonateChecked || !isTransfusionChecked) {
+        if (!isChecked('donate') || !isChecked('transfusion')) {
             return;
         }
 
         // Hide fields on initialization
-        var isRBCChecked = $('input:radio[name=rbc_qn]').is(':checked');
-        var isPPCChecked = $('input:radio[name=ppc_qn]').is(':checked');
         var hideFieldNames = ['order-info-text', 'continue'];
-        if (!isRBCChecked) {
+        if (!isChecked('rbc_qn')) {
             hideFieldNames.push('rbc-qn');
         }
-        if (!isPPCChecked) {
+        if (!isChecked('ppc_qn')) {
             hideFieldNames.push('ppc-qn');
         }
         hideFields(hideFieldNames);
