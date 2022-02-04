@@ -39,6 +39,9 @@ $(document).ready(function () {
 
     var handleStep5 = function (donate) {
         // #5 Show Question 5
+        if (!isChecked('ppc_qn')) {
+            hideFields(['syncope-qn', 'syncope-sub-qn']);
+        }
         showFields(['ppc-qn']);
         hideFields(['continue', 'order-info-text']);
         var ppc = $('input:radio[name=ppc_qn]:checked').val();
@@ -120,6 +123,9 @@ $(document).ready(function () {
                 // #4 Show Question 4
                 showFields(['rbc-qn']);
                 hideFields(['continue', 'order-info-text']);
+                if (!isChecked('rbc_qn')) {
+                    hideFields(['syncope-qn', 'syncope-sub-qn']);
+                }
                 var rbc = $('input:radio[name=rbc_qn]:checked').val();
                 if (rbc === 'yes') {
                     if (!isTransfusionPPCChecked) {
@@ -148,7 +154,7 @@ $(document).ready(function () {
                 }
             } else if (isTransfusionPPCChecked) {
                 // #5 Handle step 5
-                hideFields(['rbc-qn', 'syncope-qn']);
+                hideFields(['rbc-qn']);
                 handleStep5(donate);
             } else {
                 // Hide both RBC and PPC questions if no transfusion type is checked
