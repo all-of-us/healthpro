@@ -174,3 +174,9 @@
         {{ displayStatusText ? ' (current status)' : '' }}
     {% endif %}
 {% endmacro %}
+
+{% macro displayChoiceText(choice, choices) %}
+    {% for key, value in choices|filter(value => value == choice) -%}
+        {{ key }}
+    {% endfor %}
+{% endmacro %}

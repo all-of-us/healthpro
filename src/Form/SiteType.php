@@ -19,6 +19,30 @@ class SiteType extends AbstractType
     public const DOWNLOAD_DISABLED = 'disabled';
     public const DV_HYBRID = 'hybrid';
 
+    public static $siteChoices = [
+        'status' => [
+            'Active'=> 1,
+            'Inactive' => 0
+        ],
+        'dv_module' => [
+            'Default (Based on HOS selection)' => null,
+            'DV Hybrid (Abbreviated PM Form + Kit)' => self::DV_HYBRID
+        ],
+        'centrifuge_type' => [
+            'Fixed Angle' => self::FIXED_ANGLE,
+            'Swinging Bucket' => self::SWINGING_BUCKET
+        ],
+        'workqueue_download' => [
+            'Full Data Access' => self::FULL_DATA_ACCESS,
+            'Limited Data Access (No PII)' => self::LIMITED_DATA_ACCESS,
+            'Download Disabled' => self::DOWNLOAD_DISABLED
+        ],
+        'ehr_modification_protocol' => [
+            'Yes' => 1,
+            'No' => 0
+        ]
+    ];
+
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -35,10 +59,7 @@ class SiteType extends AbstractType
             ->add('status', Type\ChoiceType::class, [
                 'label' => 'Status',
                 'required' => true,
-                'choices' => [
-                    'Active'=> 1,
-                    'Inactive' => 0
-                ],
+                'choices' => self::$siteChoices['status'],
                 'disabled' => $options['isDisabled']
             ])
             ->add('google_group', Type\TextType::class, [
@@ -85,10 +106,7 @@ class SiteType extends AbstractType
             $builder->add('dv_module', Type\ChoiceType::class, [
                 'label' => 'DV Module Configuration',
                 'required' => false,
-                'choices' => [
-                    'Default (Based on HOS selection)' => null,
-                    'DV Hybrid (Abbreviated PM Form + Kit)' => self::DV_HYBRID
-                ],
+                'choices' => self::$siteChoices['dv_module'],
                 'multiple' => false
             ]);
         }
@@ -129,21 +147,14 @@ class SiteType extends AbstractType
             ->add('centrifuge_type', Type\ChoiceType::class, [
                 'label' => 'Centrifuge type',
                 'required' => false,
-                'choices' => [
-                    '-- Select centrifuge type --' => null,
-                    'Fixed Angle'=> self::FIXED_ANGLE,
-                    'Swinging Bucket' => self::SWINGING_BUCKET
-                ],
-                'multiple' => false
+                'choices' => self::$siteChoices['centrifuge_type'],
+                'multiple' => false,
+                'placeholder' => '-- Select centrifuge type --'
             ])
             ->add('workqueue_download', Type\ChoiceType::class, [
                 'label' => 'Work Queue Download',
                 'required' => true,
-                'choices' => [
-                    'Full Data Access'=> self::FULL_DATA_ACCESS,
-                    'Limited Data Access (No PII)' => self::LIMITED_DATA_ACCESS,
-                    'Download Disabled' => self::DOWNLOAD_DISABLED
-                ],
+                'choices' => self::$siteChoices['workqueue_download'],
                 'multiple' => false,
                 'constraints' => [
                     new Constraints\NotBlank(),
@@ -153,10 +164,7 @@ class SiteType extends AbstractType
             ->add('ehr_modification_protocol', Type\ChoiceType::class, [
                 'label' => 'EHR modification protocol',
                 'required' => false,
-                'choices' => [
-                    'Yes'=> 1,
-                    'No' => 0
-                ],
+                'choices' => self::$siteChoices['ehr_modification_protocol'],
                 'multiple' => false
             ]);
     }
