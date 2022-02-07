@@ -62,6 +62,8 @@ class Order
 
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
 
+    public static $urineSamples = ['1UR10', '1UR90'];
+
     public static $mapRdrSamples = [
         '1SST8' => [
             'code' => '1SS08',
@@ -1483,5 +1485,30 @@ class Order
         ];
         $this->setBiobankFinalized(1);
         $this->setBiobankChanges(json_encode($biobankChanges));
+    }
+
+    public function isUrineOrder(): bool
+    {
+        $requestedSamples = json_decode($this->requestedSamples, true);
+        return is_array($requestedSamples) && empty(array_diff($requestedSamples, self::$urineSamples));
+    }
+
+    public function getOrderTypeDisplayText(): string
+    {
+        if (!empty($this->requestedSamples)) {
+            if ($this->isUrineOrder()) {
+                return 'Urine';
+            }
+            if ($this->type !== 'kit') {
+                return 'Custom HPO';
+            }
+        }
+        if ($this->type === 'kit') {
+            return 'Full Kit';
+        }
+        if ($this->type === 'saliva') {
+            return 'Saliva';
+        }
+        return 'Full HPO';
     }
 }
