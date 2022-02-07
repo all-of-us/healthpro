@@ -5,7 +5,7 @@ $(document).ready(function () {
     }
 
     var isChecked = function (fieldName) {
-        return $('input:radio[name='+fieldName+']').is(':checked')
+        return $('input:radio[name='+fieldName+']').is(':checked');
     };
 
     var hideFields = function (fields) {
@@ -37,32 +37,6 @@ $(document).ready(function () {
         }
     };
 
-    var handleStep5 = function (donate) {
-        // #5 Show Question 5
-        if (!isChecked('ppc_qn')) {
-            hideFields(['syncope-qn', 'syncope-sub-qn']);
-        }
-        showFields(['ppc-qn']);
-        hideFields(['continue', 'order-info-text']);
-        var ppc = $('input:radio[name=ppc_qn]:checked').val();
-        if (ppc === 'yes') {
-            if (donate === 'no') {
-                // #5 Answer syncope question and continue
-                handleSyncopeQuestion();
-            } else {
-                // #5 Display info text 1 and continue
-                showFields(['order-info-text', 'info-text-1', 'continue']);
-                hideFields(['syncope-qn', 'info-text-5']);
-                allowCollection('saliva');
-            }
-        } else if (ppc === 'no') {
-            // #5 Display info text 3 and continue
-            hideFields(['order-info-text', 'syncope-qn', 'info-text-5']);
-            showFields(['continue', 'order-info-text', 'info-text-3']);
-            allowCollection('saliva');
-        }
-    };
-
     var handleSyncopeQuestion = function () {
         showFields(['syncope-qn']);
         if (!isChecked('syncope')) {
@@ -86,6 +60,32 @@ $(document).ready(function () {
             hideFields(['syncope-sub-qn']);
             showFields(['continue']);
             allowCollection('all');
+        }
+    };
+
+    var handleStep5 = function (donate) {
+        // #5 Show Question 5
+        if (!isChecked('ppc_qn')) {
+            hideFields(['syncope-qn', 'syncope-sub-qn']);
+        }
+        showFields(['ppc-qn']);
+        hideFields(['continue', 'order-info-text']);
+        var ppc = $('input:radio[name=ppc_qn]:checked').val();
+        if (ppc === 'yes') {
+            if (donate === 'no') {
+                // #5 Answer syncope question and continue
+                handleSyncopeQuestion();
+            } else {
+                // #5 Display info text 1 and continue
+                showFields(['order-info-text', 'info-text-1', 'continue']);
+                hideFields(['syncope-qn', 'info-text-5']);
+                allowCollection('saliva');
+            }
+        } else if (ppc === 'no') {
+            // #5 Display info text 3 and continue
+            hideFields(['order-info-text', 'syncope-qn', 'info-text-5']);
+            showFields(['continue', 'order-info-text', 'info-text-3']);
+            allowCollection('saliva');
         }
     };
 
