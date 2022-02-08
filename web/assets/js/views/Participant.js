@@ -30,10 +30,10 @@ $(document).ready(function () {
 
     if (participantInfo.data('can-view-patient-status')) {
 
-        let orgPatientStatusData = participantInfo.data('org-patient-status');
+        let hasOrgPatientStatusData = participantInfo.data('has-org-patient-status');
 
         // Switch to default tab if empty
-        if (!orgPatientStatusData) {
+        if (!hasOrgPatientStatusData) {
             $('[href="#patientstatus"]').tab('show');
         }
 
@@ -51,7 +51,7 @@ $(document).ready(function () {
         });
 
         // Hide form by default if not empty
-        if (orgPatientStatusData) {
+        if (hasOrgPatientStatusData) {
             $('#patient-status-data-box').show();
             $('#patient-status-form-box').hide();
         }
