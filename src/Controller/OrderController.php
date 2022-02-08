@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -70,7 +71,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
-    public function orderCheck($participantId)
+    public function orderCheck($participantId, RequestStack $requestStack)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -80,7 +81,8 @@ class OrderController extends AbstractController
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         return $this->render('order/check.html.twig', [
-            'participant' => $participant
+            'participant' => $participant,
+            'siteType' => $requestStack->getSession()->get('siteType')
         ]);
     }
 
