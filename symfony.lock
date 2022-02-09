@@ -135,6 +135,9 @@
     "google/cloud-logging": {
         "version": "v1.20.0"
     },
+    "google/cloud-secret-manager": {
+        "version": "v1.7.3"
+    },
     "google/cloud-storage": {
         "version": "v1.24.1"
     },
