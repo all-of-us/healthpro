@@ -2,6 +2,7 @@
 
 use App\Service\EnvironmentService;
 use App\Datastore\Entities\Configuration;
+use App\SecretManager\SecretManager;
 
 $env = new EnvironmentService();
 
@@ -48,6 +49,12 @@ if (!$env->values['isUnitTest'] && !$env->isPhpDevServer() && !$env->isLocal()) 
     $configs = Configuration::fetchBy();
     foreach ($configs as $config) {
         $container->setParameter($config->key, $config->value);
+    }
+    // Get credentials from Secret Manager
+    $secretManager = new SecretManager();
+    $secrets = $secretManager->getSecrets();
+    foreach ($secrets as $key => $value) {
+        $container->setParameter($key, $value);
     }
 }
 
