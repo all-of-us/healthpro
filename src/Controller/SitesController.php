@@ -29,7 +29,8 @@ class SitesController extends AbstractController
         $sites = $siteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('admin/sites/index.html.twig', [
             'sites' => $sites,
-            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false
+            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false,
+            'siteChoices' => SiteType::$siteChoices
         ]);
     }
 

@@ -105,6 +105,11 @@ class Site
     private $siteType;
 
     /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $dvModule;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $state;
@@ -319,6 +324,18 @@ class Site
     public function setSiteType(?string $siteType): self
     {
         $this->siteType = $siteType;
+
+        return $this;
+    }
+
+    public function getDvModule(): ?string
+    {
+        return $this->dvModule;
+    }
+
+    public function setDvModule(?string $dvModule): self
+    {
+        $this->dvModule = $dvModule;
 
         return $this;
     }

@@ -13,7 +13,7 @@
 
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
-        {% if app.session.get('siteType') == 'dv' %}
+        {% if siteType == 'dv' %}
             {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
         {% else %}
             {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
@@ -34,12 +34,14 @@
         </div>
 
         <div id="transfusion">
-            <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
-            <div class="radio">
-                <label><input type="radio" name="transfusion" value="yes"/> Yes</label>
-            </div>
-            <div class="radio">
-                <label><input type="radio" name="transfusion" value="no"/> No</label>
+            <div>
+                <h3>In the past 6 months, has the participant had a blood transfusion?</h3>
+                <div class="radio">
+                    <label><input type="radio" name="transfusion" value="yes"/> Yes</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="transfusion" value="no"/> No</label>
+                </div>
             </div>
             <div style="display:none;" id="transfusion-qn">
                 <h3>Please select the specific type of blood transfusion:</h3>
@@ -71,9 +73,27 @@
                     <label><input type="radio" name="ppc_qn" value="no"/> No</label>
                 </div>
             </div>
+            <div style="display:none;" id="syncope-qn">
+                <h3>Has the participant ever felt dizzy, nauseous, or lost consciousness when having blood drawn?</h3>
+                <div class="radio">
+                    <label><input type="radio" name="syncope" value="yes"/> Yes</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="syncope" value="no"/> No</label>
+                </div>
+                <div style="display:none;" id="syncope-sub-qn">
+                    <h3>Would the participant like to continue with a full HPO Biobank order or a modified order with urine and saliva only?</h3>
+                    <div class="radio">
+                        <label><input type="radio" name="syncope_sub" value="yes"/> Full HPO Biobank Order</label>
+                    </div>
+                    <div class="radio">
+                        <label><input type="radio" name="syncope_sub" value="no"/> Modified Order - {{ siteType == 'dv' ? 'Urine ' : 'Saliva and Urine ' }} only</label>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="alert alert-danger" style="display:none;" id="order-info-text">
-            {% set displayText = app.session.get('siteType') == 'dv' ? 'Urine' : 'Saliva and urine ' %}
+            {% set displayText = siteType == 'dv' ? 'Urine' : 'Saliva and urine ' %}
             <span id="info-text-1">
                 Participants may not have blood drawn if they have donated blood, platelets, or plasma in the past week.
                 <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
@@ -87,8 +107,12 @@
                 <strong>{{ displayText }} collection is permissible, and can be initiated by selecting Continue.</strong>
             </span>
             <span id="info-text-4">
-                Participants may not have blood drawn {% if app.session.get('siteType') != 'dv' %} and/or saliva collected {% endif %} if they have received Whole Blood Transfusion previously.
+                Participants may not have blood drawn {% if siteType != 'dv' %} and/or saliva collected {% endif %} if they have received Whole Blood Transfusion previously.
                 <strong>Urine collection is permissible, and can be initiated by selecting Continue.</strong>
+            </span>
+            <span id="info-text-5">
+                Caution! In order to minimize risk to participants, those who experience syncope should be offered {{ siteType == 'dv' ? 'urine ' : 'saliva and urine ' }} collection as an alternative.
+                <strong>Please select whether the participant would like to continue with a full HPO Biobank order or a modified order with {{ siteType == 'dv' ? 'urine ' : 'saliva and urine ' }} only.</strong>
             </span>
         </div>
         <div id="continue" style="display:none;">
