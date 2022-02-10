@@ -26,7 +26,8 @@ class SecretManager
     public function getSecretPayload($secretName)
     {
         try {
-            $name = $this->secretManagerClient::secretVersionName('pmi-hpo-dev', $secretName, 'latest');
+            $projectId = getenv('GOOGLE_CLOUD_PROJECT');
+            $name = $this->secretManagerClient::secretVersionName($projectId, $secretName, 'latest');
             $response = $this->secretManagerClient->accessSecretVersion($name);
             return $response->getPayload()->getData();
         } catch (\Exception $e) {
