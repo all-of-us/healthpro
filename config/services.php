@@ -50,9 +50,25 @@ if (!$env->values['isUnitTest'] && !$env->isPhpDevServer() && !$env->isLocal()) 
     foreach ($configs as $config) {
         $container->setParameter($config->key, $config->value);
     }
+}
+
+$useSecretManager = $useDefaultCredentials = true;
+if ($env->isLocal()) {
+    if (isset($configs['local_use_secret_manager']) && $configs['local_use_secret_manager']) {
+        $useDefaultCredentials = false;
+    } else {
+        $useSecretManager = false;
+    }
+}
+
+if ($useSecretManager) {
     // Get credentials from Secret Manager
-    $secretManager = new SecretManager();
+    $secretManager = new SecretManager($useDefaultCredentials);
     $secrets = $secretManager->getSecrets();
+    if ($env->isLocal()) {
+        unset($secrets['mysql_user']);
+        unset($secrets['mysql_password']);
+    }
     foreach ($secrets as $key => $value) {
         $container->setParameter($key, $value);
     }

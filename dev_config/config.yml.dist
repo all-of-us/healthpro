@@ -148,3 +148,6 @@ ehr_protocol_banner_message:
 
 # Dashboard URL displayed on the login page
 # dashboard_url:
+
+# For getting secret manager credential in local env
+# local_use_secret_manager: false
