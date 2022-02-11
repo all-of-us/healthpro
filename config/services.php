@@ -52,25 +52,27 @@ if (!$env->values['isUnitTest'] && !$env->isPhpDevServer() && !$env->isLocal()) 
     }
 }
 
-$useSecretManager = $useDefaultCredentials = true;
-if ($env->isLocal()) {
-    if (isset($configs['local_use_secret_manager']) && $configs['local_use_secret_manager']) {
-        $useDefaultCredentials = false;
-    } else {
-        $useSecretManager = false;
-    }
-}
-
-if ($useSecretManager) {
-    // Get credentials from Secret Manager
-    $secretManager = new SecretManager($useDefaultCredentials);
-    $secrets = $secretManager->getSecrets();
+if (!$env->values['isUnitTest']) {
+    $useSecretManager = $useDefaultCredentials = true;
     if ($env->isLocal()) {
-        unset($secrets['mysql_user']);
-        unset($secrets['mysql_password']);
+        if (isset($configs['local_use_secret_manager']) && $configs['local_use_secret_manager']) {
+            $useDefaultCredentials = false;
+        } else {
+            $useSecretManager = false;
+        }
     }
-    foreach ($secrets as $key => $value) {
-        $container->setParameter($key, $value);
+
+    if ($useSecretManager) {
+        // Get credentials from Secret Manager
+        $secretManager = new SecretManager($useDefaultCredentials);
+        $secrets = $secretManager->getSecrets();
+        if ($env->isLocal()) {
+            unset($secrets['mysql_user']);
+            unset($secrets['mysql_password']);
+        }
+        foreach ($secrets as $key => $value) {
+            $container->setParameter($key, $value);
+        }
     }
 }
 

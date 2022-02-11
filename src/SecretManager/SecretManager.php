@@ -18,10 +18,11 @@ class SecretManager
     {
         if (!$useDefaultCredentials) {
             $basePath = realpath(__DIR__ . '/../../');
-            if (file_exists($basePath . '/dev_config/rdr_key.json')) {
-                $file = $basePath . '/dev_config/rdr_key.json';
+            $keyFile = $basePath . '/dev_config/rdr_key.json';
+            if (!file_exists($keyFile)) {
+                throw new \Exception("Couldn't find $keyFile");
             }
-            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $file);
+            putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $keyFile);
 
             $googleClient = new GoogleClient();
             $googleClient->useApplicationDefaultCredentials();
