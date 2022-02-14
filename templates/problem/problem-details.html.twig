@@ -88,13 +88,5 @@
 {% endblock %}
 
 {% block pagejs %}
-<script>
-$(document).ready(function() {
-    $('#comment-overflow-show').on('click', function(e) {
-        $(this).hide();
-        $('#comment-overflow').show();
-        e.preventDefault();
-    });
-});
-</script>
+    {{ encore_entry_script_tags('problem-reports') }}
 {% endblock %}

@@ -58,15 +58,5 @@
 {% endblock %}
 
 {% block pagejs %}
-<script>
-$(document).ready(function() {
-    var table = $('#problem_reports').DataTable({
-        order: [],
-        pageLength: 25,
-        columnDefs: [
-            { orderable: false, targets: -1 }
-        ]
-    });
-});
-</script>
+    {{ encore_entry_script_tags('problem-reports') }}
 {% endblock %}
