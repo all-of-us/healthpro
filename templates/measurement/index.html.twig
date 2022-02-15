@@ -48,7 +48,7 @@
                 <div class="alert alert-success">
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                     <strong>Finalized by {{ measurement.finalizedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(measurement.finalizedSite) }} on {{ measurement.finalizedTs|date('n/j/Y \\a\\t g:ia', app.user.timezone) }}</strong>
-                    <a class="btn btn-success pull-right" href="{{ path('measurement_summary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">View Summary</a>
+                    <a class="btn btn-success btn-sm pull-right" href="{{ path('measurement_summary', { participantId: participant.id, measurementId: measurement.id }) }}" target="_blank">View Summary</a>
                 </div>
             {% elseif measurement.finalizedTs and measurement.rdrId is empty %}
                 <div class="alert alert-danger well-sm">
