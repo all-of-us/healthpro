@@ -2,6 +2,7 @@
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
     <div id="physicalEvaluation">
+        {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
         {% endif %}
@@ -15,6 +16,9 @@
                 {% endif %}
                 <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
                 {% if measurement.id %}
+                    {% if measurement.rdrId and (measurement.history is empty or measurement.history.type != 'cancel') %}
+                        <button type="submit" class="btn btn-sm btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
+                    {% endif %}
                     {% if measurement.canCancel %}
                         <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
                     {% elseif measurement.canRestore %}
@@ -54,7 +58,6 @@
             {% endif %}
         {% endif %}
 
-        {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {{ form_errors(measurementForm) }}
         {% if showAutoModification %}
             <div class="row">
@@ -107,9 +110,6 @@
         {% if measurement and measurement.rdrId %}
             <p>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
-                {% if measurement.history is empty or measurement.history.type != 'cancel' %}
-                    <button type="submit" class="btn btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
-                {% endif %}
             </p>
         {% else %}
             <p>
