@@ -3,7 +3,6 @@
 namespace App\SecretManager;
 
 use Google\Cloud\SecretManager\V1\SecretManagerServiceClient;
-use Google_Client as GoogleClient;
 
 class SecretManager
 {
@@ -23,9 +22,6 @@ class SecretManager
                 throw new \Exception("Couldn't find $keyFile");
             }
             putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $keyFile);
-
-            $googleClient = new GoogleClient();
-            $googleClient->useApplicationDefaultCredentials();
             $this->projectId = self::DEV_PROJECT_ID;
         } else {
             $this->projectId = getenv('GOOGLE_CLOUD_PROJECT');
