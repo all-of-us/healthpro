@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Google_Client as GoogleClient;
+use Google\Client as GoogleClient;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
 use Psr\Log\LoggerInterface;
 use App\Cache\DatastoreAdapter;
