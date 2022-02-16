@@ -3,10 +3,10 @@
 namespace App\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Google_Client as GoogleClient;
-use Google_Service_Directory as GoogleDirectory;
-use Google_Service_Exception as GoogleException;
-use Google_Service_Directory_Member as GoogleMember;
+use Google\Client as GoogleClient;
+use Google\Service\Directory as GoogleDirectory;
+use Google\Service\Exception as GoogleException;
+use Google\Service\Directory\Member as GoogleMember;
 
 class GoogleGroupsService
 {
