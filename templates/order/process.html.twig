@@ -6,7 +6,7 @@
 {% block title %}Process - Order {{ order.orderId }} - {% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
-    <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized-ts="{{ order.finalizedTs }}">
+    <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">
     {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form' } }) }}
     {{ form_errors(processForm) }}
     {% if processForm.processedSamples is defined %}

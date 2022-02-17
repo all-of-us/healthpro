@@ -4,7 +4,7 @@ $(document).ready(function () {
         $('input.sample-disabled').closest('label').addClass('text-warning');
         $('input.sample-disabled').closest('div.checkbox').append('<small class="text-muted">was not collected</small>');
         $('#order_processedSamples input').each(function () {
-            if (!order.data('order-finalized-ts')) {
+            if (!order.data('order-finalized')) {
                 if ($(this).attr('disabled')) {
                     return;
                 }
@@ -32,7 +32,7 @@ $(document).ready(function () {
         $('.sample-disabled label').addClass('text-warning');
         $('.sample-disabled').find('td:last').append('<small style="margin-left:15px" class="text-muted">was not collected</small>');
         $('#order_processedSamples input').each(function () {
-            if (!order.data('order-finalized-ts')) {
+            if (!order.data('order-finalized')) {
                 if ($(this).attr('disabled')) {
                     return;
                 }
@@ -67,7 +67,7 @@ $(document).ready(function () {
         }
     }
 
-    var orderView = new PMI.views['OrderSubPage']({
+    new PMI.views['OrderSubPage']({
         el: $("body")
     });
 
