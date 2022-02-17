@@ -43,6 +43,7 @@ Encore
     .addEntry('problem-reports', './web/assets/js/views/ProblemReports.js')
     .addEntry('participant', './web/assets/js/views/Participant.js')
     .addEntry('order-process', './web/assets/js/views/OrderProcess.js')
+    .addEntry('order-requisition', './web/assets/js/views/OrderRequisition.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
