@@ -138,11 +138,4 @@
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('order-create') }}
-    <script>
-        $(document).ready(function() {
-            {% if not showBloodTubes %}
-            $( "input:not(:checked)").closest('tr').addClass("custom-text-muted");
-            {% endif %}
-        });
-    </script>
 {% endblock %}
