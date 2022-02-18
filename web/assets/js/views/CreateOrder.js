@@ -45,6 +45,9 @@ $(document).ready(function() {
     if ($("#createOrder").length > 0) {
         new CreateOrder({el: $("#createOrder") });
     }
+    if ($("input[name='show-blood-tubes']").val() === 'no') {
+        $( "input:not(:checked)").closest('tr').addClass("custom-text-muted");
+    }
 });
 
 })(jQuery); // END wrapper

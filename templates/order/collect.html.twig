@@ -57,15 +57,5 @@
 
 {% block pagejs %}
     {{ encore_entry_script_tags('order-sub') }}
-    <script>
-        $(document).ready(function() {
-            $('#checkall').on('change', function() {
-                $('#order_collectedSamples input:checkbox:enabled').prop('checked', $(this).prop('checked'));
-            });
-            $('#order_collectedTs').pmiDateTimePicker();
-            var orderView = new PMI.views['OrderSubPage']({
-                el: $("body")
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('order-collect') }}
 {% endblock %}
