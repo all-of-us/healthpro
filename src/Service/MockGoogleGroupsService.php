@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Security\User;
-use Google_Service_Directory_Group as Group;
+use Google\Service\Directory\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
