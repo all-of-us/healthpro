@@ -83,13 +83,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            $('#order-overflow-show').on('click', function (e) {
-                $(this).hide();
-                $('#order-overflow').show();
-                e.preventDefault();
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('order-modify') }}
 {% endblock %}

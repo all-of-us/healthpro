@@ -46,6 +46,7 @@ Encore
     .addEntry('order-process', './web/assets/js/views/OrderProcess.js')
     .addEntry('order-requisition', './web/assets/js/views/OrderRequisition.js')
     .addEntry('order-print-labels', './web/assets/js/views/OrderPrintLabels.js')
+    .addEntry('order-modify', './web/assets/js/views/OrderModify.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
