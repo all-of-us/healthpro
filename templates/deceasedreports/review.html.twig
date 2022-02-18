@@ -67,7 +67,7 @@
       {{ form_row(form.denialReasonOtherDescription) }}
     </div>
     {{ form_widget(form.submit) }}
-    <a class="btn btn-default" href="{{ path('participant', { id: participant.participantId }) }}">Cancel</a>
+    <a class="btn btn-default" href="{{ path('deceased_reports_index') }}">Cancel</a>
     
     {{ form_rest(form) }}
     {{ form_end(form) }}
