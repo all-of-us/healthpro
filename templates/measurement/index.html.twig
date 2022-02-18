@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Physical Measurements - {% endblock %}
 {% block body %}
-    <div id="physicalEvaluation">
+    <div id="physicalEvaluation" data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}" data-warnings="{{ warnings|json_encode|escape('html_attr') }}" data-conversions="{{ conversions|json_encode|escape('html_attr') }}" data-finalized="{{ (measurement and measurement.finalizedTs)|json_encode|escape('html_attr') }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
@@ -131,22 +131,5 @@
 
 {% block pagejs %}
     {{ encore_entry_script_tags('physical-measurements-' ~ (schema.template|default('-0.1'))) }}
-    <script>
-        $(document).ready(function () {
-            var evalView = new PMI.views['PhysicalEvaluation{% if schema.template is defined %}-{{ schema.template }}{% else %}-0.1{% endif %}']({
-                el: $("#physicalEvaluation"),
-                warnings: {{ warnings|json_encode|raw }},
-                conversions: {{ conversions|json_encode|raw }},
-                finalized: {{ (measurement and measurement.finalizedTs)|json_encode|raw }}
-            });
-            $('#evaluationAffixSave')
-                .affix({
-                    offset: {
-                        top: 100,
-                        bottom: $(window).height()
-                    }
-                })
-                .width($('#physicalEvaluation').width());
-        });
-    </script>
+    {{ encore_entry_script_tags('measurements') }}
 {% endblock %}
