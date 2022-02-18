@@ -2,7 +2,7 @@ $(document).ready(function () {
     let measurement = $("#physicalEvaluation");
 
     new PMI.views['PhysicalEvaluation-' + measurement.data('schema-template')]({
-        el: $("#physicalEvaluation"),
+        el: measurement,
         warnings: measurement.data('warnings'),
         conversions: measurement.data('conversions'),
         finalized: measurement.data('finalized')
@@ -14,5 +14,5 @@ $(document).ready(function () {
                 bottom: $(window).height()
             }
         })
-        .width($('#physicalEvaluation').width());
+        .width(measurement.width());
 });
