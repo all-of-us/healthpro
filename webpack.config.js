@@ -24,6 +24,7 @@ Encore
     .addEntry('login', './web/assets/css/login.css')
     .addEntry('workqueue', './web/assets/js/views/workqueue.js')
     .addEntry('workqueue-consents', './web/assets/js/views/WorkQueueConsents.js')
+    .addEntry('workqueue-filters', './web/assets/js/views/WorkQueueFilters.js')
     .addEntry('order-check', './web/assets/js/views/OrderSafetyChecks.js')
     .addEntry('order-create', './web/assets/js/views/CreateOrder.js')
     .addEntry('order-sub', './web/assets/js/views/OrderSubPage.js')
