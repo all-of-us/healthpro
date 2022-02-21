@@ -33,14 +33,7 @@
                 <small><a href="{{ path('workqueue_index') }}">reset</a></small>
             </p>
             <div class="form-inline">
-                {% for name, filter in filters if name != 'awardee' %}
-                    <select name="{{ name }}" class="form-control input-sm">
-                        <option value="">-- {{ filter.label }} --</option>
-                        {% for label, value in filter.options %}
-                            <option value="{{ value }}"{% if params[name]|default(false) == value %} selected="selected"{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                {% endfor %}
+                {% include 'partials/workqueue-consents-advance-filters.html.twig' %}
             </div>
         </form>
     </div>

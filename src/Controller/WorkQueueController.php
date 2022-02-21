@@ -65,7 +65,7 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $filters = WorkQueue::$filters;
+        $filters = WorkQueue::$consentAdvanceFilters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
@@ -109,7 +109,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $sitesList['site']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $sitesList);
+            $filters['Pairing'] = array_merge($filters['Pairing'], $sitesList);
 
             //Add organization filter
             $organizationsList = [];
@@ -120,7 +120,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $organizationsList);
+            $filters['Pairing'] = array_merge($filters['Pairing'], $organizationsList);
         }
 
         //For ajax requests
@@ -140,7 +140,7 @@ class WorkQueueController extends AbstractController
             return $this->json($ajaxData, $responseCode);
         } else {
             return $this->render('workqueue/index.html.twig', [
-                'filters' => $filters,
+                'advancedFilters' => $filters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
                 'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
@@ -153,7 +153,8 @@ class WorkQueueController extends AbstractController
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
                 'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab,
                 'columns' => WorkQueue::$columns,
-                'columnsDef' => WorkQueue::$columnsDef
+                'columnsDef' => WorkQueue::$columnsDef,
+                'filterIcons' => WorkQueue::$filterIcons
             ]);
         }
     }
