@@ -1161,6 +1161,17 @@ class WorkQueue
         'education',
     ];
 
+    public static $columnGroups = [
+        'details' => 'Participant Details',
+        'consent' => 'Consent',
+        'surveys' => 'PPI Surveys',
+        'enrollment' => 'In Person Enrollment',
+        'demographics' => 'Demographics',
+        'status' => 'Patient Status',
+        'contact' => 'Contact',
+        'metrics' => 'Metrics'
+    ];
+
     public static $consentColumns = [
         'lastName',
         'firstName',
@@ -2300,6 +2311,24 @@ class WorkQueue
             }
         }
         return $workQueueConsentColumns;
+    }
+
+    public static function getWorkQueueColumns()
+    {
+        $workQueueColumns = [];
+        foreach (self::$columns as $field) {
+            $columnDef = self::$columnsDef[$field];
+            if (isset($columnDef['group'])) {
+                if (isset($columnDef['names'])) {
+                    foreach (array_keys($columnDef['names']) as $subField) {
+                        $workQueueColumns[] = 'column' . $subField;
+                    }
+                } else {
+                    $workQueueColumns[] = 'column' . $field;
+                }
+            }
+        }
+        return $workQueueColumns;
     }
 
     public static function isValidDate($date)

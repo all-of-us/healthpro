@@ -139,6 +139,10 @@ class WorkQueueController extends AbstractController
             }
             return $this->json($ajaxData, $responseCode);
         } else {
+            if (!$this->requestStack->getSession()->has('workQueueColumns')) {
+                $workQueueColumns = WorkQueue::getWorkQueueColumns();
+                $this->requestStack->getSession()->set('workQueueColumns', $workQueueColumns);
+            }
             return $this->render('workqueue/index.html.twig', [
                 'advancedFilters' => $filters,
                 'surveys' => WorkQueue::$surveys,
@@ -154,7 +158,8 @@ class WorkQueueController extends AbstractController
                 'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab,
                 'columns' => WorkQueue::$columns,
                 'columnsDef' => WorkQueue::$columnsDef,
-                'filterIcons' => WorkQueue::$filterIcons
+                'filterIcons' => WorkQueue::$filterIcons,
+                'columnGroups' => WorkQueue::$columnGroups
             ]);
         }
     }
