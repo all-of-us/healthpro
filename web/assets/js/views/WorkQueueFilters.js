@@ -1,22 +1,4 @@
 $(document).ready(function () {
-    $('.toggle-vis').on('click', function () {
-        var column = workQueueTable.column($(this).attr('data-column'));
-        column.visible(!column.visible());
-        var columnName = $(this).attr('name');
-        // Set column names in session
-        var consentColumnsUrl = $('#columns_group').data('consent-columns-url');
-        $.get(consentColumnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
-    });
-
-    var toggleColumns = function () {
-        $('#columns_group input[type=checkbox]').each(function () {
-            var column = workQueueTable.column($(this).attr('data-column'));
-            column.visible($(this).prop('checked'));
-        });
-    };
-
-    toggleColumns();
-
     var validateDateFormat = function (value) {
         var parts = value.split('/');
         if (parts.length < 3) {

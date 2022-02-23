@@ -311,4 +311,22 @@ $(document).ready(function() {
         }, 'slow');
         $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
+
+    $('.toggle-vis').on('click', function () {
+        var column = table.column($(this).attr('data-column'));
+        column.visible(!column.visible());
+        var columnName = $(this).attr('name');
+        // Set column names in session
+        var columnsUrl = $('#columns_group').data('columns-url');
+        $.get(columnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
+    });
+
+    var toggleColumns = function () {
+        $('#columns_group input[type=checkbox]').each(function () {
+            var column = table.column($(this).attr('data-column'));
+            column.visible($(this).prop('checked'));
+        });
+    };
+
+    toggleColumns();
 });

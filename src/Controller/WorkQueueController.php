@@ -470,4 +470,33 @@ class WorkQueueController extends AbstractController
         $this->requestStack->getSession()->set('workQueueConsentColumns', $workQueueConsentColumns);
         return $this->json(['success' => true]);
     }
+
+    /**
+     * @Route("/columns", name="workqueue_columns")
+     */
+    public function columnsAction(Request $request)
+    {
+        if (!$this->displayParticipantConsentsTab) {
+            throw $this->createNotFoundException();
+        }
+        if ($request->query->has('select')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            return $this->json(['success' => true]);
+        }
+        if ($request->query->has('deselect')) {
+            $this->requestStack->getSession()->set('workQueueColumns', []);
+            return $this->json(['success' => true]);
+        }
+        $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
+        $columnName = $request->query->get('columnName');
+        if ($request->query->get('checked') === 'true') {
+            $workQueueColumns[] = $columnName;
+        } else {
+            if (($key = array_search($columnName, $workQueueColumns)) !== false) {
+                unset($workQueueColumns[$key]);
+            }
+        }
+        $this->requestStack->getSession()->set('workQueueColumns', $workQueueColumns);
+        return $this->json(['success' => true]);
+    }
 }
