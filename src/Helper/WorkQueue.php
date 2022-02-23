@@ -21,14 +21,16 @@ class WorkQueue
             'rdrField' => 'lastName',
             'sortField' => 'lastName',
             'generateLink' => true,
-            'toggleColumn' => false
+            'toggleColumn' => false,
+            'default' => true
         ],
         'firstName' => [
             'name' => 'First Name',
             'rdrField' => 'firstName',
             'sortField' => 'firstName',
             'generateLink' => true,
-            'toggleColumn' => false
+            'toggleColumn' => false,
+            'default' => true
         ],
         'middleName' => [
             'name' => 'Middle Name',
@@ -36,7 +38,8 @@ class WorkQueue
             'rdrField' => 'middleName',
             'sortField' => 'firstName',
             'generateLink' => true,
-            'toggleColumn' => false
+            'toggleColumn' => false,
+            'default' => true
         ],
         'dateOfBirth' => [
             'name' => 'Date of Birth',
@@ -45,14 +48,16 @@ class WorkQueue
             'formatDate' => true,
             'csvMethod' => 'csvDateFromObject',
             'toggleColumn' => false,
-            'group' => 'details'
+            'group' => 'details',
+            'default' => true
         ],
         'participantId' => [
             'name' => 'PMI ID',
             'rdrField' => 'id',
             'sortField' => 'participantId',
             'toggleColumn' => false,
-            'group' => 'details'
+            'group' => 'details',
+            'default' => true
         ],
         'biobankId' => [
             'name' => 'Biobank ID',
@@ -68,7 +73,8 @@ class WorkQueue
             'sortField' => 'enrollmentStatus',
             'toggleColumn' => true,
             'type' => 'participantStatus',
-            'group' => 'details'
+            'group' => 'details',
+            'default' => true
         ],
         'coreParticipant' => [
             'name' => 'Core Participant Date',
@@ -88,7 +94,8 @@ class WorkQueue
             'method' => 'getActivityStatus',
             'toggleColumn' => true,
             'type' => 'activityStatus',
-            'group' => 'details'
+            'group' => 'details',
+            'default' => true
         ],
         'withdrawalStatus' => [
             'name' => 'Withdrawal Status',
@@ -146,7 +153,8 @@ class WorkQueue
             'sortField' => 'consentCohort',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'firstPrimaryConsent' => [
             'name' => 'First Primary Consent',
@@ -176,7 +184,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForStudyEnrollmentFilePath',
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'questionnaireOnDnaProgram' => [
             'name' => 'Program Update',
@@ -191,7 +200,8 @@ class WorkQueue
             'method' => 'displayProgramUpdate',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'firstEhrConsent' => [
             'name' => 'First EHR Consent',
@@ -204,7 +214,8 @@ class WorkQueue
             'type' => 'firstEhrConsent',
             'visible' => false,
             'csvFormatDate' => true,
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'ehrConsent' => [
             'name' => 'EHR Consent',
@@ -221,7 +232,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'ehrConsentExpireStatus' => [
             'name' => 'EHR Expiration Status',
@@ -257,14 +269,16 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForGenomicsRORFilePath',
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'primaryLanguage' => [
             'name' => 'Language of Primary Consent',
             'rdrField' => 'primaryLanguage',
             'sortField' => 'primaryLanguage',
             'toggleColumn' => true,
-            'group' => 'consent'
+            'group' => 'consent',
+            'default' => true
         ],
         'dvEhrStatus' => [
             'name' => 'DV-only EHR Sharing',
@@ -482,7 +496,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'ppiStatus',
             'csvStatusText' => 3,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'default' => true
         ],
         'ppiSurveys' => [
             'name' => 'Completed Surveys',
@@ -490,7 +505,8 @@ class WorkQueue
             'sortField' => 'numCompletedPPIModules',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'default' => true
         ],
         'TheBasics' => [
             'name' => 'Basics',
@@ -786,7 +802,8 @@ class WorkQueue
             'sortField' => 'siteSuffix',
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'default' => true
         ],
         'pairedOrganization' => [
             'name' => 'Paired Organization',
@@ -794,7 +811,8 @@ class WorkQueue
             'sortField' => 'organization',
             'serviceMethod' => 'getOrganizationDisplayName',
             'toggleColumn' => true,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'default' => true
         ],
         'physicalMeasurementsStatus' => [
             'name' => 'Phys Measurements',
@@ -811,7 +829,8 @@ class WorkQueue
             'statusText' => 'COMPLETED',
             'csvStatusText' => 'COMPLETED',
             'csvDisplayTime' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'default' => true
         ],
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',
@@ -833,7 +852,8 @@ class WorkQueue
             'toggleColumn' => true,
             'statusText' => 'RECEIVED',
             'csvStatusText' => 'RECEIVED',
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'default' => true
         ],
         'biobankSamples' => [
             'name' => 'Baseline Samples',
@@ -841,7 +861,8 @@ class WorkQueue
             'sortField' => 'numBaselineSamplesArrived',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'default' => true
         ],
         'orderCreatedSite' => [
             'name' => 'Bio-specimens Site',
@@ -2318,7 +2339,7 @@ class WorkQueue
         $workQueueColumns = [];
         foreach (self::$columns as $field) {
             $columnDef = self::$columnsDef[$field];
-            if (isset($columnDef['group'])) {
+            if (isset($columnDef['default'])) {
                 if (isset($columnDef['names'])) {
                     foreach (array_keys($columnDef['names']) as $subField) {
                         $workQueueColumns[] = 'column' . $subField;
