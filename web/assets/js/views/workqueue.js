@@ -282,7 +282,7 @@ $(document).ready(function() {
     });
 
     // Populate count in header
-    $('#workqueue').on('init.dt', function(e, settings, json) {
+    $('#workqueue').on('init.dt', function (e, settings, json) {
         var count = json.recordsFiltered;
         $('#heading-count .count').text(count);
         if (count == 1) {
@@ -299,12 +299,12 @@ $(document).ready(function() {
 
     // Display custom error message
     $.fn.dataTable.ext.errMode = 'none';
-    $('#workqueue').on('error.dt', function(e) {
+    $('#workqueue').on('error.dt', function (e) {
         alert('An error occurred please reload the page and try again');
     });
 
     // Scroll to top when performing pagination
-    $('#workqueue').on('page.dt', function() {
+    $('#workqueue').on('page.dt', function () {
         //Took reference from https://stackoverflow.com/a/21627503
         $('html').animate({
             scrollTop: $('#filters').offset().top
@@ -312,12 +312,13 @@ $(document).ready(function() {
         $('thead tr th:first-child').trigger('focus').trigger('blur');
     });
 
+    var columnsUrl = $('#columns_group').data('columns-url');
+
     $('.toggle-vis').on('click', function () {
         var column = table.column($(this).attr('data-column'));
         column.visible(!column.visible());
         var columnName = $(this).attr('name');
         // Set column names in session
-        var columnsUrl = $('#columns_group').data('columns-url');
         $.get(columnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
     });
 
@@ -329,4 +330,28 @@ $(document).ready(function() {
     };
 
     toggleColumns();
+
+    var showColumns = function () {
+        var columns = table.columns();
+        columns.visible(true);
+    };
+
+    var hideColumns = function () {
+        for (let i = 5; i <= 80; i++) {
+            var column = table.column(i);
+            column.visible(false);
+        }
+    };
+
+    $('#columns_select_all').on('click', function () {
+        $('#columns_group input[type=checkbox]').prop('checked', true);
+        showColumns();
+        $.get(columnsUrl, {select: true});
+    });
+
+    $('#columns_deselect_all').on('click', function () {
+        $('#columns_group input[type=checkbox]').prop('checked', false);
+        hideColumns();
+        $.get(columnsUrl, {deselect: true});
+    });
 });
