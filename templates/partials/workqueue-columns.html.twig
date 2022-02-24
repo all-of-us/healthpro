@@ -8,14 +8,14 @@
             <ul class="dropdown-menu">
                 <li>
                     <div class="pull-right">
-                        <small class="pull-right filter-reset">
+                        <small class="filter-reset">
                             <a id="columns_select_all" data-group-id="columns_group">Select All</a> |
                             <a id="columns_deselect_all" data-group-id="columns_group">Deselect All</a>
                         </small>
                     </div>
                     <div class="wq-main-columns">
                         <ul class="list-group">
-                            {% set columNumber = 5 %}
+                            {% set columNumber = 3 %}
                             {% for group, groupName in columnGroups %}
                                 <li><b>{{ groupName }}</b></li>
                                 {% for name, columnDef in columnsDef %}

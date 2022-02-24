@@ -1185,12 +1185,12 @@ class WorkQueue
     public static $columnGroups = [
         'details' => 'Participant Details',
         'consent' => 'Consent',
-        'surveys' => 'PPI Surveys',
-        'enrollment' => 'In Person Enrollment',
-        'demographics' => 'Demographics',
+        'metrics' => 'Metrics',
         'status' => 'Patient Status',
         'contact' => 'Contact',
-        'metrics' => 'Metrics'
+        'surveys' => 'PPI Surveys',
+        'enrollment' => 'In Person Enrollment',
+        'demographics' => 'Demographics'
     ];
 
     public static $consentColumns = [

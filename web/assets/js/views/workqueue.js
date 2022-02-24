@@ -254,11 +254,6 @@ $(document).ready(function() {
                 extend: 'colvisGroup',
                 text: 'Show all',
                 show: ':hidden'
-            },
-            {
-                extend: 'colvis',
-                text: 'Columns <i class="fa fa-caret-down" aria-hidden="true"></i>',
-                columns: ':not(.col-group-name)'
             }
         ]
     });
