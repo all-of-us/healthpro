@@ -335,4 +335,11 @@ $(document).ready(function() {
         hideColumns();
         $.get(columnsUrl, {deselect: true});
     });
+
+    // Check/uncheck columns when clicked on group buttons
+    $('#workqueue').on('column-visibility.dt', function (e, settings, column, state) {
+        if (column >= 3) {
+            $('#toggle_column_' + column).prop('checked', state);
+        }
+    });
 });
