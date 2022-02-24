@@ -4,20 +4,6 @@ $(document).ready(function() {
       return;
     }
 
-    var checkFilters = function () {
-        if ($('#filters select[name=activityStatus]').val() == 'withdrawn') {
-            $('#filters select').not('[name=activityStatus], [name=organization]').val('');
-            $('#filters select').not('[name=activityStatus], [name=organization]').prop('disabled', true);
-        } else {
-            $('#filters select').prop('disabled', false);
-        }
-    };
-    checkFilters();
-    $('#filters select').on('change', function() {
-        checkFilters();
-        $('#filters').submit();
-    });
-
     var exportLimit = $('#workqueue').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {
@@ -337,7 +323,7 @@ $(document).ready(function() {
     };
 
     var hideColumns = function () {
-        for (let i = 5; i <= 80; i++) {
+        for (let i = 3; i <= 80; i++) {
             var column = table.column(i);
             column.visible(false);
         }
