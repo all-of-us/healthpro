@@ -7,37 +7,41 @@
             </button>
             <ul class="dropdown-menu">
                 <li>
-                    <small class="pull-right filter-reset">
-                        <a id="columns_select_all" data-group-id="columns_group">Select All</a> |
-                        <a id="columns_deselect_all" data-group-id="columns_group">Deselect All</a>
-                    </small>
-                    <ul class="list-group">
-                        {% set columNumber = 5 %}
-                        {% for group, groupName in columnGroups %}
-                            <li><b>{{ groupName }}</b></li>
-                            {% for name, columnDef in columnsDef %}
-                                {% if columnDef.group is defined and columnDef.group == group  %}
-                                    {% if columnDef.toggleColumn is defined and columnDef.toggleColumn %}
-                                        {% if columnDef.names is defined %}
-                                            {% for subFieldName, subFieldLabel in columnDef.names %}
-                                                {% set checked = "column"~subFieldName in app.session.get('workQueueColumns') ? 'checked' : '' %}
+                    <div class="pull-right">
+                        <small class="pull-right filter-reset">
+                            <a id="columns_select_all" data-group-id="columns_group">Select All</a> |
+                            <a id="columns_deselect_all" data-group-id="columns_group">Deselect All</a>
+                        </small>
+                    </div>
+                    <div class="wq-main-columns">
+                        <ul class="list-group">
+                            {% set columNumber = 5 %}
+                            {% for group, groupName in columnGroups %}
+                                <li><b>{{ groupName }}</b></li>
+                                {% for name, columnDef in columnsDef %}
+                                    {% if columnDef.group is defined and columnDef.group == group  %}
+                                        {% if columnDef.toggleColumn is defined and columnDef.toggleColumn %}
+                                            {% if columnDef.names is defined %}
+                                                {% for subFieldName, subFieldLabel in columnDef.names %}
+                                                    {% set checked = "column"~subFieldName in app.session.get('workQueueColumns') ? 'checked' : '' %}
+                                                    <li class="filter-list-group-item checkbox">
+                                                        <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
+                                                    </li>
+                                                    {% set columNumber = columNumber + 1 %}
+                                                {% endfor %}
+                                            {% else %}
+                                                {% set checked = "column"~name in app.session.get('workQueueColumns') ? 'checked' : '' %}
                                                 <li class="filter-list-group-item checkbox">
-                                                    <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
+                                                    <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.name }}</label>
                                                 </li>
                                                 {% set columNumber = columNumber + 1 %}
-                                            {% endfor %}
-                                        {% else %}
-                                            {% set checked = "column"~name in app.session.get('workQueueColumns') ? 'checked' : '' %}
-                                            <li class="filter-list-group-item checkbox">
-                                                <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.name }}</label>
-                                            </li>
-                                            {% set columNumber = columNumber + 1 %}
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
-                                {% endif %}
+                                {% endfor %}
                             {% endfor %}
-                        {% endfor %}
-                    </ul>
+                        </ul>
+                    </div>
                 </li>
             </ul>
         </li>
