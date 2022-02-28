@@ -440,7 +440,11 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
+        WorkQueue::mapExportColumns($workQueueColumns);
         foreach (WorkQueue::$exportColumns as $field) {
+            if ($workQueueColumns && !in_array($field, $workQueueColumns)) {
+                continue;
+            }
             $columnDef = WorkQueue::$columnsDef[$field];
             if ($field === 'dateOfDeath') {
                 $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';

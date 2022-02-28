@@ -184,7 +184,8 @@ class WorkQueueController extends AbstractController
         }
 
         $exportConfiguration = $this->workQueueService->getExportConfiguration();
-        $limit = $exportConfiguration['limit'];
+        //$limit = $exportConfiguration['limit'];
+        $limit = 100;
         $pageSize = $exportConfiguration['pageSize'];
 
         $params = array_filter($request->query->all());
@@ -193,17 +194,24 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
-        $workQueueConsentColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
-        if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
-            $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueConsentColumns);
+        $exportType = isset($params['exportType']) ? $params['exportType'] : '';
+        $workQueueColumns = [];
+        if ($this->displayParticipantConsentsTab && $exportType === 'consents') {
+            $workQueueColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
+            $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueColumns);
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
         } else {
-            $exportHeaders = WorkQueue::getExportHeaders();
+            if ($exportType === 'main') {
+                $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
+                $exportHeaders = WorkQueue::getSessionExportHeaders($workQueueColumns);
+            } else {
+                $exportHeaders = WorkQueue::getExportHeaders();
+            }
             $exportRowMethod = 'generateExportRow';
             $fileName = 'workqueue';
         }
-        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueConsentColumns) {
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueColumns) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -218,7 +226,7 @@ class WorkQueueController extends AbstractController
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueConsentColumns));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueColumns));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {
@@ -484,7 +492,7 @@ class WorkQueueController extends AbstractController
             return $this->json(['success' => true]);
         }
         if ($request->query->has('deselect')) {
-            $this->requestStack->getSession()->set('workQueueColumns', []);
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::$defaultColumns);
             return $this->json(['success' => true]);
         }
         if ($request->query->has('groupName')) {

@@ -2066,6 +2066,21 @@ class WorkQueue
         ]
     ];
 
+    public static $defaultColumns = [
+        'lastName',
+        'firstName',
+        'middleName'
+    ];
+
+    public static $tableExportMap = [
+        'address' => [
+            'address2',
+            'city',
+            'state',
+            'zip'
+        ]
+    ];
+
     public static function dateFromString($string, $timezone = null, $displayTime = true, $link = null)
     {
         if (!empty($string)) {
@@ -2337,6 +2352,38 @@ class WorkQueue
         return $headers;
     }
 
+    public static function mapExportColumns(&$columns): void
+    {
+        foreach ($columns as $column) {
+            if (isset(self::$tableExportMap[$column])) {
+                foreach (self::$tableExportMap[$column] as $subColumn) {
+                    $columns[] = $subColumn;
+                }
+            }
+        }
+    }
+
+    public static function getSessionExportHeaders($sessionConsentColumns)
+    {
+        $headers = [];
+        self::mapExportColumns($sessionConsentColumns);
+        foreach (self::$exportColumns as $field) {
+            $columnDef = self::$columnsDef[$field];
+            if (in_array($field, $sessionConsentColumns)) {
+                if (isset($columnDef['csvNames'])) {
+                    foreach ($columnDef['csvNames'] as $csvName) {
+                        $headers[] = $csvName;
+                    }
+                } elseif (isset($columnDef['csvName'])) {
+                    $headers[] = $columnDef['csvName'];
+                } else {
+                    $headers[] = $columnDef['name'];
+                }
+            }
+        }
+        return $headers;
+    }
+
     public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
     {
         if ($digitalHealthSharingStatus) {
@@ -2410,14 +2457,15 @@ class WorkQueue
     public static function getWorkQueueColumns()
     {
         $workQueueColumns = [];
-        foreach (self::$columns as $field) {
-            $columnDef = self::$columnsDef[$field];
+        $defaultColumns = array_merge(self::$defaultColumns, self::$buttonGroups['default']);
+        foreach ($defaultColumns as $column) {
+            $columnDef = self::$columnsDef[$column];
             if (isset($columnDef['names'])) {
-                foreach (array_keys($columnDef['names']) as $subField) {
-                    $workQueueColumns[] = $subField;
+                foreach (array_keys($columnDef['names']) as $subColumn) {
+                    $workQueueColumns[] = $subColumn;
                 }
             } else {
-                $workQueueColumns[] = $field;
+                $workQueueColumns[] = $column;
             }
         }
         return $workQueueColumns;
@@ -2459,6 +2507,6 @@ class WorkQueue
                 $columns[] = $field;
             }
         }
-        return array_merge($columns, self::$buttonGroups[$groupName]);
+        return array_merge($columns, self::$buttonGroups[$groupName], self::$defaultColumns);
     }
 }

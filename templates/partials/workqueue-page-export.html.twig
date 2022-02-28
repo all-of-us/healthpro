@@ -4,5 +4,9 @@
     </div>
     {% if canExport %}
         <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</button>
+        {% set params = params|merge({
+            'exportType': 'main'
+        }) %}
+        <button data-href="{{ path('workqueue_export', params) }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export View</button>
     {% endif %}
 </div>
