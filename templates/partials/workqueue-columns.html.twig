@@ -22,14 +22,14 @@
                                     {% if columnDef.group is defined and columnDef.group == group  %}
                                         {% if columnDef.names is defined %}
                                             {% for subFieldName, subFieldLabel in columnDef.names %}
-                                                {% set checked = "column"~subFieldName in app.session.get('workQueueColumns') ? 'checked' : '' %}
+                                                {% set checked = subFieldName in app.session.get('workQueueColumns') ? 'checked' : '' %}
                                                 <li class="filter-list-group-item checkbox">
                                                     <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" id="toggle_column_{{ columNumber }}" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
                                                 </li>
                                                 {% set columNumber = columNumber + 1 %}
                                             {% endfor %}
                                         {% else %}
-                                            {% set checked = "column"~name in app.session.get('workQueueColumns') ? 'checked' : '' %}
+                                            {% set checked = name in app.session.get('workQueueColumns') ? 'checked' : '' %}
                                             <li class="filter-list-group-item checkbox">
                                                 <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" id="toggle_column_{{ columNumber }}" data-column="{{ columNumber }}"/> {{ columnDef.name }}</label>
                                             </li>

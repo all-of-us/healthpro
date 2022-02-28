@@ -2412,14 +2412,12 @@ class WorkQueue
         $workQueueColumns = [];
         foreach (self::$columns as $field) {
             $columnDef = self::$columnsDef[$field];
-            if (isset($columnDef['default'])) {
-                if (isset($columnDef['names'])) {
-                    foreach (array_keys($columnDef['names']) as $subField) {
-                        $workQueueColumns[] = 'column' . $subField;
-                    }
-                } else {
-                    $workQueueColumns[] = 'column' . $field;
+            if (isset($columnDef['names'])) {
+                foreach (array_keys($columnDef['names']) as $subField) {
+                    $workQueueColumns[] = $subField;
                 }
+            } else {
+                $workQueueColumns[] = $field;
             }
         }
         return $workQueueColumns;
@@ -2448,5 +2446,19 @@ class WorkQueue
             }
         }
         return true;
+    }
+
+    public static function getWorkQueueGroupColumns($groupName)
+    {
+        if (!isset(self::$buttonGroups[$groupName])) {
+            return [];
+        }
+        $columns = [];
+        foreach (self::$columnsDef as $field => $columnDef) {
+            if (isset($columnDef['group']) && $columnDef['group'] === $groupName) {
+                $columns[] = $field;
+            }
+        }
+        return array_merge($columns, self::$buttonGroups[$groupName]);
     }
 }

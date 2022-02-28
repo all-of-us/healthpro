@@ -4,6 +4,18 @@ $(document).ready(function() {
       return;
     }
 
+    var buttonGroups = {
+        'Default': 'default',
+        'Consent': 'consent',
+        'PPI Surveys': 'surveys',
+        'In-Person': 'enrollment',
+        'Demographics': 'demographics',
+        'Patient Status': 'status',
+        'Contact': 'contact',
+        'Metrics': 'metrics',
+        'Show all': 'all'
+    };
+
     var exportLimit = $('#workqueue').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {
@@ -341,5 +353,17 @@ $(document).ready(function() {
         if (column >= 3) {
             $('#toggle_column_' + column).prop('checked', state);
         }
+    });
+
+    // Handle button groups
+    table.on('buttons-action', function (e, buttonApi) {
+        var groupName = buttonGroups[buttonApi.text()];
+        var params;
+        if (groupName === 'all') {
+            params = {select: true};
+        } else {
+            params = {groupName: groupName};
+        }
+        $.get(columnsUrl, params);
     });
 });

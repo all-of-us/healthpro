@@ -487,6 +487,10 @@ class WorkQueueController extends AbstractController
             $this->requestStack->getSession()->set('workQueueColumns', []);
             return $this->json(['success' => true]);
         }
+        if ($request->query->has('groupName')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueGroupColumns($request->query->get('groupName')));
+            return $this->json(['success' => true]);
+        }
         $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
         $columnName = $request->query->get('columnName');
         if ($request->query->get('checked') === 'true') {
