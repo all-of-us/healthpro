@@ -1993,6 +1993,79 @@ class WorkQueue
         'appleEHR' => 'Apple EHR Consent'
     ];
 
+    public static $buttonGroups = [
+        'default' => [
+            'dateOfBirth',
+            'participantId',
+            'participantStatus',
+            'activityStatus',
+            'consentCohort',
+            'primaryConsent',
+            'questionnaireOnDnaProgram',
+            'ehrConsent',
+            'gRoRConsent',
+            'primaryLanguage',
+            'ppiStatus',
+            'ppiSurveys',
+            'pairedSite',
+            'pairedOrganization',
+            'physicalMeasurementsStatus',
+            'biobankDnaStatus',
+            'biobankSamples'
+        ],
+        'consent' => [
+            'dateOfBirth',
+            'participantStatus',
+            'activityStatus',
+            'withdrawalReason'
+        ],
+        'metrics' => [
+            'dateOfBirth',
+            'participantId',
+            'participantStatus',
+            'activityStatus',
+            'consentCohort',
+            'primaryConsent',
+            'questionnaireOnDnaProgram',
+            'ehrConsent',
+            'ehrConsentExpireStatus',
+            'gRoRConsent',
+            'primaryLanguage',
+        ],
+        'status' => [
+            'dateOfBirth',
+            'participantId',
+            'participantStatus',
+            'activityStatus',
+            'consentCohort',
+            'primaryConsent',
+            'questionnaireOnDnaProgram',
+            'ehrConsent',
+            'ehrConsentExpireStatus',
+            'gRoRConsent',
+            'primaryLanguage',
+            'isEhrDataAvailable',
+            'latestEhrReceiptTime'
+        ],
+        'contact' => [
+            'participantId',
+            'retentionEligibleStatus',
+            'retentionType'
+        ],
+        'surveys' => [
+            'dateOfBirth',
+            'participantStatus',
+        ],
+        'enrollment' => [
+            'dateOfBirth',
+            'participantStatus',
+        ],
+        'demographics' => [
+            'dateOfBirth',
+            'participantStatus',
+        ]
+    ];
+
     public static function dateFromString($string, $timezone = null, $displayTime = true, $link = null)
     {
         if (!empty($string)) {
