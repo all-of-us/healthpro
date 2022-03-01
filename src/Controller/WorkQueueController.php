@@ -65,6 +65,7 @@ class WorkQueueController extends AbstractController
         }
         if ($request->query->has('reset')) {
             $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            return $this->redirectToRoute('workqueue_index');
         }
 
         $params = array_filter($request->query->all());
@@ -344,6 +345,7 @@ class WorkQueueController extends AbstractController
         }
         if ($request->query->has('reset')) {
             $this->requestStack->getSession()->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
+            return $this->redirectToRoute('workqueue_consents');
         }
 
         $params = array_filter($request->query->all());
