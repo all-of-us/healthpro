@@ -18,16 +18,16 @@
                             {% if columnDef.toggleColumn %}
                                 {% if columnDef.names is defined %}
                                     {% for subFieldName, subFieldLabel in columnDef.names %}
-                                        {% set checked = "column"~subFieldName in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
+                                        {% set checked = subFieldName in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
                                         <li class="filter-list-group-item checkbox">
-                                            <labeL><input type="checkbox" name="column{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
+                                            <labeL><input type="checkbox" name="{{ subFieldName }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ subFieldLabel }}</label>
                                         </li>
                                         {% set columNumber = columNumber + 1 %}
                                     {% endfor %}
                                 {% else %}
-                                    {% set checked = "column"~name in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
+                                    {% set checked = name in app.session.get('workQueueConsentColumns') ? 'checked' : '' %}
                                     <li class="filter-list-group-item checkbox">
-                                        <label><input type="checkbox" name="column{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.name }}</label>
+                                        <label><input type="checkbox" name="{{ name }}" {{ checked }} class="toggle-vis" data-column="{{ columNumber }}"/> {{ columnDef.name }}</label>
                                     </li>
                                     {% set columNumber = columNumber + 1 %}
                                 {% endif %}

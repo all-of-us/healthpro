@@ -2072,6 +2072,14 @@ class WorkQueue
         'middleName'
     ];
 
+    public static $defaultConsentColumns = [
+        'lastName',
+        'firstName',
+        'middleName',
+        'dateOfBirth',
+        'participantId'
+    ];
+
     public static $tableExportMap = [
         'participantStatus' => [
             'participantStatus',
@@ -2351,20 +2359,16 @@ class WorkQueue
         $headers = [];
         foreach (self::$consentColumns as $field) {
             $columnDef = self::$columnsDef[$field];
-            if ($columnDef['toggleColumn']) {
-                if (in_array("column{$field}", $sessionConsentColumns)) {
-                    if (isset($columnDef['csvNames'])) {
-                        foreach ($columnDef['csvNames'] as $csvName) {
-                            $headers[] = $csvName;
-                        }
-                    } elseif (isset($columnDef['csvName'])) {
-                        $headers[] = $columnDef['csvName'];
-                    } else {
-                        $headers[] = $columnDef['name'];
+            if (in_array($field, $sessionConsentColumns)) {
+                if (isset($columnDef['csvNames'])) {
+                    foreach ($columnDef['csvNames'] as $csvName) {
+                        $headers[] = $csvName;
                     }
+                } elseif (isset($columnDef['csvName'])) {
+                    $headers[] = $columnDef['csvName'];
+                } else {
+                    $headers[] = $columnDef['name'];
                 }
-            } else {
-                $headers[] = $columnDef['csvName'];
             }
         }
         return $headers;
@@ -2458,16 +2462,15 @@ class WorkQueue
     public static function getWorkQueueConsentColumns()
     {
         $workQueueConsentColumns = [];
-        foreach (self::$consentColumns as $field) {
-            $columnDef = self::$columnsDef[$field];
-            if ($columnDef['toggleColumn']) {
-                if (isset($columnDef['names'])) {
-                    foreach (array_keys($columnDef['names']) as $subField) {
-                        $workQueueConsentColumns[] = 'column' . $subField;
-                    }
-                } else {
-                    $workQueueConsentColumns[] = 'column' . $field;
+        $defaultConsentColumns = array_merge(self::$defaultConsentColumns, self::$consentColumns);
+        foreach ($defaultConsentColumns as $column) {
+            $columnDef = self::$columnsDef[$column];
+            if (isset($columnDef['names'])) {
+                foreach (array_keys($columnDef['names']) as $subColumn) {
+                    $workQueueConsentColumns[] = $subColumn;
                 }
+            } else {
+                $workQueueConsentColumns[] = $column;
             }
         }
         return $workQueueConsentColumns;

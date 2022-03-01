@@ -470,7 +470,7 @@ class WorkQueueController extends AbstractController
             return $this->json(['success' => true]);
         }
         if ($request->query->has('deselect')) {
-            $this->requestStack->getSession()->set('workQueueConsentColumns', []);
+            $this->requestStack->getSession()->set('workQueueConsentColumns', WorkQueue::$defaultConsentColumns);
             return $this->json(['success' => true]);
         }
         $workQueueConsentColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
