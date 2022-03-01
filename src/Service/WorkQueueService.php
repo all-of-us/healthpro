@@ -440,7 +440,9 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
-        WorkQueue::mapExportColumns($workQueueColumns);
+        if ($workQueueColumns) {
+            WorkQueue::mapExportColumns($workQueueColumns);
+        }
         foreach (WorkQueue::$exportColumns as $field) {
             if ($workQueueColumns && !in_array($field, $workQueueColumns)) {
                 continue;

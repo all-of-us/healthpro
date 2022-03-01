@@ -184,8 +184,7 @@ class WorkQueueController extends AbstractController
         }
 
         $exportConfiguration = $this->workQueueService->getExportConfiguration();
-        //$limit = $exportConfiguration['limit'];
-        $limit = 100;
+        $limit = $exportConfiguration['limit'];
         $pageSize = $exportConfiguration['pageSize'];
 
         $params = array_filter($request->query->all());

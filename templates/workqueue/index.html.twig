@@ -40,6 +40,7 @@
         {# Not using siteAwardeeDisplayName field from session as the awardee/organization is variable for STSI users #}
         <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ awardee == 'salivary_pilot' ? 'Salivary Pilot' : siteInfo.awardeeDisplayName(awardee) }})</h4>
         {% include 'partials/workqueue-columns.html.twig' %}
+        {% set exportType = 'main' %}
         {% include 'partials/workqueue-page-export.html.twig' %}
     </form>
 
