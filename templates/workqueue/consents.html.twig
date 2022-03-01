@@ -24,10 +24,10 @@
                     <br/>
                 {% endif %}
                 <p><strong>Filters</strong>
-                    <small><a href="{{ path('workqueue_consents') }}">Reset All</a></small>
+                    <small><a href="{{ path('workqueue_consents', { reset: 'all' }) }}">Reset All</a></small>
                 </p>
                 <div class="form-inline">
-                    {% include 'partials/workqueue-consents-advance-filters.html.twig' %}
+                    {% include 'partials/workqueue-advance-filters.html.twig' %}
                 </div>
             </div>
             {# Not using siteAwardeeDisplayName field from session as the awardee/organization is variable for STSI users #}

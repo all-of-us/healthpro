@@ -63,6 +63,9 @@ class WorkQueueController extends AbstractController
         if (empty($awardee)) {
             return $this->render('workqueue/no-organization.html.twig');
         }
+        if ($request->query->has('reset')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+        }
 
         $params = array_filter($request->query->all());
         $filters = WorkQueue::$consentAdvanceFilters;
@@ -338,6 +341,9 @@ class WorkQueueController extends AbstractController
         }
         if (empty($awardee)) {
             return $this->render('workqueue/no-organization.html.twig');
+        }
+        if ($request->query->has('reset')) {
+            $this->requestStack->getSession()->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
         }
 
         $params = array_filter($request->query->all());

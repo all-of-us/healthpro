@@ -30,10 +30,10 @@
                 <br/>
             {% endif %}
             <p><strong>Filters</strong>
-                <small><a href="{{ path('workqueue_index') }}">Rest All</a></small>
+                <small><a href="{{ path('workqueue_index', { reset: 'all' }) }}">Reset All</a></small>
             </p>
             <div class="form-inline">
-                {% include 'partials/workqueue-consents-advance-filters.html.twig' %}
+                {% include 'partials/workqueue-advance-filters.html.twig' %}
             </div>
         </div>
 
