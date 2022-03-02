@@ -2088,7 +2088,6 @@ class WorkQueue
         ],
         'activityStatus' => [
             'withdrawalStatus',
-            'withdrawalReason',
             'deactivationStatus',
             'deceasedStatus',
             'dateOfdeath',
