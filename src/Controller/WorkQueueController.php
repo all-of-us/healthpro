@@ -144,8 +144,7 @@ class WorkQueueController extends AbstractController
             return $this->json($ajaxData, $responseCode);
         } else {
             if (!$this->requestStack->getSession()->has('workQueueColumns')) {
-                $workQueueColumns = WorkQueue::getWorkQueueColumns();
-                $this->requestStack->getSession()->set('workQueueColumns', $workQueueColumns);
+                $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
             }
             return $this->render('workqueue/index.html.twig', [
                 'advancedFilters' => $filters,
