@@ -142,7 +142,6 @@ $(document).ready(function () {
         $('#heading-count').show();
     });
 
-    $('#workqueue_length').addClass('pull-right');
     $('#workqueue_info').addClass('pull-left');
 
     // Display custom error message
