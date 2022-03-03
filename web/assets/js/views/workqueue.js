@@ -310,7 +310,7 @@ $(document).ready(function() {
     $('.toggle-vis').on('click', function () {
         var column = table.column($(this).attr('data-column'));
         column.visible(!column.visible());
-        var columnName = $(this).attr('name');
+        var columnName = $(this).data('name');
         // Set column names in session
         $.get(columnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
     });

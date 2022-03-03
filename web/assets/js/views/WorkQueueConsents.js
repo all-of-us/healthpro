@@ -307,7 +307,7 @@ $(document).ready(function () {
     $('.toggle-vis').on('click', function () {
         var column = workQueueTable.column($(this).attr('data-column'));
         column.visible(!column.visible());
-        var columnName = $(this).attr('name');
+        var columnName = $(this).data('name');
         // Set column names in session
         var consentColumnsUrl = $('#columns_group').data('consent-columns-url');
         $.get(consentColumnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
