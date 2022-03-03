@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Entity\PatientStatus;
 use App\Entity\Problem;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
@@ -161,6 +162,12 @@ class ParticipantDetailsController extends AbstractController
             $canViewPatientStatus = false;
         }
 
+        $incentiveForm = $this->createForm(IncentiveType::class, null, []);
+        $incentiveForm->handleRequest($request);
+        if ($incentiveForm->isSubmitted()) {
+            //TODO
+        }
+
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
         // Generate url for blood donor check form
@@ -189,7 +196,8 @@ class ParticipantDetailsController extends AbstractController
             'canEdit' => $participant->status || $participant->editExistingOnly,
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl,
-            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue')
+            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
+            'incentiveForm' => $incentiveForm->createView()
         ]);
     }
 

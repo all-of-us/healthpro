@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Incentive</h3>
+    </div>
+    <div class="panel-body">
+        {{ form_start(incentiveForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+        {{ form_errors(incentiveForm) }}
+        <p><b>Verification</b></p>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox"> <b>Please verify the participant has completed all study requirements?</b>
+            </label>
+        </div>
+        {{ form_rest(incentiveForm) }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+        {{ form_end(incentiveForm) }}
+    </div>
+</div>
