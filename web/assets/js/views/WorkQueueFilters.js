@@ -1,6 +1,6 @@
 $(document).ready(function () {
-    var columnsDef = $('#workqueue').data('columns-def');
-    var columns = $('#workqueue').data('wq-columns');
+    var columnsDef = $('.workqueue-table').data('columns-def');
+    var columns = $('.workqueue-table').data('wq-columns');
 
     var clearInvalidFields = function (type = null) {
         if (type !== 'participantIdSearch') {
