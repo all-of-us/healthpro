@@ -51,18 +51,18 @@ class IncentiveType extends AbstractType
                 'required' => false,
                 'constraints' => new Constraints\Type('string')
             ])
-            ->add('incentive_occurance', Type\ChoiceType::class, [
-                'label' => 'Incentive Occurance',
+            ->add('incentive_occurrence', Type\ChoiceType::class, [
+                'label' => 'Incentive Occurrence',
                 'choices' => [
                     'One-time Incentive' => 'one_time',
                     'Redraw' => 'redraw',
                     'Other' => 'other'
                 ],
-                'placeholder' => '-- Select incentive occurance --',
+                'placeholder' => '-- Select incentive occurrence --',
                 'multiple' => false,
                 'required' => true
             ])
-            ->add('other_incentive_occurance', Type\TextType::class, [
+            ->add('other_incentive_occurrence', Type\TextType::class, [
                 'label' => 'Specify Other',
                 'required' => false,
                 'constraints' => new Constraints\Type('string')

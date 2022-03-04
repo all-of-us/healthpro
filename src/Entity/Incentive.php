@@ -50,12 +50,12 @@ class Incentive
     /**
      * @ORM\Column(type="string", length=50)
      */
-    private $incentiveOccurance;
+    private $incentiveOccurrence;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $otherIncentiveOccurance;
+    private $otherIncentiveOccurrence;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -184,26 +184,26 @@ class Incentive
         return $this;
     }
 
-    public function getIncentiveOccurance(): ?string
+    public function getIncentiveOccurrence(): ?string
     {
-        return $this->incentiveOccurance;
+        return $this->incentiveOccurrence;
     }
 
-    public function setIncentiveOccurance(string $incentiveOccurance): self
+    public function setIncentiveOccurrence(string $incentiveOccurrence): self
     {
-        $this->incentiveOccurance = $incentiveOccurance;
+        $this->incentiveOccurrence = $incentiveOccurrence;
 
         return $this;
     }
 
-    public function getOtherIncentiveOccurance(): ?string
+    public function getOtherIncentiveOccurrence(): ?string
     {
-        return $this->otherIncentiveOccurance;
+        return $this->otherIncentiveOccurrence;
     }
 
-    public function setOtherIncentiveOccurance(?string $otherIncentiveOccurance): self
+    public function setOtherIncentiveOccurrence(?string $otherIncentiveOccurrence): self
     {
-        $this->otherIncentiveOccurance = $otherIncentiveOccurance;
+        $this->otherIncentiveOccurrence = $otherIncentiveOccurrence;
 
         return $this;
     }
