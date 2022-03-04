@@ -39,6 +39,11 @@ class IncentiveType extends AbstractType
                 'multiple' => false,
                 'required' => true
             ])
+            ->add('other_incentive_type', Type\TextType::class, [
+                'label' => 'Specify Other',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
+            ])
             ->add('incentive_occurance', Type\ChoiceType::class, [
                 'label' => 'Incentive Occurance',
                 'choices' => [
@@ -50,6 +55,11 @@ class IncentiveType extends AbstractType
                 'multiple' => false,
                 'required' => true
             ])
+            ->add('other_incentive_occurance', Type\TextType::class, [
+                'label' => 'Specify Other',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
+            ])
             ->add('incentive_amount', Type\ChoiceType::class, [
                 'label' => 'Incentive Amount',
                 'choices' => [
@@ -60,6 +70,11 @@ class IncentiveType extends AbstractType
                 'placeholder' => '-- Select amount --',
                 'multiple' => false,
                 'required' => true
+            ])
+            ->add('other_incentive_amount', Type\TextType::class, [
+                'label' => 'Specify Other',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',
