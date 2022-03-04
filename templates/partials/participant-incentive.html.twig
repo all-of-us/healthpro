@@ -11,6 +11,20 @@
                 <input type="checkbox"> <b>Please verify the participant has completed all study requirements?</b>
             </label>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(incentiveForm.incentive_date_given) }}
+                {{ form_row(incentiveForm.incentive_occurance) }}
+                {{ form_row(incentiveForm.other_incentive_occurance) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(incentiveForm.incentive_type) }}
+                {{ form_row(incentiveForm.gift_card_type) }}
+                {{ form_row(incentiveForm.other_incentive_type) }}
+                {{ form_row(incentiveForm.incentive_amount) }}
+                {{ form_row(incentiveForm.other_incentive_amount) }}
+            </div>
+        </div>
         {{ form_rest(incentiveForm) }}
         <button type="submit" class="btn btn-primary">Submit</button>
         <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>

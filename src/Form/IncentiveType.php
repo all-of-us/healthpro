@@ -12,7 +12,7 @@ class IncentiveType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('date_given', Type\DateType::class, [
+            ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date Incentive Given',
                 'required' => true,
@@ -38,6 +38,11 @@ class IncentiveType extends AbstractType
                 'placeholder' => '-- Select incentive type --',
                 'multiple' => false,
                 'required' => true
+            ])
+            ->add('gift_card_type', Type\TextType::class, [
+                'label' => 'Specify Type of Gift Card',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('other_incentive_type', Type\TextType::class, [
                 'label' => 'Specify Other',
