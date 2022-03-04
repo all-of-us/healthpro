@@ -85,12 +85,12 @@ class Incentive
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
      */
-    private $updatedUser;
+    private $amendedUser;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $updatedTs;
+    private $amendedTs;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
@@ -268,26 +268,26 @@ class Incentive
         return $this;
     }
 
-    public function getUpdatedUser(): ?User
+    public function getAmendedUser(): ?User
     {
-        return $this->updatedUser;
+        return $this->amendedUser;
     }
 
-    public function setUpdatedUser(?User $updatedUser): self
+    public function setAmendedUser(?User $amendedUser): self
     {
-        $this->updatedUser = $updatedUser;
+        $this->amendedUser = $amendedUser;
 
         return $this;
     }
 
-    public function getUpdatedTs(): ?\DateTimeInterface
+    public function getAmendedTs(): ?\DateTimeInterface
     {
-        return $this->updatedTs;
+        return $this->amendedTs;
     }
 
-    public function setUpdatedTs(?\DateTimeInterface $updatedTs): self
+    public function setAmendedTs(?\DateTimeInterface $amendedTs): self
     {
-        $this->updatedTs = $updatedTs;
+        $this->amendedTs = $amendedTs;
 
         return $this;
     }
