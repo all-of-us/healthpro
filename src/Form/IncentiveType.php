@@ -2,10 +2,12 @@
 
 namespace App\Form;
 
+use App\Entity\Incentive;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IncentiveType extends AbstractType
 {
@@ -86,5 +88,12 @@ class IncentiveType extends AbstractType
                 'required' => false,
                 'constraints' => new Constraints\Type('string')
             ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'data_class' => Incentive::class
+        ]);
     }
 }

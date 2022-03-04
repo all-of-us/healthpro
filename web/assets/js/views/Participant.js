@@ -82,5 +82,7 @@ $(document).ready(function () {
         $(psDetailsModal).on('hidden.bs.modal', function () {
             $("#patient-status-details-modal .modal-body").html('');
         });
+
+        $('#incentive_incentive_date_given').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: new Date().setHours(23,59,59,999), useCurrent: false});
     }
 });

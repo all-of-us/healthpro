@@ -6,6 +6,7 @@ use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PatientStatus;
 use App\Entity\Problem;
+use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
 use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
@@ -165,7 +166,16 @@ class ParticipantDetailsController extends AbstractController
         $incentiveForm = $this->createForm(IncentiveType::class, null, []);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
-            //TODO
+            $userRepository = $em->getRepository(User::class);
+            $now = new \DateTime();
+            $incentive = $incentiveForm->getData();
+            $incentive->setParticipantId($id);
+            $incentive->setCreatedTs($now);
+            $incentive->setSite($siteService->getSiteId());
+            $incentive->setUser($userRepository->find($this->getUser()->getId()));
+            $em->persist($incentive);
+            $em->flush();
+            $this->addFlash('success', 'Incentive created');
         }
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
