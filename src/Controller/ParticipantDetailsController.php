@@ -177,6 +177,8 @@ class ParticipantDetailsController extends AbstractController
                 $em->persist($incentive);
                 $em->flush();
                 $this->addFlash('success', 'Incentive created');
+            } else {
+                $incentiveForm->addError(new FormError('Please correct the errors below'));
             }
         }
 

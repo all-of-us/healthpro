@@ -71,7 +71,7 @@
                 </li>
                 {% if not isDVType %}
                     <li role="presentation">
-                        <a href="#patientstatus" aria-controls="patientstatus" role="tab" data-toggle="tab">On-Site Details</a>
+                        <a href="#on_site_details" aria-controls="on_site_details" role="tab" data-toggle="tab">On-Site Details</a>
                     </li>
                 {% endif %}
                 {% if canViewDetails %}
@@ -466,7 +466,7 @@
                     </div>
                 {% endif %}
                 {% if not isDVType %}
-                    <div role="tabpanel" class="tab-pane" id="patientstatus">
+                    <div role="tabpanel" class="tab-pane" id="on_site_details">
                         {% if canViewPatientStatus %}
                             {% if orgPatientStatusData is empty %}
                                 <div class="alert alert-warning">
