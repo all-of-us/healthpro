@@ -490,9 +490,6 @@ class WorkQueueController extends AbstractController
      */
     public function columnsAction(Request $request)
     {
-        if (!$this->displayParticipantConsentsTab) {
-            throw $this->createNotFoundException();
-        }
         if ($request->query->has('select')) {
             $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
             return $this->json(['success' => true]);
