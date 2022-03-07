@@ -4,19 +4,17 @@ $(document).ready(function() {
       return;
     }
 
-    var checkFilters = function () {
-        if ($('#filters select[name=activityStatus]').val() == 'withdrawn') {
-            $('#filters select').not('[name=activityStatus], [name=organization]').val('');
-            $('#filters select').not('[name=activityStatus], [name=organization]').prop('disabled', true);
-        } else {
-            $('#filters select').prop('disabled', false);
-        }
+    var buttonGroups = {
+        'Default': 'default',
+        'Consent': 'consent',
+        'PPI Surveys': 'surveys',
+        'In-Person': 'enrollment',
+        'Demographics': 'demographics',
+        'Patient Status': 'status',
+        'Contact': 'contact',
+        'Metrics': 'metrics',
+        'Show all': 'all'
     };
-    checkFilters();
-    $('#filters select').on('change', function() {
-        checkFilters();
-        $('#filters').submit();
-    });
 
     var exportLimit = $('#workqueue').data('export-limit');
 
@@ -268,11 +266,6 @@ $(document).ready(function() {
                 extend: 'colvisGroup',
                 text: 'Show all',
                 show: ':hidden'
-            },
-            {
-                extend: 'colvis',
-                text: 'Columns <i class="fa fa-caret-down" aria-hidden="true"></i>',
-                columns: ':not(.col-group-name)'
             }
         ]
     });
@@ -282,7 +275,7 @@ $(document).ready(function() {
     });
 
     // Populate count in header
-    $('#workqueue').on('init.dt', function(e, settings, json) {
+    $('#workqueue').on('init.dt', function (e, settings, json) {
         var count = json.recordsFiltered;
         $('#heading-count .count').text(count);
         if (count == 1) {
@@ -294,21 +287,82 @@ $(document).ready(function() {
     });
 
     table.buttons().container().find('.btn').addClass('btn-sm');
-    $('#workqueue_length').addClass('pull-right');
     $('#workqueue_info').addClass('pull-left');
 
     // Display custom error message
     $.fn.dataTable.ext.errMode = 'none';
-    $('#workqueue').on('error.dt', function(e) {
+    $('#workqueue').on('error.dt', function (e) {
         alert('An error occurred please reload the page and try again');
     });
 
     // Scroll to top when performing pagination
-    $('#workqueue').on('page.dt', function() {
+    $('#workqueue').on('page.dt', function () {
         //Took reference from https://stackoverflow.com/a/21627503
         $('html').animate({
             scrollTop: $('#filters').offset().top
         }, 'slow');
         $('thead tr th:first-child').trigger('focus').trigger('blur');
+    });
+
+    var columnsUrl = $('#columns_group').data('columns-url');
+
+    $('.toggle-vis').on('click', function () {
+        var column = table.column($(this).attr('data-column'));
+        column.visible(!column.visible());
+        var columnName = $(this).data('name');
+        // Set column names in session
+        $.get(columnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
+    });
+
+    var toggleColumns = function () {
+        $('#columns_group input[type=checkbox]').each(function () {
+            var column = table.column($(this).attr('data-column'));
+            column.visible($(this).prop('checked'));
+        });
+    };
+
+    toggleColumns();
+
+    var showColumns = function () {
+        var columns = table.columns();
+        columns.visible(true);
+    };
+
+    var hideColumns = function () {
+        for (let i = 3; i <= 80; i++) {
+            var column = table.column(i);
+            column.visible(false);
+        }
+    };
+
+    $('#columns_select_all').on('click', function () {
+        $('#columns_group input[type=checkbox]').prop('checked', true);
+        showColumns();
+        $.get(columnsUrl, {select: true});
+    });
+
+    $('#columns_deselect_all').on('click', function () {
+        $('#columns_group input[type=checkbox]').prop('checked', false);
+        hideColumns();
+        $.get(columnsUrl, {deselect: true});
+    });
+
+    // Check/uncheck columns when clicked on group buttons
+    $('#workqueue').on('column-visibility.dt', function (e, settings, column, state) {
+        if (column >= 3) {
+            $('#toggle_column_' + column).prop('checked', state);
+        }
+    });
+
+    // Handle button groups
+    table.on('buttons-action', function (e, buttonApi) {
+        var groupName = buttonGroups[buttonApi.text()];
+        var params;
+        if (groupName === 'all') {
+            params = {select: true};
+        } else {
+            params = {groupName: groupName};
+        }
+        $.get(columnsUrl, params);
     });
 });

@@ -240,6 +240,89 @@ class WorkQueueServiceTest extends ServiceTestCase
         ], $row);
     }
 
+    public function testDefaultGroupExportSelected()
+    {
+        $participants = $this->getParticipants();
+        $row = $this->service->generateExportRow($participants[0], WorkQueue::getWorkQueueColumns());
+        $this->assertSame([
+            'LN1',
+            'FN1',
+            'M1',
+            '01/01/1990',
+            'P100000001',
+            'Participant + EHR Consent',
+            '',
+            '0',
+            '',
+            '0',
+            '',
+            0,
+            '',
+            '',
+            'Cohort 3',
+            1,
+            '11/3/2021 2:08 pm',
+            0,
+            '',
+            1,
+            '11/3/2021 2:08 pm',
+            1,
+            '11/3/2021 2:08 pm',
+            'English',
+            '1',
+            4,
+            'bannerdesert',
+            'AZ_TUCSON_BANNER_HEALTH',
+            1,
+            '11/3/2021',
+            '0',
+            0,
+            ''
+        ], $row);
+    }
+
+    public function testContactGroupExportSelected()
+    {
+        $participants = $this->getParticipants();
+        $row = $this->service->generateExportRow($participants[0], WorkQueue::getWorkQueueGroupColumns('contact'));
+        $this->assertSame([
+            'LN1',
+            'FN1',
+            'M1',
+            'P100000001',
+            0,
+            '',
+            0,
+            '100 Main St',
+            null,
+            'City1',
+            'AL',
+            '10001',
+            'p1@example.com',
+            null,
+            '8885551001',
+        ], $row);
+    }
+
+    public function testDemographicsGroupExportSelected()
+    {
+        $participants = $this->getParticipants();
+        $row = $this->service->generateExportRow($participants[0], WorkQueue::getWorkQueueGroupColumns('demographics'));
+        $this->assertSame([
+            'LN1',
+            'FN1',
+            'M1',
+            '01/01/1990',
+            'Participant + EHR Consent',
+            '',
+            'Female',
+            'Woman',
+            'Black or African American',
+            'College 4 years or more (College graduate)',
+            ''
+        ], $row);
+    }
+
     private function getParticipants()
     {
         $rdrParticipantFixtures = json_decode(file_get_contents(__DIR__ . '/data/participant_summary_search.json'));

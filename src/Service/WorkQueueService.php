@@ -440,7 +440,13 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
+        if ($workQueueColumns) {
+            WorkQueue::mapExportColumns($workQueueColumns);
+        }
         foreach (WorkQueue::$exportColumns as $field) {
+            if ($workQueueColumns && !in_array($field, $workQueueColumns)) {
+                continue;
+            }
             $columnDef = WorkQueue::$columnsDef[$field];
             if ($field === 'dateOfDeath') {
                 $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
@@ -515,7 +521,7 @@ class WorkQueueService
         $row = [];
         foreach (WorkQueue::$consentColumns as $field) {
             $columnDef = WorkQueue::$columnsDef[$field];
-            if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
+            if (in_array($field, $workQueueConsentColumns)) {
                 if (isset($columnDef['csvMethod'])) {
                     if (isset($columnDef['otherField'])) {
                         $row[] = WorkQueue::{$columnDef['csvMethod']}(

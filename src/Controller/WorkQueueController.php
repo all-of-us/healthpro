@@ -63,9 +63,13 @@ class WorkQueueController extends AbstractController
         if (empty($awardee)) {
             return $this->render('workqueue/no-organization.html.twig');
         }
+        if ($request->query->has('reset')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            return $this->redirectToRoute('workqueue_index');
+        }
 
         $params = array_filter($request->query->all());
-        $filters = WorkQueue::$filters;
+        $filters = WorkQueue::$consentAdvanceFilters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
@@ -109,7 +113,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $sitesList['site']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $sitesList);
+            $filters['Pairing'] = array_merge($filters['Pairing'], $sitesList);
 
             //Add organization filter
             $organizationsList = [];
@@ -120,7 +124,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
-            $filters = array_merge($filters, $organizationsList);
+            $filters['Pairing'] = array_merge($filters['Pairing'], $organizationsList);
         }
 
         //For ajax requests
@@ -139,8 +143,11 @@ class WorkQueueController extends AbstractController
             }
             return $this->json($ajaxData, $responseCode);
         } else {
+            if (!$this->requestStack->getSession()->has('workQueueColumns')) {
+                $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            }
             return $this->render('workqueue/index.html.twig', [
-                'filters' => $filters,
+                'advancedFilters' => $filters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
                 'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
@@ -153,7 +160,9 @@ class WorkQueueController extends AbstractController
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
                 'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab,
                 'columns' => WorkQueue::$columns,
-                'columnsDef' => WorkQueue::$columnsDef
+                'columnsDef' => WorkQueue::$columnsDef,
+                'filterIcons' => WorkQueue::$filterIcons,
+                'columnGroups' => WorkQueue::$columnGroups
             ]);
         }
     }
@@ -187,17 +196,24 @@ class WorkQueueController extends AbstractController
         if (!empty($params['patientStatus'])) {
             $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
         }
-        $workQueueConsentColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
-        if ($this->displayParticipantConsentsTab && isset($params['exportType']) && $params['exportType'] === 'consents') {
-            $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueConsentColumns);
+        $exportType = isset($params['exportType']) ? $params['exportType'] : '';
+        $workQueueColumns = [];
+        if ($this->displayParticipantConsentsTab && $exportType === 'consents') {
+            $workQueueColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
+            $exportHeaders = WorkQueue::getConsentExportHeaders($workQueueColumns);
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
         } else {
-            $exportHeaders = WorkQueue::getExportHeaders();
+            if ($exportType === 'main') {
+                $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
+                $exportHeaders = WorkQueue::getSessionExportHeaders($workQueueColumns);
+            } else {
+                $exportHeaders = WorkQueue::getExportHeaders();
+            }
             $exportRowMethod = 'generateExportRow';
             $fileName = 'workqueue';
         }
-        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueConsentColumns) {
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueColumns) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -212,7 +228,7 @@ class WorkQueueController extends AbstractController
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
                 $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
                 foreach ($participants as $participant) {
-                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueConsentColumns));
+                    fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueColumns));
                 }
                 unset($participants);
                 if (!$this->workQueueService->getNextToken()) {
@@ -325,6 +341,10 @@ class WorkQueueController extends AbstractController
         }
         if (empty($awardee)) {
             return $this->render('workqueue/no-organization.html.twig');
+        }
+        if ($request->query->has('reset')) {
+            $this->requestStack->getSession()->set('workQueueConsentColumns', WorkQueue::getWorkQueueConsentColumns());
+            return $this->redirectToRoute('workqueue_consents');
         }
 
         $params = array_filter($request->query->all());
@@ -449,7 +469,7 @@ class WorkQueueController extends AbstractController
             return $this->json(['success' => true]);
         }
         if ($request->query->has('deselect')) {
-            $this->requestStack->getSession()->set('workQueueConsentColumns', []);
+            $this->requestStack->getSession()->set('workQueueConsentColumns', WorkQueue::$defaultConsentColumns);
             return $this->json(['success' => true]);
         }
         $workQueueConsentColumns = $this->requestStack->getSession()->get('workQueueConsentColumns');
@@ -462,6 +482,36 @@ class WorkQueueController extends AbstractController
             }
         }
         $this->requestStack->getSession()->set('workQueueConsentColumns', $workQueueConsentColumns);
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/columns", name="workqueue_columns")
+     */
+    public function columnsAction(Request $request)
+    {
+        if ($request->query->has('select')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            return $this->json(['success' => true]);
+        }
+        if ($request->query->has('deselect')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::$defaultColumns);
+            return $this->json(['success' => true]);
+        }
+        if ($request->query->has('groupName')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueGroupColumns($request->query->get('groupName')));
+            return $this->json(['success' => true]);
+        }
+        $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
+        $columnName = $request->query->get('columnName');
+        if ($request->query->get('checked') === 'true') {
+            $workQueueColumns[] = $columnName;
+        } else {
+            if (($key = array_search($columnName, $workQueueColumns)) !== false) {
+                unset($workQueueColumns[$key]);
+            }
+        }
+        $this->requestStack->getSession()->set('workQueueColumns', $workQueueColumns);
         return $this->json(['success' => true]);
     }
 }
