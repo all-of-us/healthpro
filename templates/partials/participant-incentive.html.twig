@@ -8,8 +8,9 @@
         <p><b>Verification</b></p>
         <div class="checkbox">
             <label>
-                <input type="checkbox"> <b>Please verify the participant has completed all study requirements?</b>
+                <input type="checkbox" id="incentive_verification"> <b>Please verify the participant has completed all study requirements?</b>
             </label>
+            <p id="incentive_verification_warning" class="text-danger small" style="display:none">Participant must complete study requirements before receiving incentive.</p>
         </div>
         <div class="row">
             <div class="col-md-6">
@@ -26,7 +27,7 @@
             </div>
         </div>
         {{ form_rest(incentiveForm) }}
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
         <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
         {{ form_end(incentiveForm) }}
     </div>
