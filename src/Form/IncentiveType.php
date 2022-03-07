@@ -26,6 +26,9 @@ class IncentiveType extends AbstractType
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
                     ])
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ]
             ])
             ->add('incentive_type', Type\ChoiceType::class, [
@@ -44,12 +47,26 @@ class IncentiveType extends AbstractType
             ->add('gift_card_type', Type\TextType::class, [
                 'label' => 'Specify Type of Gift Card',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if ($context->getRoot()['incentive_type']->getData() === 'gift_card' && empty($value)) {
+                            $context->buildViolation('Please specify type of gift card')->addViolation();
+                        }
+                    })
+                ]
             ])
             ->add('other_incentive_type', Type\TextType::class, [
                 'label' => 'Specify Other',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if ($context->getRoot()['incentive_type']->getData() === 'other' && empty($value)) {
+                            $context->buildViolation('Please specify other incentive type')->addViolation();
+                        }
+                    })
+                ]
             ])
             ->add('incentive_occurrence', Type\ChoiceType::class, [
                 'label' => 'Incentive Occurrence',
@@ -65,7 +82,14 @@ class IncentiveType extends AbstractType
             ->add('other_incentive_occurrence', Type\TextType::class, [
                 'label' => 'Specify Other',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if ($context->getRoot()['incentive_occurrence']->getData() === 'other' && empty($value)) {
+                            $context->buildViolation('Please specify other incentive occurrence')->addViolation();
+                        }
+                    })
+                ]
             ])
             ->add('incentive_amount', Type\ChoiceType::class, [
                 'label' => 'Incentive Amount',
@@ -78,10 +102,17 @@ class IncentiveType extends AbstractType
                 'multiple' => false,
                 'required' => true
             ])
-            ->add('other_incentive_amount', Type\TextType::class, [
+            ->add('other_incentive_amount', Type\IntegerType::class, [
                 'label' => 'Specify Other',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => [
+                    new Constraints\Type('integer'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if ($context->getRoot()['incentive_amount']->getData() === 'other' && empty($value)) {
+                            $context->buildViolation('Please specify other incentive amount')->addViolation();
+                        }
+                    })
+                ]
             ])
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',
