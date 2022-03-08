@@ -130,11 +130,11 @@ class WorkQueue
             'rdrField' => 'deceasedStatus',
             'csvMethod' => 'csvDeceasedStatus'
         ],
-        'dateOfdeath' => [
+        'dateOfDeath' => [
             'name' => 'Date of Death',
-            'rdrDateField' => 'dateOfdeath',
+            'rdrDateField' => 'dateOfDeath',
         ],
-        'dateOfdeathApproval' => [
+        'dateOfDeathApproval' => [
             'name' => 'Date of Death Approval',
             'rdrDateField' => 'deceasedAuthored',
             'csvStatusText' => 'APPROVED'
@@ -1224,8 +1224,8 @@ class WorkQueue
         'withdrawalReason',
         'deactivationStatus',
         'deceasedStatus',
-        'dateOfdeath',
-        'dateOfdeathApproval',
+        'dateOfDeath',
+        'dateOfDeathApproval',
         'participantOrigin',
         'consentCohort',
         'firstPrimaryConsent',
@@ -2090,8 +2090,8 @@ class WorkQueue
             'withdrawalStatus',
             'deactivationStatus',
             'deceasedStatus',
-            'dateOfdeath',
-            'dateOfdeathApproval'
+            'dateOfDeath',
+            'dateOfDeathApproval'
         ],
         'address' => [
             'address',
