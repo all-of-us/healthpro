@@ -30,6 +30,12 @@ class WorkQueueTest extends TestCase
             'DV-only EHR Sharing Date',
             'CABoR Consent Status',
             'CABoR Consent Date',
+            'Fitbit Consent',
+            'Fitbit Consent Date',
+            'Apple HealthKit Consent',
+            'Apple HealthKit Consent Date',
+            'Apple EHR Consent',
+            'Apple EHR Consent Date',
             'Consent Cohort',
             'Language of Primary Consent'
         ], $exportHeaders);
