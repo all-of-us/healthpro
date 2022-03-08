@@ -136,6 +136,7 @@ class WorkQueue
         ],
         'dateOfDeathApproval' => [
             'name' => 'Date of Death Approval',
+            'rdrField' => 'deceasedStatus',
             'rdrDateField' => 'deceasedAuthored',
             'csvStatusText' => 'APPROVED'
         ],

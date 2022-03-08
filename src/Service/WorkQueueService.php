@@ -469,7 +469,7 @@ class WorkQueueService
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone, $displayTime);
                 } else {
                     if (isset($columnDef['rdrDateField'])) {
-                        $row[] = $participant->{$columnDef['rdrDateField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString(
+                        $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString(
                             $participant->{$columnDef['rdrDateField']},
                             $userTimezone,
                             false
