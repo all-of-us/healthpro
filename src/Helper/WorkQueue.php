@@ -130,12 +130,13 @@ class WorkQueue
             'rdrField' => 'deceasedStatus',
             'csvMethod' => 'csvDeceasedStatus'
         ],
-        'dateOfdeath' => [
+        'dateOfDeath' => [
             'name' => 'Date of Death',
-            'rdrDateField' => 'dateOfdeath',
+            'rdrDateField' => 'dateOfDeath',
         ],
-        'dateOfdeathApproval' => [
+        'dateOfDeathApproval' => [
             'name' => 'Date of Death Approval',
+            'rdrField' => 'deceasedStatus',
             'rdrDateField' => 'deceasedAuthored',
             'csvStatusText' => 'APPROVED'
         ],
@@ -1097,7 +1098,34 @@ class WorkQueue
             'toggleColumn' => true,
             'visible' => false,
             'group' => 'demographics'
-        ]
+        ],
+        'fitbit' => [
+            'name' => 'Fitbit Consent',
+            'csvNames' => [
+                'Fitbit Consent',
+                'Fitbit Consent Date',
+            ],
+            'rdrField' => 'digitalHealthSharingStatus',
+            'csvMethod' => 'csvDigitalHealthSharingStatus',
+        ],
+        'appleHealthKit' => [
+            'name' => 'Apple HealthKit Consent',
+            'csvNames' => [
+                'Apple HealthKit Consent',
+                'Apple HealthKit Consent Date',
+            ],
+            'rdrField' => 'digitalHealthSharingStatus',
+            'csvMethod' => 'csvDigitalHealthSharingStatus',
+        ],
+        'appleEHR' => [
+            'name' => 'Apple EHR Consent',
+            'csvNames' => [
+                'Apple EHR Consent',
+                'Apple EHR Consent Date',
+            ],
+            'rdrField' => 'digitalHealthSharingStatus',
+            'csvMethod' => 'csvDigitalHealthSharingStatus',
+        ],
     ];
 
     public static $columns = [
@@ -1211,6 +1239,26 @@ class WorkQueue
         'primaryLanguage'
     ];
 
+    public static $consentExportColumns = [
+        'lastName',
+        'firstName',
+        'middleName',
+        'dateOfBirth',
+        'participantId',
+        'primaryConsent',
+        'questionnaireOnDnaProgram',
+        'ehrConsent',
+        'ehrConsentExpireStatus',
+        'gRoRConsent',
+        'dvEhrStatus',
+        'caborConsent',
+        'fitbit',
+        'appleHealthKit',
+        'appleEHR',
+        'consentCohort',
+        'primaryLanguage'
+    ];
+
     public static $exportColumns = [
         'lastName',
         'firstName',
@@ -1224,8 +1272,8 @@ class WorkQueue
         'withdrawalReason',
         'deactivationStatus',
         'deceasedStatus',
-        'dateOfdeath',
-        'dateOfdeathApproval',
+        'dateOfDeath',
+        'dateOfDeathApproval',
         'participantOrigin',
         'consentCohort',
         'firstPrimaryConsent',
@@ -1295,7 +1343,9 @@ class WorkQueue
         'enrollmentStatusCoreMinusPMTime',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
-        'digitalHealthSharingStatus',
+        'fitbit',
+        'appleHealthKit',
+        'appleEHR',
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
@@ -2090,8 +2140,8 @@ class WorkQueue
             'withdrawalStatus',
             'deactivationStatus',
             'deceasedStatus',
-            'dateOfdeath',
-            'dateOfdeathApproval'
+            'dateOfDeath',
+            'dateOfDeathApproval'
         ],
         'address' => [
             'address',
@@ -2356,7 +2406,7 @@ class WorkQueue
     public static function getConsentExportHeaders($sessionConsentColumns)
     {
         $headers = [];
-        foreach (self::$consentColumns as $field) {
+        foreach (self::$consentExportColumns as $field) {
             $columnDef = self::$columnsDef[$field];
             if (in_array($field, $sessionConsentColumns)) {
                 if (isset($columnDef['csvNames'])) {
