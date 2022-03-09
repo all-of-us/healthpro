@@ -1,11 +1,14 @@
-{% extends 'base.html.twig' %}
+{% extends 'render-base.html.twig' %}
 {% block title %}Participants - {% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>Participants</h2>
     </div>
-
-    <p><a href="{{ path('participants') }}">Return to participant lookup</a></p>
+    {% set returnRoute = 'participants' %}
+    {% if app.request.get('_route') starts with 'read_' %}
+        {% set returnRoute = 'read_participants' %}
+    {% endif %}
+    <p><a href="{{ path(returnRoute) }}">Return to participant lookup</a></p>
 
     {% if participants %}
         <table class="table table-striped">
