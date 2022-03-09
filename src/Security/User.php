@@ -15,6 +15,7 @@ class User implements UserInterface
     public const BIOBANK_GROUP = 'biospecimen-non-pii';
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
+    public const READ_ONLY_GROUP = 'ready-only';
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
@@ -31,6 +32,7 @@ class User implements UserInterface
     private $biobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
+    private $readyOnlyAccess;
 
     public function __construct($googleUser, array $groups, $info = null, $timezone = null, $sessionInfo = null)
     {
@@ -45,6 +47,7 @@ class User implements UserInterface
         $this->adminDvAccess = $this->computeAdminDvAccess();
         $this->biobankAccess = $this->computeBiobankAccess();
         $this->scrippsAccess = $this->computeScrippsAccess();
+        $this->readyOnlyAccess = $this->computeReadyOnlyAccess();
     }
 
     public function getGroups()
@@ -135,6 +138,17 @@ class User implements UserInterface
         $hasAccess = false;
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), self::SCRIPPS_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeReadyOnlyAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::READ_ONLY_GROUP . '@') === 0) {
                 $hasAccess = true;
             }
         }
@@ -247,6 +261,9 @@ class User implements UserInterface
         }
         if (!empty($this->sessionInfo['managegroups'])) {
             $roles[] = 'ROLE_MANAGE_USERS';
+        }
+        if ($this->readyOnlyAccess) {
+            $roles[] = 'ROLE_READY_ONLY';
         }
         return $roles;
     }
