@@ -13,9 +13,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/participants")
- */
 class ParticipantLookupController extends AbstractController
 {
     protected $participantSummaryService;
@@ -26,7 +23,8 @@ class ParticipantLookupController extends AbstractController
     }
 
     /**
-     * @Route("/", name="participants")
+     * @Route("/participants", name="participants")
+     * @Route("/read/participants", name="read_participants")
      */
     public function participantsAction(Request $request)
     {

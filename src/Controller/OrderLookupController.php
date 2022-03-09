@@ -12,13 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/orders")
- */
 class OrderLookupController extends AbstractController
 {
     /**
-     * @Route("/", name="orders")
+     * @Route("/orders", name="orders")
+     * @Route("/read/orders", name="read_orders")
      */
     public function ordersAction(
         Request $request,
