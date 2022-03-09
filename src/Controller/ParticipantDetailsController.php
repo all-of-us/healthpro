@@ -37,6 +37,7 @@ class ParticipantDetailsController extends AbstractController
 
     /**
      * @Route("/participant/{id}", name="participant")
+     * @Route("/read/participant/{id}", name="read_participant")
      */
     public function participantDetailsAction(
         $id,
@@ -77,7 +78,10 @@ class ParticipantDetailsController extends AbstractController
                 'id' => $id
             ]);
         }
-        $isCrossOrg = $participant->hpoId !== $siteService->getSiteAwardee();
+        $isCrossOrg = false;
+        if (strpos($request->get('_route'), 'read_') === false) {
+            $isCrossOrg = $participant->hpoId !== $siteService->getSiteAwardee();
+        }
         $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, [
                     'test-participant',
                     'basics',

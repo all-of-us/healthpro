@@ -28,6 +28,10 @@ class ParticipantLookupController extends AbstractController
      */
     public function participantsAction(Request $request)
     {
+        $redirectRoute = 'participant';
+        if (strpos($request->get('_route'), 'read_') !== false) {
+            $redirectRoute = 'read_participant';
+        }
         $idForm = $this->createForm(ParticipantLookupIdType::class, null);
         $idForm->handleRequest($request);
 
@@ -35,7 +39,7 @@ class ParticipantLookupController extends AbstractController
             $id = $idForm->get('participantId')->getData();
             $participant = $this->participantSummaryService->getParticipantById($id);
             if ($participant) {
-                return $this->redirectToRoute('participant', ['id' => $id]);
+                return $this->redirectToRoute($redirectRoute, ['id' => $id]);
             }
             $this->addFlash('error', 'Participant ID not found');
         }
@@ -48,7 +52,7 @@ class ParticipantLookupController extends AbstractController
             try {
                 $searchResults = $this->participantSummaryService->search($searchParameters);
                 if (count($searchResults) == 1) {
-                    return $this->redirectToRoute('participant', [
+                    return $this->redirectToRoute($redirectRoute, [
                         'id' => $searchResults[0]->id
                     ]);
                 }
