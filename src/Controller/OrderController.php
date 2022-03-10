@@ -320,7 +320,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
-     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="order_process")
+     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="read_order_process")
      */
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
