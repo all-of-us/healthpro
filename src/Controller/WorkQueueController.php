@@ -71,6 +71,7 @@ class WorkQueueController extends AbstractController
         $params = array_filter($request->query->all());
 
         $filters = [];
+        $advancedFilters = WorkQueue::$consentAdvanceFilters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
@@ -94,15 +95,8 @@ class WorkQueueController extends AbstractController
             // Save selected (or default) awardee in requestStack->getSession()
             $this->requestStack->getSession()->set('workQueueAwardee', $awardee);
 
-            // Remove patient status filter for awardee
-            unset($filters['patientStatus']);
-        }
-
-        $advancedFilters = WorkQueue::$consentAdvanceFilters;
-
-        // Display current organization in the default patient status filter drop down label
-        if (isset($advancedFilters['patientStatus'])) {
-            $advancedFilters['patientStatus']['label'] = 'Patient Status at ' . $this->siteService->getOrganizationDisplayName($this->siteService->getSiteOrganization());
+            // Remove patient status from advanced filter for awardee
+            unset($advancedFilters['Status']['patientStatus']);
         }
 
         $sites = $this->siteService->getAwardeeSites($awardee);
@@ -352,7 +346,8 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $filters = WorkQueue::$consentFilters;
+        $filters = [];
+        $consentAdvanceFilters = WorkQueue::$consentAdvanceFilters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
@@ -376,17 +371,11 @@ class WorkQueueController extends AbstractController
             // Save selected (or default) awardee in session
             $this->requestStack->getSession()->set('workQueueAwardee', $awardee);
 
-            // Remove patient status filter for awardee
-            unset($filters['patientStatus']);
-        }
-
-        // Display current organization in the default patient status filter drop down label
-        if (isset($filters['patientStatus'])) {
-            $filters['patientStatus']['label'] = 'Patient Status at ' . $this->siteService->getOrganizationDisplayName($this->siteService->getSiteOrganization());
+            // Remove patient status from advanced filter for awardee
+            unset($consentAdvanceFilters['Status']['patientStatus']);
         }
 
         $sites = $this->siteService->getAwardeeSites($awardee);
-        $consentAdvanceFilters = WorkQueue::$consentAdvanceFilters;
         if (!empty($sites)) {
             //Add organization filter
             $organizationsList = [];
