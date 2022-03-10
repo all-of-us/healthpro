@@ -27,6 +27,8 @@ class OrderLookupController extends AbstractController
         $idForm = $this->createForm(OrderLookupIdType::class, null);
         $idForm->handleRequest($request);
 
+        $readOnlyView = strpos($request->get('_route'), 'read_') === 0 ? true : false;
+
         if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('orderId')->getData();
 
@@ -41,7 +43,7 @@ class OrderLookupController extends AbstractController
             ]);
             if ($order) {
                 $redirectRoute = 'order';
-                if (strpos($request->get('_route'), 'read_') === 0) {
+                if ($readOnlyView) {
                     $redirectRoute = 'read_order';
                 }
                 return $this->redirectToRoute($redirectRoute, [
@@ -52,15 +54,19 @@ class OrderLookupController extends AbstractController
             $this->addFlash('error', 'Order ID not found');
         }
 
-        $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
+        $recentOrders = [];
+        if (!$readOnlyView) {
+            $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
 
-        foreach ($recentOrders as &$order) {
-            $order->participant = $participantSummaryService->getParticipantById($order->getParticipantId());
+            foreach ($recentOrders as &$order) {
+                $order->participant = $participantSummaryService->getParticipantById($order->getParticipantId());
+            }
         }
 
         return $this->render('orderlookup/orders.html.twig', [
             'idForm' => $idForm->createView(),
-            'recentOrders' => $recentOrders
+            'recentOrders' => $recentOrders,
+            'readOnlyView' => $readOnlyView
         ]);
     }
 }
