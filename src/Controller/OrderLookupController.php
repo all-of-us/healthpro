@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Form\OrderLookupIdType;
 use App\Service\ParticipantSummaryService;
+use App\Service\ReadOnlyService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,12 +23,11 @@ class OrderLookupController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SiteService $siteService,
-        ParticipantSummaryService $participantSummaryService
+        ParticipantSummaryService $participantSummaryService,
+        ReadOnlyService $readOnlyService
     ): Response {
         $idForm = $this->createForm(OrderLookupIdType::class, null);
         $idForm->handleRequest($request);
-
-        $readOnlyView = strpos($request->get('_route'), 'read_') === 0 ? true : false;
 
         if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('orderId')->getData();
@@ -43,7 +43,7 @@ class OrderLookupController extends AbstractController
             ]);
             if ($order) {
                 $redirectRoute = 'order';
-                if ($readOnlyView) {
+                if ($readOnlyService->isReadOnly()) {
                     $redirectRoute = 'read_order';
                 }
                 return $this->redirectToRoute($redirectRoute, [
@@ -55,7 +55,7 @@ class OrderLookupController extends AbstractController
         }
 
         $recentOrders = [];
-        if (!$readOnlyView) {
+        if (!$readOnlyService->isReadOnly()) {
             $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
 
             foreach ($recentOrders as &$order) {
@@ -66,7 +66,7 @@ class OrderLookupController extends AbstractController
         return $this->render('orderlookup/orders.html.twig', [
             'idForm' => $idForm->createView(),
             'recentOrders' => $recentOrders,
-            'readOnlyView' => $readOnlyView
+            'readOnlyView' => $readOnlyService->isReadOnly()
         ]);
     }
 }

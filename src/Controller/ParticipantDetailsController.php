@@ -14,6 +14,7 @@ use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusService;
+use App\Service\ReadOnlyService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
@@ -49,7 +50,8 @@ class ParticipantDetailsController extends AbstractController
         SiteService $siteService,
         ParameterBagInterface $params,
         PatientStatusService $patientStatusService,
-        MeasurementService $measurementService
+        MeasurementService $measurementService,
+        ReadOnlyService $readOnlyService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -79,7 +81,7 @@ class ParticipantDetailsController extends AbstractController
             ]);
         }
         $isCrossOrg = false;
-        if (strpos($request->get('_route'), 'read_') === false) {
+        if (!$readOnlyService->isReadOnly()) {
             $isCrossOrg = $participant->hpoId !== $siteService->getSiteAwardee();
         }
         $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, [
