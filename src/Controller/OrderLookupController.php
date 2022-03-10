@@ -40,7 +40,11 @@ class OrderLookupController extends AbstractController
                 'orderId' => $id
             ]);
             if ($order) {
-                return $this->redirectToRoute('order', [
+                $redirectRoute = 'order';
+                if (strpos($request->get('_route'), 'read_') === 0) {
+                    $redirectRoute = 'read_order';
+                }
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $order->getParticipantId(),
                     'orderId' => $order->getId()
                 ]);

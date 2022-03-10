@@ -249,6 +249,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
+     * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect")
      */
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
@@ -315,6 +316,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
+     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="order_process")
      */
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
@@ -409,6 +411,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
+     * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize")
      */
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
@@ -715,8 +718,9 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}", name="order")
+     * @Route("/read/participant/{participantId}/order/{orderId}", name="read_order")
      */
-    public function orderAction($participantId, $orderId)
+    public function orderAction($participantId, $orderId, Request $request)
     {
         $orderRepository = $this->em->getRepository(Order::class);
         $order = $orderRepository->find($orderId);
@@ -725,7 +729,11 @@ class OrderController extends AbstractController
         }
         $this->orderService->loadSamplesSchema($order);
         $action = $order->getCurrentStep();
-        return $this->redirectToRoute("order_{$action}", [
+        $redirectRoute = 'order_';
+        if (strpos($request->get('_route'), 'read_') === 0) {
+            $redirectRoute = 'read_order_';
+        }
+        return $this->redirectToRoute($redirectRoute . $action, [
             'participantId' => $participantId,
             'orderId' => $orderId
         ]);
