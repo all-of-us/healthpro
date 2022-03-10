@@ -440,7 +440,13 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
+        if ($workQueueColumns) {
+            WorkQueue::mapExportColumns($workQueueColumns);
+        }
         foreach (WorkQueue::$exportColumns as $field) {
+            if ($workQueueColumns && !in_array($field, $workQueueColumns)) {
+                continue;
+            }
             $columnDef = WorkQueue::$columnsDef[$field];
             if ($field === 'dateOfDeath') {
                 $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
@@ -463,7 +469,7 @@ class WorkQueueService
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone, $displayTime);
                 } else {
                     if (isset($columnDef['rdrDateField'])) {
-                        $row[] = $participant->{$columnDef['rdrDateField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString(
+                        $row[] = $participant->{$columnDef['rdrField']} === $columnDef['csvStatusText'] ? WorkQueue::dateFromString(
                             $participant->{$columnDef['rdrDateField']},
                             $userTimezone,
                             false
@@ -479,11 +485,9 @@ class WorkQueueService
                         $participant->{$columnDef['otherField']}
                     );
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                } elseif (isset($columnDef['names'])) {
-                    foreach (array_keys($columnDef['names']) as $type) {
-                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
-                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
-                    }
+                } elseif (isset($columnDef['csvNames'])) {
+                    $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field);
+                    $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field, true, $userTimezone);
                 } else {
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
                 }
@@ -513,9 +517,9 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
-        foreach (WorkQueue::$consentColumns as $field) {
+        foreach (WorkQueue::$consentExportColumns as $field) {
             $columnDef = WorkQueue::$columnsDef[$field];
-            if (!$columnDef['toggleColumn'] || (in_array("column{$field}", $workQueueConsentColumns))) {
+            if (in_array($field, $workQueueConsentColumns)) {
                 if (isset($columnDef['csvMethod'])) {
                     if (isset($columnDef['otherField'])) {
                         $row[] = WorkQueue::{$columnDef['csvMethod']}(
@@ -523,11 +527,9 @@ class WorkQueueService
                             $participant->{$columnDef['otherField']}
                         );
                         $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
-                    } elseif (isset($columnDef['names'])) {
-                        foreach (array_keys($columnDef['names']) as $type) {
-                            $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type);
-                            $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $type, true, $userTimezone);
-                        }
+                    } elseif (isset($columnDef['csvNames'])) {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field);
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field, true, $userTimezone);
                     } else {
                         $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']});
                     }
