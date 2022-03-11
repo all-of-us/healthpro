@@ -3,6 +3,7 @@
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
     {% set hasOrgPatientStatusData = orgPatientStatusData ? 1 : 0 %}
+    {% set readOnlyView = readOnlyView|default(false) %}
     <div id="participant_info" data-participant-id="{{ participant.id }}" data-has-org-patient-status="{{ hasOrgPatientStatusData }}" data-can-view-patient-status="{{ canViewPatientStatus }}">
     {% if hasNoParticipantAccess %}
         <div class="row">
@@ -58,7 +59,7 @@
             {% include 'partials/deceased-participant-notice.html.twig' %}
         {% endif %}
 
-        {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
+        {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' and not readOnlyView %}
             <div class="btn-group pull-right">
                 <a class="btn btn-default" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
             </div>
@@ -490,9 +491,11 @@
                                                             <dd>{{ orgPatientStatusData.comments }}</dd>
                                                         </dl>
                                                     </div>
-                                                    <div align="center">
-                                                        <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
-                                                    </div>
+                                                    {% if not readOnlyView %}
+                                                        <div align="center">
+                                                            <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                                                        </div>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                             <div id="patient-status-form-box">
@@ -503,7 +506,9 @@
                                                     <small class="text-warning">User must enter a reason for updating previous organization status.</small>
                                                     <br><br>
                                                 {% endif %}
-                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                                {% if not readOnlyView %}
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                {% endif %}
                                                 {% if orgPatientStatusData is not empty %}
                                                     <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
                                                 {% endif %}

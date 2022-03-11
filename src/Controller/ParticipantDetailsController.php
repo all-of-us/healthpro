@@ -129,9 +129,9 @@ class ParticipantDetailsController extends AbstractController
             // Determine if comment field is required
             $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
             // Get patient status form
-            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired]);
+            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired, 'disabled' => $readOnlyService->isReadOnly()]);
             $patientStatusForm->handleRequest($request);
-            if ($patientStatusForm->isSubmitted()) {
+            if ($patientStatusForm->isSubmitted() && !$readOnlyService->isReadOnly()) {
                 $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
                     'participantId' => $id,
                     'organization' => $siteService->getSiteOrganization()
@@ -195,7 +195,8 @@ class ParticipantDetailsController extends AbstractController
             'canEdit' => $participant->status || $participant->editExistingOnly,
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl,
-            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue')
+            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
+            'readOnlyView' => $readOnlyService->isReadOnly()
         ]);
     }
 

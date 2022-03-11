@@ -53,7 +53,7 @@
                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                 </a>
             {% endif %}
-            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status %}
+            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView|default(false) %}
                 <a href="{{ path('order_check', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
             {% endif %}
         {% endif %}
