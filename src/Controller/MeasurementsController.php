@@ -50,6 +50,7 @@ class MeasurementsController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
+     * @Route("/read/participant/{participantId}/measurements/{measurementId}", name="read_measurement")
      */
     public function measurementsAction($participantId, $measurementId, Request $request)
     {

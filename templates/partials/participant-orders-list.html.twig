@@ -1,3 +1,4 @@
+{% set readOnlyView = readOnlyView|default(false) %}
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
@@ -15,7 +16,8 @@
                 {% elseif biobankView is defined %}
                     <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% else %}
-                    <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
+                    {% set orderRoute = readOnlyView ? 'read_order' : 'order' %}
+                    <a href="{{ path(orderRoute, { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg {% if orderId is defined and order.id == orderId %} btn-warning {% else %} btn-default {% endif %}">
                 {% endif %}
                     {{ order.createdTs|date('D n/j/Y', app.user.timezone) }}
                     <small class="text-muted"><strong>{{ order.orderId }}</strong></small>
@@ -53,7 +55,7 @@
                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                 </a>
             {% endif %}
-            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView|default(false) %}
+            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView %}
                 <a href="{{ path('order_check', { participantId: participant.id }) }}" class="btn btn-block btn-lg btn-default"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
             {% endif %}
         {% endif %}
