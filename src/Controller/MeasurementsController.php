@@ -13,6 +13,7 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
+use App\Service\ReadOnlyService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
@@ -52,7 +53,7 @@ class MeasurementsController extends AbstractController
      * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
      * @Route("/read/participant/{participantId}/measurements/{measurementId}", name="read_measurement")
      */
-    public function measurementsAction($participantId, $measurementId, Request $request)
+    public function measurementsAction($participantId, $measurementId, Request $request, ReadOnlyService $readOnlyService)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -86,7 +87,7 @@ class MeasurementsController extends AbstractController
         $showAutoModification = false;
         $measurementsForm = $this->get('form.factory')->createNamed('form', MeasurementType::class, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
-            'locked' => $measurement->getFinalizedTs() ? true : false
+            'locked' => $measurement->getFinalizedTs() || $readOnlyService->isReadOnly() ? true : false
         ]);
         $measurementsForm->handleRequest($request);
         if ($measurementsForm->isSubmitted()) {
@@ -259,7 +260,8 @@ class MeasurementsController extends AbstractController
             'showAutoModification' => $showAutoModification,
             'revertForm' => $this->createForm(MeasurementRevertType::class, null)->createView(),
             'displayEhrBannerMessage' => $this->measurementService->requireEhrModificationProtocol() || $measurement->isEhrProtocolForm(),
-            'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : ''
+            'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
+            'readOnlyView' => $readOnlyService->isReadOnly()
         ]);
     }
 
@@ -370,6 +372,7 @@ class MeasurementsController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurement_summary")
+     * @Route("/read/participant/{participantId}/measurements/{measurementId}/summary", name="read_measurement_summary")
      */
     public function measurementsSummaryAction($participantId, $measurementId)
     {
