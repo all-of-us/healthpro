@@ -198,6 +198,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/print/labels", name="order_print_labels")
+     * @Route("/read/participant/{participantId}/order/{orderId}/print/labels", name="read_order_print_labels")
      */
     public function orderPrintLabelsAction($participantId, $orderId)
     {
@@ -221,12 +222,14 @@ class OrderController extends AbstractController
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
-            'errorMessage' => $errorMessage
+            'errorMessage' => $errorMessage,
+            'readOnlyView' => $this->readOnlyService->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/labels/pdf", name="order_labels_pdf")
+     * @Route("/read/participant/{participantId}/order/{orderId}/labels/pdf", name="read_order_labels_pdf")
      */
     public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
@@ -272,10 +275,11 @@ class OrderController extends AbstractController
             'order' => $order,
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId()
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->readOnlyService->isReadOnly()
         ]);
         $collectForm->handleRequest($request);
-        if ($collectForm->isSubmitted()) {
+        if ($collectForm->isSubmitted() && !$this->readOnlyService->isReadOnly()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -314,7 +318,8 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView()
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
+            'readOnlyView' => $this->readOnlyService->isReadOnly()
         ]);
     }
 
@@ -338,10 +343,11 @@ class OrderController extends AbstractController
             'order' => $order,
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId()
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->readOnlyService->isReadOnly()
         ]);
         $processForm->handleRequest($request);
-        if ($processForm->isSubmitted()) {
+        if ($processForm->isSubmitted() && !$this->readOnlyService->isReadOnly()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -409,7 +415,8 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView()
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
+            'readOnlyView' => $this->readOnlyService->isReadOnly()
         ]);
     }
 
@@ -433,10 +440,11 @@ class OrderController extends AbstractController
             'order' => $order,
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId()
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->readOnlyService->isReadOnly()
         ]);
         $finalizeForm->handleRequest($request);
-        if ($finalizeForm->isSubmitted()) {
+        if ($finalizeForm->isSubmitted() && !$this->readOnlyService->isReadOnly()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -539,12 +547,14 @@ class OrderController extends AbstractController
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
-            'showUnfinalizeMsg' => $showUnfinalizeMsg
+            'showUnfinalizeMsg' => $showUnfinalizeMsg,
+            'readOnlyView' => $this->readOnlyService->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/print/requisition", name="order_print_requisition")
+     * @Route("/read/participant/{participantId}/order/{orderId}/print/requisition", name="read_order_print_requisition")
      */
     public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
     {
@@ -566,12 +576,14 @@ class OrderController extends AbstractController
         return $this->render('order/print-requisition.html.twig', [
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'readOnlyView' => $this->readOnlyService->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/requisition/pdf", name="order_requisition_pdf")
+     * @Route("/read/participant/{participantId}/order/{orderId}/requisition/pdf", name="read_order_requisition_pdf")
      */
     public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {

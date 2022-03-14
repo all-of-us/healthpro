@@ -69,7 +69,7 @@
         {{ form_errors(finalizeForm.finalizedNotes) }}
     </div>
     {{ form_rest(finalizeForm) }}
-    {% if not order.disabled %}
+    {% if not order.disabled and not readOnlyView %}
         <p>
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized

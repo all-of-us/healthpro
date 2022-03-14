@@ -15,16 +15,20 @@
             {% elseif order.mayoId is not empty %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <a class="pull-right" href="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                        {% if not readOnlyView  %}
+                            <a class="pull-right" href="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                        {% endif %}
                         <h3 class="panel-title">Requisition</h3>
                     </div>
                     <div class="panel-body">
                         <div id="requisition-loading-widget" class="text-center hidden-ie">
                             <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
                             <p id="requisition-loaded">
-                                <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-print" aria-hidden="true"></i> Print
-                                </a>
+                                {% if not readOnlyView  %}
+                                    <a href="javascript:window.requisition.print();" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                                    </a>
+                                {% endif %}
                             </p>
                         </div>
                         <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>

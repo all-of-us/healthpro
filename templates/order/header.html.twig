@@ -1,3 +1,4 @@
+{% set orderRoute = readOnlyView ? 'read_order_' : 'order_' %}
 {% if order.expired %}
     <div class="alert alert-danger custom-alert">
         This order has expired and can no longer be updated. Please create a new order to collect or send samples.
@@ -123,7 +124,7 @@
             </li>
         {% elseif nextEnabled %}
             <li role="presentation"{% if active == step %} class="active"{% endif %}>
-                <a href="{{ path('order_'~path, params) }}">
+                <a href="{{ path(orderRoute ~ path, params) }}">
                     {% if attribute(order, column[1]~'Ts') %}
                         {% if step == 'process' and processTabClass is defined %}
                             <i class="{{ processTabClass }}" aria-hidden="true"></i>
