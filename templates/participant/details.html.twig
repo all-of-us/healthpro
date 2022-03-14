@@ -4,6 +4,7 @@
     {% import 'macros/display-text.html.twig' as macros %}
     {% set hasOrgPatientStatusData = orgPatientStatusData ? 1 : 0 %}
     {% set readOnlyView = readOnlyView|default(false) %}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     <div id="participant_info" data-participant-id="{{ participant.id }}" data-has-org-patient-status="{{ hasOrgPatientStatusData }}" data-can-view-patient-status="{{ canViewPatientStatus }}">
     {% if hasNoParticipantAccess %}
         <div class="row">
@@ -41,7 +42,7 @@
             <div class="row">
                 <div class="col-sm-12 text-center">
                     Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
-                    <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px" class="btn btn-primary btn-xs"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
+                    <a href="{{ path(routePrefix ~ 'participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px" class="btn btn-primary btn-xs"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
                 </div>
             </div>
             <br/>
@@ -561,7 +562,7 @@
                                                             <td>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</td>
                                                             <td>
                                                                 <small>
-                                                                    <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
+                                                                    <a data-href="{{ path(routePrefix ~ 'patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">History</a>
                                                                 </small>
                                                             </td>
                                                         </tr>

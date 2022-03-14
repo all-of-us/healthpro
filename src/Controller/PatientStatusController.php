@@ -137,6 +137,7 @@ class PatientStatusController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/patient/status/{patientStatusId}", name="patientStatus")
+     * @Route("/read/participant/{participantId}/patient/status/{patientStatusId}", name="read_patientStatus")
      */
     public function patientStatusAction(
         $participantId,
