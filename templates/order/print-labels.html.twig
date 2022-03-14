@@ -24,7 +24,7 @@
                                 {% endif %}
                             </p>
                         </div>
-                        <iframe name="labels" class="pdf pdf-labels" src="{{ path('order_labels_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
+                        <iframe name="labels" class="pdf pdf-labels" src="{{ path(orderRoute ~ 'labels_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
                     </div>
                 </div>
                 <div class="text-center">

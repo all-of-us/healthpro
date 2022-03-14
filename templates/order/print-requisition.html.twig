@@ -2,6 +2,7 @@
 {% block title %}Print Requisition - Order {{ order.orderId }} - {% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'print_requisition' } %}
+    {% set orderRoute = readOnlyView ? 'read_order_' : 'order_' %}
     <div class="row">
         <div class="col-sm-10 col-md-offset-1">
             {% if order.status == 'edit' or order.status == 'unlock' %}
@@ -16,7 +17,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         {% if not readOnlyView  %}
-                            <a class="pull-right" href="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                            <a class="pull-right" href="{{ path(orderRoute ~ 'requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
                         {% endif %}
                         <h3 class="panel-title">Requisition</h3>
                     </div>
@@ -31,7 +32,7 @@
                                 {% endif %}
                             </p>
                         </div>
-                        <iframe name="requisition" class="pdf pdf-requisition" src="{{ path('order_requisition_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
+                        <iframe name="requisition" class="pdf pdf-requisition" src="{{ path(orderRoute ~ 'requisition_pdf', { participantId: participant.id, orderId: order.id }) }}#view=FitH"></iframe>
                     </div>
                 </div>
             {% else %}
