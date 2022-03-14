@@ -36,6 +36,8 @@ class DefaultController extends AbstractController
             return $this->redirectToRoute('admin_home');
         } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
             return $this->redirectToRoute('biobank_home');
+        } elseif ($this->isGranted('ROLE_READ_ONLY')) {
+            return $this->redirectToRoute('read_home');
         } else {
             throw $this->createAccessDeniedException();
         }
