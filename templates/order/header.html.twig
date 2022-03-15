@@ -148,7 +148,7 @@
 </ul>
 <br />
 {% if active in ['collect', 'process', 'finalize'] %}
-    <p><strong>Your time zone</strong>: {{ timezone_display(app.user.timezone) }} <a href="{{ path('settings', { return: return}) }}" class="small">change</a></p>
+    <p><strong>Your time zone</strong>: {{ timezone_display(app.user.timezone) }} <a href="{{ path(routePrefix ~ 'settings', { return: return}) }}" class="small">change</a></p>
 {% endif %}
 
 <div class="modal fade" id="unlockWarningModal" tabindex="-1" role="dialog" aria-labelledby="unlockWarningModalLabel">
