@@ -101,14 +101,14 @@
                                     {% include 'partials/participant-notice.html.twig' %}
                                 </div>
                             {% endif %}
-                            <div class="col-sm-6 {{ isDVType ? 'col-lg-4' : 'col-lg-6' }}">
+                            <div class="col-sm-6 {{ isDVType and not readOnlyView ? 'col-lg-4' : 'col-lg-6' }}">
                                 {% include 'partials/participant-measurement-list.html.twig' %}
                             </div>
 
-                            <div class="col-sm-6 {{ isDVType ? 'col-lg-4' : 'col-lg-6' }}">
+                            <div class="col-sm-6 {{ isDVType and not readOnlyView ? 'col-lg-4' : 'col-lg-6' }}">
                                 {% include 'partials/participant-orders-list.html.twig' %}
                             </div>
-                            {% if isDVType %}
+                            {% if isDVType and not readOnlyView %}
                                 <div class="col-sm-6 col-lg-4">
                                     {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
                                 </div>
