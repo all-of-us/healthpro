@@ -14,7 +14,6 @@ class SettingsController extends AbstractController
 {
     /**
      * @Route("/settings", name="settings")
-     * @Route("/read/settings", name="read_settings")
      */
     public function settings(Request $request, TimezoneService $timezeoneService, UserRepository $userRepository, EntityManagerInterface $em)
     {

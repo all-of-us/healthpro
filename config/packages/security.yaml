@@ -22,7 +22,7 @@ security:
         - { path: ^/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/problem($|\/).*, roles: ROLE_DV_ADMIN }
-        - { path: ^/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
+        - { path: ^/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS, ROLE_READ_ONLY] }
         - { path: ^/site($|\/), roles: [ROLE_USER, ROLE_AWARDEE] }
         - { path: ^/help/.*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS] }
         - { path: ^/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }

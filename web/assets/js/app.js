@@ -366,7 +366,7 @@ $(document).ready(function()
     PMI.browserTimeZone = jstz.determine().name();
     PMI.isTimeZoneDiff = PMI.userTimeZone && PMI.browserTimeZone && PMI.browserTimeZone in PMI.timeZones && PMI.userTimeZone != PMI.browserTimeZone;
 
-    if (PMI.userSite && $.inArray(PMI.currentRoute, ['settings']) === -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
+    if ((PMI.userSite || PMI.readOnlyView) && $.inArray(PMI.currentRoute, ['settings']) === -1 && PMI.isTimeZoneDiff && !PMI.hideTZWarning) {
         var html = '<div class="alert alert-warning">';
         html += '<a href="#" class="close" id="tz_close" data-dismiss="alert" aria-label="close">&times;</a>';
         html += 'Your computer\'s time zone does not appear to match your HealthPro time zone preference. ';

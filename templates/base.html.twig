@@ -31,7 +31,6 @@
     {% set showRoleDropdown = showRoleDropdown or is_granted(roleNav.role) %}
 {% endfor %}
 {% set currentRoleNav = currentRoleNav|default(false) %}
-{% set routePrefix = app.request.get('_route') starts with 'read_' ? 'read_' : '' %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -173,7 +172,7 @@
                     <li class="dropdown">
                         <a href="{{ path('settings') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ path(routePrefix ~ 'settings') }}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
+                            <li><a href="{{ path('settings') }}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
                             <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
                         </ul>
                     </li>
