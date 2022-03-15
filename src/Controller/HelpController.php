@@ -14,7 +14,6 @@ class HelpController extends AbstractController
 {
     /**
      * @Route("/help", name="help_home")
-     * @Route("/read/help", name="read_help_home")
      */
     public function index()
     {
