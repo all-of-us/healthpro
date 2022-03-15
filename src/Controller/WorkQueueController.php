@@ -69,7 +69,9 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $filters = WorkQueue::$consentAdvanceFilters;
+
+        $filters = [];
+        $advancedFilters = WorkQueue::$consentAdvanceFilters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
@@ -93,13 +95,8 @@ class WorkQueueController extends AbstractController
             // Save selected (or default) awardee in requestStack->getSession()
             $this->requestStack->getSession()->set('workQueueAwardee', $awardee);
 
-            // Remove patient status filter for awardee
-            unset($filters['patientStatus']);
-        }
-
-        // Display current organization in the default patient status filter drop down label
-        if (isset($filters['patientStatus'])) {
-            $filters['patientStatus']['label'] = 'Patient Status at ' . $this->siteService->getOrganizationDisplayName($this->siteService->getSiteOrganization());
+            // Remove patient status from advanced filter for awardee
+            unset($advancedFilters['Status']['patientStatus']);
         }
 
         $sites = $this->siteService->getAwardeeSites($awardee);
@@ -113,7 +110,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $sitesList['site']['options']['Unpaired'] = 'UNSET';
-            $filters['Pairing'] = array_merge($filters['Pairing'], $sitesList);
+            $advancedFilters['Pairing'] = array_merge($advancedFilters['Pairing'], $sitesList);
 
             //Add organization filter
             $organizationsList = [];
@@ -124,7 +121,7 @@ class WorkQueueController extends AbstractController
                 }
             }
             $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
-            $filters['Pairing'] = array_merge($filters['Pairing'], $organizationsList);
+            $advancedFilters['Pairing'] = array_merge($advancedFilters['Pairing'], $organizationsList);
         }
 
         //For ajax requests
@@ -147,7 +144,8 @@ class WorkQueueController extends AbstractController
                 $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
             }
             return $this->render('workqueue/index.html.twig', [
-                'advancedFilters' => $filters,
+                'filters' => $filters,
+                'advancedFilters' => $advancedFilters,
                 'surveys' => WorkQueue::$surveys,
                 'samples' => WorkQueue::$samples,
                 'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
@@ -348,7 +346,8 @@ class WorkQueueController extends AbstractController
         }
 
         $params = array_filter($request->query->all());
-        $filters = WorkQueue::$consentFilters;
+        $filters = [];
+        $consentAdvanceFilters = WorkQueue::$consentAdvanceFilters;
 
         if ($this->isGranted('ROLE_AWARDEE')) {
             // Add awardees list to filters
@@ -372,17 +371,11 @@ class WorkQueueController extends AbstractController
             // Save selected (or default) awardee in session
             $this->requestStack->getSession()->set('workQueueAwardee', $awardee);
 
-            // Remove patient status filter for awardee
-            unset($filters['patientStatus']);
-        }
-
-        // Display current organization in the default patient status filter drop down label
-        if (isset($filters['patientStatus'])) {
-            $filters['patientStatus']['label'] = 'Patient Status at ' . $this->siteService->getOrganizationDisplayName($this->siteService->getSiteOrganization());
+            // Remove patient status from advanced filter for awardee
+            unset($consentAdvanceFilters['Status']['patientStatus']);
         }
 
         $sites = $this->siteService->getAwardeeSites($awardee);
-        $consentAdvanceFilters = WorkQueue::$consentAdvanceFilters;
         if (!empty($sites)) {
             //Add organization filter
             $organizationsList = [];
