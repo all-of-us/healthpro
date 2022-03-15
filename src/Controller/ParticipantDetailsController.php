@@ -55,9 +55,9 @@ class ParticipantDetailsController extends AbstractController
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
-
+        $routePrefix = $readOnlyService->isReadOnly() ? 'read_' : '';
         if ($refresh) {
-            return $this->redirectToRoute('participant', [
+            return $this->redirectToRoute($routePrefix . 'participant', [
                 'id' => $id
             ]);
         }
