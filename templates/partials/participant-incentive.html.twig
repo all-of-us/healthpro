@@ -5,10 +5,10 @@
     <div class="panel-body" id="incentive">
         {{ form_start(incentiveForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit incentive-form' } }) }}
         {{ form_errors(incentiveForm) }}
-        <p><b>Verification</b></p>
+        <p><b>Confirmation</b></p>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="incentive_verification"> <b>Please verify the participant has completed all study requirements?</b>
+                <input type="checkbox" id="incentive_verification"> <b>Please confirm the participant has completed PM&B.</b>
             </label>
             <p id="incentive_verification_warning" class="text-danger small" style="display:none">Participant must complete study requirements before receiving incentive.</p>
         </div>
