@@ -740,10 +740,7 @@ class OrderController extends BaseController
         }
         $this->orderService->loadSamplesSchema($order);
         $action = $order->getCurrentStep();
-        $redirectRoute = 'order_';
-        if ($this->isReadOnly()) {
-            $redirectRoute = 'read_order_';
-        }
+        $redirectRoute = $this->isReadOnly() ? 'read_order_' : 'order_';
         return $this->redirectToRoute($redirectRoute . $action, [
             'participantId' => $participantId,
             'orderId' => $orderId
