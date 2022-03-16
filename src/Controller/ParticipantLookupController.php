@@ -27,10 +27,7 @@ class ParticipantLookupController extends BaseController
      */
     public function participantsAction(Request $request)
     {
-        $redirectRoute = 'participant';
-        if ($this->isReadOnly()) {
-            $redirectRoute = 'read_participant';
-        }
+        $redirectRoute = $this->isReadOnly() ? 'read_participant' : 'participant';
         $idForm = $this->createForm(ParticipantLookupIdType::class, null);
         $idForm->handleRequest($request);
 

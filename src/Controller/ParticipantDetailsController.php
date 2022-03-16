@@ -77,10 +77,7 @@ class ParticipantDetailsController extends BaseController
                 'id' => $id
             ]);
         }
-        $isCrossOrg = false;
-        if (!$this->isReadOnly()) {
-            $isCrossOrg = $participant->hpoId !== $siteService->getSiteAwardee();
-        }
+        $isCrossOrg = $this->isReadOnly() ? false : $participant->hpoId !== $siteService->getSiteAwardee();
         $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, [
                     'test-participant',
                     'basics',

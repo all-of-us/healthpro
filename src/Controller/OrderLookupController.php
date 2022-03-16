@@ -39,10 +39,7 @@ class OrderLookupController extends BaseController
                 'orderId' => $id
             ]);
             if ($order) {
-                $redirectRoute = 'order';
-                if ($this->isReadOnly()) {
-                    $redirectRoute = 'read_order';
-                }
+                $redirectRoute = $this->isReadOnly() ? 'read_order' : 'order';
                 return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $order->getParticipantId(),
                     'orderId' => $order->getId()

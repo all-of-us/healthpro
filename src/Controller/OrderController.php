@@ -253,7 +253,7 @@ class OrderController extends BaseController
      * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
      * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect", methods={"GET"})
      */
-    public function orderCollectAction($participantId, $orderId, Request $request, $_route)
+    public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $nextStep = $order->getType() === 'saliva' ? 'finalize' : 'process';
