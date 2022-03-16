@@ -36,7 +36,7 @@ class ParticipantDetailsController extends BaseController
 
     /**
      * @Route("/participant/{id}", name="participant")
-     * @Route("/read/participant/{id}", name="read_participant")
+     * @Route("/read/participant/{id}", name="read_participant", methods={"GET"})
      */
     public function participantDetailsAction(
         $id,
@@ -128,7 +128,7 @@ class ParticipantDetailsController extends BaseController
             // Get patient status form
             $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired, 'disabled' => $this->isReadOnly()]);
             $patientStatusForm->handleRequest($request);
-            if ($patientStatusForm->isSubmitted() && !$this->isReadOnly()) {
+            if ($patientStatusForm->isSubmitted()) {
                 $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
                     'participantId' => $id,
                     'organization' => $siteService->getSiteOrganization()

@@ -251,7 +251,7 @@ class OrderController extends BaseController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
-     * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect")
+     * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect", methods={"GET"})
      */
     public function orderCollectAction($participantId, $orderId, Request $request, $_route)
     {
@@ -274,7 +274,7 @@ class OrderController extends BaseController
             'disabled' => $this->isReadOnly()
         ]);
         $collectForm->handleRequest($request);
-        if ($collectForm->isSubmitted() && !$this->isReadOnly()) {
+        if ($collectForm->isSubmitted()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -320,7 +320,7 @@ class OrderController extends BaseController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
-     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="read_order_process")
+     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="read_order_process", methods={"GET"})
      */
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
@@ -342,7 +342,7 @@ class OrderController extends BaseController
             'disabled' => $this->isReadOnly()
         ]);
         $processForm->handleRequest($request);
-        if ($processForm->isSubmitted() && !$this->isReadOnly()) {
+        if ($processForm->isSubmitted()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -417,7 +417,7 @@ class OrderController extends BaseController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
-     * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize")
+     * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize", methods={"GET"})
      */
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
@@ -439,7 +439,7 @@ class OrderController extends BaseController
             'disabled' => $this->isReadOnly()
         ]);
         $finalizeForm->handleRequest($request);
-        if ($finalizeForm->isSubmitted() && !$this->isReadOnly()) {
+        if ($finalizeForm->isSubmitted()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }

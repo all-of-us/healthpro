@@ -49,7 +49,7 @@ class MeasurementsController extends BaseController
 
     /**
      * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
-     * @Route("/read/participant/{participantId}/measurements/{measurementId}", name="read_measurement")
+     * @Route("/read/participant/{participantId}/measurements/{measurementId}", name="read_measurement", methods={"GET"})
      */
     public function measurementsAction($participantId, $measurementId, Request $request)
     {
