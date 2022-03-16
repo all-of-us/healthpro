@@ -95,4 +95,49 @@ class AuthControllerTest extends AppWebTestCase
         $this->client->request('GET', '/');
         $this->assertResponseHeaderSame('X-Frame-Options', 'SAMEORIGIN');
     }
+
+    public function testReadOnlyRoutes()
+    {
+        $this->login('testReadOnlyRoutes@example.com', [User::READ_ONLY_GROUP]);
+        $this->client->followRedirects();
+        $this->client->request('GET', '/');
+        self::assertEquals('/read/', $this->client->getRequest()->getRequestUri());
+
+        $this->client->request('GET', '/read/participants');
+        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+
+        $this->client->request('GET', '/read/orders');
+        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testSiteUserReadOnlyRoutes()
+    {
+        $siteId = 'hpo-site-' . uniqid();
+        $this->login('testSiteUserReadOnlyRoutes@example.com', [$siteId]);
+        $this->client->followRedirects();
+
+        $this->client->request('GET', '/read/');
+        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+
+        $this->client->request('GET', '/read/participants');
+        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+
+        $this->client->request('GET', '/read/orders');
+        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testAdminUserReadOnlyRoutes()
+    {
+        $this->login('testAdminUserReadOnlyRoutes@example.com', [User::ADMIN_GROUP]);
+        $this->client->followRedirects();
+
+        $this->client->request('GET', '/read/');
+        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+
+        $this->client->request('GET', '/read/participants');
+        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+
+        $this->client->request('GET', '/read/orders');
+        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
+    }
 }
