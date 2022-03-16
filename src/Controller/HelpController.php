@@ -10,10 +10,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\HttpClient;
 
+/**
+ * @Route("/help")
+ */
 class HelpController extends AbstractController
 {
     /**
-     * @Route("/help", name="help_home")
+     * @Route("/", name="help_home")
      */
     public function index()
     {
@@ -21,7 +24,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/videos", name="help_videos")
+     * @Route("/videos", name="help_videos")
      */
 
     public function videosAction(SessionInterface $session)
@@ -31,7 +34,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/videos/{id}", name="help_videosPlaylist")
+     * @Route("/videos/{id}", name="help_videosPlaylist")
      */
 
     public function videosPlaylistAction($id, Request $request, HelpService $helpService)
@@ -53,7 +56,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/faq", name="help_faq")
+     * @Route("/faq", name="help_faq")
      */
 
     public function faqAction(HelpService $helpService)
@@ -62,7 +65,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/sop", name="help_sop")
+     * @Route("/sop", name="help_sop")
      */
 
     public function sopAction(HelpService $helpService)
@@ -74,7 +77,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/sop/{id}", name="help_sopView")
+     * @Route("/sop/{id}", name="help_sopView")
      */
 
     public function sopViewAction($id, HelpService $helpService)
@@ -92,7 +95,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/sop/file/{id}", name="help_sopFile")
+     * @Route("/sop/file/{id}", name="help_sopFile")
      */
 
     public function sopFileAction($id, HelpService $helpService)
@@ -121,7 +124,7 @@ class HelpController extends AbstractController
     }
 
     /**
-     * @Route("/help/sop/redirect/{id}", name="help_sopRedirect")
+     * @Route("/sop/redirect/{id}", name="help_sopRedirect")
      */
 
     public function sopRedirectAction($id, HelpService $helpService)

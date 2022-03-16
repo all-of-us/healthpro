@@ -10,10 +10,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route("/settings")
+ */
 class SettingsController extends AbstractController
 {
     /**
-     * @Route("/settings", name="settings")
+     * @Route("/", name="settings")
      */
     public function settings(Request $request, TimezoneService $timezeoneService, UserRepository $userRepository, EntityManagerInterface $em)
     {
