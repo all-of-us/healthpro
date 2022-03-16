@@ -5,15 +5,13 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Form\OrderLookupIdType;
 use App\Service\ParticipantSummaryService;
-use App\Service\ReadOnlyService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class OrderLookupController extends AbstractController
+class OrderLookupController extends BaseController
 {
     /**
      * @Route("/orders", name="orders")
@@ -23,8 +21,7 @@ class OrderLookupController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         SiteService $siteService,
-        ParticipantSummaryService $participantSummaryService,
-        ReadOnlyService $readOnlyService
+        ParticipantSummaryService $participantSummaryService
     ): Response {
         $idForm = $this->createForm(OrderLookupIdType::class, null);
         $idForm->handleRequest($request);
@@ -43,7 +40,7 @@ class OrderLookupController extends AbstractController
             ]);
             if ($order) {
                 $redirectRoute = 'order';
-                if ($readOnlyService->isReadOnly()) {
+                if ($this->isReadOnly()) {
                     $redirectRoute = 'read_order';
                 }
                 return $this->redirectToRoute($redirectRoute, [
@@ -55,7 +52,7 @@ class OrderLookupController extends AbstractController
         }
 
         $recentOrders = [];
-        if (!$readOnlyService->isReadOnly()) {
+        if (!$this->isReadOnly()) {
             $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
 
             foreach ($recentOrders as &$order) {
@@ -66,7 +63,7 @@ class OrderLookupController extends AbstractController
         return $this->render('orderlookup/orders.html.twig', [
             'idForm' => $idForm->createView(),
             'recentOrders' => $recentOrders,
-            'readOnlyView' => $readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 }

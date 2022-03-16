@@ -8,13 +8,11 @@ use App\Form\ParticipantLookupSearchType;
 use App\Form\ParticipantLookupTelephoneType;
 use App\Service\ParticipantSummaryService;
 use App\Drc\Exception\ParticipantSearchExceptionInterface;
-use App\Service\ReadOnlyService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ParticipantLookupController extends AbstractController
+class ParticipantLookupController extends BaseController
 {
     protected $participantSummaryService;
 
@@ -27,10 +25,10 @@ class ParticipantLookupController extends AbstractController
      * @Route("/participants", name="participants")
      * @Route("/read/participants", name="read_participants")
      */
-    public function participantsAction(Request $request, ReadOnlyService $readOnlyService)
+    public function participantsAction(Request $request)
     {
         $redirectRoute = 'participant';
-        if ($readOnlyService->isReadOnly()) {
+        if ($this->isReadOnly()) {
             $redirectRoute = 'read_participant';
         }
         $idForm = $this->createForm(ParticipantLookupIdType::class, null);

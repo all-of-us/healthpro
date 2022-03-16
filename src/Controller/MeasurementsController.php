@@ -13,18 +13,16 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
-use App\Service\ReadOnlyService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MeasurementsController extends AbstractController
+class MeasurementsController extends BaseController
 {
     protected $em;
     protected $measurementService;
@@ -53,7 +51,7 @@ class MeasurementsController extends AbstractController
      * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
      * @Route("/read/participant/{participantId}/measurements/{measurementId}", name="read_measurement")
      */
-    public function measurementsAction($participantId, $measurementId, Request $request, ReadOnlyService $readOnlyService)
+    public function measurementsAction($participantId, $measurementId, Request $request)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -87,7 +85,7 @@ class MeasurementsController extends AbstractController
         $showAutoModification = false;
         $measurementsForm = $this->get('form.factory')->createNamed('form', MeasurementType::class, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
-            'locked' => $measurement->getFinalizedTs() || $readOnlyService->isReadOnly() ? true : false
+            'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() ? true : false
         ]);
         $measurementsForm->handleRequest($request);
         if ($measurementsForm->isSubmitted()) {
@@ -261,7 +259,7 @@ class MeasurementsController extends AbstractController
             'revertForm' => $this->createForm(MeasurementRevertType::class, null)->createView(),
             'displayEhrBannerMessage' => $this->measurementService->requireEhrModificationProtocol() || $measurement->isEhrProtocolForm(),
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
-            'readOnlyView' => $readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 

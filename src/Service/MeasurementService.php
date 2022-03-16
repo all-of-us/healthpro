@@ -21,7 +21,6 @@ class MeasurementService
     protected $params;
     protected $measurement;
     protected $loggerService;
-    protected $readOnlyService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -30,8 +29,7 @@ class MeasurementService
         RdrApiService $rdrApiService,
         SiteService $siteService,
         ParameterBagInterface $params,
-        LoggerService $loggerService,
-        ReadOnlyService $readOnlyService
+        LoggerService $loggerService
     ) {
         $this->em = $em;
         $this->requestStack = $requestStack;
@@ -40,7 +38,6 @@ class MeasurementService
         $this->siteService = $siteService;
         $this->params = $params;
         $this->loggerService = $loggerService;
-        $this->readOnlyService = $readOnlyService;
     }
 
     public function load($measurement, $type = null)
@@ -58,7 +55,7 @@ class MeasurementService
             $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUserId() : $this->userService->getUser()->getId();
             $finalizedUser = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
             $finalizedUserEmail = $finalizedUser->getEmail();
-            $finalizedSite = $measurement->getFinalizedTs() || $this->readOnlyService->isReadOnly() ? $measurement->getSite() : $this->requestStack->getSession()->get('site')->id;
+            $finalizedSite = $measurement->getFinalizedTs() || strpos($this->requestStack->getCurrentRequest()->get('_route'), 'read_') === 0 ? $measurement->getSite() : $this->requestStack->getSession()->get('site')->id;
         } else {
             $finalizedUserEmail = $measurement->getFinalizedUser()->getEmail();
             $finalizedSite = $measurement->getFinalizedSite();

@@ -13,11 +13,9 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
-use App\Service\ReadOnlyService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,29 +26,26 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
-class OrderController extends AbstractController
+class OrderController extends BaseController
 {
     protected $em;
     protected $orderService;
     protected $participantSummaryService;
     protected $loggerService;
     protected $siteService;
-    protected $readOnlyService;
 
     public function __construct(
         EntityManagerInterface $em,
         OrderService $orderService,
         ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
-        SiteService $siteService,
-        ReadOnlyService $readOnlyService
+        SiteService $siteService
     ) {
         $this->em = $em;
         $this->orderService = $orderService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
-        $this->readOnlyService = $readOnlyService;
     }
 
     public function loadOrder($participantId, $orderId)
@@ -223,7 +218,7 @@ class OrderController extends AbstractController
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
             'errorMessage' => $errorMessage,
-            'readOnlyView' => $this->readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
@@ -258,7 +253,7 @@ class OrderController extends AbstractController
      * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
      * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect")
      */
-    public function orderCollectAction($participantId, $orderId, Request $request)
+    public function orderCollectAction($participantId, $orderId, Request $request, $_route)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $nextStep = $order->getType() === 'saliva' ? 'finalize' : 'process';
@@ -276,10 +271,10 @@ class OrderController extends AbstractController
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->readOnlyService->isReadOnly()
+            'disabled' => $this->isReadOnly()
         ]);
         $collectForm->handleRequest($request);
-        if ($collectForm->isSubmitted() && !$this->readOnlyService->isReadOnly()) {
+        if ($collectForm->isSubmitted() && !$this->isReadOnly()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -319,7 +314,7 @@ class OrderController extends AbstractController
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
-            'readOnlyView' => $this->readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
@@ -344,10 +339,10 @@ class OrderController extends AbstractController
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->readOnlyService->isReadOnly()
+            'disabled' => $this->isReadOnly()
         ]);
         $processForm->handleRequest($request);
-        if ($processForm->isSubmitted() && !$this->readOnlyService->isReadOnly()) {
+        if ($processForm->isSubmitted() && !$this->isReadOnly()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -416,7 +411,7 @@ class OrderController extends AbstractController
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
-            'readOnlyView' => $this->readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
@@ -441,10 +436,10 @@ class OrderController extends AbstractController
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->readOnlyService->isReadOnly()
+            'disabled' => $this->isReadOnly()
         ]);
         $finalizeForm->handleRequest($request);
-        if ($finalizeForm->isSubmitted() && !$this->readOnlyService->isReadOnly()) {
+        if ($finalizeForm->isSubmitted() && !$this->isReadOnly()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
@@ -548,7 +543,7 @@ class OrderController extends AbstractController
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'showUnfinalizeMsg' => $showUnfinalizeMsg,
-            'readOnlyView' => $this->readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
@@ -577,7 +572,7 @@ class OrderController extends AbstractController
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
-            'readOnlyView' => $this->readOnlyService->isReadOnly()
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
@@ -746,7 +741,7 @@ class OrderController extends AbstractController
         $this->orderService->loadSamplesSchema($order);
         $action = $order->getCurrentStep();
         $redirectRoute = 'order_';
-        if ($this->readOnlyService->isReadOnly()) {
+        if ($this->isReadOnly()) {
             $redirectRoute = 'read_order_';
         }
         return $this->redirectToRoute($redirectRoute . $action, [
