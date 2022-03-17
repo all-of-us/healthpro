@@ -379,18 +379,6 @@ class WorkQueueController extends AbstractController
 
         $sites = $this->siteService->getAwardeeSites($awardee);
         if (!empty($sites)) {
-            //Add organization filter
-            $organizationsList = [];
-            $organizationsList['organization_id']['label'] = 'Paired Organization';
-            $organizationsList['organization_id']['options']['View All'] = '';
-            foreach ($sites as $site) {
-                if (!empty($site->getOrganizationId())) {
-                    $organizationsList['organization_id']['options'][$this->siteService->getOrganizationDisplayName($site->getOrganizationId())] = $site->getOrganizationId();
-                }
-            }
-            $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
-            $consentAdvanceFilters['Pairing'] = array_merge($consentAdvanceFilters['Pairing'], $organizationsList);
-
             //Add sites filter
             $sitesList = [];
             $sitesList['site']['label'] = 'Paired Site';
@@ -402,6 +390,18 @@ class WorkQueueController extends AbstractController
             }
             $sitesList['site']['options']['Unpaired'] = 'UNSET';
             $consentAdvanceFilters['Pairing'] = array_merge($consentAdvanceFilters['Pairing'], $sitesList);
+
+            //Add organization filter
+            $organizationsList = [];
+            $organizationsList['organization_id']['label'] = 'Paired Organization';
+            $organizationsList['organization_id']['options']['View All'] = '';
+            foreach ($sites as $site) {
+                if (!empty($site->getOrganizationId())) {
+                    $organizationsList['organization_id']['options'][$this->siteService->getOrganizationDisplayName($site->getOrganizationId())] = $site->getOrganizationId();
+                }
+            }
+            $organizationsList['organization_id']['options']['Unpaired'] = 'UNSET';
+            $consentAdvanceFilters['Pairing'] = array_merge($consentAdvanceFilters['Pairing'], $organizationsList);
         }
 
         //For ajax requests
