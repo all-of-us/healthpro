@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PatientStatus;
@@ -181,6 +182,7 @@ class ParticipantDetailsController extends AbstractController
                 $incentiveForm->addError(new FormError('Please correct the errors below'));
             }
         }
+        $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
@@ -211,7 +213,8 @@ class ParticipantDetailsController extends AbstractController
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl,
             'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
-            'incentiveForm' => $incentiveForm->createView()
+            'incentiveForm' => $incentiveForm->createView(),
+            'incentives' => $incentives
         ]);
     }
 

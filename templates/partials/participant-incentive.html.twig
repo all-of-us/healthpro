@@ -31,4 +31,54 @@
         <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
         {{ form_end(incentiveForm) }}
     </div>
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        View Incentive History
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">
+                    {% for incentive in incentives %}
+                        <dl class="dl-horizontal">
+                            <dt>Date Created</dt>
+                            <dd>{{ incentive.createdTs|date('m/d/Y', app.user.timezone) }}</dd>
+                            <dt>User</dt>
+                            <dd>{{ incentive.user.email }}</dd>
+                            <dt>Site</dt>
+                            <dd>{{ incentive.site }}</dd>
+                            <dt>Date Incentive Given</dt>
+                            <dd>{{ incentive.incentiveDateGiven|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                            <dt>Incentive Occurrence</dt>
+                            <dd>{{ incentive.incentiveOccurrence }}</dd>
+                            {% if incentive.otherIncentiveOccurrence %}
+                                <dt>Other Incentive Occurrence</dt>
+                                <dd>{{ incentive.otherIncentiveOccurrence }}</dd>
+                            {% endif %}
+                            <dt>Incentive Type</dt>
+                            <dd>
+                                {{ incentive.incentiveType }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
+                            </dd>
+                            {% if incentive.otherIncentiveType %}
+                                <dt>Other Incentive Type</dt>
+                                <dd>{{ incentive.otherIncentiveType }}</dd>
+                            {% endif %}
+                            <dt>Incentive Amount</dt>
+                            <dd>{{ incentive.incentiveAmount }}</dd>
+                            {% if incentive.otherIncentiveAmount %}
+                                <dt>Other Incentive Amount</dt>
+                                <dd>${{ incentive.otherIncentiveAmount }}</dd>
+                            {% endif %}
+                            <dt>Notes</dt>
+                            <dd>{{ incentive.notes }}</dd>
+                        </dl>
+                        <hr/>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
