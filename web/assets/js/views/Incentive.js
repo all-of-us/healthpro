@@ -9,10 +9,22 @@ $(document).ready(function () {
 
     $(".incentive-modify").on('click', function (e) {
         e.preventDefault();
-        var url = $(e.currentTarget).data('href');
-        var type = $(e.currentTarget).data('type');
-        $('#incentiveModifyModel .modal-body').html('Are you sure you want to ' + type + ' this incentive occurance?');
-        $('#incentiveModifyModel .incentive-ok').attr('href', url);
+        var url = $(this).data('href');
+        var type = $(this).data('type');
+        $('#incentiveModifyModel .modal-body').html('Are you sure you want to ' + type + ' this incentive occurrence?');
+        $('#incentiveModifyModel #incentive-ok').data('href', url);
         $('#incentiveModifyModel').modal('show');
+    });
+
+    $("#incentive-ok").on('click', function (e) {
+        e.preventDefault();
+        var incentiveEditModal = $('#incentive-edit-modal');
+        var modelContent = $("#incentive-edit-modal .modal-content");
+        modelContent.html('');
+        // Load data from url
+        modelContent.load(
+            $(this).data('href')
+        );
+        incentiveEditModal.modal('show');
     });
 });

@@ -255,4 +255,44 @@ class ParticipantDetailsController extends AbstractController
         $response->headers->set('Content-Type', 'application/pdf');
         return $response;
     }
+
+    /**
+     * @Route("/participant/{id}/incentive/{incentiveId}", name="participant_incentive_edit")
+     */
+    public function incentiveEditAction(
+        $id,
+        $incentiveId,
+        Request $request,
+        LoggerService $loggerService,
+        EntityManagerInterface $em,
+        ParticipantSummaryService $participantSummaryService,
+        SiteService $siteService
+    ): Response {
+        $participant = $participantSummaryService->getParticipantById($id);
+        $incentive = $em->getRepository(Incentive::class)->find($incentiveId);
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['action' => $request->getRequestUri()]);
+        $incentiveForm->handleRequest($request);
+        if ($incentiveForm->isSubmitted()) {
+            if ($incentiveForm->isValid()) {
+                $userRepository = $em->getRepository(User::class);
+                $now = new \DateTime();
+                $incentive = $incentiveForm->getData();
+                $incentive->setParticipantId($id);
+                $incentive->setCreatedTs($now);
+                $incentive->setSite($siteService->getSiteId());
+                $incentive->setUser($userRepository->find($this->getUser()->getId()));
+                $em->persist($incentive);
+                $em->flush();
+                $this->addFlash('success', 'Incentive updated');
+            } else {
+                $incentiveForm->addError(new FormError('Please correct the errors below'));
+            }
+            return $this->redirectToRoute("participant", ['id' => $id]);
+        }
+
+        return $this->render('/partials/participant-incentive.html.twig', [
+            'incentiveForm' => $incentiveForm->createView(),
+            'participant' => $participant
+        ]);
+    }
 }
