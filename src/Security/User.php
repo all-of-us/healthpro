@@ -15,7 +15,7 @@ class User implements UserInterface
     public const BIOBANK_GROUP = 'biospecimen-non-pii';
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
-    public const READ_ONLY_GROUP = 'read-only';
+    public const READ_ONLY_GROUP = 'tactisview';
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
