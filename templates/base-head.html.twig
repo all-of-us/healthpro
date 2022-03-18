@@ -34,7 +34,8 @@
         "userTimeZone": {{ (app.user ? app.user.timezone : null )|json_encode|raw }},
         "userSite": {{ app.session.get('site')|json_encode|raw }},
         "currentRoute": {{ app.request.attributes.get('_route')|json_encode|raw }},
-        "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }}
+        "hideTZWarning": {{ app.session.get('hideTZWarning')|json_encode|raw }},
+        "readOnlyView": {{ (app.request.get('_route') starts with 'read_' ? true : false )|json_encode|raw }}
     };
 </script>
 

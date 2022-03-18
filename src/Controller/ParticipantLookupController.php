@@ -8,15 +8,11 @@ use App\Form\ParticipantLookupSearchType;
 use App\Form\ParticipantLookupTelephoneType;
 use App\Service\ParticipantSummaryService;
 use App\Drc\Exception\ParticipantSearchExceptionInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/participants")
- */
-class ParticipantLookupController extends AbstractController
+class ParticipantLookupController extends BaseController
 {
     protected $participantSummaryService;
 
@@ -26,10 +22,12 @@ class ParticipantLookupController extends AbstractController
     }
 
     /**
-     * @Route("/", name="participants")
+     * @Route("/participants", name="participants")
+     * @Route("/read/participants", name="read_participants")
      */
     public function participantsAction(Request $request)
     {
+        $redirectRoute = $this->isReadOnly() ? 'read_participant' : 'participant';
         $idForm = $this->createForm(ParticipantLookupIdType::class, null);
         $idForm->handleRequest($request);
 
@@ -37,7 +35,7 @@ class ParticipantLookupController extends AbstractController
             $id = $idForm->get('participantId')->getData();
             $participant = $this->participantSummaryService->getParticipantById($id);
             if ($participant) {
-                return $this->redirectToRoute('participant', ['id' => $id]);
+                return $this->redirectToRoute($redirectRoute, ['id' => $id]);
             }
             $this->addFlash('error', 'Participant ID not found');
         }
@@ -50,7 +48,7 @@ class ParticipantLookupController extends AbstractController
             try {
                 $searchResults = $this->participantSummaryService->search($searchParameters);
                 if (count($searchResults) == 1) {
-                    return $this->redirectToRoute('participant', [
+                    return $this->redirectToRoute($redirectRoute, [
                         'id' => $searchResults[0]->id
                     ]);
                 }

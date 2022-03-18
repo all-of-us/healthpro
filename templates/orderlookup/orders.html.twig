@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'render-base.html.twig' %}
 {% block title %}Orders - {% endblock %}
 {% block body %}
     <div class="page-header">
@@ -14,32 +14,33 @@
             </p>
             {{ form_end(idForm) }}
         </div>
-
-        <div class="col-sm-6 col-md-7">
-            <hr class="visible-xs"/>
-            <h3><i class="fa fa-clock-o" aria-hidden="true"></i> Recent orders</h3>
-            {% if recentOrders|length > 0 %}
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Date (Created)</th>
-                        <th>Order ID</th>
-                        <th>Participant</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for order in recentOrders %}
+        {% if not readOnlyView %}
+            <div class="col-sm-6 col-md-7">
+                <hr class="visible-xs"/>
+                <h3><i class="fa fa-clock-o" aria-hidden="true"></i> Recent orders</h3>
+                {% if recentOrders|length > 0 %}
+                    <table class="table table-striped">
+                        <thead>
                         <tr>
-                            <td><a href="{{ path('order', { participantId: order.participantId, orderId: order.id }) }}">{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</a></td>
-                            <td><a href="{{ path('order', { participantId: order.participantId, orderId: order.id }) }}">{{ order.orderId }}</a></td>
-                            <td><a href="{{ path('participant', { id: order.participantId }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
+                            <th>Date (Created)</th>
+                            <th>Order ID</th>
+                            <th>Participant</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <div class="alert alert-warning">No recent orders for this site</div>
-            {% endif %}
-        </div>
+                        </thead>
+                        <tbody>
+                        {% for order in recentOrders %}
+                            <tr>
+                                <td><a href="{{ path('order', { participantId: order.participantId, orderId: order.id }) }}">{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</a></td>
+                                <td><a href="{{ path('order', { participantId: order.participantId, orderId: order.id }) }}">{{ order.orderId }}</a></td>
+                                <td><a href="{{ path('participant', { id: order.participantId }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert alert-warning">No recent orders for this site</div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
