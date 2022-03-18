@@ -43,6 +43,10 @@
             <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
+                        <div class="pull-right">
+                            <i class="fa fa-trash-alt fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="" data-type="remove"></i>
+                            <i class="fa fa-edit fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="" data-type="amend"></i>
+                        </div>
                         <dl class="dl-horizontal">
                             <dt>Date Created</dt>
                             <dd>{{ incentive.createdTs|date('m/d/Y', app.user.timezone) }}</dd>
@@ -78,6 +82,19 @@
                         <hr/>
                     {% endfor %}
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="incentiveModifyModel" tabindex="-1" role="dialog" aria-labelledby="unlockWarningModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                <a class="btn btn-primary" id="unlock-continue">Ok</a>
             </div>
         </div>
     </div>
