@@ -362,4 +362,31 @@ class User implements UserInterface
         }
         return $roles;
     }
+
+    public function getGroup($email)
+    {
+        $group = $this->getSite($email);
+        if ($group) {
+            return $group;
+        }
+        $groupId = preg_replace('/@.*$/', '', $email);
+        return (object)[
+            'id' => $groupId,
+            'name' => $groupId,
+            'email' => $email
+        ];
+    }
+
+    public function getGroupFromId($groupId, $domain)
+    {
+        $group = $this->getSiteFromId($groupId);
+        if ($group) {
+            return $group;
+        }
+        return (object)[
+            'id' => $groupId,
+            'name' => $groupId,
+            'email' => $groupId . '@' . $domain
+        ];
+    }
 }
