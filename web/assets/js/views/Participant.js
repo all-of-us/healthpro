@@ -83,41 +83,4 @@ $(document).ready(function () {
             $("#patient-status-details-modal .modal-body").html('');
         });
     }
-
-    $('#incentive_incentive_date_given').pmiDateTimePicker({format: 'MM/DD/YYYY', maxDate: new Date().setHours(23,59,59,999), useCurrent: false});
-
-    var incentivePrefix = 'incentive_';
-
-    var handleIncentiveFormFields = function (that) {
-        var selectFieldId = $(that).attr('id').replace(incentivePrefix, '');
-        var otherFieldSelector = '#' + incentivePrefix + 'other_' + selectFieldId;
-        if ($(that).val() === 'other') {
-            $(otherFieldSelector).parent().show();
-        } else {
-            $(otherFieldSelector).parent().hide();
-            $(otherFieldSelector).val('');
-        }
-        if (selectFieldId === 'incentive_type') {
-            var giftCardFieldSelector = '#' + incentivePrefix + 'gift_card_type';
-            if ($(that).val() === 'gift_card') {
-                $(giftCardFieldSelector).parent().show();
-            } else {
-                $(giftCardFieldSelector).parent().hide();
-                $(giftCardFieldSelector).val('');
-            }
-        }
-    };
-
-    $('#incentive select').each(function () {
-        handleIncentiveFormFields(this);
-    });
-
-
-    $('#incentive select').change(function () {
-        handleIncentiveFormFields(this);
-    });
-
-    if ($('.incentive-form').find('div').hasClass('alert-danger')) {
-        $('[href="#on_site_details"]').tab('show');
-    }
 });
