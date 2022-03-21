@@ -16,6 +16,7 @@ class User implements UserInterface
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
     public const READ_ONLY_GROUP = 'tactisview';
+    public const READ_ONLY_GROUP_NAME = 'Tactis View';
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
@@ -372,7 +373,7 @@ class User implements UserInterface
         $groupId = preg_replace('/@.*$/', '', $email);
         return (object)[
             'id' => $groupId,
-            'name' => $groupId,
+            'name' => self::READ_ONLY_GROUP_NAME,
             'email' => $email
         ];
     }
@@ -385,7 +386,7 @@ class User implements UserInterface
         }
         return (object)[
             'id' => $groupId,
-            'name' => $groupId,
+            'name' => self::READ_ONLY_GROUP_NAME,
             'email' => $groupId . '@' . $domain
         ];
     }
