@@ -54,14 +54,14 @@ $(document).ready(function () {
     $(".incentive-modify").on('click', function () {
         var url = $(this).data('href');
         var type = $(this).data('type');
-        $('#incentiveModifyModel .modal-body').html('Are you sure you want to ' + type + ' this incentive occurrence?');
-        $('#incentiveModifyModel #incentive-ok').data('href', url);
-        $('#incentiveModifyModel').modal('show');
+        $('#incentive_modify_model .modal-body').html('Are you sure you want to ' + type + ' this incentive occurrence?');
+        $('#incentive_modify_model #incentive-ok').data('href', url);
+        $('#incentive_modify_model').modal('show');
     });
 
     $("#incentive-ok").on('click', function () {
-        var incentiveEditModal = $('#incentive-edit-modal');
-        var modelContent = $("#incentive-edit-modal .modal-content");
+        var incentiveEditModal = $('#incentive_edit_modal');
+        var modelContent = $("#incentive_edit_modal .modal-content");
         modelContent.html('');
         // Load data from url
         modelContent.load($(this).data('href'), function () {
@@ -69,13 +69,13 @@ $(document).ready(function () {
         });
     });
 
-    $('#incentive-edit-modal').on('shown.bs.modal', function () {
-        var editIncentiveFormSelect = $('#incentive-edit-modal select');
+    $('#incentive_edit_modal').on('shown.bs.modal', function () {
+        var editIncentiveFormSelect = $('#incentive_edit_modal select');
         editIncentiveFormSelect.each(function () {
-            handleIncentiveFormFields(this, '#incentive-edit-modal ');
+            handleIncentiveFormFields(this, '#incentive_edit_modal ');
         });
         editIncentiveFormSelect.change(function () {
-            handleIncentiveFormFields(this, '#incentive-edit-modal ');
+            handleIncentiveFormFields(this, '#incentive_edit_modal ');
         });
     });
 });
