@@ -117,21 +117,6 @@ $(document).ready(function () {
         handleIncentiveFormFields(this);
     });
 
-    $('#incentive_submit').on('click', function (e) {
-        if ($('#incentive_verification').prop('checked') !== true) {
-            $('#incentive_verification_warning').show();
-            return false;
-        }
-    });
-
-    $('#incentive_verification').on('click', function () {
-        if ($(this).prop('checked') === true) {
-            $('#incentive_verification_warning').hide();
-        } else {
-            $('#incentive_verification_warning').show();
-        }
-    });
-
     if ($('.incentive-form').find('div').hasClass('alert-danger')) {
         $('[href="#on_site_details"]').tab('show');
     }
