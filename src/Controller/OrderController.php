@@ -749,6 +749,7 @@ class OrderController extends BaseController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/biobank/summary", name="biobank_summary")
+     * @Route("/read/participant/{participantId}/order/{orderId}/biobank/summary", name="read_biobank_summary")
      */
 
     public function biobankSummaryAction($participantId, $orderId)
