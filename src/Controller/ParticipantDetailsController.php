@@ -267,6 +267,11 @@ class ParticipantDetailsController extends AbstractController
                 $em->persist($incentive);
                 $em->flush();
                 $this->addFlash('success', $incentiveId ? 'Incentive Updated' : 'Incentive Created');
+                if ($incentiveId) {
+                    $loggerService->log(Log::INCENTIVE_EDIT, $incentiveId);
+                } else {
+                    $loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                }
             } else {
                 $incentiveForm->addError(new FormError('Please correct the errors below'));
             }
