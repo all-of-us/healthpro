@@ -87,7 +87,7 @@
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <strong {% if attribute(order, 'biobankFinalized') and attribute(order, activeStep~'User') is empty %} class="text-danger" {% endif %}>{{ activeStep|capitalize }} by {{ attribute(order, activeStep~'User').id is defined and attribute(order, activeStep~'User').id is not empty ? attribute(order, activeStep~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, activeStep~'Site')) }}</strong>
                 {% if order.biobankFinalized and attribute(order, activeStep~'User') is empty %}
-                    <a class="btn btn-success btn-xs pull-right" href="{{ path('biobank_summary', { participantId: participant.id, orderId: order.id }) }}" target="_blank">Summary</a>
+                    <a class="btn btn-success btn-xs pull-right" href="{{ path(routePrefix ~ 'biobank_summary', { participantId: participant.id, orderId: order.id }) }}" target="_blank">Summary</a>
                 {% endif %}
             </div>
         {% endif %}
