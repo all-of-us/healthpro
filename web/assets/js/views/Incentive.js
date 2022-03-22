@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    $("#incentive form").parsley();
+
     $('#incentive_incentive_date_given').pmiDateTimePicker({
         format: 'MM/DD/YYYY',
         maxDate: new Date().setHours(23, 59, 59, 999),
@@ -12,17 +14,21 @@ $(document).ready(function () {
         var otherFieldSelector = idPrefix + '#' + incentivePrefix + 'other_' + selectFieldId;
         if ($(that).val() === 'other') {
             $(otherFieldSelector).parent().show();
+            $(otherFieldSelector).attr('required', 'required');
         } else {
             $(otherFieldSelector).parent().hide();
             $(otherFieldSelector).val('');
+            $(otherFieldSelector).removeAttr('required');
         }
         if (selectFieldId === 'incentive_type') {
             var giftCardFieldSelector = idPrefix + '#' + incentivePrefix + 'gift_card_type';
             if ($(that).val() === 'gift_card') {
                 $(giftCardFieldSelector).parent().show();
+                $(giftCardFieldSelector).attr('required', 'required');
             } else {
                 $(giftCardFieldSelector).parent().hide();
                 $(giftCardFieldSelector).val('');
+                $(giftCardFieldSelector).removeAttr('required');
             }
         }
     };
@@ -77,5 +83,6 @@ $(document).ready(function () {
         editIncentiveFormSelect.change(function () {
             handleIncentiveFormFields(this, '#incentive_edit_modal ');
         });
+        $("#incentive_edit_modal form").parsley();
     });
 });

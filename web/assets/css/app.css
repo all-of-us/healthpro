@@ -340,6 +340,15 @@ label.label-normal {
     transform: rotate(180deg);
 }
 
+#incentive .parsley-errors-list {
+    margin-left: -36px
+}
+
+#incentive .parsley-errors-list li {
+    list-style: none;
+    color: #a94442;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
