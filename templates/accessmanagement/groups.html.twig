@@ -17,7 +17,7 @@
         </thead>
         <tbody>
         {% for group in app.session.get('managegroups') %}
-            {% set groupInfo = app.user.site(group) %}
+            {% set groupInfo = app.user.group(group) %}
             <tr>
                 <td>
                     <h4><a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ groupInfo.name }}</a></h4>
