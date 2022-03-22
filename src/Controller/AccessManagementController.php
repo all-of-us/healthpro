@@ -24,13 +24,11 @@ class AccessManagementController extends AbstractController
 
     private $googleGroupsService;
     private $loggerService;
-    private $params;
 
-    public function __construct(GoogleGroupsService $googleGroupsService, LoggerService $loggerService, ParameterBagInterface $params)
+    public function __construct(GoogleGroupsService $googleGroupsService, LoggerService $loggerService)
     {
         $this->googleGroupsService = $googleGroupsService;
         $this->loggerService = $loggerService;
-        $this->params = $params;
     }
 
     /**
@@ -54,7 +52,7 @@ class AccessManagementController extends AbstractController
      */
     public function userGroup($groupId)
     {
-        $group = $this->getUser()->getGroupFromId($groupId, $this->params->get('gaDomain'));
+        $group = $this->getUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -76,7 +74,7 @@ class AccessManagementController extends AbstractController
      */
     public function member($groupId, Request $request)
     {
-        $group = $this->getUser()->getGroupFromId($groupId, $this->params->get('gaDomain'));
+        $group = $this->getUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -121,7 +119,7 @@ class AccessManagementController extends AbstractController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        $group = $this->getUser()->getGroupFromId($groupId, $this->params->get('gaDomain'));
+        $group = $this->getUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
