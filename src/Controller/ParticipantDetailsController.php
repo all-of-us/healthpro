@@ -164,24 +164,7 @@ class ParticipantDetailsController extends AbstractController
             $canViewPatientStatus = false;
         }
 
-        $incentiveForm = $this->createForm(IncentiveType::class, null, []);
-        $incentiveForm->handleRequest($request);
-        if ($incentiveForm->isSubmitted()) {
-            if ($incentiveForm->isValid()) {
-                $userRepository = $em->getRepository(User::class);
-                $now = new \DateTime();
-                $incentive = $incentiveForm->getData();
-                $incentive->setParticipantId($id);
-                $incentive->setCreatedTs($now);
-                $incentive->setSite($siteService->getSiteId());
-                $incentive->setUser($userRepository->find($this->getUser()->getId()));
-                $em->persist($incentive);
-                $em->flush();
-                $this->addFlash('success', 'Incentive created');
-            } else {
-                $incentiveForm->addError(new FormError('Please correct the errors below'));
-            }
-        }
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['action' => $this->generateUrl('participant_incentive', ['id' => $id])]);
         $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
@@ -257,9 +240,9 @@ class ParticipantDetailsController extends AbstractController
     }
 
     /**
-     * @Route("/participant/{id}/incentive/{incentiveId}", name="participant_incentive_edit")
+     * @Route("/participant/{id}/incentive/{incentiveId}", name="participant_incentive", defaults={"incentiveId": null})
      */
-    public function incentiveEditAction(
+    public function participantIncentiveAction(
         $id,
         $incentiveId,
         Request $request,
@@ -269,7 +252,7 @@ class ParticipantDetailsController extends AbstractController
         SiteService $siteService
     ): Response {
         $participant = $participantSummaryService->getParticipantById($id);
-        $incentive = $em->getRepository(Incentive::class)->find($incentiveId);
+        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->find($incentiveId) : null;
         $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['action' => $request->getRequestUri()]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
@@ -283,7 +266,7 @@ class ParticipantDetailsController extends AbstractController
                 $incentive->setUser($userRepository->find($this->getUser()->getId()));
                 $em->persist($incentive);
                 $em->flush();
-                $this->addFlash('success', 'Incentive updated');
+                $this->addFlash('success', $incentiveId ? 'Incentive Updated' : 'Incentive Created');
             } else {
                 $incentiveForm->addError(new FormError('Please correct the errors below'));
             }

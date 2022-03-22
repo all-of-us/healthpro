@@ -39,7 +39,7 @@
                     {% for incentive in incentives %}
                         <div class="pull-right">
                             <i class="fa fa-trash-alt fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="" data-type="remove"></i>
-                            <i class="fa fa-edit fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="{{ path('participant_incentive_edit', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
+                            <i class="fa fa-edit fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                         </div>
                         <dl class="dl-horizontal">
                             <dt>Date Created</dt>
