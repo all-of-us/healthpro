@@ -368,6 +368,11 @@ class User implements UserInterface
         return $roles;
     }
 
+    public function getReadOnlyGroups()
+    {
+        return $this->readOnlyGroups;
+    }
+
     public function getReadOnlyGroup($email)
     {
         $readOnlyGroup = null;
