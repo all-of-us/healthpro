@@ -1,6 +1,6 @@
 <div class="panel panel-default" id="incentive">
     <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Incentive</h3>
+        <h3 class="panel-title"><i class="fa fa-plus-circle" aria-hidden="true"></i> {{ type is defined and type == 'edit' ? 'Edit' : 'Add New' }} Incentive</h3>
     </div>
     <div class="panel-body">
         {{ form_start(incentiveForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit incentive-form' } }) }}

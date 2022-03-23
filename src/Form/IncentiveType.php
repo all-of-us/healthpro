@@ -116,15 +116,19 @@ class IncentiveType extends AbstractType
             ])
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'required' => $options['require_notes'],
+                'constraints' => new Constraints\Type('string'),
+                'attr' => [
+                    'data-parsley-error-message' => 'Please provide a reason for amending this incentive.'
+                ]
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Incentive::class
+            'data_class' => Incentive::class,
+            'require_notes' => false
         ]);
     }
 }

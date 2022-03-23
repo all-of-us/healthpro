@@ -271,7 +271,7 @@ class ParticipantDetailsController extends AbstractController
     ): Response {
         $participant = $participantSummaryService->getParticipantById($id);
         $incentive = $incentiveId ? $em->getRepository(Incentive::class)->find($incentiveId) : null;
-        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['action' => $request->getRequestUri()]);
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['action' => $request->getRequestUri(), 'require_notes' => true]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {
