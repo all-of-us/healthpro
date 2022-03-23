@@ -349,6 +349,10 @@ label.label-normal {
     color: #a94442;
 }
 
+.incentive-modify i {
+    cursor: pointer;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
