@@ -79,11 +79,14 @@ $(document).ready(function () {
     });
 
     $("#incentive_amend_ok").on('click', function () {
+        var amendButton = $(this).button('loading');
         var incentiveEditFormModal = $('#incentive_edit_form_modal');
         var modelContent = $("#incentive_edit_form_modal .modal-content");
         modelContent.html('');
         // Load data from url
         modelContent.load($(this).data('href'), function () {
+            $('#incentive_amend_modal').modal('hide');
+            amendButton.button('reset');
             incentiveEditFormModal.modal('show');
         });
     });
