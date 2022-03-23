@@ -23,7 +23,7 @@ class Incentive
     private $participantId;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Entity\User")
      */
     private $user;
 

@@ -9,6 +9,7 @@ use App\Entity\PatientStatus;
 use App\Entity\Problem;
 use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IncentiveRemoveType;
 use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
@@ -164,7 +165,23 @@ class ParticipantDetailsController extends AbstractController
             $canViewPatientStatus = false;
         }
 
+        // Incentive Form
         $incentiveForm = $this->createForm(IncentiveType::class, null, ['action' => $this->generateUrl('participant_incentive', ['id' => $id])]);
+
+        // Incentive Delete Form
+        $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
+        $incentiveDeleteForm->handleRequest($request);
+        if ($incentiveDeleteForm->isSubmitted() && $incentiveDeleteForm->isValid()) {
+            $incentiveId = $incentiveDeleteForm['id']->getData();
+            $incentive = $em->getRepository(Incentive::class)->find($incentiveId);
+            if ($incentive) {
+                $em->remove($incentive);
+                $em->flush();
+                $this->addFlash('success', 'Incentive Deleted');
+                $this->redirectToRoute('participant', ['id' => $id]);
+            }
+        }
+
         $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
@@ -197,7 +214,8 @@ class ParticipantDetailsController extends AbstractController
             'evaluationUrl' => $evaluationUrl,
             'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
             'incentiveForm' => $incentiveForm->createView(),
-            'incentives' => $incentives
+            'incentives' => $incentives,
+            'incentiveDeleteForm' => $incentiveDeleteForm->createView()
         ]);
     }
 

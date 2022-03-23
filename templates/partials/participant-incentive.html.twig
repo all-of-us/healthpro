@@ -42,8 +42,8 @@
                 <div class="panel-body">
                     {% for incentive in incentives %}
                         <div class="pull-right">
-                            <i class="fa fa-trash-alt fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="" data-type="remove"></i>
-                            <i class="fa fa-edit fa-lg incentive-modify" aria-hidden="true" data-attr="{{ incentive.id }}" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
+                            <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
+                            <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                         </div>
                         <dl class="dl-horizontal">
                             <dt>Date Created</dt>
@@ -86,20 +86,35 @@
     {% endif %}
 </div>
 
-<div class="modal fade" id="incentive_modify_model" tabindex="-1" role="dialog" aria-labelledby="unlockWarningModalLabel">
+<div class="modal fade" id="incentive_amend_modal" tabindex="-1" role="dialog" aria-labelledby="incentiveModalAmend">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-body">
-            </div>
+            <div class="modal-body">Are you sure you want to amend this incentive occurrence?'</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
-                <a class="btn btn-primary incentive-ok" id="incentive-ok" data-href="" data-dismiss="modal">Ok</a>
+                <a class="btn btn-primary incentive-ok" id="incentive_amend_ok" data-href="" data-dismiss="modal">Ok</a>
             </div>
         </div>
     </div>
 </div>
 
-<div id="incentive_edit_modal" class="modal fade">
+{% if incentiveDeleteForm is defined %}
+    <div class="modal fade" id="incentive_remove_modal" tabindex="-1" role="dialog" aria-labelledby="incentiveModalRemove">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">Are you sure you want to remove this incentive occurrence?'</div>
+                <div class="modal-footer">
+                    {{ form_start(incentiveDeleteForm) }}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                        <button type="submit" class="btn btn-primary">Ok</button>
+                    {{ form_end(incentiveDeleteForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div id="incentive_edit_form_modal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
         </div>
