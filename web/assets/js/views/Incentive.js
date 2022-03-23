@@ -33,15 +33,19 @@ $(document).ready(function () {
         }
     };
 
-    var incentiveFormSelect = $('#incentive select');
+    var showHideIncentiveFormFields = function (idPrefix = '') {
+        var incentiveFormSelect = $(idPrefix + '#incentive select');
 
-    incentiveFormSelect.each(function () {
-        handleIncentiveFormFields(this);
-    });
+        incentiveFormSelect.each(function () {
+            handleIncentiveFormFields(this, idPrefix);
+        });
 
-    incentiveFormSelect.change(function () {
-        handleIncentiveFormFields(this);
-    });
+        incentiveFormSelect.change(function () {
+            handleIncentiveFormFields(this, idPrefix);
+        });
+    };
+
+    showHideIncentiveFormFields();
 
     if ($('.incentive-form').find('div').hasClass('alert-danger')) {
         $('[href="#on_site_details"]').tab('show');
@@ -55,6 +59,11 @@ $(document).ready(function () {
 
     incentivePanelCollapse.on('hide.bs.collapse', function () {
         $(this).siblings('.panel-heading').removeClass('active');
+    });
+
+    $('#incentive_cancel').on('click', function () {
+       $('.incentive-form')[0].reset();
+       showHideIncentiveFormFields();
     });
 
     $(".incentive-modify").on('click', function () {
@@ -76,13 +85,7 @@ $(document).ready(function () {
     });
 
     $('#incentive_edit_modal').on('shown.bs.modal', function () {
-        var editIncentiveFormSelect = $('#incentive_edit_modal select');
-        editIncentiveFormSelect.each(function () {
-            handleIncentiveFormFields(this, '#incentive_edit_modal ');
-        });
-        editIncentiveFormSelect.change(function () {
-            handleIncentiveFormFields(this, '#incentive_edit_modal ');
-        });
+        showHideIncentiveFormFields('#incentive_edit_modal ');
         $("#incentive_edit_modal form").parsley();
     });
 });

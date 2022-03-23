@@ -280,7 +280,8 @@ class ParticipantDetailsController extends AbstractController
 
         return $this->render('/partials/participant-incentive.html.twig', [
             'incentiveForm' => $incentiveForm->createView(),
-            'participant' => $participant
+            'participant' => $participant,
+            'type' => 'edit'
         ]);
     }
 }
