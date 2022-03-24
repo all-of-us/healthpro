@@ -175,9 +175,14 @@ class ParticipantDetailsController extends AbstractController
             $incentiveId = $incentiveDeleteForm['id']->getData();
             $incentive = $em->getRepository(Incentive::class)->find($incentiveId);
             if ($incentive) {
-                $em->remove($incentive);
+                $userRepository = $em->getRepository(User::class);
+                $now = new \DateTime();
+                $incentive->setCancelledTs($now);
+                $incentive->setCancelledUser($userRepository->find($this->getUser()->getId()));
+                $em->persist($incentive);
                 $em->flush();
                 $this->addFlash('success', 'Incentive Deleted');
+                $loggerService->log(Log::INCENTIVE_REMOVE, $incentiveId);
                 $this->redirectToRoute('participant', ['id' => $id]);
             }
         }

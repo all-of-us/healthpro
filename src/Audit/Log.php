@@ -53,4 +53,5 @@ class Log
     public const CSRF_TOKEN_MISMATCH = 'CSRF_TOKEN_MISMATCH';
     public const INCENTIVE_ADD = 'INCENTIVE_ADD';
     public const INCENTIVE_EDIT = 'INCENTIVE_EDIT';
+    public const INCENTIVE_REMOVE = 'INCENTIVE_REMOVE';
 }
