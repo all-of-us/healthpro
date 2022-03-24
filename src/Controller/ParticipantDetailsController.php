@@ -284,9 +284,15 @@ class ParticipantDetailsController extends AbstractController
                 $now = new \DateTime();
                 $incentive = $incentiveForm->getData();
                 $incentive->setParticipantId($id);
-                $incentive->setCreatedTs($now);
-                $incentive->setSite($siteService->getSiteId());
-                $incentive->setUser($userRepository->find($this->getUser()->getId()));
+                $user = $userRepository->find($this->getUser()->getId());
+                if ($incentiveId) {
+                    $incentive->setAmendedTs($now);
+                    $incentive->setAmendedUser($user);
+                } else {
+                    $incentive->setCreatedTs($now);
+                    $incentive->setUser($user);
+                    $incentive->setSite($siteService->getSiteId());
+                }
                 $em->persist($incentive);
                 $em->flush();
                 $this->addFlash('success', $incentiveId ? 'Incentive Updated' : 'Incentive Created');
