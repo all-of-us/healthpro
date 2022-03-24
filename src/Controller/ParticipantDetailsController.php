@@ -187,7 +187,7 @@ class ParticipantDetailsController extends AbstractController
             }
         }
 
-        $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
+        $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
