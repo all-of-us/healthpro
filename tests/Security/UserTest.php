@@ -88,4 +88,51 @@ class UserTest extends WebTestCase
         $this->assertEquals(true, $user->belongsToSite($groups[2]->getEmail()));
         $this->assertEquals(false, $user->belongsToSite(User::SITE_PREFIX . 'my-siteD@gapps.com'));
     }
+
+    public function testReadOnlyGroups()
+    {
+        $email = 'user-test6@example.com';
+        MockUserHelper::switchCurrentUser($email);
+        $hpoGroup = User::SITE_PREFIX . 'my-siteA@gapps.com';
+        $readOnlyGroup = User::READ_ONLY_GROUP . '@gapps.com';
+        $groups = [
+            new GoogleGroup($hpoGroup, 'Test Site 1', 'lorem ipsum 1'),
+            new GoogleGroup($readOnlyGroup, 'Read Only View', 'lorem ipsum 2')
+        ];
+        $user = new User(MockUserHelper::getCurrentUser(), $groups);
+        self::assertEquals($email, $user->getEmail());
+        self::assertEquals(count($groups), count($user->getGroups()));
+        self::assertEquals(1, count($user->getReadOnlyGroups()));
+        self::assertEquals($groups[1]->getEmail(), $user->getReadOnlyGroups()[0]->email);
+    }
+
+    public function testGetGroup()
+    {
+        $email = 'user-test7@example.com';
+        MockUserHelper::switchCurrentUser($email);
+        $hpoGroup = User::SITE_PREFIX . 'my-siteA@gapps.com';
+        $readOnlyGroup = User::READ_ONLY_GROUP . '@gapps.com';
+        $groups = [
+            new GoogleGroup($hpoGroup, 'Test Site 1', 'lorem ipsum 1'),
+            new GoogleGroup($readOnlyGroup, 'Read Only View', 'lorem ipsum 2')
+        ];
+        $user = new User(MockUserHelper::getCurrentUser(), $groups);
+        self::assertEquals('my-siteA', $user->getGroup($hpoGroup)->id);
+        self::assertEquals(User::READ_ONLY_GROUP, $user->getGroup($readOnlyGroup)->id);
+    }
+
+    public function testGetGroupFromId()
+    {
+        $email = 'user-test8@example.com';
+        MockUserHelper::switchCurrentUser($email);
+        $hpoGroup = User::SITE_PREFIX . 'my-siteA@gapps.com';
+        $readOnlyGroup = User::READ_ONLY_GROUP . '@gapps.com';
+        $groups = [
+            new GoogleGroup($hpoGroup, 'Test Site 1', 'lorem ipsum 1'),
+            new GoogleGroup($readOnlyGroup, 'Read Only View', 'lorem ipsum 2')
+        ];
+        $user = new User(MockUserHelper::getCurrentUser(), $groups);
+        self::assertEquals($hpoGroup, $user->getGroupFromId('my-siteA')->email);
+        self::assertEquals($readOnlyGroup, $user->getGroupFromId(User::READ_ONLY_GROUP)->email);
+    }
 }

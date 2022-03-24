@@ -53,7 +53,7 @@ class UserProvider implements UserProviderInterface
                 $groups = $this->googleGroups->getGroups($googleUser->getEmail());
                 if ($this->params->has('feature.manageusers') && $this->params->get('feature.manageusers')) {
                     foreach ($groups as $group) {
-                        if (strpos($group->getEmail(), User::SITE_PREFIX) === 0) {
+                        if (strpos($group->getEmail(), User::SITE_PREFIX) === 0 || strpos($group->getEmail(), User::READ_ONLY_GROUP) === 0) {
                             $role = $this->googleGroups->getRole($googleUser->getEmail(), $group->getEmail());
                             if (in_array($role, ['OWNER', 'MANAGER'])) {
                                 $manageGroups[] = $group->getEmail();

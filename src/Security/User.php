@@ -15,6 +15,7 @@ class User implements UserInterface
     public const BIOBANK_GROUP = 'biospecimen-non-pii';
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
+    public const READ_ONLY_GROUP = 'tactisview';
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
@@ -31,6 +32,7 @@ class User implements UserInterface
     private $biobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
+    private $readOnlyGroups;
 
     public function __construct($googleUser, array $groups, $info = null, $timezone = null, $sessionInfo = null)
     {
@@ -45,6 +47,7 @@ class User implements UserInterface
         $this->adminDvAccess = $this->computeAdminDvAccess();
         $this->biobankAccess = $this->computeBiobankAccess();
         $this->scrippsAccess = $this->computeScrippsAccess();
+        $this->readOnlyGroups = $this->computeReadOnlyGroups();
     }
 
     public function getGroups()
@@ -139,6 +142,22 @@ class User implements UserInterface
             }
         }
         return $hasAccess;
+    }
+
+    private function computeReadOnlyGroups()
+    {
+        $readOnlyGroups = [];
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::READ_ONLY_GROUP . '@') === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $readOnlyGroups[] = (object)[
+                    'email' => $group->getEmail(),
+                    'name' => $group->getName(),
+                    'id' => $id
+                ];
+            }
+        }
+        return $readOnlyGroups;
     }
 
 
@@ -248,6 +267,9 @@ class User implements UserInterface
         if (!empty($this->sessionInfo['managegroups'])) {
             $roles[] = 'ROLE_MANAGE_USERS';
         }
+        if (count($this->readOnlyGroups)) {
+            $roles[] = 'ROLE_READ_ONLY';
+        }
         return $roles;
     }
 
@@ -344,5 +366,52 @@ class User implements UserInterface
             }
         }
         return $roles;
+    }
+
+    public function getReadOnlyGroups()
+    {
+        return $this->readOnlyGroups;
+    }
+
+    public function getReadOnlyGroup($email)
+    {
+        $readOnlyGroup = null;
+        foreach ($this->readOnlyGroups as $g) {
+            if ($g->email === $email) {
+                $readOnlyGroup = $g;
+                break;
+            }
+        }
+        return $readOnlyGroup;
+    }
+
+    public function getReadOnlyGroupFromId($groupId)
+    {
+        $readOnlyGroup = null;
+        foreach ($this->readOnlyGroups as $g) {
+            if ($g->id === $groupId) {
+                $readOnlyGroup = $g;
+                break;
+            }
+        }
+        return $readOnlyGroup;
+    }
+
+    public function getGroup($email)
+    {
+        $group = $this->getSite($email);
+        if ($group) {
+            return $group;
+        }
+        return $this->getReadOnlyGroup($email);
+    }
+
+    public function getGroupFromId($groupId)
+    {
+        $group = $this->getSiteFromId($groupId);
+        if ($group) {
+            return $group;
+        }
+        return $this->getReadOnlyGroupFromId($groupId);
     }
 }

@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'render-base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% if order.type != 'saliva' %}
     {% form_theme processForm 'form/simple_checkbox.html.twig' %}
@@ -38,7 +38,7 @@
     </div>
     {{ form_rest(processForm) }}
 
-    {% if not order.formDisabled %}
+    {% if not order.formDisabled and not readOnlyView %}
         <p>
             <button type="submit" class="btn btn-primary">
                 {% if order.processedTs %}

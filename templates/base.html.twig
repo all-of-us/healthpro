@@ -19,6 +19,11 @@
         role: 'ROLE_BIOBANK',
         title: 'Biobank',
         path: 'biobank_home'
+    },
+    read_only: {
+        role: 'ROLE_READ_ONLY',
+        title: 'Support Center',
+        path: 'read_home'
     }
 } %}
 {% set showRoleDropdown = false %}
@@ -126,9 +131,9 @@
                     {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
                         <li><a data-href="{{ reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
                     {% endif %}
-                    {% if is_granted('ROLE_MANAGE_USERS') %}
-                        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-                    {% endif %}
+                {% endif %}
+                {% if is_granted('ROLE_MANAGE_USERS') %}
+                    <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

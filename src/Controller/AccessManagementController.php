@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * @Route("/access/manage")
@@ -51,7 +52,7 @@ class AccessManagementController extends AbstractController
      */
     public function userGroup($groupId)
     {
-        $group = $this->getUser()->getSiteFromId($groupId);
+        $group = $this->getUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -73,7 +74,7 @@ class AccessManagementController extends AbstractController
      */
     public function member($groupId, Request $request)
     {
-        $group = $this->getUser()->getSiteFromId($groupId);
+        $group = $this->getUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -118,7 +119,7 @@ class AccessManagementController extends AbstractController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        $group = $this->getUser()->getSiteFromId($groupId);
+        $group = $this->getUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }

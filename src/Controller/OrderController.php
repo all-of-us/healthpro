@@ -16,7 +16,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +26,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
-class OrderController extends AbstractController
+class OrderController extends BaseController
 {
     protected $em;
     protected $orderService;
@@ -194,6 +193,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/print/labels", name="order_print_labels")
+     * @Route("/read/participant/{participantId}/order/{orderId}/print/labels", name="read_order_print_labels")
      */
     public function orderPrintLabelsAction($participantId, $orderId)
     {
@@ -217,12 +217,14 @@ class OrderController extends AbstractController
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
-            'errorMessage' => $errorMessage
+            'errorMessage' => $errorMessage,
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/labels/pdf", name="order_labels_pdf")
+     * @Route("/read/participant/{participantId}/order/{orderId}/labels/pdf", name="read_order_labels_pdf")
      */
     public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
@@ -249,6 +251,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
+     * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect", methods={"GET"})
      */
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
@@ -267,7 +270,8 @@ class OrderController extends AbstractController
             'order' => $order,
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId()
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->isReadOnly()
         ]);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
@@ -309,12 +313,14 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView()
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
+     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="read_order_process", methods={"GET"})
      */
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
@@ -332,7 +338,8 @@ class OrderController extends AbstractController
             'order' => $order,
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId()
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->isReadOnly()
         ]);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
@@ -403,12 +410,14 @@ class OrderController extends AbstractController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
-            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView()
+            'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
+     * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize", methods={"GET"})
      */
     public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
     {
@@ -426,7 +435,8 @@ class OrderController extends AbstractController
             'order' => $order,
             'em' => $this->em,
             'timeZone' => $this->getUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId()
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->isReadOnly()
         ]);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
@@ -532,12 +542,14 @@ class OrderController extends AbstractController
             'hasErrors' => $hasErrors,
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
-            'showUnfinalizeMsg' => $showUnfinalizeMsg
+            'showUnfinalizeMsg' => $showUnfinalizeMsg,
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/print/requisition", name="order_print_requisition")
+     * @Route("/read/participant/{participantId}/order/{orderId}/print/requisition", name="read_order_print_requisition")
      */
     public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
     {
@@ -559,12 +571,14 @@ class OrderController extends AbstractController
         return $this->render('order/print-requisition.html.twig', [
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
-            'processTabClass' => $order->getProcessTabClass()
+            'processTabClass' => $order->getProcessTabClass(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/requisition/pdf", name="order_requisition_pdf")
+     * @Route("/read/participant/{participantId}/order/{orderId}/requisition/pdf", name="read_order_requisition_pdf")
      */
     public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
@@ -715,6 +729,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}", name="order")
+     * @Route("/read/participant/{participantId}/order/{orderId}", name="read_order")
      */
     public function orderAction($participantId, $orderId)
     {
@@ -725,7 +740,8 @@ class OrderController extends AbstractController
         }
         $this->orderService->loadSamplesSchema($order);
         $action = $order->getCurrentStep();
-        return $this->redirectToRoute("order_{$action}", [
+        $redirectRoute = $this->isReadOnly() ? 'read_order_' : 'order_';
+        return $this->redirectToRoute($redirectRoute . $action, [
             'participantId' => $participantId,
             'orderId' => $orderId
         ]);
@@ -733,6 +749,7 @@ class OrderController extends AbstractController
 
     /**
      * @Route("/participant/{participantId}/order/{orderId}/biobank/summary", name="biobank_summary")
+     * @Route("/read/participant/{participantId}/order/{orderId}/biobank/summary", name="read_biobank_summary")
      */
 
     public function biobankSummaryAction($participantId, $orderId)

@@ -7,18 +7,15 @@ use App\Form\OrderLookupIdType;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/orders")
- */
-class OrderLookupController extends AbstractController
+class OrderLookupController extends BaseController
 {
     /**
-     * @Route("/", name="orders")
+     * @Route("/orders", name="orders")
+     * @Route("/read/orders", name="read_orders")
      */
     public function ordersAction(
         Request $request,
@@ -42,7 +39,8 @@ class OrderLookupController extends AbstractController
                 'orderId' => $id
             ]);
             if ($order) {
-                return $this->redirectToRoute('order', [
+                $redirectRoute = $this->isReadOnly() ? 'read_order' : 'order';
+                return $this->redirectToRoute($redirectRoute, [
                     'participantId' => $order->getParticipantId(),
                     'orderId' => $order->getId()
                 ]);
@@ -50,15 +48,19 @@ class OrderLookupController extends AbstractController
             $this->addFlash('error', 'Order ID not found');
         }
 
-        $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
+        $recentOrders = [];
+        if (!$this->isReadOnly()) {
+            $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
 
-        foreach ($recentOrders as &$order) {
-            $order->participant = $participantSummaryService->getParticipantById($order->getParticipantId());
+            foreach ($recentOrders as &$order) {
+                $order->participant = $participantSummaryService->getParticipantById($order->getParticipantId());
+            }
         }
 
         return $this->render('orderlookup/orders.html.twig', [
             'idForm' => $idForm->createView(),
-            'recentOrders' => $recentOrders
+            'recentOrders' => $recentOrders,
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 }
