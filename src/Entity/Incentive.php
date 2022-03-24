@@ -10,6 +10,26 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Incentive
 {
+    public static $incentiveTypeChoices = [
+        'Cash' => 'cash',
+        'Gift Card' => 'gift_card',
+        'Voucher' => 'voucher',
+        'Promotional Item' => 'promotional',
+        'Other' => 'other'
+    ];
+
+    public static $incentiveOccurrenceChoices = [
+        'One-time Incentive' => 'one_time',
+        'Redraw' => 'redraw',
+        'Other' => 'other'
+    ];
+
+    public static $incentiveAmountChoices = [
+        '$25.00' => '25',
+        '$15.00' => '15',
+        'Other' => 'other'
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -326,5 +346,20 @@ class Incentive
         $this->rdrTs = $rdrTs;
 
         return $this;
+    }
+
+    public function getIncentiveTypeDisplayName()
+    {
+        return array_search($this->incentiveType, Incentive::$incentiveTypeChoices);
+    }
+
+    public function getIncentiveOccurrenceDisplayName()
+    {
+        return array_search($this->incentiveOccurrence, Incentive::$incentiveOccurrenceChoices);
+    }
+
+    public function getIncentiveAmountDisplayName()
+    {
+        return array_search($this->incentiveAmount, Incentive::$incentiveAmountChoices);
     }
 }

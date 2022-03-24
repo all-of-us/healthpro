@@ -33,13 +33,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('incentive_type', Type\ChoiceType::class, [
                 'label' => 'Incentive Type',
-                'choices' => [
-                    'Cash' => 'cash',
-                    'Gift Card' => 'gift_card',
-                    'Voucher' => 'voucher',
-                    'Promotional Item' => 'promotional',
-                    'Other' => 'other'
-                ],
+                'choices' => Incentive::$incentiveTypeChoices,
                 'placeholder' => '-- Select incentive type --',
                 'multiple' => false,
                 'required' => true
@@ -70,11 +64,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('incentive_occurrence', Type\ChoiceType::class, [
                 'label' => 'Incentive Occurrence',
-                'choices' => [
-                    'One-time Incentive' => 'one_time',
-                    'Redraw' => 'redraw',
-                    'Other' => 'other'
-                ],
+                'choices' => Incentive::$incentiveOccurrenceChoices,
                 'placeholder' => '-- Select incentive occurrence --',
                 'multiple' => false,
                 'required' => true
@@ -93,11 +83,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('incentive_amount', Type\ChoiceType::class, [
                 'label' => 'Incentive Amount',
-                'choices' => [
-                    '$25.00' => '25',
-                    '$15.00' => '15',
-                    'Other' => 'other'
-                ],
+                'choices' => Incentive::$incentiveAmountChoices,
                 'placeholder' => '-- Select amount --',
                 'multiple' => false,
                 'required' => true
@@ -112,6 +98,9 @@ class IncentiveType extends AbstractType
                             $context->buildViolation('Please specify other incentive amount')->addViolation();
                         }
                     })
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ]
             ])
             ->add('notes', Type\TextareaType::class, [

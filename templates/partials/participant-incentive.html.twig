@@ -55,21 +55,21 @@
                             <dt>Date Incentive Given</dt>
                             <dd>{{ incentive.incentiveDateGiven|date('n/j/Y g:ia', app.user.timezone) }}</dd>
                             <dt>Incentive Occurrence</dt>
-                            <dd>{{ incentive.incentiveOccurrence }}</dd>
+                            <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
                             {% if incentive.otherIncentiveOccurrence %}
                                 <dt>Other Incentive Occurrence</dt>
                                 <dd>{{ incentive.otherIncentiveOccurrence }}</dd>
                             {% endif %}
                             <dt>Incentive Type</dt>
                             <dd>
-                                {{ incentive.incentiveType }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
+                                {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
                             </dd>
                             {% if incentive.otherIncentiveType %}
                                 <dt>Other Incentive Type</dt>
                                 <dd>{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
                             <dt>Incentive Amount</dt>
-                            <dd>{{ incentive.incentiveAmount }}</dd>
+                            <dd>{{ incentive.incentiveAmountDisplayName }}</dd>
                             {% if incentive.otherIncentiveAmount %}
                                 <dt>Other Incentive Amount</dt>
                                 <dd>${{ incentive.otherIncentiveAmount }}</dd>
