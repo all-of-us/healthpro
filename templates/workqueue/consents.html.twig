@@ -24,17 +24,17 @@
                     <br/>
                 {% endif %}
                 <p><strong>Filters</strong>
-                    <small><a href="{{ path('workqueue_consents') }}">Reset All</a></small>
+                    <small><a href="{{ path('workqueue_consents', { reset: 'all' }) }}">Reset All</a></small>
                 </p>
                 <div class="form-inline">
-                    {% include 'partials/workqueue-consents-advance-filters.html.twig' %}
+                    {% include 'partials/workqueue-advance-filters.html.twig' %}
                 </div>
             </div>
             {# Not using siteAwardeeDisplayName field from session as the awardee/organization is variable for STSI users #}
             <h4 id="heading-count" style="display:none"><span class="count"></span> {{ params|length > 0 ? ' matching' }} participant<span class="plural">s</span> ({{ awardee == 'salivary_pilot' ? 'Salivary Pilot' : siteInfo.awardeeDisplayName(awardee) }})</h4>
             {% include 'partials/workqueue-consents-columns.html.twig' %}
             {% include 'partials/workqueue-page-export.html.twig' %}
-            <table class="table table-striped table-bordered table-small" id="workqueue_consents" width="100%" data-columns-def="{{ columnsDef|json_encode() }}" data-consent-columns="{{ consentColumns|json_encode() }}">
+            <table class="table table-striped table-bordered table-small workqueue-table" id="workqueue_consents" width="100%" data-columns-def="{{ columnsDef|json_encode() }}" data-wq-columns="{{ consentColumns|json_encode() }}">
                 <thead>
                 <tr>
                     <th>Last Name</th>
@@ -66,4 +66,5 @@
 
 {% block pagejs %}
     {{ encore_entry_script_tags('workqueue-consents') }}
+    {{ encore_entry_script_tags('workqueue-filters') }}
 {% endblock %}

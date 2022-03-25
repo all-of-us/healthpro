@@ -112,7 +112,7 @@ class RequestListener
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
             } elseif (!preg_match(
-                '/^\/(_profiler|_wdt|cron|admin|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
+                '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
                 $this->request->getPathInfo()
             ) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/site/select');

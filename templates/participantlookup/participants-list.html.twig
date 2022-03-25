@@ -1,11 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'render-base.html.twig' %}
 {% block title %}Participants - {% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>Participants</h2>
     </div>
-
-    <p><a href="{{ path('participants') }}">Return to participant lookup</a></p>
+    {% set routePrefix = app.request.get('_route') starts with 'read_' ? 'read_' : '' %}
+    <p><a href="{{ path(routePrefix ~ 'participants') }}">Return to participant lookup</a></p>
 
     {% if participants %}
         <table class="table table-striped">
@@ -30,11 +30,11 @@
             <tbody>
                 {% for participant in participants %}
                     <tr>
-                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.lastName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.firstName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.middleName }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
-                        <td><a href="{{ path('participant', { id: participant.participantId }) }}">{{ participant.zipCode }}</a></td>
+                        <td><a href="{{ path(routePrefix ~ 'participant', { id: participant.participantId }) }}">{{ participant.lastName }}</a></td>
+                        <td><a href="{{ path(routePrefix ~ 'participant', { id: participant.participantId }) }}">{{ participant.firstName }}</a></td>
+                        <td><a href="{{ path(routePrefix ~ 'participant', { id: participant.participantId }) }}">{{ participant.middleName }}</a></td>
+                        <td><a href="{{ path(routePrefix ~ 'participant', { id: participant.participantId }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a></td>
+                        <td><a href="{{ path(routePrefix ~ 'participant', { id: participant.participantId }) }}">{{ participant.zipCode }}</a></td>
                         <td>
                             {% if participant.awardee %}
                                 {% if participant.awardee != siteInfo.siteAwardee %}

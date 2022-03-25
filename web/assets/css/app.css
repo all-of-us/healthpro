@@ -509,6 +509,17 @@ label.label-normal {
     min-width: 350px;
 }
 
+.wq-main-columns {
+    column-width: 200px;
+    width: 1100px;
+    height: 500px;
+    padding: 20px;
+}
+
+.wq-main-columns ul li {
+    list-style: none;
+}
+
 .list-options li {
     width: 100%
 }

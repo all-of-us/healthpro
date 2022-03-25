@@ -1,0 +1,5 @@
+{% set baseTemplate = 'base.html.twig' %}
+{% if app.request.get('_route') starts with 'read_' %}
+    {% set baseTemplate = 'readonly/base.html.twig' %}
+{% endif %}
+{% extends baseTemplate %}

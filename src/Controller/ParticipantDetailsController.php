@@ -21,7 +21,6 @@ use App\Service\PatientStatusService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -30,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ParticipantDetailsController extends AbstractController
+class ParticipantDetailsController extends BaseController
 {
     private const VALID_CONSENT_TYPES = [
         'consentForStudyEnrollment' => 'consentForStudyEnrollmentFilePath',
@@ -41,6 +40,7 @@ class ParticipantDetailsController extends AbstractController
 
     /**
      * @Route("/participant/{id}", name="participant")
+     * @Route("/read/participant/{id}", name="read_participant", methods={"GET"})
      */
     public function participantDetailsAction(
         $id,
@@ -56,9 +56,9 @@ class ParticipantDetailsController extends AbstractController
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
-
+        $routePrefix = $this->isReadOnly() ? 'read_' : '';
         if ($refresh) {
-            return $this->redirectToRoute('participant', [
+            return $this->redirectToRoute($routePrefix . 'participant', [
                 'id' => $id
             ]);
         }
@@ -81,7 +81,7 @@ class ParticipantDetailsController extends AbstractController
                 'id' => $id
             ]);
         }
-        $isCrossOrg = $participant->hpoId !== $siteService->getSiteAwardee();
+        $isCrossOrg = $this->isReadOnly() ? false : $participant->hpoId !== $siteService->getSiteAwardee();
         $canViewDetails = !$isCrossOrg && ($participant->status || in_array($participant->statusReason, [
                     'test-participant',
                     'basics',
@@ -127,7 +127,7 @@ class ParticipantDetailsController extends AbstractController
             // Determine if comment field is required
             $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
             // Get patient status form
-            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired]);
+            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired, 'disabled' => $this->isReadOnly()]);
             $patientStatusForm->handleRequest($request);
             if ($patientStatusForm->isSubmitted()) {
                 $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
@@ -220,7 +220,8 @@ class ParticipantDetailsController extends AbstractController
             'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
             'incentiveForm' => $incentiveForm->createView(),
             'incentives' => $incentives,
-            'incentiveDeleteForm' => $incentiveDeleteForm->createView()
+            'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
