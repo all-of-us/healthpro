@@ -1,3 +1,4 @@
+{% set readOnlyView = readOnlyView|default(false) %}
 <div class="panel panel-default" id="incentive">
     <div class="panel-heading">
         <h3 class="panel-title">
@@ -26,11 +27,13 @@
             </div>
         </div>
         {{ form_rest(incentiveForm) }}
-        <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
-        {% if type is defined and type == 'edit' %}
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        {% else %}
-            <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+        {% if not readOnlyView %}
+            <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
+            {% if type is defined and type == 'edit' %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            {% else %}
+                <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+            {% endif %}
         {% endif %}
         {{ form_end(incentiveForm) }}
     </div>
@@ -47,10 +50,12 @@
             <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
-                        <div class="pull-right incentive-modify">
-                            <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
-                            <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
-                        </div>
+                        {% if not readOnlyView %}
+                            <div class="pull-right incentive-modify">
+                                <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
+                                <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
+                            </div>
+                        {% endif %}
                         <dl class="dl-horizontal">
                             <dt>Date Created</dt>
                             <dd>{{ incentive.createdTs|date('m/d/Y', app.user.timezone) }}</dd>

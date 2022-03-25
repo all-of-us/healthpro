@@ -166,7 +166,7 @@ class ParticipantDetailsController extends BaseController
         }
 
         // Incentive Form
-        $incentiveForm = $this->createForm(IncentiveType::class, null, ['action' => $this->generateUrl('participant_incentive', ['id' => $id])]);
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['action' => $this->generateUrl('participant_incentive', ['id' => $id]), 'disabled' => $this->isReadOnly()]);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
