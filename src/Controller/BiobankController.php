@@ -190,8 +190,8 @@ class BiobankController extends AbstractController
                         if ($order->getType() === 'kit' && empty($order->getProcessedCentrifugeType())) {
                             if ($finalizeForm->has('processedCentrifugeType')) {
                                 $centrifugeType = $finalizeForm['processedCentrifugeType']->getData();
-                            } elseif (!empty($site['centrifugeType'])) {
-                                $centrifugeType = $site['centrifugeType'];
+                            } elseif (!empty($site->getCentrifugeType())) {
+                                $centrifugeType = $site->getCentrifugeType();
                             }
                             if (!empty($centrifugeType)) {
                                 $order->setProcessedCentrifugeType($centrifugeType);
