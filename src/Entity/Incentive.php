@@ -6,7 +6,7 @@ use App\Repository\IncentiveRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=IncentiveRepository::class)
+ * @ORM\Entity
  */
 class Incentive
 {
