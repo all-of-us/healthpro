@@ -173,8 +173,11 @@ class ParticipantDetailsController extends BaseController
         $incentiveDeleteForm->handleRequest($request);
         if ($incentiveDeleteForm->isSubmitted() && $incentiveDeleteForm->isValid()) {
             $incentiveId = $incentiveDeleteForm['id']->getData();
-            $incentive = $em->getRepository(Incentive::class)->find($incentiveId);
+            $incentive = $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]);
             if ($incentive) {
+                if ($incentive->getSite() !== $siteService->getSiteId()) {
+                    throw $this->createAccessDeniedException();
+                }
                 $now = new \DateTime();
                 $incentive->setCancelledTs($now);
                 $incentive->setCancelledUser($this->getUserEntity());
@@ -275,7 +278,10 @@ class ParticipantDetailsController extends BaseController
         SiteService $siteService
     ): Response {
         $participant = $participantSummaryService->getParticipantById($id);
-        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findBy(['id' => $incentiveId, 'participantId' => $id]) : null;
+        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]) : null;
+        if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
+            throw $this->createAccessDeniedException();
+        }
         $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => true]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
