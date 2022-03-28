@@ -327,17 +327,14 @@ label.label-normal {
     color: #337ab7;
 }
 
-#incentive .panel-heading  a:before {
-    font-family: 'Glyphicons Halflings';
-    content: "\e114";
-    float: left;
-    transition: all 0.5s;
+#incentive .panel-heading a:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f107";
 }
 
 #incentive .panel-heading.active a:before {
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    transform: rotate(180deg);
+    content: "\f106";
 }
 
 #incentive .parsley-errors-list {
