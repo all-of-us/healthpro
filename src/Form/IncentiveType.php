@@ -91,6 +91,7 @@ class IncentiveType extends AbstractType
             ->add('other_incentive_amount', Type\IntegerType::class, [
                 'label' => 'Specify Other',
                 'required' => false,
+                'mapped' => false,
                 'constraints' => [
                     new Constraints\Type('integer'),
                     new Constraints\Callback(function ($value, $context) {

@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\IncentiveRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -78,14 +77,9 @@ class Incentive
     private $otherIncentiveOccurrence;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="integer")
      */
     private $incentiveAmount;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $otherIncentiveAmount;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -236,18 +230,6 @@ class Incentive
     public function setIncentiveAmount(?string $incentiveAmount): self
     {
         $this->incentiveAmount = $incentiveAmount;
-
-        return $this;
-    }
-
-    public function getOtherIncentiveAmount(): ?int
-    {
-        return $this->otherIncentiveAmount;
-    }
-
-    public function setOtherIncentiveAmount(?int $otherIncentiveAmount): self
-    {
-        $this->otherIncentiveAmount = $otherIncentiveAmount;
 
         return $this;
     }

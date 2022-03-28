@@ -81,11 +81,7 @@
                                 <dd>{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
                             <dt>Incentive Amount</dt>
-                            <dd>{{ incentive.incentiveAmountDisplayName }}</dd>
-                            {% if incentive.otherIncentiveAmount %}
-                                <dt>Other Incentive Amount</dt>
-                                <dd>${{ incentive.otherIncentiveAmount }}</dd>
-                            {% endif %}
+                            <dd>${{ incentive.incentiveAmount }}</dd>
                             <dt>Notes</dt>
                             <dd>{{ incentive.notes }}</dd>
                         </dl>

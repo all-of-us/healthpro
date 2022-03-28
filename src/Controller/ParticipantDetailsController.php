@@ -291,6 +291,9 @@ class ParticipantDetailsController extends BaseController
                     $incentive->setUser($this->getUserEntity());
                     $incentive->setSite($siteService->getSiteId());
                 }
+                if ($incentiveForm['incentive_amount']->getData() === 'other') {
+                    $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
+                }
                 $em->persist($incentive);
                 $em->flush();
                 $this->addFlash('success', $incentiveId ? 'Incentive Updated' : 'Incentive Created');
