@@ -166,7 +166,7 @@ class ParticipantDetailsController extends BaseController
         }
 
         // Incentive Form
-        $incentiveForm = $this->createForm(IncentiveType::class, null, ['action' => $this->generateUrl('participant_incentive', ['id' => $id]), 'disabled' => $this->isReadOnly()]);
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
@@ -276,8 +276,8 @@ class ParticipantDetailsController extends BaseController
         SiteService $siteService
     ): Response {
         $participant = $participantSummaryService->getParticipantById($id);
-        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->find($incentiveId) : null;
-        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['action' => $request->getRequestUri(), 'require_notes' => true]);
+        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findBy(['id' => $incentiveId, 'participantId' => $id]) : null;
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => true]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {
@@ -311,7 +311,8 @@ class ParticipantDetailsController extends BaseController
         return $this->render('/partials/participant-incentive.html.twig', [
             'incentiveForm' => $incentiveForm->createView(),
             'participant' => $participant,
-            'type' => 'edit'
+            'type' => 'edit',
+            'incentiveId' => $incentiveId
         ]);
     }
 }
