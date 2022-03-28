@@ -175,10 +175,9 @@ class ParticipantDetailsController extends BaseController
             $incentiveId = $incentiveDeleteForm['id']->getData();
             $incentive = $em->getRepository(Incentive::class)->find($incentiveId);
             if ($incentive) {
-                $userRepository = $em->getRepository(User::class);
                 $now = new \DateTime();
                 $incentive->setCancelledTs($now);
-                $incentive->setCancelledUser($userRepository->find($this->getUser()->getId()));
+                $incentive->setCancelledUser($this->getUserEntity());
                 $em->persist($incentive);
                 $em->flush();
                 $this->addFlash('success', 'Incentive Deleted');
@@ -281,17 +280,15 @@ class ParticipantDetailsController extends BaseController
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {
-                $userRepository = $em->getRepository(User::class);
                 $now = new \DateTime();
                 $incentive = $incentiveForm->getData();
                 $incentive->setParticipantId($id);
-                $user = $userRepository->find($this->getUser()->getId());
                 if ($incentiveId) {
                     $incentive->setAmendedTs($now);
-                    $incentive->setAmendedUser($user);
+                    $incentive->setAmendedUser($this->getUserEntity());
                 } else {
                     $incentive->setCreatedTs($now);
-                    $incentive->setUser($user);
+                    $incentive->setUser($this->getUserEntity());
                     $incentive->setSite($siteService->getSiteId());
                 }
                 $em->persist($incentive);
