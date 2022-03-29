@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PatientStatus;
 use App\Entity\Problem;
+use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IncentiveRemoveType;
+use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
@@ -161,6 +165,32 @@ class ParticipantDetailsController extends BaseController
             $canViewPatientStatus = false;
         }
 
+        // Incentive Form
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
+
+        // Incentive Delete Form
+        $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
+        $incentiveDeleteForm->handleRequest($request);
+        if ($incentiveDeleteForm->isSubmitted() && $incentiveDeleteForm->isValid()) {
+            $incentiveId = $incentiveDeleteForm['id']->getData();
+            $incentive = $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]);
+            if ($incentive) {
+                if ($incentive->getSite() !== $siteService->getSiteId()) {
+                    throw $this->createAccessDeniedException();
+                }
+                $now = new \DateTime();
+                $incentive->setCancelledTs($now);
+                $incentive->setCancelledUser($this->getUserEntity());
+                $em->persist($incentive);
+                $em->flush();
+                $this->addFlash('success', 'Incentive Deleted');
+                $loggerService->log(Log::INCENTIVE_REMOVE, $incentiveId);
+                $this->redirectToRoute('participant', ['id' => $id]);
+            }
+        }
+
+        $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
+
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
         // Generate url for blood donor check form
@@ -190,6 +220,9 @@ class ParticipantDetailsController extends BaseController
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl,
             'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
+            'incentiveForm' => $incentiveForm->createView(),
+            'incentives' => $incentives,
+            'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
             'readOnlyView' => $this->isReadOnly()
         ]);
     }
@@ -230,5 +263,62 @@ class ParticipantDetailsController extends BaseController
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', 'application/pdf');
         return $response;
+    }
+
+    /**
+     * @Route("/participant/{id}/incentive/{incentiveId}", name="participant_incentive", defaults={"incentiveId": null})
+     */
+    public function participantIncentiveAction(
+        $id,
+        $incentiveId,
+        Request $request,
+        LoggerService $loggerService,
+        EntityManagerInterface $em,
+        ParticipantSummaryService $participantSummaryService,
+        SiteService $siteService
+    ): Response {
+        $participant = $participantSummaryService->getParticipantById($id);
+        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]) : null;
+        if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
+            throw $this->createAccessDeniedException();
+        }
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => true]);
+        $incentiveForm->handleRequest($request);
+        if ($incentiveForm->isSubmitted()) {
+            if ($incentiveForm->isValid()) {
+                $now = new \DateTime();
+                $incentive = $incentiveForm->getData();
+                $incentive->setParticipantId($id);
+                if ($incentiveId) {
+                    $incentive->setAmendedTs($now);
+                    $incentive->setAmendedUser($this->getUserEntity());
+                } else {
+                    $incentive->setCreatedTs($now);
+                    $incentive->setUser($this->getUserEntity());
+                    $incentive->setSite($siteService->getSiteId());
+                }
+                if ($incentiveForm['incentive_amount']->getData() === 'other') {
+                    $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
+                }
+                $em->persist($incentive);
+                $em->flush();
+                $this->addFlash('success', $incentiveId ? 'Incentive Updated' : 'Incentive Created');
+                if ($incentiveId) {
+                    $loggerService->log(Log::INCENTIVE_EDIT, $incentiveId);
+                } else {
+                    $loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                }
+            } else {
+                $incentiveForm->addError(new FormError('Please correct the errors below'));
+            }
+            return $this->redirectToRoute("participant", ['id' => $id]);
+        }
+
+        return $this->render('/partials/participant-incentive.html.twig', [
+            'incentiveForm' => $incentiveForm->createView(),
+            'participant' => $participant,
+            'type' => 'edit',
+            'incentiveId' => $incentiveId
+        ]);
     }
 }

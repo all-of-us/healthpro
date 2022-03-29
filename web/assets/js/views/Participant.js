@@ -34,12 +34,12 @@ $(document).ready(function () {
 
         // Switch to default tab if empty
         if (!hasOrgPatientStatusData) {
-            $('[href="#patientstatus"]').tab('show');
+            $('[href="#on_site_details"]').tab('show');
         }
 
         // Switch to patient status tab if there is a form error
         if ($('.patient-status-form').find('div').hasClass('alert-danger')) {
-            $('[href="#patientstatus"]').tab('show');
+            $('[href="#on_site_details"]').tab('show');
             // Display form
             setTimeout(function () {
                 $('.btn-patient-status-update').trigger('click');
@@ -47,7 +47,7 @@ $(document).ready(function () {
         }
 
         $('.patient-status-block').on('click', function () {
-            $('[href="#patientstatus"]').tab('show');
+            $('[href="#on_site_details"]').tab('show');
         });
 
         // Hide form by default if not empty
