@@ -64,7 +64,7 @@ class IncentiveService
                 $obj->giftCardType = $incentive->getGiftCardType();
             }
             $obj->amount = $incentive->getIncentiveAmount();
-            $obj->notes = $incentive->notes;
+            $obj->notes = $incentive->getNotes();
         }
         return $obj;
     }
