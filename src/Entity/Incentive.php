@@ -117,9 +117,9 @@ class Incentive
     private $cancelledTs;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $rdrTs;
+    private $rdrId;
 
     public function getId(): ?int
     {
@@ -318,14 +318,14 @@ class Incentive
         return $this;
     }
 
-    public function getRdrTs(): ?\DateTimeInterface
+    public function getRdrId(): ?string
     {
-        return $this->rdrTs;
+        return $this->rdrId;
     }
 
-    public function setRdrTs(?\DateTimeInterface $rdrTs): self
+    public function setRdrId(string $rdrId): self
     {
-        $this->rdrTs = $rdrTs;
+        $this->rdrId = $rdrId;
 
         return $this;
     }
