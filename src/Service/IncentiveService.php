@@ -48,7 +48,7 @@ class IncentiveService
         $email = $this->userService->getUser()->getEmail();
         $now = new \DateTime();
         if ($type !== 'create') {
-            $obj->incentiveId = $incentive->getRdrRid();
+            $obj->incentiveId = $incentive->getRdrid();
         }
         if ($type === 'cancel') {
             $obj->cancelledBy = $email;
@@ -79,15 +79,17 @@ class IncentiveService
         try {
             $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->authored)) {
+            if (is_object($result) && isset($result->incentiveId)) {
                 $now = new \DateTime();
                 $incentive->setParticipantId($participantId);
                 $incentive->setCreatedTs($now);
                 $incentive->setUser($this->userService->getUserEntity());
                 $incentive->setSite($this->siteService->getSiteId());
+                $incentive->setRdrId($result->incentiveId);
                 $this->em->persist($incentive);
                 $this->em->flush();
                 $this->loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
@@ -106,13 +108,14 @@ class IncentiveService
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->authored)) {
+            if (is_object($result) && isset($result->incentiveId)) {
                 $now = new \DateTime();
                 $incentive->setAmendedTs($now);
                 $incentive->setAmendedUser($this->userService->getUserEntity());
                 $this->em->persist($incentive);
                 $this->em->flush();
                 $this->loggerService->log(Log::INCENTIVE_EDIT, $incentive->getId());
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
@@ -121,23 +124,20 @@ class IncentiveService
         return false;
     }
 
-    public function cancelIncentive($participantId, $incentiveForm)
+    public function cancelIncentive($participantId, $incentive)
     {
-        $incentive = $incentiveForm->getData();
-        if ($incentive->getIncentiveAmount() === 'other') {
-            $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
-        }
         $postData = $this->getRdrObject($incentive, 'cancel');
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->authored)) {
+            if (is_object($result) && isset($result->incentiveId)) {
                 $now = new \DateTime();
                 $incentive->setCancelledTs($now);
                 $incentive->setCancelledUser($this->userService->getUserEntity());
                 $this->em->persist($incentive);
                 $this->em->flush();
                 $this->loggerService->log(Log::INCENTIVE_REMOVE, $incentive->getId());
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);

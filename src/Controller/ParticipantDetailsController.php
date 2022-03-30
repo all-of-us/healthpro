@@ -14,6 +14,7 @@ use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
+use App\Service\IncentiveService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
@@ -52,7 +53,8 @@ class ParticipantDetailsController extends BaseController
         SiteService $siteService,
         ParameterBagInterface $params,
         PatientStatusService $patientStatusService,
-        MeasurementService $measurementService
+        MeasurementService $measurementService,
+        IncentiveService $incentiveService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -178,13 +180,9 @@ class ParticipantDetailsController extends BaseController
                 if ($incentive->getSite() !== $siteService->getSiteId()) {
                     throw $this->createAccessDeniedException();
                 }
-                $now = new \DateTime();
-                $incentive->setCancelledTs($now);
-                $incentive->setCancelledUser($this->getUserEntity());
-                $em->persist($incentive);
-                $em->flush();
-                $this->addFlash('success', 'Incentive Deleted');
-                $loggerService->log(Log::INCENTIVE_REMOVE, $incentiveId);
+                if ($incentiveService->cancelIncentive($id, $incentive)) {
+                    $this->addFlash('success', 'Incentive Deleted');
+                }
                 $this->redirectToRoute('participant', ['id' => $id]);
             }
         }
@@ -272,10 +270,10 @@ class ParticipantDetailsController extends BaseController
         $id,
         $incentiveId,
         Request $request,
-        LoggerService $loggerService,
         EntityManagerInterface $em,
         ParticipantSummaryService $participantSummaryService,
-        SiteService $siteService
+        SiteService $siteService,
+        IncentiveService $incentiveService
     ): Response {
         $participant = $participantSummaryService->getParticipantById($id);
         $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]) : null;
@@ -286,27 +284,12 @@ class ParticipantDetailsController extends BaseController
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {
-                $now = new \DateTime();
-                $incentive = $incentiveForm->getData();
-                $incentive->setParticipantId($id);
                 if ($incentiveId) {
-                    $incentive->setAmendedTs($now);
-                    $incentive->setAmendedUser($this->getUserEntity());
+                    $incentiveService->amendIncentive($id, $incentiveForm);
+                    $this->addFlash('success', 'Incentive Updated');
                 } else {
-                    $incentive->setCreatedTs($now);
-                    $incentive->setUser($this->getUserEntity());
-                    $incentive->setSite($siteService->getSiteId());
-                }
-                if ($incentiveForm['incentive_amount']->getData() === 'other') {
-                    $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
-                }
-                $em->persist($incentive);
-                $em->flush();
-                $this->addFlash('success', $incentiveId ? 'Incentive Updated' : 'Incentive Created');
-                if ($incentiveId) {
-                    $loggerService->log(Log::INCENTIVE_EDIT, $incentiveId);
-                } else {
-                    $loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                    $incentiveService->createIncentive($id, $incentiveForm);
+                    $this->addFlash('success', 'Incentive Created');
                 }
             } else {
                 $incentiveForm->addError(new FormError('Please correct the errors below'));
