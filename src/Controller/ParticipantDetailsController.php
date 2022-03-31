@@ -182,6 +182,8 @@ class ParticipantDetailsController extends BaseController
                 }
                 if ($incentiveService->cancelIncentive($id, $incentive)) {
                     $this->addFlash('success', 'Incentive Deleted');
+                } else {
+                    $this->addFlash('error', 'Error deleting incentive. Please try again');
                 }
                 $this->redirectToRoute('participant', ['id' => $id]);
             }
@@ -285,11 +287,17 @@ class ParticipantDetailsController extends BaseController
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {
                 if ($incentiveId) {
-                    $incentiveService->amendIncentive($id, $incentiveForm);
-                    $this->addFlash('success', 'Incentive Updated');
+                    if ($incentiveService->amendIncentive($id, $incentiveForm)) {
+                        $this->addFlash('success', 'Incentive Updated');
+                    } else {
+                        $this->addFlash('error', 'Error updating incentive. Please try again');
+                    }
                 } else {
-                    $incentiveService->createIncentive($id, $incentiveForm);
-                    $this->addFlash('success', 'Incentive Created');
+                    if ($incentiveService->createIncentive($id, $incentiveForm)) {
+                        $this->addFlash('success', 'Incentive Created');
+                    } else {
+                        $this->addFlash('error', 'Error creating incentive. Please try again');
+                    }
                 }
             } else {
                 $incentiveForm->addError(new FormError('Please correct the errors below'));
