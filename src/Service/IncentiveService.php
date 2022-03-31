@@ -27,21 +27,6 @@ class IncentiveService
         $this->loggerService = $loggerService;
     }
 
-    public function getIncentivesHistory($participantId, $organizationId)
-    {
-        try {
-            $response = $this->rdrApiService->get("rdr/v1/PatientStatus/{$participantId}/Organization/{$organizationId}/History");
-            $result = json_decode($response->getBody()->getContents());
-            if (is_array($result)) {
-                return $result;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
-    }
-
     public function getRdrObject($incentive, $type = 'create')
     {
         $obj = new \StdClass();
