@@ -61,7 +61,7 @@ class IncentiveService
             $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
             $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
             if ($incentive->getGiftCardType()) {
-                $obj->giftCardType = $incentive->getGiftCardType();
+                $obj->giftcardType = $incentive->getGiftCardType();
             }
             $obj->amount = $incentive->getIncentiveAmount();
             $obj->notes = $incentive->getNotes();
