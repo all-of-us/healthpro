@@ -53,8 +53,8 @@
                     {% for incentive in incentives %}
                         {% if not readOnlyView  and incentive.site == siteInfo.siteId %}
                             <div class="pull-right incentive-modify">
-                                <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
                                 <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
+                                <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
                             </div>
                         {% endif %}
                         <dl class="dl-horizontal">
