@@ -59,7 +59,7 @@
                         {% endif %}
                         <dl class="dl-horizontal">
                             <dt>Date Created</dt>
-                            <dd>{{ incentive.createdTs|date('m/d/Y', app.user.timezone) }}</dd>
+                            <dd>{{ incentive.createdTs|date('m/d/Y', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}</dd>
                             <dt>User</dt>
                             <dd>{{ incentive.user.email }}</dd>
                             <dt>Site</dt>
