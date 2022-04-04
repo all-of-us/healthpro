@@ -13,6 +13,10 @@ class IncentiveService
     protected $em;
     protected $loggerService;
 
+    private const CREATE = 'create';
+    private const AMEND = 'amend';
+    private const CANCEL = 'cancel';
+
     public function __construct(
         RdrApiService $rdrApiService,
         SiteService $siteService,
@@ -27,7 +31,7 @@ class IncentiveService
         $this->loggerService = $loggerService;
     }
 
-    public function getRdrObject($incentive, $type = 'create')
+    public function getRdrObject($incentive, $type = self::CREATE)
     {
         $obj = new \StdClass();
         $email = $this->userService->getUser()->getEmail();
@@ -89,7 +93,7 @@ class IncentiveService
         if ($incentive->getIncentiveAmount() === 'other') {
             $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
         }
-        $postData = $this->getRdrObject($incentive, 'amend');
+        $postData = $this->getRdrObject($incentive, self::AMEND);
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
@@ -111,7 +115,7 @@ class IncentiveService
 
     public function cancelIncentive($participantId, $incentive)
     {
-        $postData = $this->getRdrObject($incentive, 'cancel');
+        $postData = $this->getRdrObject($incentive, self::CANCEL);
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
