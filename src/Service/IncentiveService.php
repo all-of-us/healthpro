@@ -57,10 +57,7 @@ class IncentiveService
 
     public function createIncentive($participantId, $incentiveForm)
     {
-        $incentive = $incentiveForm->getData();
-        if ($incentive->getIncentiveAmount() === 'other') {
-            $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
-        }
+        $incentive = $this->getIncentiveFromFormData($incentiveForm);
         $postData = $this->getRdrObject($incentive);
         try {
             $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
@@ -86,10 +83,7 @@ class IncentiveService
 
     public function amendIncentive($participantId, $incentiveForm)
     {
-        $incentive = $incentiveForm->getData();
-        if ($incentive->getIncentiveAmount() === 'other') {
-            $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
-        }
+        $incentive = $this->getIncentiveFromFormData($incentiveForm);
         $postData = $this->getRdrObject($incentive, Incentive::AMEND);
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
@@ -130,5 +124,17 @@ class IncentiveService
             return false;
         }
         return false;
+    }
+
+    private function getIncentiveFromFormData($incentiveForm)
+    {
+        $incentive = $incentiveForm->getData();
+        if ($incentive->getIncentiveAmount() === 'other') {
+            $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
+        }
+        if ($incentive->getIncentiveType() === 'promotional') {
+            $incentive->setIncentiveAmount(0);
+        }
+        return $incentive;
     }
 }

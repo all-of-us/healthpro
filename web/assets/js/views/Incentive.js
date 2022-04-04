@@ -30,6 +30,15 @@ $(document).ready(function () {
                 $(giftCardFieldSelector).val('');
                 $(giftCardFieldSelector).removeAttr('required');
             }
+            var incentiveAmountSelector = idPrefix + '#' + incentivePrefix + 'incentive_amount';
+            if ($(that).val() === 'promotional') {
+                $(incentiveAmountSelector).val('');
+                $(incentiveAmountSelector).attr('disabled', 'disabled');
+                $(incentiveAmountSelector).removeAttr('required');
+            } else {
+                $(incentiveAmountSelector).removeAttr('disabled');
+                $(incentiveAmountSelector).attr('required', 'required');
+            }
         }
     };
 
@@ -62,8 +71,8 @@ $(document).ready(function () {
     });
 
     $('#incentive_cancel').on('click', function () {
-       $('.incentive-form')[0].reset();
-       showHideIncentiveFormFields();
+        $('.incentive-form')[0].reset();
+        showHideIncentiveFormFields();
     });
 
     $(".incentive-amend").on('click', function () {

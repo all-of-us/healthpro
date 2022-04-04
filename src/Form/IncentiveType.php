@@ -86,7 +86,14 @@ class IncentiveType extends AbstractType
                 'choices' => Incentive::$incentiveAmountChoices,
                 'placeholder' => '-- Select amount --',
                 'multiple' => false,
-                'required' => true
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if ($context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
+                            $context->buildViolation('Please specify incentive amount')->addViolation();
+                        }
+                    })
+                ]
             ])
             ->add('other_incentive_amount', Type\IntegerType::class, [
                 'label' => 'Specify Other',

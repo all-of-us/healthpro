@@ -300,7 +300,7 @@ class ParticipantDetailsController extends BaseController
                     }
                 }
             } else {
-                $incentiveForm->addError(new FormError('Please correct the errors below'));
+                $this->addFlash('error', 'Invalid form');
             }
             return $this->redirectToRoute("participant", ['id' => $id]);
         }
