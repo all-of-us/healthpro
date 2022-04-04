@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Incentive;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
 
@@ -12,10 +13,6 @@ class IncentiveService
     protected $userService;
     protected $em;
     protected $loggerService;
-
-    private const CREATE = 'create';
-    private const AMEND = 'amend';
-    private const CANCEL = 'cancel';
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -31,7 +28,7 @@ class IncentiveService
         $this->loggerService = $loggerService;
     }
 
-    public function getRdrObject($incentive, $type = self::CREATE)
+    public function getRdrObject($incentive, $type = Incentive::CREATE)
     {
         $obj = new \StdClass();
         $email = $this->userService->getUser()->getEmail();
@@ -93,7 +90,7 @@ class IncentiveService
         if ($incentive->getIncentiveAmount() === 'other') {
             $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
         }
-        $postData = $this->getRdrObject($incentive, self::AMEND);
+        $postData = $this->getRdrObject($incentive, Incentive::AMEND);
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
@@ -115,7 +112,7 @@ class IncentiveService
 
     public function cancelIncentive($participantId, $incentive)
     {
-        $postData = $this->getRdrObject($incentive, self::CANCEL);
+        $postData = $this->getRdrObject($incentive, Incentive::CANCEL);
         try {
             $response = $this->rdrApiService->put("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());

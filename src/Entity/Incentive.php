@@ -9,6 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Incentive
 {
+    public const CREATE = 'create';
+    public const AMEND = 'amend';
+    public const CANCEL = 'cancel';
+
     public static $incentiveTypeChoices = [
         'Cash' => 'cash',
         'Gift Card' => 'gift_card',
