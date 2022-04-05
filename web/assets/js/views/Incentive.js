@@ -31,10 +31,14 @@ $(document).ready(function () {
                 $(giftCardFieldSelector).removeAttr('required');
             }
             var incentiveAmountSelector = idPrefix + '#' + incentivePrefix + 'incentive_amount';
+            var otherIncentiveAmountSelector = idPrefix + '#' + incentivePrefix + 'other_incentive_amount';
             if ($(that).val() === 'promotional') {
                 $(incentiveAmountSelector).val('');
                 $(incentiveAmountSelector).attr('disabled', 'disabled');
                 $(incentiveAmountSelector).removeAttr('required');
+                $(otherIncentiveAmountSelector).parent().hide();
+                $(otherIncentiveAmountSelector).val('');
+                $(otherIncentiveAmountSelector).removeAttr('required');
             } else {
                 $(incentiveAmountSelector).removeAttr('disabled');
                 $(incentiveAmountSelector).attr('required', 'required');
