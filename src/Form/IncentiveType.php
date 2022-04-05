@@ -118,7 +118,8 @@ class IncentiveType extends AbstractType
                     })
                 ],
                 'attr' => [
-                    'autocomplete' => 'off'
+                    'autocomplete' => 'off',
+                    'min' => 1
                 ],
                 'data' => $otherIncentiveAmount
             ])
