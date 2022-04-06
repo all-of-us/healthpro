@@ -103,6 +103,7 @@ class IncentiveType extends AbstractType
                     if (!in_array($incentive->getIncentiveAmount(), Incentive::$incentiveAmountChoices)) {
                         return 'other';
                     }
+                    return $incentive->getIncentiveAmount();
                 }
             ])
             ->add('other_incentive_amount', Type\IntegerType::class, [
