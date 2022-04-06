@@ -13,6 +13,11 @@ class IncentiveType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $otherIncentiveAmount = $builder->getData() && !in_array(
+            $builder->getData()->getIncentiveAmount(),
+            Incentive::$incentiveAmountChoices
+        ) ? $builder->getData()->getIncentiveAmount() : 0;
+
         $builder
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
@@ -86,7 +91,20 @@ class IncentiveType extends AbstractType
                 'choices' => Incentive::$incentiveAmountChoices,
                 'placeholder' => '-- Select amount --',
                 'multiple' => false,
-                'required' => true
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if ($context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
+                            $context->buildViolation('Please specify incentive amount')->addViolation();
+                        }
+                    })
+                ],
+                'getter' => function (Incentive $incentive) {
+                    if (!in_array($incentive->getIncentiveAmount(), Incentive::$incentiveAmountChoices)) {
+                        return 'other';
+                    }
+                    return $incentive->getIncentiveAmount();
+                }
             ])
             ->add('other_incentive_amount', Type\IntegerType::class, [
                 'label' => 'Specify Other',
@@ -101,8 +119,10 @@ class IncentiveType extends AbstractType
                     })
                 ],
                 'attr' => [
-                    'autocomplete' => 'off'
-                ]
+                    'autocomplete' => 'off',
+                    'min' => 1
+                ],
+                'data' => $otherIncentiveAmount
             ])
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',

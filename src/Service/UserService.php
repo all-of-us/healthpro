@@ -153,4 +153,9 @@ class UserService
         $remaining = $this->env->values['sessionTimeOut'] - $idle;
         return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }
+
+    public function getUserEntity()
+    {
+        return $this->em->getRepository(User::class)->find($this->getUser()->getId());
+    }
 }
