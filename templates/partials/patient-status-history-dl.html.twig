@@ -1,17 +1,30 @@
-{% for key, field in orgPatientStatusHistoryData %}
-    <dl class="dl-horizontal">
-        <dt>Status</dt>
-        <dd>{{ field.display_status }}</dd>
-        <dt>User</dt>
-        <dd>{{ field.user_email }}</dd>
-        <dt>Site</dt>
-        <dd>{{ field.site_name }}</dd>
-        <dt>Date</dt>
-        <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</dd>
-        <dt>Comments</dt>
-        <dd>{{ field.comments }}</dd>
-    </dl>
-    {% if not loop.last %}
-        <hr>
-    {% endif %}
-{% endfor %}
+<div class="panel-group" id="accordion_patient_status_history" role="tablist" aria-multiselectable="true">
+    <div class="panel-heading" role="tab">
+        <h5>
+            <span role="button" data-toggle="collapse" data-parent="#accordion_patient_status_history" href="#collapse_patient_status_history" aria-expanded="true" aria-controls="collapseOne">
+                View Patient Status History: {{ app.session.get('siteOrganizationDisplayName') }}
+            </span>
+        </h5>
+    </div>
+    <div id="collapse_patient_status_history" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body">
+            {% for key, field in orgPatientStatusHistoryData %}
+                <dl class="dl-horizontal">
+                    <dt>Status</dt>
+                    <dd>{{ field.display_status }}</dd>
+                    <dt>User</dt>
+                    <dd>{{ field.user_email }}</dd>
+                    <dt>Site</dt>
+                    <dd>{{ field.site_name }}</dd>
+                    <dt>Date</dt>
+                    <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                    <dt>Comments</dt>
+                    <dd>{{ field.comments }}</dd>
+                </dl>
+                {% if not loop.last %}
+                    <hr>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

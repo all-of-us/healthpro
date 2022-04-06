@@ -44,14 +44,7 @@
                     {{ form_end(patientStatusForm) }}
                 </div>
                 {% if orgPatientStatusHistoryData is not empty %}
-                    <hr>
-                    <br>
-                    <div>
-                        <p><b>Patient Status History: {{ app.session.get('siteOrganizationDisplayName') }}</b></p>
-                        <div>
-                            {% include 'partials/patient-status-history-dl.html.twig' %}
-                        </div>
-                    </div>
+                    {% include 'partials/patient-status-history-dl.html.twig' %}
                 {% endif %}
             </div>
         </div>

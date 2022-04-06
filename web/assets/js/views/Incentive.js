@@ -64,16 +64,6 @@ $(document).ready(function () {
         $('[href="#on_site_details"]').tab('show');
     }
 
-    var incentivePanelCollapse = $('#incentive .panel-collapse');
-
-    incentivePanelCollapse.on('show.bs.collapse', function () {
-        $(this).siblings('.panel-heading').addClass('active');
-    });
-
-    incentivePanelCollapse.on('hide.bs.collapse', function () {
-        $(this).siblings('.panel-heading').removeClass('active');
-    });
-
     $('#incentive_cancel').on('click', function () {
         $('.incentive-form')[0].reset();
         showHideIncentiveFormFields();
