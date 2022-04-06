@@ -327,13 +327,13 @@ label.label-normal {
     color: #337ab7;
 }
 
-#incentive .panel-heading a:before {
+#on_site_details .panel-heading span:before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     content: "\f107";
 }
 
-#incentive .panel-heading.active a:before {
+#on_site_details .panel-heading.active span:before {
     content: "\f106";
 }
 

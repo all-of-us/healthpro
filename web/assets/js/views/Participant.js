@@ -83,4 +83,14 @@ $(document).ready(function () {
             $("#patient-status-details-modal .modal-body").html('');
         });
     }
+
+    var panelCollapse = $('#on_site_details .panel-collapse');
+
+    panelCollapse.on('show.bs.collapse', function () {
+        $(this).siblings('.panel-heading').addClass('active');
+    });
+
+    panelCollapse.on('hide.bs.collapse', function () {
+        $(this).siblings('.panel-heading').removeClass('active');
+    });
 });
