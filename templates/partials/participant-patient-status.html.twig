@@ -44,7 +44,7 @@
                     {{ form_end(patientStatusForm) }}
                 </div>
                 {% if orgPatientStatusHistoryData is not empty %}
-                    {% include 'partials/patient-status-history-dl.html.twig' %}
+                    {% include 'partials/patient-status-history-list.html.twig' %}
                 {% endif %}
                 {% if awardeePatientStatusData is not empty %}
                     {% include 'partials/participant-organization-patient-status-details.html.twig' %}
