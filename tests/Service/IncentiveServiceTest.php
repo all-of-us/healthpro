@@ -18,7 +18,6 @@ class IncentiveServiceTest extends ServiceTestCase
         $siteService = static::$container->get(SiteService::class);
         $siteService->switchSite('hpo-site-test' . '@' . self::GROUP_DOMAIN);
         $this->service = static::$container->get(IncentiveService::class);
-
     }
 
     public function testRdrObject(): void
@@ -43,9 +42,6 @@ class IncentiveServiceTest extends ServiceTestCase
         self::assertEquals('test@example.com', $rdrObject->cancelledBy);
         self::assertEquals(true, $rdrObject->cancel);
         self::assertEquals(1, $rdrObject->incentiveId);
-
-
-
     }
 
     private function createIncentive($type = Incentive::CREATE)
