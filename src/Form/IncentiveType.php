@@ -53,6 +53,10 @@ class IncentiveType extends AbstractType
                             $context->buildViolation('Please specify type of gift card')->addViolation();
                         }
                     })
+                ],
+                'attr' => [
+                    'class' => 'typeahead',
+                    'autocomplete' => 'off'
                 ]
             ])
             ->add('other_incentive_type', Type\TextType::class, [

@@ -23,10 +23,10 @@ $(document).ready(function () {
         if (selectFieldId === 'incentive_type') {
             var giftCardFieldSelector = idPrefix + '#' + incentivePrefix + 'gift_card_type';
             if ($(that).val() === 'gift_card') {
-                $(giftCardFieldSelector).parent().show();
+                $('#gift_card').show();
                 $(giftCardFieldSelector).attr('required', 'required');
             } else {
-                $(giftCardFieldSelector).parent().hide();
+                $('#gift_card').hide();
                 $(giftCardFieldSelector).val('');
                 $(giftCardFieldSelector).removeAttr('required');
             }
@@ -97,5 +97,23 @@ $(document).ready(function () {
     $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
         showHideIncentiveFormFields('#incentive_edit_form_modal ');
         $("#incentive_edit_form_modal form").parsley();
+    });
+
+    /* Gift card search */
+    $('#gift_card .typeahead').typeahead({
+            highlight: true
+    },
+    {
+        display: 'giftCardType',
+        source: new Bloodhound({
+            name: 'giftCardType',
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('giftCardType'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: 10,
+            remote: {
+                url: '/ajax/search/giftcard/%QUERY',
+                wildcard: '%QUERY'
+            }
+        })
     });
 });

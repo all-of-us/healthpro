@@ -21,7 +21,9 @@
             </div>
             <div class="col-md-6">
                 {{ form_row(incentiveForm.incentive_type) }}
-                {{ form_row(incentiveForm.gift_card_type) }}
+                <div id="gift_card">
+                    {{ form_row(incentiveForm.gift_card_type) }}
+                </div>
                 {{ form_row(incentiveForm.other_incentive_type) }}
                 {{ form_row(incentiveForm.incentive_amount) }}
                 {{ form_row(incentiveForm.other_incentive_amount) }}

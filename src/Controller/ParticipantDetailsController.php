@@ -312,4 +312,14 @@ class ParticipantDetailsController extends BaseController
             'incentiveId' => $incentiveId
         ]);
     }
+
+    /**
+     * @Route("/ajax/search/giftcard/{query}", name="search_giftcard")
+     */
+    public function giftCardAction(EntityManagerInterface $em, Request $request)
+    {
+        $query = $request->get('query');
+        $results = $em->getRepository(Incentive::class)->search($query);
+        return $this->json($results);
+    }
 }
