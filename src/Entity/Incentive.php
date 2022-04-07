@@ -33,6 +33,22 @@ class Incentive
         'Other' => 'other'
     ];
 
+    public static $giftCarTypes = [
+        'ClinCard',
+        'Target',
+        'Safeway',
+        'Kroger',
+        'Walmart',
+        'Walmart Gas',
+        'Food City',
+        'Stop & Shop',
+        'Dunkin Donuts',
+        'Visa',
+        'MasterCard',
+        'Amazon',
+        'Meijer',
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

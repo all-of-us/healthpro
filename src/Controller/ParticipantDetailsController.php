@@ -314,6 +314,18 @@ class ParticipantDetailsController extends BaseController
     }
 
     /**
+     * @Route("/ajax/search/giftcard-prefill", name="search_gift_card_prefill")
+     */
+    public function giftCardFillAction()
+    {
+        $result = [];
+        foreach (Incentive::$giftCarTypes as $key => $giftCarType) {
+            $result[$key]['giftCardType'] = $giftCarType;
+        }
+        return $this->json($result);
+    }
+
+    /**
      * @Route("/ajax/search/giftcard/{query}", name="search_giftcard")
      */
     public function giftCardAction(EntityManagerInterface $em, Request $request)

@@ -97,23 +97,30 @@ $(document).ready(function () {
     $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
         showHideIncentiveFormFields('#incentive_edit_form_modal ');
         $("#incentive_edit_form_modal form").parsley();
+        handleGiftCardAutoPopulate();
     });
 
     /* Gift card search */
-    $('#gift_card .typeahead').typeahead({
-            highlight: true
-    },
-    {
-        display: 'giftCardType',
-        source: new Bloodhound({
-            name: 'giftCardType',
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('giftCardType'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            limit: 10,
-            remote: {
-                url: '/ajax/search/giftcard/%QUERY',
-                wildcard: '%QUERY'
-            }
-        })
-    });
+    var handleGiftCardAutoPopulate = function () {
+        $('#gift_card .typeahead').typeahead({
+                highlight: true
+            },
+            {
+                display: 'giftCardType',
+                source: new Bloodhound({
+                    name: 'giftCardType',
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('giftCardType'),
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    limit: 10,
+                    prefetch: '/ajax/search/giftcard-prefill',
+                    remote: {
+                        url: '/ajax/search/giftcard/%QUERY',
+                        wildcard: '%QUERY'
+                    }
+                })
+            });
+    };
+
+    handleGiftCardAutoPopulate();
+
 });
