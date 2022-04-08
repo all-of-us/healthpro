@@ -94,12 +94,6 @@ $(document).ready(function () {
         });
     });
 
-    $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
-        showHideIncentiveFormFields('#incentive_edit_form_modal ');
-        $("#incentive_edit_form_modal form").parsley();
-        handleGiftCardAutoPopulate();
-    });
-
     /* Gift card search */
     var handleGiftCardAutoPopulate = function () {
         $('.gift-card').typeahead({
@@ -121,6 +115,11 @@ $(document).ready(function () {
             });
     };
 
-    handleGiftCardAutoPopulate();
+    $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
+        showHideIncentiveFormFields('#incentive_edit_form_modal ');
+        $("#incentive_edit_form_modal form").parsley();
+        handleGiftCardAutoPopulate();
+    });
 
+    handleGiftCardAutoPopulate();
 });
