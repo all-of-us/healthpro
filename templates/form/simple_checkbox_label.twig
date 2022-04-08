@@ -1,0 +1,23 @@
+{% use "bootstrap_3_layout.html.twig" %}
+{# Somehow the label contents are escaped even if label_html is set to true so overiding the below method to allow raw labels #}
+{% block checkbox_radio_label -%}
+    {# Do not display the label if widget is not defined in order to prevent double label rendering #}
+    {%- if widget is defined -%}
+        {%- if required -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
+        {%- endif -%}
+        {%- if label is not same as(false) and label is empty -%}
+            {%- if label_format is not empty -%}
+                {%- set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) -%}
+            {%- else -%}
+                {% set label = name|humanize %}
+            {%- endif -%}
+        {%- endif -%}
+        <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+            {{- widget|raw }} {{ label is not same as(false) ? (label_html is same as(false) ? label : label|raw) : '' }}
+        </label>
+    {%- endif -%}
+{%- endblock checkbox_radio_label %}

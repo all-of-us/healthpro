@@ -701,3 +701,8 @@ table.table-samples td {
     cursor: pointer;
 }
 /* End Typeahead styles */
+
+/* User management */
+.attest-choice-text {
+    text-decoration: underline;
+}
