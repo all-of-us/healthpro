@@ -655,3 +655,8 @@ table.table-samples td {
   border: solid 2pt white;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
 }
+
+/* User management */
+.attest-choice-text {
+    text-decoration: underline;
+}

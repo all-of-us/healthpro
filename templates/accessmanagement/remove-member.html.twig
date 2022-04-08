@@ -38,7 +38,10 @@
             </div>
             <div class="member-last-date" style="display: none">
                 {{ form_row(removeGoupMemberForm.memberLastDay) }}
-                {{ form_row(removeGoupMemberForm.attestation) }}
+                {{ form_label(removeGoupMemberForm.attestation) }}
+                {% for attestation in removeGoupMemberForm.attestation %}
+                    {{ form_widget(attestation, { 'label': false }) }}
+                {% endfor %}
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>

@@ -35,4 +35,7 @@ $(document).ready(function () {
         maxDate: new Date().setHours(23,59,59,999),
         useCurrent: false
     });
+
+    $('#remove_group_member_attestation_0').after('I attest that this user has left the All of Us Research Program <strong class="attest-choice-text">voluntarily.</strong>');
+    $('#remove_group_member_attestation_1').after('I attest that this user has left the All of Us Research Program <strong class="attest-choice-text">involuntarily.</strong>');
 });
