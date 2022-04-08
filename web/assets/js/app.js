@@ -19,7 +19,9 @@ require('jsbarcode/dist/barcodes/JsBarcode.code128.min.js');
 require('inputmask/dist/jquery.inputmask.bundle.js');
 require('bootstrap-toggle/js/bootstrap-toggle.js');
 require('./bootstrap-session-timeout.js');
+require('corejs-typeahead');
 const jstz = require('./jstz.min.js');
+window.Bloodhound = require('corejs-typeahead/dist/bloodhound.js');
 
 // Most views are separate webpack entries except for:
 // Modals is needed on every page

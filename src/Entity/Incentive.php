@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\IncentiveRepository")
  */
 class Incentive
 {
@@ -31,6 +31,22 @@ class Incentive
         '$25.00' => '25',
         '$15.00' => '15',
         'Other' => 'other'
+    ];
+
+    public static $giftCardTypes = [
+        'ClinCard',
+        'Target',
+        'Safeway',
+        'Kroger',
+        'Walmart',
+        'Walmart Gas',
+        'Food City',
+        'Stop & Shop',
+        'Dunkin Donuts',
+        'Visa',
+        'MasterCard',
+        'Amazon',
+        'Meijer',
     ];
 
     /**

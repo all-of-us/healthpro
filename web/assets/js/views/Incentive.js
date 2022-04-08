@@ -23,10 +23,10 @@ $(document).ready(function () {
         if (selectFieldId === 'incentive_type') {
             var giftCardFieldSelector = idPrefix + '#' + incentivePrefix + 'gift_card_type';
             if ($(that).val() === 'gift_card') {
-                $(giftCardFieldSelector).parent().show();
+                $('#gift_card').show();
                 $(giftCardFieldSelector).attr('required', 'required');
             } else {
-                $(giftCardFieldSelector).parent().hide();
+                $('#gift_card').hide();
                 $(giftCardFieldSelector).val('');
                 $(giftCardFieldSelector).removeAttr('required');
             }
@@ -94,8 +94,31 @@ $(document).ready(function () {
         });
     });
 
+    /* Gift card search */
+    var handleGiftCardAutoPopulate = function () {
+        $('.gift-card').typeahead({
+                highlight: true
+            },
+            {
+                source: new Bloodhound({
+                    name: 'giftCardType',
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    limit: 10,
+                    prefetch: '/ajax/search/giftcard-prefill',
+                    remote: {
+                        url: '/ajax/search/giftcard/%QUERY',
+                        wildcard: '%QUERY'
+                    }
+                })
+            });
+    };
+
     $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
         showHideIncentiveFormFields('#incentive_edit_form_modal ');
         $("#incentive_edit_form_modal form").parsley();
+        handleGiftCardAutoPopulate();
     });
+
+    handleGiftCardAutoPopulate();
 });

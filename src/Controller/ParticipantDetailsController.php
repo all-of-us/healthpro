@@ -312,4 +312,26 @@ class ParticipantDetailsController extends BaseController
             'incentiveId' => $incentiveId
         ]);
     }
+
+    /**
+     * @Route("/ajax/search/giftcard-prefill", name="search_gift_card_prefill")
+     */
+    public function giftCardFillAction()
+    {
+        return $this->json(Incentive::$giftCardTypes);
+    }
+
+    /**
+     * @Route("/ajax/search/giftcard/{query}", name="search_giftcard")
+     */
+    public function giftCardAction(EntityManagerInterface $em, Request $request)
+    {
+        $query = $request->get('query');
+        $giftCards = $em->getRepository(Incentive::class)->search($query);
+        $results = [];
+        foreach ($giftCards as $giftCard) {
+            $results[] = $giftCard['giftCardType'];
+        }
+        return $this->json($results);
+    }
 }
