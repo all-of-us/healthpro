@@ -10,8 +10,8 @@ use Symfony\Component\Validator\Constraints;
 class RemoveGroupMemberType extends AbstractType
 {
     public const ATTESTATIONS = [
-        'I attest that this user has left the All of Us Research Program in good standing.' => 'yes',
-        'This user has been terminated for cause and has not left the All of Us Research Program in good standing.' => 'no'
+        'I attest that this user has left the All of Us Research Program voluntarily.' => 'yes',
+        'I attest that this user has left the All of Us Research Program involuntarily.' => 'no'
     ];
 
     public function buildForm(FormBuilderInterface $builder, array $options)
