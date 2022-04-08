@@ -102,7 +102,7 @@ $(document).ready(function () {
 
     /* Gift card search */
     var handleGiftCardAutoPopulate = function () {
-        $('#gift_card .typeahead').typeahead({
+        $('.gift-card').typeahead({
                 highlight: true
             },
             {

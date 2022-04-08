@@ -55,7 +55,7 @@ class IncentiveType extends AbstractType
                     })
                 ],
                 'attr' => [
-                    'class' => 'typeahead',
+                    'class' => 'gift-card',
                     'autocomplete' => 'off'
                 ]
             ])

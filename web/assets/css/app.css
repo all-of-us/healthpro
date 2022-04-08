@@ -663,14 +663,14 @@ table.table-samples td {
  * but Twitter Typeahead wraps the input.form-control with a span,
  * so we need to redefine this rule
 */
-.input-group-sm .form-control {
+#gift_card .input-group-sm .form-control {
     height: 30px;
     padding: 5px 10px;
     font-size: 12px;
     line-height: 1.5;
     border-radius: 3px;
 }
-#condition {
+.gift-card {
     border-bottom-left-radius: 3px !important;
     border-top-left-radius: 3px !important;
 }
