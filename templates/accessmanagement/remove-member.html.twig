@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% form_theme removeGoupMemberForm 'form/simple_checkbox_label.html.twig' %}
 {% block body %}
     <ol class="breadcrumb">
         <li><a href="{{ path('home') }}">Home</a></li>
@@ -38,10 +39,7 @@
             </div>
             <div class="member-last-date" style="display: none">
                 {{ form_row(removeGoupMemberForm.memberLastDay) }}
-                {{ form_label(removeGoupMemberForm.attestation) }}
-                {% for attestation in removeGoupMemberForm.attestation %}
-                    {{ form_widget(attestation, { 'label': false }) }}
-                {% endfor %}
+                {{ form_row(removeGoupMemberForm.attestation) }}
             </div>
             <p>
                 <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
