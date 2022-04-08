@@ -27,15 +27,13 @@ class IncentiveRepository extends ServiceEntityRepository
             return [];
         }
         $queryBuilder = $this->createQueryBuilder('i')
-            ->select('distinct lower(i.giftCardType) as giftCardType')
+            ->select('i.giftCardType')
+            ->groupBy('i.giftCardType')
+            ->orderBy('i.giftCardType', 'ASC')
             ->setMaxResults(10);
 
         foreach ($queryParts as $i => $queryPart) {
-            if ($i === 0) {
-                $parameter = "{$queryPart}%";
-            } else {
-                $parameter = "%{$queryPart}%";
-            }
+            $parameter = "%{$queryPart}%";
             $queryBuilder
                 ->andWhere("i.giftCardType like ?{$i}")
                 ->setParameter($i, $parameter);

@@ -318,11 +318,7 @@ class ParticipantDetailsController extends BaseController
      */
     public function giftCardFillAction()
     {
-        $result = [];
-        foreach (Incentive::$giftCarTypes as $key => $giftCarType) {
-            $result[$key]['giftCardType'] = $giftCarType;
-        }
-        return $this->json($result);
+        return $this->json(Incentive::$giftCardTypes);
     }
 
     /**
@@ -331,7 +327,11 @@ class ParticipantDetailsController extends BaseController
     public function giftCardAction(EntityManagerInterface $em, Request $request)
     {
         $query = $request->get('query');
-        $results = $em->getRepository(Incentive::class)->search($query);
+        $giftCards = $em->getRepository(Incentive::class)->search($query);
+        $results = [];
+        foreach ($giftCards as $giftCard) {
+            $results[] = $giftCard['giftCardType'];
+        }
         return $this->json($results);
     }
 }

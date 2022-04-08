@@ -33,7 +33,7 @@ class Incentive
         'Other' => 'other'
     ];
 
-    public static $giftCarTypes = [
+    public static $giftCardTypes = [
         'ClinCard',
         'Target',
         'Safeway',

@@ -100,10 +100,9 @@ $(document).ready(function () {
                 highlight: true
             },
             {
-                display: 'giftCardType',
                 source: new Bloodhound({
                     name: 'giftCardType',
-                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('giftCardType'),
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
                     queryTokenizer: Bloodhound.tokenizers.whitespace,
                     limit: 10,
                     prefetch: '/ajax/search/giftcard-prefill',
