@@ -29,7 +29,7 @@ class IncentiveRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i.giftCardType')
             ->groupBy('i.giftCardType')
-            ->orderBy('i.giftCardType', 'ASC')
+            ->orderBy('count(i.giftCardType)', 'DESC')
             ->setMaxResults(10);
 
         foreach ($queryParts as $i => $queryPart) {
