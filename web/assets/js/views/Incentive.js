@@ -23,10 +23,10 @@ $(document).ready(function () {
         if (selectFieldId === 'incentive_type') {
             var giftCardFieldSelector = idPrefix + '#' + incentivePrefix + 'gift_card_type';
             if ($(that).val() === 'gift_card') {
-                $('#gift_card').show();
+                $(idPrefix + ' #gift_card').show();
                 $(giftCardFieldSelector).attr('required', 'required');
             } else {
-                $('#gift_card').hide();
+                $(idPrefix + ' #gift_card').hide();
                 $(giftCardFieldSelector).val('');
                 $(giftCardFieldSelector).removeAttr('required');
             }
