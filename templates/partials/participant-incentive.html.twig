@@ -61,13 +61,13 @@
                         {% endif %}
                         <dl class="dl-horizontal">
                             <dt>Date Created</dt>
-                            <dd>{{ incentive.createdTs|date('m/d/Y', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}</dd>
+                            <dd>{{ incentive.createdTs|date('n/j/Y g:ia', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}</dd>
                             <dt>User</dt>
                             <dd>{{ incentive.user.email }}</dd>
                             <dt>Site</dt>
                             <dd>{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
                             <dt>Date Incentive Given</dt>
-                            <dd>{{ incentive.incentiveDateGiven|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                            <dd>{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
                             <dt>Incentive Occurrence</dt>
                             <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
                             {% if incentive.otherIncentiveOccurrence %}
