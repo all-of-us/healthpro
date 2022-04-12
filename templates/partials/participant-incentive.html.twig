@@ -1,5 +1,5 @@
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="panel panel-default" id="incentive">
+<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}">
     <div class="panel-heading">
         <h3 class="panel-title">
             {% if type is defined and type == 'edit' %}

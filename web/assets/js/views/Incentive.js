@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#incentive form").parsley();
+    $("#incentive_create form").parsley();
 
     $('#incentive_incentive_date_given').pmiDateTimePicker({
         format: 'MM/DD/YYYY',
@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     var incentivePrefix = 'incentive_';
 
-    var handleIncentiveFormFields = function (that, idPrefix = '') {
+    var handleIncentiveFormFields = function (that, idPrefix = '#incentive_create ') {
         var selectFieldId = $(that).attr('id').replace(incentivePrefix, '');
         var otherFieldSelector = idPrefix + '#' + incentivePrefix + 'other_' + selectFieldId;
         if ($(that).val() === 'other') {
@@ -46,8 +46,8 @@ $(document).ready(function () {
         }
     };
 
-    var showHideIncentiveFormFields = function (idPrefix = '') {
-        var incentiveFormSelect = $(idPrefix + '#incentive select');
+    var showHideIncentiveFormFields = function (idPrefix = '#incentive_create ') {
+        var incentiveFormSelect = $(idPrefix + ' select');
 
         incentiveFormSelect.each(function () {
             handleIncentiveFormFields(this, idPrefix);
@@ -65,7 +65,7 @@ $(document).ready(function () {
     }
 
     $('#incentive_cancel').on('click', function () {
-        $('.incentive-form')[0].reset();
+        $('#incentive_create .incentive-form')[0].reset();
         showHideIncentiveFormFields();
     });
 
@@ -95,8 +95,8 @@ $(document).ready(function () {
     });
 
     /* Gift card search */
-    var handleGiftCardAutoPopulate = function () {
-        $('.gift-card').typeahead({
+    var handleGiftCardAutoPopulate = function (idPrefix = '#incentive_create ') {
+        $(idPrefix + ' .gift-card').typeahead({
                 highlight: true
             },
             {
@@ -115,9 +115,9 @@ $(document).ready(function () {
     };
 
     $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
-        showHideIncentiveFormFields('#incentive_edit_form_modal ');
-        $("#incentive_edit_form_modal form").parsley();
-        handleGiftCardAutoPopulate();
+        showHideIncentiveFormFields('#incentive_edit ');
+        $("#incentive_edit form").parsley();
+        handleGiftCardAutoPopulate('#incentive_edit ');
     });
 
     handleGiftCardAutoPopulate();
