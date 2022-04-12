@@ -29,6 +29,13 @@
                 {{ form_row(incentiveForm.other_incentive_amount) }}
             </div>
         </div>
+        <div class="form-group">
+            {{ form_label(incentiveForm.notes) }}
+            {{ form_widget(incentiveForm.notes) }}
+            {% if type is defined and type == 'edit' %}
+                <small class="text-warning">Please provide a reason for amending this incentive.</small>
+            {% endif %}
+        </div>
         {{ form_rest(incentiveForm) }}
         {% if not readOnlyView %}
             <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
@@ -99,7 +106,7 @@
 <div class="modal fade" id="incentive_amend_modal" tabindex="-1" role="dialog" aria-labelledby="incentiveModalAmend">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-body">Are you sure you want to amend this incentive occurrence?'</div>
+            <div class="modal-body">Are you sure you want to amend this incentive occurrence?</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
                 <a class="btn btn-primary incentive-ok" id="incentive_amend_ok" data-loading-text="Loading..." data-href="">Ok</a>
@@ -112,7 +119,7 @@
     <div class="modal fade" id="incentive_remove_modal" tabindex="-1" role="dialog" aria-labelledby="incentiveModalRemove">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-body">Are you sure you want to remove this incentive occurrence?'</div>
+                <div class="modal-body">Are you sure you want to remove this incentive occurrence?</div>
                 <div class="modal-footer">
                     {{ form_start(incentiveDeleteForm) }}
                         <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
