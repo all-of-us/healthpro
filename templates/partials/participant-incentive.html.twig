@@ -29,6 +29,13 @@
                 {{ form_row(incentiveForm.other_incentive_amount) }}
             </div>
         </div>
+        <div class="form-group">
+            {{ form_label(incentiveForm.notes) }}
+            {{ form_widget(incentiveForm.notes) }}
+            {% if type is defined and type == 'edit' %}
+                <small class="text-warning">Please provide a reason for amending this incentive.</small>
+            {% endif %}
+        </div>
         {{ form_rest(incentiveForm) }}
         {% if not readOnlyView %}
             <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
