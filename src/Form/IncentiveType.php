@@ -131,9 +131,12 @@ class IncentiveType extends AbstractType
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',
                 'required' => $options['require_notes'],
-                'constraints' => new Constraints\Type('string'),
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Length(['max' => 285])
+                ],
                 'attr' => [
-                    'data-parsley-error-message' => 'Please provide a reason for amending this incentive.'
+                    'data-parsley-maxlength' => 280
                 ]
             ]);
     }
