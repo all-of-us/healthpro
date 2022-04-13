@@ -1,3 +1,4 @@
+{% set readOnlyView = readOnlyView|default(false) %}
 <div class="panel panel-default" id="id_verification">
     <div class="panel-heading">
         <h3 class="panel-title">
@@ -8,11 +9,14 @@
         {{ form_start(idVerificationForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form' } }) }}
         {{ form_errors(idVerificationForm) }}
         {{ form_rest(idVerificationForm) }}
-        <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
-        {% if type is defined and type == 'edit' %}
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        {% else %}
-            <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+        {% if not readOnlyView %}
+            <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
+            {% if type is defined and type == 'edit' %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            {% else %}
+                <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+            {% endif %}
         {% endif %}
+        {{ form_end(idVerificationForm) }}
     </div>
 </div>

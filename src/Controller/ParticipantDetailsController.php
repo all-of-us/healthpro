@@ -174,7 +174,7 @@ class ParticipantDetailsController extends BaseController
         $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
 
         // Id Verification Form
-        $idVerificationForm = $this->createForm(IdVerificationType::class, null);
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
