@@ -94,6 +94,9 @@
                 <div role="tabpanel" class="tab-pane active" id="on_site_details">
                     <div class="row">
                         {% if canViewOnSiteDetails %}
+                            <div class="col-md-6">
+                                {% include 'partials/participant-id-verification.html.twig' %}
+                            </div>
                             {% if not isDVType %}
                                 {% include 'partials/participant-patient-status.html.twig' %}
                             {% endif %}

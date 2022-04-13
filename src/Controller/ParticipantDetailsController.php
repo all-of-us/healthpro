@@ -9,6 +9,7 @@ use App\Entity\PatientStatus;
 use App\Entity\Problem;
 use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IdVerificationType;
 use App\Form\IncentiveRemoveType;
 use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
@@ -172,6 +173,9 @@ class ParticipantDetailsController extends BaseController
         // Incentive Form
         $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
 
+        // Id Verification Form
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null);
+
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
         $incentiveDeleteForm->handleRequest($request);
@@ -226,7 +230,8 @@ class ParticipantDetailsController extends BaseController
             'incentives' => $incentives,
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
             'readOnlyView' => $this->isReadOnly(),
-            'canViewOnSiteDetails' => $canViewOnSiteDetails
+            'canViewOnSiteDetails' => $canViewOnSiteDetails,
+            'idVerificationForm' => $idVerificationForm->createView()
         ]);
     }
 
