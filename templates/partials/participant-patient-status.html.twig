@@ -28,7 +28,7 @@
                     {% endif %}
                 </div>
                 <div id="patient-status-form-box">
-                    {{ form_start(patientStatusForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit patient-status-form' } }) }}
+                    {{ form_start(patientStatusForm, { attr: { class: 'disable-enter prevent-resubmit patient-status-form' } }) }}
                     {{ form_errors(patientStatusForm) }}
                     {{ form_rest(patientStatusForm) }}
                     {% if orgPatientStatusData is not empty %}

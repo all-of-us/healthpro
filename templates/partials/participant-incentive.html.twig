@@ -1,5 +1,5 @@
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="panel panel-default" id="incentive">
+<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}">
     <div class="panel-heading">
         <h3 class="panel-title">
             {% if type is defined and type == 'edit' %}
@@ -11,7 +11,7 @@
     </div>
     <div class="panel-body">
         {% set actionUrl = incentiveId is defined ? path('participant_incentive', { id: participant.id, incentiveId: incentiveId }) : path('participant_incentive', { id: participant.id }) %}
-        {{ form_start(incentiveForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
+        {{ form_start(incentiveForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
         {{ form_errors(incentiveForm) }}
         <div class="row">
             <div class="col-md-6">
@@ -47,15 +47,15 @@
         {% endif %}
         {{ form_end(incentiveForm) }}
     </div>
-    {% if incentives is defined %}
+    {% if incentives is defined and incentives is not empty %}
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         <div>
             <div class="panel-heading" role="tab" id="headingOne">
-                <h4 class="panel-title">
+                <h5>
                     <span role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                         View Incentive History
                     </span>
-                </h4>
+                </h5>
             </div>
             <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">

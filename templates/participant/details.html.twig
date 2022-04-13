@@ -93,12 +93,18 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="on_site_details">
                     <div class="row">
-                        {% if not isDVType %}
-                            {% include 'partials/participant-patient-status.html.twig' %}
+                        {% if canViewOnSiteDetails %}
+                            {% if not isDVType %}
+                                {% include 'partials/participant-patient-status.html.twig' %}
+                            {% endif %}
+                            <div class="col-md-6">
+                                {% include 'partials/participant-incentive.html.twig' %}
+                            </div>
+                        {% else %}
+                            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                                {% include 'partials/participant-notice.html.twig' %}
+                            </div>
                         {% endif %}
-                        <div class="col-md-6">
-                            {% include 'partials/participant-incentive.html.twig' %}
-                        </div>
                     </div>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="inperson">

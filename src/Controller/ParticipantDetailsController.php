@@ -159,12 +159,14 @@ class ParticipantDetailsController extends BaseController
             $awardeePatientStatusData = $patientStatusRepository->getAwardeePatientStatusData($id, $siteService->getSiteOrganization());
             $patientStatusForm = $patientStatusForm->createView();
             $canViewPatientStatus = $patientStatusService->hasAccess($participant);
+            $canViewOnSiteDetails = $incentiveService->hasAccess($participant);
         } else {
             $patientStatusForm = null;
             $orgPatientStatusData = null;
             $orgPatientStatusHistoryData = null;
             $awardeePatientStatusData = null;
             $canViewPatientStatus = false;
+            $canViewOnSiteDetails = false;
         }
 
         // Incentive Form
@@ -223,7 +225,8 @@ class ParticipantDetailsController extends BaseController
             'incentiveForm' => $incentiveForm->createView(),
             'incentives' => $incentives,
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'canViewOnSiteDetails' => $canViewOnSiteDetails
         ]);
     }
 
