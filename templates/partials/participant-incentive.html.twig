@@ -11,7 +11,7 @@
     </div>
     <div class="panel-body">
         {% set actionUrl = incentiveId is defined ? path('participant_incentive', { id: participant.id, incentiveId: incentiveId }) : path('participant_incentive', { id: participant.id }) %}
-        {{ form_start(incentiveForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
+        {{ form_start(incentiveForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
         {{ form_errors(incentiveForm) }}
         <div class="row">
             <div class="col-md-6">
