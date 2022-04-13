@@ -1,11 +1,13 @@
 $(document).ready(function () {
     $("#incentive_create form").parsley();
 
-    $('#incentive_incentive_date_given').pmiDateTimePicker({
-        format: 'MM/DD/YYYY',
-        maxDate: new Date().setHours(23, 59, 59, 999),
-        useCurrent: false
-    });
+    var setIncentiveDateGiven = function () {
+        $('.incentive-date-given').pmiDateTimePicker({
+            format: 'MM/DD/YYYY',
+            maxDate: new Date().setHours(23, 59, 59, 999),
+            useCurrent: false
+        });
+    };
 
     var incentivePrefix = 'incentive_';
 
@@ -117,8 +119,10 @@ $(document).ready(function () {
     $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
         showHideIncentiveFormFields('#incentive_edit ');
         $("#incentive_edit form").parsley();
+        setIncentiveDateGiven();
         handleGiftCardAutoPopulate('#incentive_edit ');
     });
 
+    setIncentiveDateGiven();
     handleGiftCardAutoPopulate();
 });
