@@ -33,7 +33,8 @@ class IncentiveType extends AbstractType
                     ])
                 ],
                 'attr' => [
-                    'autocomplete' => 'off'
+                    'autocomplete' => 'off',
+                    'class' => 'incentive-date-given'
                 ]
             ])
             ->add('incentive_type', Type\ChoiceType::class, [
