@@ -137,4 +137,12 @@ class IncentiveService
         }
         return $incentive;
     }
+
+    public function hasAccess($participant): bool
+    {
+        return
+            $participant->statusReason !== 'withdrawal' &&
+            $participant->statusReason !== 'test-participant' &&
+            !$this->siteService->isTestSite();
+    }
 }
