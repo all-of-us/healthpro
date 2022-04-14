@@ -2,14 +2,19 @@
 
 namespace App\Controller;
 
+use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PatientStatus;
 use App\Entity\Problem;
+use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IncentiveRemoveType;
+use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
+use App\Service\IncentiveService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
@@ -48,7 +53,8 @@ class ParticipantDetailsController extends BaseController
         SiteService $siteService,
         ParameterBagInterface $params,
         PatientStatusService $patientStatusService,
-        MeasurementService $measurementService
+        MeasurementService $measurementService,
+        IncentiveService $incentiveService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -153,13 +159,39 @@ class ParticipantDetailsController extends BaseController
             $awardeePatientStatusData = $patientStatusRepository->getAwardeePatientStatusData($id, $siteService->getSiteOrganization());
             $patientStatusForm = $patientStatusForm->createView();
             $canViewPatientStatus = $patientStatusService->hasAccess($participant);
+            $canViewOnSiteDetails = $incentiveService->hasAccess($participant);
         } else {
             $patientStatusForm = null;
             $orgPatientStatusData = null;
             $orgPatientStatusHistoryData = null;
             $awardeePatientStatusData = null;
             $canViewPatientStatus = false;
+            $canViewOnSiteDetails = false;
         }
+
+        // Incentive Form
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
+
+        // Incentive Delete Form
+        $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
+        $incentiveDeleteForm->handleRequest($request);
+        if ($incentiveDeleteForm->isSubmitted() && $incentiveDeleteForm->isValid()) {
+            $incentiveId = $incentiveDeleteForm['id']->getData();
+            $incentive = $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]);
+            if ($incentive) {
+                if ($incentive->getSite() !== $siteService->getSiteId()) {
+                    throw $this->createAccessDeniedException();
+                }
+                if ($incentiveService->cancelIncentive($id, $incentive)) {
+                    $this->addFlash('success', 'Incentive Deleted');
+                } else {
+                    $this->addFlash('error', 'Error deleting incentive. Please try again');
+                }
+                $this->redirectToRoute('participant', ['id' => $id]);
+            }
+        }
+
+        $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
@@ -190,7 +222,11 @@ class ParticipantDetailsController extends BaseController
             'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl,
             'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
-            'readOnlyView' => $this->isReadOnly()
+            'incentiveForm' => $incentiveForm->createView(),
+            'incentives' => $incentives,
+            'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
+            'readOnlyView' => $this->isReadOnly(),
+            'canViewOnSiteDetails' => $canViewOnSiteDetails
         ]);
     }
 
@@ -230,5 +266,75 @@ class ParticipantDetailsController extends BaseController
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', 'application/pdf');
         return $response;
+    }
+
+    /**
+     * @Route("/participant/{id}/incentive/{incentiveId}", name="participant_incentive", defaults={"incentiveId": null})
+     */
+    public function participantIncentiveAction(
+        $id,
+        $incentiveId,
+        Request $request,
+        EntityManagerInterface $em,
+        ParticipantSummaryService $participantSummaryService,
+        SiteService $siteService,
+        IncentiveService $incentiveService
+    ): Response {
+        $participant = $participantSummaryService->getParticipantById($id);
+        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]) : null;
+        if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
+            throw $this->createAccessDeniedException();
+        }
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => true]);
+        $incentiveForm->handleRequest($request);
+        if ($incentiveForm->isSubmitted()) {
+            if ($incentiveForm->isValid()) {
+                if ($incentiveId) {
+                    if ($incentiveService->amendIncentive($id, $incentiveForm)) {
+                        $this->addFlash('success', 'Incentive Updated');
+                    } else {
+                        $this->addFlash('error', 'Error updating incentive. Please try again');
+                    }
+                } else {
+                    if ($incentiveService->createIncentive($id, $incentiveForm)) {
+                        $this->addFlash('success', 'Incentive Created');
+                    } else {
+                        $this->addFlash('error', 'Error creating incentive. Please try again');
+                    }
+                }
+            } else {
+                $this->addFlash('error', 'Invalid form');
+            }
+            return $this->redirectToRoute("participant", ['id' => $id]);
+        }
+
+        return $this->render('/partials/participant-incentive.html.twig', [
+            'incentiveForm' => $incentiveForm->createView(),
+            'participant' => $participant,
+            'type' => 'edit',
+            'incentiveId' => $incentiveId
+        ]);
+    }
+
+    /**
+     * @Route("/ajax/search/giftcard-prefill", name="search_gift_card_prefill")
+     */
+    public function giftCardFillAction()
+    {
+        return $this->json(Incentive::$giftCardTypes);
+    }
+
+    /**
+     * @Route("/ajax/search/giftcard/{query}", name="search_giftcard")
+     */
+    public function giftCardAction(EntityManagerInterface $em, Request $request)
+    {
+        $query = $request->get('query');
+        $giftCards = $em->getRepository(Incentive::class)->search($query);
+        $results = [];
+        foreach ($giftCards as $giftCard) {
+            $results[] = $giftCard['giftCardType'];
+        }
+        return $this->json($results);
     }
 }

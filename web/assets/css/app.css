@@ -327,6 +327,29 @@ label.label-normal {
     color: #337ab7;
 }
 
+#on_site_details .panel-heading span:before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f107";
+}
+
+#on_site_details .panel-heading.active span:before {
+    content: "\f106";
+}
+
+.incentive .parsley-errors-list {
+    margin-left: -36px
+}
+
+.incentive .parsley-errors-list li {
+    list-style: none;
+    color: #a94442;
+}
+
+.incentive-modify i {
+    cursor: pointer;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
@@ -631,4 +654,55 @@ table.table-samples td {
   padding: 0.5rem;
   border: solid 2pt white;
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
+/* Typeahead styles */
+
+/*
+ * Bootstrap defines this rule with .input-group-sm>.form-control
+ * but Twitter Typeahead wraps the input.form-control with a span,
+ * so we need to redefine this rule
+*/
+.twitter-typeahead {
+    display: block !important;
+}
+.typeahead-wrapper {
+    display: block;
+    margin: 50px 0;
+}
+.input-group .tt-dropdown-menu {
+    margin-top: 34px;
+}
+.tt-menu {
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #000;
+    width: 100%;
+}
+
+.tt-hint {
+    color: #999
+}
+.tt-dropdown-menu {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    max-height: 300px;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 14px;
+}
+.tt-suggestion {
+    padding: 6px 10px;
+}
+.tt-suggestion.tt-cursor {
+    background-color: #ccc;
+    cursor: pointer;
+}
+/* End Typeahead styles */
+
+/* User management */
+.attest-choice-text {
+    text-decoration: underline;
 }

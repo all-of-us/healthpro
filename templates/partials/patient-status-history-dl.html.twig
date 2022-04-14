@@ -1,17 +1,17 @@
 {% for key, field in orgPatientStatusHistoryData %}
-    <dl class="dl-horizontal">
-        <dt>Status</dt>
-        <dd>{{ field.display_status }}</dd>
-        <dt>User</dt>
-        <dd>{{ field.user_email }}</dd>
-        <dt>Site</dt>
-        <dd>{{ field.site_name }}</dd>
-        <dt>Date</dt>
-        <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</dd>
-        <dt>Comments</dt>
-        <dd>{{ field.comments }}</dd>
-    </dl>
-    {% if not loop.last %}
-        <hr>
-    {% endif %}
-{% endfor %}
+      <dl class="dl-horizontal">
+          <dt>Status</dt>
+          <dd>{{ field.display_status }}</dd>
+          <dt>User</dt>
+          <dd>{{ field.user_email }}</dd>
+          <dt>Site</dt>
+          <dd>{{ field.site_name }}</dd>
+          <dt>Date</dt>
+          <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+          <dt>Comments</dt>
+          <dd>{{ field.comments }}</dd>
+      </dl>
+      {% if not loop.last %}
+          <hr>
+      {% endif %}
+  {% endfor %}

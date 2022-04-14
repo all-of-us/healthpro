@@ -1,0 +1,139 @@
+{% set readOnlyView = readOnlyView|default(false) %}
+<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {% if type is defined and type == 'edit' %}
+                <i class="fa fa-edit" aria-hidden="true"></i> Edit Incentive
+            {% else %}
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Incentive
+            {% endif %}
+        </h3>
+    </div>
+    <div class="panel-body">
+        {% set actionUrl = incentiveId is defined ? path('participant_incentive', { id: participant.id, incentiveId: incentiveId }) : path('participant_incentive', { id: participant.id }) %}
+        {{ form_start(incentiveForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
+        {{ form_errors(incentiveForm) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(incentiveForm.incentive_date_given) }}
+                {{ form_row(incentiveForm.incentive_occurrence) }}
+                {{ form_row(incentiveForm.other_incentive_occurrence) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(incentiveForm.incentive_type) }}
+                <div id="gift_card">
+                    {{ form_row(incentiveForm.gift_card_type) }}
+                </div>
+                {{ form_row(incentiveForm.other_incentive_type) }}
+                {{ form_row(incentiveForm.incentive_amount) }}
+                {{ form_row(incentiveForm.other_incentive_amount) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(incentiveForm.notes) }}
+            {{ form_widget(incentiveForm.notes) }}
+            {% if type is defined and type == 'edit' %}
+                <small class="text-warning">Please provide a reason for amending this incentive.</small>
+            {% endif %}
+        </div>
+        {{ form_rest(incentiveForm) }}
+        {% if not readOnlyView %}
+            <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
+            {% if type is defined and type == 'edit' %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            {% else %}
+                <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+            {% endif %}
+        {% endif %}
+        {{ form_end(incentiveForm) }}
+    </div>
+    {% if incentives is defined and incentives is not empty %}
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div>
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h5>
+                    <span role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        View Incentive History
+                    </span>
+                </h5>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">
+                    {% for incentive in incentives %}
+                        {% if not readOnlyView  and incentive.site == siteInfo.siteId %}
+                            <div class="pull-right incentive-modify">
+                                <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
+                                <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
+                            </div>
+                        {% endif %}
+                        <dl class="dl-horizontal">
+                            <dt>Date Created</dt>
+                            <dd>{{ incentive.createdTs|date('n/j/Y g:ia', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}</dd>
+                            <dt>User</dt>
+                            <dd>{{ incentive.user.email }}</dd>
+                            <dt>Site</dt>
+                            <dd>{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
+                            <dt>Date Incentive Given</dt>
+                            <dd>{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
+                            <dt>Incentive Occurrence</dt>
+                            <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
+                            {% if incentive.otherIncentiveOccurrence %}
+                                <dt>Other Incentive Occurrence</dt>
+                                <dd>{{ incentive.otherIncentiveOccurrence }}</dd>
+                            {% endif %}
+                            <dt>Incentive Type</dt>
+                            <dd>
+                                {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
+                            </dd>
+                            {% if incentive.otherIncentiveType %}
+                                <dt>Other Incentive Type</dt>
+                                <dd>{{ incentive.otherIncentiveType }}</dd>
+                            {% endif %}
+                            <dt>Incentive Amount</dt>
+                            <dd>${{ incentive.incentiveAmount }}</dd>
+                            <dt>Notes</dt>
+                            <dd>{{ incentive.notes }}</dd>
+                        </dl>
+                        <hr/>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="incentive_amend_modal" tabindex="-1" role="dialog" aria-labelledby="incentiveModalAmend">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">Are you sure you want to amend this incentive occurrence?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                <a class="btn btn-primary incentive-ok" id="incentive_amend_ok" data-loading-text="Loading..." data-href="">Ok</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if incentiveDeleteForm is defined %}
+    <div class="modal fade" id="incentive_remove_modal" tabindex="-1" role="dialog" aria-labelledby="incentiveModalRemove">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">Are you sure you want to remove this incentive occurrence?</div>
+                <div class="modal-footer">
+                    {{ form_start(incentiveDeleteForm) }}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                        <button type="submit" class="btn btn-primary">Ok</button>
+                    {{ form_end(incentiveDeleteForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div id="incentive_edit_form_modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>

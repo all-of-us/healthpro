@@ -1,0 +1,67 @@
+<div class="col-md-6">
+    {% if canViewPatientStatus %}
+        {% if orgPatientStatusData is empty %}
+            <div class="alert alert-warning">
+                Please complete the patient status information for your organization. User should have access to EHR system information for verification.
+            </div>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
+            </div>
+            <div class="panel-body">
+                <div id="patient-status-data-box">
+                    {% if orgPatientStatusData is not empty %}
+                        <div>
+                            <dl class="dl-horizontal">
+                                <dt>Status</dt>
+                                <dd>{{ orgPatientStatusData.display_status }}</dd>
+                                <dt>Comments</dt>
+                                <dd>{{ orgPatientStatusData.comments }}</dd>
+                            </dl>
+                        </div>
+                        {% if not readOnlyView %}
+                            <div align="center">
+                                <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div id="patient-status-form-box">
+                    {{ form_start(patientStatusForm, { attr: { class: 'disable-enter prevent-resubmit patient-status-form' } }) }}
+                    {{ form_errors(patientStatusForm) }}
+                    {{ form_rest(patientStatusForm) }}
+                    {% if orgPatientStatusData is not empty %}
+                        <small class="text-warning">User must enter a reason for updating previous organization status.</small>
+                        <br><br>
+                    {% endif %}
+                    {% if not readOnlyView %}
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    {% endif %}
+                    {% if orgPatientStatusData is not empty %}
+                        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                    {% endif %}
+                    {{ form_end(patientStatusForm) }}
+                </div>
+                {% if orgPatientStatusHistoryData is not empty %}
+                    {% include 'partials/patient-status-history-list.html.twig' %}
+                {% endif %}
+                {% if awardeePatientStatusData is not empty %}
+                    {% include 'partials/participant-organization-patient-status-details.html.twig' %}
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                {% if disablePatientStatusMessage is not empty %}
+                    <div class="alert alert-warning">
+                        {{ disablePatientStatusMessage }}
+                    </div>
+                {% else %}
+                    {% include 'partials/participant-notice.html.twig' %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
