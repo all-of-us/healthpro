@@ -1,12 +1,12 @@
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="panel panel-default" id="id_verification">
+<div class="panel panel-default id-verification" id="id_verification">
     <div class="panel-heading">
         <h3 class="panel-title">
             <i class="fa fa-id-card" aria-hidden="true"></i> ID Verification
         </h3>
     </div>
     <div class="panel-body">
-        {{ form_start(idVerificationForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form' } }) }}
+        {{ form_start(idVerificationForm, { attr: { class: 'disable-enter prevent-resubmit id-verification-form' } }) }}
         {{ form_errors(idVerificationForm) }}
         {{ form_rest(idVerificationForm) }}
         {% if not readOnlyView %}

@@ -337,11 +337,11 @@ label.label-normal {
     content: "\f106";
 }
 
-.incentive .parsley-errors-list {
+.incentive .parsley-errors-list, .id-verification .parsley-errors-list  {
     margin-left: -36px
 }
 
-.incentive .parsley-errors-list li {
+.incentive .parsley-errors-list li, .id-verification .parsley-errors-list li {
     list-style: none;
     color: #a94442;
 }
