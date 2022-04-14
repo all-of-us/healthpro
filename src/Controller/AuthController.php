@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\MockLoginType;
+use App\Security\User;
 use App\Service\AuthService;
 use App\Service\EnvironmentService;
 use App\Service\UserService;
@@ -34,6 +35,7 @@ class AuthController extends AbstractController
                 // Set mock user and token for local development
                 $email = $loginForm->get('userName')->getData();
                 $userService->setMockUser($email);
+                /** @var User $user */
                 $user = $userProvider->loadUserByUsername($email);
                 if (empty($user->getGroups())) {
                     $session->invalidate();
