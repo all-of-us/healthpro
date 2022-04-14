@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Service\EnvironmentService;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -166,6 +167,7 @@ class DeployCommand extends Command
             copy($envFavicon, $favicon);
         }
 
+        /** @var QuestionHelper $question */
         $question = $this->getHelper('question');
         $this->exec("git status"); // display git status
         $gitStatus = new ConfirmationQuestion(
@@ -411,6 +413,7 @@ class DeployCommand extends Command
                 if (!$this->local) {
                     throw new \Exception('Fix security vulnerabilities before deploying');
                 } else {
+                    /** @var QuestionHelper $helper */
                     $helper = $this->getHelper('question');
                     if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
                         throw new \Exception('Aborting due to security vulnerability');
@@ -429,6 +432,7 @@ class DeployCommand extends Command
         } else {
             $this->out->writeln('');
             if (!$this->noInteraction) {
+                /** @var QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
                     throw new \Exception('Aborting due to JS security vulnerability');
