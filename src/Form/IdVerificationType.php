@@ -10,15 +10,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IdVerificationType extends AbstractType
 {
     public static $verificationTypeChoices = [
-        'Photo ID and one form of PII' => 'PHOTO_AND_ONE_OF_PII',
-        'Two forms of PII' => 'TWO_OF_PII'
+        'Photo ID & One Form of PII' => 'PHOTO_AND_ONE_OF_PII',
+        'Two Forms of PII' => 'TWO_OF_PII'
     ];
 
     public static $visitTypeChoices = [
-        'PM&B initial visit' => 'PMB_INITIAL_VISIT',
-        'Physical measurements only' => 'PHYSICAL_MEASUREMENTS_ONLY',
-        'Biospecimen collection only' => 'BIOSPECIMEN_COLLECTION_ONLY',
-        'Biospecimen redraw' => 'BIOSPECIMEN_COLLECTION_ONLY',
+        'PM&B Initial Visit' => 'PMB_INITIAL_VISIT',
+        'Physical Measurements Only' => 'PHYSICAL_MEASUREMENTS_ONLY',
+        'Biospecimen Collection Only' => 'BIOSPECIMEN_COLLECTION_ONLY',
+        'Biospecimen Redraw' => 'BIOSPECIMEN_COLLECTION_ONLY',
         'Retention Activities' => 'RETENTION_ACTIVITIES',
     ];
 
