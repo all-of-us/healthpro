@@ -97,30 +97,37 @@ $(document).ready(function () {
     });
 
     /* Gift card search */
+    var getGiftCards = new Bloodhound({
+        name: 'giftCardType',
+        datumTokenizer: Bloodhound.tokenizers.whitespace,
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 10,
+        prefetch: '/ajax/search/giftcard-prefill',
+        remote: {
+            url: '/ajax/search/giftcard/%QUERY',
+            wildcard: '%QUERY'
+        }
+    });
+
     var handleGiftCardAutoPopulate = function (idPrefix = '#incentive_create ') {
         $(idPrefix + ' .gift-card').typeahead({
                 highlight: true
             },
             {
-                source: new Bloodhound({
-                    name: 'giftCardType',
-                    datumTokenizer: Bloodhound.tokenizers.whitespace,
-                    queryTokenizer: Bloodhound.tokenizers.whitespace,
-                    limit: 10,
-                    prefetch: '/ajax/search/giftcard-prefill',
-                    remote: {
-                        url: '/ajax/search/giftcard/%QUERY',
-                        wildcard: '%QUERY'
-                    }
-                })
+                source: getGiftCards
             });
     };
 
-    $('#incentive_edit_form_modal').on('shown.bs.modal', function () {
+    var incentiveEditModal = '#incentive_edit_form_modal';
+
+    $(incentiveEditModal).on('shown.bs.modal', function () {
         showHideIncentiveFormFields('#incentive_edit ');
         $("#incentive_edit form").parsley();
         setIncentiveDateGiven();
-        handleGiftCardAutoPopulate('#incentive_edit ');
+    });
+
+    $(incentiveEditModal).on('hidden.bs.modal', function () {
+        $("#patient-status-details-modal .modal-content").html('');
     });
 
     setIncentiveDateGiven();
