@@ -7,6 +7,7 @@ use App\Model\Measurement\Fhir;
 use App\Exception\InvalidSchemaException;
 use App\Exception\MissingSchemaException;
 use App\Helper\Util;
+use stdClass;
 
 /**
  * @ORM\Table(name="evaluations", indexes={
@@ -347,7 +348,7 @@ class Measurement
         if (empty($this->currentVersion) && empty($this->version)) {
             $this->currentVersion = self::CURRENT_VERSION;
         }
-        $data = empty($this->getData()) ? new \StdClass() : $this->getData();
+        $data = empty($this->getData()) ? new StdClass() : $this->getData();
         if (is_object($data)) {
             $this->fieldData = $data;
         } else {
@@ -412,6 +413,7 @@ class Measurement
                 $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
             }
         }
+        /** @var stdClass $field */
         foreach ($this->schema->fields as $field) {
             if (isset($field->replicates)) {
                 $key = $field->name;
@@ -626,6 +628,7 @@ class Measurement
     public function getWarnings()
     {
         $warnings = [];
+        /** @var stdClass $metric */
         foreach ($this->schema->fields as $metric) {
             if (!empty($metric->warnings) && is_array($metric->warnings)) {
                 $warnings[$metric->name] = $metric->warnings;
@@ -637,6 +640,7 @@ class Measurement
     public function getConversions()
     {
         $conversions = [];
+        /** @var stdClass $metric */
         foreach ($this->schema->fields as $metric) {
             if (!empty($metric->convert)) {
                 $conversions[$metric->name] = $metric->convert;
