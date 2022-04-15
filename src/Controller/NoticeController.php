@@ -16,8 +16,13 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/notices")
  */
-class NoticeController extends AbstractController
+class NoticeController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/", name="admin_notices")
      */
@@ -32,7 +37,7 @@ class NoticeController extends AbstractController
     /**
      * @Route("/notice/{id}", name="admin_notice")
      */
-    public function edit(NoticeRepository $noticeRepository, EntityManagerInterface $em, LoggerService $loggerService, Request $request, $id=null)
+    public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id=null)
     {
         if ($id) {
             $notice = $noticeRepository->find($id);
@@ -44,25 +49,25 @@ class NoticeController extends AbstractController
             $notice->setStatus(true);
         }
 
-        $form = $this->createForm(NoticeType::class, $notice, ['timezone' => $this->getUser()->getTimezone()]);
+        $form = $this->createForm(NoticeType::class, $notice, ['timezone' => $this->getSecurityUser()->getTimezone()]);
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 if ($notice === null) {
                     $notice = $form->getData();
-                    $em->persist($notice);
-                    $em->flush();
+                    $this->em->persist($notice);
+                    $this->em->flush();
                     $loggerService->log(Log::NOTICE_ADD, $notice->getId());
                     $this->addFlash('success', 'Notice added');
                 } elseif ($request->request->has('delete')) {
-                    $em->remove($notice);
-                    $em->flush();
+                    $this->em->remove($notice);
+                    $this->em->flush();
                     $loggerService->log(Log::NOTICE_DELETE, $notice->getId());
                     $this->addFlash('success', 'Notice removed');
                 } else {
-                    $em->persist($notice);
-                    $em->flush();
+                    $this->em->persist($notice);
+                    $this->em->flush();
                     $loggerService->log(Log::NOTICE_EDIT, $notice->getId());
                     $this->addFlash('success', 'Notice updated');
                 }
