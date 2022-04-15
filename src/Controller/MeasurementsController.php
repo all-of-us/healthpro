@@ -90,7 +90,7 @@ class MeasurementsController extends BaseController
         if ($measurementsForm->isSubmitted()) {
             // Get current logged in user entity
             $userRepository = $this->em->getRepository(User::class);
-            $currentUser = $userRepository->find($this->getUser()->getId());
+            $currentUser = $userRepository->find($this->getSecurityUser()->getId());
 
             // Check if PMs are cancelled
             if ($measurement->isEvaluationCancelled()) {
