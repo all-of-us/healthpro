@@ -57,9 +57,7 @@ class AccessManagementController extends BaseController
      */
     public function userGroup($groupId): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
-        $group = $user->getGroupFromId($groupId);
+        $group = $this->getSecurityUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -81,9 +79,7 @@ class AccessManagementController extends BaseController
      */
     public function member($groupId, Request $request)
     {
-        /** @var User $user */
-        $user = $this->getUser();
-        $group = $user->getGroupFromId($groupId);
+        $group = $this->getSecurityUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -128,9 +124,7 @@ class AccessManagementController extends BaseController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        /** @var User $user */
-        $user = $this->getUser();
-        $group = $user->getGroupFromId($groupId);
+        $group = $this->getSecurityUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
