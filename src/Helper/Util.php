@@ -8,7 +8,7 @@ class Util
 {
     public static function generateUuid()
     {
-        return (string)Uuid::uuid4();
+        return Uuid::uuid4()->toString();
     }
 
     public static function generateShortUuid($length = 16, $upper = true)
