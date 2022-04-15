@@ -13,7 +13,6 @@ use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
 use App\Service\PatientStatusService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
