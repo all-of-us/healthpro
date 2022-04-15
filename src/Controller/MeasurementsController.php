@@ -24,7 +24,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MeasurementsController extends BaseController
 {
-    protected $em;
     protected $measurementService;
     protected $participantSummaryService;
     protected $loggerService;
@@ -39,7 +38,7 @@ class MeasurementsController extends BaseController
         SiteService $siteService,
         ParameterBagInterface $params
     ) {
-        $this->em = $em;
+        parent::__construct($em);
         $this->measurementService = $measurementService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;

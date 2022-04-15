@@ -28,7 +28,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 
 class OrderController extends BaseController
 {
-    protected $em;
     protected $orderService;
     protected $participantSummaryService;
     protected $loggerService;
@@ -41,7 +40,7 @@ class OrderController extends BaseController
         LoggerService $loggerService,
         SiteService $siteService
     ) {
-        $this->em = $em;
+        parent::__construct($em);
         $this->orderService = $orderService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
@@ -70,7 +69,7 @@ class OrderController extends BaseController
     /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
-    public function orderCheck($participantId, RequestStack $requestStack)
+    public function orderCheck($participantId, RequestStack $requestStack): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -88,7 +87,7 @@ class OrderController extends BaseController
     /**
      * @Route("/participant/{participantId}/order/create", name="order_create")
      */
-    public function orderCreateAction($participantId, Request $request, SessionInterface $session)
+    public function orderCreateAction($participantId, Request $request, SessionInterface $session): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -195,7 +194,7 @@ class OrderController extends BaseController
      * @Route("/participant/{participantId}/order/{orderId}/print/labels", name="order_print_labels")
      * @Route("/read/participant/{participantId}/order/{orderId}/print/labels", name="read_order_print_labels")
      */
-    public function orderPrintLabelsAction($participantId, $orderId)
+    public function orderPrintLabelsAction($participantId, $orderId): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {

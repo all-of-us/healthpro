@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
+use App\Security\User;
 use App\Service\AccessManagementService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
@@ -11,6 +12,7 @@ use App\Audit\Log;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -50,9 +52,11 @@ class AccessManagementController extends AbstractController
     /**
      * @Route("/user/group/{groupId}", name="access_manage_user_group")
      */
-    public function userGroup($groupId)
+    public function userGroup($groupId): Response
     {
-        $group = $this->getUser()->getGroupFromId($groupId);
+        /** @var User $user */
+        $user = $this->getUser();
+        $group = $user->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -74,7 +78,9 @@ class AccessManagementController extends AbstractController
      */
     public function member($groupId, Request $request)
     {
-        $group = $this->getUser()->getGroupFromId($groupId);
+        /** @var User $user */
+        $user = $this->getUser();
+        $group = $user->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -119,7 +125,9 @@ class AccessManagementController extends AbstractController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        $group = $this->getUser()->getGroupFromId($groupId);
+        /** @var User $user */
+        $user = $this->getUser();
+        $group = $user->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
