@@ -7,6 +7,7 @@ use App\Service\AuthService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Audit\Log;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,15 +15,20 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
-class DefaultController extends AbstractController
+class DefaultController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/", name="home")
      */
     public function index()
     {
         $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
-        if ($checkTimeZone && !$this->getUser()->getTimezone()) {
+        if ($checkTimeZone && !$this->getSecurityUser()->getTimezone()) {
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
         }
