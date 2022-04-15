@@ -15,7 +15,6 @@ use App\Service\OrderService;
 use App\Service\PatientStatusService;
 use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,8 +22,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * @Route("/admin/debug")
  */
-class DebugToolsController extends AbstractController
+class DebugToolsController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/participants", name="admin_debug_participants")
      */
@@ -63,9 +67,9 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/measurements", name="admin_debug_missing_measurements")
      */
-    public function missingMeasurementsAction(Request $request, EntityManagerInterface $em, MeasurementService $measurementsService, RdrApiService $rdrApiService)
+    public function missingMeasurementsAction(Request $request, MeasurementService $measurementsService, RdrApiService $rdrApiService)
     {
-        $missing = $em->getRepository(Measurement::class)->getMissingMeasurements();
+        $missing = $this->em->getRepository(Measurement::class)->getMissingMeasurements();
         $choices = [];
         foreach ($missing as $physicalMeasurements) {
             $choices[$physicalMeasurements->getId()] = $physicalMeasurements->getId();
@@ -75,7 +79,7 @@ class DebugToolsController extends AbstractController
         if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
             if (!empty($ids) && $form->isValid()) {
-                $repository = $em->getRepository(Measurement::class);
+                $repository = $this->em->getRepository(Measurement::class);
                 foreach ($ids as $id) {
                     $measurement = $repository->findOneBy(['id' => $id]);
                     if (!$measurement) {
@@ -97,8 +101,8 @@ class DebugToolsController extends AbstractController
                         $updateMeasurement = $repository->find($measurement->getId());
                         $updateMeasurement->setRdrId($rdrEvalId);
                         $updateMeasurement->setFhirVersion(Fhir::CURRENT_VERSION);
-                        $em->flush();
-                        $em->clear();
+                        $this->em->flush();
+                        $this->em->clear();
                         $this->addFlash('success', "#{$id} successfully sent to RDR");
                     } else {
                         $this->addFlash('error', "#{$id} failed sending to RDR: " . $rdrApiService->getLastError());
@@ -118,9 +122,9 @@ class DebugToolsController extends AbstractController
     /**
      * @Route("/missing/orders", name="admin_debug_missing_orders")
      */
-    public function missingOrdersAction(Request $request, EntityManagerInterface $em, OrderService $orderService, RdrApiService $rdrApiService)
+    public function missingOrdersAction(Request $request, OrderService $orderService, RdrApiService $rdrApiService)
     {
-        $missing = $em->getRepository(Order::class)->getMissingOrders();
+        $missing = $this->em->getRepository(Order::class)->getMissingOrders();
         $choices = [];
         foreach ($missing as $orders) {
             $choices[$orders->getId()] = $orders->getId();
@@ -130,7 +134,7 @@ class DebugToolsController extends AbstractController
         if ($form->isSubmitted()) {
             $ids = $form->get('ids')->getData();
             if (!empty($ids) && $form->isValid()) {
-                $repository = $em->getRepository(Order::class);
+                $repository = $this->em->getRepository(Order::class);
                 // Send orders to RDR
                 foreach ($ids as $id) {
                     $order = $repository->find(['id' => $id]);
@@ -145,8 +149,8 @@ class DebugToolsController extends AbstractController
                     if ($rdrId = $orderService->createOrder($order->getParticipantId(), $orderRdrObject)) {
                         $updateOrder = $repository->find($order->getId());
                         $updateOrder->setRdrId($rdrId);
-                        $em->flush();
-                        $em->clear();
+                        $this->em->flush();
+                        $this->em->clear();
                         $this->addFlash('success', "#{$id} successfully sent to RDR");
                     } elseif ($rdrApiService->getLastErrorCode() === 409) {
                         $rdrOrder = $orderService->getOrder($order->getParticipantId(), $order->getMayoId());
@@ -154,8 +158,8 @@ class DebugToolsController extends AbstractController
                         if (!empty($rdrOrder) && $rdrOrder->id === $order->getMayoId()) {
                             $updateOrder = $repository->find($order->getId());
                             $updateOrder->setRdrId($order->getMayoId());
-                            $em->flush();
-                            $em->clear();
+                            $this->em->flush();
+                            $this->em->clear();
                             $this->addFlash('success', "#{$id} successfully reconciled");
                         } else {
                             $this->addFlash('error', "#{$id} failed to finalize: " . $rdrApiService->getLastError());

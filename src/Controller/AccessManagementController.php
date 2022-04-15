@@ -9,7 +9,7 @@ use App\Service\AccessManagementService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/access/manage")
  */
-class AccessManagementController extends AbstractController
+class AccessManagementController extends BaseController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
     public const RESET_PASSWORD_URL = 'https://admin.google.com';
@@ -26,8 +26,12 @@ class AccessManagementController extends AbstractController
     private $googleGroupsService;
     private $loggerService;
 
-    public function __construct(GoogleGroupsService $googleGroupsService, LoggerService $loggerService)
-    {
+    public function __construct(
+        GoogleGroupsService $googleGroupsService,
+        LoggerService $loggerService,
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
         $this->googleGroupsService = $googleGroupsService;
         $this->loggerService = $loggerService;
     }

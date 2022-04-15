@@ -15,7 +15,6 @@ use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -26,8 +25,13 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/cron", condition="request.headers.get('X-Appengine-Cron') === 'true'")
  */
-class CronController extends AbstractController
+class CronController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/ping-test", name="cron_ping_test")
      */
@@ -173,10 +177,10 @@ class CronController extends AbstractController
     /**
      * @Route("/backfill-order-processed-time", name="backfill_order_processed_time")
      */
-    public function backfillOrderProcessedTimeAction(EntityManagerInterface $em, ParameterBagInterface $params)
+    public function backfillOrderProcessedTimeAction(ParameterBagInterface $params)
     {
         $limit = $params->has('backfill_order_limit') ? $params->get('backfill_order_limit') : 500;
-        $orders = $em->getRepository(Order::class)->getBackfillOrders($limit);
+        $orders = $this->em->getRepository(Order::class)->getBackfillOrders($limit);
         $batchSize = 50;
         foreach ($orders as $key => $order) {
             $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
@@ -185,12 +189,12 @@ class CronController extends AbstractController
                 $processedTs->setTimestamp(max($processedSamplesTs));
                 $order->setProcessedTs($processedTs);
             }
-            $em->persist($order);
+            $this->em->persist($order);
             if (($key % $batchSize) === 0) {
-                $em->flush();
+                $this->em->flush();
             }
         }
-        $em->flush();
+        $this->em->flush();
         return $this->json(['success' => true]);
     }
 }
