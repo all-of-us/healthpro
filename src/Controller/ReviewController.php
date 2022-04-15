@@ -8,7 +8,9 @@ use App\Repository\MeasurementRepository;
 use App\Service\ParticipantSummaryService;
 use App\Service\ReviewService;
 use App\Service\SiteService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use DateTime;
+use DateTimeZone;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/review")
  */
-class ReviewController extends AbstractController
+class ReviewController extends BaseController
 {
     public const DATE_RANGE_LIMIT = 7;
 
@@ -26,8 +28,13 @@ class ReviewController extends AbstractController
 
     protected $siteService;
 
-    public function __construct(ParticipantSummaryService $participantSummaryService, ReviewService $reviewService, SiteService $siteService)
-    {
+    public function __construct(
+        ParticipantSummaryService $participantSummaryService,
+        ReviewService $reviewService,
+        SiteService $siteService,
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
         $this->participantSummaryService = $participantSummaryService;
         $this->reviewService = $reviewService;
         $this->siteService = $siteService;
@@ -45,13 +52,13 @@ class ReviewController extends AbstractController
         }
 
         // Get beginning of today (at midnight) in user's timezone
-        $startDate = new \DateTime('today', new \DateTimeZone($this->getUser()->getTimeZone()));
+        $startDate = new DateTime('today', new DateTimeZone($this->getSecurityUser()->getTimeZone()));
 
         // Get beginning of tomorrow (at midnight) in user's timezone (will be comparing < $endDate)
-        $endDate = new \DateTime('tomorrow', new \DateTimeZone($this->getUser()->getTimeZone()));
+        $endDate = new DateTime('tomorrow', new DateTimeZone($this->getSecurityUser()->getTimeZone()));
 
         $displayMessage = "Today's participants";
-        $todayFilterForm = $this->createForm(ReviewTodayFilterType::class, null, ['timezone' => $this->getUser()->getTimeZone()]);
+        $todayFilterForm = $this->createForm(ReviewTodayFilterType::class, null, ['timezone' => $this->getSecurityUser()->getTimeZone()]);
         $todayFilterForm->handleRequest($request);
         if ($todayFilterForm->isSubmitted()) {
             if ($todayFilterForm->isValid()) {
@@ -82,10 +89,10 @@ class ReviewController extends AbstractController
         $endDate->modify('+1 day');
 
         // Get MySQL date/time string in UTC
-        $startDate->setTimezone(new \DateTimezone('UTC'));
+        $startDate->setTimezone(new DateTimezone('UTC'));
         $startDate = $startDate->format('Y-m-d H:i:s');
 
-        $endDate->setTimezone(new \DateTimezone('UTC'));
+        $endDate->setTimezone(new DateTimezone('UTC'));
         $endDate = $endDate->format('Y-m-d H:i:s');
 
         $participants = $this->reviewService->getTodayParticipants($startDate, $endDate, $site);
