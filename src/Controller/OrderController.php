@@ -87,7 +87,7 @@ class OrderController extends BaseController
     /**
      * @Route("/participant/{participantId}/order/create", name="order_create")
      */
-    public function orderCreateAction($participantId, Request $request, SessionInterface $session): Response
+    public function orderCreateAction($participantId, Request $request, SessionInterface $session)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
