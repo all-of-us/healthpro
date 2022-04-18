@@ -8,6 +8,7 @@
     "require": {
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-json" : "*",
         "beberlei/doctrineextensions": "^1.2",
         "composer/package-versions-deprecated": "1.11.99.4",
         "doctrine/doctrine-bundle": "^2.4",
