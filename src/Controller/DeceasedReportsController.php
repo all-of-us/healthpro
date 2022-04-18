@@ -27,8 +27,7 @@ class DeceasedReportsController extends BaseController
     public function __construct(
         ParameterBagInterface $params,
         EntityManagerInterface $em
-    )
-    {
+    ) {
         parent::__construct($em);
         $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
     }
