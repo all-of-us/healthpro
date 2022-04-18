@@ -445,12 +445,12 @@ class Order
         return $this;
     }
 
-    public function getCollectedTs(): ?DateTimeInterface
+    public function getCollectedTs(): ?DateTime
     {
         return $this->collectedTs;
     }
 
-    public function setCollectedTs(?DateTimeInterface $collectedTs): self
+    public function setCollectedTs(?DateTime $collectedTs): self
     {
         $this->collectedTs = $collectedTs;
 
