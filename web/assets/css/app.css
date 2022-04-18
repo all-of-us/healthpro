@@ -350,6 +350,12 @@ label.label-normal {
     cursor: pointer;
 }
 
+.equal-height {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
