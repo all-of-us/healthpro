@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\Site;
-use App\Entity\User;
 use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
