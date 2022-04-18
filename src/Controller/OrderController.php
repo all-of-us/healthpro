@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -415,7 +416,8 @@ class OrderController extends BaseController
      * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
      * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize", methods={"GET"})
      */
-    public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
+    // @ToDo - Replace SessionInterface with Symfony\Component\HttpFoundation\Session
+    public function orderFinalizeAction($participantId, $orderId, Request $request, Session $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $wasPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
