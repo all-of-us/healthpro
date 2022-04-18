@@ -9,11 +9,13 @@ $(document).ready(function () {
         } else {
             $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
             $(verificationFormSelector + ' :input:not(:checkbox)').val('');
+            $(verificationFormSelector).parsley().reset();
         }
     });
 
     $('#id_verification_cancel').on('click', function () {
         $(verificationFormSelector)[0].reset();
         $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
+        $(verificationFormSelector).parsley().reset();
     });
 });
