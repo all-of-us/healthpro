@@ -6,7 +6,9 @@ use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\Site;
 use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Audit\Log;
 
@@ -184,7 +186,7 @@ class OrderService
         }
         $result = ['status' => 'fail'];
         // Set collected time to created date at midnight local time
-        $collectedAt = new \DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
+        $collectedAt = new DateTime($this->order->getCreatedTs()->format('Y-m-d'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
         if ($site = $this->em->getRepository(Site::class)->findOneBy(['deleted' => 0, 'googleGroup' => $this->siteService->getSiteId()])) {
             $mayoClientId = $site->getMayolinkAccount();
         }
@@ -407,7 +409,7 @@ class OrderService
             foreach (Order::$samplesRequiringProcessing as $sample) {
                 if (!empty($processedSampleTimes[$sample])) {
                     try {
-                        $sampleTs = new \DateTime();
+                        $sampleTs = new DateTime();
                         $sampleTs->setTimestamp($processedSampleTimes[$sample]);
                         $sampleTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()));
                         $formData['processedSamplesTs'][$sample] = $sampleTs;
@@ -436,7 +438,7 @@ class OrderService
         }
         $result = ['status' => 'fail'];
         // Set collected time to user local time
-        $collectedAt = new \DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
+        $collectedAt = new DateTime($this->order->getCollectedTs()->format('Y-m-d H:i:s'), new \DateTimeZone($this->userService->getUser()->getTimezone()));
         // Check if mayo account number exists
         if (!empty($mayoClientId)) {
             $birthDate = $this->params->has('ml_real_dob') ? $this->participant->dob : $this->participant->getMayolinkDob();
@@ -544,7 +546,7 @@ class OrderService
             if (!empty($this->order->getProcessedSamplesTs())) {
                 $processedSamplesTs = json_decode($this->order->getProcessedSamplesTs(), true);
                 if (!empty($processedSamplesTs[$value])) {
-                    $processedTs = new \DateTime();
+                    $processedTs = new DateTime();
                     $processedTs->setTimestamp($processedSamplesTs[$value]);
                     $processedTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()));
                     $sample['processed_ts'] = $processedTs;
@@ -574,7 +576,7 @@ class OrderService
             $orderHistory->setUser($userRepository->find($this->userService->getUser()->getId()));
             $orderHistory->setSite($this->siteService->getSiteId());
             $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
-            $orderHistory->setCreatedTs(new \DateTime());
+            $orderHistory->setCreatedTs(new DateTime());
             $this->em->persist($orderHistory);
             $this->em->flush();
             $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);
@@ -613,7 +615,7 @@ class OrderService
                 }
                 if (!empty($sample->processed)) {
                     $processedSamples[] = $sampleCode;
-                    $processedTs = new \DateTime($sample->processed);
+                    $processedTs = new DateTime($sample->processed);
                     $processedSamplesTs[$sampleCode] = $processedTs->getTimestamp();
                 }
                 if (!empty($sample->finalized)) {
@@ -640,11 +642,11 @@ class OrderService
         $connection->beginTransaction();
         try {
             $this->order->setCollectedSamples(json_encode(!empty($collectedSamples) ? $collectedSamples : []));
-            $this->order->setCollectedTs(!empty($collectedTs) ? new \DateTime($collectedTs) : null);
+            $this->order->setCollectedTs(!empty($collectedTs) ? new DateTime($collectedTs) : null);
             $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
             $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
             $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
-            $this->order->setFinalizedTs(!empty($finalizedTs) ? new \DateTime($finalizedTs) : null);
+            $this->order->setFinalizedTs(!empty($finalizedTs) ? new DateTime($finalizedTs) : null);
             $this->order->setCollectedNotes($collectedNotes);
             $this->order->setProcessedNotes($processedNotes);
             $this->order->setFinalizedNotes($finalizedNotes);
@@ -670,7 +672,7 @@ class OrderService
         return !$this->participant->status && !empty($this->order->getId()) ? $this->participant->editExistingOnly : $this->participant->status;
     }
 
-    public function loadFromJsonObject($object)
+    public function loadFromJsonObject(stdClass $object)
     {
         if (!empty($object->samples)) {
             foreach ($object->samples as $sample) {
@@ -686,7 +688,7 @@ class OrderService
                 if (!empty($sample->processed)) {
                     $processedSamples[] = $sampleCode;
                     $processedTs = $sample->processed;
-                    $processedSamplesTs[$sampleCode] = (new \DateTime($sample->processed))->getTimestamp();
+                    $processedSamplesTs[$sampleCode] = (new DateTime($sample->processed))->getTimestamp();
                 }
                 if (!empty($sample->finalized)) {
                     $finalizedSamples[] = $sampleCode;
@@ -726,16 +728,16 @@ class OrderService
         }
         $this->order->setType('kit');
         if (!empty($object->created)) {
-            $this->order->setCreatedTs(new \DateTime($object->created));
+            $this->order->setCreatedTs(new DateTime($object->created));
         }
         if (!empty($processedTs)) {
-            $this->order->setProcessedTs(new \DateTime($processedTs));
+            $this->order->setProcessedTs(new DateTime($processedTs));
         }
         if (!empty($collectedTs)) {
-            $this->order->setCollectedTs(new \DateTime($collectedTs));
+            $this->order->setCollectedTs(new DateTime($collectedTs));
         }
         if (!empty($finalizedTs)) {
-            $this->order->setFinalizedTs(new \DateTime($finalizedTs));
+            $this->order->setFinalizedTs(new DateTime($finalizedTs));
         }
         $this->order->setProcessedCentrifugeType((!empty($centrifugeType)) ? $centrifugeType : null);
         $this->order->setCollectedSamples(json_encode(!empty($collectedSamples) ? $collectedSamples : []));
@@ -751,7 +753,7 @@ class OrderService
         if (!empty($object->collectedInfo)) {
             $this->order->setQuanumCollectedUser($object->collectedInfo->author->value);
         }
-        if (!empty($object->collectedInfo->address)) {
+        if ($object->collectedInfo instanceof stdClass && !empty($object->collectedInfo->address)) {
             $this->order->setCollectedSiteAddress($object->collectedInfo->author->value);
         }
         $this->order->setCollectedSiteName('A Quest Site');
