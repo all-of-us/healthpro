@@ -15,6 +15,7 @@ use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
+use App\Service\IdVerificationService;
 use App\Service\IncentiveService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
@@ -55,7 +56,8 @@ class ParticipantDetailsController extends BaseController
         ParameterBagInterface $params,
         PatientStatusService $patientStatusService,
         MeasurementService $measurementService,
-        IncentiveService $incentiveService
+        IncentiveService $incentiveService,
+        IdVerificationService $idVerificationService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -175,6 +177,19 @@ class ParticipantDetailsController extends BaseController
 
         // Id Verification Form
         $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
+        $idVerificationForm->handleRequest($request);
+        if ($idVerificationForm->isSubmitted()) {
+            if ($idVerificationForm->isValid()) {
+                if ($idVerificationService->createIdVerification($id, $idVerificationForm)) {
+                    $this->addFlash('success', 'Id Verification Saved');
+                } else {
+                    $this->addFlash('error', 'Error saving id verification . Please try again');
+                }
+            } else {
+                $this->addFlash('error', 'Invalid form');
+            }
+            return $this->redirectToRoute("participant", ['id' => $id]);
+        }
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
