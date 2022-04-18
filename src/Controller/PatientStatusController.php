@@ -98,6 +98,7 @@ class PatientStatusController extends BaseController
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @ToDo - Fix PHPStan error on next line */
             if ($form->get('Confirm')->isClicked()) {
                 // Update confirm status
                 $patientStatusImport->setConfirm(1);
