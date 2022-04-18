@@ -93,6 +93,4 @@ $(document).ready(function () {
     panelCollapse.on('hide.bs.collapse', function () {
         $(this).siblings('.panel-heading').removeClass('active');
     });
-
-    $("#id_verification form").parsley();
 });
