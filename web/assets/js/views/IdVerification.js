@@ -11,4 +11,9 @@ $(document).ready(function () {
             $(verificationFormSelector + ' :input:not(:checkbox)').val('');
         }
     });
+
+    $('#id_verification_cancel').on('click', function () {
+        $(verificationFormSelector)[0].reset();
+        $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
+    });
 });
