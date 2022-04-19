@@ -56,4 +56,18 @@ class IdVerificationService
         }
         return false;
     }
+
+    public function getIdVerifications($participantId): array
+    {
+        try {
+            $response = $this->rdrApiService->get("rdr/v1/Onsite/Id/Verification/{$participantId}");
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && !empty($result->entry)) {
+                return $result->entry;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+        }
+        return [];
+    }
 }

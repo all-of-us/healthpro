@@ -190,6 +190,7 @@ class ParticipantDetailsController extends BaseController
             }
             return $this->redirectToRoute("participant", ['id' => $id]);
         }
+        $idVerifications = $idVerificationService->getIdVerifications($id);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
@@ -246,7 +247,8 @@ class ParticipantDetailsController extends BaseController
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
             'readOnlyView' => $this->isReadOnly(),
             'canViewOnSiteDetails' => $canViewOnSiteDetails,
-            'idVerificationForm' => $idVerificationForm->createView()
+            'idVerificationForm' => $idVerificationForm->createView(),
+            'idVerifications' => $idVerifications
         ]);
     }
 

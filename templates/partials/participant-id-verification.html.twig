@@ -19,4 +19,36 @@
         {% endif %}
         {{ form_end(idVerificationForm) }}
     </div>
+    {% if idVerifications is not empty %}
+        <div class="panel-group" id="verification" role="tablist" aria-multiselectable="true">
+            <div>
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h5>
+                        <span role="button" data-toggle="collapse" data-parent="#verification" href="#idVerification" aria-expanded="true" aria-controls="idVerification">
+                            View ID Verification History
+                        </span>
+                    </h5>
+                </div>
+                <div id="idVerification" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        {% for idVerification in idVerifications %}
+                            <dl class="dl-horizontal">
+                                <dt>Verified</dt>
+                                <dd>{{ idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                                <dt>User</dt>
+                                <dd>{{ idVerification.userEmail }}</dd>
+                                <dt>Site</dt>
+                                <dd>{{ idVerification.siteName }}</dd>
+                                <dt>Verification Type</dt>
+                                <dd>{{ idVerification.verificationType }}</dd>
+                                <dt>Visit Type</dt>
+                                <dd>{{ idVerification.visitType }}</dd>
+                            </dl>
+                            <hr/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
