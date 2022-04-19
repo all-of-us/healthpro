@@ -1,3 +1,4 @@
+{% import 'macros/display-text.html.twig' as macros %}
 {% set readOnlyView = readOnlyView|default(false) %}
 <div class="panel panel-default id-verification" id="id_verification">
     <div class="panel-heading">
@@ -40,9 +41,9 @@
                                 <dt>Site</dt>
                                 <dd>{{ idVerification.siteName }}</dd>
                                 <dt>Verification Type</dt>
-                                <dd>{{ idVerification.verificationType }}</dd>
+                                <dd>{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
                                 <dt>Visit Type</dt>
-                                <dd>{{ idVerification.visitType }}</dd>
+                                <dd>{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
                             </dl>
                             <hr/>
                         {% endfor %}

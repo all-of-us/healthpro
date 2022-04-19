@@ -248,7 +248,8 @@ class ParticipantDetailsController extends BaseController
             'readOnlyView' => $this->isReadOnly(),
             'canViewOnSiteDetails' => $canViewOnSiteDetails,
             'idVerificationForm' => $idVerificationForm->createView(),
-            'idVerifications' => $idVerifications
+            'idVerifications' => $idVerifications,
+            'idVerificationChoices' => IdVerificationType::$idVerificationChoices
         ]);
     }
 
