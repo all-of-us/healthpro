@@ -181,7 +181,7 @@ class ParticipantDetailsController extends BaseController
         if ($idVerificationForm->isSubmitted()) {
             if ($idVerificationForm->isValid()) {
                 if ($idVerificationService->createIdVerification($id, $idVerificationForm->getData())) {
-                    $this->addFlash('success', 'Id Verification Saved');
+                    $this->addFlash('success', 'ID Verification Saved');
                 } else {
                     $this->addFlash('error', 'Error saving id verification . Please try again');
                 }
