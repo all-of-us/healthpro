@@ -3,7 +3,12 @@
 namespace App\Tests\Service;
 
 use App\Service\IdVerificationService;
+use App\Service\LoggerService;
+use App\Service\RdrApiService;
 use App\Service\SiteService;
+use App\Service\UserService;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Utils;
 
 class IdVerificationServiceTest extends ServiceTestCase
 {
@@ -13,9 +18,9 @@ class IdVerificationServiceTest extends ServiceTestCase
     {
         parent::setUp();
         $this->login('test@example.com', ['hpo-site-test'], 'America/Chicago');
-        $siteService = static::$container->get(SiteService::class);
+        $siteService = static::getContainer()->get(SiteService::class);
         $siteService->switchSite('hpo-site-test' . '@' . self::GROUP_DOMAIN);
-        $this->service = static::$container->get(IdVerificationService::class);
+        $this->service = $this->getIdVerificationService();
     }
 
     public function testRdrObject(): void
@@ -28,6 +33,12 @@ class IdVerificationServiceTest extends ServiceTestCase
         self::assertEquals('PHYSICAL_MEASUREMENTS_ONLY', $rdrObject->visitType);
     }
 
+    public function testCreateIdVerification(): void
+    {
+        $result = $this->service->createIdVerification('P123456789', $this->getIdVerificationData());
+        self::assertTrue($result);
+    }
+
     private function getIdVerificationData(): array
     {
         $idVerificationData = [
@@ -35,5 +46,24 @@ class IdVerificationServiceTest extends ServiceTestCase
             'visit_type' => 'PHYSICAL_MEASUREMENTS_ONLY'
         ];
         return $idVerificationData;
+    }
+
+    private function getCreateMockResponseData(): string
+    {
+        return '{"participantId" : "P123456789", "verificationType": "PHOTO_AND_ONE_OF_PII"}';
+    }
+
+    private function getIdVerificationService(): IdVerificationService
+    {
+        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $stream = Utils::streamFor($this->getCreateMockResponseData());
+        $response = new Psr7\Response(200, ['Content-Type' => 'application/json'], $stream);
+        $mockRdrApiService->method('post')->willReturn($response);
+        return new IdVerificationService(
+            $mockRdrApiService,
+            static::getContainer()->get(SiteService::class),
+            static::getContainer()->get(UserService::class),
+            $this->createMock(LoggerService::class)
+        );
     }
 }

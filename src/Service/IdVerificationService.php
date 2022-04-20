@@ -37,9 +37,8 @@ class IdVerificationService
         return $obj;
     }
 
-    public function createIdVerification($participantId, $idVerificationForm): bool
+    public function createIdVerification($participantId, $verificationData): bool
     {
-        $verificationData = $idVerificationForm->getData();
         $postData = $this->getRdrObject($participantId, $verificationData);
         try {
             $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
