@@ -9,7 +9,7 @@ use App\Service\LoggerService;
 use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
@@ -19,8 +19,13 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/sites")
  */
-class SitesController extends AbstractController
+class SitesController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/", name="admin_sites")
      */
@@ -37,7 +42,7 @@ class SitesController extends AbstractController
     /**
      * @Route("/site/{id}", name="admin_site")
      */
-    public function edit(SiteRepository $siteRepository, EntityManagerInterface $em, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, $id = null)
+    public function edit(SiteRepository $siteRepository, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, $id = null)
     {
         $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false;
         if ($id) {
@@ -47,8 +52,8 @@ class SitesController extends AbstractController
             }
 
             if ($request->request->has('delete')) {
-                $em->remove($site);
-                $em->flush();
+                $this->em->remove($site);
+                $this->em->flush();
                 $loggerService->log(Log::SITE_DELETE, $site->getId());
                 $this->addFlash('success', 'Site removed.');
                 return $this->redirectToRoute('admin_sites');
@@ -76,14 +81,14 @@ class SitesController extends AbstractController
             }
             if ($form->isValid()) {
                 if ($site) {
-                    $em->persist($site);
-                    $em->flush();
+                    $this->em->persist($site);
+                    $this->em->flush();
                     $loggerService->log(Log::SITE_EDIT, $site->getId());
                     $this->addFlash('success', 'Site updated.');
                 } else {
                     $site = $form->getData();
-                    $em->persist($site);
-                    $em->flush();
+                    $this->em->persist($site);
+                    $this->em->flush();
                     $loggerService->log(Log::SITE_ADD, $site->getId());
                     $this->addFlash('success', 'Site added.');
                 }
@@ -104,7 +109,7 @@ class SitesController extends AbstractController
     /**
      * @Route("/site/{id}/emails", name="admin_site_emails")
      */
-    public function siteAdminEmails(SiteRepository $siteRepository, EntityManagerInterface $em, EnvironmentService $env, SiteSyncService $siteSyncService, int $id)
+    public function siteAdminEmails(SiteRepository $siteRepository, EnvironmentService $env, SiteSyncService $siteSyncService, int $id)
     {
         $site = $siteRepository->find($id);
         if (!$site) {
@@ -112,7 +117,7 @@ class SitesController extends AbstractController
         }
         try {
             $emails = join(', ', $siteSyncService->getSiteAdminEmails($site));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addFlash('error', sprintf(
                 'Unable to retrieve email for %s (%s)',
                 $site->getName(),
@@ -130,8 +135,8 @@ class SitesController extends AbstractController
         }
 
         $site->setEmail($emails);
-        $em->persist($site);
-        $em->flush();
+        $this->em->persist($site);
+        $this->em->flush();
 
         $this->addFlash('success', sprintf(
             '%s (%s) email updated to: %s',

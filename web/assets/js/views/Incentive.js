@@ -67,8 +67,10 @@ $(document).ready(function () {
     }
 
     $('#incentive_cancel').on('click', function () {
-        $('#incentive_create .incentive-form')[0].reset();
+        var incentiveFormSelector = $('#incentive_create .incentive-form');
+        incentiveFormSelector[0].reset();
         showHideIncentiveFormFields();
+        incentiveFormSelector.parsley().reset();
     });
 
     $(".incentive-amend").on('click', function () {

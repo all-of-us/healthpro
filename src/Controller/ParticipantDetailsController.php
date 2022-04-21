@@ -9,11 +9,13 @@ use App\Entity\PatientStatus;
 use App\Entity\Problem;
 use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IdVerificationType;
 use App\Form\IncentiveRemoveType;
 use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
+use App\Service\IdVerificationService;
 use App\Service\IncentiveService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
@@ -25,6 +27,7 @@ use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -32,6 +35,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ParticipantDetailsController extends BaseController
 {
+    public function __construct(
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
+    }
+
     private const VALID_CONSENT_TYPES = [
         'consentForStudyEnrollment' => 'consentForStudyEnrollmentFilePath',
         'consentForElectronicHealthRecords' => 'consentForElectronicHealthRecordsFilePath',
@@ -48,13 +57,13 @@ class ParticipantDetailsController extends BaseController
         Request $request,
         SessionInterface $session,
         LoggerService $loggerService,
-        EntityManagerInterface $em,
         ParticipantSummaryService $participantSummaryService,
         SiteService $siteService,
         ParameterBagInterface $params,
         PatientStatusService $patientStatusService,
         MeasurementService $measurementService,
-        IncentiveService $incentiveService
+        IncentiveService $incentiveService,
+        IdVerificationService $idVerificationService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -106,9 +115,9 @@ class ParticipantDetailsController extends BaseController
                 'organization' => $participant->hpoId
             ]);
         }
-        $measurements = $em->getRepository(Measurement::class)->getMeasurementsWithoutParent($id);
-        $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
-        $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
+        $measurements = $this->em->getRepository(Measurement::class)->getMeasurementsWithoutParent($id);
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
+        $problems = $this->em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
 
         if (empty($participant->cacheTime)) {
             $participant->cacheTime = new \DateTime();
@@ -124,7 +133,7 @@ class ParticipantDetailsController extends BaseController
         // Check if patient status is allowed for this participant
         if ($patientStatusService->hasAccess($participant)) {
             // Patient Status
-            $patientStatusRepository = $em->getRepository(PatientStatus::class);
+            $patientStatusRepository = $this->em->getRepository(PatientStatus::class);
             $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id, $siteService->getSiteOrganization());
             // Determine if comment field is required
             $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
@@ -132,7 +141,7 @@ class ParticipantDetailsController extends BaseController
             $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired, 'disabled' => $this->isReadOnly()]);
             $patientStatusForm->handleRequest($request);
             if ($patientStatusForm->isSubmitted()) {
-                $patientStatus = $em->getRepository(PatientStatus::class)->findOneBy([
+                $patientStatus = $this->em->getRepository(PatientStatus::class)->findOneBy([
                     'participantId' => $id,
                     'organization' => $siteService->getSiteOrganization()
                 ]);
@@ -170,12 +179,28 @@ class ParticipantDetailsController extends BaseController
         // Incentive Form
         $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
 
+        // Id Verification Form
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
+        $idVerificationForm->handleRequest($request);
+        if ($idVerificationForm->isSubmitted()) {
+            if ($idVerificationForm->isValid()) {
+                if ($idVerificationService->createIdVerification($id, $idVerificationForm->getData())) {
+                    $this->addFlash('success', 'ID Verification Saved');
+                    return $this->redirectToRoute("participant", ['id' => $id]);
+                }
+                $this->addFlash('error', 'Error saving id verification . Please try again');
+            } else {
+                $this->addFlash('error', 'Invalid form');
+            }
+        }
+        $idVerifications = $idVerificationService->getIdVerifications($id);
+
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
         $incentiveDeleteForm->handleRequest($request);
         if ($incentiveDeleteForm->isSubmitted() && $incentiveDeleteForm->isValid()) {
             $incentiveId = $incentiveDeleteForm['id']->getData();
-            $incentive = $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]);
+            $incentive = $this->em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]);
             if ($incentive) {
                 if ($incentive->getSite() !== $siteService->getSiteId()) {
                     throw $this->createAccessDeniedException();
@@ -189,7 +214,7 @@ class ParticipantDetailsController extends BaseController
             }
         }
 
-        $incentives = $em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
+        $incentives = $this->em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
@@ -224,7 +249,10 @@ class ParticipantDetailsController extends BaseController
             'incentives' => $incentives,
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
             'readOnlyView' => $this->isReadOnly(),
-            'canViewOnSiteDetails' => $incentiveService->hasAccess($participant)
+            'canViewOnSiteDetails' => $incentiveService->hasAccess($participant),
+            'idVerificationForm' => $idVerificationForm->createView(),
+            'idVerifications' => $idVerifications,
+            'idVerificationChoices' => IdVerificationType::$idVerificationChoices
         ]);
     }
 
@@ -273,13 +301,12 @@ class ParticipantDetailsController extends BaseController
         $id,
         $incentiveId,
         Request $request,
-        EntityManagerInterface $em,
         ParticipantSummaryService $participantSummaryService,
         SiteService $siteService,
         IncentiveService $incentiveService
     ): Response {
         $participant = $participantSummaryService->getParticipantById($id);
-        $incentive = $incentiveId ? $em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]) : null;
+        $incentive = $incentiveId ? $this->em->getRepository(Incentive::class)->findOneBy(['id' => $incentiveId, 'participantId' => $id]) : null;
         if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
             throw $this->createAccessDeniedException();
         }
@@ -317,7 +344,7 @@ class ParticipantDetailsController extends BaseController
     /**
      * @Route("/ajax/search/giftcard-prefill", name="search_gift_card_prefill")
      */
-    public function giftCardFillAction()
+    public function giftCardFillAction(): JsonResponse
     {
         return $this->json(Incentive::$giftCardTypes);
     }
@@ -325,10 +352,10 @@ class ParticipantDetailsController extends BaseController
     /**
      * @Route("/ajax/search/giftcard/{query}", name="search_giftcard")
      */
-    public function giftCardAction(EntityManagerInterface $em, Request $request)
+    public function giftCardAction(Request $request): JsonResponse
     {
         $query = $request->get('query');
-        $giftCards = $em->getRepository(Incentive::class)->search($query);
+        $giftCards = $this->em->getRepository(Incentive::class)->search($query);
         $results = [];
         foreach ($giftCards as $giftCard) {
             $results[] = $giftCard['giftCardType'];

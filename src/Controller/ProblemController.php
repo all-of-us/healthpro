@@ -15,26 +15,29 @@ use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class ProblemController extends AbstractController
+class ProblemController extends BaseController
 {
     protected $logger;
     protected $params;
-    protected $em;
     protected $problemNotificationService;
     protected $siteService;
 
-    public function __construct(LoggerService $loggerService, ParameterBagInterface $parameterBag, EntityManagerInterface $entityManager, ProblemNotificationService $problemNotificationService, SiteService $siteService)
-    {
+    public function __construct(
+        LoggerService $loggerService,
+        ParameterBagInterface $parameterBag,
+        EntityManagerInterface $em,
+        ProblemNotificationService $problemNotificationService,
+        SiteService $siteService
+    ) {
+        parent::__construct($em);
         $this->logger = $loggerService;
         $this->params = $parameterBag;
-        $this->em = $entityManager;
         $this->problemNotificationService = $problemNotificationService;
         $this->siteService = $siteService;
     }
@@ -115,7 +118,7 @@ class ProblemController extends AbstractController
             $enableConstraints = true;
         }
 
-        $problemForm = $this->createForm(ProblemType::class, $problem, ['formDisabled' => $formDisabled, 'enableConstraints' => $enableConstraints, 'user' => $this->getUser()]);
+        $problemForm = $this->createForm(ProblemType::class, $problem, ['formDisabled' => $formDisabled, 'enableConstraints' => $enableConstraints, 'user' => $this->getSecurityUser()]);
         $problemForm->handleRequest($request);
         if ($problemForm->isSubmitted()) {
             if ($problemForm->isValid()) {
@@ -123,7 +126,7 @@ class ProblemController extends AbstractController
                 $now = new \DateTime();
                 $problem->setUpdatedTs($now);
                 if ($request->request->has('reportable_finalize') && (!$problem || empty($problem->getFinalizedTs()))) {
-                    $problem->setFinalizedUserId($this->getUser()->getId());
+                    $problem->setFinalizedUserId($this->getSecurityUser()->getId());
                     $problem->setFinalizedSite($this->siteService->getSiteId());
                     $problem->setFinalizedTs($now);
                 }
@@ -144,7 +147,7 @@ class ProblemController extends AbstractController
                     }
                     // Create a new report (optionally finalize at creation)
                 } else {
-                    $problem->setUserId($this->getUser()->getId());
+                    $problem->setUserId($this->getSecurityUser()->getId());
                     $problem->setSite($this->siteService->getSiteId());
                     $problem->setParticipantId($participantId);
                     try {
@@ -205,7 +208,7 @@ class ProblemController extends AbstractController
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
         $problem = $problemRepository->findOneBy(['id' => $problemId, 'participantId' => $participantId]);
-        if (!$problem && !$problem->getFinalizedTs()) {
+        if (is_null($problem)) {
             throw $this->createNotFoundException('Problem report not found.');
         }
 
@@ -216,7 +219,7 @@ class ProblemController extends AbstractController
             if ($problemCommentForm->isValid()) {
                 $problemComment = $problemCommentForm->getData();
                 $problemComment->setProblem($problem);
-                $problemComment->setUserId($this->getUser()->getId());
+                $problemComment->setUserId($this->getSecurityUser()->getId());
                 $problemComment->setSite($this->siteService->getSiteId());
                 try {
                     $this->em->persist($problemComment);

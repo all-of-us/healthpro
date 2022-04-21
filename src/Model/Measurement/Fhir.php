@@ -4,6 +4,7 @@ namespace App\Model\Measurement;
 
 use App\Entity\Measurement;
 use App\Helper\Util;
+use stdClass;
 
 class Fhir
 {
@@ -62,6 +63,7 @@ class Fhir
     protected function getMetricUrns()
     {
         $metrics = [];
+        /** @var stdClass $field */
         foreach ($this->schema->fields as $field) {
             if (preg_match('/^blood-pressure-/', $field->name)) {
                 if (!preg_match('/^blood-pressure-(systolic|protocol-modification)/', $field->name)) {
@@ -1147,7 +1149,7 @@ class Fhir
 
     public function toObject()
     {
-        $fhir = new \StdClass();
+        $fhir = new StdClass();
         $fhir->entry = [];
         $fhir->resourceType = 'Bundle';
         $fhir->type = 'document';

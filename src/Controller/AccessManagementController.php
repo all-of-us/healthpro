@@ -4,20 +4,21 @@ namespace App\Controller;
 
 use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
+use App\Security\User;
 use App\Service\AccessManagementService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * @Route("/access/manage")
  */
-class AccessManagementController extends AbstractController
+class AccessManagementController extends BaseController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
     public const RESET_PASSWORD_URL = 'https://admin.google.com';
@@ -25,8 +26,12 @@ class AccessManagementController extends AbstractController
     private $googleGroupsService;
     private $loggerService;
 
-    public function __construct(GoogleGroupsService $googleGroupsService, LoggerService $loggerService)
-    {
+    public function __construct(
+        GoogleGroupsService $googleGroupsService,
+        LoggerService $loggerService,
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
         $this->googleGroupsService = $googleGroupsService;
         $this->loggerService = $loggerService;
     }
@@ -50,9 +55,9 @@ class AccessManagementController extends AbstractController
     /**
      * @Route("/user/group/{groupId}", name="access_manage_user_group")
      */
-    public function userGroup($groupId)
+    public function userGroup($groupId): Response
     {
-        $group = $this->getUser()->getGroupFromId($groupId);
+        $group = $this->getSecurityUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -74,7 +79,7 @@ class AccessManagementController extends AbstractController
      */
     public function member($groupId, Request $request)
     {
-        $group = $this->getUser()->getGroupFromId($groupId);
+        $group = $this->getSecurityUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -119,7 +124,7 @@ class AccessManagementController extends AbstractController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        $group = $this->getUser()->getGroupFromId($groupId);
+        $group = $this->getSecurityUser()->getGroupFromId($groupId);
         if (empty($group)) {
             throw $this->createNotFoundException();
         }

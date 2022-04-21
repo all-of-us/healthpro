@@ -13,13 +13,17 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderLookupController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/orders", name="orders")
      * @Route("/read/orders", name="read_orders")
      */
     public function ordersAction(
         Request $request,
-        EntityManagerInterface $em,
         SiteService $siteService,
         ParticipantSummaryService $participantSummaryService
     ): Response {
@@ -35,7 +39,7 @@ class OrderLookupController extends BaseController
                 $id = substr($id, 0, 10);
             }
 
-            $order = $em->getRepository(Order::class)->findOneBy([
+            $order = $this->em->getRepository(Order::class)->findOneBy([
                 'orderId' => $id
             ]);
             if ($order) {
@@ -50,7 +54,7 @@ class OrderLookupController extends BaseController
 
         $recentOrders = [];
         if (!$this->isReadOnly()) {
-            $recentOrders = $em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
+            $recentOrders = $this->em->getRepository(Order::class)->getSiteRecentOrders($siteService->getSiteId());
 
             foreach ($recentOrders as &$order) {
                 $order->participant = $participantSummaryService->getParticipantById($order->getParticipantId());

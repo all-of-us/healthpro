@@ -1,0 +1,55 @@
+{% import 'macros/display-text.html.twig' as macros %}
+{% set readOnlyView = readOnlyView|default(false) %}
+<div class="panel panel-default id-verification" id="id_verification">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <i class="fa fa-id-card" aria-hidden="true"></i> ID Verification
+        </h3>
+    </div>
+    <div class="panel-body">
+        {{ form_start(idVerificationForm, { attr: { class: 'disable-enter prevent-resubmit id-verification-form', id: 'id_verification_form' } }) }}
+        {{ form_errors(idVerificationForm) }}
+        {{ form_rest(idVerificationForm) }}
+        {% if not readOnlyView %}
+            <button type="submit" id="id_verification_submit" class="btn btn-primary">Submit</button>
+            {% if type is defined and type == 'edit' %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            {% else %}
+                <button type="button" class="btn btn-default" id="id_verification_cancel">Cancel</button>
+            {% endif %}
+        {% endif %}
+        {{ form_end(idVerificationForm) }}
+    </div>
+    {% if idVerifications is not empty %}
+        <div class="panel-group" id="verification" role="tablist" aria-multiselectable="true">
+            <div>
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h5>
+                        <span role="button" data-toggle="collapse" data-parent="#verification" href="#idVerification" aria-expanded="true" aria-controls="idVerification">
+                            View ID Verification History
+                        </span>
+                    </h5>
+                </div>
+                <div id="idVerification" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        {% for idVerification in idVerifications %}
+                            <dl class="dl-horizontal">
+                                <dt>Verified</dt>
+                                <dd>{{ idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                                <dt>User</dt>
+                                <dd>{{ idVerification.userEmail }}</dd>
+                                <dt>Site</dt>
+                                <dd>{{ idVerification.siteName }}</dd>
+                                <dt>Verification Type</dt>
+                                <dd>{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
+                                <dt>Visit Type</dt>
+                                <dd>{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                            </dl>
+                            <hr/>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

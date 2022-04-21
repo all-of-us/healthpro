@@ -24,7 +24,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MeasurementsController extends BaseController
 {
-    protected $em;
     protected $measurementService;
     protected $participantSummaryService;
     protected $loggerService;
@@ -39,7 +38,7 @@ class MeasurementsController extends BaseController
         SiteService $siteService,
         ParameterBagInterface $params
     ) {
-        $this->em = $em;
+        parent::__construct($em);
         $this->measurementService = $measurementService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
@@ -91,7 +90,7 @@ class MeasurementsController extends BaseController
         if ($measurementsForm->isSubmitted()) {
             // Get current logged in user entity
             $userRepository = $this->em->getRepository(User::class);
-            $currentUser = $userRepository->find($this->getUser()->getId());
+            $currentUser = $userRepository->find($this->getSecurityUser()->getId());
 
             // Check if PMs are cancelled
             if ($measurement->isEvaluationCancelled()) {

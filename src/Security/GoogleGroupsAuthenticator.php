@@ -80,6 +80,10 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
             return true; // Bypass groups auth
         }
+        if (!($user instanceof User)) {
+            throw new Exception("Invalid user type");
+        }
+
         $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
         $this->authEmail = $user->getUsername();
         if (!$valid2fa) {
