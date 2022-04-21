@@ -94,6 +94,7 @@ class SiteSyncService
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
                 continue;
             }
+            /** @var stdClass $organization */
             foreach ($awardee->organizations as $organization) {
                 if (!isset($organization->sites) || !is_array($organization->sites)) {
                     continue;

@@ -208,7 +208,7 @@ class ProblemController extends BaseController
             throw $this->createAccessDeniedException('Participant ineligible for problem report.');
         }
         $problem = $problemRepository->findOneBy(['id' => $problemId, 'participantId' => $participantId]);
-        if (!$problem && !$problem->getFinalizedTs()) {
+        if (is_null($problem)) {
             throw $this->createNotFoundException('Problem report not found.');
         }
 
