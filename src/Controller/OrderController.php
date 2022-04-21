@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\Site;
-use App\Entity\User;
 use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
@@ -22,13 +21,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
 class OrderController extends BaseController
 {
-    protected $em;
     protected $orderService;
     protected $participantSummaryService;
     protected $loggerService;
@@ -41,7 +40,7 @@ class OrderController extends BaseController
         LoggerService $loggerService,
         SiteService $siteService
     ) {
-        $this->em = $em;
+        parent::__construct($em);
         $this->orderService = $orderService;
         $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
@@ -70,7 +69,7 @@ class OrderController extends BaseController
     /**
      * @Route("/participant/{participantId}/order/check", name="order_check")
      */
-    public function orderCheck($participantId, RequestStack $requestStack)
+    public function orderCheck($participantId, RequestStack $requestStack): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -147,8 +146,7 @@ class OrderController extends BaseController
                 }
             }
             if ($createForm->isValid()) {
-                $userRepository = $this->em->getRepository(User::class);
-                $order->setUser($userRepository->find($this->getUser()->getId()));
+                $order->setUser($this->getUserEntity());
                 $order->setSite($this->siteService->getSiteId());
                 $order->setParticipantId($participant->id);
                 $order->setBiobankId($participant->biobankId);
@@ -195,7 +193,7 @@ class OrderController extends BaseController
      * @Route("/participant/{participantId}/order/{orderId}/print/labels", name="order_print_labels")
      * @Route("/read/participant/{participantId}/order/{orderId}/print/labels", name="read_order_print_labels")
      */
-    public function orderPrintLabelsAction($participantId, $orderId)
+    public function orderPrintLabelsAction($participantId, $orderId): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
@@ -269,7 +267,7 @@ class OrderController extends BaseController
             'step' => 'collected',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getTimezone(),
+            'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly()
         ]);
@@ -285,8 +283,7 @@ class OrderController extends BaseController
             if ($collectForm->isValid()) {
                 $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
                 if (!$order->isUnlocked()) {
-                    $userRepository = $this->em->getRepository(User::class);
-                    $order->setCollectedUser($userRepository->find($this->getUser()->getId()));
+                    $order->setCollectedUser($this->getUserEntity());
                     $order->setCollectedSite($this->siteService->getSiteId());
                 }
                 // Save order
@@ -337,7 +334,7 @@ class OrderController extends BaseController
             'step' => 'processed',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getTimezone(),
+            'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly()
         ]);
@@ -372,8 +369,7 @@ class OrderController extends BaseController
                     }
                 }
                 if (!$order->isUnlocked()) {
-                    $userRepository = $this->em->getRepository(User::class);
-                    $order->setProcessedUser($userRepository->find($this->getUser()->getId()));
+                    $order->setProcessedUser($this->getUserEntity());
                     $order->setProcessedSite($this->siteService->getSiteId());
                 }
                 if ($order->getType() !== 'saliva') {
@@ -419,7 +415,8 @@ class OrderController extends BaseController
      * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
      * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize", methods={"GET"})
      */
-    public function orderFinalizeAction($participantId, $orderId, Request $request, SessionInterface $session)
+    // @ToDo - Replace SessionInterface with Symfony\Component\HttpFoundation\Session
+    public function orderFinalizeAction($participantId, $orderId, Request $request, Session $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $wasPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
@@ -434,7 +431,7 @@ class OrderController extends BaseController
             'step' => 'finalized',
             'order' => $order,
             'em' => $this->em,
-            'timeZone' => $this->getUser()->getTimezone(),
+            'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly()
         ]);
@@ -472,8 +469,7 @@ class OrderController extends BaseController
                 if ($finalizeForm->isValid()) {
                     $this->orderService->setOrderUpdateFromForm('finalized', $finalizeForm);
                     if (!$order->isUnlocked()) {
-                        $userRepository = $this->em->getRepository(User::class);
-                        $order->setFinalizedUser($userRepository->find($this->getUser()->getId()));
+                        $order->setFinalizedUser($this->getUserEntity());
                         $order->setFinalizedSite($this->siteService->getSiteId());
                     }
                     // Unset finalized_ts for all types of orders
@@ -756,7 +752,7 @@ class OrderController extends BaseController
     {
         $order = $this->loadOrder($participantId, $orderId);
         return $this->render('biobank/summary.html.twig', [
-            'biobankChanges' => $order->getBiobankChangesDetails($this->getUser()->getTimezone())
+            'biobankChanges' => $order->getBiobankChangesDetails($this->getSecurityUser()->getTimezone())
         ]);
     }
 }

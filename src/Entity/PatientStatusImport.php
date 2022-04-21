@@ -167,7 +167,7 @@ class PatientStatusImport
     {
         if (!$this->PatientStatusImportRows->contains($PatientStatusImportRow)) {
             $this->PatientStatusImportRows[] = $PatientStatusImportRow;
-            $PatientStatusImportRow->setImportId($this);
+            $PatientStatusImportRow->setImport($this);
         }
 
         return $this;
@@ -178,8 +178,8 @@ class PatientStatusImport
         if ($this->PatientStatusImportRows->contains($PatientStatusImportRow)) {
             $this->PatientStatusImportRows->removeElement($PatientStatusImportRow);
             // set the owning side to null (unless already changed)
-            if ($PatientStatusImportRow->getImportId() === $this) {
-                $PatientStatusImportRow->setImportId(null);
+            if ($PatientStatusImportRow->getImport()->getId() === $this->getId()) {
+                $PatientStatusImportRow->setImport(null);
             }
         }
 

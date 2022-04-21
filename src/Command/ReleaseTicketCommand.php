@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\JiraService;
+use stdClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -65,6 +66,7 @@ class ReleaseTicketCommand extends Command
         $tableHeaders = ['Version', 'Released?', 'Release Date', 'Tickets (Done / Total)'];
         $tableRows = [];
         $releaseDateMap = [];
+        /** @var stdClass $version */
         foreach ($versions as $version) {
             $totalIssues = $completedIssues = 0;
             foreach ($version->issuesStatusForFixVersion as $type => $count) {

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Service\HelpService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -13,8 +13,13 @@ use App\HttpClient;
 /**
  * @Route("/help")
  */
-class HelpController extends AbstractController
+class HelpController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/", name="help_home")
      */

@@ -8,7 +8,7 @@ use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
 use App\Cache\DatastoreAdapter;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -17,15 +17,18 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/deceased-reports")
  */
-class DeceasedReportsController extends AbstractController
+class DeceasedReportsController extends BaseController
 {
     public const ORG_PENDING_CACHE_TTL = 500;
     public const ORG_PENDING_CACHE_KEY = 'deceased_reports.org-%s.pending.count';
 
     protected $cache;
 
-    public function __construct(ParameterBagInterface $params)
-    {
+    public function __construct(
+        ParameterBagInterface $params,
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
         $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
     }
 
@@ -59,15 +62,15 @@ class DeceasedReportsController extends AbstractController
         }
         $fhirData = $deceasedReportsService->getDeceasedReportById($participantId, $reportId);
         $report = (new DeceasedReport())->loadFromFhirObservation($fhirData);
-        if ($report->getSubmittedBy() === $this->getUser()->getEmail() && $report->getReportStatus() === 'preliminary') {
+        if ($report->getSubmittedBy() === $this->getSecurityUser()->getEmail() && $report->getReportStatus() === 'preliminary') {
             $this->addFlash('notice', 'You submitted this report. Another user must review it.');
         }
-        $form = $this->createForm(DeceasedReportReviewType::class, $report, ['reviewer_email' => $this->getUser()->getEmail()]);
+        $form = $this->createForm(DeceasedReportReviewType::class, $report, ['reviewer_email' => $this->getSecurityUser()->getEmail()]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             try {
-                $fhirData = $deceasedReportsService->buildDeceasedReportReviewFhir($data, $this->getUser());
+                $fhirData = $deceasedReportsService->buildDeceasedReportReviewFhir($data, $this->getSecurityUser());
                 $deceasedReportsService->updateDeceasedReport($participantId, $reportId, $fhirData);
                 $report->setReportStatus('preliminary');
                 $this->resetPendingCountCache($organizationId);
@@ -117,7 +120,7 @@ class DeceasedReportsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $report = $form->getData();
             try {
-                $fhirData = $deceasedReportsService->buildDeceasedReportFhir($report, $this->getUser());
+                $fhirData = $deceasedReportsService->buildDeceasedReportFhir($report, $this->getSecurityUser());
                 $response = $deceasedReportsService->createDeceasedReport($participantId, $fhirData);
                 $report = $report->loadFromFhirObservation($response);
                 $this->resetPendingCountCache($organizationId);

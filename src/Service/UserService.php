@@ -145,7 +145,7 @@ class UserService
     }
 
     /** Is the user's session expired? */
-    public function isLoginExpired()
+    public function isLoginExpired(): bool
     {
         $time = time();
         // custom "last used" session time updated on keepAliveAction

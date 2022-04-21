@@ -3,18 +3,24 @@
 namespace App\Controller;
 
 use App\Form\MockLoginType;
+use App\Security\User;
 use App\Service\AuthService;
 use App\Service\EnvironmentService;
 use App\Service\UserService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class AuthController extends AbstractController
+class AuthController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/login", name="login")
      */
@@ -34,6 +40,7 @@ class AuthController extends AbstractController
                 // Set mock user and token for local development
                 $email = $loginForm->get('userName')->getData();
                 $userService->setMockUser($email);
+                /** @var User $user */
                 $user = $userProvider->loadUserByUsername($email);
                 if (empty($user->getGroups())) {
                     $session->invalidate();

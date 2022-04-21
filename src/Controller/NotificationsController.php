@@ -4,14 +4,19 @@ namespace App\Controller;
 
 use App\Repository\DeactivateLogRepository;
 use App\Repository\WithdrawalLogRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/admin/notifications")
  */
-class NotificationsController extends AbstractController
+class NotificationsController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/", name="admin_notifications")
      */

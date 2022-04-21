@@ -13,9 +13,9 @@ use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use App\Service\ReviewService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,9 +25,8 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/biobank")
  */
-class BiobankController extends AbstractController
+class BiobankController extends BaseController
 {
-    protected $em;
     protected $participantSummaryService;
     protected $orderService;
     protected $loggerService;
@@ -40,7 +39,7 @@ class BiobankController extends AbstractController
         LoggerService $loggerService,
         ParameterBagInterface $params
     ) {
-        $this->em = $em;
+        parent::__construct($em);
         $this->participantSummaryService = $participantSummaryService;
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
@@ -180,7 +179,7 @@ class BiobankController extends AbstractController
                 if ($finalizeForm->isValid()) {
                     //Send order to mayo if mayo id is empty
                     if (empty($order->getMayoId())) {
-                        $finalizedTs = new \DateTime();
+                        $finalizedTs = new DateTime();
                         $samples = [];
                         if ($finalizeForm["finalizedSamples"]->getData() && is_array($finalizeForm["finalizedSamples"]->getData())) {
                             $samples = array_values($finalizeForm["finalizedSamples"]->getData());
@@ -305,7 +304,7 @@ class BiobankController extends AbstractController
         if (!$env->isProd() && intval($request->query->get('days')) > 0) {
             $startString = '-' . intval($request->query->get('days')) . ' days';
         }
-        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getTimezone()));
+        $startTime = new DateTime($startString, new \DateTimeZone($this->getSecurityUser()->getTimezone()));
         // Get MySQL date/time string in UTC
         $startTime->setTimezone(new \DateTimezone('UTC'));
         $today = $startTime->format('Y-m-d H:i:s');
@@ -328,9 +327,9 @@ class BiobankController extends AbstractController
         if (!$env->isProd() && intval($request->query->get('days')) > 0) {
             $startString = '-' . intval($request->query->get('days')) . ' days';
         }
-        $startTime = new \DateTime($startString, new \DateTimeZone($this->getUser()->getTimezone()));
+        $startTime = new DateTime($startString, new \DateTimeZone($this->getSecurityUser()->getTimezone()));
         $today = $startTime->format('Y-m-d');
-        $endDate = (new \DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
+        $endDate = (new DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
 
         $quanumOrders = $this->orderService->getOrders([
             'startDate' => $today,
