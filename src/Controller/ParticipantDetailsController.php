@@ -9,11 +9,13 @@ use App\Entity\PatientStatus;
 use App\Entity\Problem;
 use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
+use App\Form\IdVerificationType;
 use App\Form\IncentiveRemoveType;
 use App\Form\IncentiveType;
 use App\Form\PatientStatusType;
 use App\Helper\WorkQueue;
 use App\Service\GcsBucketService;
+use App\Service\IdVerificationService;
 use App\Service\IncentiveService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
@@ -54,7 +56,8 @@ class ParticipantDetailsController extends BaseController
         ParameterBagInterface $params,
         PatientStatusService $patientStatusService,
         MeasurementService $measurementService,
-        IncentiveService $incentiveService
+        IncentiveService $incentiveService,
+        IdVerificationService $idVerificationService
     ) {
         $refresh = $request->query->get('refresh');
         $participant = $participantSummaryService->getParticipantById($id, $refresh);
@@ -172,6 +175,22 @@ class ParticipantDetailsController extends BaseController
         // Incentive Form
         $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
 
+        // Id Verification Form
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
+        $idVerificationForm->handleRequest($request);
+        if ($idVerificationForm->isSubmitted()) {
+            if ($idVerificationForm->isValid()) {
+                if ($idVerificationService->createIdVerification($id, $idVerificationForm->getData())) {
+                    $this->addFlash('success', 'ID Verification Saved');
+                    return $this->redirectToRoute("participant", ['id' => $id]);
+                }
+                $this->addFlash('error', 'Error saving id verification . Please try again');
+            } else {
+                $this->addFlash('error', 'Invalid form');
+            }
+        }
+        $idVerifications = $idVerificationService->getIdVerifications($id);
+
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
         $incentiveDeleteForm->handleRequest($request);
@@ -226,7 +245,10 @@ class ParticipantDetailsController extends BaseController
             'incentives' => $incentives,
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
             'readOnlyView' => $this->isReadOnly(),
-            'canViewOnSiteDetails' => $canViewOnSiteDetails
+            'canViewOnSiteDetails' => $canViewOnSiteDetails,
+            'idVerificationForm' => $idVerificationForm->createView(),
+            'idVerifications' => $idVerifications,
+            'idVerificationChoices' => IdVerificationType::$idVerificationChoices
         ]);
     }
 
