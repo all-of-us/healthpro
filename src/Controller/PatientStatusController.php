@@ -14,6 +14,7 @@ use App\Form\PatientStatusImportConfirmFormType;
 use App\Service\PatientStatusService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -98,7 +99,9 @@ class PatientStatusController extends BaseController
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('Confirm')->isClicked()) {
+            /** @var SubmitButton $confirmButton */
+            $confirmButton = $form->get('Confirm');
+            if ($confirmButton->isClicked()) {
                 // Update confirm status
                 $patientStatusImport->setConfirm(1);
                 $this->em->flush();

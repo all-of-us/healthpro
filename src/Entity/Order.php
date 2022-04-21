@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -359,12 +361,12 @@ class Order
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): ?DateTime
     {
         return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $createdTs): self
+    public function setCreatedTs(DateTime $createdTs): self
     {
         $this->createdTs = $createdTs;
 
@@ -407,12 +409,12 @@ class Order
         return $this;
     }
 
-    public function getPrintedTs(): ?\DateTimeInterface
+    public function getPrintedTs(): ?DateTimeInterface
     {
         return $this->printedTs;
     }
 
-    public function setPrintedTs(?\DateTimeInterface $printedTs): self
+    public function setPrintedTs(?DateTimeInterface $printedTs): self
     {
         $this->printedTs = $printedTs;
 
@@ -443,12 +445,12 @@ class Order
         return $this;
     }
 
-    public function getCollectedTs(): ?\DateTimeInterface
+    public function getCollectedTs(): ?DateTime
     {
         return $this->collectedTs;
     }
 
-    public function setCollectedTs(?\DateTimeInterface $collectedTs): self
+    public function setCollectedTs(?DateTime $collectedTs): self
     {
         $this->collectedTs = $collectedTs;
 
@@ -503,12 +505,12 @@ class Order
         return $this;
     }
 
-    public function getProcessedTs(): ?\DateTimeInterface
+    public function getProcessedTs(): ?DateTimeInterface
     {
         return $this->processedTs;
     }
 
-    public function setProcessedTs(?\DateTimeInterface $processedTs): self
+    public function setProcessedTs(?DateTimeInterface $processedTs): self
     {
         $this->processedTs = $processedTs;
 
@@ -575,12 +577,12 @@ class Order
         return $this;
     }
 
-    public function getFinalizedTs(): ?\DateTimeInterface
+    public function getFinalizedTs(): ?DateTimeInterface
     {
         return $this->finalizedTs;
     }
 
-    public function setFinalizedTs(?\DateTimeInterface $finalizedTs): self
+    public function setFinalizedTs(?DateTimeInterface $finalizedTs): self
     {
         $this->finalizedTs = $finalizedTs;
 
@@ -1017,7 +1019,7 @@ class Order
             $processedSampleTimes = json_decode($this->getProcessedSamplesTs(), true);
             if (!empty($processedSampleTimes[$sample])) {
                 try {
-                    $time = new \DateTime();
+                    $time = new DateTime();
                     $time->setTimestamp($processedSampleTimes[$sample]);
                     return $time->format('Y-m-d\TH:i:s\Z');
                 } catch (\Exception $e) {
@@ -1350,7 +1352,7 @@ class Order
 
         $biobankChanges = !empty($this->getBiobankChanges()) ? json_decode($this->getBiobankChanges(), true) : [];
         if (!empty($biobankChanges['collected']['time'])) {
-            $collectedTs = new \DateTime();
+            $collectedTs = new DateTime();
             $collectedTs->setTimestamp($biobankChanges['collected']['time']);
             $collectedTs->setTimezone(new \DateTimeZone($timeZone));
             $biobankChanges['collected']['time'] = $collectedTs;
@@ -1370,7 +1372,7 @@ class Order
             foreach ($biobankChanges['processed']['samples_ts'] as $sample => $time) {
                 $sampleDetails[$sample]['code'] = array_search($sample, $this->getCustomRequestedSamples());
                 $sampleDetails[$sample]['color'] = $samplesInfo[$sample]['color'];
-                $processedTs = new \DateTime();
+                $processedTs = new DateTime();
                 $processedTs->setTimestamp($time);
                 $processedTs->setTimezone(new \DateTimeZone($timeZone));
                 $sampleDetails[$sample]['time'] = $processedTs;
@@ -1383,7 +1385,7 @@ class Order
         }
 
         if (!empty($biobankChanges['finalized']['time'])) {
-            $collectedTs = new \DateTime();
+            $collectedTs = new DateTime();
             $collectedTs->setTimestamp($biobankChanges['finalized']['time']);
             $collectedTs->setTimezone(new \DateTimeZone($timeZone));
             $biobankChanges['finalized']['time'] = $collectedTs;
