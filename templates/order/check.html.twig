@@ -82,12 +82,12 @@
                     <label><input type="radio" name="syncope" value="no"/> No</label>
                 </div>
                 <div style="display:none;" id="syncope-sub-qn">
-                    <h3>Would the participant like to continue with a full HPO Biobank order or a modified order with urine and saliva only?</h3>
+                    <h3>Would the participant like to continue with a full Biobank order or a modified order with {{ siteType == 'dv' ? 'urine only?' : 'urine only and a saliva order?' }}</h3>
                     <div class="radio">
-                        <label><input type="radio" name="syncope_sub" value="yes"/> Full HPO Biobank Order</label>
+                        <label><input type="radio" name="syncope_sub" value="yes"/> Full Biobank Order</label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="syncope_sub" value="no"/> Modified Order - {{ siteType == 'dv' ? 'Urine ' : 'Saliva and Urine ' }} only</label>
+                        <label><input type="radio" name="syncope_sub" value="no"/> Modified Order - {{ siteType == 'dv' ? 'Urine Only' : 'Urine Only and Saliva Order' }}</label>
                     </div>
                 </div>
             </div>
@@ -111,8 +111,8 @@
                 <strong>Urine collection is permissible, and can be initiated by selecting Continue.</strong>
             </span>
             <span id="info-text-5">
-                Caution! In order to minimize risk to participants, those who experience syncope should be offered {{ siteType == 'dv' ? 'urine ' : 'saliva and urine ' }} collection as an alternative.
-                <strong>Please select whether the participant would like to continue with a full HPO Biobank order or a modified order with {{ siteType == 'dv' ? 'urine ' : 'saliva and urine ' }} only.</strong>
+                Caution! In order to minimize risk to participants, those who experience syncope should be offered {{ siteType == 'dv' ? 'a urine collection' : 'saliva and urine collections' }} as an alternative.
+                <strong>Please select whether the participant would like to continue with a full Biobank order or a modified order with {{ siteType == 'dv' ? 'urine only' : 'urine only and a saliva order' }}.</strong>
             </span>
         </div>
         <div id="continue" style="display:none;">
