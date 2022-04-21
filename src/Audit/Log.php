@@ -54,4 +54,5 @@ class Log
     public const INCENTIVE_ADD = 'INCENTIVE_ADD';
     public const INCENTIVE_EDIT = 'INCENTIVE_EDIT';
     public const INCENTIVE_REMOVE = 'INCENTIVE_REMOVE';
+    public const ID_VERIFICATION_ADD = 'ID_VERIFICATION_ADD';
 }

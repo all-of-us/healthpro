@@ -199,7 +199,7 @@ class BiobankController extends BaseController
                         // Set collected ts and finalized samples that are needed to send order to mayo
                         $collectedTs = $order->getCollectedTs();
                         if (empty($collectedTs)) {
-                            $order->setCollectedTs($finalizedTs->setTimezone(new \DateTimeZone($this->getSecurityUser()->getTimezone())));
+                            $order->setCollectedTs($finalizedTs);
                         }
                         $order->setFinalizedSamples(json_encode($samples));
 
