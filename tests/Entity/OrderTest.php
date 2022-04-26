@@ -411,6 +411,28 @@ class OrderTest extends TestCase
         self::assertEquals($orderDisplayText, $order->getOrderTypeDisplayText());
     }
 
+    /**
+     * @dataProvider biobankOrderDataProvider
+     */
+    public function testBiobankChanges($data, $json)
+    {
+        $createdTs = new \DateTime('2022-01-01 08:00:00');
+        $finalizedTs = new \DateTime('2022-01-02 08:00:00');
+        $finalizedSamples = ["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"];
+        $centrifugeType = 'swinging_bucket';
+        $orderData = [
+            'user' => $this->getUser(),
+            'site' => 'test',
+            'createdTs' => $createdTs,
+            'participantId' => 'P123456789'
+        ];
+        $orderData = array_merge($orderData, $data);
+        $collectedTs = $data['collectedTs'];
+        $order = $this->createOrder($orderData);
+        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType);
+        self::assertEquals($order->getBiobankChanges(), $json);
+    }
+
     public function orderTypeProvider(): array
     {
         return [
@@ -420,6 +442,43 @@ class OrderTest extends TestCase
             ['Full HPO', null, null],
             ['Saliva', 'saliva', null],
             ['Urine', null, '["1UR10"]']
+        ];
+    }
+
+    public function biobankOrderDataProvider(): array
+    {
+        $ts = new \DateTime('2022-01-01 08:00:00');
+        return [
+            [
+                [
+                    'collectedTs' => null,
+                    'processedTs' => null,
+                ],
+                '{"collected":{"time":1641024000,"user":null,"site":"test","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]},"processed":{"time":1641024000,"user":null,"site":"test","samples":["1SS08","1PS08"],"samples_ts":{"1SS08":1641024000,"1PS08":1641024000},"centrifuge_type":"swinging_bucket"},"finalized":{"time":1641110400,"site":"test","user":null,"notes":"","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]}}'
+            ],
+            [
+                [
+                    'collectedTs' => $ts,
+                    'processedTs' => null,
+                ],
+                '{"collected":{"site":"test","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]},"processed":{"time":1641024000,"user":null,"site":"test","samples":["1SS08","1PS08"],"samples_ts":{"1SS08":1641024000,"1PS08":1641024000},"centrifuge_type":"swinging_bucket"},"finalized":{"time":1641110400,"site":"test","user":null,"notes":"","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]}}'
+            ],
+            [
+                [
+                    'collectedTs' => null,
+                    'processedTs' => $ts,
+                    'processedSamplesTs' => '{"1SS08":1641024000,"1PS08":1641024000}'
+                ],
+                '{"collected":{"time":1641024000,"user":null,"site":"test","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]},"processed":{"site":"test","samples":["1SS08","1PS08"],"samples_ts":{"1SS08":1641024000,"1PS08":1641024000},"centrifuge_type":"swinging_bucket"},"finalized":{"time":1641110400,"site":"test","user":null,"notes":"","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]}}'
+            ],
+            [
+                [
+                    'collectedTs' => $ts,
+                    'processedTs' => $ts,
+                    'processedSamplesTs' => '{"1SS08":1641024000,"1PS08":1641024000}'
+                ],
+                '{"collected":{"site":"test","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]},"processed":{"site":"test","samples":["1SS08","1PS08"],"samples_ts":{"1SS08":1641024000,"1PS08":1641024000},"centrifuge_type":"swinging_bucket"},"finalized":{"time":1641110400,"site":"test","user":null,"notes":"","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]}}'
+            ],
         ];
     }
 }
