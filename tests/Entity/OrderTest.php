@@ -411,6 +411,18 @@ class OrderTest extends TestCase
         self::assertEquals($orderDisplayText, $order->getOrderTypeDisplayText());
     }
 
+    public function orderTypeProvider(): array
+    {
+        return [
+            ['Full Kit', 'kit', null],
+            ['Urine', 'kit', '["1UR10"]'],
+            ['Custom HPO', null, '["1SS08", "1PS08", "1UR10"]'],
+            ['Full HPO', null, null],
+            ['Saliva', 'saliva', null],
+            ['Urine', null, '["1UR10"]']
+        ];
+    }
+
     /**
      * @dataProvider getBiobankChangesDataProvider
      */
@@ -431,45 +443,6 @@ class OrderTest extends TestCase
         $order = $this->createOrder($orderData);
         $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType);
         self::assertEquals($order->getBiobankChanges(), $json);
-    }
-
-    /**
-     * @dataProvider biobankOrderDataProvider
-     */
-    public function testBiobankOrderChanges($data, $result)
-    {
-        $createdTs = new \DateTime('2022-01-01 08:00:00');
-        $finalizedTs = new \DateTime('2022-01-02 08:00:00');
-        $finalizedSamples = ["1SS08", "1PS08", "1HEP4", "1ED04", "1ED10", "1CFD9", "1PXR2", "1UR10"];
-        $centrifugeType = 'swinging_bucket';
-        $orderData = [
-            'user' => $this->getUser(),
-            'site' => 'test',
-            'createdTs' => $createdTs,
-            'participantId' => 'P123456789'
-        ];
-        $collectedTs = $data['collectedTs'];
-        $orderData = array_merge($orderData, $data);
-        $order = $this->createOrder($orderData);
-        if (empty($collectedTs)) {
-            $order->setCollectedTs($createdTs);
-        }
-        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType);
-        self::assertEquals($order->getCollectedTs(), $result['collectedTs']);
-        self::assertEquals($order->getProcessedTs(), $result['processedTs']);
-        self::assertEquals($order->getFinalizedTs(), $finalizedTs);
-    }
-
-    public function orderTypeProvider(): array
-    {
-        return [
-            ['Full Kit', 'kit', null],
-            ['Urine', 'kit', '["1UR10"]'],
-            ['Custom HPO', null, '["1SS08", "1PS08", "1UR10"]'],
-            ['Full HPO', null, null],
-            ['Saliva', 'saliva', null],
-            ['Urine', null, '["1UR10"]']
-        ];
     }
 
     public function getBiobankChangesDataProvider(): array
@@ -507,6 +480,33 @@ class OrderTest extends TestCase
                 '{"collected":{"site":"test","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]},"processed":{"site":"test","samples":["1SS08","1PS08"],"samples_ts":{"1SS08":1641024000,"1PS08":1641024000},"centrifuge_type":"swinging_bucket"},"finalized":{"time":1641110400,"site":"test","user":null,"notes":"","samples":["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]}}'
             ],
         ];
+    }
+
+    /**
+     * @dataProvider biobankOrderDataProvider
+     */
+    public function testBiobankOrderChanges($data, $result)
+    {
+        $createdTs = new \DateTime('2022-01-01 08:00:00');
+        $finalizedTs = new \DateTime('2022-01-02 08:00:00');
+        $finalizedSamples = ["1SS08", "1PS08", "1HEP4", "1ED04", "1ED10", "1CFD9", "1PXR2", "1UR10"];
+        $centrifugeType = 'swinging_bucket';
+        $orderData = [
+            'user' => $this->getUser(),
+            'site' => 'test',
+            'createdTs' => $createdTs,
+            'participantId' => 'P123456789'
+        ];
+        $collectedTs = $data['collectedTs'];
+        $orderData = array_merge($orderData, $data);
+        $order = $this->createOrder($orderData);
+        if (empty($collectedTs)) {
+            $order->setCollectedTs($createdTs);
+        }
+        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType);
+        self::assertEquals($order->getCollectedTs(), $result['collectedTs']);
+        self::assertEquals($order->getProcessedTs(), $result['processedTs']);
+        self::assertEquals($order->getFinalizedTs(), $finalizedTs);
     }
 
     public function biobankOrderDataProvider(): array

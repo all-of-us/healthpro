@@ -199,7 +199,6 @@ class BiobankController extends BaseController
                         // Set collected ts and finalized samples that are needed to send order to mayo
                         $collectedTs = $order->getCollectedTs();
                         if (empty($collectedTs)) {
-                            // If empty set collected ts to created ts
                             $createdTs = $order->getCreatedTs();
                             $order->setCollectedTs($createdTs);
                         }
