@@ -446,7 +446,7 @@ class WorkQueue
         ],
         'address2' => [
             'name' => 'Street Address 2',
-            'csvName' => 'Street Address 2',
+            'csvName' => 'Street Address2',
             'rdrField' => 'streetAddress2',
             'sortField' => 'streetAddress2',
             'csvRdrField' => 'streetAddress2',
