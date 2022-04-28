@@ -435,33 +435,42 @@ class WorkQueue
             'group' => 'contact'
         ],
         'address' => [
-            'name' => 'Address',
-            'csvName' => 'Street Address',
-            'rdrField' => 'address',
-            'sortField' => 'address',
-            'participantMethod' => 'getAddress',
+            'name' => 'Street Address',
+            'rdrField' => 'streetAddress',
+            'sortField' => 'streetAddress',
             'toggleColumn' => true,
-            'type' => 'address',
             'csvRdrField' => 'streetAddress',
             'visible' => false,
             'group' => 'contact'
         ],
         'address2' => [
-            'name' => 'Address2',
+            'name' => 'Street Address 2',
             'csvName' => 'Street Address2',
-            'csvRdrField' => 'streetAddress2'
+            'rdrField' => 'streetAddress2',
+            'sortField' => 'streetAddress2',
+            'csvRdrField' => 'streetAddress2',
+            'group' => 'contact'
         ],
         'city' => [
             'name' => 'City',
-            'csvRdrField' => 'city'
+            'rdrField' => 'city',
+            'sortField' => 'city',
+            'csvRdrField' => 'city',
+            'group' => 'contact'
         ],
         'state' => [
             'name' => 'State',
-            'csvRdrField' => 'state'
+            'rdrField' => 'state',
+            'csvRdrField' => 'state',
+            'group' => 'contact',
+            'orderable' => false,
         ],
         'zip' => [
             'name' => 'Zip',
-            'csvRdrField' => 'zipCode'
+            'rdrField' => 'zipCode',
+            'sortField' => 'zipCode',
+            'csvRdrField' => 'zipCode',
+            'group' => 'contact'
         ],
         'email' => [
             'name' => 'Email',
@@ -1161,6 +1170,10 @@ class WorkQueue
         'patientStatusUnknown',
         'contactMethod',
         'address',
+        'address2',
+        'city',
+        'state',
+        'zip',
         'email',
         'loginPhone',
         'phone',
@@ -1387,6 +1400,10 @@ class WorkQueue
         'patientStatus',
         'recontactMethod',
         'streetAddress',
+        'streetAddress2',
+        'city',
+        'stateId',
+        'zipCode',
         'email',
         'loginPhoneNumber',
         'phoneNumber',
@@ -2143,13 +2160,6 @@ class WorkQueue
             'deceasedStatus',
             'dateOfDeath',
             'dateOfDeathApproval'
-        ],
-        'address' => [
-            'address',
-            'address2',
-            'city',
-            'state',
-            'zip'
         ],
         '1SAL' => [
             '1SAL',

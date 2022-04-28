@@ -57,7 +57,11 @@ class WorkQueueServiceTest extends ServiceTestCase
         $this->assertSame('PTSC Portal', $row1['participantOrigin']);
         $this->assertSame('Participant + EHR Consent', $row1['participantStatus']);
         $this->assertStringContainsString('Active', $row1['activityStatus']);
-        $this->assertSame('100 Main St, City1, AL 10001', $row1['address']);
+        $this->assertSame('100 Main St', $row1['address']);
+        $this->assertSame('Unit 1', $row1['address2']);
+        $this->assertSame('City1', $row1['city']);
+        $this->assertSame('AL', $row1['state']);
+        $this->assertSame('10001', $row1['zip']);
         $this->assertStringContainsString('11/3/2021 2:08 pm', $row1['TheBasics']);
 
         $row2 = $rows[1];
@@ -65,7 +69,11 @@ class WorkQueueServiceTest extends ServiceTestCase
         $this->assertSame('PTSC Portal', $row2['participantOrigin']);
         $this->assertSame('Participant', $row2['participantStatus']);
         $this->assertStringContainsString('Active', $row2['activityStatus']);
-        $this->assertSame('200 Main St, City2, AZ 20002', $row2['address']);
+        $this->assertSame('200 Main St', $row2['address']);
+        $this->assertSame('Unit 2', $row2['address2']);
+        $this->assertSame('City2', $row2['city']);
+        $this->assertSame('AZ', $row2['state']);
+        $this->assertSame('20002', $row2['zip']);
         $this->assertStringContainsString('text-danger', $row2['TheBasics']);
     }
 
@@ -154,7 +162,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             '100 Main St',
-            null,
+            'Unit 1',
             'City1',
             'AL',
             '10001',
@@ -300,7 +308,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             0,
             '100 Main St',
-            null,
+            'Unit 1',
             'City1',
             'AL',
             '10001',

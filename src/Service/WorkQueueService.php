@@ -288,12 +288,6 @@ class WorkQueueService
                             $userTimezone,
                             'ehr'
                         );
-                    } elseif ($columnDef['type'] === 'address') {
-                        if ($participant->{$columnDef['participantMethod']}()) {
-                            $row[$field] = $e($participant->{$columnDef['participantMethod']}());
-                        } else {
-                            $row[$field] = '';
-                        }
                     } elseif ($columnDef['type'] === 'ppiStatus') {
                         if ($participant->{$columnDef['rdrField']} == 3) {
                             $row[$field] = WorkQueue::HTML_SUCCESS;
