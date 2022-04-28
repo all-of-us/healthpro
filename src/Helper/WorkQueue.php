@@ -461,9 +461,9 @@ class WorkQueue
         'state' => [
             'name' => 'State',
             'rdrField' => 'state',
-            'sortField' => 'stateId',
             'csvRdrField' => 'state',
-            'group' => 'contact'
+            'group' => 'contact',
+            'orderable' => false,
         ],
         'zip' => [
             'name' => 'Zip',
