@@ -13,7 +13,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use App\Service\WorkQueueService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,15 +24,21 @@ use App\Audit\Log;
 /**
  * @Route("/workqueue")
  */
-class WorkQueueController extends AbstractController
+class WorkQueueController extends BaseController
 {
     protected $requestStack;
     protected $workQueueService;
     protected $siteService;
     protected $displayParticipantConsentsTab;
 
-    public function __construct(RequestStack $requestStack, WorkQueueService $workQueueService, SiteService $siteService, ParameterBagInterface $params)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        WorkQueueService $workQueueService,
+        SiteService $siteService,
+        ParameterBagInterface $params,
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
         $this->requestStack = $requestStack;
         $this->workQueueService = $workQueueService;
         $this->siteService = $siteService;
@@ -260,7 +265,6 @@ class WorkQueueController extends AbstractController
         $id,
         Request $request,
         ParticipantSummaryService $participantSummaryService,
-        EntityManagerInterface $em,
         OrderService $orderService,
         ParameterBagInterface $params
     ) {
@@ -287,10 +291,10 @@ class WorkQueueController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $measurements = $em->getRepository(Measurement::class)->findBy(['participantId' => $id]);
+        $measurements = $this->em->getRepository(Measurement::class)->findBy(['participantId' => $id]);
 
         // Internal Orders
-        $orders = $em->getRepository(Order::class)->findBy(['participantId' => $id]);
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $id]);
 
         // Quanum Orders
         $order = new Order();
@@ -302,7 +306,7 @@ class WorkQueueController extends AbstractController
             }
         }
 
-        $problems = $em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
+        $problems = $this->em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         return $this->render('workqueue/participant.html.twig', [
             'participant' => $participant,

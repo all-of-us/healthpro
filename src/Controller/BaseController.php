@@ -2,20 +2,37 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\User as UserEntity;
+use App\Security\User as SecurityUser;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BaseController extends AbstractController
 {
+    protected $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     protected function isReadOnly(): bool
     {
         $route = $this->container->get('request_stack')->getCurrentRequest()->get('_route');
         return strpos($route, 'read_') === 0;
     }
 
-    protected function getUserEntity()
+    protected function getUserEntity(): ?UserEntity
     {
-        $em = $this->container->get('doctrine')->getManager();
-        return $em->getRepository(User::class)->find($this->getUser()->getId());
+        return $this->em->getRepository(UserEntity::class)->find($this->getSecurityUser()->getId());
+    }
+
+    protected function getSecurityUser(): SecurityUser
+    {
+        $user = $this->getUser();
+        if ($user instanceof SecurityUser) {
+            return $user;
+        }
+        throw new \Exception('Invalid user type');
     }
 }

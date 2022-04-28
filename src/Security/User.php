@@ -161,7 +161,7 @@ class User implements UserInterface
     }
 
 
-    public function hasTwoFactorAuth()
+    public function hasTwoFactorAuth(): bool
     {
         // Google doesn't expose the user's current 2FA setting via API so
         // we infer it by checking whether they are in a 2FA exception group

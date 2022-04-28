@@ -92,8 +92,11 @@
             <br />
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="on_site_details">
-                    <div class="row">
+                    <div class="row equal-height">
                         {% if canViewOnSiteDetails %}
+                            <div class="col-md-6">
+                                {% include 'partials/participant-id-verification.html.twig' %}
+                            </div>
                             {% if not isDVType %}
                                 {% include 'partials/participant-patient-status.html.twig' %}
                             {% endif %}
@@ -499,4 +502,5 @@
 {% block pagejs %}
     {{ encore_entry_script_tags('participant') }}
     {{ encore_entry_script_tags('incentive') }}
+    {{ encore_entry_script_tags('id-verification') }}
 {% endblock %}

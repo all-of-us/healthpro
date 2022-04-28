@@ -52,10 +52,6 @@ class DeceasedReportsService
         return json_decode($response->getBody());
     }
 
-    /**
-     * @var array $data
-     * @var User $actor
-     */
     public function buildDeceasedReportFhir(DeceasedReport $deceasedReport, User $actor)
     {
         $report = [
@@ -112,10 +108,6 @@ class DeceasedReportsService
         return $report;
     }
 
-    /**
-     * @var array $data
-     * @var User $actor
-     */
     public function buildDeceasedReportReviewFhir(DeceasedReport $deceasedReport, User $actor)
     {
         $report = [

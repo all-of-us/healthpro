@@ -13,21 +13,30 @@ use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
 use App\Service\PatientStatusService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Audit\Log;
 
-class PatientStatusController extends AbstractController
+class PatientStatusController extends BaseController
 {
+    public function __construct(EntityManagerInterface $em)
+    {
+        parent::__construct($em);
+    }
+
     /**
      * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
      */
-    public function patientStatusImport(Request $request, SessionInterface $session, EntityManagerInterface $em, LoggerService $loggerService, PatientStatusImportService $patientStatusImportService)
-    {
+    public function patientStatusImport(
+        Request $request,
+        SessionInterface $session,
+        LoggerService $loggerService,
+        PatientStatusImportService $patientStatusImportService
+    ) {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
@@ -37,16 +46,16 @@ class PatientStatusController extends AbstractController
             $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
-                    $organization = $em->getRepository(Organization::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
+                    $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport
                         ->setFileName($fileName)
                         ->setOrganization($organization)
                         ->setAwardee($session->get('siteAwardeeId'))
-                        ->setUserId($this->getUser()->getId())
+                        ->setUserId($this->getSecurityUser()->getId())
                         ->setSite($session->get('site')->id)
                         ->setCreatedTs(new \DateTime());
-                    $em->persist($patientStatusImport);
+                    $this->em->persist($patientStatusImport);
                     $batchSize = 50;
                     foreach ($patientStatuses as $key => $patientStatus) {
                         $PatientStatusImportRow = new PatientStatusImportRow();
@@ -55,23 +64,23 @@ class PatientStatusController extends AbstractController
                             ->setStatus($patientStatus['status'])
                             ->setComments($patientStatus['comments'])
                             ->setImport($patientStatusImport);
-                        $em->persist($PatientStatusImportRow);
+                        $this->em->persist($PatientStatusImportRow);
                         if (($key % $batchSize) === 0) {
-                            $em->flush();
-                            $em->clear(PatientStatusImportRow::class);
+                            $this->em->flush();
+                            $this->em->clear(PatientStatusImportRow::class);
                         }
                     }
-                    $em->flush();
+                    $this->em->flush();
                     $id = $patientStatusImport->getId();
                     $loggerService->log(Log::PATIENT_STATUS_IMPORT_ADD, $id);
-                    $em->clear();
+                    $this->em->clear();
                     return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
                 }
             } else {
                 $form->addError(new FormError('Please correct the errors below'));
             }
         }
-        $patientStatusImports = $em->getRepository(PatientStatusImport::class)->findBy(['userId' => $this->getUser()->getId(), 'confirm' => 1], ['id' => 'DESC']);
+        $patientStatusImports = $this->em->getRepository(PatientStatusImport::class)->findBy(['userId' => $this->getSecurityUser()->getId(), 'confirm' => 1], ['id' => 'DESC']);
         return $this->render('patientstatus/import.html.twig', [
             'importForm' => $form->createView(),
             'imports' => $patientStatusImports
@@ -81,26 +90,28 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/confirmation/{id}", name="patientStatusImportConfirmation", methods={"GET", "POST"})
      */
-    public function patientStatusImportConfirmation(int $id, Request $request, EntityManagerInterface $em, LoggerService $loggerService)
+    public function patientStatusImportConfirmation(int $id, Request $request, LoggerService $loggerService)
     {
-        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getUser()->getId(), 'confirm' => 0]);
+        $patientStatusImport = $this->em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getSecurityUser()->getId(), 'confirm' => 0]);
         if (empty($patientStatusImport)) {
             throw $this->createNotFoundException('Page Not Found!');
         }
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('Confirm')->isClicked()) {
+            /** @var SubmitButton $confirmButton */
+            $confirmButton = $form->get('Confirm');
+            if ($confirmButton->isClicked()) {
                 // Update confirm status
                 $patientStatusImport->setConfirm(1);
-                $em->flush();
+                $this->em->flush();
                 $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
-                $em->clear();
+                $this->em->clear();
                 $this->addFlash('success', 'Successfully Imported!');
             } else {
                 $this->addFlash('notice', 'Import canceled!');
-                $em->remove($patientStatusImport);
-                $em->flush();
+                $this->em->remove($patientStatusImport);
+                $this->em->flush();
             }
             return $this->redirectToRoute('patientStatusImport');
         } else {
@@ -116,9 +127,9 @@ class PatientStatusController extends AbstractController
     /**
      * @Route("/patient/status/import/{id}", name="patientStatusImportDetails", methods={"GET", "POST"})
      */
-    public function patientStatusImportDetails(int $id, Request $request, EntityManagerInterface $em, PatientStatusImportService $patientStatusImportService)
+    public function patientStatusImportDetails(int $id, Request $request, PatientStatusImportService $patientStatusImportService)
     {
-        $patientStatusImport = $em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getUser()->getId(), 'confirm' => 1]);
+        $patientStatusImport = $this->em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getSecurityUser()->getId(), 'confirm' => 1]);
         if (empty($patientStatusImport)) {
             throw $this->createNotFoundException('Page Not Found!');
         }

@@ -6,8 +6,8 @@ use App\Audit\Log;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
-use App\Entity\SiteSync;
 use Doctrine\ORM\EntityManagerInterface;
+use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -89,10 +89,12 @@ class SiteSyncService
         $deleted = array_keys($existingSites); // add everything to the deleted array, then remove as we find them
         $entries = $this->getAwardeeEntriesFromRdr();
         foreach ($entries as $entry) {
+            /** @var stdClass $awardee */
             $awardee = $entry->resource;
             if (!isset($awardee->organizations) || !is_array($awardee->organizations)) {
                 continue;
             }
+            /** @var stdClass $organization */
             foreach ($awardee->organizations as $organization) {
                 if (!isset($organization->sites) || !is_array($organization->sites)) {
                     continue;
