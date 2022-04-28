@@ -436,7 +436,6 @@ class WorkQueue
         ],
         'address' => [
             'name' => 'Street Address',
-            'csvName' => 'Street Address',
             'rdrField' => 'streetAddress',
             'sortField' => 'streetAddress',
             'toggleColumn' => true,
@@ -462,7 +461,7 @@ class WorkQueue
         'state' => [
             'name' => 'State',
             'rdrField' => 'state',
-            'sortField' => 'state',
+            'sortField' => 'stateId',
             'csvRdrField' => 'state',
             'group' => 'contact'
         ],
@@ -1403,7 +1402,7 @@ class WorkQueue
         'streetAddress',
         'streetAddress2',
         'city',
-        'state',
+        'stateId',
         'zipCode',
         'email',
         'loginPhoneNumber',
