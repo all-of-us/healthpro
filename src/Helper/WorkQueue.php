@@ -2162,13 +2162,6 @@ class WorkQueue
             'dateOfDeath',
             'dateOfDeathApproval'
         ],
-        'address' => [
-            'address',
-            'address2',
-            'city',
-            'state',
-            'zip'
-        ],
         '1SAL' => [
             '1SAL',
             'sample1SAL2CollectionMethod'
