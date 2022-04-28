@@ -20,68 +20,68 @@ class WorkQueueServiceTest extends ServiceTestCase
     public function testGenerateConsentTableRows(): void
     {
         $rows = $this->service->generateConsentTableRows($this->getParticipants());
-        self::assertIsArray($rows);
-        self::assertCount(2, $rows);
+        $this->assertIsArray($rows);
+        $this->assertCount(2, $rows);
 
         $row1 = $rows[0];
-        self::assertMatchesRegularExpression('/<a href=".*P100000001.*>LN1/', $row1['lastName']);
-        self::assertSame('01/01/1990', $row1['dateOfBirth']);
-        self::assertSame('P100000001', $row1['participantId']);
-        self::assertStringContainsString('11/3/2021 2:08 pm (Consented Yes)', $row1['primaryConsent']);
-        self::assertStringContainsString('11/3/2021 2:08 pm (Consented Yes)', $row1['ehrConsent']);
-        self::assertStringContainsString('Active', $row1['ehrConsentExpireStatus']);
-        self::assertStringContainsString('(Consent Not Completed)', $row1['dvEhrStatus']);
-        self::assertSame('Cohort 3', $row1['consentCohort']);
-        self::assertSame('English', $row1['primaryLanguage']);
+        $this->assertMatchesRegularExpression('/<a href=".*P100000001.*>LN1/', $row1['lastName']);
+        $this->assertSame('01/01/1990', $row1['dateOfBirth']);
+        $this->assertSame('P100000001', $row1['participantId']);
+        $this->assertStringContainsString('11/3/2021 2:08 pm (Consented Yes)', $row1['primaryConsent']);
+        $this->assertStringContainsString('11/3/2021 2:08 pm (Consented Yes)', $row1['ehrConsent']);
+        $this->assertStringContainsString('Active', $row1['ehrConsentExpireStatus']);
+        $this->assertStringContainsString('(Consent Not Completed)', $row1['dvEhrStatus']);
+        $this->assertSame('Cohort 3', $row1['consentCohort']);
+        $this->assertSame('English', $row1['primaryLanguage']);
 
         $row2 = $rows[1];
-        self::assertMatchesRegularExpression('/<a href=".*P200000002.*>LN2/', $row2['lastName']);
-        self::assertSame('12/31/1989', $row2['dateOfBirth']);
-        self::assertSame('P200000002', $row2['participantId']);
-        self::assertStringContainsString('11/2/2021 10:23 am (Consented Yes)', $row2['primaryConsent']);
-        self::assertStringContainsString('(Consent Not Completed)', $row2['ehrConsent']);
-        self::assertSame('', $row2['ehrConsentExpireStatus']);
-        self::assertStringContainsString('(Consent Not Completed)', $row2['dvEhrStatus']);
-        self::assertSame('Cohort 3', $row2['consentCohort']);
-        self::assertSame('English', $row2['primaryLanguage']);
+        $this->assertMatchesRegularExpression('/<a href=".*P200000002.*>LN2/', $row2['lastName']);
+        $this->assertSame('12/31/1989', $row2['dateOfBirth']);
+        $this->assertSame('P200000002', $row2['participantId']);
+        $this->assertStringContainsString('11/2/2021 10:23 am (Consented Yes)', $row2['primaryConsent']);
+        $this->assertStringContainsString('(Consent Not Completed)', $row2['ehrConsent']);
+        $this->assertSame('', $row2['ehrConsentExpireStatus']);
+        $this->assertStringContainsString('(Consent Not Completed)', $row2['dvEhrStatus']);
+        $this->assertSame('Cohort 3', $row2['consentCohort']);
+        $this->assertSame('English', $row2['primaryLanguage']);
     }
 
     public function testGenerateTableRows(): void
     {
         $rows = $this->service->generateTableRows($this->getParticipants());
-        self::assertIsArray($rows);
-        self::assertCount(2, $rows);
+        $this->assertIsArray($rows);
+        $this->assertCount(2, $rows);
 
         $row1 = $rows[0];
-        self::assertNotEmpty($row1['patientStatusYes']);
-        self::assertSame('PTSC Portal', $row1['participantOrigin']);
-        self::assertSame('Participant + EHR Consent', $row1['participantStatus']);
-        self::assertStringContainsString('Active', $row1['activityStatus']);
-        self::assertSame('100 Main St', $row1['address']);
-        self::assertSame('Unit 1', $row1['address2']);
-        self::assertSame('City1', $row1['city']);
-        self::assertSame('AL', $row1['state']);
-        self::assertSame('10001', $row1['zip']);
-        self::assertStringContainsString('11/3/2021 2:08 pm', $row1['TheBasics']);
+        $this->assertNotEmpty($row1['patientStatusYes']);
+        $this->assertSame('PTSC Portal', $row1['participantOrigin']);
+        $this->assertSame('Participant + EHR Consent', $row1['participantStatus']);
+        $this->assertStringContainsString('Active', $row1['activityStatus']);
+        $this->assertSame('100 Main St', $row1['address']);
+        $this->assertSame('Unit 1', $row1['address2']);
+        $this->assertSame('City1', $row1['city']);
+        $this->assertSame('AL', $row1['state']);
+        $this->assertSame('10001', $row1['zip']);
+        $this->assertStringContainsString('11/3/2021 2:08 pm', $row1['TheBasics']);
 
         $row2 = $rows[1];
-        self::assertEmpty($row2['patientStatusYes']);
-        self::assertSame('PTSC Portal', $row2['participantOrigin']);
-        self::assertSame('Participant', $row2['participantStatus']);
-        self::assertStringContainsString('Active', $row2['activityStatus']);
-        self::assertSame('200 Main St', $row2['address']);
-        self::assertSame('Unit 2', $row2['address2']);
-        self::assertSame('City2', $row2['city']);
-        self::assertSame('AZ', $row2['state']);
-        self::assertSame('20002', $row2['zip']);
-        self::assertStringContainsString('text-danger', $row2['TheBasics']);
+        $this->assertEmpty($row2['patientStatusYes']);
+        $this->assertSame('PTSC Portal', $row2['participantOrigin']);
+        $this->assertSame('Participant', $row2['participantStatus']);
+        $this->assertStringContainsString('Active', $row2['activityStatus']);
+        $this->assertSame('200 Main St', $row2['address']);
+        $this->assertSame('Unit 2', $row2['address2']);
+        $this->assertSame('City2', $row2['city']);
+        $this->assertSame('AZ', $row2['state']);
+        $this->assertSame('20002', $row2['zip']);
+        $this->assertStringContainsString('text-danger', $row2['TheBasics']);
     }
 
     public function testGenerateConsentExportRow()
     {
         $participants = $this->getParticipants();
         $row = $this->service->generateConsentExportRow($participants[0], WorkQueue::getWorkQueueConsentColumns());
-        self::assertSame([
+        $this->assertSame([
             'LN1',
             'FN1',
             'M1',
@@ -116,7 +116,7 @@ class WorkQueueServiceTest extends ServiceTestCase
     {
         $participants = $this->getParticipants();
         $row = $this->service->generateExportRow($participants[0]);
-        self::assertSame([
+        $this->assertSame([
             'LN1',
             'FN1',
             'M1',
@@ -258,7 +258,7 @@ class WorkQueueServiceTest extends ServiceTestCase
     {
         $participants = $this->getParticipants();
         $row = $this->service->generateExportRow($participants[0], WorkQueue::getWorkQueueColumns());
-        self::assertSame([
+        $this->assertSame([
             'LN1',
             'FN1',
             'M1',
@@ -299,7 +299,7 @@ class WorkQueueServiceTest extends ServiceTestCase
     {
         $participants = $this->getParticipants();
         $row = $this->service->generateExportRow($participants[0], WorkQueue::getWorkQueueGroupColumns('contact'));
-        self::assertSame([
+        $this->assertSame([
             'LN1',
             'FN1',
             'M1',
@@ -322,7 +322,7 @@ class WorkQueueServiceTest extends ServiceTestCase
     {
         $participants = $this->getParticipants();
         $row = $this->service->generateExportRow($participants[0], WorkQueue::getWorkQueueGroupColumns('demographics'));
-        self::assertSame([
+        $this->assertSame([
             'LN1',
             'FN1',
             'M1',
