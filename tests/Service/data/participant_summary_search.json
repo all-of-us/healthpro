@@ -147,7 +147,7 @@
             "biospecimenProcessedSite": "UNSET",
             "biospecimenFinalizedSite": "UNSET",
             "site": "hpo-site-bannerdesert",
-            "enrollmentSite": "UNSET"
+            "enrollmentSite": "hpo-site-bannerdesert"
         }
     },
     {

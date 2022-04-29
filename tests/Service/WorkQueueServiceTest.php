@@ -251,6 +251,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             1,
             '1/12/2022 1:09 pm',
+            'bannerdesert'
         ], $row);
     }
 
