@@ -38,6 +38,7 @@ class Participant
     public $consentCohortText;
     public $editExistingOnly = false;
     public $siteSuffix;
+    public $enrollmentSiteSuffix;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -192,6 +193,11 @@ class Participant
         // Get site suffix
         if (!empty($participant->site) && $participant->site !== 'UNSET') {
             $this->siteSuffix = $this->getSiteSuffix($participant->site);
+        }
+
+        // Get enrollment site suffix
+        if (!empty($participant->enrollmentSite) && $participant->enrollmentSite !== 'UNSET') {
+            $this->enrollmentSiteSuffix = $this->getSiteSuffix($participant->enrollmentSite);
         }
 
         //Set age
