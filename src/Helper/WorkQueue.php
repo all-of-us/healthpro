@@ -1372,7 +1372,8 @@ class WorkQueue
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
-        'CopeVaccineMinute4'
+        'CopeVaccineMinute4',
+        'enrollmentSite'
     ];
 
     public static $sortColumns = [
