@@ -1423,11 +1423,12 @@ class Order
         $collectedSamplesDiff = array_values(array_diff($finalizedSamples, $collectedSamples));
         $finalizedProcessSamples = $this->getFinalizedProcessSamples($finalizedSamples);
         $processedSamplesDiff = array_values(array_diff($finalizedProcessSamples, $processedSamples));
+        $createdTs = $this->getCreatedTs();
         if (empty($collectedTs)) {
             // Collected ts should already been set
             $this->setCollectedUser(null);
             $biobankChanges['collected'] = [
-                'time' => $finalizedTs->getTimestamp(),
+                'time' => $createdTs->getTimestamp(),
                 'user' => null
             ];
         }
@@ -1439,28 +1440,28 @@ class Order
         }
         // Do not set processed time for saliva orders
         if ($this->type !== 'saliva' && empty($processedSamplesTs)) {
-            $this->setProcessedTs($finalizedTs);
+            $this->setProcessedTs($createdTs);
             $this->setProcessedUser(null);
             $biobankChanges['processed'] = [
-                'time' => $finalizedTs->getTimestamp(),
+                'time' => $createdTs->getTimestamp(),
                 'user' => null
             ];
-            $finalizedProcessSamplesTs = [];
+            $createdProcessSamplesTs = [];
             foreach ($finalizedProcessSamples as $sample) {
-                $finalizedProcessSamplesTs[$sample] = $finalizedTs->getTimestamp();
+                $createdProcessSamplesTs[$sample] = $createdTs->getTimestamp();
             }
             $this->setProcessedSite($this->getSite());
             $this->setProcessedSamples(json_encode($finalizedProcessSamples));
-            $this->setProcessedSamplesTs(json_encode($finalizedProcessSamplesTs));
+            $this->setProcessedSamplesTs(json_encode($createdProcessSamplesTs));
             $biobankChanges['processed']['site'] = $this->getSite();
             $biobankChanges['processed']['samples'] = $finalizedProcessSamples;
-            $biobankChanges['processed']['samples_ts'] = $finalizedProcessSamplesTs;
+            $biobankChanges['processed']['samples_ts'] = $createdProcessSamplesTs;
         }
         if (!empty($processedSamplesTs) && !empty($processedSamplesDiff)) {
             $totalProcessedSamples = array_merge($processedSamples, $processedSamplesDiff);
             $newProcessedSampleTs = [];
             foreach ($processedSamplesDiff as $sample) {
-                $newProcessedSampleTs[$sample] = $finalizedTs->getTimestamp();
+                $newProcessedSampleTs[$sample] = $createdTs->getTimestamp();
             }
             $this->setProcessedSite($this->getSite());
             $this->setProcessedSamples(json_encode($totalProcessedSamples));
