@@ -165,6 +165,14 @@ class WorkQueueService
             }
             $rdrParams['site'] = $site;
         }
+        // Add enrollment site prefix
+        if (!empty($params['enrollmentSite'])) {
+            $enrollmentSite = $params['enrollmentSite'];
+            if ($enrollmentSite !== 'UNSET') {
+                $enrollmentSite = \App\Security\User::SITE_PREFIX . $enrollmentSite;
+            }
+            $rdrParams['enrollmentSite'] = $enrollmentSite;
+        }
         if (!empty($params['organization_id'])) {
             $rdrParams['organization'] = $params['organization_id'];
         }

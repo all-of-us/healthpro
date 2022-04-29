@@ -1946,6 +1946,13 @@ class WorkQueue
                     'DV Pilot Portal' => 'careevolution'
                 ]
             ],
+            'enrollmentSite' => [
+                'label' => 'Enrollment Site',
+                'options' => [
+                    'View All' => '',
+                    'Unpaired' => 'UNSET'
+                ]
+            ],
         ]
     ];
 
