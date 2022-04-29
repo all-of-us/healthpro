@@ -813,7 +813,8 @@ class WorkQueue
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'group' => 'enrollment',
-            'default' => true
+            'default' => true,
+            'orderable' => false
         ],
         'pairedSite' => [
             'name' => 'Paired Site',
