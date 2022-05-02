@@ -504,8 +504,12 @@ label.label-normal {
     padding-left: 15px;
 }
 
-.consent-filters .dropdown-menu {
+.advanced-filters .dropdown-menu {
     min-width: 250px;
+}
+
+.advanced-filters .filter-list-group-item {
+    padding: 10px 15px;
 }
 
 .consent-columns .dropdown-menu {
