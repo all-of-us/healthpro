@@ -120,13 +120,17 @@ class HelpService
         [
             'title' => 'HealthPro Application SOPs',
             'documents' => [
-                'SOP-0001' => [
-                    'title' => 'Report of Death in HealthPro SOP',
-                    'filename' => 'Report of Death in HealthPro SOP.pdf'
+                'HPRO SOP-001' => [
+                    'title' => 'HPRO SOP-001 Report of Death in HealthPro',
+                    'filename' => 'HPRO SOP-001 Report of Death in HealthPro.pdf'
                 ],
-                'SOP-0002' => [
-                    'title' => 'HealthPro Incentive Tracking Feature SOP',
-                    'filename' => 'HealthPro Incentive Tracking Feature SOP.pdf'
+                'HPRO SOP-002' => [
+                    'title' => 'HPRO SOP-002 HealthPro Incentive Tracking Feature',
+                    'filename' => 'HPRO SOP-002 HealthPro Incentive Tracking Feature.pdf'
+                ],
+                'HPRO SOP-003' => [
+                    'title' => 'HPRO SOP-003 On-Site ID Verification Feature',
+                    'filename' => 'HPRO SOP-003 On-Site ID Verification Feature.pdf'
                 ]
             ]
         ]
