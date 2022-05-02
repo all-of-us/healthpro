@@ -116,6 +116,19 @@ class HelpService
                     'filename' => 'SOP-025 DV Biobank Order Review.pdf'
                 ]
             ]
+        ],
+        [
+            'title' => 'HealthPro Application SOPs',
+            'documents' => [
+                'SOP-0001' => [
+                    'title' => 'Report of Death in HealthPro SOP',
+                    'filename' => 'Report of Death in HealthPro SOP.pdf'
+                ],
+                'SOP-0002' => [
+                    'title' => 'HealthPro Incentive Tracking Feature SOP',
+                    'filename' => 'HealthPro Incentive Tracking Feature SOP.pdf'
+                ]
+            ]
         ]
     ];
 
