@@ -806,6 +806,16 @@ class WorkQueue
             'visible' => false,
             'group' => 'surveys'
         ],
+        'enrollmentSite' => [
+            'name' => 'Enrollment Site',
+            'rdrField' => 'enrollmentSiteSuffix',
+            'sortField' => 'enrollmentSite',
+            'serviceMethod' => 'getSiteDisplayName',
+            'toggleColumn' => true,
+            'group' => 'enrollment',
+            'default' => true,
+            'orderable' => false
+        ],
         'pairedSite' => [
             'name' => 'Paired Site',
             'rdrField' => 'siteSuffix',
@@ -1197,6 +1207,7 @@ class WorkQueue
         'CopeVaccineMinute2',
         'CopeVaccineMinute3',
         'CopeVaccineMinute4',
+        'enrollmentSite',
         'pairedSite',
         'pairedOrganization',
         'physicalMeasurementsStatus',
@@ -1362,7 +1373,8 @@ class WorkQueue
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
-        'CopeVaccineMinute4'
+        'CopeVaccineMinute4',
+        'enrollmentSite'
     ];
 
     public static $sortColumns = [
@@ -1427,6 +1439,7 @@ class WorkQueue
         'questionnaireOnCopeVaccineMinute2Authored',
         'questionnaireOnCopeVaccineMinute3Authored',
         'questionnaireOnCopeVaccineMinute4Authored',
+        'enrollmentSite',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -1931,6 +1944,13 @@ class WorkQueue
                     'View All' => '',
                     'PTSC Portal' => 'vibrent',
                     'DV Pilot Portal' => 'careevolution'
+                ]
+            ],
+            'enrollmentSite' => [
+                'label' => 'Enrollment Site',
+                'options' => [
+                    'View All' => '',
+                    'Unpaired' => 'UNSET'
                 ]
             ],
         ]
