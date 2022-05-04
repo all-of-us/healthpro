@@ -139,6 +139,10 @@ class IncentiveType extends AbstractType
                 'attr' => [
                     'data-parsley-maxlength' => 280
                 ]
+            ])
+            ->add('declined', Type\CheckboxType::class, [
+                'label' => 'Participant declined incentive',
+                'required' => false
             ]);
     }
 
