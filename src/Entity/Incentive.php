@@ -141,6 +141,11 @@ class Incentive
      */
     private $rdrId;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $declined;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -346,6 +351,18 @@ class Incentive
     public function setRdrId(string $rdrId): self
     {
         $this->rdrId = $rdrId;
+
+        return $this;
+    }
+
+    public function getDeclined(): ?bool
+    {
+        return $this->declined;
+    }
+
+    public function setDeclined(int $status): self
+    {
+        $this->declined = $status;
 
         return $this;
     }
