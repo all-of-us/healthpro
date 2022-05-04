@@ -93,6 +93,8 @@
                             <dd>${{ incentive.incentiveAmount }}</dd>
                             <dt>Notes</dt>
                             <dd>{{ incentive.notes }}</dd>
+                            <dt>Declined</dt>
+                            <dd>{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                         </dl>
                         <hr/>
                     {% endfor %}
