@@ -11,7 +11,7 @@ class IdVerificationType extends AbstractType
 {
     public static $idVerificationChoices = [
         'verificationType' => [
-            'Photo ID & One Form of PII' => 'PHOTO_AND_ONE_OF_PII',
+            'Photo & One Form of PII' => 'PHOTO_AND_ONE_OF_PII',
             'Two Forms of PII' => 'TWO_OF_PII'
         ],
         'visitType' => [
