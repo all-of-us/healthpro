@@ -72,12 +72,12 @@ class Incentive
     private $site;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $incentiveDateGiven;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $incentiveType;
 
@@ -87,7 +87,7 @@ class Incentive
     private $otherIncentiveType;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $incentiveOccurrence;
 
@@ -97,7 +97,7 @@ class Incentive
     private $otherIncentiveOccurrence;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $incentiveAmount;
 
