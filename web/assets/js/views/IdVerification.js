@@ -18,4 +18,11 @@ $(document).ready(function () {
         $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
         $(verificationFormSelector).parsley().reset();
     });
+
+    $('.toggle-id-verification-help-text').on('click', function () {
+        let id = $(this).data('id');
+        let html = $('#' + id).html();
+        $('#helpModal .modal-body').html(html);
+        $('#helpModal').modal();
+    });
 });

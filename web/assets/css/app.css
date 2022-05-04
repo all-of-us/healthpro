@@ -322,18 +322,18 @@ label.label-normal {
     font-size: 20px;
 }
 
-.toggle-help-image {
+.toggle-help-image, .toggle-help-text {
     cursor: pointer;
     color: #337ab7;
 }
 
-#on_site_details .panel-heading span:before {
+.verification-history .panel-heading span:before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     content: "\f107";
 }
 
-#on_site_details .panel-heading.active span:before {
+.verification-history .panel-heading.active span:before {
     content: "\f106";
 }
 
