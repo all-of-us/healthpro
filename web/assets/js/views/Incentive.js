@@ -17,6 +17,7 @@ $(document).ready(function () {
         } else {
             $(idPrefix + ' .toggle-required').attr('required', 'required');
         }
+        $(idPrefix +' .incentive-form').parsley().reset();
     };
 
     var handleIncentiveFormFields = function (that, idPrefix = '#incentive_create') {
