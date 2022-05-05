@@ -22,7 +22,7 @@ class IncentiveType extends AbstractType
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date Incentive Given',
-                'required' => true,
+                'required' => false,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
                 'constraints' => [
@@ -34,7 +34,7 @@ class IncentiveType extends AbstractType
                 ],
                 'attr' => [
                     'autocomplete' => 'off',
-                    'class' => 'incentive-date-given'
+                    'class' => 'incentive-date-given toggle-required'
                 ]
             ])
             ->add('incentive_type', Type\ChoiceType::class, [
@@ -42,7 +42,10 @@ class IncentiveType extends AbstractType
                 'choices' => Incentive::$incentiveTypeChoices,
                 'placeholder' => '-- Select incentive type --',
                 'multiple' => false,
-                'required' => true
+                'required' => false,
+                'attr' => [
+                    'class' => 'toggle-required'
+                ]
             ])
             ->add('gift_card_type', Type\TextType::class, [
                 'label' => 'Specify Type of Gift Card',
@@ -77,7 +80,10 @@ class IncentiveType extends AbstractType
                 'choices' => Incentive::$incentiveOccurrenceChoices,
                 'placeholder' => '-- Select incentive occurrence --',
                 'multiple' => false,
-                'required' => true
+                'required' => false,
+                'attr' => [
+                    'class' => 'toggle-required'
+                ]
             ])
             ->add('other_incentive_occurrence', Type\TextType::class, [
                 'label' => 'Specify Other',
@@ -97,6 +103,9 @@ class IncentiveType extends AbstractType
                 'placeholder' => '-- Select amount --',
                 'multiple' => false,
                 'required' => false,
+                'attr' => [
+                    'class' => 'toggle-required'
+                ],
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) {
                         if ($context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
@@ -137,12 +146,16 @@ class IncentiveType extends AbstractType
                     new Constraints\Length(['max' => 285])
                 ],
                 'attr' => [
-                    'data-parsley-maxlength' => 280
+                    'data-parsley-maxlength' => 280,
+                    'class' => $options['require_notes'] ? 'toggle-required' : ''
                 ]
             ])
             ->add('declined', Type\CheckboxType::class, [
                 'label' => 'Participant declined incentive',
-                'required' => false
+                'required' => false,
+                'attr' => [
+                    'class' => 'incentive-declined'
+                ]
             ]);
     }
 
