@@ -30,7 +30,12 @@ class IncentiveType extends AbstractType
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
-                    ])
+                    ]),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify date incentive given')->addViolation();
+                        }
+                    })
                 ],
                 'attr' => [
                     'autocomplete' => 'off',
@@ -43,6 +48,13 @@ class IncentiveType extends AbstractType
                 'placeholder' => '-- Select incentive type --',
                 'multiple' => false,
                 'required' => false,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify incentive type')->addViolation();
+                        }
+                    })
+                ],
                 'attr' => [
                     'class' => 'toggle-required'
                 ]
@@ -81,6 +93,13 @@ class IncentiveType extends AbstractType
                 'placeholder' => '-- Select incentive occurrence --',
                 'multiple' => false,
                 'required' => false,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify incentive occurrence')->addViolation();
+                        }
+                    })
+                ],
                 'attr' => [
                     'class' => 'toggle-required'
                 ]
@@ -108,7 +127,7 @@ class IncentiveType extends AbstractType
                 ],
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
                             $context->buildViolation('Please specify incentive amount')->addViolation();
                         }
                     })
@@ -143,7 +162,12 @@ class IncentiveType extends AbstractType
                 'required' => $options['require_notes'],
                 'constraints' => [
                     new Constraints\Type('string'),
-                    new Constraints\Length(['max' => 285])
+                    new Constraints\Length(['max' => 285]),
+                    new Constraints\Callback(function ($value, $context) use ($options) {
+                        if ($options['require_notes'] && !$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify notes')->addViolation();
+                        }
+                    })
                 ],
                 'attr' => [
                     'data-parsley-maxlength' => 280,

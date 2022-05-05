@@ -192,7 +192,7 @@ class Incentive
         return $this->incentiveDateGiven;
     }
 
-    public function setIncentiveDateGiven(\DateTimeInterface $incentiveDateGiven): self
+    public function setIncentiveDateGiven(?\DateTimeInterface $incentiveDateGiven): self
     {
         $this->incentiveDateGiven = $incentiveDateGiven;
 
@@ -204,7 +204,7 @@ class Incentive
         return $this->incentiveType;
     }
 
-    public function setIncentiveType(string $incentiveType): self
+    public function setIncentiveType(?string $incentiveType): self
     {
         $this->incentiveType = $incentiveType;
 
@@ -228,7 +228,7 @@ class Incentive
         return $this->incentiveOccurrence;
     }
 
-    public function setIncentiveOccurrence(string $incentiveOccurrence): self
+    public function setIncentiveOccurrence(?string $incentiveOccurrence): self
     {
         $this->incentiveOccurrence = $incentiveOccurrence;
 
