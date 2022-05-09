@@ -716,3 +716,11 @@ table.table-samples td {
 .attest-choice-text {
     text-decoration: underline;
 }
+
+.sub-text {
+    padding-left: 30px;
+}
+
+.bg-light {
+    background-color: #f8f9fa!important;
+}
