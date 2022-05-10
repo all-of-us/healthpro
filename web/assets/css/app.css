@@ -356,6 +356,10 @@ label.label-normal {
     flex-wrap: wrap;
 }
 
+.import-sub-header-icon {
+    padding-right: 10px;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
@@ -722,5 +726,5 @@ table.table-samples td {
 }
 
 .bg-light {
-    background-color: #f8f9fa!important;
+    background-color: #eeeeee!important;
 }

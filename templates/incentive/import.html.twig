@@ -5,11 +5,11 @@
         <li class="active">Incentive Tracking Import</li>
     </ol>
     <div class="page-header">
-        <h2><i class="fa fa-upload" aria-hidden="true"></i> Import</h2>
+        <h2><i class="fa fa-upload" aria-hidden="true"></i> Imports</h2>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <h3 class="pull-left"><i class="fas fa-hand-holding-usd fa-lg"></i></h3>
+            <h3 class="pull-left import-sub-header-icon"><i class="fas fa-hand-holding-usd fa-lg"></i></h3>
             <div>
                 <h4>Incentive Tracking Import</h4>
                 <p class="text-muted">Upload csv files of participant incentive Tracking history in bulk.</p>
@@ -83,57 +83,58 @@
                         <td>P000000000</td>
                         <td>test.user1@pmi-ops.org</td>
                         <td>4/1/2022</td>
-                        <td>One-time Incentive</td>
+                        <td>one_time</td>
                         <td></td>
                         <td>cash</td>
                         <td></td>
                         <td></td>
                         <td>25</td>
                         <td></td>
-                        <td>No</td>
-                        <td>Test Notes 1</td>
+                        <td>no</td>
+                        <td>test notes 1</td>
                     </tr>
                     <tr>
                         <td>P000000000</td>
                         <td>test.user1@pmi-ops.org</td>
                         <td>4/1/2022</td>
-                        <td>Other</td>
-                        <td>Adverse Event</td>
-                        <td>Gift Card</td>
+                        <td>other</td>
+                        <td>adverse event</td>
+                        <td>gift_card</td>
                         <td>Walmart</td>
                         <td></td>
                         <td>15</td>
                         <td></td>
-                        <td>Yes</td>
-                        <td>Test Notes 2</td>
+                        <td>yes</td>
+                        <td>test notes 2</td>
                     </tr>
                     <tr>
                         <td>P000000000</td>
                         <td>test.user1@pmi-ops.org</td>
                         <td>4/1/2022</td>
-                        <td>Redraw</td>
+                        <td>redraw</td>
                         <td></td>
-                        <td>Other</td>
+                        <td>other</td>
                         <td></td>
-                        <td>Certificate</td>
-                        <td>Other</td>
+                        <td>certificate</td>
+                        <td>other</td>
                         <td>50</td>
-                        <td>No</td>
-                        <td>Test Notes 3</td>
+                        <td>no</td>
+                        <td>test notes 3</td>
                     </tr>
                     </tbody>
                 </table>
+                <p class="pull-right text-danger">* Required</p>
                 <p><u>Participant ID:<span class="text-danger">*</span></u> <strong>Must be 10 digits ex: P000000000</strong></p>
                 <p><u>User:</u> Include the <strong>pmi-ops account</strong> for the user who provided the incentive. <strong>If no user was recorded, enter "no data"</strong></p>
                 <p><u>Date:<span class="text-danger">*</span></u> Enter the <strong>date the incentive was given in mm/dd/yyyy format.</strong></p>
-                <p><u>Occurrence:</u> Enter the <strong>incentive occurrence</strong> from the provided options. <strong>Allowed values are: One-time Incentive, Redraw, Other, No Data</strong></p>
-                <p class="sub-text"><u>Occurrence, Other:</u>  If the value for <strong>Occurrence = Other, specify other in this field (free text).</strong> If other was not entered for occurence, leave the field blank.</p>
-                <p><u>Type:</u> Enter the <strong>type of incentive</strong> from the provided options. <strong>Allowed values are: Cash, Gift Card, Voucher, Promotional Item, Other, No Data</strong></p>
-                <p class="sub-text"><u>Type of Gift Card:</u>  If the value for <strong>Type = Gift Card, specify the type of gift card in this field (free text).</strong> If Gift Card was not entered for Type, leave the field blank.</p>
-                <p class="sub-text"><u>Type, Other:</u> If the value for <strong>Type = Other, specify other in this field (free text).</strong> If Other was not entered for Type, leave the field blank.</p>
-                <p><u>Amount:</u> Enter the <strong>incentive amount</strong> from the provided options. <strong>Allowed values are: 25, 15, Other, No Data</strong> <em>(Note: If Promotional Item was entered for Type, Amount field is not required.)</em></p>
-                <p class="sub-text"><u>Amount, Other:</u> If the value for <strong>Amount = Other, specify other in this field (free text)</strong> If other was not entered for an amount, leave the field blank. </p>
-                <p><u>Declined?:</u> Enter <strong>Yes if the participant declined the incentive.</strong> Enter <strong>No if the participant <u>did not</u> decline the incentive.</strong> If unknown, enter No Data.</u></p>
+                <p><u>Occurrence:</u> Enter the <strong>incentive occurrence</strong> from the provided options. <strong>Allowed values are: one_time, redraw, other, no data</strong></p>
+                <p class="sub-text"><u>Occurrence, Other:</u>  If the value for <strong>Occurrence = other, specify other in this field (free text).</strong> If other was not entered for occurence, leave the field blank.</p>
+                <p><u>Type:</u> Enter the <strong>type of incentive</strong> from the provided options. <strong>Allowed values are: cash, gift_card, voucher, promotional, other, no data</strong></p>
+                <p class="sub-text"><u>Type of Gift Card:</u>  If the value for <strong>Type = gift_card, specify the type of gift card in this field (free text).</strong> If gift_card was not entered for Type, leave the field blank.</p>
+                <p class="sub-text"><u>Type, Other:</u> If the value for <strong>Type = other, specify other in this field (free text).</strong> If other was not entered for Type, leave the field blank.</p>
+                <p><u>Amount:</u> Enter the <strong>incentive amount</strong> from the provided options. <strong>Allowed values are: 25, 15, other, no data</strong> <em>(Note: If Promotional Item was entered for Type, Amount field should be left blank.)</em></p>
+                <p class="sub-text"><u>Amount, Other:</u> If the value for <strong>Amount = other, specify other in this field (free text)</strong> If other was not entered for an amount, leave the field blank. </p>
+                <p><u>Declined?:</u> Enter <strong>yes if the participant declined the incentive.</strong> Enter <strong>no if the participant <u>did not</u> decline the incentive.</strong> If unknown, enter no data.</p>
                 <p><u>Notes:</u> <strong>Free text (optional)</strong></p>
             </div>
         </div>
