@@ -327,13 +327,13 @@ label.label-normal {
     color: #337ab7;
 }
 
-.verification-history .panel-heading span:before {
+.view-details .panel-heading span:before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     content: "\f107";
 }
 
-.verification-history .panel-heading.active span:before {
+.view-details .panel-heading.active span:before {
     content: "\f106";
 }
 
