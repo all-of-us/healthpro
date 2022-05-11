@@ -50,7 +50,8 @@ class IncentiveImportController extends BaseController
                     foreach ($incentives as $key => $incentive) {
                         $incentiveImportRow = new IncentiveImportRow();
                         $incentiveImportRow
-                            ->setParticipantId($incentive['participantId'])
+                            ->setParticipantId($incentive['participant_id'])
+                            ->setUserEmail($incentive['user_email'])
                             ->setIncentiveDateGiven(new \DateTime($incentive['incentive_date_given']))
                             ->setIncentiveOccurrence($incentive['incentive_occurrence'])
                             ->setOtherIncentiveOccurrence($incentive['other_incentive_occurrence'])

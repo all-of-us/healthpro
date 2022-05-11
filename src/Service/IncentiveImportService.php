@@ -45,7 +45,8 @@ class IncentiveImportService
             if ($this->hasDuplicateParticipantId($incentives, $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            $incentive['participantId'] = $data[0];
+            $incentive['participant_id'] = $data[0];
+            $incentive['user_email'] = $data[1];
             $incentive['incentive_date_given'] = $data[2];
             $incentive['incentive_occurrence'] = $data[3];
             $incentive['other_incentive_occurrence'] = $data[4];
@@ -70,7 +71,7 @@ class IncentiveImportService
     private function hasDuplicateParticipantId($incentives, $participantId)
     {
         foreach ($incentives as $incentive) {
-            if ($incentive['participantId'] === $participantId) {
+            if ($incentive['participant_id'] === $participantId) {
                 return true;
             }
         }
