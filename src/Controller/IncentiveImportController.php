@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\IncentiveImportRow;
 use App\Entity\IncentiveImport;
+use App\Form\IncentiveImportConfirmFormType;
 use App\Form\IncentiveImportFormType;
 use App\Service\IncentiveImportService;
 use App\Service\LoggerService;
@@ -93,7 +94,35 @@ class IncentiveImportController extends BaseController
      */
     public function incentiveImportConfirmation(int $id, Request $request, LoggerService $loggerService)
     {
-        return '';
+        $incentiveImport = $this->em->getRepository(IncentiveImport::class)->findOneBy(['id' => $id, 'user' => $this->getUserEntity(), 'confirm' => 0]);
+        if (empty($incentiveImport)) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        $form = $this->createForm(IncentiveImportConfirmFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var SubmitButton $confirmButton */
+            $confirmButton = $form->get('Confirm');
+            if ($confirmButton->isClicked()) {
+                // Update confirm status
+                $incentiveImport->setConfirm(1);
+                $this->em->flush();
+                $loggerService->log(Log::INCENTIVE_IMPORT_EDIT, $incentiveImport->getId());
+                $this->em->clear();
+                $this->addFlash('success', 'Successfully Imported!');
+            } else {
+                $this->addFlash('notice', 'Import canceled!');
+                $this->em->remove($incentiveImport);
+                $this->em->flush();
+            }
+            return $this->redirectToRoute('incentiveImport');
+        }
+        $importIncentives = $incentiveImport->getIncentiveImportRows()->slice(0, 100);
+        return $this->render('incentive/confirmation.html.twig', [
+            'importIncentives' => $importIncentives,
+            'importConfirmForm' => $form->createView(),
+            'rowsCount' => count($incentiveImport->getIncentiveImportRows())
+        ]);
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\IncentiveImportRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -10,6 +12,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class IncentiveImport
 {
+    public function __construct()
+    {
+        $this->IncentiveImportRows = new ArrayCollection();
+    }
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -46,6 +53,11 @@ class IncentiveImport
      * @ORM\Column(type="smallint", options={"default":0})
      */
     private $confirm = 0;
+
+    /**
+     * @ORM\OneToMany(targetEntity="IncentiveImportRow", mappedBy="import", cascade={"persist", "remove"})
+     */
+    private $IncentiveImportRows;
 
     public function getId(): ?int
     {
@@ -120,6 +132,37 @@ class IncentiveImport
     public function setConfirm(int $confirm): self
     {
         $this->confirm = $confirm;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|IncentiveImportRow[]
+     */
+    public function getIncentiveImportRows(): Collection
+    {
+        return $this->IncentiveImportRows;
+    }
+
+    public function addIncentiveImportRow(IncentiveImportRow $IncentiveImportRow): self
+    {
+        if (!$this->IncentiveImportRows->contains($IncentiveImportRow)) {
+            $this->IncentiveImportRows[] = $IncentiveImportRow;
+            $IncentiveImportRow->setImport($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIncentiveImportRow(IncentiveImportRow $IncentiveImportRow): self
+    {
+        if ($this->IncentiveImportRows->contains($IncentiveImportRow)) {
+            $this->IncentiveImportRows->removeElement($IncentiveImportRow);
+            // set the owning side to null (unless already changed)
+            if ($IncentiveImportRow->getImport()->getId() === $this->getId()) {
+                $IncentiveImportRow->setImport(null);
+            }
+        }
 
         return $this;
     }
