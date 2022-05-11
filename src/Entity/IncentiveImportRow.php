@@ -78,6 +78,11 @@ class IncentiveImportRow
      */
     private $rdrStatus = 0;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $userEmail;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -223,6 +228,18 @@ class IncentiveImportRow
     public function setOtherIncentiveOccurrence(?string $otherIncentiveOccurrence): self
     {
         $this->otherIncentiveOccurrence = $otherIncentiveOccurrence;
+
+        return $this;
+    }
+
+    public function getUserEmail(): ?string
+    {
+        return $this->userEmail;
+    }
+
+    public function setUserEmail(?string $userEmail): self
+    {
+        $this->userEmail = $userEmail;
 
         return $this;
     }
