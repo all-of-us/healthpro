@@ -4,6 +4,9 @@
     <div class="panel-heading">
         <h3 class="panel-title">
             <i class="fa fa-id-card" aria-hidden="true"></i> ID Verification
+            <span class="toggle-help-text toggle-id-verification-help-text" data-id="id_verification_help_modal">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
         </h3>
     </div>
     <div class="panel-body">
@@ -21,7 +24,7 @@
         {{ form_end(idVerificationForm) }}
     </div>
     {% if idVerifications is not empty %}
-        <div class="panel-group" id="verification" role="tablist" aria-multiselectable="true">
+        <div class="panel-group verification-history view-details" id="verification" role="tablist" aria-multiselectable="true">
             <div>
                 <div class="panel-heading" role="tab" id="headingOne">
                     <h5>
@@ -52,4 +55,21 @@
             </div>
         </div>
     {% endif %}
+</div>
+
+<div id="id_verification_help_modal" style="display:none">
+    <h5><em>AoU</em> program standards for ID verification include any form of identification that can supply:</h5>
+    <ol>
+        <li>A photo and at least one piece of personally identifiable information (PII); or</li>
+        <li>At least two separate pieces of PII.</li>
+    </ol>
+    <h5>Acceptable pieces of PII include:</h5>
+    <ul>
+        <li>Name</li>
+        <li>Date of Birth (DOB)</li>
+        <li>Street Address</li>
+        <li>Phone Number</li>
+        <li>Email Address</li>
+    </ul>
+    <em>Minimum Participant ID Verification Requirements for Physical Measurement and Biospecimen Appointments policy (pg. 2)</em>
 </div>

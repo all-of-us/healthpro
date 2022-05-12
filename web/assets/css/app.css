@@ -322,18 +322,18 @@ label.label-normal {
     font-size: 20px;
 }
 
-.toggle-help-image {
+.toggle-help-image, .toggle-help-text {
     cursor: pointer;
     color: #337ab7;
 }
 
-#on_site_details .panel-heading span:before {
+.view-details .panel-heading span:before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     content: "\f107";
 }
 
-#on_site_details .panel-heading.active span:before {
+.view-details .panel-heading.active span:before {
     content: "\f106";
 }
 
@@ -504,8 +504,12 @@ label.label-normal {
     padding-left: 15px;
 }
 
-.consent-filters .dropdown-menu {
+.advanced-filters .dropdown-menu {
     min-width: 250px;
+}
+
+.advanced-filters .filter-list-group-item {
+    padding: 10px 15px;
 }
 
 .consent-columns .dropdown-menu {
@@ -515,7 +519,7 @@ label.label-normal {
 .wq-main-columns {
     column-width: 200px;
     width: 1100px;
-    height: 500px;
+    height: 520px;
     padding: 20px;
 }
 

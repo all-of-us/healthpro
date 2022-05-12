@@ -65,11 +65,11 @@
 
             <th colspan="4" class="topheader multiheader-patient-status">Patient Status</th>
 
-            <th colspan="5" class="topheader multiheader-contact">Contact</th>
+            <th colspan="9" class="topheader multiheader-contact">Contact</th>
 
             <th colspan="{{ (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
 
-            <th colspan="{{ (samples|length) + 7 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
+            <th colspan="{{ (samples|length) + 8 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
 
             <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
         </tr>
@@ -100,7 +100,11 @@
             <th class="secondaryheader col-group-patient-status multiheader-patient-status">Unknown</th>
 
             <th class="secondaryheader col-group-contact multiheader-contact">Contact Method</th>
-            <th class="secondaryheader col-group-contact multiheader-contact">Address</th>
+            <th class="secondaryheader col-group-contact multiheader-contact">Street Address</th>
+            <th class="secondaryheader col-group-contact multiheader-contact">Street Address 2</th>
+            <th class="secondaryheader col-group-contact multiheader-contact">City</th>
+            <th class="secondaryheader col-group-contact multiheader-contact">State</th>
+            <th class="secondaryheader col-group-contact multiheader-contact">Zip</th>
             <th class="secondaryheader col-group-contact multiheader-contact">Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
             <th class="secondaryheader col-group-contact multiheader-contact">Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
             <th class="secondaryheader col-group-contact multiheader-contact">Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
@@ -111,6 +115,7 @@
                 <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}</th>
             {% endfor %}
 
+            <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Enrollment Site</th>
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Paired Site {{ display_message('pairing_info', 'tooltip')|raw }}</th>
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Paired Organization {{ display_message('pairing_info', 'tooltip')|raw }}</th>
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Phys Measurements</th>

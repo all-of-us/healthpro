@@ -68,7 +68,7 @@ $(document).ready(function() {
             row.class = columnDef['htmlClass'];
         }
         if (columnDef.hasOwnProperty('orderable')) {
-            row.class = columnDef['orderable'];
+            row.orderable = columnDef['orderable'];
         }
         if (columnDef.hasOwnProperty('visible')) {
             row.visible = columnDef['visible'];

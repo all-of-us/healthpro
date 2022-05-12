@@ -435,33 +435,42 @@ class WorkQueue
             'group' => 'contact'
         ],
         'address' => [
-            'name' => 'Address',
-            'csvName' => 'Street Address',
-            'rdrField' => 'address',
-            'sortField' => 'address',
-            'participantMethod' => 'getAddress',
+            'name' => 'Street Address',
+            'rdrField' => 'streetAddress',
+            'sortField' => 'streetAddress',
             'toggleColumn' => true,
-            'type' => 'address',
             'csvRdrField' => 'streetAddress',
             'visible' => false,
             'group' => 'contact'
         ],
         'address2' => [
-            'name' => 'Address2',
+            'name' => 'Street Address 2',
             'csvName' => 'Street Address2',
-            'csvRdrField' => 'streetAddress2'
+            'rdrField' => 'streetAddress2',
+            'sortField' => 'streetAddress2',
+            'csvRdrField' => 'streetAddress2',
+            'group' => 'contact'
         ],
         'city' => [
             'name' => 'City',
-            'csvRdrField' => 'city'
+            'rdrField' => 'city',
+            'sortField' => 'city',
+            'csvRdrField' => 'city',
+            'group' => 'contact'
         ],
         'state' => [
             'name' => 'State',
-            'csvRdrField' => 'state'
+            'rdrField' => 'state',
+            'csvRdrField' => 'state',
+            'group' => 'contact',
+            'orderable' => false,
         ],
         'zip' => [
             'name' => 'Zip',
-            'csvRdrField' => 'zipCode'
+            'rdrField' => 'zipCode',
+            'sortField' => 'zipCode',
+            'csvRdrField' => 'zipCode',
+            'group' => 'contact'
         ],
         'email' => [
             'name' => 'Email',
@@ -796,6 +805,16 @@ class WorkQueue
             'toggleColumn' => true,
             'visible' => false,
             'group' => 'surveys'
+        ],
+        'enrollmentSite' => [
+            'name' => 'Enrollment Site',
+            'rdrField' => 'enrollmentSiteSuffix',
+            'sortField' => 'enrollmentSite',
+            'serviceMethod' => 'getSiteDisplayName',
+            'toggleColumn' => true,
+            'group' => 'enrollment',
+            'default' => true,
+            'orderable' => false
         ],
         'pairedSite' => [
             'name' => 'Paired Site',
@@ -1161,6 +1180,10 @@ class WorkQueue
         'patientStatusUnknown',
         'contactMethod',
         'address',
+        'address2',
+        'city',
+        'state',
+        'zip',
         'email',
         'loginPhone',
         'phone',
@@ -1184,6 +1207,7 @@ class WorkQueue
         'CopeVaccineMinute2',
         'CopeVaccineMinute3',
         'CopeVaccineMinute4',
+        'enrollmentSite',
         'pairedSite',
         'pairedOrganization',
         'physicalMeasurementsStatus',
@@ -1349,7 +1373,8 @@ class WorkQueue
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
-        'CopeVaccineMinute4'
+        'CopeVaccineMinute4',
+        'enrollmentSite'
     ];
 
     public static $sortColumns = [
@@ -1387,6 +1412,10 @@ class WorkQueue
         'patientStatus',
         'recontactMethod',
         'streetAddress',
+        'streetAddress2',
+        'city',
+        'stateId',
+        'zipCode',
         'email',
         'loginPhoneNumber',
         'phoneNumber',
@@ -1410,6 +1439,7 @@ class WorkQueue
         'questionnaireOnCopeVaccineMinute2Authored',
         'questionnaireOnCopeVaccineMinute3Authored',
         'questionnaireOnCopeVaccineMinute4Authored',
+        'enrollmentSite',
         'site',
         'organization',
         'physicalMeasurementsFinalizedTime',
@@ -1916,6 +1946,13 @@ class WorkQueue
                     'DV Pilot Portal' => 'careevolution'
                 ]
             ],
+            'enrollmentSite' => [
+                'label' => 'Enrollment Site',
+                'options' => [
+                    'View All' => '',
+                    'Unpaired' => 'UNSET'
+                ]
+            ],
         ]
     ];
 
@@ -2143,13 +2180,6 @@ class WorkQueue
             'deceasedStatus',
             'dateOfDeath',
             'dateOfDeathApproval'
-        ],
-        'address' => [
-            'address',
-            'address2',
-            'city',
-            'state',
-            'zip'
         ],
         '1SAL' => [
             '1SAL',
