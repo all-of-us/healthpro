@@ -22,7 +22,7 @@ class IncentiveType extends AbstractType
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date Incentive Given',
-                'required' => true,
+                'required' => false,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
                 'constraints' => [
@@ -30,11 +30,16 @@ class IncentiveType extends AbstractType
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
-                    ])
+                    ]),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify date incentive given')->addViolation();
+                        }
+                    })
                 ],
                 'attr' => [
                     'autocomplete' => 'off',
-                    'class' => 'incentive-date-given'
+                    'class' => 'incentive-date-given toggle-required'
                 ]
             ])
             ->add('incentive_type', Type\ChoiceType::class, [
@@ -42,7 +47,17 @@ class IncentiveType extends AbstractType
                 'choices' => Incentive::$incentiveTypeChoices,
                 'placeholder' => '-- Select incentive type --',
                 'multiple' => false,
-                'required' => true
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify incentive type')->addViolation();
+                        }
+                    })
+                ],
+                'attr' => [
+                    'class' => 'toggle-required'
+                ]
             ])
             ->add('gift_card_type', Type\TextType::class, [
                 'label' => 'Specify Type of Gift Card',
@@ -77,7 +92,17 @@ class IncentiveType extends AbstractType
                 'choices' => Incentive::$incentiveOccurrenceChoices,
                 'placeholder' => '-- Select incentive occurrence --',
                 'multiple' => false,
-                'required' => true
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify incentive occurrence')->addViolation();
+                        }
+                    })
+                ],
+                'attr' => [
+                    'class' => 'toggle-required'
+                ]
             ])
             ->add('other_incentive_occurrence', Type\TextType::class, [
                 'label' => 'Specify Other',
@@ -97,9 +122,12 @@ class IncentiveType extends AbstractType
                 'placeholder' => '-- Select amount --',
                 'multiple' => false,
                 'required' => false,
+                'attr' => [
+                    'class' => 'toggle-required'
+                ],
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
                             $context->buildViolation('Please specify incentive amount')->addViolation();
                         }
                     })
@@ -134,10 +162,23 @@ class IncentiveType extends AbstractType
                 'required' => $options['require_notes'],
                 'constraints' => [
                     new Constraints\Type('string'),
-                    new Constraints\Length(['max' => 285])
+                    new Constraints\Length(['max' => 285]),
+                    new Constraints\Callback(function ($value, $context) use ($options) {
+                        if ($options['require_notes'] && !$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify notes')->addViolation();
+                        }
+                    })
                 ],
                 'attr' => [
-                    'data-parsley-maxlength' => 280
+                    'data-parsley-maxlength' => 280,
+                    'class' => $options['require_notes'] ? 'toggle-required' : ''
+                ]
+            ])
+            ->add('declined', Type\CheckboxType::class, [
+                'label' => 'Participant declined incentive',
+                'required' => false,
+                'attr' => [
+                    'class' => 'incentive-declined'
                 ]
             ]);
     }

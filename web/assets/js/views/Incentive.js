@@ -11,9 +11,18 @@ $(document).ready(function () {
 
     var incentivePrefix = 'incentive_';
 
-    var handleIncentiveFormFields = function (that, idPrefix = '#incentive_create ') {
+    var toggleFormFieldsRequired = function (idPrefix = '#incentive_create') {
+        if ($(idPrefix + ' .incentive-declined').is(':checked')) {
+            $(idPrefix + ' input, select, textarea').removeAttr('required');
+        } else {
+            $(idPrefix + ' .toggle-required').attr('required', 'required');
+        }
+        $(idPrefix +' .incentive-form').parsley().reset();
+    };
+
+    var handleIncentiveFormFields = function (that, idPrefix = '#incentive_create') {
         var selectFieldId = $(that).attr('id').replace(incentivePrefix, '');
-        var otherFieldSelector = idPrefix + '#' + incentivePrefix + 'other_' + selectFieldId;
+        var otherFieldSelector = idPrefix + ' #' + incentivePrefix + 'other_' + selectFieldId;
         if ($(that).val() === 'other') {
             $(otherFieldSelector).parent().show();
             $(otherFieldSelector).attr('required', 'required');
@@ -23,7 +32,7 @@ $(document).ready(function () {
             $(otherFieldSelector).removeAttr('required');
         }
         if (selectFieldId === 'incentive_type') {
-            var giftCardFieldSelector = idPrefix + '#' + incentivePrefix + 'gift_card_type';
+            var giftCardFieldSelector = idPrefix + ' #' + incentivePrefix + 'gift_card_type';
             if ($(that).val() === 'gift_card') {
                 $(idPrefix + ' #gift_card').show();
                 $(giftCardFieldSelector).attr('required', 'required');
@@ -32,8 +41,8 @@ $(document).ready(function () {
                 $(giftCardFieldSelector).val('');
                 $(giftCardFieldSelector).removeAttr('required');
             }
-            var incentiveAmountSelector = idPrefix + '#' + incentivePrefix + 'incentive_amount';
-            var otherIncentiveAmountSelector = idPrefix + '#' + incentivePrefix + 'other_incentive_amount';
+            var incentiveAmountSelector = idPrefix + ' #' + incentivePrefix + 'incentive_amount';
+            var otherIncentiveAmountSelector = idPrefix + ' #' + incentivePrefix + 'other_incentive_amount';
             if ($(that).val() === 'promotional') {
                 $(incentiveAmountSelector).val('');
                 $(incentiveAmountSelector).attr('disabled', 'disabled');
@@ -48,8 +57,10 @@ $(document).ready(function () {
         }
     };
 
-    var showHideIncentiveFormFields = function (idPrefix = '#incentive_create ') {
+    var showHideIncentiveFormFields = function (idPrefix = '#incentive_create') {
+        toggleFormFieldsRequired(idPrefix);
         var incentiveFormSelect = $(idPrefix + ' select');
+        var incentiveFormSelectDeclined = $(idPrefix + '_declined');
 
         incentiveFormSelect.each(function () {
             handleIncentiveFormFields(this, idPrefix);
@@ -57,6 +68,10 @@ $(document).ready(function () {
 
         incentiveFormSelect.change(function () {
             handleIncentiveFormFields(this, idPrefix);
+        });
+
+        incentiveFormSelectDeclined.change(function () {
+            toggleFormFieldsRequired(idPrefix);
         });
     };
 
@@ -111,7 +126,7 @@ $(document).ready(function () {
         }
     });
 
-    var handleGiftCardAutoPopulate = function (idPrefix = '#incentive_create ') {
+    var handleGiftCardAutoPopulate = function (idPrefix = '#incentive_create') {
         $(idPrefix + ' .gift-card').typeahead({
                 highlight: true
             },
@@ -123,7 +138,7 @@ $(document).ready(function () {
     var incentiveEditModal = '#incentive_edit_form_modal';
 
     $(incentiveEditModal).on('shown.bs.modal', function () {
-        showHideIncentiveFormFields('#incentive_edit ');
+        showHideIncentiveFormFields('#incentive_edit');
         $("#incentive_edit form").parsley();
         setIncentiveDateGiven();
     });

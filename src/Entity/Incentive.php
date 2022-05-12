@@ -72,12 +72,12 @@ class Incentive
     private $site;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $incentiveDateGiven;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $incentiveType;
 
@@ -87,7 +87,7 @@ class Incentive
     private $otherIncentiveType;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $incentiveOccurrence;
 
@@ -97,7 +97,7 @@ class Incentive
     private $otherIncentiveOccurrence;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $incentiveAmount;
 
@@ -140,6 +140,11 @@ class Incentive
      * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $rdrId;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $declined;
 
     public function getId(): ?int
     {
@@ -187,7 +192,7 @@ class Incentive
         return $this->incentiveDateGiven;
     }
 
-    public function setIncentiveDateGiven(\DateTimeInterface $incentiveDateGiven): self
+    public function setIncentiveDateGiven(?\DateTimeInterface $incentiveDateGiven): self
     {
         $this->incentiveDateGiven = $incentiveDateGiven;
 
@@ -199,7 +204,7 @@ class Incentive
         return $this->incentiveType;
     }
 
-    public function setIncentiveType(string $incentiveType): self
+    public function setIncentiveType(?string $incentiveType): self
     {
         $this->incentiveType = $incentiveType;
 
@@ -223,7 +228,7 @@ class Incentive
         return $this->incentiveOccurrence;
     }
 
-    public function setIncentiveOccurrence(string $incentiveOccurrence): self
+    public function setIncentiveOccurrence(?string $incentiveOccurrence): self
     {
         $this->incentiveOccurrence = $incentiveOccurrence;
 
@@ -346,6 +351,18 @@ class Incentive
     public function setRdrId(string $rdrId): self
     {
         $this->rdrId = $rdrId;
+
+        return $this;
+    }
+
+    public function getDeclined(): ?bool
+    {
+        return $this->declined;
+    }
+
+    public function setDeclined(int $status): self
+    {
+        $this->declined = $status;
 
         return $this;
     }
