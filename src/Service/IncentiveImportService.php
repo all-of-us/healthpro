@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormError;
 class IncentiveImportService
 {
     public const DEFAULT_CSV_ROWS_LIMIT = 5000;
+    public const EMAIL_DOMAIN = 'pmi-ops.org';
 
     protected $userService;
     protected $em;
@@ -21,7 +22,7 @@ class IncentiveImportService
         $this->params = $params;
     }
 
-    public function extractCsvFileData($file, &$form, &$incentives)
+    public function extractCsvFileData($file, &$form, &$incentives): void
     {
         $fileHandle = fopen($file->getPathname(), 'r');
         $headers = fgetcsv($fileHandle, 0, ",");
@@ -44,6 +45,9 @@ class IncentiveImportService
             }
             if ($this->hasDuplicateParticipantId($incentives, $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
+            }
+            if (!$this->isValidEmail($data[1])) {
+                $form['incentive_csv']->addError(new FormError("Invalid email address {$data[1]} in line {$row}, column 2"));
             }
             $incentive['participant_id'] = $data[0];
             $incentive['user_email'] = $data[1];
@@ -68,12 +72,22 @@ class IncentiveImportService
         }
     }
 
-    private function hasDuplicateParticipantId($incentives, $participantId)
+    private function hasDuplicateParticipantId($incentives, $participantId): bool
     {
         foreach ($incentives as $incentive) {
             if ($incentive['participant_id'] === $participantId) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    private function isValidEmail($email): bool
+    {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $parts = explode('@', $email);
+            $domain = array_pop($parts);
+            return $domain === self::EMAIL_DOMAIN;
         }
         return false;
     }
