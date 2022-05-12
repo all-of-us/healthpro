@@ -48,22 +48,22 @@ class IncentiveImportService
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
             if (!$this->isValidEmail($data[1])) {
-                $form['incentive_csv']->addError(new FormError("Invalid email address {$data[1]} in line {$row}, column 2"));
+                $form['incentive_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
             if (!in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
-                $form['incentive_csv']->addError(new FormError("Invalid incentive occurrence {$data[3]} in line {$row}, column 4"));
+                $form['incentive_csv']->addError(new FormError("Invalid Occurrence {$data[3]} in line {$row}, column 4"));
             }
             if (!in_array($data[5], array_values(Incentive::$incentiveTypeChoices))) {
-                $form['incentive_csv']->addError(new FormError("Invalid incentive type {$data[5]} in line {$row}, column 6"));
+                $form['incentive_csv']->addError(new FormError("Invalid Type {$data[5]} in line {$row}, column 6"));
             }
             if (!in_array($data[8], array_values(Incentive::$incentiveAmountChoices))) {
-                $form['incentive_csv']->addError(new FormError("Invalid incentive amount {$data[8]} in line {$row}, column 9"));
+                $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
             }
             if ($data[3] === 'other' && empty($data[4])) {
-                $form['incentive_csv']->addError(new FormError("Please enter other incentive occurrence in line {$row}, column 5"));
+                $form['incentive_csv']->addError(new FormError("Please enter other occurrence in line {$row}, column 5"));
             }
             if ($data[5] === 'other' && empty($data[7])) {
-                $form['incentive_csv']->addError(new FormError("Please enter other incentive type in line {$row}, column 8"));
+                $form['incentive_csv']->addError(new FormError("Please enter other type in line {$row}, column 8"));
             }
             if ($data[5] === 'gift_card' && empty($data[6])) {
                 $form['incentive_csv']->addError(new FormError("Please enter gift card type in line {$row}, column 7"));
