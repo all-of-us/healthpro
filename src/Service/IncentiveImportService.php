@@ -2,10 +2,14 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Incentive;
+use App\Entity\IncentiveImport;
+use App\Entity\IncentiveImportRow;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class IncentiveImportService
 {
@@ -15,12 +19,21 @@ class IncentiveImportService
     protected $userService;
     protected $em;
     protected $params;
+    protected $loggerService;
+    protected $session;
 
-    public function __construct(UserService $userService, EntityManagerInterface $em, ParameterBagInterface $params)
-    {
+    public function __construct(
+        UserService $userService,
+        EntityManagerInterface $em,
+        ParameterBagInterface $params,
+        LoggerService $loggerService,
+        RequestStack $requestStack
+    ) {
         $this->userService = $userService;
         $this->em = $em;
         $this->params = $params;
+        $this->loggerService = $loggerService;
+        $this->session = $requestStack->getSession();
     }
 
     public function extractCsvFileData($file, &$form, &$incentives): void
@@ -112,5 +125,43 @@ class IncentiveImportService
             return $domain === self::EMAIL_DOMAIN;
         }
         return false;
+    }
+
+    public function createIncentives($fileName, $incentives): int
+    {
+        $incentiveImport = new IncentiveImport();
+        $incentiveImport
+            ->setFileName($fileName)
+            ->setUser($this->userService->getUserEntity())
+            ->setSite($this->session->get('site')->id)
+            ->setCreatedTs(new \DateTime());
+        $this->em->persist($incentiveImport);
+        $batchSize = 50;
+        foreach ($incentives as $key => $incentive) {
+            $incentiveImportRow = new IncentiveImportRow();
+            $incentiveImportRow
+                ->setParticipantId($incentive['participant_id'])
+                ->setUserEmail($incentive['user_email'])
+                ->setIncentiveDateGiven(new \DateTime($incentive['incentive_date_given']))
+                ->setIncentiveOccurrence($incentive['incentive_occurrence'])
+                ->setOtherIncentiveOccurrence($incentive['other_incentive_occurrence'])
+                ->setIncentiveType($incentive['incentive_type'])
+                ->setGiftCardType($incentive['gift_card_type'])
+                ->setOtherIncentiveType($incentive['other_incentive_type'])
+                ->setIncentiveAmount($incentive['incentive_amount'])
+                ->setDeclined($incentive['declined'])
+                ->setNotes($incentive['notes'])
+                ->setImport($incentiveImport);
+            $this->em->persist($incentiveImportRow);
+            if (($key % $batchSize) === 0) {
+                $this->em->flush();
+                $this->em->clear(IncentiveImportRow::class);
+            }
+        }
+        $this->em->flush();
+        $id = $incentiveImport->getId();
+        $this->loggerService->log(Log::INCENTIVE_IMPORT_ADD, $id);
+        $this->em->clear();
+        return $id;
     }
 }
