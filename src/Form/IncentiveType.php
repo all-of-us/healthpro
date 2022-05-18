@@ -22,7 +22,7 @@ class IncentiveType extends AbstractType
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date Incentive Given',
-                'required' => false,
+                'required' => true,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
                 'constraints' => [

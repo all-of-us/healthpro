@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     var toggleFormFieldsRequired = function (idPrefix = '#incentive_create') {
         if ($(idPrefix + ' .incentive-declined').is(':checked')) {
-            $(idPrefix + ' input, select, textarea').removeAttr('required');
+            $(idPrefix + ' input, select, textarea').not('.incentive-date-given').removeAttr('required');
         } else {
             $(idPrefix + ' .toggle-required').attr('required', 'required');
         }
