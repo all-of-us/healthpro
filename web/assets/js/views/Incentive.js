@@ -58,7 +58,6 @@ $(document).ready(function () {
     };
 
     var showHideIncentiveFormFields = function (idPrefix = '#incentive_create') {
-        toggleFormFieldsRequired(idPrefix);
         var incentiveFormSelect = $(idPrefix + ' select');
         var incentiveFormSelectDeclined = $(idPrefix + '_declined');
 
@@ -73,6 +72,8 @@ $(document).ready(function () {
         incentiveFormSelectDeclined.change(function () {
             toggleFormFieldsRequired(idPrefix);
         });
+
+        toggleFormFieldsRequired(idPrefix);
     };
 
     showHideIncentiveFormFields();
