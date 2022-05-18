@@ -117,7 +117,7 @@ class IncentiveImportService
         return false;
     }
 
-    private function isValidEmail($email): bool
+    public function isValidEmail($email): bool
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $parts = explode('@', $email);
