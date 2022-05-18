@@ -51,6 +51,7 @@ class IncentiveService
             }
             $obj->amount = $incentive->getIncentiveAmount();
             $obj->notes = $incentive->getNotes();
+            $obj->declined = $incentive->getDeclined();
         }
         return $obj;
     }
