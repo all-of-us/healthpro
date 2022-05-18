@@ -36,8 +36,9 @@ class IncentiveImportService
         $this->session = $requestStack->getSession();
     }
 
-    public function extractCsvFileData($file, &$form, &$incentives): void
+    public function extractCsvFileData($file, $form)
     {
+        $incentives = [];
         $fileHandle = fopen($file->getPathname(), 'r');
         $headers = fgetcsv($fileHandle, 0, ",");
         // Guess file format using headers
@@ -105,6 +106,7 @@ class IncentiveImportService
             $incentives[] = $incentive;
             $row++;
         }
+        return $incentives;
     }
 
     private function hasDuplicateParticipantId($incentives, $participantId): bool

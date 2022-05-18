@@ -33,8 +33,7 @@ class IncentiveImportController extends BaseController
         if ($form->isSubmitted()) {
             $file = $form['incentive_csv']->getData();
             $fileName = $file->getClientOriginalName();
-            $incentives = [];
-            $incentiveImportService->extractCsvFileData($file, $form, $incentives);
+            $incentives = $incentiveImportService->extractCsvFileData($file, $form);
             if ($form->isValid()) {
                 if (!empty($incentives)) {
                     $id = $incentiveImportService->createIncentives($fileName, $incentives);
