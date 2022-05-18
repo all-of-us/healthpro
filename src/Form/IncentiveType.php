@@ -133,7 +133,7 @@ class IncentiveType extends AbstractType
                     })
                 ],
                 'getter' => function (Incentive $incentive) {
-                    if (!in_array($incentive->getIncentiveAmount(), Incentive::$incentiveAmountChoices)) {
+                    if ($incentive->getIncentiveAmount() && !in_array($incentive->getIncentiveAmount(), Incentive::$incentiveAmountChoices)) {
                         return 'other';
                     }
                     return $incentive->getIncentiveAmount();
