@@ -65,7 +65,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_type']->getData() === 'gift_card' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === 'gift_card' && empty($value)) {
                             $context->buildViolation('Please specify type of gift card')->addViolation();
                         }
                     })
@@ -159,7 +159,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',
-                'required' => $options['require_notes'],
+                'required' => false,
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Length(['max' => 285]),
