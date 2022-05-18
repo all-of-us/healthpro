@@ -14,7 +14,7 @@ class IncentiveImport
 {
     public function __construct()
     {
-        $this->IncentiveImportRows = new ArrayCollection();
+        $this->incentiveImportRows = new ArrayCollection();
     }
 
     /**
@@ -57,7 +57,7 @@ class IncentiveImport
     /**
      * @ORM\OneToMany(targetEntity="IncentiveImportRow", mappedBy="import", cascade={"persist", "remove"})
      */
-    private $IncentiveImportRows;
+    private $incentiveImportRows;
 
     public function getId(): ?int
     {
@@ -141,26 +141,26 @@ class IncentiveImport
      */
     public function getIncentiveImportRows(): Collection
     {
-        return $this->IncentiveImportRows;
+        return $this->incentiveImportRows;
     }
 
-    public function addIncentiveImportRow(IncentiveImportRow $IncentiveImportRow): self
+    public function addIncentiveImportRow(IncentiveImportRow $incentiveImportRow): self
     {
-        if (!$this->IncentiveImportRows->contains($IncentiveImportRow)) {
-            $this->IncentiveImportRows[] = $IncentiveImportRow;
-            $IncentiveImportRow->setImport($this);
+        if (!$this->incentiveImportRows->contains($incentiveImportRow)) {
+            $this->incentiveImportRows[] = $incentiveImportRow;
+            $incentiveImportRow->setImport($this);
         }
 
         return $this;
     }
 
-    public function removeIncentiveImportRow(IncentiveImportRow $IncentiveImportRow): self
+    public function removeIncentiveImportRow(IncentiveImportRow $incentiveImportRow): self
     {
-        if ($this->IncentiveImportRows->contains($IncentiveImportRow)) {
-            $this->IncentiveImportRows->removeElement($IncentiveImportRow);
+        if ($this->incentiveImportRows->contains($incentiveImportRow)) {
+            $this->incentiveImportRows->removeElement($incentiveImportRow);
             // set the owning side to null (unless already changed)
-            if ($IncentiveImportRow->getImport()->getId() === $this->getId()) {
-                $IncentiveImportRow->setImport(null);
+            if ($incentiveImportRow->getImport()->getId() === $this->getId()) {
+                $incentiveImportRow->setImport(null);
             }
         }
 
