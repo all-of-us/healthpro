@@ -6,7 +6,7 @@ use App\Repository\IncentiveImportRowRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=IncentiveImportRowRepository::class)
+ * @ORM\Entity
  */
 class IncentiveImportRow
 {
