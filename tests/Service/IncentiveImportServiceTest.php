@@ -2,8 +2,10 @@
 
 namespace App\Tests\Service;
 
+use App\Form\IncentiveImportFormType;
 use App\Service\IncentiveImportService;
 use App\Service\SiteService;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class IncentiveImportServiceTest extends ServiceTestCase
 {
@@ -22,7 +24,6 @@ class IncentiveImportServiceTest extends ServiceTestCase
     /**
      * @dataProvider emailDataProvider
      */
-
     public function testValidEmail($email, $isValid): void
     {
         $result = $this->service->isValidEmail($email);
@@ -38,5 +39,33 @@ class IncentiveImportServiceTest extends ServiceTestCase
             ['test-4@pmi-ops.org@ops-pmi.org', false],
             ['pmi-ops.org@ops-pmi.org', false]
         ];
+    }
+
+    /**
+     * @dataProvider csvFileDataProvider
+     */
+    public function testExtractCsvFileData($fileName, $isValid)
+    {
+        $form = static::$container->get('form.factory')->create(IncentiveImportFormType::class, null, ['csrf_protection' => false]);
+        $form->submit([
+            'incentive_csv' => $this->createUploadedFile($fileName)
+        ]);
+        $file = $form['incentive_csv']->getData();
+        $this->service->extractCsvFileData($file, $form);
+        $this->assertEquals($form->isValid(), $isValid);
+    }
+
+    public function csvFileDataProvider()
+    {
+        return [
+            ['incentive_import.csv', true],
+            ['incentive_import_invalid.csv', false]
+        ];
+    }
+
+    private function createUploadedFile($fileName)
+    {
+        $fileName = __DIR__ . '/data/' . $fileName;
+        return new UploadedFile($fileName, 'incentive_import.csv', 'text/csv', null, true);
     }
 }
