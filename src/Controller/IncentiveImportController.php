@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\IncentiveImport;
 use App\Form\IncentiveImportConfirmFormType;
 use App\Form\IncentiveImportFormType;
+use App\Service\EnvironmentService;
 use App\Service\IncentiveImportService;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,9 +17,12 @@ use App\Audit\Log;
 
 class IncentiveImportController extends BaseController
 {
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, EnvironmentService $env)
     {
         parent::__construct($em);
+        if (!$env->isLocal()) {
+            throw $this->createNotFoundException();
+        }
     }
 
     /**
