@@ -14,9 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/deceased-reports")
- */
 class DeceasedReportsController extends BaseController
 {
     public const ORG_PENDING_CACHE_TTL = 500;
@@ -33,7 +30,7 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/", name="deceased_reports_index")
+     * @Route("/deceased-reports", name="deceased_reports_index")
      */
     public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
@@ -51,7 +48,7 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
+     * @Route("/deceased-reports/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
      */
     public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
     {
@@ -90,7 +87,8 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
+     * @Route("/deceased-reports/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
+     * @Route("/read/deceased-reports/{participantId}/new", name="read_deceased_report_new", requirements={"participantId"="P\d+"})
      */
     public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId)
     {
@@ -141,7 +139,7 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
+     * @Route("/deceased-reports/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
      */
     public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
@@ -159,7 +157,7 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/stats", name="deceased_report_stats")
+     * @Route("/deceased-reports/stats", name="deceased_report_stats")
      */
     public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
@@ -178,6 +176,28 @@ class DeceasedReportsController extends BaseController
         return $this->json([
             'pending' => $pendingReportCount,
             'cacheHit' => $cacheHit
+        ]);
+    }
+
+    /**
+     * @Route("/read/deceased-reports/{participantId}/check", name="read_deceased_report_check", requirements={"participantId"="P\d+"})
+     */
+    public function deceasedReportCheck(ParticipantSummaryService $participantSummaryService, $participantId)
+    {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if ($participant->withdrawalStatus !== 'NOT_WITHDRAWN') {
+            $this->addFlash('error', 'Cannot create Deceased Report on withdrawn participant.');
+            return $this->redirectToRoute('participant', ['id' => $participantId]);
+        }
+        if ($participant->suspensionStatus !== 'NOT_SUSPENDED') {
+            $this->addFlash('error', 'Cannot create Deceased Report on deactivated participant.');
+            return $this->redirectToRoute('participant', ['id' => $participantId]);
+        }
+        return $this->render('deceasedreports/check.html.twig', [
+            'participant' => $participant
         ]);
     }
 

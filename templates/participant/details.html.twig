@@ -60,9 +60,10 @@
             {% include 'partials/deceased-participant-notice.html.twig' %}
         {% endif %}
 
-        {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' and not readOnlyView %}
+        {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
             <div class="btn-group pull-right">
-                <a class="btn btn-default" href="{{ path('deceased_report_new', {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
+                {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
+                <a class="btn btn-default" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
             </div>
         {% endif %}
 
