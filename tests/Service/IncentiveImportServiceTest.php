@@ -44,21 +44,24 @@ class IncentiveImportServiceTest extends ServiceTestCase
     /**
      * @dataProvider csvFileDataProvider
      */
-    public function testExtractCsvFileData($fileName, $isValid)
+    public function testExtractCsvFileData($fileName, $isValid, $rows = null)
     {
         $form = static::$container->get('form.factory')->create(IncentiveImportFormType::class, null, ['csrf_protection' => false]);
         $form->submit([
             'incentive_csv' => $this->createUploadedFile($fileName)
         ]);
         $file = $form['incentive_csv']->getData();
-        $this->service->extractCsvFileData($file, $form);
+        $incentives = $this->service->extractCsvFileData($file, $form);
         $this->assertEquals($form->isValid(), $isValid);
+        if ($form->isValid()) {
+            $this->assertEquals($rows, count($incentives));
+        }
     }
 
     public function csvFileDataProvider()
     {
         return [
-            ['incentive_import.csv', true],
+            ['incentive_import.csv', true, 3],
             ['incentive_import_invalid.csv', false]
         ];
     }
