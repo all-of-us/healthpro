@@ -72,7 +72,6 @@ class IncentiveImportController extends BaseController
                 $incentiveImport->setConfirm(1);
                 $this->em->flush();
                 $loggerService->log(Log::INCENTIVE_IMPORT_EDIT, $incentiveImport->getId());
-                $this->em->clear();
                 $this->addFlash('success', 'Successfully Imported!');
             } else {
                 $this->addFlash('notice', 'Import canceled!');
