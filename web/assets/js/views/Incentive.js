@@ -67,6 +67,7 @@ $(document).ready(function () {
 
         incentiveFormSelect.change(function () {
             handleIncentiveFormFields(this, idPrefix);
+            toggleFormFieldsRequired(idPrefix);
         });
 
         incentiveFormSelectDeclined.change(function () {
