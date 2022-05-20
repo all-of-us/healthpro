@@ -21,7 +21,7 @@ class IncentiveType extends AbstractType
         $builder
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date Incentive Given',
+                'label' => 'Date of Service',
                 'required' => true,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
@@ -33,7 +33,7 @@ class IncentiveType extends AbstractType
                     ]),
                     new Constraints\Callback(function ($value, $context) {
                         if (!$context->getRoot()['declined']->getData() && empty($value)) {
-                            $context->buildViolation('Please specify date incentive given')->addViolation();
+                            $context->buildViolation('Please specify date of service')->addViolation();
                         }
                     })
                 ],
@@ -81,7 +81,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_type']->getData() === 'other' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === 'other' && empty($value)) {
                             $context->buildViolation('Please specify other incentive type')->addViolation();
                         }
                     })
@@ -110,7 +110,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_occurrence']->getData() === 'other' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_occurrence']->getData() === 'other' && empty($value)) {
                             $context->buildViolation('Please specify other incentive occurrence')->addViolation();
                         }
                     })
@@ -146,7 +146,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('integer'),
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_amount']->getData() === 'other' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_amount']->getData() === 'other' && empty($value)) {
                             $context->buildViolation('Please specify other incentive amount')->addViolation();
                         }
                     })
