@@ -31,7 +31,6 @@ class DeceasedReportsController extends BaseController
 
     /**
      * @Route("/deceased-reports", name="deceased_reports_index")
-     * @Route("/read/deceased-reports", name="read_deceased_reports_index")
      */
     public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
@@ -44,14 +43,13 @@ class DeceasedReportsController extends BaseController
         $reports = $this->formatReportTableRows($reports);
         return $this->render('deceasedreports/index.html.twig', [
             'statusFilter' => $statusFilter,
-            'reports' => $reports,
-            'readOnlyView' => $this->isReadOnly()
+            'reports' => $reports
         ]);
     }
 
     /**
      * @Route("/deceased-reports/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
-     * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
+     * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"}, methods={GET})
      */
     public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
     {

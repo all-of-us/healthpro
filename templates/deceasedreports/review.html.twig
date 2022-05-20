@@ -6,7 +6,9 @@
         <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path(routePrefix ~ 'participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
     </div>
 
-    <a href="{{ path('deceased_reports_index') }}">Return to Deceased Participants</a>
+    {% if not readOnlyView %}
+        <a href="{{ path('deceased_reports_index') }}">Return to Deceased Participants</a>
+    {% endif %}
 
     {% include 'deceasedreports/_review-details.html.twig' %}
 
