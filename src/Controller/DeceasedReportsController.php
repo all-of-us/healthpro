@@ -126,7 +126,7 @@ class DeceasedReportsController extends BaseController
                 $this->resetPendingCountCache($organizationId);
                 $this->addFlash('success', 'Deceased Report created!');
                 $redirectRoute = $this->isReadOnly() ? 'read_participant' : 'participant';
-                return $this->redirectToRoute($redirectRoute, ['id' => $participantId]);
+                return $this->redirectToRoute($redirectRoute, ['id' => $participantId, 'refresh' => 1]);
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 $report->setReportStatus('preliminary');
