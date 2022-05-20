@@ -49,7 +49,7 @@ class DeceasedReportsController extends BaseController
 
     /**
      * @Route("/deceased-reports/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
-     * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"}, methods={GET})
+     * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"}, methods={"GET"})
      */
     public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
     {
