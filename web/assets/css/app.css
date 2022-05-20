@@ -356,6 +356,10 @@ label.label-normal {
     flex-wrap: wrap;
 }
 
+.import-sub-header-icon {
+    padding-right: 10px;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
@@ -715,4 +719,12 @@ table.table-samples td {
 /* User management */
 .attest-choice-text {
     text-decoration: underline;
+}
+
+.sub-text {
+    padding-left: 30px;
+}
+
+.bg-light {
+    background-color: #eeeeee!important;
 }

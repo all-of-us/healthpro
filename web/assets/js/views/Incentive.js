@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     var toggleFormFieldsRequired = function (idPrefix = '#incentive_create') {
         if ($(idPrefix + ' .incentive-declined').is(':checked')) {
-            $(idPrefix + ' input, select, textarea').removeAttr('required');
+            $(idPrefix + ' input, select, textarea').not('.incentive-date-given').removeAttr('required');
         } else {
             $(idPrefix + ' .toggle-required').attr('required', 'required');
         }
@@ -58,7 +58,6 @@ $(document).ready(function () {
     };
 
     var showHideIncentiveFormFields = function (idPrefix = '#incentive_create') {
-        toggleFormFieldsRequired(idPrefix);
         var incentiveFormSelect = $(idPrefix + ' select');
         var incentiveFormSelectDeclined = $(idPrefix + '_declined');
 
@@ -73,6 +72,8 @@ $(document).ready(function () {
         incentiveFormSelectDeclined.change(function () {
             toggleFormFieldsRequired(idPrefix);
         });
+
+        toggleFormFieldsRequired(idPrefix);
     };
 
     showHideIncentiveFormFields();

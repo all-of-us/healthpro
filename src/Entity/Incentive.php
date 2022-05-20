@@ -146,6 +146,11 @@ class Incentive
      */
     private $declined;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=IncentiveImport::class, inversedBy="incentives")
+     */
+    private $import;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -380,5 +385,17 @@ class Incentive
     public function getIncentiveAmountDisplayName()
     {
         return array_search($this->incentiveAmount, Incentive::$incentiveAmountChoices);
+    }
+
+    public function getImport(): ?IncentiveImport
+    {
+        return $this->import;
+    }
+
+    public function setImport(?IncentiveImport $import): self
+    {
+        $this->import = $import;
+
+        return $this;
     }
 }

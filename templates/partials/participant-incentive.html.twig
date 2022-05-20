@@ -91,7 +91,7 @@
                                 <dd>{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
                             <dt>Incentive Amount</dt>
-                            <dd>${{ incentive.incentiveAmount }}</dd>
+                            <dd>{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
                             <dt>Notes</dt>
                             <dd>{{ incentive.notes }}</dd>
                             <dt>Declined</dt>

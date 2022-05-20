@@ -22,7 +22,7 @@ class IncentiveType extends AbstractType
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date Incentive Given',
-                'required' => false,
+                'required' => true,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
                 'constraints' => [
@@ -65,7 +65,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if ($context->getRoot()['incentive_type']->getData() === 'gift_card' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === 'gift_card' && empty($value)) {
                             $context->buildViolation('Please specify type of gift card')->addViolation();
                         }
                     })
@@ -133,7 +133,7 @@ class IncentiveType extends AbstractType
                     })
                 ],
                 'getter' => function (Incentive $incentive) {
-                    if (!in_array($incentive->getIncentiveAmount(), Incentive::$incentiveAmountChoices)) {
+                    if ($incentive->getIncentiveAmount() && !in_array($incentive->getIncentiveAmount(), Incentive::$incentiveAmountChoices)) {
                         return 'other';
                     }
                     return $incentive->getIncentiveAmount();
@@ -159,7 +159,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('notes', Type\TextareaType::class, [
                 'label' => 'Notes',
-                'required' => $options['require_notes'],
+                'required' => false,
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Length(['max' => 285]),
