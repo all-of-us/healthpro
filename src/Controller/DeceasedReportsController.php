@@ -188,7 +188,7 @@ class DeceasedReportsController extends BaseController
     /**
      * @Route("/read/deceased-reports/{participantId}/check", name="read_deceased_report_check", requirements={"participantId"="P\d+"})
      */
-    public function deceasedReportCheck(ParticipantSummaryService $participantSummaryService, $participantId)
+    public function deceasedReportCheck(ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -201,6 +201,17 @@ class DeceasedReportsController extends BaseController
         if ($participant->suspensionStatus !== 'NOT_SUSPENDED') {
             $this->addFlash('error', 'Cannot create Deceased Report on deactivated participant.');
             return $this->redirectToRoute('read_participant', ['id' => $participantId]);
+        }
+        $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
+        $report = new DeceasedReport();
+        foreach ($reports as $record) {
+            if ($record->status === 'cancelled') {
+                continue;
+            }
+            $report = (new DeceasedReport())->loadFromFhirObservation($record);
+        }
+        if ($report->getId()) {
+            return $this->redirectToRoute('read_deceased_report_new', ['participantId' => $participantId]);
         }
         return $this->render('deceasedreports/check.html.twig', [
             'participant' => $participant
