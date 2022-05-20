@@ -135,12 +135,14 @@ class DeceasedReportsController extends BaseController
         return $this->render('deceasedreports/new.html.twig', [
             'participant' => $participant,
             'report' => $report,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
      * @Route("/deceased-reports/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
+     * @Route("/read/deceased-reports/{participantId}/history", name="read_deceased_report_history", requirements={"participantId"="P\d+"})
      */
     public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
@@ -191,11 +193,11 @@ class DeceasedReportsController extends BaseController
         }
         if ($participant->withdrawalStatus !== 'NOT_WITHDRAWN') {
             $this->addFlash('error', 'Cannot create Deceased Report on withdrawn participant.');
-            return $this->redirectToRoute('participant', ['id' => $participantId]);
+            return $this->redirectToRoute('read_participant', ['id' => $participantId]);
         }
         if ($participant->suspensionStatus !== 'NOT_SUSPENDED') {
             $this->addFlash('error', 'Cannot create Deceased Report on deactivated participant.');
-            return $this->redirectToRoute('participant', ['id' => $participantId]);
+            return $this->redirectToRoute('read_participant', ['id' => $participantId]);
         }
         return $this->render('deceasedreports/check.html.twig', [
             'participant' => $participant
