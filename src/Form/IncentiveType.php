@@ -21,7 +21,7 @@ class IncentiveType extends AbstractType
         $builder
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date Incentive Given',
+                'label' => 'Date of Service',
                 'required' => true,
                 'html5' => false,
                 'format' => 'MM/dd/yyyy',
@@ -33,7 +33,7 @@ class IncentiveType extends AbstractType
                     ]),
                     new Constraints\Callback(function ($value, $context) {
                         if (!$context->getRoot()['declined']->getData() && empty($value)) {
-                            $context->buildViolation('Please specify date incentive given')->addViolation();
+                            $context->buildViolation('Please specify date of service')->addViolation();
                         }
                     })
                 ],
