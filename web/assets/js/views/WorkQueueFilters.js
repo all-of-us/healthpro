@@ -72,6 +72,11 @@ $(document).ready(function () {
                 return false;
             }
         });
+
+        if ($("input[name='activityStatus']:checked").val() === 'withdrawn') {
+            $('.advanced-filter-btn').not('#filter_Status_btn').attr('disabled', true);
+            $('#enrollmentStatus_submenu, #patientStatus_submenu').removeClass('dropdown-submenu').addClass('disabled');
+        }
     };
 
     checkFilters();
