@@ -516,6 +516,10 @@ label.label-normal {
     padding: 10px 15px;
 }
 
+.advanced-filters li {
+    list-style: none;
+}
+
 .consent-columns .dropdown-menu {
     min-width: 350px;
 }
