@@ -166,4 +166,28 @@ class IncentiveImportService
         $this->em->clear();
         return $id;
     }
+
+    public function getAjaxData($incentiveImport, $incentiveImportRows)
+    {
+        $rows = [];
+        foreach ($incentiveImportRows as $incentiveImportRow) {
+            $row = [];
+            $row['participantId'] = $incentiveImportRow->getParticipantId();
+            $row['userEmail'] = $incentiveImportRow->getUserEmail();
+            $row['incentiveDateGiven'] = $incentiveImportRow->getIncentiveDateGiven() ? $incentiveImportRow->getIncentiveDateGiven()->format('n/j/Y') : '';
+            $row['incentiveType'] = $incentiveImportRow->getIncentiveType();
+            $row['otherIncentiveType'] = $incentiveImportRow->getOtherIncentiveType();
+            $row['incentiveOccurrence'] = $incentiveImportRow->getIncentiveOccurrence();
+            $row['otherIncentiveOccurrence'] = $incentiveImportRow->getOtherIncentiveOccurrence();
+            $row['incentiveAmount'] = $incentiveImportRow->getIncentiveAmount();
+            $row['giftCardType'] = $incentiveImportRow->getGiftCardType();
+            $row['notes'] = $incentiveImportRow->getNotes();
+            $row['declined'] = $incentiveImportRow->getDeclined();
+            $createdTs = $incentiveImport->getCreatedTs();
+            $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()))->format('n/j/Y g:ia');
+            $row['status'] = $incentiveImportRow->getRdrStatus();
+            array_push($rows, $row);
+        }
+        return $rows;
+    }
 }
