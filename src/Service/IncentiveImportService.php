@@ -182,7 +182,7 @@ class IncentiveImportService
             $row['incentiveAmount'] = $incentiveImportRow->getIncentiveAmount();
             $row['giftCardType'] = $incentiveImportRow->getGiftCardType();
             $row['notes'] = $incentiveImportRow->getNotes();
-            $row['declined'] = $incentiveImportRow->getDeclined();
+            $row['declined'] = $incentiveImportRow->getDeclined() ? 'yes' : 'no';
             $createdTs = $incentiveImport->getCreatedTs();
             $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()))->format('n/j/Y g:ia');
             $row['status'] = $incentiveImportRow->getRdrStatus();
