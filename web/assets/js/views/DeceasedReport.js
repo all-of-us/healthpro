@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('input:radio').on('change', function () {
+    $('input:radio[name=full-withdrawn]').on('change', function () {
         if ($('input:radio[name=full-withdrawn]').is(':checked')) {
             if ($('input:radio[name=full-withdrawn]:checked').val() === 'no') {
                 $('#deceased_check_continue').show();
