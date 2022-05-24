@@ -440,10 +440,10 @@ label.label-normal {
 #workqueue_consents_row .list-group-item.radio{
     margin-top: 0;
 }
-#workqueue_consents_row .parsley-errors-list {
+#filters .parsley-errors-list {
     margin-left: -36px
 }
-#workqueue_consents_row .parsley-errors-list li {
+#filters .parsley-errors-list li {
     list-style: none;
     color: #a94442;
 }
