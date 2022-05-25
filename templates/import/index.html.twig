@@ -1,0 +1,28 @@
+{% extends 'render-base.html.twig' %}
+{% block title %}Import - {% endblock %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li class="active">Imports</li>
+    </ol>
+
+    <div class="page-header">
+        <h2><i class="fa fa-upload" aria-hidden="true"></i> Imports</h2>
+    </div>
+    <div class="row home-menu row-equal-height">
+        <div class="col-sm-6 col-md-4">
+            <a href="{{ path('patientStatusImport') }}" class="btn btn-lg btn-default btn-block">
+                <i class="fa fa-hospital-user" aria-hidden="true"></i>
+                Patient Status Import
+                <div class="description">Upload .csv files of participant Patient Status in bulk.</div>
+            </a>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <a href="{{ path('incentiveImport') }}" class="btn btn-lg btn-default btn-block">
+                <i class="fa fa-hand-holding-usd" aria-hidden="true"></i>
+                Incentive Tracking Import
+                <div class="description">Upload .csv files of participant Incentive Tracking history in bulk.</div>
+            </a>
+        </div>
+    </div>
+{% endblock %}

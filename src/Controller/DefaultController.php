@@ -153,4 +153,12 @@ class DefaultController extends BaseController
         $session->invalidate();
         return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
+
+    /**
+     * @Route("/import", name="import_home")
+     */
+    public function importIndex()
+    {
+        return $this->render('import/index.html.twig');
+    }
 }
