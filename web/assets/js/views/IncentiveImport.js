@@ -1,9 +1,12 @@
 $(document).ready(function () {
     $('.incentive-import-status').DataTable({
-        order: [[0, 'asc']],
+        order: [[1, 'desc']],
         pageLength: 25,
         searching: false,
-        lengthChange: false
+        lengthChange: false,
+        columnDefs: [
+            {orderable: false, targets: 3}
+        ]
     });
 
     var tableColumns = [];
