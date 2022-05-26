@@ -2187,6 +2187,15 @@ class WorkQueue
         ]
     ];
 
+    public static $withdrawnParticipantFields = [
+        'activityStatus',
+        'organization',
+        'participantId',
+        'firstName',
+        'lastName',
+        'dateOfBirth'
+    ];
+
     public static function dateFromString($string, $timezone = null, $displayTime = true, $link = null)
     {
         if (!empty($string)) {

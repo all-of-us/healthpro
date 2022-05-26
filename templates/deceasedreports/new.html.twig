@@ -1,8 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}Deceased Participant {{ participant.participantId }} - {% endblock %}
 {% block body %}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     <div class="page-header">
-        <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path('participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
+        <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path(routePrefix ~ 'participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
     </div>
     
     {% include 'deceasedreports/_review-details.html.twig' %}
@@ -10,7 +11,7 @@
     {% if report.id %}
     <div class="alert alert-info">
       <div class="pull-right">
-        <a class="btn btn-sm btn-primary" href="{{ path('deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
+        <a class="btn btn-sm btn-primary" href="{{ path(routePrefix ~ 'deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
       </div>
       <div style="line-height:2em;">
         <i class="fas fa-info-circle"></i> There is already one or more Deceased Report for this Participant.
@@ -58,7 +59,7 @@
     <div class="row">
       <div class="col-sm-6">
         {{ form_widget(form.submit) }}
-        <a class="btn btn-default" href="{{ path('participant', { id: participant.participantId }) }}">Cancel</a>
+        <a class="btn btn-default" href="{{ path(routePrefix ~ 'participant', { id: participant.participantId }) }}">Cancel</a>
       </div>
     </div>
     {{ form_rest(form) }}

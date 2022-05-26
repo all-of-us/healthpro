@@ -1,11 +1,14 @@
 {% extends 'base.html.twig' %}
 {% block title %}Deceased Participant {{ participant.participantId }} - {% endblock %}
 {% block body %}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     <div class="page-header">
-        <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path('participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
+        <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path(routePrefix ~ 'participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
     </div>
 
-    <a href="{{ path('deceased_reports_index') }}">Return to Deceased Participants</a>
+    {% if not readOnlyView %}
+        <a href="{{ path('deceased_reports_index') }}">Return to Deceased Participants</a>
+    {% endif %}
 
     {% include 'deceasedreports/_review-details.html.twig' %}
 
@@ -56,7 +59,7 @@
       {% endif %}
     </dl>
 
-    {% if app.user.email != report.submittedBy and report.reportStatus == 'preliminary' %}
+    {% if not readOnlyView and app.user.email != report.submittedBy and report.reportStatus == 'preliminary' %}
     {{ form_start(form) }}
     
     {{ form_row(form.reportStatus) }}
