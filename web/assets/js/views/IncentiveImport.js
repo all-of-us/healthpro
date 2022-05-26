@@ -26,7 +26,8 @@ $(document).ready(function () {
         {name: 'status', data: 'status'}
     );
     var url = window.location.href;
-    $('#incentive-import-details').DataTable({
+    var importDetailsSelector = $('#incentive_import_details');
+    importDetailsSelector.DataTable({
         processing: true,
         serverSide: true,
         scrollX: true,
@@ -61,7 +62,7 @@ $(document).ready(function () {
         ]
     });
 
-    $('#incentive-import-details').tooltip({
+    importDetailsSelector.tooltip({
         selector: '[data-toggle="tooltip"]'
     });
 });

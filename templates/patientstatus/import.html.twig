@@ -26,7 +26,7 @@
         <div class="col-sm-8 col-md-9">
             {% if imports is not empty %}
                 <h4>Import Status</h4>
-                <table class="table table-striped table-bordered patient-status-import-status">
+                <table class="table table-striped table-bordered" id="patient_status_import_status">
                     <thead>
                     <tr>
                         <th>File Name</th>
@@ -93,4 +93,7 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('patient-status-import') }}
 {% endblock %}
