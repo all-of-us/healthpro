@@ -155,10 +155,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/import", name="import_home")
+     * @Route("/imports", name="imports_home")
      */
-    public function importIndex()
+    public function importsIndex()
     {
-        return $this->render('import/index.html.twig');
+        return $this->render('imports/index.html.twig');
     }
 }
