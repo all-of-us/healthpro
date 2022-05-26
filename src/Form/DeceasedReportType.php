@@ -32,6 +32,9 @@ class DeceasedReportType extends AbstractType
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
                     ])
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ]
             ])
             ->add('causeOfDeath', TextType::class, [

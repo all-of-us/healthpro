@@ -14,7 +14,8 @@
     </div>
     <div class="col-sm-3">
       <div style="margin-top: 1em; margin-bottom: 1em;">
-        <a class="btn btn-sm btn-block btn-primary" href="{{ path('deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
+        {% set routePrefix = readOnlyView ? 'read_' : '' %}
+        <a class="btn btn-sm btn-block btn-primary" href="{{ path(routePrefix ~ 'deceased_report_history', {participantId: participant.participantId}) }}">View Report(s)</a>
       </div>
     </div>
   </div>
