@@ -18,7 +18,7 @@ class IdVerificationType extends AbstractType
             'PM&B Initial Visit' => 'PMB_INITIAL_VISIT',
             'Physical Measurements Only' => 'PHYSICAL_MEASUREMENTS_ONLY',
             'Biospecimen Collection Only' => 'BIOSPECIMEN_COLLECTION_ONLY',
-            'Biospecimen Redraw' => 'BIOSPECIMEN_COLLECTION_ONLY',
+            'Biospecimen Redraw' => 'BIOSPECIMEN_REDRAW_ONLY',
             'Retention Activities' => 'RETENTION_ACTIVITIES',
         ]
     ];
