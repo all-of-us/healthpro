@@ -36,6 +36,7 @@
                 <small class="text-warning">Please provide a reason for amending this incentive.</small>
             {% endif %}
         </div>
+        {{ form_row(incentiveForm.declined, { 'id': incentiveId is defined ? 'incentive_edit_declined' : 'incentive_create_declined' }) }}
         {{ form_rest(incentiveForm) }}
         {% if not readOnlyView %}
             <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
@@ -73,7 +74,7 @@
                             <dd>{{ incentive.user.email }}</dd>
                             <dt>Site</dt>
                             <dd>{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
-                            <dt>Date Incentive Given</dt>
+                            <dt>Date of Service</dt>
                             <dd>{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
                             <dt>Incentive Occurrence</dt>
                             <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
@@ -90,9 +91,11 @@
                                 <dd>{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
                             <dt>Incentive Amount</dt>
-                            <dd>${{ incentive.incentiveAmount }}</dd>
+                            <dd>{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
                             <dt>Notes</dt>
                             <dd>{{ incentive.notes }}</dd>
+                            <dt>Declined</dt>
+                            <dd>{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                         </dl>
                         <hr/>
                     {% endfor %}

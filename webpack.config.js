@@ -52,6 +52,7 @@ Encore
     .addEntry('measurement-blood-donor-check', './web/assets/js/views/MeasurementBloodDonorCheck.js')
     .addEntry('incentive', './web/assets/js/views/Incentive.js')
     .addEntry('id-verification', './web/assets/js/views/IdVerification.js')
+    .addEntry('incentive-import', './web/assets/js/views/IncentiveImport.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
