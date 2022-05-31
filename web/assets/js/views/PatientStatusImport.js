@@ -1,9 +1,4 @@
 $(document).ready(function () {
-    // Ignore non-workqeue pages.
-    if (!$('#patient-status-import-details').length) {
-        return;
-    }
-
     var tableColumns = [];
     tableColumns.push(
         {name: 'participantId', data: 'participantId'},
@@ -14,7 +9,8 @@ $(document).ready(function () {
         {name: 'status', data: 'status'}
     );
     var url = window.location.href;
-    $('table').DataTable({
+    var importDetailsTableSelector = $('#patient_status_import_details');
+    importDetailsTableSelector.DataTable({
         processing: true,
         serverSide: true,
         scrollX: true,
@@ -49,7 +45,17 @@ $(document).ready(function () {
         ]
     });
 
-    $('table').tooltip({
+    importDetailsTableSelector.tooltip({
         selector: '[data-toggle="tooltip"]'
+    });
+
+    $('#patient_status_import_status').DataTable({
+        order: [[1, 'desc']],
+        pageLength: 25,
+        searching: false,
+        lengthChange: false,
+        columnDefs: [
+            {orderable: false, targets: 4}
+        ]
     });
 });
