@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\IncentiveService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\PatientStatusService;
@@ -195,6 +196,15 @@ class CronController extends BaseController
             }
         }
         $this->em->flush();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/send-incentives-rdr", name="cron_send_incentives_rdr")
+     */
+    public function sendIncentivesToRdrAction(IncentiveService $incentiveService)
+    {
+        $incentiveService->sendIncentivesToRdr();
         return $this->json(['success' => true]);
     }
 }
