@@ -115,7 +115,7 @@ class DeceasedReportsController extends BaseController
             }
             $report = (new DeceasedReport())->loadFromFhirObservation($record);
         }
-        $form = $this->createForm(DeceasedReportType::class, $report, ['disabled' => (bool) $report->getId(), 'readOnly' => $this->isReadOnly()]);
+        $form = $this->createForm(DeceasedReportType::class, $report, ['disabled' => (bool) $report->getId()]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $report = $form->getData();

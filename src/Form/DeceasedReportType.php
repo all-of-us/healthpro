@@ -18,21 +18,6 @@ class DeceasedReportType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $reportMechanismOptions = [
-            'label' => 'Notification Mechanism',
-            'choices' => [
-                'Electronic Health Record (EHR)' => 'EHR',
-                'Attempted to contact participant' => 'ATTEMPTED_CONTACT',
-                'Next of kin contacted HPO' => 'NEXT_KIN_HPO',
-                'Next of kin contacted Support Center' => 'NEXT_KIN_SUPPORT',
-                'Other' => 'OTHER'
-            ],
-            'expanded' => true,
-            'required' => true
-        ];
-        if ($options['readOnly']) {
-            $reportMechanismOptions['data'] = 'NEXT_KIN_SUPPORT';
-        }
         $builder
             ->add('dateOfDeath', DateType::class, [
                 'widget' => 'single_text',
@@ -57,7 +42,18 @@ class DeceasedReportType extends AbstractType
                 'required' => false,
                 'help' => 'Please do not enter PII or the participant’s PMID when describing the cause of death. Do NOT prompt reporter for this information and only enter if offered.'
             ])
-            ->add('reportMechanism', ChoiceType::class, $reportMechanismOptions)
+            ->add('reportMechanism', ChoiceType::class, [
+                'label' => 'Notification Mechanism',
+                'choices' => [
+                    'Electronic Health Record (EHR)' => 'EHR',
+                    'Attempted to contact participant' => 'ATTEMPTED_CONTACT',
+                    'Next of kin contacted HPO' => 'NEXT_KIN_HPO',
+                    'Next of kin contacted Support Center' => 'NEXT_KIN_SUPPORT',
+                    'Other' => 'OTHER'
+                ],
+                'expanded' => true,
+                'required' => true
+            ])
             ->add('nextOfKinName', TextType::class, [
                 'label' => 'Next of kin\'s full name',
                 'required' => false
@@ -107,8 +103,7 @@ class DeceasedReportType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DeceasedReport::class,
-            'attr' => ['data-parsley-validate' => true],
-            'readOnly' => false
+            'attr' => ['data-parsley-validate' => true]
         ]);
     }
 }
