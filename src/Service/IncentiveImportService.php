@@ -253,7 +253,7 @@ class IncentiveImportService
 
     public function getIncentiveFromImportData($importData, $incentiveImport): Incentive
     {
-        $incentive = new Incentive;
+        $incentive = new Incentive();
         if ($importData['incentive_date_given']) {
             $incentiveGivenDate = new \DateTime($importData['incentive_date_given']);
             $incentive->setIncentiveDateGiven($incentiveGivenDate);
