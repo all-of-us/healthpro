@@ -3,12 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Incentive;
-use App\Entity\IncentiveImport;
-use App\Entity\IncentiveImportRow;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class IncentiveService
 {
@@ -17,25 +13,19 @@ class IncentiveService
     protected $userService;
     protected $em;
     protected $loggerService;
-    protected $params;
-    protected $logger;
 
     public function __construct(
         RdrApiService $rdrApiService,
         SiteService $siteService,
         UserService $userService,
         EntityManagerInterface $em,
-        LoggerService $loggerService,
-        ParameterBagInterface $params,
-        LoggerInterface $logger
+        LoggerService $loggerService
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
         $this->userService = $userService;
         $this->em = $em;
         $this->loggerService = $loggerService;
-        $this->params = $params;
-        $this->logger = $logger;
     }
 
     public function getRdrObject($incentive, $type = Incentive::CREATE)
@@ -155,37 +145,5 @@ class IncentiveService
             $participant->statusReason !== 'withdrawal' &&
             $participant->statusReason !== 'test-participant' &&
             !$this->siteService->isTestSite();
-    }
-
-    public function sendIncentivesToRdr()
-    {
-        $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
-        $incentiveImports = $this->em->getRepository(IncentiveImportRow::class)->getIncentiveImportRows($limit);
-        $importIds = [];
-        foreach ($incentiveImports as $incentiveImport) {
-            if (!in_array($incentiveImport['import_id'], $importIds)) {
-                $importIds[] = $incentiveImport['import_id'];
-            }
-            $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($incentiveImport['id']);
-            if (!empty($incentiveImportRow)) {
-                if ($this->createIncentive($incentiveImportRow->getParticipantId(), $incentiveImportRow)) {
-                    $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_SUCCESS);
-                    $this->em->persist($incentiveImportRow);
-                    $this->em->flush();
-                } else {
-                    $this->logger->error("#{$incentiveImport['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
-                    $rdrStatus = IncentiveImport::STATUS_OTHER_RDR_ERRORS;
-                    if ($this->rdrApiService->getLastErrorCode() === 400) {
-                        $rdrStatus = IncentiveImport::STATUS_INVALID_PARTICIPANT_ID;
-                    } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
-                        $rdrStatus = IncentiveImport::STATUS_RDR_INTERNAL_SERVER_ERROR;
-                    }
-                    $incentiveImportRow->setRdrStatus($rdrStatus);
-                    $this->em->persist($incentiveImportRow);
-                    $this->em->flush();
-                }
-            }
-        }
-        // TODO Update import status
     }
 }

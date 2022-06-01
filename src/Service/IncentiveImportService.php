@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Psr\Log\LoggerInterface;
 
 class IncentiveImportService
 {
@@ -21,19 +22,28 @@ class IncentiveImportService
     protected $params;
     protected $loggerService;
     protected $session;
+    protected $rdrApiService;
+    protected $logger;
+    protected $incentiveService;
 
     public function __construct(
         UserService $userService,
         EntityManagerInterface $em,
         ParameterBagInterface $params,
         LoggerService $loggerService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        RdrApiService $rdrApiService,
+        LoggerInterface $logger,
+        IncentiveService $incentiveService
     ) {
         $this->userService = $userService;
         $this->em = $em;
         $this->params = $params;
         $this->loggerService = $loggerService;
         $this->session = $requestStack->getSession();
+        $this->rdrApiService = $rdrApiService;
+        $this->logger = $logger;
+        $this->incentiveService = $incentiveService;
     }
 
     public function extractCsvFileData($file, $form)
@@ -189,5 +199,99 @@ class IncentiveImportService
             array_push($rows, $row);
         }
         return $rows;
+    }
+
+    public function sendIncentive($participantId, $incentive, $user): bool
+    {
+        $postData = $this->incentiveService->getRdrObject($incentive);
+        try {
+            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->incentiveId)) {
+                $incentive->setUser($user);
+                $incentive->setRdrId($result->incentiveId);
+                $this->em->persist($incentive);
+                $this->loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function sendIncentivesToRdr(): void
+    {
+        $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
+        $importRows = $this->em->getRepository(IncentiveImportRow::class)->getIncentiveImportRows($limit);
+        foreach ($importRows as $importRow) {
+            $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRow['import_id']);
+            $incentive = $this->getIncentiveFromImportData($importRow, $incentiveImport);
+            // TODO check if user entity exists
+            $user = $this->userService->getUserEntityFromEmail($importRow['user_email']);
+            $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($importRow['id']);
+            if ($this->sendIncentive($importRow['participant_id'], $incentive, $user)) {
+                $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_SUCCESS);
+                $this->em->persist($incentiveImportRow);
+                $this->em->flush();
+            } else {
+                $this->logger->error("#{$importRow['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
+                $rdrStatus = IncentiveImport::STATUS_OTHER_RDR_ERRORS;
+                if ($this->rdrApiService->getLastErrorCode() === 404) {
+                    $rdrStatus = IncentiveImport::STATUS_INVALID_PARTICIPANT_ID;
+                } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
+                    $rdrStatus = IncentiveImport::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                }
+                $incentiveImportRow->setRdrStatus($rdrStatus);
+                $this->em->persist($incentiveImportRow);
+                $this->em->flush();
+            }
+        }
+        // TODO Update import status
+    }
+
+    public function getIncentiveFromImportData($importData, $incentiveImport): Incentive
+    {
+        $incentive = new Incentive;
+        if ($importData['incentive_date_given']) {
+            $incentiveGivenDate = new \DateTime($importData['incentive_date_given']);
+            $incentive->setIncentiveDateGiven($incentiveGivenDate);
+        }
+        if ($importData['incentive_type']) {
+            $incentive->setIncentiveType($importData['incentive_type']);
+        }
+        if ($importData['other_incentive_type']) {
+            $incentive->setOtherIncentiveType($importData['other_incentive_type']);
+        }
+        if ($importData['incentive_occurrence']) {
+            $incentive->setIncentiveOccurrence($importData['incentive_occurrence']);
+        }
+        if ($importData['other_incentive_occurrence']) {
+            $incentive->setOtherIncentiveOccurrence($importData['other_incentive_occurrence']);
+        }
+        if ($importData['incentive_amount']) {
+            if ($importData['incentive_amount'] === 'other') {
+                $incentive->setIncentiveAmount($importData['other_incentive_amount']);
+            } else {
+                $incentive->setIncentiveAmount($importData['incentive_amount']);
+            }
+        }
+        if ($importData['gift_card_type']) {
+            $incentive->setGiftCardType($importData['gift_card_type']);
+        }
+        if ($importData['notes']) {
+            $incentive->setNotes($importData['notes']);
+        }
+        if ($importData['incentive_type'] === 'promotional') {
+            $incentive->setIncentiveAmount(0);
+        }
+        $incentive->setDeclined($importData['declined']);
+        $incentive->setImport($incentiveImport);
+        $now = new \DateTime();
+        $incentive->setParticipantId($importData['participant_id']);
+        $incentive->setCreatedTs($now);
+        $incentive->setSite($importData['site']);
+        return $incentive;
     }
 }

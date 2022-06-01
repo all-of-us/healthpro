@@ -7,7 +7,7 @@ use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
-use App\Service\IncentiveService;
+use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\PatientStatusService;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/cron", condition="request.headers.get('X-Appengine-Cron') === 'true'")
+ * @Route("/cron")
  */
 class CronController extends BaseController
 {
@@ -202,9 +202,9 @@ class CronController extends BaseController
     /**
      * @Route("/send-incentives-rdr", name="cron_send_incentives_rdr")
      */
-    public function sendIncentivesToRdrAction(IncentiveService $incentiveService)
+    public function sendIncentivesToRdrAction(IncentiveImportService $incentiveImportService)
     {
-        $incentiveService->sendIncentivesToRdr();
+        $incentiveImportService->sendIncentivesToRdr();
         return $this->json(['success' => true]);
     }
 }
