@@ -242,7 +242,7 @@ class IncentiveImportService
                         } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
                             $rdrStatus = IncentiveImport::STATUS_RDR_INTERNAL_SERVER_ERROR;
                         }
-                        $incentiveImportRow->setRdrStatus($rdrSitatus);
+                        $incentiveImportRow->setRdrStatus($rdrStatus);
                     }
                 } else {
                     $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_INVALID_USER);
