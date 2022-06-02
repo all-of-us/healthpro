@@ -228,22 +228,25 @@ class IncentiveImportService
         foreach ($importRows as $importRow) {
             $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRow['import_id']);
             $incentive = $this->getIncentiveFromImportData($importRow, $incentiveImport);
-            // TODO check if user entity exists
             $user = $this->userService->getUserEntityFromEmail($importRow['user_email']);
             $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($importRow['id']);
-            if ($this->sendIncentive($importRow['participant_id'], $incentive, $user)) {
-                $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_SUCCESS);
-                $this->em->persist($incentiveImportRow);
-                $this->em->flush();
-            } else {
-                $this->logger->error("#{$importRow['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
-                $rdrStatus = IncentiveImport::STATUS_OTHER_RDR_ERRORS;
-                if ($this->rdrApiService->getLastErrorCode() === 404) {
-                    $rdrStatus = IncentiveImport::STATUS_INVALID_PARTICIPANT_ID;
-                } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
-                    $rdrStatus = IncentiveImport::STATUS_RDR_INTERNAL_SERVER_ERROR;
+            if ($incentiveImportRow) {
+                if ($user) {
+                    if ($this->sendIncentive($importRow['participant_id'], $incentive, $user)) {
+                        $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_SUCCESS);
+                    } else {
+                        $this->logger->error("#{$importRow['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
+                        $rdrStatus = IncentiveImport::STATUS_OTHER_RDR_ERRORS;
+                        if ($this->rdrApiService->getLastErrorCode() === 404) {
+                            $rdrStatus = IncentiveImport::STATUS_INVALID_PARTICIPANT_ID;
+                        } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
+                            $rdrStatus = IncentiveImport::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                        }
+                        $incentiveImportRow->setRdrStatus($rdrSitatus);
+                    }
+                } else {
+                    $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_INVALID_USER);
                 }
-                $incentiveImportRow->setRdrStatus($rdrStatus);
                 $this->em->persist($incentiveImportRow);
                 $this->em->flush();
             }

@@ -21,6 +21,7 @@ class IncentiveImport
     public const STATUS_INVALID_PARTICIPANT_ID = 2;
     public const STATUS_RDR_INTERNAL_SERVER_ERROR = 3;
     public const STATUS_OTHER_RDR_ERRORS = 4;
+    public const STATUS_INVALID_USER = 5;
 
     /**
      * @ORM\Id
