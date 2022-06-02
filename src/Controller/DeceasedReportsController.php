@@ -109,6 +109,9 @@ class DeceasedReportsController extends BaseController
         }
         $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
         $report = new DeceasedReport();
+        if ($this->isReadOnly()) {
+            $report->setReportMechanism('NEXT_KIN_SUPPORT');
+        }
         foreach ($reports as $record) {
             if ($record->status === 'cancelled') {
                 continue;
