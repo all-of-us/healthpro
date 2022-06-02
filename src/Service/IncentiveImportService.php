@@ -107,6 +107,9 @@ class IncentiveImportService
             if ($data[8] === 'other') {
                 $incentive['incentive_amount'] = $data[9];
             }
+            if ($data[5] === 'promotional') {
+                $incentive['incentive_amount'] = 0;
+            }
             if ($data[10] === 'yes') {
                 $incentive['declined'] = true;
             } else {
@@ -278,20 +281,13 @@ class IncentiveImportService
             $incentive->setOtherIncentiveOccurrence($importData['other_incentive_occurrence']);
         }
         if ($importData['incentive_amount']) {
-            if ($importData['incentive_amount'] === 'other') {
-                $incentive->setIncentiveAmount($importData['other_incentive_amount']);
-            } else {
-                $incentive->setIncentiveAmount($importData['incentive_amount']);
-            }
+            $incentive->setIncentiveAmount($importData['incentive_amount']);
         }
         if ($importData['gift_card_type']) {
             $incentive->setGiftCardType($importData['gift_card_type']);
         }
         if ($importData['notes']) {
             $incentive->setNotes($importData['notes']);
-        }
-        if ($importData['incentive_type'] === 'promotional') {
-            $incentive->setIncentiveAmount(0);
         }
         $incentive->setDeclined($importData['declined']);
         $incentive->setImport($incentiveImport);
