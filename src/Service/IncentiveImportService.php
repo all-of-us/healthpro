@@ -225,7 +225,11 @@ class IncentiveImportService
     {
         $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
         $importRows = $this->em->getRepository(IncentiveImportRow::class)->getIncentiveImportRows($limit);
+        $importIds = [];
         foreach ($importRows as $importRow) {
+            if (!in_array($importRow['import_id'], $importIds)) {
+                $importIds[] = $importRow['import_id'];
+            }
             $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRow['import_id']);
             $incentive = $this->getIncentiveFromImportData($importRow, $incentiveImport);
             $user = $this->userService->getUserEntityFromEmail($importRow['user_email']);
@@ -233,25 +237,25 @@ class IncentiveImportService
             if ($incentiveImportRow) {
                 if ($user) {
                     if ($this->sendIncentive($importRow['participant_id'], $incentive, $user)) {
-                        $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_SUCCESS);
+                        $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_SUCCESS);
                     } else {
                         $this->logger->error("#{$importRow['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
-                        $rdrStatus = IncentiveImport::STATUS_OTHER_RDR_ERRORS;
+                        $rdrStatus = IncentiveImportRow::STATUS_OTHER_RDR_ERRORS;
                         if ($this->rdrApiService->getLastErrorCode() === 404) {
-                            $rdrStatus = IncentiveImport::STATUS_INVALID_PARTICIPANT_ID;
+                            $rdrStatus = IncentiveImportRow::STATUS_INVALID_PARTICIPANT_ID;
                         } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
-                            $rdrStatus = IncentiveImport::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                            $rdrStatus = IncentiveImportRow::STATUS_RDR_INTERNAL_SERVER_ERROR;
                         }
                         $incentiveImportRow->setRdrStatus($rdrStatus);
                     }
                 } else {
-                    $incentiveImportRow->setRdrStatus(IncentiveImport::STATUS_INVALID_USER);
+                    $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_INVALID_USER);
                 }
                 $this->em->persist($incentiveImportRow);
                 $this->em->flush();
             }
         }
-        // TODO Update import status
+        $this->updateImportStatus($importIds);
     }
 
     public function getIncentiveFromImportData($importData, $incentiveImport): Incentive
@@ -296,5 +300,32 @@ class IncentiveImportService
         $incentive->setCreatedTs($now);
         $incentive->setSite($importData['site']);
         return $incentive;
+    }
+
+    private function updateImportStatus($importIds): void
+    {
+        foreach ($importIds as $importId) {
+            $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importId);
+            if (!empty($incentiveImport)) {
+                $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
+                    'import' => $incentiveImport,
+                    'rdrStatus' => 0
+                ]);
+                if (empty($incentiveImportRows)) {
+                    $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
+                        'import' => $incentiveImport,
+                        'rdrStatus' => [2, 3, 4, 5]
+                    ]);
+                    if (!empty($incentiveImportRows)) {
+                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE_WITH_ERRORS);
+                    } else {
+                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE);
+                    }
+                    $this->em->persist($incentiveImport);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
+                }
+            }
+        }
     }
 }
