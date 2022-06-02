@@ -207,4 +207,13 @@ class CronController extends BaseController
         $incentiveImportService->sendIncentivesToRdr();
         return $this->json(['success' => true]);
     }
+
+    /**
+     * @Route("/delete-unconfirmed-incentives-import-data", name="cron_delete_unconfirmed_patient_status_import_data")
+     */
+    public function deleteUnconfimedIncentivesImportDataAction(IncentiveImportService $incentiveImportService)
+    {
+        $incentiveImportService->deleteUnconfirmedImportData();
+        return $this->json(['success' => true]);
+    }
 }

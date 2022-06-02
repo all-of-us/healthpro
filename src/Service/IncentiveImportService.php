@@ -324,4 +324,11 @@ class IncentiveImportService
             }
         }
     }
+
+    public function deleteUnconfirmedImportData(): void
+    {
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->em->getRepository(IncentiveImportRow::class)->deleteUnconfirmedImportData($date);
+    }
 }
