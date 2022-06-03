@@ -346,10 +346,10 @@ class IncentiveImportService
         $this->em->getRepository(IncentiveImportRow::class)->deleteUnconfirmedImportData($date);
     }
 
-    public function getRdrObject($incentive, $email)
+    public function getRdrObject($incentive, $user)
     {
         $obj = new \StdClass();
-        $obj->createdBy = $email;
+        $obj->createdBy = $user ? $user->getEmail() : '';
         $obj->site = $this->siteService->getSiteWithPrefix($incentive->getSite());
         $obj->dateGiven = $incentive->getIncentiveDateGiven();
         $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
