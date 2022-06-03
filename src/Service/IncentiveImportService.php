@@ -86,6 +86,9 @@ class IncentiveImportService
             if (!in_array($data[8], array_values(Incentive::$incentiveAmountChoices))) {
                 $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
             }
+            if (empty($data[2])) {
+                $form['incentive_csv']->addError(new FormError("Please enter date in line {$row}, column 3"));
+            }
             if ($data[3] === 'other' && empty($data[4])) {
                 $form['incentive_csv']->addError(new FormError("Please enter other occurrence in line {$row}, column 5"));
             }
