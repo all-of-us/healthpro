@@ -2,7 +2,9 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\Incentive;
 use App\Entity\IncentiveImport;
+use App\Entity\User;
 use App\Form\IncentiveImportFormType;
 use App\Service\IncentiveImportService;
 use App\Service\SiteService;
@@ -124,5 +126,40 @@ class IncentiveImportServiceTest extends ServiceTestCase
                 ]
             ]
         ];
+    }
+
+    public function testRdrObject(): void
+    {
+        $incentive = $this->createIncentive();
+        $rdrObject = $this->service->getRdrObject($incentive, $this->getUser());
+        self::assertEquals('test@example.com', $rdrObject->createdBy);
+        self::assertEquals('hpo-site-test', $rdrObject->site);
+        self::assertEquals('redraw', $rdrObject->occurrence);
+        self::assertEquals(new \DateTime('2022-06-03'), $rdrObject->dateGiven);
+        self::assertEquals('redraw', $rdrObject->occurrence);
+        self::assertEquals('gift_card', $rdrObject->incentiveType);
+        self::assertEquals('target', $rdrObject->giftcardType);
+        self::assertEquals(15, $rdrObject->amount);
+    }
+
+    private function createIncentive(): Incentive
+    {
+        $incentive = new Incentive();
+        $incentive
+            ->setCreatedTs(new \DateTime())
+            ->setIncentiveDateGiven(new \DateTime('2022-06-03'))
+            ->setOtherIncentiveOccurrence('redraw')
+            ->setOtherIncentiveType('gift_card')
+            ->setGiftCardType('target')
+            ->setIncentiveAmount(15)
+            ->setSite('test');
+        return $incentive;
+    }
+
+    protected function getUser(): User
+    {
+        $user = new User();
+        $user->setEmail('test@example.com');
+        return $user;
     }
 }
