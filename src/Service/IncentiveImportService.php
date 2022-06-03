@@ -256,6 +256,7 @@ class IncentiveImportService
                 }
                 $this->em->persist($incentiveImportRow);
                 $this->em->flush();
+                $this->em->clear();
             }
         }
         $this->updateImportStatus($importIds);
