@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\IncentiveImport;
 use App\Form\IncentiveImportFormType;
 use App\Service\IncentiveImportService;
 use App\Service\SiteService;
@@ -70,5 +71,58 @@ class IncentiveImportServiceTest extends ServiceTestCase
     {
         $fileName = __DIR__ . '/data/' . $fileName;
         return new UploadedFile($fileName, 'incentive_import.csv', 'text/csv', null, true);
+    }
+
+    /**
+     * @dataProvider incentiveImportDataProvider
+     */
+    public function testGetIncentiveFromImportData($importData)
+    {
+        $incentive = $this->service->getIncentiveFromImportData($importData, new IncentiveImport());
+        $this->assertEquals($incentive->getIncentiveDateGiven(), new \Datetime($importData['incentive_date_given']));
+        $this->assertEquals($incentive->getIncentiveType(), $importData['incentive_type']);
+        $this->assertEquals($incentive->getOtherIncentiveType(), $importData['other_incentive_type']);
+        $this->assertEquals($incentive->getIncentiveOccurrence(), $importData['incentive_occurrence']);
+        $this->assertEquals($incentive->getOtherIncentiveOccurrence(), $importData['other_incentive_occurrence']);
+        $this->assertEquals($incentive->getIncentiveAmount(), $importData['incentive_amount']);
+        $this->assertEquals($incentive->getGiftCardType(), $importData['gift_card_type']);
+        $this->assertEquals($incentive->getNotes(), $importData['notes']);
+        $this->assertEquals($incentive->getDeclined(), $importData['declined']);
+        $this->assertEquals($incentive->getParticipantId(), $importData['participant_id']);
+        $this->assertEquals($incentive->getSite(), $importData['site']);
+    }
+
+    public function incentiveImportDataProvider()
+    {
+        return [
+            [
+                [
+                    'incentive_date_given' => '06/03/2022',
+                    'incentive_type' => 'cash',
+                    'other_incentive_type' => '',
+                    'incentive_occurrence' => 'one_time',
+                    'other_incentive_occurrence' => '',
+                    'incentive_amount' => 15,
+                    'gift_card_type' => '',
+                    'notes' => '',
+                    'declined' => 0,
+                    'participant_id' => 'P123456789',
+                    'site' => 'test-site1'
+                ],
+                [
+                    'incentive_date_given' => '06/03/2022',
+                    'incentive_type' => 'promotional',
+                    'other_incentive_type' => '',
+                    'incentive_occurrence' => 'redraw',
+                    'other_incentive_occurrence' => '',
+                    'incentive_amount' => 0,
+                    'gift_card_type' => '',
+                    'notes' => 'Test notes',
+                    'declined' => 1,
+                    'participant_id' => 'P123456799',
+                    'site' => 'test-site2'
+                ]
+            ]
+        ];
     }
 }
