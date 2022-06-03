@@ -35,6 +35,7 @@ $(document).ready(function () {
                         if (status === 2) {
                             return html + ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Invalid Participant Id"></i>';
                         }
+                        return html;
                     }
                 }
             },
