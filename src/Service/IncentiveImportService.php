@@ -25,6 +25,7 @@ class IncentiveImportService
     protected $rdrApiService;
     protected $logger;
     protected $incentiveService;
+    protected $siteService;
 
     public function __construct(
         UserService $userService,
@@ -34,7 +35,8 @@ class IncentiveImportService
         RequestStack $requestStack,
         RdrApiService $rdrApiService,
         LoggerInterface $logger,
-        IncentiveService $incentiveService
+        IncentiveService $incentiveService,
+        SiteService $siteService
     ) {
         $this->userService = $userService;
         $this->em = $em;
@@ -44,6 +46,7 @@ class IncentiveImportService
         $this->rdrApiService = $rdrApiService;
         $this->logger = $logger;
         $this->incentiveService = $incentiveService;
+        $this->siteService = $siteService;
     }
 
     public function extractCsvFileData($file, $form)
@@ -71,7 +74,7 @@ class IncentiveImportService
             if ($this->hasDuplicateParticipantId($incentives, $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            if (!$this->isValidEmail($data[1])) {
+            if ($data[1] && !$this->isValidEmail($data[1])) {
                 $form['incentive_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
             if (!in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
@@ -206,7 +209,7 @@ class IncentiveImportService
 
     public function sendIncentive($participantId, $incentive, $user): bool
     {
-        $postData = $this->incentiveService->getRdrObject($incentive);
+        $postData = $this->getRdrObject($incentive, $user);
         try {
             $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
             $result = json_decode($response->getBody()->getContents());
@@ -235,10 +238,17 @@ class IncentiveImportService
             }
             $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRow['import_id']);
             $incentive = $this->getIncentiveFromImportData($importRow, $incentiveImport);
-            $user = $this->userService->getUserEntityFromEmail($importRow['user_email']);
+            $validUser = true;
+            $user = null;
+            if ($importRow['user_email']) {
+                $user = $this->userService->getUserEntityFromEmail($importRow['user_email']);
+                if ($user === null) {
+                    $validUser = false;
+                }
+            }
             $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($importRow['id']);
             if ($incentiveImportRow) {
-                if ($user) {
+                if ($validUser) {
                     if ($this->sendIncentive($importRow['participant_id'], $incentive, $user)) {
                         $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_SUCCESS);
                     } else {
@@ -331,5 +341,22 @@ class IncentiveImportService
         $date = (new \DateTime('UTC'))->modify('-1 hours');
         $date = $date->format('Y-m-d H:i:s');
         $this->em->getRepository(IncentiveImportRow::class)->deleteUnconfirmedImportData($date);
+    }
+
+    public function getRdrObject($incentive, $email)
+    {
+        $obj = new \StdClass();
+        $obj->createdBy = $email;
+        $obj->site = $this->siteService->getSiteWithPrefix($incentive->getSite());
+        $obj->dateGiven = $incentive->getIncentiveDateGiven();
+        $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
+        $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
+        if ($incentive->getGiftCardType()) {
+            $obj->giftcardType = $incentive->getGiftCardType();
+        }
+        $obj->amount = $incentive->getIncentiveAmount();
+        $obj->notes = $incentive->getNotes();
+        $obj->declined = $incentive->getDeclined();
+        return $obj;
     }
 }

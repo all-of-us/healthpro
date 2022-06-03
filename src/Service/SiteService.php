@@ -315,4 +315,9 @@ class SiteService
     {
         return $this->requestStack->getSession()->get('siteState') === self::CABOR_STATE ? true : false;
     }
+
+    public function getSiteWithPrefix($siteId): string
+    {
+        return \App\Security\User::SITE_PREFIX . $siteId;
+    }
 }

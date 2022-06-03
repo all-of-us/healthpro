@@ -76,7 +76,7 @@
                                 {% endif %}
                             </dd>
                             <dt>User</dt>
-                            <dd>{{ incentive.user.email }}</dd>
+                            <dd>{{ incentive.user ? incentive.user.email : '' }}</dd>
                             <dt>Site</dt>
                             <dd>{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
                             <dt>Date of Service</dt>
