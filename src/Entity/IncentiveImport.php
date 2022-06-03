@@ -15,6 +15,7 @@ class IncentiveImport
     public function __construct()
     {
         $this->incentiveImportRows = new ArrayCollection();
+        $this->idVerificationImportRows = new ArrayCollection();
     }
 
     /**
@@ -58,6 +59,11 @@ class IncentiveImport
      * @ORM\OneToMany(targetEntity="IncentiveImportRow", mappedBy="import", cascade={"persist", "remove"})
      */
     private $incentiveImportRows;
+
+    /**
+     * @ORM\OneToMany(targetEntity=IdVerificationImportRow::class, mappedBy="import")
+     */
+    private $idVerificationImportRows;
 
     public function getId(): ?int
     {
@@ -161,6 +167,36 @@ class IncentiveImport
             // set the owning side to null (unless already changed)
             if ($incentiveImportRow->getImport()->getId() === $this->getId()) {
                 $incentiveImportRow->setImport(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|IdVerificationImportRow[]
+     */
+    public function getIdVerificationImportRows(): Collection
+    {
+        return $this->idVerificationImportRows;
+    }
+
+    public function addIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
+    {
+        if (!$this->idVerificationImportRows->contains($idVerificationImportRow)) {
+            $this->idVerificationImportRows[] = $idVerificationImportRow;
+            $idVerificationImportRow->setImport($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
+    {
+        if ($this->idVerificationImportRows->removeElement($idVerificationImportRow)) {
+            // set the owning side to null (unless already changed)
+            if ($idVerificationImportRow->getImport() === $this) {
+                $idVerificationImportRow->setImport(null);
             }
         }
 
