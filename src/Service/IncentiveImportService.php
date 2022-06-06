@@ -210,7 +210,7 @@ class IncentiveImportService
         return $rows;
     }
 
-    public function sendIncentive($participantId, $incentive, $user): bool
+    private function sendIncentive($participantId, $incentive, $user): bool
     {
         $postData = $this->getRdrObject($incentive, $user);
         try {
