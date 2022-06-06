@@ -236,26 +236,28 @@ class IncentiveImportService
         $importRows = $this->em->getRepository(IncentiveImportRow::class)->getIncentiveImportRows($limit);
         $importIds = [];
         foreach ($importRows as $importRow) {
-            if (!in_array($importRow['import_id'], $importIds)) {
-                $importIds[] = $importRow['import_id'];
+            $importRowData = $importRow[0];
+            $importRowData['site'] = $importRow['site'];
+            if (!in_array($importRowData['import_id'], $importIds)) {
+                $importIds[] = $importRowData['import_id'];
             }
-            $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRow['import_id']);
-            $incentive = $this->getIncentiveFromImportData($importRow, $incentiveImport);
+            $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRowData['import_id']);
+            $incentive = $this->getIncentiveFromImportData($importRowData, $incentiveImport);
             $validUser = true;
             $user = null;
-            if ($importRow['user_email']) {
-                $user = $this->userService->getUserEntityFromEmail($importRow['user_email']);
+            if ($importRowData['userEmail']) {
+                $user = $this->userService->getUserEntityFromEmail($importRowData['userEmail']);
                 if ($user === null) {
                     $validUser = false;
                 }
             }
-            $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($importRow['id']);
+            $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($importRowData['id']);
             if ($incentiveImportRow) {
                 if ($validUser) {
-                    if ($this->sendIncentive($importRow['participant_id'], $incentive, $user)) {
+                    if ($this->sendIncentive($importRowData['participantId'], $incentive, $user)) {
                         $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_SUCCESS);
                     } else {
-                        $this->logger->error("#{$importRow['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
+                        $this->logger->error("#{$importRowData['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
                         $rdrStatus = IncentiveImportRow::STATUS_OTHER_RDR_ERRORS;
                         if ($this->rdrApiService->getLastErrorCode() === 404) {
                             $rdrStatus = IncentiveImportRow::STATUS_INVALID_PARTICIPANT_ID;
@@ -278,27 +280,26 @@ class IncentiveImportService
     public function getIncentiveFromImportData($importData, $incentiveImport): Incentive
     {
         $incentive = new Incentive();
-        if ($importData['incentive_date_given']) {
-            $incentiveGivenDate = new \DateTime($importData['incentive_date_given']);
-            $incentive->setIncentiveDateGiven($incentiveGivenDate);
+        if ($importData['incentiveDateGiven']) {
+            $incentive->setIncentiveDateGiven($importData['incentiveDateGiven']);
         }
-        if ($importData['incentive_type']) {
-            $incentive->setIncentiveType($importData['incentive_type']);
+        if ($importData['incentiveType']) {
+            $incentive->setIncentiveType($importData['incentiveType']);
         }
-        if ($importData['other_incentive_type']) {
-            $incentive->setOtherIncentiveType($importData['other_incentive_type']);
+        if ($importData['otherIncentiveType']) {
+            $incentive->setOtherIncentiveType($importData['otherIncentiveType']);
         }
-        if ($importData['incentive_occurrence']) {
-            $incentive->setIncentiveOccurrence($importData['incentive_occurrence']);
+        if ($importData['incentiveOccurrence']) {
+            $incentive->setIncentiveOccurrence($importData['incentiveOccurrence']);
         }
-        if ($importData['other_incentive_occurrence']) {
-            $incentive->setOtherIncentiveOccurrence($importData['other_incentive_occurrence']);
+        if ($importData['otherIncentiveOccurrence']) {
+            $incentive->setOtherIncentiveOccurrence($importData['otherIncentiveOccurrence']);
         }
-        if ($importData['incentive_amount']) {
-            $incentive->setIncentiveAmount($importData['incentive_amount']);
+        if ($importData['incentiveAmount']) {
+            $incentive->setIncentiveAmount($importData['incentiveAmount']);
         }
-        if ($importData['gift_card_type']) {
-            $incentive->setGiftCardType($importData['gift_card_type']);
+        if ($importData['giftCardType']) {
+            $incentive->setGiftCardType($importData['giftCardType']);
         }
         if ($importData['notes']) {
             $incentive->setNotes($importData['notes']);
@@ -306,7 +307,7 @@ class IncentiveImportService
         $incentive->setDeclined($importData['declined']);
         $incentive->setImport($incentiveImport);
         $now = new \DateTime();
-        $incentive->setParticipantId($importData['participant_id']);
+        $incentive->setParticipantId($importData['participantId']);
         $incentive->setCreatedTs($now);
         $incentive->setSite($importData['site']);
         return $incentive;

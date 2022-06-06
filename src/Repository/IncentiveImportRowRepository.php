@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\IncentiveImportRow;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,24 +20,19 @@ class IncentiveImportRowRepository extends ServiceEntityRepository
         parent::__construct($registry, IncentiveImportRow::class);
     }
 
-    public function getIncentiveImportRows($limit): array
+    public function getIncentiveImportRows(int $limit): array
     {
-        $query = "
-            SELECT iir.*,
-                   ii.site,
-                   ii.created_ts
-            FROM incentive_import_row iir
-            INNER JOIN incentive_import ii ON ii.id = iir.import_id AND ii.confirm = :confirm
-            WHERE iir.rdr_status = :rdrStatus
-            ORDER BY iir.id ASC
-        ";
-        if ($limit > 0) {
-            $query .= ' LIMIT ' . $limit;
-        }
-        return $this->getEntityManager()->getConnection()->fetchAll($query, [
-            'confirm' => 1,
-            'rdrStatus' => 0
-        ]);
+        return $this->createQueryBuilder('iir')
+            ->select('iir, ii.site')
+            ->innerJoin('iir.import', 'ii')
+            ->where('ii.confirm = :confirm')
+            ->andWhere('iir.rdrStatus = :rdrStatus')
+            ->setParameters(['confirm' => 1, 'rdrStatus' => 0])
+            ->orderBy('iir.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_ARRAY);
     }
 
     public function deleteUnconfirmedImportData($date): void
