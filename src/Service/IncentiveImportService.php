@@ -214,8 +214,7 @@ class IncentiveImportService
     {
         $postData = $this->getRdrObject($incentive, $user);
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
-            $result = json_decode($response->getBody()->getContents());
+            $result = $this->incentiveService->sendToRdr($participantId, $postData);
             if (is_object($result) && isset($result->incentiveId)) {
                 $incentive->setUser($user);
                 $incentive->setRdrId($result->incentiveId);
