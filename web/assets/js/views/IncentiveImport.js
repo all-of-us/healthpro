@@ -14,14 +14,14 @@ $(document).ready(function () {
         {name: 'participantId', data: 'participantId'},
         {name: 'userEmail', data: 'userEmail'},
         {name: 'incentiveDateGiven', data: 'incentiveDateGiven'},
-        {name: 'incentiveType', data: 'incentiveType'},
-        {name: 'otherIncentiveType', data: 'otherIncentiveType'},
         {name: 'incentiveOccurrence', data: 'incentiveOccurrence'},
         {name: 'otherIncentiveOccurrence', data: 'otherIncentiveOccurrence'},
-        {name: 'incentiveAmount', data: 'incentiveAmount'},
+        {name: 'incentiveType', data: 'incentiveType'},
         {name: 'giftCardType', data: 'giftCardType'},
-        {name: 'notes', data: 'notes'},
+        {name: 'otherIncentiveType', data: 'otherIncentiveType'},
+        {name: 'incentiveAmount', data: 'incentiveAmount'},
         {name: 'declined', data: 'declined'},
+        {name: 'notes', data: 'notes'},
         {name: 'createdTs', data: 'createdTs'},
         {name: 'status', data: 'status'}
     );
