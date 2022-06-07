@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\PatientStatusService;
@@ -195,6 +196,24 @@ class CronController extends BaseController
             }
         }
         $this->em->flush();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/send-incentives-rdr", name="cron_send_incentives_rdr")
+     */
+    public function sendIncentivesToRdrAction(IncentiveImportService $incentiveImportService)
+    {
+        $incentiveImportService->sendIncentivesToRdr();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/delete-unconfirmed-incentives-import-data", name="cron_delete_unconfirmed_patient_status_import_data")
+     */
+    public function deleteUnconfimedIncentivesImportDataAction(IncentiveImportService $incentiveImportService)
+    {
+        $incentiveImportService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 }

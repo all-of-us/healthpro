@@ -158,4 +158,9 @@ class UserService
     {
         return $this->em->getRepository(User::class)->find($this->getUser()->getId());
     }
+
+    public function getUserEntityFromEmail($email): ?User
+    {
+        return $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
+    }
 }
