@@ -49,9 +49,11 @@ $(document).ready(function () {
                         return '<i class="fa fa-tasks" aria-hidden="true"></i> In Progress';
                     } else {
                         var html = '<i class="fa fa-times text-danger" aria-hidden="true"></i> Failed';
-                        if (status === 2) {
-                            return html + ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Invalid Participant Id"></i>';
+                        if (status === 2 || status === 5) {
+                            var statusTitle = status === 2 ? 'Invalid Participant Id' : 'Invalid User';
+                            return html + ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="'+statusTitle+'"></i>';
                         }
+                        return html;
                     }
                 }
             },

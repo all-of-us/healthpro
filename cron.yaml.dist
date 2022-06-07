@@ -63,3 +63,11 @@ cron:
   url: /cron/resend-measurements-rdr
   schedule: 29 of feb 00:00
   timezone: America/Chicago
+- description: "Send incentives to RDR"
+  url: /cron/send-incentives-rdr
+  schedule: every 5 mins
+  timezone: America/Chicago
+- description: "Delete incentives import unconfirmed data"
+  url: /cron/delete-unconfirmed-incentives-import-data
+  schedule: every day 03:00
+  timezone: America/Chicago

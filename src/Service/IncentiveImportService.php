@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Psr\Log\LoggerInterface;
 
 class IncentiveImportService
 {
@@ -21,19 +22,31 @@ class IncentiveImportService
     protected $params;
     protected $loggerService;
     protected $session;
+    protected $rdrApiService;
+    protected $logger;
+    protected $incentiveService;
+    protected $siteService;
 
     public function __construct(
         UserService $userService,
         EntityManagerInterface $em,
         ParameterBagInterface $params,
         LoggerService $loggerService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        RdrApiService $rdrApiService,
+        LoggerInterface $logger,
+        IncentiveService $incentiveService,
+        SiteService $siteService
     ) {
         $this->userService = $userService;
         $this->em = $em;
         $this->params = $params;
         $this->loggerService = $loggerService;
         $this->session = $requestStack->getSession();
+        $this->rdrApiService = $rdrApiService;
+        $this->logger = $logger;
+        $this->incentiveService = $incentiveService;
+        $this->siteService = $siteService;
     }
 
     public function extractCsvFileData($file, $form)
@@ -61,7 +74,7 @@ class IncentiveImportService
             if ($this->hasDuplicateParticipantId($incentives, $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            if (!$this->isValidEmail($data[1])) {
+            if ($data[1] && !$this->isValidEmail($data[1])) {
                 $form['incentive_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
             if (!in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
@@ -72,6 +85,9 @@ class IncentiveImportService
             }
             if (!in_array($data[8], array_values(Incentive::$incentiveAmountChoices))) {
                 $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
+            }
+            if (empty($data[2])) {
+                $form['incentive_csv']->addError(new FormError("Please enter date in line {$row}, column 3"));
             }
             if ($data[3] === 'other' && empty($data[4])) {
                 $form['incentive_csv']->addError(new FormError("Please enter other occurrence in line {$row}, column 5"));
@@ -96,6 +112,9 @@ class IncentiveImportService
             $incentive['incentive_amount'] = $data[8];
             if ($data[8] === 'other') {
                 $incentive['incentive_amount'] = $data[9];
+            }
+            if ($data[5] === 'promotional') {
+                $incentive['incentive_amount'] = 0;
             }
             if ($data[10] === 'yes') {
                 $incentive['declined'] = true;
@@ -189,5 +208,158 @@ class IncentiveImportService
             array_push($rows, $row);
         }
         return $rows;
+    }
+
+    private function sendIncentive($participantId, $incentive, $user): bool
+    {
+        $postData = $this->getRdrObject($incentive, $user);
+        try {
+            $result = $this->incentiveService->sendToRdr($participantId, $postData);
+            if (is_object($result) && isset($result->incentiveId)) {
+                $incentive->setUser($user);
+                $incentive->setRdrId($result->incentiveId);
+                $this->em->persist($incentive);
+                $this->loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function sendIncentivesToRdr(): void
+    {
+        $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
+        $importRows = $this->em->getRepository(IncentiveImportRow::class)->getIncentiveImportRows($limit);
+        $importIds = [];
+        foreach ($importRows as $importRow) {
+            $importRowData = $importRow[0];
+            $importRowData['site'] = $importRow['site'];
+            if (!in_array($importRowData['import_id'], $importIds)) {
+                $importIds[] = $importRowData['import_id'];
+            }
+            $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importRowData['import_id']);
+            $incentive = $this->getIncentiveFromImportData($importRowData, $incentiveImport);
+            $validUser = true;
+            $user = null;
+            if ($importRowData['userEmail']) {
+                $user = $this->userService->getUserEntityFromEmail($importRowData['userEmail']);
+                if ($user === null) {
+                    $validUser = false;
+                }
+            }
+            $incentiveImportRow = $this->em->getRepository(IncentiveImportRow::class)->find($importRowData['id']);
+            if ($incentiveImportRow) {
+                if ($validUser) {
+                    if ($this->sendIncentive($importRowData['participantId'], $incentive, $user)) {
+                        $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_SUCCESS);
+                    } else {
+                        $this->logger->error("#{$importRowData['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
+                        $rdrStatus = IncentiveImportRow::STATUS_OTHER_RDR_ERRORS;
+                        if ($this->rdrApiService->getLastErrorCode() === 404) {
+                            $rdrStatus = IncentiveImportRow::STATUS_INVALID_PARTICIPANT_ID;
+                        } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
+                            $rdrStatus = IncentiveImportRow::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                        }
+                        $incentiveImportRow->setRdrStatus($rdrStatus);
+                    }
+                } else {
+                    $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_INVALID_USER);
+                }
+                $this->em->persist($incentiveImportRow);
+                $this->em->flush();
+                $this->em->clear();
+            }
+        }
+        $this->updateImportStatus($importIds);
+    }
+
+    public function getIncentiveFromImportData($importData, $incentiveImport): Incentive
+    {
+        $incentive = new Incentive();
+        if ($importData['incentiveDateGiven']) {
+            $incentive->setIncentiveDateGiven($importData['incentiveDateGiven']);
+        }
+        if ($importData['incentiveType']) {
+            $incentive->setIncentiveType($importData['incentiveType']);
+        }
+        if ($importData['otherIncentiveType']) {
+            $incentive->setOtherIncentiveType($importData['otherIncentiveType']);
+        }
+        if ($importData['incentiveOccurrence']) {
+            $incentive->setIncentiveOccurrence($importData['incentiveOccurrence']);
+        }
+        if ($importData['otherIncentiveOccurrence']) {
+            $incentive->setOtherIncentiveOccurrence($importData['otherIncentiveOccurrence']);
+        }
+        if ($importData['incentiveAmount']) {
+            $incentive->setIncentiveAmount($importData['incentiveAmount']);
+        }
+        if ($importData['giftCardType']) {
+            $incentive->setGiftCardType($importData['giftCardType']);
+        }
+        if ($importData['notes']) {
+            $incentive->setNotes($importData['notes']);
+        }
+        $incentive->setDeclined($importData['declined']);
+        $incentive->setImport($incentiveImport);
+        $now = new \DateTime();
+        $incentive->setParticipantId($importData['participantId']);
+        $incentive->setCreatedTs($now);
+        $incentive->setSite($importData['site']);
+        return $incentive;
+    }
+
+    private function updateImportStatus($importIds): void
+    {
+        foreach ($importIds as $importId) {
+            $incentiveImport = $this->em->getRepository(IncentiveImport::class)->find($importId);
+            if (!empty($incentiveImport)) {
+                $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
+                    'import' => $incentiveImport,
+                    'rdrStatus' => 0
+                ]);
+                if (empty($incentiveImportRows)) {
+                    $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
+                        'import' => $incentiveImport,
+                        'rdrStatus' => [2, 3, 4, 5]
+                    ]);
+                    if (!empty($incentiveImportRows)) {
+                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE_WITH_ERRORS);
+                    } else {
+                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE);
+                    }
+                    $this->em->persist($incentiveImport);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
+                }
+            }
+        }
+    }
+
+    public function deleteUnconfirmedImportData(): void
+    {
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->em->getRepository(IncentiveImportRow::class)->deleteUnconfirmedImportData($date);
+    }
+
+    public function getRdrObject($incentive, $user)
+    {
+        $obj = new \StdClass();
+        $obj->createdBy = $user ? $user->getEmail() : '';
+        $obj->site = $this->siteService->getSiteWithPrefix($incentive->getSite());
+        $obj->dateGiven = $incentive->getIncentiveDateGiven();
+        $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
+        $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
+        if ($incentive->getGiftCardType()) {
+            $obj->giftcardType = $incentive->getGiftCardType();
+        }
+        $obj->amount = $incentive->getIncentiveAmount();
+        $obj->notes = $incentive->getNotes();
+        $obj->declined = $incentive->getDeclined();
+        return $obj;
     }
 }

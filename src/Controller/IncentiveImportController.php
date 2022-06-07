@@ -5,25 +5,20 @@ namespace App\Controller;
 use App\Entity\IncentiveImport;
 use App\Form\IncentiveImportConfirmFormType;
 use App\Form\IncentiveImportFormType;
-use App\Service\EnvironmentService;
 use App\Service\IncentiveImportService;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Audit\Log;
 
 class IncentiveImportController extends BaseController
 {
-    public function __construct(EntityManagerInterface $em, EnvironmentService $env)
+    public function __construct(EntityManagerInterface $em)
     {
         parent::__construct($em);
-        if (!$env->isLocal()) {
-            throw $this->createNotFoundException();
-        }
     }
 
     /**
