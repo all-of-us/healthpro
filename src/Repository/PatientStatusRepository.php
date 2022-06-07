@@ -64,6 +64,7 @@ class PatientStatusRepository extends ServiceEntityRepository
                    psh.comments,
                    psh.status,
                    psh.created_ts,
+                   psh.import_id,
                    s.name as site_name,
                    u.email as user_email
             FROM patient_status ps
