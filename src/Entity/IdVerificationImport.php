@@ -6,7 +6,7 @@ use App\Repository\IdVerificationImportRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=IdVerificationImportRepository::class)
+ * @ORM\Entity
  */
 class IdVerificationImport
 {
