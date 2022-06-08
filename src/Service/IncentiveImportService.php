@@ -86,7 +86,11 @@ class IncentiveImportService
             if ($data[8] && !in_array($data[8], array_values(Incentive::$incentiveAmountChoices))) {
                 $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
             }
-            if (empty($data[2])) {
+            if (!empty($data[2])) {
+                if (!$this->isValidDate($data[2])) {
+                    $form['incentive_csv']->addError(new FormError("Please enter valid date in line {$row}, column 3"));
+                }
+            } else {
                 $form['incentive_csv']->addError(new FormError("Please enter date in line {$row}, column 3"));
             }
             if ($data[3] === 'other' && empty($data[4])) {
@@ -152,6 +156,11 @@ class IncentiveImportService
             return $domain === self::EMAIL_DOMAIN;
         }
         return false;
+    }
+
+    public function isValidDate($date): bool
+    {
+        return (bool)strtotime($date);
     }
 
     public function createIncentives($fileName, $incentives): int
