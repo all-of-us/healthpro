@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\IdVerificationImport;
+use App\Form\IdVerificationType;
+use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
@@ -10,9 +13,6 @@ use Psr\Log\LoggerInterface;
 
 class IdVerificationImportService
 {
-    public const DEFAULT_CSV_ROWS_LIMIT = 5000;
-    public const EMAIL_DOMAIN = 'pmi-ops.org';
-
     protected $userService;
     protected $em;
     protected $params;
@@ -55,7 +55,7 @@ class IdVerificationImportService
             $form['id_verification_csv']->addError(new FormError("Invalid file format"));
             return;
         }
-        $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : self::DEFAULT_CSV_ROWS_LIMIT;
+        $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : Import::DEFAULT_CSV_ROWS_LIMIT;
         $csvFile = file($file->getPathname(), FILE_SKIP_EMPTY_LINES);
         if (count($csvFile) > $rowsLimit + 1) {
             $form['id_verification_csv']->addError(new FormError("CSV file rows should not be greater than {$rowsLimit}"));
@@ -64,17 +64,27 @@ class IdVerificationImportService
         $row = 2;
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
             $idVerification = [];
-            if (!preg_match("/^P\d{9}+$/", $data[0])) {
+            if (!Import::isValidParticipantId($data[0])) {
                 $form['id_verification_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
             }
-            if ($this->hasDuplicateParticipantId($idVerifications, $data[0])) {
+            if (Import::hasDuplicateParticipantId($idVerifications, $data[0])) {
                 $form['id_verification_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            if ($data[1] && !$this->isValidEmail($data[1])) {
+            if ($data[1] && !Import::isValidEmail($data[1])) {
                 $form['id_verification_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
-            if (empty($data[2])) {
+            if (!empty($data[2])) {
+                if (!Import::isValidDate($data[2])) {
+                    $form['id_verification_csv']->addError(new FormError("Invalid date in line {$row}, column 3"));
+                }
+            } else {
                 $form['id_verification_csv']->addError(new FormError("Please enter date in line {$row}, column 3"));
+            }
+            if ($data[3] && !in_array($data[3], array_values(IdVerificationType::$idVerificationChoices['verificationType']))) {
+                $form['id_verification_csv']->addError(new FormError("Invalid verification type {$data[3]} in line {$row}, column 4"));
+            }
+            if ($data[4] && !in_array($data[4], array_values(IdVerificationType::$idVerificationChoices['visitType']))) {
+                $form['id_verification_csv']->addError(new FormError("Invalid visit type {$data[4]} in line {$row}, column 5"));
             }
             $idVerification['participant_id'] = $data[0];
             $idVerification['user_email'] = $data[1];
@@ -85,25 +95,5 @@ class IdVerificationImportService
             $row++;
         }
         return $idVerifications;
-    }
-
-    private function hasDuplicateParticipantId($idVerifications, $participantId): bool
-    {
-        foreach ($idVerifications as $idVerification) {
-            if ($idVerification['participant_id'] === $participantId) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function isValidEmail($email): bool
-    {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $parts = explode('@', $email);
-            $domain = array_pop($parts);
-            return $domain === self::EMAIL_DOMAIN;
-        }
-        return false;
     }
 }
