@@ -23,8 +23,7 @@ class IdVerificationImport
     private $file_name;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
      */
     private $user;
 
