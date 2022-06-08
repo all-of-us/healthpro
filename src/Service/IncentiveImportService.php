@@ -77,13 +77,13 @@ class IncentiveImportService
             if ($data[1] && !$this->isValidEmail($data[1])) {
                 $form['incentive_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
-            if (!in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
+            if ($data[3] && !in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
                 $form['incentive_csv']->addError(new FormError("Invalid Occurrence {$data[3]} in line {$row}, column 4"));
             }
-            if (!in_array($data[5], array_values(Incentive::$incentiveTypeChoices))) {
+            if ($data[5] && !in_array($data[5], array_values(Incentive::$incentiveTypeChoices))) {
                 $form['incentive_csv']->addError(new FormError("Invalid Type {$data[5]} in line {$row}, column 6"));
             }
-            if (!in_array($data[8], array_values(Incentive::$incentiveAmountChoices))) {
+            if ($data[8] && !in_array($data[8], array_values(Incentive::$incentiveAmountChoices))) {
                 $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
             }
             if (empty($data[2])) {
@@ -109,7 +109,7 @@ class IncentiveImportService
             $incentive['incentive_type'] = $data[5];
             $incentive['gift_card_type'] = $data[6];
             $incentive['other_incentive_type'] = $data[7];
-            $incentive['incentive_amount'] = $data[8];
+            $incentive['incentive_amount'] = !empty($data[8]) ? $data[8] : 0;
             if ($data[8] === 'other') {
                 $incentive['incentive_amount'] = $data[9];
             }
