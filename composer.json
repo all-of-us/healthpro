@@ -49,6 +49,10 @@
     "config": {
         "platform": {
             "php": "7.4.14"
+        },
+        "allow-plugins": {
+            "phpstan/extension-installer": true,
+            "symfony/flex": true
         }
     },
     "require-dev": {
