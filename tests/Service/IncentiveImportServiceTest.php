@@ -162,4 +162,25 @@ class IncentiveImportServiceTest extends ServiceTestCase
         $user->setEmail('test@example.com');
         return $user;
     }
+
+    /**
+     * @dataProvider incentiveImportDateProvider
+     */
+    public function testValidDate($date, $isValid): void
+    {
+        $result = $this->service->isValidDate($date);
+        $this->assertEquals($result, $isValid);
+    }
+
+    public function incentiveImportDateProvider()
+    {
+        return [
+            ['02/01/2022', true],
+            ['01/03/20', true],
+            ['13/01/2020', false],
+            ['12/32/2020', false],
+            ['12/32/test', false],
+            ['test', false]
+        ];
+    }
 }
