@@ -98,8 +98,14 @@ class IncentiveImportService
             if ($data[5] === 'gift_card' && empty($data[6])) {
                 $form['incentive_csv']->addError(new FormError("Please enter gift card type in line {$row}, column 7"));
             }
-            if ($data[8] === 'other' && empty($data[9])) {
-                $form['incentive_csv']->addError(new FormError("Please enter other incentive amount in line {$row}, column 10"));
+            if ($data[8] === 'other') {
+                if (!empty($data[9])) {
+                    if (!preg_match("/^\d+$/", $data[9])) {
+                        $form['incentive_csv']->addError(new FormError("Please enter valid other amount in line {$row}, column 10"));
+                    }
+                } else {
+                    $form['incentive_csv']->addError(new FormError("Please enter other incentive amount in line {$row}, column 10"));
+                }
             }
             $incentive['participant_id'] = $data[0];
             $incentive['user_email'] = $data[1];
