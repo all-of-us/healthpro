@@ -14,7 +14,6 @@ class IncentiveImport
     public function __construct()
     {
         $this->incentiveImportRows = new ArrayCollection();
-        $this->idVerificationImportRows = new ArrayCollection();
     }
 
     public const COMPLETE = 1;
