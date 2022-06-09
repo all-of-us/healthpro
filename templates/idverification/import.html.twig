@@ -42,15 +42,15 @@
                             <td>{{ idVerification.fileName }}</td>
                             <td>{{ idVerification.createdTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                             <td>
-                                {% if idVerification.idVerificationStatus == 1 %}
+                                {% if idVerification.importStatus == 1 %}
                                     <i class="fa fa-check text-success" aria-hidden="true"></i> Complete
-                                {% elseif idVerification.idVerificationStatus == 2 %}
+                                {% elseif idVerification.importStatus == 2 %}
                                     <i class="fa fa-check text-success" aria-hidden="true"></i> Complete <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
                                 {% else %}
                                     <i class="fa fa-tasks" aria-hidden="true"></i> In Progress
                                 {% endif %}
                             </td>
-                            <td><a href="{{ path('idVerificationDetails', { id: idVerification.id }) }}">Details</a></td>
+                            <td><a href="{{ path('idVerificationImportDetails', { id: idVerification.id }) }}">Details</a></td>
                         </tr>
                     {% endfor %}
                     </tbody>

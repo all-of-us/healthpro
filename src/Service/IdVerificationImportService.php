@@ -2,7 +2,9 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\IdVerificationImport;
+use App\Entity\IdVerificationImportRow;
 use App\Form\IdVerificationType;
 use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
@@ -95,5 +97,37 @@ class IdVerificationImportService
             $row++;
         }
         return $idVerifications;
+    }
+
+    public function createIdVerifications($fileName, $idVerifications): int
+    {
+        $idVerificationImport = new IdVerificationImport();
+        $idVerificationImport
+            ->setFileName($fileName)
+            ->setUser($this->userService->getUserEntity())
+            ->setSite($this->session->get('site')->id)
+            ->setCreatedTs(new \DateTime());
+        $this->em->persist($idVerificationImport);
+        $batchSize = 50;
+        foreach ($idVerifications as $key => $idVerification) {
+            $idVerificationImportRow = new IdVerificationImportRow();
+            $idVerificationImportRow
+                ->setParticipantId($idVerification['participant_id'])
+                ->setUserEmail($idVerification['user_email'])
+                ->setVerifiedDate(new \DateTime($idVerification['idVerification_date']))
+                ->setVerificationType($idVerification['verification_type'])
+                ->setVisitType($idVerification['visit_type'])
+                ->setImport($idVerificationImport);
+            $this->em->persist($idVerificationImportRow);
+            if (($key % $batchSize) === 0) {
+                $this->em->flush();
+                $this->em->clear(IdVerificationImportRow::class);
+            }
+        }
+        $this->em->flush();
+        $id = $idVerificationImport->getId();
+        $this->loggerService->log(Log::INCENTIVE_IMPORT_ADD, $id);
+        $this->em->clear();
+        return $id;
     }
 }

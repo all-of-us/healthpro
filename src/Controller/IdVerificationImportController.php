@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\IdVerificationImport;
+use App\Form\IdVerificationImportConfirmFormType;
 use App\Form\IdVerificationImportFormType;
 use App\Service\IdVerificationImportService;
+use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -32,7 +36,8 @@ class IdVerificationImportController extends BaseController
             $idVerifications = $idVerificationImportService->extractCsvFileData($file, $form);
             if ($form->isValid()) {
                 if (!empty($idVerifications)) {
-                    // TODO create id verifications import rows and redirect to confirmation
+                    $id = $idVerificationImportService->createIdVerifications($fileName, $idVerifications);
+                    return $this->redirectToRoute('idVerificationImportConfirmation', ['id' => $id]);
                 }
             } else {
                 $form->addError(new FormError('Please correct the errors below'));
@@ -45,6 +50,41 @@ class IdVerificationImportController extends BaseController
         return $this->render('idverification/import.html.twig', [
             'idVerificationForm' => $form->createView(),
             'idVerifications' => $idVerificationImports
+        ]);
+    }
+
+    /**
+     * @Route("/incentive/confirmation/{id}", name="idVerificationImportConfirmation", methods={"GET", "POST"})
+     */
+    public function idVerificationImportConfirmation(int $id, Request $request, LoggerService $loggerService)
+    {
+        $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->findOneBy(['id' => $id, 'user' => $this->getUserEntity(), 'confirm' => 0]);
+        if (empty($idVerificationImport)) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        $form = $this->createForm(IdVerificationImportConfirmFormType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var SubmitButton $confirmButton */
+            $confirmButton = $form->get('Confirm');
+            if ($confirmButton->isClicked()) {
+                // Update confirm status
+                $idVerificationImport->setConfirm(1);
+                $this->em->flush();
+                $loggerService->log(Log::ID_VERIFICATION_IMPORT_EDIT, $idVerificationImport->getId());
+                $this->addFlash('success', 'Successfully Imported!');
+            } else {
+                $this->addFlash('notice', 'Import canceled!');
+                $this->em->remove($idVerificationImport);
+                $this->em->flush();
+            }
+            return $this->redirectToRoute('idVerificationImport');
+        }
+        $importIdVerifications = $idVerificationImport->getIdVerificationImportRows()->slice(0, 100);
+        return $this->render('idverification/confirmation.html.twig', [
+            'importIdVerifications' => $importIdVerifications,
+            'importConfirmForm' => $form->createView(),
+            'rowsCount' => count($idVerificationImport->getIdVerificationImportRows())
         ]);
     }
 

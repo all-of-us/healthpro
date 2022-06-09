@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\IdVerificationImportRowRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,7 +22,7 @@ class IdVerificationImportRow
     private $participantId;
 
     /**
-     * @ORM\ManyToOne(targetEntity=IncentiveImport::class, inversedBy="idVerificationImportRows")
+     * @ORM\ManyToOne(targetEntity=IdVerificationImport::class, inversedBy="idVerificationImportRows")
      * @ORM\JoinColumn(nullable=false)
      */
     private $import;
@@ -49,9 +48,9 @@ class IdVerificationImportRow
     private $visitType;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $rdrStatus;
+    private $rdrStatus = 0;
 
     public function getId(): ?int
     {
@@ -70,12 +69,12 @@ class IdVerificationImportRow
         return $this;
     }
 
-    public function getImport(): ?IncentiveImport
+    public function getImport(): ?IdVerificationImport
     {
         return $this->import;
     }
 
-    public function setImport(?IncentiveImport $import): self
+    public function setImport(?IdVerificationImport $import): self
     {
         $this->import = $import;
 

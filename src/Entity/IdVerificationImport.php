@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\IdVerificationImportRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,8 +23,7 @@ class IdVerificationImport
     private $file_name;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
      */
     private $user;
 
@@ -39,14 +38,19 @@ class IdVerificationImport
     private $createdTs;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $importStatus;
+    private $importStatus = 0;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default":0})
      */
-    private $confirm;
+    private $confirm = 0;
+
+    /**
+     * @ORM\OneToMany(targetEntity=IdVerificationImportRow::class, mappedBy="import")
+     */
+    private $idVerificationImportRows;
 
     public function getId(): ?int
     {
@@ -121,6 +125,36 @@ class IdVerificationImport
     public function setConfirm(int $confirm): self
     {
         $this->confirm = $confirm;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|IdVerificationImportRow[]
+     */
+    public function getIdVerificationImportRows(): Collection
+    {
+        return $this->idVerificationImportRows;
+    }
+
+    public function addIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
+    {
+        if (!$this->idVerificationImportRows->contains($idVerificationImportRow)) {
+            $this->idVerificationImportRows[] = $idVerificationImportRow;
+            $idVerificationImportRow->setImport($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
+    {
+        if ($this->idVerificationImportRows->removeElement($idVerificationImportRow)) {
+            // set the owning side to null (unless already changed)
+            if ($idVerificationImportRow->getImport() === $this) {
+                $idVerificationImportRow->setImport(null);
+            }
+        }
 
         return $this;
     }
