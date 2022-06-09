@@ -1,8 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}Deceased Participant {{ participant.participantId }} - {% endblock %}
 {% block body %}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     <div class="page-header">
-      <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path('participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
+      <h2><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participant <small><a href="{{ path(routePrefix ~ 'participant', {id: participant.participantId} )}}">{{ participant.lastName }}, {{ participant.firstName }}</a></small></h2>
     </div>
     {% include 'deceasedreports/_review-details.html.twig' %}
     <div class="container">
@@ -22,7 +23,7 @@
         <tbody>
           {% for report in reports %}
           <tr>
-            <td><a href="{{ path('deceased_report_review', {participantId: report.participantId, reportId: report.id}) }}">{{ report.id }}</a></td>
+            <td><a href="{{ path(routePrefix ~ 'deceased_report_review', {participantId: report.participantId, reportId: report.id}) }}">{{ report.id }}</a></td>
             <td>{{ report.dateOfDeath ? report.dateOfDeath|date('n/j/Y') : '' }}</td>
             <td>{{ report.reportMechanismDisplay }}{% if report.reportMechanism == 'Other' %} - {{ report.reportMechanismOtherDescription }}{% endif %}</td>
             <td><a href="{{ path('deceased_report_review', {participantId: report.participantId, reportId: report.id}) }}"><span class="label label-default">{{ report.reportStatusDisplay }}</span></a></td>

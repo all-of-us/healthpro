@@ -56,10 +56,10 @@
         {% endif %}
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4">
-                <a href="{{ path('patientStatusImport') }}" class="btn btn-lg btn-default btn-block">
+                <a href="{{ path('imports_home') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-upload" aria-hidden="true"></i>
-                    Patient Status Import
-                    <div class="description">Upload .csv files of participant Patient Status in bulk.</div>
+                    Imports
+                    <div class="description">Upload .csv files of participant Patient Status, Incentive Tracking, and ID Verification in bulk.</div>
                 </a>
             </div>
         {% endif %}

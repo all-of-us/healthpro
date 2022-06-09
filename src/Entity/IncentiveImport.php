@@ -17,6 +17,9 @@ class IncentiveImport
         $this->incentiveImportRows = new ArrayCollection();
     }
 
+    public const COMPLETE = 1;
+    public const COMPLETE_WITH_ERRORS = 2;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

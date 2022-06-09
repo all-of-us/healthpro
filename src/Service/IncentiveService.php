@@ -61,8 +61,7 @@ class IncentiveService
         $incentive = $this->getIncentiveFromFormData($incentiveForm);
         $postData = $this->getRdrObject($incentive);
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
-            $result = json_decode($response->getBody()->getContents());
+            $result = $this->sendToRdr($participantId, $postData);
             if (is_object($result) && isset($result->incentiveId)) {
                 $now = new \DateTime();
                 $incentive->setParticipantId($participantId);
@@ -145,5 +144,11 @@ class IncentiveService
             $participant->statusReason !== 'withdrawal' &&
             $participant->statusReason !== 'test-participant' &&
             !$this->siteService->isTestSite();
+    }
+
+    public function sendToRdr($participantId, $postData)
+    {
+        $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
+        return json_decode($response->getBody()->getContents());
     }
 }

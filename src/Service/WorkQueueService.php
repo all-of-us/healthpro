@@ -74,7 +74,7 @@ class WorkQueueService
         // Unset other params when activity status is withdrawn
         if (isset($params['activityStatus']) && $params['activityStatus'] === 'withdrawn') {
             foreach (array_keys($params) as $key) {
-                if ($key === 'activityStatus' || $key === 'organization') {
+                if (in_array($key, WorkQueue::$withdrawnParticipantFields)) {
                     continue;
                 }
                 unset($params[$key]);

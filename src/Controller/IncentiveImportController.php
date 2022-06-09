@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\IncentiveImport;
 use App\Form\IncentiveImportConfirmFormType;
 use App\Form\IncentiveImportFormType;
-use App\Service\EnvironmentService;
 use App\Service\IncentiveImportService;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,12 +16,9 @@ use App\Audit\Log;
 
 class IncentiveImportController extends BaseController
 {
-    public function __construct(EntityManagerInterface $em, EnvironmentService $env)
+    public function __construct(EntityManagerInterface $em)
     {
         parent::__construct($em);
-        if (!$env->isLocal()) {
-            throw $this->createNotFoundException();
-        }
     }
 
     /**
@@ -95,8 +91,25 @@ class IncentiveImportController extends BaseController
     /**
      * @Route("/incentive/import/{id}", name="incentiveImportDetails", methods={"GET", "POST"})
      */
-    public function patientStatusImportDetails(int $id, Request $request, IncentiveImportService $incentiveImportService)
+    public function incentiveImportDetails(int $id, Request $request, IncentiveImportService $incentiveImportService)
     {
-        return '';
+        $incentiveImport = $this->em->getRepository(IncentiveImport::class)->findOneBy([
+            'id' => $id,
+            'user' => $this->getUserEntity(),
+            'confirm' => 1
+        ]);
+        if (empty($incentiveImport)) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        //For ajax requests
+        if ($request->isXmlHttpRequest()) {
+            $params = $request->request->all();
+            $incentiveImportRows = $incentiveImport->getIncentiveImportRows()->slice($params['start'], $params['length']);
+            $ajaxData = [];
+            $ajaxData['data'] = $incentiveImportService->getAjaxData($incentiveImport, $incentiveImportRows);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($incentiveImport->getIncentiveImportRows());
+            return $this->json($ajaxData);
+        }
+        return $this->render('incentive/import-details.html.twig');
     }
 }

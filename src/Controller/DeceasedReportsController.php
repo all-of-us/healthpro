@@ -14,9 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/deceased-reports")
- */
 class DeceasedReportsController extends BaseController
 {
     public const ORG_PENDING_CACHE_TTL = 500;
@@ -33,7 +30,7 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/", name="deceased_reports_index")
+     * @Route("/deceased-reports", name="deceased_reports_index")
      */
     public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
@@ -51,7 +48,8 @@ class DeceasedReportsController extends BaseController
     }
 
     /**
-     * @Route("/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
+     * @Route("/deceased-reports/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
+     * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"}, methods={"GET"})
      */
     public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
     {
@@ -85,12 +83,14 @@ class DeceasedReportsController extends BaseController
         return $this->render('deceasedreports/review.html.twig', [
             'report' => $report,
             'participant' => $participant,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
-     * @Route("/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
+     * @Route("/deceased-reports/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
+     * @Route("/read/deceased-reports/{participantId}/new", name="read_deceased_report_new", requirements={"participantId"="P\d+"})
      */
     public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId)
     {
@@ -109,6 +109,9 @@ class DeceasedReportsController extends BaseController
         }
         $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
         $report = new DeceasedReport();
+        if ($this->isReadOnly()) {
+            $report->setReportMechanism('NEXT_KIN_SUPPORT');
+        }
         foreach ($reports as $record) {
             if ($record->status === 'cancelled') {
                 continue;
@@ -125,7 +128,8 @@ class DeceasedReportsController extends BaseController
                 $report = $report->loadFromFhirObservation($response);
                 $this->resetPendingCountCache($organizationId);
                 $this->addFlash('success', 'Deceased Report created!');
-                return $this->redirectToRoute('participant', ['id' => $participantId]);
+                $redirectRoute = $this->isReadOnly() ? 'read_participant' : 'participant';
+                return $this->redirectToRoute($redirectRoute, ['id' => $participantId, 'refresh' => 1]);
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 $report->setReportStatus('preliminary');
@@ -136,12 +140,14 @@ class DeceasedReportsController extends BaseController
         return $this->render('deceasedreports/new.html.twig', [
             'participant' => $participant,
             'report' => $report,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
-     * @Route("/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
+     * @Route("/deceased-reports/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
+     * @Route("/read/deceased-reports/{participantId}/history", name="read_deceased_report_history", requirements={"participantId"="P\d+"})
      */
     public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
@@ -154,12 +160,13 @@ class DeceasedReportsController extends BaseController
 
         return $this->render('deceasedreports/history.html.twig', [
             'participant' => $participant,
-            'reports' => $reports
+            'reports' => $reports,
+            'readOnlyView' => $this->isReadOnly()
         ]);
     }
 
     /**
-     * @Route("/stats", name="deceased_report_stats")
+     * @Route("/deceased-reports/stats", name="deceased_report_stats")
      */
     public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
@@ -178,6 +185,39 @@ class DeceasedReportsController extends BaseController
         return $this->json([
             'pending' => $pendingReportCount,
             'cacheHit' => $cacheHit
+        ]);
+    }
+
+    /**
+     * @Route("/read/deceased-reports/{participantId}/check", name="read_deceased_report_check", requirements={"participantId"="P\d+"})
+     */
+    public function deceasedReportCheck(ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
+    {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if ($participant->withdrawalStatus !== 'NOT_WITHDRAWN') {
+            $this->addFlash('error', 'Cannot create Deceased Report on withdrawn participant.');
+            return $this->redirectToRoute('read_participant', ['id' => $participantId]);
+        }
+        if ($participant->suspensionStatus !== 'NOT_SUSPENDED') {
+            $this->addFlash('error', 'Cannot create Deceased Report on deactivated participant.');
+            return $this->redirectToRoute('read_participant', ['id' => $participantId]);
+        }
+        $reports = $deceasedReportsService->getDeceasedReportsByParticipant($participantId);
+        $report = new DeceasedReport();
+        foreach ($reports as $record) {
+            if ($record->status === 'cancelled') {
+                continue;
+            }
+            $report = (new DeceasedReport())->loadFromFhirObservation($record);
+        }
+        if ($report->getId()) {
+            return $this->redirectToRoute('read_deceased_report_new', ['participantId' => $participantId]);
+        }
+        return $this->render('deceasedreports/check.html.twig', [
+            'participant' => $participant
         ]);
     }
 
