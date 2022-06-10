@@ -7,10 +7,10 @@ class Import
     public const DEFAULT_CSV_ROWS_LIMIT = 5000;
     public const EMAIL_DOMAIN = 'pmi-ops.org';
 
-    public static function hasDuplicateParticipantId($idVerifications, $participantId): bool
+    public static function hasDuplicateParticipantId($imports, $participantId): bool
     {
-        foreach ($idVerifications as $idVerification) {
-            if ($idVerification['participant_id'] === $participantId) {
+        foreach ($imports as $import) {
+            if ($import['participant_id'] === $participantId) {
                 return true;
             }
         }
