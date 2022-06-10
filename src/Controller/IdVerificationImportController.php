@@ -54,7 +54,7 @@ class IdVerificationImportController extends BaseController
     }
 
     /**
-     * @Route("/incentive/confirmation/{id}", name="idVerificationImportConfirmation", methods={"GET", "POST"})
+     * @Route("/id-verification/confirmation/{id}", name="idVerificationImportConfirmation", methods={"GET", "POST"})
      */
     public function idVerificationImportConfirmation(int $id, Request $request, LoggerService $loggerService)
     {
