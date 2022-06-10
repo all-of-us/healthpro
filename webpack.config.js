@@ -54,6 +54,7 @@ Encore
     .addEntry('id-verification', './web/assets/js/views/IdVerification.js')
     .addEntry('deceased-report', './web/assets/js/views/DeceasedReport.js')
     .addEntry('incentive-import', './web/assets/js/views/IncentiveImport.js')
+    .addEntry('id-verification-import', './web/assets/js/views/IdVerificationImport.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
