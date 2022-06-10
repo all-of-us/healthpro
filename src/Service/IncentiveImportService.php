@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\Incentive;
 use App\Entity\IncentiveImport;
 use App\Entity\IncentiveImportRow;
+use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
@@ -71,10 +72,10 @@ class IncentiveImportService
             if (!preg_match("/^P\d{9}+$/", $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
             }
-            if ($this->hasDuplicateParticipantId($incentives, $data[0])) {
+            if (Import::hasDuplicateParticipantId($incentives, $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            if ($data[1] && !$this->isValidEmail($data[1])) {
+            if ($data[1] && !Import::isValidEmail($data[1])) {
                 $form['incentive_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
             if ($data[3] && !in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
@@ -87,7 +88,7 @@ class IncentiveImportService
                 $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
             }
             if (!empty($data[2])) {
-                if (!$this->isValidDate($data[2])) {
+                if (!Import::isValidDate($data[2])) {
                     $form['incentive_csv']->addError(new FormError("Please enter valid date in line {$row}, column 3"));
                 }
             } else {
@@ -136,31 +137,6 @@ class IncentiveImportService
             $row++;
         }
         return $incentives;
-    }
-
-    private function hasDuplicateParticipantId($incentives, $participantId): bool
-    {
-        foreach ($incentives as $incentive) {
-            if ($incentive['participant_id'] === $participantId) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function isValidEmail($email): bool
-    {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $parts = explode('@', $email);
-            $domain = array_pop($parts);
-            return $domain === self::EMAIL_DOMAIN;
-        }
-        return false;
-    }
-
-    public function isValidDate($date): bool
-    {
-        return (bool)strtotime($date);
     }
 
     public function createIncentives($fileName, $incentives): int
