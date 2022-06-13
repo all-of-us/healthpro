@@ -106,7 +106,7 @@ class IdVerificationImportController extends BaseController
             $params = $request->request->all();
             $idVerificationImportRows = $idVerificationImport->getIdVerificationImportRows()->slice($params['start'], $params['length']);
             $ajaxData = [];
-            $ajaxData['data'] = $idVerificationImportService->getAjaxData($idVerificationImport, $idVerificationImportRows);
+            $ajaxData['data'] = $idVerificationImportService->getAjaxData($idVerificationImportRows, $idVerificationImport->getCreatedTs());
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($idVerificationImport->getIdVerificationImportRows());
             return $this->json($ajaxData);
         }

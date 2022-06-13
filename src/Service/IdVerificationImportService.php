@@ -131,7 +131,7 @@ class IdVerificationImportService
         return $id;
     }
 
-    public function getAjaxData($idVerificationImport, $idVerificationImportRows): array
+    public function getAjaxData($idVerificationImportRows, $createdTs): array
     {
         $rows = [];
         foreach ($idVerificationImportRows as $idVerificationImportRow) {
@@ -141,7 +141,6 @@ class IdVerificationImportService
             $row['verifiedDate'] = $idVerificationImportRow->getVerifiedDate() ? $idVerificationImportRow->getVerifiedDate()->format('n/j/Y') : '';
             $row['verificationType'] = $idVerificationImportRow->getVerificationType();
             $row['visitType'] = $idVerificationImportRow->getVisitType();
-            $createdTs = $idVerificationImport->getCreatedTs();
             $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()))->format('n/j/Y g:ia');
             $row['status'] = $idVerificationImportRow->getRdrStatus();
             array_push($rows, $row);
