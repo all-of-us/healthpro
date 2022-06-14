@@ -37,7 +37,7 @@ Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html)
 
 `npm run watch`
 
-Run docker container
+Run Docker containers
 
 `docker compose up`
 
