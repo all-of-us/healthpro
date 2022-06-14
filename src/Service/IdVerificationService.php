@@ -23,15 +23,13 @@ class IdVerificationService
         $this->loggerService = $loggerService;
     }
 
-    public function getRdrObject($participantId, $verificationData): \stdClass
+    public function getRdrObject($verificationData): \stdClass
     {
         $obj = new \StdClass();
-        $email = $this->userService->getUser()->getEmail();
-        $now = new \DateTime();
-        $obj->participantId = $participantId;
-        $obj->userEmail = $email;
-        $obj->verifiedTime = $now->format('Y-m-d\TH:i:s\Z');
-        $obj->siteGoogleGroup = $this->siteService->getSiteIdWithPrefix();
+        $obj->participantId = $verificationData['participantId'];
+        $obj->userEmail = $verificationData['userEmail'];
+        $obj->verifiedTime = $verificationData['verifiedTime'];
+        $obj->siteGoogleGroup = $verificationData['siteGoogleGroup'];
         $obj->verificationType = $verificationData['verification_type'];
         $obj->visitType = $verificationData['visit_type'];
         return $obj;
@@ -39,7 +37,12 @@ class IdVerificationService
 
     public function createIdVerification($participantId, $verificationData): bool
     {
-        $postData = $this->getRdrObject($participantId, $verificationData);
+        $verificationData['userEmail'] = $this->userService->getUser()->getEmail();
+        $verificationData['participantId'] = $participantId;
+        $now = new \DateTime();
+        $verificationData['verifiedTime'] = $now->format('Y-m-d\TH:i:s\Z');
+        $verificationData['siteGoogleGroup'] = $this->siteService->getSiteIdWithPrefix();
+        $postData = $this->getRdrObject($verificationData);
         return $this->sendToRdr($postData);
     }
 
