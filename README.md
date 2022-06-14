@@ -17,11 +17,13 @@ Prerequisites:
     4. Install additional gcloud components:
         * `gcloud components install app-engine-php`
         * `gcloud components install cloud-datastore-emulator`
+        * `gcloud components install cloud_sql_proxy`
 * [NodeJS](https://nodejs.org/) (latest LTS should be fine)
 * [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 5.7 which is used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
 * [git-secrets](https://github.com/awslabs/git-secrets#installing-git-secrets)
 * [Symfony CLI](https://symfony.com/download)
+* [Docker](https://docs.docker.com/get-docker)
 
 Install PHP dependencies via Composer:
 
@@ -35,13 +37,9 @@ Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html)
 
 `npm run watch`
 
-Run local Datastore emulator
+Run Docker containers
 
-`gcloud beta emulators datastore start`
-
-Run local App Engine dev server:
-
-`./bin/console pmi:deploy --local`
+`docker compose up`
 
 ## Credentials and configuration
 
@@ -56,7 +54,13 @@ Run local App Engine dev server:
 Configure your local development parameters by copying the `dev_config/config.yml.dist` file to `dev_config/config.yml`.  Edit `config.yml` as needed.  This file is .gitignore'd.  See comments in the `config.yml.dist` file for more details.
 
 #### MySQL database configuration
-Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`.  Then, run `bin/console doctine:migrations:migrate` to build your local database.
+Create a new MySQL for this application.  Configure the MySQL connection in `config.yml`. 
+
+Then, run `bin/console doctine:migrations:migrate` to build your local database.
+
+Then, run `bin/dx bin/console doctrine:migrations:migrate` to execute the necessary Doctrine migrations.
+
+(`bin/dx` is a convenience wrapper for executing a command inside the Docker web container. You can also run `bin/dx bash` to open a shell into the container.)
 
 ## Jira Release Process
 
