@@ -39,7 +39,7 @@ Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html)
 
 Run docker container
 
-`docker-compose up`
+`docker compose up`
 
 ## Credentials and configuration
 
