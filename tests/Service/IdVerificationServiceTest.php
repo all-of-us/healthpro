@@ -25,9 +25,11 @@ class IdVerificationServiceTest extends ServiceTestCase
     {
         $idVerificationData = $this->getIdVerificationData();
         $idVerificationService = static::getContainer()->get(IdVerificationService::class);
-        $rdrObject = $idVerificationService->getRdrObject('P123456789', $idVerificationData);
+        $rdrObject = $idVerificationService->getRdrObject($idVerificationData);
+        self::assertEquals('P123456789', $rdrObject->participantId);
         self::assertEquals('test@example.com', $rdrObject->userEmail);
         self::assertEquals('hpo-site-test', $rdrObject->siteGoogleGroup);
+        self::assertEquals('2022-04-19T20:52:23', $rdrObject->verifiedTime);
         self::assertEquals('PHOTO_AND_ONE_OF_PII', $rdrObject->verificationType);
         self::assertEquals('PHYSICAL_MEASUREMENTS_ONLY', $rdrObject->visitType);
     }
@@ -74,6 +76,10 @@ class IdVerificationServiceTest extends ServiceTestCase
     private function getIdVerificationData(): array
     {
         return [
+            'participantId' => 'P123456789',
+            'userEmail' => 'test@example.com',
+            'siteGoogleGroup' => 'hpo-site-test',
+            'verifiedTime' => '2022-04-19T20:52:23',
             'verification_type' => 'PHOTO_AND_ONE_OF_PII',
             'visit_type' => 'PHYSICAL_MEASUREMENTS_ONLY'
         ];
