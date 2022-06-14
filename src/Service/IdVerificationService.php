@@ -40,20 +40,7 @@ class IdVerificationService
     public function createIdVerification($participantId, $verificationData): bool
     {
         $postData = $this->getRdrObject($participantId, $verificationData);
-        try {
-            $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && !empty($result->verificationType)) {
-                $this->loggerService->log(Log::ID_VERIFICATION_ADD, [
-                    'participantId' => $participantId
-                ]);
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
+        return $this->sendToRdr($postData);
     }
 
     public function getIdVerifications($participantId): array
@@ -68,5 +55,23 @@ class IdVerificationService
             $this->rdrApiService->logException($e);
         }
         return [];
+    }
+
+    private function sendToRdr($postData)
+    {
+        try {
+            $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && !empty($result->verificationType)) {
+                $this->loggerService->log(Log::ID_VERIFICATION_ADD, [
+                    'participantId' => $postData->participantId
+                ]);
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
     }
 }
