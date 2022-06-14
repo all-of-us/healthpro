@@ -69,7 +69,7 @@ class IncentiveImportService
         $row = 2;
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
             $incentive = [];
-            if (!preg_match("/^P\d{9}+$/", $data[0])) {
+            if (!Import::isValidParticipantId($data[0])) {
                 $form['incentive_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
             }
             if (Import::hasDuplicateParticipantId($incentives, $data[0])) {
