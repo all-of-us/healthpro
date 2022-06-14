@@ -93,6 +93,23 @@ class IdVerificationImportController extends BaseController
      */
     public function idVerificationImportDetails(int $id, Request $request, IdVerificationImportService $idVerificationImportService)
     {
-        return '';
+        $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->findOneBy([
+            'id' => $id,
+            'user' => $this->getUserEntity(),
+            'confirm' => 1
+        ]);
+        if (empty($idVerificationImport)) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        //For ajax requests
+        if ($request->isXmlHttpRequest()) {
+            $params = $request->request->all();
+            $idVerificationImportRows = $idVerificationImport->getIdVerificationImportRows()->slice($params['start'], $params['length']);
+            $ajaxData = [];
+            $ajaxData['data'] = $idVerificationImportService->getAjaxData($idVerificationImportRows, $idVerificationImport->getCreatedTs());
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($idVerificationImport->getIdVerificationImportRows());
+            return $this->json($ajaxData);
+        }
+        return $this->render('idverification/import-details.html.twig');
     }
 }

@@ -88,7 +88,7 @@ class IncentiveImportServiceTest extends ServiceTestCase
                     'giftCardType' => '',
                     'notes' => '',
                     'declined' => 0,
-                    'participantId' => 'P123456789',
+                    'participantId' => 'P000000001',
                     'site' => 'test-site1'
                 ],
                 [
@@ -101,7 +101,7 @@ class IncentiveImportServiceTest extends ServiceTestCase
                     'giftCardType' => '',
                     'notes' => 'Test notes',
                     'declined' => 1,
-                    'participantId' => 'P123456799',
+                    'participantId' => 'P000000002',
                     'site' => 'test-site2'
                 ]
             ]

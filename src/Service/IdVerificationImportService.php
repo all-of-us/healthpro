@@ -126,8 +126,25 @@ class IdVerificationImportService
         }
         $this->em->flush();
         $id = $idVerificationImport->getId();
-        $this->loggerService->log(Log::INCENTIVE_IMPORT_ADD, $id);
+        $this->loggerService->log(Log::ID_VERIFICATION_ADD, $id);
         $this->em->clear();
         return $id;
+    }
+
+    public function getAjaxData($idVerificationImportRows, $createdTs): array
+    {
+        $rows = [];
+        foreach ($idVerificationImportRows as $idVerificationImportRow) {
+            $row = [];
+            $row['participantId'] = $idVerificationImportRow->getParticipantId();
+            $row['userEmail'] = $idVerificationImportRow->getUserEmail();
+            $row['verifiedDate'] = $idVerificationImportRow->getVerifiedDate() ? $idVerificationImportRow->getVerifiedDate()->format('n/j/Y') : '';
+            $row['verificationType'] = $idVerificationImportRow->getVerificationType();
+            $row['visitType'] = $idVerificationImportRow->getVisitType();
+            $row['createdTs'] = $createdTs->setTimezone(new \DateTimeZone($this->userService->getUser()->getTimezone()))->format('n/j/Y g:ia');
+            $row['status'] = $idVerificationImportRow->getRdrStatus();
+            array_push($rows, $row);
+        }
+        return $rows;
     }
 }
