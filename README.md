@@ -58,7 +58,9 @@ Create a new MySQL for this application.  Configure the MySQL connection in `con
 
 Then, run `bin/console doctine:migrations:migrate` to build your local database.
 
-Then, run `docker exec -it healthpro-web bin/console doctine:migrations:migrate` to build your database in docker container.
+Then, run `bin/dx bin/console doctrine:migrations:migrate` to execute the necessary Doctrine migrations.
+
+(`bin/dx` is a convenience wrapper for executing a command inside the Docker web container. You can also run `bin/dx bash` to open a shell into the container.)
 
 ## Jira Release Process
 
