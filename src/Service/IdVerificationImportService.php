@@ -147,4 +147,74 @@ class IdVerificationImportService
         }
         return $rows;
     }
+
+    public function sendIdVerificationsToRdr(): void
+    {
+        $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
+        $importRows = $this->em->getRepository(IdVerificationImportRow::class)->getIdVerificationImportRows($limit);
+        $importIds = [];
+        foreach ($importRows as $importRow) {
+            $importRowData = $importRow[0];
+            $importRowData['site'] = $importRow['site'];
+            if (!in_array($importRowData['import_id'], $importIds)) {
+                $importIds[] = $importRowData['import_id'];
+            }
+            $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->find($importRowData['import_id']);
+            $idVerification = $this->getIdVerificationFromImportData($importRowData);
+            $validUser = true;
+            $user = null;
+            if ($importRowData['userEmail']) {
+                $user = $this->userService->getUserEntityFromEmail($importRowData['userEmail']);
+                if ($user === null) {
+                    $validUser = false;
+                }
+            }
+            $idVerificationImportRow = $this->em->getRepository(IdVerificationImportRow::class)->find($importRowData['id']);
+            if ($idVerificationImportRow) {
+                if ($validUser) {
+                    if ($this->sendIdVerification($idVerification)) {
+                        $idVerificationImportRow->setRdrStatus(Import::STATUS_SUCCESS);
+                    } else {
+                        $this->logger->error("#{$importRowData['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
+                        $rdrStatus = Import::STATUS_OTHER_RDR_ERRORS;
+                        if ($this->rdrApiService->getLastErrorCode() === 404) {
+                            $rdrStatus = Import::STATUS_INVALID_PARTICIPANT_ID;
+                        } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
+                            $rdrStatus = Import::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                        }
+                        $idVerificationImportRow->setRdrStatus($rdrStatus);
+                    }
+                } else {
+                    $idVerificationImportRow->setRdrStatus(Import::STATUS_INVALID_USER);
+                }
+                $this->em->persist($idVerificationImportRow);
+                $this->em->flush();
+                $this->em->clear();
+            }
+        }
+    }
+
+    public function getIdVerificationFromImportData($importData): array
+    {
+        $idVerification = [];
+        $idVerification['participantId'] = $importData['participantId'];
+        $idVerification['verifiedTime'] = $importData['verifiedDate']->format('Y-m-d\TH:i:s\Z');
+        $idVerification['siteGoogleGroup'] = $this->siteService->getSiteWithPrefix($importData['site']);
+        if ($importData['userEmail']) {
+            $idVerification['userEmail'] = $importData['userEmail'];
+        }
+        if ($importData['verificationType']) {
+            $idVerification['verificationType'] = $importData['verificationType'];
+        }
+        if ($importData['visitType']) {
+            $idVerification['visitType'] = $importData['visitType'];
+        }
+        return $idVerification;
+    }
+
+    private function sendIdVerification($idVerification): bool
+    {
+        $postData = $this->idVerificationService->getRdrObject($idVerification);
+        return $this->idVerificationService->sendToRdr($postData);
+    }
 }

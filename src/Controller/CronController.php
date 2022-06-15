@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\IdVerificationImportService;
 use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/cron", condition="request.headers.get('X-Appengine-Cron') === 'true'")
+ * @Route("/cron")
  */
 class CronController extends BaseController
 {
@@ -214,6 +215,15 @@ class CronController extends BaseController
     public function deleteUnconfimedIncentivesImportDataAction(IncentiveImportService $incentiveImportService)
     {
         $incentiveImportService->deleteUnconfirmedImportData();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/send-id-verifications-rdr", name="cron_send_id_verifications_rdr")
+     */
+    public function sendIdVerificationsToRdrAction(IdVerificationImportService $idVerificationImportService)
+    {
+        $idVerificationImportService->sendIdVerificationsToRdr();
         return $this->json(['success' => true]);
     }
 }
