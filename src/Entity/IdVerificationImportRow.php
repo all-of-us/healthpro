@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\IdVerificationImportRowRepository")
  */
 class IdVerificationImportRow
 {
@@ -30,7 +30,7 @@ class IdVerificationImportRow
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $user_email;
+    private $userEmail;
 
     /**
      * @ORM\Column(type="datetime")
@@ -83,12 +83,12 @@ class IdVerificationImportRow
 
     public function getUserEmail(): ?string
     {
-        return $this->user_email;
+        return $this->userEmail;
     }
 
-    public function setUserEmail(?string $user_email): self
+    public function setUserEmail(?string $userEmail): self
     {
-        $this->user_email = $user_email;
+        $this->userEmail = $userEmail;
 
         return $this;
     }
