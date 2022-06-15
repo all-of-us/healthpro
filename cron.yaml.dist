@@ -71,3 +71,11 @@ cron:
   url: /cron/delete-unconfirmed-incentives-import-data
   schedule: every day 03:00
   timezone: America/Chicago
+- description: "Send id verifications to RDR"
+  url: /cron/send-id-verifications-rdr
+  schedule: every 5 mins
+  timezone: America/Chicago
+- description: "Delete id verifications import unconfirmed data"
+  url: /cron/delete-unconfirmed-id-verifications-import-data
+  schedule: every day 04:00
+  timezone: America/Chicago
