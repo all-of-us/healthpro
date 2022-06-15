@@ -34,4 +34,12 @@ class IdVerificationImportRowRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_ARRAY);
     }
+
+    public function deleteUnconfirmedImportData($date): void
+    {
+        $query = "DELETE ivir FROM id_verification_import_row ivir inner join id_verification_import ivi on ivir.import_id = ivi.id where ivi.created_ts < :date and ivi.confirm = :confirm";
+        $params = ['date' => $date, 'confirm' => 0];
+        $statement = $this->getEntityManager()->getConnection()->prepare($query);
+        $statement->execute($params);
+    }
 }

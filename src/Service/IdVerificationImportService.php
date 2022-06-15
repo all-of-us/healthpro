@@ -159,7 +159,6 @@ class IdVerificationImportService
             if (!in_array($importRowData['import_id'], $importIds)) {
                 $importIds[] = $importRowData['import_id'];
             }
-            $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->find($importRowData['import_id']);
             $idVerification = $this->getIdVerificationFromImportData($importRowData);
             $validUser = true;
             $user = null;
@@ -244,5 +243,12 @@ class IdVerificationImportService
                 }
             }
         }
+    }
+
+    public function deleteUnconfirmedImportData(): void
+    {
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->em->getRepository(IdVerificationImportRow::class)->deleteUnconfirmedImportData($date);
     }
 }
