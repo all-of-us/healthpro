@@ -27,16 +27,25 @@ class IdVerificationService
     {
         $obj = new \StdClass();
         $obj->participantId = $verificationData['participantId'];
-        $obj->userEmail = $verificationData['userEmail'];
+        if (isset($verificationData['userEmail'])) {
+            $obj->userEmail = $verificationData['userEmail'];
+        }
         $obj->verifiedTime = $verificationData['verifiedTime'];
         $obj->siteGoogleGroup = $verificationData['siteGoogleGroup'];
-        $obj->verificationType = $verificationData['verification_type'];
-        $obj->visitType = $verificationData['visit_type'];
+        if (isset($verificationData['verificationType'])) {
+            $obj->verificationType = $verificationData['verificationType'];
+        }
+        if (isset($verificationData['visitType'])) {
+            $obj->visitType = $verificationData['visitType'];
+        }
         return $obj;
     }
 
-    public function createIdVerification($participantId, $verificationData): bool
+    public function createIdVerification($participantId, $verificationFormData): bool
     {
+        $verificationData = [];
+        $verificationData['verificationType'] = $verificationFormData['verification_type'];
+        $verificationData['visitType'] = $verificationFormData['visit_type'];
         $verificationData['userEmail'] = $this->userService->getUser()->getEmail();
         $verificationData['participantId'] = $participantId;
         $now = new \DateTime();
@@ -60,7 +69,7 @@ class IdVerificationService
         return [];
     }
 
-    private function sendToRdr($postData)
+    public function sendToRdr($postData)
     {
         try {
             $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
