@@ -11,6 +11,8 @@ class Import
     public const STATUS_RDR_INTERNAL_SERVER_ERROR = 3;
     public const STATUS_OTHER_RDR_ERRORS = 4;
     public const STATUS_INVALID_USER = 5;
+    public const COMPLETE = 1;
+    public const COMPLETE_WITH_ERRORS = 2;
 
 
     public static function hasDuplicateParticipantId($imports, $participantId): bool

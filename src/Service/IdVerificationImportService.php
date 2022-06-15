@@ -192,6 +192,7 @@ class IdVerificationImportService
                 $this->em->clear();
             }
         }
+        $this->updateImportStatus($importIds);
     }
 
     public function getIdVerificationFromImportData($importData): array
@@ -216,5 +217,32 @@ class IdVerificationImportService
     {
         $postData = $this->idVerificationService->getRdrObject($idVerification);
         return $this->idVerificationService->sendToRdr($postData);
+    }
+
+    private function updateImportStatus($importIds): void
+    {
+        foreach ($importIds as $importId) {
+            $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->find($importId);
+            if (!empty($idVerificationImport)) {
+                $idVerificationImportRows = $this->em->getRepository(IdVerificationImportRow::class)->findBy([
+                    'import' => $idVerificationImport,
+                    'rdrStatus' => 0
+                ]);
+                if (empty($idVerificationImportRows)) {
+                    $idVerificationImportRows = $this->em->getRepository(IdVerificationImportRow::class)->findBy([
+                        'import' => $idVerificationImport,
+                        'rdrStatus' => [2, 3, 4, 5]
+                    ]);
+                    if (!empty($idVerificationImportRows)) {
+                        $idVerificationImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);
+                    } else {
+                        $idVerificationImport->setImportStatus(Import::COMPLETE);
+                    }
+                    $this->em->persist($idVerificationImport);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::ID_VERIFICATION_IMPORT_EDIT, $importId);
+                }
+            }
+        }
     }
 }

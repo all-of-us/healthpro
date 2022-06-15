@@ -324,7 +324,7 @@ class IncentiveImportService
                     }
                     $this->em->persist($incentiveImport);
                     $this->em->flush();
-                    $this->loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
+                    $this->loggerService->log(Log::INCENTIVE_IMPORT_EDIT, $importId);
                 }
             }
         }
