@@ -23,7 +23,9 @@ class IdVerificationServiceTest extends ServiceTestCase
 
     public function testRdrObject(): void
     {
-        $idVerificationData = $this->getIdVerificationData();
+        $idVerificationData = $this->getIdVerificationFormData();
+        $idVerificationData['verificationType'] = $idVerificationData['verification_type'];
+        $idVerificationData['visitType'] = $idVerificationData['visit_type'];
         $idVerificationService = static::getContainer()->get(IdVerificationService::class);
         $rdrObject = $idVerificationService->getRdrObject($idVerificationData);
         self::assertEquals('P123456789', $rdrObject->participantId);
@@ -34,13 +36,14 @@ class IdVerificationServiceTest extends ServiceTestCase
         self::assertEquals('PHYSICAL_MEASUREMENTS_ONLY', $rdrObject->visitType);
     }
 
+
     /**
      * @dataProvider createMockResponseDataProvider
      */
     public function testCreateIdVerification($data, $response): void
     {
         $service = $this->getIdVerificationService($data, 'post');
-        $result = $service->createIdVerification('P123456789', $this->getIdVerificationData());
+        $result = $service->createIdVerification('P123456789', $this->getIdVerificationFormData());
         self::assertEquals($result, $response);
     }
 
@@ -73,7 +76,7 @@ class IdVerificationServiceTest extends ServiceTestCase
         return new Response(200, ['Content-Type' => 'application/json'], $data);
     }
 
-    private function getIdVerificationData(): array
+    private function getIdVerificationFormData(): array
     {
         return [
             'participantId' => 'P123456789',
