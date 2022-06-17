@@ -36,15 +36,10 @@
                 <div id="idVerification" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         {% for idVerification in idVerifications %}
-                            {% set isImported = idVerification.verifiedTime|date('H:i:s') == '00:00:00' %}
                             <dl class="dl-horizontal">
                                 <dt>Verified</dt>
                                 <dd>
-                                    {% if isImported %}
-                                        {{ idVerification.verifiedTime|date('n/j/Y') }} <span class="label label-primary">Imported</span>
-                                    {% else %}
-                                        {{ idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}
-                                    {% endif %}
+                                    {{ idVerification.verifiedTime|date('H:i:s') == '00:00:00' ? idVerification.verifiedTime|date('n/j/Y') : idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}
                                 </dd>
                                 <dt>User</dt>
                                 <dd>{{ idVerification.userEmail }}</dd>
