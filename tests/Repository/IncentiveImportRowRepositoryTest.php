@@ -27,10 +27,16 @@ class IncentiveImportRowRepositoryTest extends KernelTestCase
         $incentiveImport = $this->createIncentiveImport(1);
         $this->createIncentiveImportRows($incentiveImport);
         $incentiveImportRows = $this->repo->getIncentiveImportRows(10);
-        $this->assertEquals(count($incentiveImportRows), 2);
-        $this->assertEquals($incentiveImportRows[0][0]['incentiveType'], 'cash');
-        $this->assertEquals($incentiveImportRows[1][0]['incentiveType'], 'promotional');
-        $this->assertEquals($incentiveImportRows[0]['site'], 'test-site');
+        foreach ($incentiveImportRows as $incentiveImportRow) {
+            if ($incentiveImportRow[0]['participantId'] === 'P000000001') {
+                $this->assertEquals($incentiveImportRow[0]['incentiveType'], 'cash');
+                $this->assertEquals($incentiveImportRow['site'], 'test-site');
+            }
+            if ($incentiveImportRow[0]['participantId'] === 'P000000002') {
+                $this->assertEquals($incentiveImportRow[0]['incentiveType'], 'promotional');
+                $this->assertEquals($incentiveImportRow['site'], 'test-site');
+            }
+        }
     }
 
     public function testDeleteUnconfirmedImportData(): void
@@ -39,13 +45,13 @@ class IncentiveImportRowRepositoryTest extends KernelTestCase
         $this->createIncentiveImportRows($incentiveImport);
         // Before delete
         $incentiveImportRows = $this->repo->findBy(
-            ['participantId' => ['P123456789', 'P123456799']]
+            ['participantId' => ['P000000001', 'P000000002']]
         );
         $this->assertEquals(count($incentiveImportRows), 2);
         $this->repo->deleteUnconfirmedImportData('2022-06-06 17:37:23');
         // After delete
         $incentiveImportRows = $this->repo->findBy(
-            ['participantId' => ['P123456789', 'P123456799']]
+            ['participantId' => ['P000000001', 'P000000002']]
         );
         $this->assertEquals(count($incentiveImportRows), 0);
     }
@@ -107,7 +113,7 @@ class IncentiveImportRowRepositoryTest extends KernelTestCase
                 'giftCardType' => '',
                 'notes' => '',
                 'declined' => 0,
-                'participantId' => 'P123456789',
+                'participantId' => 'P000000001',
                 'userEmail' => 'test1@example.com'
             ],
             [
@@ -120,7 +126,7 @@ class IncentiveImportRowRepositoryTest extends KernelTestCase
                 'giftCardType' => '',
                 'notes' => 'Test notes',
                 'declined' => 1,
-                'participantId' => 'P123456799',
+                'participantId' => 'P000000002',
                 'userEmail' => 'test2@example.com'
             ]
         ];

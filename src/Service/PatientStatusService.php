@@ -6,6 +6,7 @@ use App\Entity\PatientStatus;
 use App\Entity\PatientStatusHistory;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
+use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Audit\Log;
 use Psr\Log\LoggerInterface;
@@ -221,17 +222,17 @@ class PatientStatusService
             if (!empty($patientStatusImportRow)) {
                 if ($this->sendToRdr()) {
                     if ($this->saveData()) {
-                        $patientStatusImportRow->setRdrStatus(PatientStatusHistory::STATUS_SUCCESS);
+                        $patientStatusImportRow->setRdrStatus(Import::STATUS_SUCCESS);
                         $this->em->persist($patientStatusImportRow);
                         $this->em->flush();
                     }
                 } else {
                     $this->logger->error("#{$patientStatus['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
-                    $rdrStatus = PatientStatusHistory::STATUS_OTHER_RDR_ERRORS;
+                    $rdrStatus = Import::STATUS_OTHER_RDR_ERRORS;
                     if ($this->rdrApiService->getLastErrorCode() === 400) {
-                        $rdrStatus = PatientStatusHistory::STATUS_INVALID_PARTICIPANT_ID;
+                        $rdrStatus = Import::STATUS_INVALID_PARTICIPANT_ID;
                     } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
-                        $rdrStatus = PatientStatusHistory::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                        $rdrStatus = Import::STATUS_RDR_INTERNAL_SERVER_ERROR;
                     }
                     $patientStatusImportRow->setRdrStatus($rdrStatus);
                     $this->em->persist($patientStatusImportRow);
@@ -282,12 +283,16 @@ class PatientStatusService
                 if (empty($patientStatusImportRows)) {
                     $patientStatusImportRows = $this->em->getRepository(PatientStatusImportRow::class)->findBy([
                         'import' => $patientStatusImport,
-                        'rdrStatus' => [2, 3, 4]
+                        'rdrStatus' => [
+                            Import::STATUS_INVALID_PARTICIPANT_ID,
+                            Import::STATUS_RDR_INTERNAL_SERVER_ERROR,
+                            Import::STATUS_OTHER_RDR_ERRORS
+                        ]
                     ]);
                     if (!empty($patientStatusImportRows)) {
-                        $patientStatusImport->setImportStatus(PatientStatusImport::COMPLETE_WITH_ERRORS);
+                        $patientStatusImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);
                     } else {
-                        $patientStatusImport->setImportStatus(PatientStatusImport::COMPLETE);
+                        $patientStatusImport->setImportStatus(Import::COMPLETE);
                     }
                     $this->em->persist($patientStatusImport);
                     $this->em->flush();

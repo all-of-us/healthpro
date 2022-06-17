@@ -245,19 +245,19 @@ class IncentiveImportService
             if ($incentiveImportRow) {
                 if ($validUser) {
                     if ($this->sendIncentive($importRowData['participantId'], $incentive, $user)) {
-                        $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_SUCCESS);
+                        $incentiveImportRow->setRdrStatus(Import::STATUS_SUCCESS);
                     } else {
                         $this->logger->error("#{$importRowData['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
-                        $rdrStatus = IncentiveImportRow::STATUS_OTHER_RDR_ERRORS;
+                        $rdrStatus = Import::STATUS_OTHER_RDR_ERRORS;
                         if ($this->rdrApiService->getLastErrorCode() === 404) {
-                            $rdrStatus = IncentiveImportRow::STATUS_INVALID_PARTICIPANT_ID;
+                            $rdrStatus = Import::STATUS_INVALID_PARTICIPANT_ID;
                         } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
-                            $rdrStatus = IncentiveImportRow::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                            $rdrStatus = Import::STATUS_RDR_INTERNAL_SERVER_ERROR;
                         }
                         $incentiveImportRow->setRdrStatus($rdrStatus);
                     }
                 } else {
-                    $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_INVALID_USER);
+                    $incentiveImportRow->setRdrStatus(Import::STATUS_INVALID_USER);
                 }
                 $this->em->persist($incentiveImportRow);
                 $this->em->flush();
@@ -315,16 +315,21 @@ class IncentiveImportService
                 if (empty($incentiveImportRows)) {
                     $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
                         'import' => $incentiveImport,
-                        'rdrStatus' => [2, 3, 4, 5]
+                        'rdrStatus' => [
+                            Import::STATUS_INVALID_PARTICIPANT_ID,
+                            Import::STATUS_RDR_INTERNAL_SERVER_ERROR,
+                            Import::STATUS_OTHER_RDR_ERRORS,
+                            Import::STATUS_INVALID_USER
+                        ]
                     ]);
                     if (!empty($incentiveImportRows)) {
-                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE_WITH_ERRORS);
+                        $incentiveImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);
                     } else {
-                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE);
+                        $incentiveImport->setImportStatus(Import::COMPLETE);
                     }
                     $this->em->persist($incentiveImport);
                     $this->em->flush();
-                    $this->loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
+                    $this->loggerService->log(Log::INCENTIVE_IMPORT_EDIT, $importId);
                 }
             }
         }

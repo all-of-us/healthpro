@@ -69,9 +69,6 @@ class PatientStatusImport
      */
     private $organization;
 
-    public const COMPLETE = 1;
-    public const COMPLETE_WITH_ERRORS = 2;
-
     public function __construct()
     {
         $this->PatientStatusImportRows = new ArrayCollection();

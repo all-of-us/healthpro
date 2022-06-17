@@ -23,37 +23,36 @@ class IdVerificationService
         $this->loggerService = $loggerService;
     }
 
-    public function getRdrObject($participantId, $verificationData): \stdClass
+    public function getRdrObject($verificationData): \stdClass
     {
         $obj = new \StdClass();
-        $email = $this->userService->getUser()->getEmail();
-        $now = new \DateTime();
-        $obj->participantId = $participantId;
-        $obj->userEmail = $email;
-        $obj->verifiedTime = $now->format('Y-m-d\TH:i:s\Z');
-        $obj->siteGoogleGroup = $this->siteService->getSiteIdWithPrefix();
-        $obj->verificationType = $verificationData['verification_type'];
-        $obj->visitType = $verificationData['visit_type'];
+        $obj->participantId = $verificationData['participantId'];
+        if (isset($verificationData['userEmail'])) {
+            $obj->userEmail = $verificationData['userEmail'];
+        }
+        $obj->verifiedTime = $verificationData['verifiedTime'];
+        $obj->siteGoogleGroup = $verificationData['siteGoogleGroup'];
+        if (isset($verificationData['verificationType'])) {
+            $obj->verificationType = $verificationData['verificationType'];
+        }
+        if (isset($verificationData['visitType'])) {
+            $obj->visitType = $verificationData['visitType'];
+        }
         return $obj;
     }
 
-    public function createIdVerification($participantId, $verificationData): bool
+    public function createIdVerification($participantId, $verificationFormData): bool
     {
-        $postData = $this->getRdrObject($participantId, $verificationData);
-        try {
-            $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && !empty($result->verificationType)) {
-                $this->loggerService->log(Log::ID_VERIFICATION_ADD, [
-                    'participantId' => $participantId
-                ]);
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
+        $verificationData = [];
+        $verificationData['verificationType'] = $verificationFormData['verification_type'];
+        $verificationData['visitType'] = $verificationFormData['visit_type'];
+        $verificationData['userEmail'] = $this->userService->getUser()->getEmail();
+        $verificationData['participantId'] = $participantId;
+        $now = new \DateTime();
+        $verificationData['verifiedTime'] = $now->format('Y-m-d\TH:i:s\Z');
+        $verificationData['siteGoogleGroup'] = $this->siteService->getSiteIdWithPrefix();
+        $postData = $this->getRdrObject($verificationData);
+        return $this->sendToRdr($postData);
     }
 
     public function getIdVerifications($participantId): array
@@ -68,5 +67,23 @@ class IdVerificationService
             $this->rdrApiService->logException($e);
         }
         return [];
+    }
+
+    public function sendToRdr($postData)
+    {
+        try {
+            $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && !empty($result->verificationType)) {
+                $this->loggerService->log(Log::ID_VERIFICATION_ADD, [
+                    'participantId' => $postData->participantId
+                ]);
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
     }
 }

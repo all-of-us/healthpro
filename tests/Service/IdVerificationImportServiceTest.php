@@ -106,4 +106,44 @@ class IdVerificationImportServiceTest extends ServiceTestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider idVerificationImportDataProvider
+     */
+    public function testGetIncentiveFromImportData($importData)
+    {
+        $idVerification = $this->service->getIdVerificationFromImportData($importData);
+        $this->assertEquals($idVerification['participantId'], $importData['participantId']);
+        $this->assertEquals($idVerification['verifiedTime'], $importData['verifiedDate']->format('Y-m-d\TH:i:s\Z'));
+        $this->assertEquals($idVerification['siteGoogleGroup'], 'hpo-site-' . $importData['site']);
+        $this->assertEquals($idVerification['userEmail'], $importData['userEmail']);
+        $this->assertEquals($idVerification['verificationType'], $importData['verificationType']);
+        $this->assertEquals($idVerification['visitType'], $importData['visitType']);
+    }
+
+    public function idVerificationImportDataProvider()
+    {
+        return [
+            [
+                [
+                    'participantId' => 'P000000001',
+                    'userEmail' => 'test1@example.com',
+                    'verifiedDate' => new \Datetime('06/13/2022'),
+                    'verificationType' => 'PHOTO_AND_ONE_OF_PII',
+                    'visitType' => 'PMB_INITIAL_VISIT',
+                    'status' => 0,
+                    'site' => 'test-site1'
+                ],
+                [
+                    'participantId' => 'P000000002',
+                    'userEmail' => 'test2@example.com',
+                    'verifiedDate' => new \Datetime('06/14/2022'),
+                    'verificationType' => 'TWO_OF_PII',
+                    'visitType' => 'BIOSPECIMEN_REDRAW_ONLY',
+                    'status' => 0,
+                    'site' => 'test-site2'
+                ]
+            ]
+        ];
+    }
 }

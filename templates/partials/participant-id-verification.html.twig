@@ -38,7 +38,9 @@
                         {% for idVerification in idVerifications %}
                             <dl class="dl-horizontal">
                                 <dt>Verified</dt>
-                                <dd>{{ idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                                <dd>
+                                    {{ idVerification.verifiedTime|date('H:i:s') == '00:00:00' ? idVerification.verifiedTime|date('n/j/Y') : idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}
+                                </dd>
                                 <dt>User</dt>
                                 <dd>{{ idVerification.userEmail }}</dd>
                                 <dt>Site</dt>
