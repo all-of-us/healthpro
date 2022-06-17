@@ -315,7 +315,12 @@ class IncentiveImportService
                 if (empty($incentiveImportRows)) {
                     $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
                         'import' => $incentiveImport,
-                        'rdrStatus' => [2, 3, 4, 5]
+                        'rdrStatus' => [
+                            Import::STATUS_INVALID_PARTICIPANT_ID,
+                            Import::STATUS_RDR_INTERNAL_SERVER_ERROR,
+                            Import::STATUS_OTHER_RDR_ERRORS,
+                            Import::STATUS_INVALID_USER
+                        ]
                     ]);
                     if (!empty($incentiveImportRows)) {
                         $incentiveImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);

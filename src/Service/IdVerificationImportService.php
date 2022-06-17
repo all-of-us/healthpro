@@ -230,7 +230,12 @@ class IdVerificationImportService
                 if (empty($idVerificationImportRows)) {
                     $idVerificationImportRows = $this->em->getRepository(IdVerificationImportRow::class)->findBy([
                         'import' => $idVerificationImport,
-                        'rdrStatus' => [2, 3, 4, 5]
+                        'rdrStatus' => [
+                            Import::STATUS_INVALID_PARTICIPANT_ID,
+                            Import::STATUS_RDR_INTERNAL_SERVER_ERROR,
+                            Import::STATUS_OTHER_RDR_ERRORS,
+                            Import::STATUS_INVALID_USER
+                        ]
                     ]);
                     if (!empty($idVerificationImportRows)) {
                         $idVerificationImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);

@@ -283,7 +283,11 @@ class PatientStatusService
                 if (empty($patientStatusImportRows)) {
                     $patientStatusImportRows = $this->em->getRepository(PatientStatusImportRow::class)->findBy([
                         'import' => $patientStatusImport,
-                        'rdrStatus' => [2, 3, 4]
+                        'rdrStatus' => [
+                            Import::STATUS_INVALID_PARTICIPANT_ID,
+                            Import::STATUS_RDR_INTERNAL_SERVER_ERROR,
+                            Import::STATUS_OTHER_RDR_ERRORS
+                        ]
                     ]);
                     if (!empty($patientStatusImportRows)) {
                         $patientStatusImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);
