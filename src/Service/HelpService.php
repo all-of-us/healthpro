@@ -131,6 +131,14 @@ class HelpService
                 'HPRO SOP-003' => [
                     'title' => 'HPRO SOP-003 On-Site ID Verification Feature',
                     'filename' => 'HPRO SOP-003 On-Site ID Verification Feature.pdf'
+                ],
+                'HPRO SOP-004' => [
+                    'title' => 'HPRO SOP-004 Patient Status Flag',
+                    'filename' => 'HPRO SOP-004 Patient Status Flag.pdf'
+                ],
+                'HPRO SOP-005' => [
+                    'title' => 'HPRO SOP-005 HealthPro Imports Feature',
+                    'filename' => 'HPRO SOP-005 HealthPro Imports Feature.pdf'
                 ]
             ]
         ]
