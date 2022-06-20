@@ -11,4 +11,26 @@
             </ul>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped table-bordered" id="on_site_patient_status" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Date Created</th>
+                    <th>Participant ID</th>
+                    <th>User</th>
+                    <th>Site</th>
+                    <th>Patient Status</th>
+                    <th>Notes</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('on-site-patient-status') }}
 {% endblock %}

@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\PatientStatus;
+use App\Service\OnSiteDetailsReportingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -20,8 +23,19 @@ class OnSiteDetailsReportingController extends BaseController
     /**
      * @Route("/patient-status", name="on_site_patient_status")
      */
-    public function index()
+    public function index(OnSiteDetailsReportingService $onSiteDetailsReportingService, Request $request)
     {
-        return $this->render('onsite/patient-status.html.twig');
+        //For ajax requests
+        if ($request->isXmlHttpRequest()) {
+            $params = $request->request->all();
+            $patientStatuses = $this->em->getRepository(PatientStatus::class)->findBy([], ['id' => 'DESC'], $params['length'], $params['start']);
+            $ajaxData = [];
+            $ajaxData['data'] = $onSiteDetailsReportingService->getAjaxData($patientStatuses);
+            // TODO get count
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = 3;
+            return $this->json($ajaxData);
+        } else {
+            return $this->render('onsite/patient-status.html.twig');
+        }
     }
 }
