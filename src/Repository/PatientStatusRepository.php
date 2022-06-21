@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\PatientStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -123,5 +124,36 @@ class PatientStatusRepository extends ServiceEntityRepository
             }
         }
         return $results;
+    }
+
+    public function getOnsitePatientStatuses($limit, $offset): array
+    {
+        return $this->createQueryBuilder('ps')
+            ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, u.email')
+            ->leftJoin('ps.history', 'psh')
+            ->leftJoin(
+                'App\Entity\User',
+                'u',
+                Join::WITH,
+                'psh.userId = u.id'
+            )
+            ->where('ps.organization =:organization')
+            ->setParameter('organization', 'PITT_UPMC')
+            ->orderBy('ps.id', 'ASC')
+            ->getQuery()
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getResult();
+    }
+
+    public function getOnsitePatientStatusesCount(): int
+    {
+        return $this->createQueryBuilder('ps')
+            ->select('count(psh.id)')
+            ->leftJoin('ps.history', 'psh')
+            ->where('ps.organization =:organization')
+            ->setParameter('organization', 'PITT_UPMC')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

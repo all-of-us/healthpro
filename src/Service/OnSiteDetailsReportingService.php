@@ -8,15 +8,13 @@ class OnSiteDetailsReportingService
     {
         $rows = [];
         foreach ($patientStatuses as $patientStatus) {
-            $patientStatusHistory = $patientStatus->getHistory();
             $row = [];
-            $row['created'] = $patientStatusHistory->getCreatedTs()->format('m-d-Y');
-            $row['participantId'] = $patientStatus->getParticipantId();
-            //TODO get user email
-            $row['user'] = $patientStatusHistory->getUserId();
-            $row['site'] = $patientStatusHistory->getSite();
-            $row['patientStatus'] = $patientStatusHistory->getStatus();
-            $row['notes'] = $patientStatusHistory->getComments();
+            $row['created'] = $patientStatus['createdTs']->format('m-d-Y');
+            $row['participantId'] = $patientStatus['participantId'];
+            $row['user'] = $patientStatus['email'];
+            $row['site'] = $patientStatus['site'];
+            $row['patientStatus'] = $patientStatus['status'];
+            $row['notes'] = $patientStatus['comments'];
             array_push($rows, $row);
         }
         return $rows;
