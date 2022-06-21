@@ -28,13 +28,13 @@
                         <div class="panel-body">
                             <div class="form-group">
                                 <label class="control-label" for="startDate">Start Date</label>
-                                <input type="text" name="startDate" class="form-control" id="startDate"
+                                <input type="text" name="startDate" class="form-control date-filter" id="startDate"
                                        value="{{ params['startDate']|default('') }}" placeholder="MM/DD/YYYY"
                                        autocomplete="off" data-parsley-date-mdy>
                             </div>
                             <div class="form-group">
                                 <label class="control-label" for="endDate">End Date</label>
-                                <input type="text" name="endDate" class="form-control" id="endDate"
+                                <input type="text" name="endDate" class="form-control date-filter" id="endDate"
                                        value="{{ params['endDate']|default('') }}" placeholder="MM/DD/YYYY"
                                        autocomplete="off" data-parsley-date-mdy>
                             </div>

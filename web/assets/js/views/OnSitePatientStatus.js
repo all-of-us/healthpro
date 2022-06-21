@@ -30,4 +30,6 @@ $(document).ready(function () {
             }
         ]
     });
+
+    $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
 });
