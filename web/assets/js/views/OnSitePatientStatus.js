@@ -16,6 +16,7 @@ $(document).ready(function () {
         scrollX: true,
         searching: false,
         ordering: false,
+        bLengthChange: false,
         ajax: {
             url: url,
             type: "POST"

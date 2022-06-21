@@ -30,7 +30,9 @@ class OnSiteDetailsReportingController extends BaseController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = $request->request->all();
-            $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($params['length'], $params['start'], $siteService->getSiteOrganization());
+            $params['startDate'] = $request->query->get('startDate') ? \DateTime::createFromFormat('m/d/Y', $request->query->get('startDate')) : '';
+            $params['endDate'] = $request->query->get('endDate') ? \DateTime::createFromFormat('m/d/Y', $request->query->get('endDate')) : '';
+            $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($params, $siteService->getSiteOrganization());
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getAjaxData($patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount();
