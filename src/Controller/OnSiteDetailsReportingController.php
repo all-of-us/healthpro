@@ -27,18 +27,19 @@ class OnSiteDetailsReportingController extends BaseController
      */
     public function index(OnSiteDetailsReportingService $onSiteDetailsReportingService, PatientStatusRepository $patientStatusRepository, SiteService $siteService, Request $request)
     {
+        $params = $request->query->all();
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
-            $params = $request->request->all();
-            $params['startDate'] = $request->query->get('startDate') ? \DateTime::createFromFormat('m/d/Y', $request->query->get('startDate')) : '';
-            $params['endDate'] = $request->query->get('endDate') ? \DateTime::createFromFormat('m/d/Y', $request->query->get('endDate')) : '';
-            $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($params, $siteService->getSiteOrganization());
+            $ajaxParams = $request->request->all();
+            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
+            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('m/d/Y', $params['endDate']) : '';
+            $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($ajaxParams, $siteService->getSiteOrganization());
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getAjaxData($patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount();
             return $this->json($ajaxData);
         } else {
-            return $this->render('onsite/patient-status.html.twig');
+            return $this->render('onsite/patient-status.html.twig', ['params' => $params]);
         }
     }
 }
