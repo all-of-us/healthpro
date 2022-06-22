@@ -134,6 +134,11 @@ class PatientStatusRepository extends ServiceEntityRepository
             ->leftJoin('App\Entity\User', 'u', Join::WITH, 'psh.userId = u.id')
             ->where('ps.awardee =:awardee');
 
+        if (!empty($params['participantId'])) {
+            $queryBuilder->andWhere('ps.participantId = :participantId')
+                ->setParameter('participantId', $params['participantId']);
+        }
+
         if (!empty($params['startDate'])) {
             $queryBuilder->andWhere('psh.createdTs >= :startDate')
                 ->setParameter('startDate', $params['startDate']);
