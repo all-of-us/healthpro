@@ -33,7 +33,7 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxParams = $request->request->all();
             $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
             $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('m/d/Y', $params['endDate']) : '';
-            $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($ajaxParams, $siteService->getSiteOrganization());
+            $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($ajaxParams, $siteService->getSiteAwardee());
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getAjaxData($patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount();

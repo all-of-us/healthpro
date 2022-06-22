@@ -126,13 +126,13 @@ class PatientStatusRepository extends ServiceEntityRepository
         return $results;
     }
 
-    public function getOnsitePatientStatuses($params, $organization): array
+    public function getOnsitePatientStatuses($params, $awardee): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, u.email')
             ->leftJoin('ps.history', 'psh')
             ->leftJoin('App\Entity\User', 'u', Join::WITH, 'psh.userId = u.id')
-            ->where('ps.organization =:organization');
+            ->where('ps.awardee =:awardee');
 
         if (!empty($params['startDate'])) {
             $queryBuilder->andWhere('psh.createdTs >= :startDate')
@@ -145,7 +145,7 @@ class PatientStatusRepository extends ServiceEntityRepository
         }
 
         return $queryBuilder
-            ->setParameter('organization', $organization)
+            ->setParameter('awardee', $awardee)
             ->orderBy('ps.id', 'ASC')
             ->getQuery()
             ->setFirstResult($params['start'])
