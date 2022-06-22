@@ -25,6 +25,12 @@ $(document).ready(function () {
         pageLength: 25,
         columnDefs: [
             {
+                targets: [1],
+                render: function (participantId) {
+                    return '<a href="/participant/' + participantId + '">' + participantId + '</a>';
+                }
+            },
+            {
                 targets: '_all',
                 render: $.fn.dataTable.render.text()
             }
