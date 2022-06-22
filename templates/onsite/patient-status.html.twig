@@ -14,8 +14,8 @@
     </div>
     <br/>
     <div class="row">
-        <div class="col-md-12">
-            <form method="get">
+        <div class="col-md-12 dropdown on-site-filters" id="patient_status_filters">
+            <form>
                 <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
                     <i class="far fa-calendar" aria-hidden="true"></i> Select Dates <b class="caret"></b>
                 </button>
@@ -23,7 +23,7 @@
                     <li>
                         <div class="list-group-item bg-light">
                             <b>Select Date(s)</b>
-                            <small class="pull-right"><a class="date-filter-reset" id="date_filter_reset">Reset</a></small>
+                            <small class="pull-right"><a class="date-filter-reset" id="date_filter_reset" href="{{ path('on_site_patient_status') }}">Reset</a></small>
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
@@ -39,7 +39,7 @@
                                        autocomplete="off" data-parsley-date-mdy>
                             </div>
                             <p class="text-center">
-                                <button type="submit" class="btn btn-primary" id="date_filter_apply">Apply</button>
+                                <button type="button" class="btn btn-primary" id="date_filter_apply">Apply</button>
                             </p>
                         </div>
                     </li>

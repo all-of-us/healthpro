@@ -32,4 +32,14 @@ $(document).ready(function () {
     });
 
     $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
+
+    $('#date_filter_apply').on('click', function () {
+        var formSelector = $("#patient_status_filters form");
+        formSelector.parsley().validate();
+        if (formSelector.parsley().isValid()) {
+            if ($('#startDate').val() !== '' || $('#endDate').val() !== '') {
+                formSelector.submit();
+            }
+        }
+    });
 });

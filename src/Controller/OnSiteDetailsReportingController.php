@@ -28,7 +28,6 @@ class OnSiteDetailsReportingController extends BaseController
     public function index(OnSiteDetailsReportingService $onSiteDetailsReportingService, PatientStatusRepository $patientStatusRepository, SiteService $siteService, Request $request)
     {
         $params = $request->query->all();
-        //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
             $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
