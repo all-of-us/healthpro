@@ -126,7 +126,7 @@ class PatientStatusRepository extends ServiceEntityRepository
         return $results;
     }
 
-    public function getOnsitePatientStatuses($params, $awardee): array
+    public function getOnsitePatientStatuses($awardee, $params): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, u.email')
@@ -144,13 +144,21 @@ class PatientStatusRepository extends ServiceEntityRepository
                 ->setParameter('endDate', $params['endDate']);
         }
 
-        return $queryBuilder
+        $queryBuilder
             ->setParameter('awardee', $awardee)
-            ->orderBy('ps.id', 'ASC')
-            ->getQuery()
-            ->setFirstResult($params['start'])
-            ->setMaxResults($params['length'])
-            ->getResult();
+            ->orderBy('ps.id', 'ASC');
+
+        if (isset($params['start'])) {
+            return $queryBuilder
+                ->getQuery()
+                ->setFirstResult($params['start'])
+                ->setMaxResults($params['length'])
+                ->getResult();
+        } else {
+            return $queryBuilder
+                ->getQuery()
+                ->getResult();
+        }
     }
 
     public function getOnsitePatientStatusesCount(): int

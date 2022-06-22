@@ -14,7 +14,7 @@
     </div>
     <br/>
     <div class="row">
-        <div class="col-md-12 dropdown on-site-filters" id="patient_status_filters">
+        <div class="col-md-4 dropdown on-site-filters" id="patient_status_filters">
             <form>
                 <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
                     <i class="far fa-calendar" aria-hidden="true"></i> Select Dates <b class="caret"></b>
@@ -45,6 +45,9 @@
                     </li>
                 </ul>
             </form>
+        </div>
+        <div class="col-md-2 col-md-offset-6">
+            <a href="{{ path('on_site_patient_status_export') }}" class="btn btn-xs btn-default export"><i class="fa fa-download" aria-hidden="true"></i> Export</a>
         </div>
     </div>
     <div class="row">

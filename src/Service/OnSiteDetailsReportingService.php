@@ -4,6 +4,14 @@ namespace App\Service;
 
 class OnSiteDetailsReportingService
 {
+    public static $patientStatusExportHeaders = [
+        'Date Created',
+        'Participant ID',
+        'User',
+        'Site',
+        'Patient Status',
+        'Notes'
+    ];
     public function getAjaxData($patientStatuses): array
     {
         $rows = [];
