@@ -51,6 +51,7 @@ $(document).ready(function () {
     $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
 
     var formSelector = $("#patient_status_filters form");
+    var participantIdSelector = $('#participantId');
     var startDateSelector = $('#startDate');
     var endDateSelector = $('#endDate');
 
@@ -72,10 +73,23 @@ $(document).ready(function () {
     });
 
     $('#participant_id_filter_apply').on('click', function () {
-        var isValidParticipantId = $('#participantId').parsley().validate();
+        var isValidParticipantId = participantIdSelector.parsley().validate();
         if (isValidParticipantId === true) {
             clearInvalidFields();
             formSelector.submit();
         }
+    });
+
+    $('#participant_id_filter_reset').on('click', function () {
+        participantIdSelector.val('');
+        clearInvalidFields();
+        formSelector.submit();
+    });
+
+    $('#date_filter_reset').on('click', function () {
+        startDateSelector.val('');
+        endDateSelector.val('');
+        clearInvalidFields();
+        formSelector.submit();
     });
 });
