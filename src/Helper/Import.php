@@ -18,7 +18,8 @@ class Import
     public static function hasDuplicateParticipantId($imports, $participantId): bool
     {
         foreach ($imports as $import) {
-            if ($import['participant_id'] === $participantId) {
+            $importParticipantId = $import['participant_id'] ?? $import['participantId'];
+            if ($importParticipantId === $participantId) {
                 return true;
             }
         }
