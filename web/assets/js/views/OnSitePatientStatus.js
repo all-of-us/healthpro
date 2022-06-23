@@ -6,7 +6,8 @@ $(document).ready(function () {
         {name: 'user', data: 'user'},
         {name: 'site', data: 'site'},
         {name: 'patientStatus', data: 'patientStatus'},
-        {name: 'notes', data: 'notes'}
+        {name: 'notes', data: 'notes'},
+        {name: 'importId', data: 'importId'}
     );
     var url = window.location.href;
     var onSitePatientStatusTableSelector = $('#on_site_patient_status');
@@ -28,6 +29,16 @@ $(document).ready(function () {
                 targets: [1],
                 render: function (participantId) {
                     return '<a href="/participant/' + participantId + '">' + participantId + '</a>';
+                }
+            },
+            {
+                targets: [6],
+                render: function (importId) {
+                    var html = '';
+                    if (importId) {
+                        html = '<span class="label label-primary">Imported</span>';
+                    }
+                    return html;
                 }
             },
             {

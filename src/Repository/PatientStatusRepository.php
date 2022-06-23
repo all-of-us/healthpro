@@ -129,9 +129,10 @@ class PatientStatusRepository extends ServiceEntityRepository
     public function getOnsitePatientStatuses($awardee, $params): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
-            ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, u.email')
+            ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
             ->leftJoin('ps.history', 'psh')
             ->leftJoin('App\Entity\User', 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin('psh.import', 'psi')
             ->where('ps.awardee =:awardee');
 
         if (!empty($params['participantId'])) {

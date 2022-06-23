@@ -23,6 +23,7 @@ class OnSiteDetailsReportingService
             $row['site'] = $patientStatus['site'];
             $row['patientStatus'] = $patientStatus['status'];
             $row['notes'] = $patientStatus['comments'];
+            $row['importId'] = $patientStatus['importId'];
             array_push($rows, $row);
         }
         return $rows;
