@@ -10,7 +10,8 @@ class OnSiteDetailsReportingService
         'User',
         'Site',
         'Patient Status',
-        'Notes'
+        'Notes',
+        'Imported'
     ];
 
     public static $patientStatusSortColumns = [
@@ -33,7 +34,7 @@ class OnSiteDetailsReportingService
             $row['site'] = $patientStatus['site'];
             $row['patientStatus'] = $patientStatus['status'];
             $row['notes'] = $patientStatus['comments'];
-            $row['importId'] = $patientStatus['importId'];
+            $row['importId'] = $patientStatus['importId'] ? 'Yes' : 'No';
             array_push($rows, $row);
         }
         return $rows;

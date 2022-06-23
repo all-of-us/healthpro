@@ -35,7 +35,7 @@ $(document).ready(function () {
                 targets: [6],
                 render: function (importId) {
                     var html = '';
-                    if (importId) {
+                    if (importId === 'Yes') {
                         html = '<span class="label label-primary">Imported</span>';
                     }
                     return html;
