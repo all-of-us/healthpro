@@ -626,6 +626,10 @@ table.table-samples td {
     color: #a94442;
 }
 
+.on-site-reset-all {
+    margin-top: 8px;
+}
+
 .btn-readonly {
     pointer-events: none;
     cursor: default;
