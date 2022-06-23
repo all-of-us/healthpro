@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
@@ -47,13 +48,13 @@ class PatientStatusImportService
         $row = 2;
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
             $patientStatus = [];
-            if (!preg_match("/^P\d{9}+$/", $data[0])) {
+            if (!Import::isValidParticipantId($data[0])) {
                 $form['patient_status_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
             }
-            if ($this->hasDuplicateParticipantId($patientStatuses, $data[0])) {
+            if (Import::hasDuplicateParticipantId($patientStatuses, $data[0])) {
                 $form['patient_status_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            $patientStatus['participantId'] = $data[0];
+            $patientStatus['participant_id'] = $data[0];
             if (!in_array($data[1], $validStatus)) {
                 $form['patient_status_csv']->addError(new FormError("Invalid patient status {$data[1]} in line {$row}, column 2"));
             }
@@ -79,15 +80,5 @@ class PatientStatusImportService
             array_push($rows, $row);
         }
         return $rows;
-    }
-
-    private function hasDuplicateParticipantId($patientStatuses, $participantId)
-    {
-        foreach ($patientStatuses as $patientStatus) {
-            if ($patientStatus['participantId'] === $participantId) {
-                return true;
-            }
-        }
-        return false;
     }
 }

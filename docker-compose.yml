@@ -7,6 +7,7 @@ services:
             MYSQL_DATABASE: hpo
         container_name: healthpro-mysql
         hostname: healthpro-mysql
+        platform: linux/x86_64
         image: mysql:5.7
         ports:
             - "53306:3306"

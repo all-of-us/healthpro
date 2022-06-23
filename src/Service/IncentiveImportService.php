@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\Incentive;
 use App\Entity\IncentiveImport;
 use App\Entity\IncentiveImportRow;
+use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
@@ -68,13 +69,13 @@ class IncentiveImportService
         $row = 2;
         while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
             $incentive = [];
-            if (!preg_match("/^P\d{9}+$/", $data[0])) {
+            if (!Import::isValidParticipantId($data[0])) {
                 $form['incentive_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
             }
-            if ($this->hasDuplicateParticipantId($incentives, $data[0])) {
+            if (Import::hasDuplicateParticipantId($incentives, $data[0])) {
                 $form['incentive_csv']->addError(new FormError("Duplicate participant ID {$data[0]} in line {$row}, column 1"));
             }
-            if ($data[1] && !$this->isValidEmail($data[1])) {
+            if ($data[1] && !Import::isValidEmail($data[1])) {
                 $form['incentive_csv']->addError(new FormError("Invalid User {$data[1]} in line {$row}, column 2"));
             }
             if ($data[3] && !in_array($data[3], array_values(Incentive::$incentiveOccurrenceChoices))) {
@@ -87,7 +88,7 @@ class IncentiveImportService
                 $form['incentive_csv']->addError(new FormError("Invalid Amount {$data[8]} in line {$row}, column 9"));
             }
             if (!empty($data[2])) {
-                if (!$this->isValidDate($data[2])) {
+                if (!Import::isValidDate($data[2])) {
                     $form['incentive_csv']->addError(new FormError("Please enter valid date in line {$row}, column 3"));
                 }
             } else {
@@ -136,31 +137,6 @@ class IncentiveImportService
             $row++;
         }
         return $incentives;
-    }
-
-    private function hasDuplicateParticipantId($incentives, $participantId): bool
-    {
-        foreach ($incentives as $incentive) {
-            if ($incentive['participant_id'] === $participantId) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function isValidEmail($email): bool
-    {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $parts = explode('@', $email);
-            $domain = array_pop($parts);
-            return $domain === self::EMAIL_DOMAIN;
-        }
-        return false;
-    }
-
-    public function isValidDate($date): bool
-    {
-        return (bool)strtotime($date);
     }
 
     public function createIncentives($fileName, $incentives): int
@@ -269,19 +245,19 @@ class IncentiveImportService
             if ($incentiveImportRow) {
                 if ($validUser) {
                     if ($this->sendIncentive($importRowData['participantId'], $incentive, $user)) {
-                        $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_SUCCESS);
+                        $incentiveImportRow->setRdrStatus(Import::STATUS_SUCCESS);
                     } else {
                         $this->logger->error("#{$importRowData['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
-                        $rdrStatus = IncentiveImportRow::STATUS_OTHER_RDR_ERRORS;
+                        $rdrStatus = Import::STATUS_OTHER_RDR_ERRORS;
                         if ($this->rdrApiService->getLastErrorCode() === 404) {
-                            $rdrStatus = IncentiveImportRow::STATUS_INVALID_PARTICIPANT_ID;
+                            $rdrStatus = Import::STATUS_INVALID_PARTICIPANT_ID;
                         } elseif ($this->rdrApiService->getLastErrorCode() === 500) {
-                            $rdrStatus = IncentiveImportRow::STATUS_RDR_INTERNAL_SERVER_ERROR;
+                            $rdrStatus = Import::STATUS_RDR_INTERNAL_SERVER_ERROR;
                         }
                         $incentiveImportRow->setRdrStatus($rdrStatus);
                     }
                 } else {
-                    $incentiveImportRow->setRdrStatus(IncentiveImportRow::STATUS_INVALID_USER);
+                    $incentiveImportRow->setRdrStatus(Import::STATUS_INVALID_USER);
                 }
                 $this->em->persist($incentiveImportRow);
                 $this->em->flush();
@@ -339,16 +315,21 @@ class IncentiveImportService
                 if (empty($incentiveImportRows)) {
                     $incentiveImportRows = $this->em->getRepository(IncentiveImportRow::class)->findBy([
                         'import' => $incentiveImport,
-                        'rdrStatus' => [2, 3, 4, 5]
+                        'rdrStatus' => [
+                            Import::STATUS_INVALID_PARTICIPANT_ID,
+                            Import::STATUS_RDR_INTERNAL_SERVER_ERROR,
+                            Import::STATUS_OTHER_RDR_ERRORS,
+                            Import::STATUS_INVALID_USER
+                        ]
                     ]);
                     if (!empty($incentiveImportRows)) {
-                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE_WITH_ERRORS);
+                        $incentiveImport->setImportStatus(Import::COMPLETE_WITH_ERRORS);
                     } else {
-                        $incentiveImport->setImportStatus(IncentiveImport::COMPLETE);
+                        $incentiveImport->setImportStatus(Import::COMPLETE);
                     }
                     $this->em->persist($incentiveImport);
                     $this->em->flush();
-                    $this->loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $importId);
+                    $this->loggerService->log(Log::INCENTIVE_IMPORT_EDIT, $importId);
                 }
             }
         }

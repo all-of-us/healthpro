@@ -23,14 +23,19 @@ class IdVerificationServiceTest extends ServiceTestCase
 
     public function testRdrObject(): void
     {
-        $idVerificationData = $this->getIdVerificationData();
+        $idVerificationData = $this->getIdVerificationFormData();
+        $idVerificationData['verificationType'] = $idVerificationData['verification_type'];
+        $idVerificationData['visitType'] = $idVerificationData['visit_type'];
         $idVerificationService = static::getContainer()->get(IdVerificationService::class);
-        $rdrObject = $idVerificationService->getRdrObject('P123456789', $idVerificationData);
+        $rdrObject = $idVerificationService->getRdrObject($idVerificationData);
+        self::assertEquals('P123456789', $rdrObject->participantId);
         self::assertEquals('test@example.com', $rdrObject->userEmail);
         self::assertEquals('hpo-site-test', $rdrObject->siteGoogleGroup);
+        self::assertEquals('2022-04-19T20:52:23', $rdrObject->verifiedTime);
         self::assertEquals('PHOTO_AND_ONE_OF_PII', $rdrObject->verificationType);
         self::assertEquals('PHYSICAL_MEASUREMENTS_ONLY', $rdrObject->visitType);
     }
+
 
     /**
      * @dataProvider createMockResponseDataProvider
@@ -38,7 +43,7 @@ class IdVerificationServiceTest extends ServiceTestCase
     public function testCreateIdVerification($data, $response): void
     {
         $service = $this->getIdVerificationService($data, 'post');
-        $result = $service->createIdVerification('P123456789', $this->getIdVerificationData());
+        $result = $service->createIdVerification('P123456789', $this->getIdVerificationFormData());
         self::assertEquals($result, $response);
     }
 
@@ -71,9 +76,13 @@ class IdVerificationServiceTest extends ServiceTestCase
         return new Response(200, ['Content-Type' => 'application/json'], $data);
     }
 
-    private function getIdVerificationData(): array
+    private function getIdVerificationFormData(): array
     {
         return [
+            'participantId' => 'P123456789',
+            'userEmail' => 'test@example.com',
+            'siteGoogleGroup' => 'hpo-site-test',
+            'verifiedTime' => '2022-04-19T20:52:23',
             'verification_type' => 'PHOTO_AND_ONE_OF_PII',
             'visit_type' => 'PHYSICAL_MEASUREMENTS_ONLY'
         ];

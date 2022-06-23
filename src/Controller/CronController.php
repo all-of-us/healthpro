@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\IdVerificationImportService;
 use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
@@ -209,11 +210,29 @@ class CronController extends BaseController
     }
 
     /**
-     * @Route("/delete-unconfirmed-incentives-import-data", name="cron_delete_unconfirmed_patient_status_import_data")
+     * @Route("/delete-unconfirmed-incentives-import-data", name="cron_delete_unconfirmed_incentives_import_data")
      */
     public function deleteUnconfimedIncentivesImportDataAction(IncentiveImportService $incentiveImportService)
     {
         $incentiveImportService->deleteUnconfirmedImportData();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/send-id-verifications-rdr", name="cron_send_id_verifications_rdr")
+     */
+    public function sendIdVerificationsToRdrAction(IdVerificationImportService $idVerificationImportService)
+    {
+        $idVerificationImportService->sendIdVerificationsToRdr();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/delete-unconfirmed-id-verifications-import-data", name="cron_delete_unconfirmed_id_verifications_import_data")
+     */
+    public function deleteUnconfimedIdVerificationsImportDataAction(IdVerificationImportService $idVerificationImportService)
+    {
+        $idVerificationImportService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 }

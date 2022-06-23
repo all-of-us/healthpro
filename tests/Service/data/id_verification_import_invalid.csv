@@ -1,0 +1,4 @@
+﻿Participant ID,User,Date,Verification Type,Visit Type
+P00000000001,test.user1@google-pmi-ops.org,1/4/22,PHOTO_AND_ONE_OF_PII,PMB_INITIAL_VISIT
+P000000002,test.user1@pmi-ops.org,4/1/22,,
+P000000003,test.user1@pmi-ops.org,4/1/22,TWO_OF_PII,BIOSPECIMEN_REDRAW_ONLY

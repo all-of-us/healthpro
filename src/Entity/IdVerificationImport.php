@@ -9,11 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  */
-class IncentiveImport
+class IdVerificationImport
 {
     public function __construct()
     {
-        $this->incentiveImportRows = new ArrayCollection();
+        $this->idVerificationImportRows = new ArrayCollection();
     }
 
     /**
@@ -26,15 +26,15 @@ class IncentiveImport
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $fileName;
+    private $file_name;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
      */
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=255)
      */
     private $site;
 
@@ -54,9 +54,9 @@ class IncentiveImport
     private $confirm = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="IncentiveImportRow", mappedBy="import", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=IdVerificationImportRow::class, mappedBy="import")
      */
-    private $incentiveImportRows;
+    private $idVerificationImportRows;
 
     public function getId(): ?int
     {
@@ -65,12 +65,12 @@ class IncentiveImport
 
     public function getFileName(): ?string
     {
-        return $this->fileName;
+        return $this->file_name;
     }
 
-    public function setFileName(string $fileName): self
+    public function setFileName(string $file_name): self
     {
-        $this->fileName = $fileName;
+        $this->file_name = $file_name;
 
         return $this;
     }
@@ -80,7 +80,7 @@ class IncentiveImport
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -136,30 +136,29 @@ class IncentiveImport
     }
 
     /**
-     * @return Collection|IncentiveImportRow[]
+     * @return Collection|IdVerificationImportRow[]
      */
-    public function getIncentiveImportRows(): Collection
+    public function getIdVerificationImportRows(): Collection
     {
-        return $this->incentiveImportRows;
+        return $this->idVerificationImportRows;
     }
 
-    public function addIncentiveImportRow(IncentiveImportRow $incentiveImportRow): self
+    public function addIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
     {
-        if (!$this->incentiveImportRows->contains($incentiveImportRow)) {
-            $this->incentiveImportRows[] = $incentiveImportRow;
-            $incentiveImportRow->setImport($this);
+        if (!$this->idVerificationImportRows->contains($idVerificationImportRow)) {
+            $this->idVerificationImportRows[] = $idVerificationImportRow;
+            $idVerificationImportRow->setImport($this);
         }
 
         return $this;
     }
 
-    public function removeIncentiveImportRow(IncentiveImportRow $incentiveImportRow): self
+    public function removeIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
     {
-        if ($this->incentiveImportRows->contains($incentiveImportRow)) {
-            $this->incentiveImportRows->removeElement($incentiveImportRow);
+        if ($this->idVerificationImportRows->removeElement($idVerificationImportRow)) {
             // set the owning side to null (unless already changed)
-            if ($incentiveImportRow->getImport()->getId() === $this->getId()) {
-                $incentiveImportRow->setImport(null);
+            if ($idVerificationImportRow->getImport() === $this) {
+                $idVerificationImportRow->setImport(null);
             }
         }
 
