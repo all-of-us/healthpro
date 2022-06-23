@@ -33,6 +33,9 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
             $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('m/d/Y', $params['endDate']) : '';
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
+            $sortColumns = $onSiteDetailsReportingService::$patientStatusSortColumns;
+            $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
+            $ajaxParams['sortDir'] = $ajaxParams['order'][0]['dir'];
             $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($siteService->getSiteAwardee(), $ajaxParams);
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getAjaxData($patientStatuses);

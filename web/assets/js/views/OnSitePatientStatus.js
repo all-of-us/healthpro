@@ -7,7 +7,7 @@ $(document).ready(function () {
         {name: 'site', data: 'site'},
         {name: 'patientStatus', data: 'patientStatus'},
         {name: 'notes', data: 'notes'},
-        {name: 'importId', data: 'importId'}
+        {name: 'importId', data: 'importId', orderable: false}
     );
     var url = window.location.href;
     var onSitePatientStatusTableSelector = $('#on_site_patient_status');
@@ -16,7 +16,6 @@ $(document).ready(function () {
         serverSide: true,
         scrollX: true,
         searching: false,
-        ordering: false,
         bLengthChange: false,
         ajax: {
             url: url,
@@ -24,6 +23,7 @@ $(document).ready(function () {
         },
         columns: tableColumns,
         pageLength: 25,
+        order: [[0, 'desc']],
         columnDefs: [
             {
                 targets: [1],

@@ -12,6 +12,16 @@ class OnSiteDetailsReportingService
         'Patient Status',
         'Notes'
     ];
+
+    public static $patientStatusSortColumns = [
+        'psh.createdTs',
+        'ps.participantId',
+        'u.email',
+        'psh.site',
+        'psh.status',
+        'psh.comments'
+    ];
+
     public function getAjaxData($patientStatuses): array
     {
         $rows = [];

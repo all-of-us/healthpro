@@ -150,9 +150,13 @@ class PatientStatusRepository extends ServiceEntityRepository
                 ->setParameter('endDate', $params['endDate']);
         }
 
-        $queryBuilder
-            ->setParameter('awardee', $awardee)
-            ->orderBy('ps.id', 'ASC');
+        $queryBuilder->setParameter('awardee', $awardee);
+
+        if (isset($params['sortColumn'])) {
+            $queryBuilder->orderBy($params['sortColumn'], $params['sortDir']);
+        } else {
+            $queryBuilder->orderBy('ps.id', 'ASC');
+        }
 
         if (isset($params['start'])) {
             return $queryBuilder
