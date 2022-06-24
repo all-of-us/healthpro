@@ -94,6 +94,13 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
+    public function getOnsitePatientStatusesCount(): void
+    {
+        $this->createPatientStatus();
+        $count = $this->repo->getOnsitePatientStatuses('PS_AWARDEE_TEST', []);
+        $this->assertEquals(5, $count);
+    }
+
     private function createPatientStatus(): void
     {
         $userId = $this->getUser()->getId();
