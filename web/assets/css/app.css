@@ -630,6 +630,10 @@ table.table-samples td {
     margin-top: 8px;
 }
 
+.on-site-date-filter-dropdown {
+    min-width: 175px;
+}
+
 .btn-readonly {
     pointer-events: none;
     cursor: default;
