@@ -71,6 +71,29 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @dataProvider participantIdDataProvider
+     */
+    public function testOnsitePatientStatusParticipantIdLookup($participantId): void
+    {
+        $this->createPatientStatus();
+        $params = [];
+        $params['participantId'] = $participantId;
+        $patientStatuses = $this->repo->getOnsitePatientStatuses('PS_AWARDEE_TEST', $params);
+        $this->assertEquals($participantId, $patientStatuses[0]['participantId']);
+    }
+
+    public function participantIdDataProvider()
+    {
+        return [
+            ['P000000000'],
+            ['P000000001'],
+            ['P000000002'],
+            ['P000000003'],
+            ['P000000004']
+        ];
+    }
+
     private function createPatientStatus(): void
     {
         $userId = $this->getUser()->getId();
