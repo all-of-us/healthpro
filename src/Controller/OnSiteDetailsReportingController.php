@@ -17,8 +17,7 @@ class OnSiteDetailsReportingController extends BaseController
 {
     public function __construct(
         EntityManagerInterface $em
-    )
-    {
+    ) {
         parent::__construct($em);
     }
 
