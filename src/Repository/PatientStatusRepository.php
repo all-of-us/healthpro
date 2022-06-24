@@ -171,13 +171,13 @@ class PatientStatusRepository extends ServiceEntityRepository
         }
     }
 
-    public function getOnsitePatientStatusesCount(): int
+    public function getOnsitePatientStatusesCount($awardee): int
     {
         return $this->createQueryBuilder('ps')
             ->select('count(psh.id)')
             ->leftJoin('ps.history', 'psh')
-            ->where('ps.organization =:organization')
-            ->setParameter('organization', 'PITT_UPMC')
+            ->where('ps.awardee =:awardee')
+            ->setParameter('awardee', $awardee)
             ->getQuery()
             ->getSingleScalarResult();
     }
