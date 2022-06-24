@@ -171,13 +171,31 @@ class PatientStatusRepository extends ServiceEntityRepository
         }
     }
 
-    public function getOnsitePatientStatusesCount($awardee): int
+    public function getOnsitePatientStatusesCount($awardee, $params): int
     {
-        return $this->createQueryBuilder('ps')
+        $queryBuilder = $this->createQueryBuilder('ps')
             ->select('count(psh.id)')
             ->leftJoin('ps.history', 'psh')
-            ->where('ps.awardee =:awardee')
-            ->setParameter('awardee', $awardee)
+            ->leftJoin('App\Entity\User', 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin('psh.import', 'psi')
+            ->where('ps.awardee =:awardee');
+        if (!empty($params['participantId'])) {
+            $queryBuilder->andWhere('ps.participantId = :participantId')
+                ->setParameter('participantId', $params['participantId']);
+        }
+
+        if (!empty($params['startDate'])) {
+            $queryBuilder->andWhere('psh.createdTs >= :startDate')
+                ->setParameter('startDate', $params['startDate']);
+        }
+
+        if (!empty($params['endDate'])) {
+            $queryBuilder->andWhere('psh.createdTs <= :endDate')
+                ->setParameter('endDate', $params['endDate']);
+        }
+        $queryBuilder->setParameter('awardee', $awardee);
+
+        return $queryBuilder
             ->getQuery()
             ->getSingleScalarResult();
     }
