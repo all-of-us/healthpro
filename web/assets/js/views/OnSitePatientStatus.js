@@ -66,7 +66,7 @@ $(document).ready(function () {
 
     $('#date_filter_apply').on('click', function () {
         if (startDateSelector.parsley().validate() === true && endDateSelector.parsley().validate() === true) {
-            if (startDateSelector.val() !== '' || startDateSelector.val() !== '') {
+            if (startDateSelector.val() !== '' || endDateSelector.val() !== '') {
                 formSelector.submit();
             }
         }
