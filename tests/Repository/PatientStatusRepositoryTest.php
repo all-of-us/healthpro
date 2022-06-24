@@ -46,6 +46,31 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @dataProvider dateFilterDataProvider
+     */
+    public function testOnsitePatientStatusDateFilters($startDate, $endDate, $resultCount): void
+    {
+        $this->createPatientStatus();
+        $params = [];
+        $params['startDate'] = $startDate;
+        $params['endDate'] = $endDate;
+        $patientStatuses = $this->repo->getOnsitePatientStatuses('PS_AWARDEE_TEST', $params);
+        $this->assertEquals($resultCount, count($patientStatuses));
+    }
+
+    public function dateFilterDataProvider()
+    {
+        return [
+            ['2022-01-15', '2022-02-15', 2],
+            ['2022-01-15', '2022-03-15', 3],
+            ['2022-01-15', '2022-05-15', 5],
+            ['2022-06-15', '2022-07-15', 0],
+            ['2022-02-15', '', 4],
+            ['', '2022-05-15', 5]
+        ];
+    }
+
     private function createPatientStatus(): void
     {
         $userId = $this->getUser()->getId();
@@ -62,8 +87,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
             $patientStatusHistory->setSite($patientStatusData['site']);
             $patientStatusHistory->setStatus($patientStatusData['status']);
             $patientStatusHistory->setComments($patientStatusData['comments']);
-            $patientStatusHistory->setCreatedTs($patientStatusData['createdTs']);
-            $patientStatusHistory->setRdrTs($patientStatusData['rdrTs']);
+            $patientStatusHistory->setCreatedTs(new \DateTime($patientStatusData['createdTs']));
+            $patientStatusHistory->setRdrTs(new \DateTime($patientStatusData['rdrTs']));
             $this->em->persist($patientStatusHistory);
 
             $patientStatus->setHistory($patientStatusHistory);
@@ -84,7 +109,6 @@ class PatientStatusRepositoryTest extends KernelTestCase
 
     private function getPatientStatusData(): array
     {
-        $now =  new \DateTime();
         return [
             [
                 'participantId' => 'P000000000',
@@ -93,8 +117,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
                 'site' => 'PS_SITE_TEST',
                 'status' => 'YES',
                 'comments' => 'test1',
-                'createdTs' => $now,
-                'rdrTs' => $now
+                'createdTs' => '2022-01-15',
+                'rdrTs' => '2022-01-15'
             ],
             [
                 'participantId' => 'P000000001',
@@ -103,8 +127,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
                 'site' => 'PS_SITE_TEST',
                 'status' => 'NO',
                 'comments' => 'test2',
-                'createdTs' => $now,
-                'rdrTs' => $now
+                'createdTs' => '2022-02-15',
+                'rdrTs' => '2022-02-15'
             ],
             [
                 'participantId' => 'P000000002',
@@ -113,8 +137,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
                 'site' => 'PS_SITE_TEST',
                 'status' => 'YES',
                 'comments' => 'test3',
-                'createdTs' => $now,
-                'rdrTs' => $now
+                'createdTs' => '2022-03-15',
+                'rdrTs' => '2022-03-15'
             ],
             [
                 'participantId' => 'P000000003',
@@ -123,8 +147,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
                 'site' => 'PS_SITE_TEST',
                 'status' => 'UNKNOWN',
                 'comments' => 'test4',
-                'createdTs' => $now,
-                'rdrTs' => $now
+                'createdTs' => '2022-04-15',
+                'rdrTs' => '2022-04-15'
             ],
             [
                 'participantId' => 'P000000004',
@@ -133,8 +157,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
                 'site' => 'PS_SITE_TEST',
                 'status' => 'NO_ACCESS',
                 'comments' => 'test5',
-                'createdTs' => $now,
-                'rdrTs' => $now
+                'createdTs' => '2022-05-15',
+                'rdrTs' => '2022-05-15'
             ],
         ];
     }
