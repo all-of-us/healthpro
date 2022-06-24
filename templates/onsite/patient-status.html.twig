@@ -15,10 +15,13 @@
     <br/>
     <div class="row">
         <div class="col-md-4 dropdown on-site-filters" id="patient_status_filters">
+            {% set participantId = params['participantId']|default('') %}
+            {% set startDate = params['startDate']|default('') %}
+            {% set endDate = params['endDate']|default('') %}
             <form>
                 <ul class="nav navbar-nav">
                     <li class="columns-filter-group">
-                        <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+                        <button href="#" class="dropdown-toggle btn {{ participantId ? 'btn-primary' : 'btn-default' }}" data-toggle="dropdown">
                             <i class="fa fa-search" aria-hidden="true"></i> Participant Lookup <b class="caret"></b>
                         </button>
                         <ul class="dropdown-menu">
@@ -35,7 +38,7 @@
                                     <div class="form-group">
                                         <label class="control-label required" for="participantId">Participant ID</label>
                                         <input type="text" name="participantId" class="form-control" id="participantId"
-                                               value="{{ params['participantId']|default('') }}"
+                                               value="{{ participantId }}"
                                                autocomplete="off"
                                                required="required"
                                                data-parsley-required>
@@ -50,7 +53,7 @@
                         </ul>
                     </li>
                     <li class="columns-filter-group">
-                        <button href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+                        <button href="#" class="dropdown-toggle btn btn-default {{ startDate or endDate ? 'btn-primary' : 'btn-default' }}" data-toggle="dropdown">
                             <i class="far fa-calendar" aria-hidden="true"></i> Select Dates <b class="caret"></b>
                         </button>
                         <ul class="dropdown-menu on-site-date-filter-dropdown">
@@ -68,13 +71,13 @@
                                         <label class="control-label" for="startDate">Start Date</label>
                                         <input type="text" name="startDate" class="form-control date-filter"
                                                id="startDate"
-                                               value="{{ params['startDate']|default('') }}" placeholder="MM/DD/YYYY"
+                                               value="{{ startDate }}" placeholder="MM/DD/YYYY"
                                                autocomplete="off" data-parsley-date-mdy>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label" for="endDate">End Date</label>
                                         <input type="text" name="endDate" class="form-control date-filter" id="endDate"
-                                               value="{{ params['endDate']|default('') }}" placeholder="MM/DD/YYYY"
+                                               value="{{ endDate }}" placeholder="MM/DD/YYYY"
                                                autocomplete="off" data-parsley-date-mdy>
                                     </div>
                                     <p class="text-center">
