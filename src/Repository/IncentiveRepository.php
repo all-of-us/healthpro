@@ -44,7 +44,9 @@ class IncentiveRepository extends ServiceEntityRepository
     public function getOnsiteIncentives($site, $params): array
     {
         $queryBuilder = $this->createQueryBuilder('i')
-            ->select('i.createdTs, i.participantId, i.site, i.incentiveDateGiven, i.incentiveOccurrence, i.incentiveType, i.incentiveAmount, i.declined, i.notes, u.email, ii.id as importId')
+            ->select('i.createdTs, i.participantId, i.site, i.incentiveDateGiven, i.incentiveOccurrence,
+                i.otherIncentiveOccurrence, i.incentiveType, i.otherIncentiveType, i.incentiveAmount, i.giftCardType,
+                i.declined, i.notes, u.email, ii.id as importId')
             ->leftJoin('i.user', 'u')
             ->leftJoin('i.import', 'ii')
             ->where('i.site =:site');

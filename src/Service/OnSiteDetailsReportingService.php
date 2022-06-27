@@ -63,8 +63,14 @@ class OnSiteDetailsReportingService
             $row['user'] = $incentive['email'];
             $row['site'] = $incentive['site'];
             $row['dateOfService'] = $incentive['incentiveDateGiven']->format('m-d-Y');
-            $row['occurrence'] = $incentive['incentiveOccurrence'];
-            $row['type'] = $incentive['incentiveType'];
+            $row['occurrence'] = $incentive['incentiveOccurrence'] === 'other' ? 'Other, ' . $incentive['otherIncentiveOccurrence'] : $incentive['incentiveOccurrence'];
+            $type = $incentive['incentiveType'];
+            if ($type === 'other') {
+                $type = 'Other, ' . $incentive['otherIncentiveType'];
+            } elseif ($type === 'gift_card') {
+                $type = 'Gift Card, ' . $incentive['giftCardType'];
+            }
+            $row['type'] = $type;
             $row['amount'] = $incentive['incentiveAmount'];
             $row['declined'] = $incentive['declined'] ? 'Yes' : 'No';
             $row['notes'] = $incentive['notes'];
