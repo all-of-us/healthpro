@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\IncentiveRepository;
 use App\Repository\PatientStatusRepository;
 use App\Service\OnSiteDetailsReportingService;
 use App\Service\SiteService;
@@ -82,5 +83,15 @@ class OnSiteDetailsReportingController extends BaseController
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
+    }
+
+    /**
+     * @Route("/incentive-tracking", name="on_site_incentive_tracking")
+     */
+    public function incentiveTrackingAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, IncentiveRepository $incentiveRepository, SiteService $siteService, Request $request)
+    {
+        $params = $request->query->all();
+
+        return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
     }
 }
