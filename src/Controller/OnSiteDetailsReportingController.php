@@ -91,7 +91,21 @@ class OnSiteDetailsReportingController extends BaseController
     public function incentiveTrackingAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, IncentiveRepository $incentiveRepository, SiteService $siteService, Request $request)
     {
         $params = $request->query->all();
-
-        return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
+        if ($request->isXmlHttpRequest()) {
+            $ajaxParams = $request->request->all();
+            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
+            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('m/d/Y', $params['endDate']) : '';
+            $ajaxParams['participantId'] = $params['participantId'] ?? '';
+            $sortColumns = $onSiteDetailsReportingService::$incentiveSortColumns;
+            $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
+            $ajaxParams['sortDir'] = $ajaxParams['order'][0]['dir'];
+            $incentives = $incentiveRepository->getOnsiteIncentives($siteService->getSiteId(), $ajaxParams);
+            $ajaxData = [];
+            $ajaxData['data'] = $onSiteDetailsReportingService->getIncentiveTrackingAjaxData($incentives);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $incentiveRepository->getOnsiteIncentivesCount($siteService->getSiteId(), $params);
+            return $this->json($ajaxData);
+        } else {
+            return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
+        }
     }
 }
