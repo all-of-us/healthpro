@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Repository\PatientStatusRepository;
 use App\Service\OnSiteDetailsReportingService;
 use App\Service\SiteService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,12 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class OnSiteDetailsReportingController extends BaseController
 {
-    public function __construct(
-        EntityManagerInterface $em
-    ) {
-        parent::__construct($em);
-    }
-
     /**
      * @Route("/patient-status", name="on_site_patient_status")
      */
