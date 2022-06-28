@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PatientStatus;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
@@ -131,7 +132,7 @@ class PatientStatusRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
             ->leftJoin('ps.history', 'psh')
-            ->leftJoin('App\Entity\User', 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
             ->leftJoin('psh.import', 'psi')
             ->where('ps.awardee =:awardee');
 
@@ -176,7 +177,7 @@ class PatientStatusRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('count(psh.id)')
             ->leftJoin('ps.history', 'psh')
-            ->leftJoin('App\Entity\User', 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
             ->leftJoin('psh.import', 'psi')
             ->where('ps.awardee =:awardee');
         if (!empty($params['participantId'])) {

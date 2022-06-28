@@ -60,7 +60,7 @@ class PatientStatusController extends BaseController
                     foreach ($patientStatuses as $key => $patientStatus) {
                         $PatientStatusImportRow = new PatientStatusImportRow();
                         $PatientStatusImportRow
-                            ->setParticipantId($patientStatus['participantId'])
+                            ->setParticipantId($patientStatus['participant_id'])
                             ->setStatus($patientStatus['status'])
                             ->setComments($patientStatus['comments'])
                             ->setImport($patientStatusImport);

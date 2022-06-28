@@ -7,7 +7,7 @@ const _ = require('underscore');
 require('backbone/backbone.js');
 require('eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js');
 require('parsleyjs/dist/parsley.js');
-require('./parsley-comparison.js'); // customized parsley validator
+require('./parsley-validator.js'); // customized parsley validator
 require('datatables.net/js/jquery.dataTables.js');
 require('datatables.net-bs/js/dataTables.bootstrap.js');
 require('datatables.net-responsive/js/dataTables.responsive.js');
@@ -400,24 +400,5 @@ $(document).ready(function()
             },
             btnTextTrue: 'Continue'
         });
-    });
-
-    var validateDateFormat = function (value) {
-        var parts = value.split('/');
-        if (parts.length < 3) {
-            return false;
-        }
-        var dt = new Date(parts[2], parts[0] - 1, parts[1]);
-        return (dt && dt.getMonth() === parseInt(parts[0], 10) - 1 && dt.getFullYear() === parseInt(parts[2]));
-    };
-
-    window.Parsley.addValidator('dateMdy', {
-        validateString: function (value) {
-            return validateDateFormat(value);
-        },
-        messages: {
-            en: 'Invalid date format.'
-        },
-        priority: 32
     });
 });
