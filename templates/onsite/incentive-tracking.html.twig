@@ -72,14 +72,14 @@
                                 </div>
                                 <div class="panel-body">
                                     <div class="form-group">
-                                        <label class="control-label" for="startDate">Start Date</label>
+                                        <label class="control-label" for="startDateOfService">Start Date</label>
                                         <input type="text" name="startDateOfService" class="form-control date-filter"
                                                id="startDateOfService"
                                                value="{{ startDateOfService }}" placeholder="MM/DD/YYYY"
                                                autocomplete="off" data-parsley-date-mdy>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label" for="endDate">End Date</label>
+                                        <label class="control-label" for="endDateOfService">End Date</label>
                                         <input type="text" name="endDateOfService" class="form-control date-filter"
                                                id="endDateOfService"
                                                value="{{ endDateOfService }}" placeholder="MM/DD/YYYY"
@@ -100,9 +100,8 @@
         <div class="col-md-1 on-site-reset-all">
             <a href="{{ path('on_site_incentive_tracking') }}">Reset All</a>
         </div>
-        <div class="col-md-1 col-md-offset-3">
-            <a href="" class="btn btn-xs btn-default export"><i
-                    class="fa fa-download" aria-hidden="true"></i> Export</a>
+        <div class="col-md-4 col-md-offset-1">
+            {% include 'onsite/partials/paging_export.html.twig' %}
         </div>
     </div>
     <div class="row">

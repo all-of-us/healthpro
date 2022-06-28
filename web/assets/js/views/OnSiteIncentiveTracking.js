@@ -15,12 +15,11 @@ $(document).ready(function () {
     );
     var url = window.location.href;
     var onSitePatientStatusTableSelector = $('#on_site_incentive_tracking');
-    onSitePatientStatusTableSelector.DataTable({
+    var table = onSitePatientStatusTableSelector.DataTable({
         processing: true,
         serverSide: true,
         scrollX: true,
         searching: false,
-        bLengthChange: false,
         ajax: {
             url: url,
             type: "POST"
@@ -49,7 +48,23 @@ $(document).ready(function () {
                 targets: '_all',
                 render: $.fn.dataTable.render.text()
             }
-        ]
+        ],
+        drawCallback: function () {
+            var pageInfo = table.page.info();
+            $('.total-pages').text(pageInfo.pages);
+            var dropDownHtml = '';
+            for (var count = 1; count <= pageInfo.pages; count++) {
+                var pageNumber = count - 1;
+                dropDownHtml += '<option value="' + pageNumber + '">' + count + '</option>';
+            }
+            var pageDropDown = $('.page-drop-down select');
+            pageDropDown.html(dropDownHtml);
+            pageDropDown.val(pageInfo.page);
+        },
+    });
+
+    $('.page-drop-down select').change(function () {
+        table.page(parseInt($(this).val())).draw('page');
     });
 
     $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
