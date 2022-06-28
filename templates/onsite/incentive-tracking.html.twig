@@ -1,19 +1,7 @@
 {% extends 'render-base.html.twig' %}
 {% block title %} On-Site Details Incentive Tracking {% endblock %}
 {% block body %}
-    <div class="page-header">
-        <h2><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</h2>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <ul class="nav nav-tabs">
-                <li role="presentation" class="active"><a href="{{ path('on_site_incentive_tracking') }}">Incentive
-                        Tracking</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <br/>
+    {% include 'onsite/partials/_page_heading.html.twig' %}
     <div class="row">
         <div class="col-md-4 dropdown on-site-filters" id="incentive_tracking_filters">
             {% set participantId = params['participantId']|default('') %}
