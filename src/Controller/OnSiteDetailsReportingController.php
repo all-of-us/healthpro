@@ -23,8 +23,8 @@ class OnSiteDetailsReportingController extends BaseController
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
-            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
-            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('m/d/Y', $params['endDate']) : '';
+            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['startDate']) : '';
+            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['endDate']) : '';
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
             $sortColumns = $onSiteDetailsReportingService::$patientStatusSortColumns;
             $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
@@ -86,10 +86,10 @@ class OnSiteDetailsReportingController extends BaseController
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
-            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('m/d/Y', $params['startDate']) : '';
-            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('m/d/Y', $params['endDate']) : '';
-            $ajaxParams['startDateOfService'] = !empty($params['startDateOfService']) ? \DateTime::createFromFormat('m/d/Y', $params['startDateOfService']) : '';
-            $ajaxParams['endDateOfService'] = !empty($params['endDateOfService']) ? \DateTime::createFromFormat('m/d/Y', $params['endDateOfService']) : '';
+            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['startDate']) : '';
+            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['endDate']) : '';
+            $ajaxParams['startDateOfService'] = !empty($params['startDateOfService']) ? \DateTime::createFromFormat('!m/d/Y', $params['startDateOfService']) : '';
+            $ajaxParams['endDateOfService'] = !empty($params['endDateOfService']) ? \DateTime::createFromFormat('!m/d/Y', $params['endDateOfService']) : '';
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
             $sortColumns = $onSiteDetailsReportingService::$incentiveSortColumns;
             $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
