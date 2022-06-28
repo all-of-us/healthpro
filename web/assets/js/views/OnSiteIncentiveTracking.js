@@ -112,4 +112,11 @@ $(document).ready(function () {
         clearInvalidFields();
         formSelector.submit();
     });
+
+    $('#date_service_filter_reset').on('click', function () {
+        startDateOfServiceSelector.val('');
+        endDateOfServiceSelector.val('');
+        clearInvalidFields();
+        formSelector.submit();
+    });
 });
