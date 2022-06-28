@@ -100,10 +100,12 @@
         <div class="col-md-1 on-site-reset-all">
             <a href="{{ path('on_site_incentive_tracking') }}">Reset All</a>
         </div>
-        <div class="col-md-4 col-md-offset-1">
+        <div class="col-md-4">
+            {% set exportRoute = 'on_site_incentive_tracking_export' %}
             {% include 'onsite/partials/paging_export.html.twig' %}
         </div>
     </div>
+    <br/>
     <div class="row">
         <div class="col-md-12">
             <table class="table table-striped table-bordered" id="on_site_incentive_tracking" style="width:100%">
@@ -131,4 +133,5 @@
 
 {% block pagejs %}
     {{ encore_entry_script_tags('on-site-incentive-tracking') }}
+    {{ encore_entry_script_tags('export-warning-modal') }}
 {% endblock %}

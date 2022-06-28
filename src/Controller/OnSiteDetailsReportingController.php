@@ -103,4 +103,12 @@ class OnSiteDetailsReportingController extends BaseController
             return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
         }
     }
+
+    /**
+     * @Route("/incentive-tracking-export", name="on_site_incentive_tracking_export")
+     */
+    public function incentiveTrackingExportAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, IncentiveRepository $incentiveRepository, SiteService $siteService, Request $request)
+    {
+        //TODO
+    }
 }
