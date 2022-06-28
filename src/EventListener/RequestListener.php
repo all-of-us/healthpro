@@ -159,7 +159,8 @@ class RequestListener
         $route = $this->request->attributes->get('_route');
         return (in_array($route, [
             'workqueue_export',
-            'help_sopFile'
+            'help_sopFile',
+            'on_site_patient_status_export'
         ]));
     }
 

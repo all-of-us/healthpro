@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\PatientStatus;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -123,5 +125,79 @@ class PatientStatusRepository extends ServiceEntityRepository
             }
         }
         return $results;
+    }
+
+    public function getOnsitePatientStatuses($awardee, $params): array
+    {
+        $queryBuilder = $this->createQueryBuilder('ps')
+            ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
+            ->leftJoin('ps.history', 'psh')
+            ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin('psh.import', 'psi')
+            ->where('ps.awardee =:awardee');
+
+        if (!empty($params['participantId'])) {
+            $queryBuilder->andWhere('ps.participantId = :participantId')
+                ->setParameter('participantId', $params['participantId']);
+        }
+
+        if (!empty($params['startDate'])) {
+            $queryBuilder->andWhere('psh.createdTs >= :startDate')
+                ->setParameter('startDate', $params['startDate']);
+        }
+
+        if (!empty($params['endDate'])) {
+            $queryBuilder->andWhere('psh.createdTs <= :endDate')
+                ->setParameter('endDate', $params['endDate']);
+        }
+
+        $queryBuilder->setParameter('awardee', $awardee);
+
+        if (isset($params['sortColumn'])) {
+            $queryBuilder->orderBy($params['sortColumn'], $params['sortDir']);
+        } else {
+            $queryBuilder->orderBy('ps.id', 'ASC');
+        }
+
+        if (isset($params['start'])) {
+            return $queryBuilder
+                ->getQuery()
+                ->setFirstResult($params['start'])
+                ->setMaxResults($params['length'])
+                ->getResult();
+        } else {
+            return $queryBuilder
+                ->getQuery()
+                ->getResult();
+        }
+    }
+
+    public function getOnsitePatientStatusesCount($awardee, $params): int
+    {
+        $queryBuilder = $this->createQueryBuilder('ps')
+            ->select('count(psh.id)')
+            ->leftJoin('ps.history', 'psh')
+            ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin('psh.import', 'psi')
+            ->where('ps.awardee =:awardee');
+        if (!empty($params['participantId'])) {
+            $queryBuilder->andWhere('ps.participantId = :participantId')
+                ->setParameter('participantId', $params['participantId']);
+        }
+
+        if (!empty($params['startDate'])) {
+            $queryBuilder->andWhere('psh.createdTs >= :startDate')
+                ->setParameter('startDate', $params['startDate']);
+        }
+
+        if (!empty($params['endDate'])) {
+            $queryBuilder->andWhere('psh.createdTs <= :endDate')
+                ->setParameter('endDate', $params['endDate']);
+        }
+        $queryBuilder->setParameter('awardee', $awardee);
+
+        return $queryBuilder
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
