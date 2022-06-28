@@ -58,6 +58,8 @@ $(document).ready(function () {
     var participantIdSelector = $('#participantId');
     var startDateSelector = $('#startDate');
     var endDateSelector = $('#endDate');
+    var startDateOfServiceSelector = $('#startDateOfService');
+    var endDateOfServiceSelector = $('#endDateOfService');
 
     var clearInvalidFields = function () {
         if (startDateSelector.parsley().validate() !== true) {
@@ -66,11 +68,25 @@ $(document).ready(function () {
         if (endDateSelector.parsley().validate() !== true) {
             endDateSelector.val('');
         }
+        if (startDateOfServiceSelector.parsley().validate() !== true) {
+            startDateOfServiceSelector.val('');
+        }
+        if (endDateOfServiceSelector.parsley().validate() !== true) {
+            endDateOfServiceSelector.val('');
+        }
     };
 
     $('#date_filter_apply').on('click', function () {
         if (startDateSelector.parsley().validate() === true && endDateSelector.parsley().validate() === true) {
             if (startDateSelector.val() !== '' || endDateSelector.val() !== '') {
+                formSelector.submit();
+            }
+        }
+    });
+
+    $('#date_service_filter_apply').on('click', function () {
+        if (startDateOfServiceSelector.parsley().validate() === true && endDateOfServiceSelector.parsley().validate() === true) {
+            if (startDateOfServiceSelector.val() !== '' || endDateOfServiceSelector.val() !== '') {
                 formSelector.submit();
             }
         }

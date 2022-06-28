@@ -3,10 +3,12 @@
 {% block body %}
     {% include 'onsite/partials/_page_heading.html.twig' %}
     <div class="row">
-        <div class="col-md-4 dropdown on-site-filters" id="incentive_tracking_filters">
+        <div class="col-md-7 dropdown on-site-filters" id="incentive_tracking_filters">
             {% set participantId = params['participantId']|default('') %}
             {% set startDate = params['startDate']|default('') %}
             {% set endDate = params['endDate']|default('') %}
+            {% set startDateOfService = params['startDateOfService']|default('') %}
+            {% set endDateOfService = params['endDateOfService']|default('') %}
             <form>
                 <ul class="nav navbar-nav">
                     <li class="columns-filter-group">
@@ -16,7 +18,8 @@
                         <button href="#"
                                 class="dropdown-toggle btn btn-default {{ startDate or endDate ? 'btn-primary' : 'btn-default' }}"
                                 data-toggle="dropdown">
-                            <i class="far fa-calendar" aria-hidden="true"></i> Select Dates <b class="caret"></b>
+                            <i class="far fa-calendar" aria-hidden="true"></i> Select Dates Created <b
+                                class="caret"></b>
                         </button>
                         <ul class="dropdown-menu on-site-date-filter-dropdown">
                             <li>
@@ -50,13 +53,54 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="columns-filter-group">
+                        <button href="#"
+                                class="dropdown-toggle btn btn-default {{ startDate or endDate ? 'btn-primary' : 'btn-default' }}"
+                                data-toggle="dropdown">
+                            <i class="far fa-calendar" aria-hidden="true"></i> Select Dates of Service <b
+                                class="caret"></b>
+                        </button>
+                        <ul class="dropdown-menu on-site-date-filter-dropdown">
+                            <li>
+                                <div class="list-group-item bg-light">
+                                    <b>Select Date(s)</b>
+                                    <small class="pull-right">
+                                        <a class="date-filter-reset" id="date_service_filter_reset">
+                                            Reset
+                                        </a>
+                                    </small>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label class="control-label" for="startDate">Start Date</label>
+                                        <input type="text" name="startDateOfService" class="form-control date-filter"
+                                               id="startDateOfService"
+                                               value="{{ startDateOfService }}" placeholder="MM/DD/YYYY"
+                                               autocomplete="off" data-parsley-date-mdy>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" for="endDate">End Date</label>
+                                        <input type="text" name="endDateOfService" class="form-control date-filter"
+                                               id="endDateOfService"
+                                               value="{{ endDateOfService }}" placeholder="MM/DD/YYYY"
+                                               autocomplete="off" data-parsley-date-mdy>
+                                    </div>
+                                    <p class="text-center">
+                                        <button type="button" class="btn btn-primary" id="date_service_filter_apply">
+                                            Apply
+                                        </button>
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </form>
         </div>
         <div class="col-md-1 on-site-reset-all">
             <a href="{{ path('on_site_incentive_tracking') }}">Reset All</a>
         </div>
-        <div class="col-md-1 col-md-offset-6">
+        <div class="col-md-1 col-md-offset-3">
             <a href="" class="btn btn-xs btn-default export"><i
                     class="fa fa-download" aria-hidden="true"></i> Export</a>
         </div>
