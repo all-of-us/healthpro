@@ -7,11 +7,11 @@ $(document).ready(function () {
         {name: 'site', data: 'site'},
         {name: 'dateOfService', data: 'dateOfService'},
         {name: 'occurrence', data: 'occurrence'},
-        {name: 'type', data: 'type'},
+        {name: 'incentiveType', data: 'incentiveType'},
         {name: 'amount', data: 'amount'},
         {name: 'declined', data: 'declined'},
         {name: 'notes', data: 'notes'},
-        {name: 'importId', data: 'importId', orderable: false}
+        {name: 'type', data: 'type', orderable: false}
     );
     var url = window.location.href;
     var onSitePatientStatusTableSelector = $('#on_site_incentive_tracking');
@@ -36,10 +36,14 @@ $(document).ready(function () {
             },
             {
                 targets: [10],
-                render: function (importId) {
+                render: function (type) {
                     var html = '';
-                    if (importId === 'Yes') {
+                    if (type === 'import_amend') {
+                        html = '<span class="label label-primary">Imported</span> <span class="label label-warning">Amended</span>';
+                    } else if (type === 'import') {
                         html = '<span class="label label-primary">Imported</span>';
+                    } else if (type === 'amend') {
+                        html = '<span class="label label-warning">Amended</span>';
                     }
                     return html;
                 }

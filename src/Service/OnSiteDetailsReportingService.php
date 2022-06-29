@@ -70,11 +70,19 @@ class OnSiteDetailsReportingService
             } elseif ($type === 'gift_card') {
                 $type = 'Gift Card, ' . $incentive['giftCardType'];
             }
-            $row['type'] = $type;
+            $row['incentiveType'] = $type;
             $row['amount'] = $incentive['incentiveAmount'];
             $row['declined'] = $incentive['declined'] ? 'Yes' : 'No';
             $row['notes'] = $incentive['notes'];
-            $row['importId'] = $incentive['importId'] ? 'Yes' : 'No';
+            $type = '';
+            if ($incentive['importId'] && $incentive['amendedUser']) {
+                $type = 'import_amend';
+            } elseif ($incentive['importId']) {
+                $type = 'import';
+            } elseif ($incentive['amendedUser']) {
+                $type = 'amend';
+            }
+            $row['type'] = $type;
             array_push($rows, $row);
         }
         return $rows;

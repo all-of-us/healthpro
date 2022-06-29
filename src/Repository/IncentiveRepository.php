@@ -46,8 +46,9 @@ class IncentiveRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i.createdTs, i.participantId, i.site, i.incentiveDateGiven, i.incentiveOccurrence,
                 i.otherIncentiveOccurrence, i.incentiveType, i.otherIncentiveType, i.incentiveAmount, i.giftCardType,
-                i.declined, i.notes, u.email, ii.id as importId')
+                i.declined, i.notes, au.email as amendedUser, u.email, ii.id as importId')
             ->leftJoin('i.user', 'u')
+            ->leftJoin('i.amendedUser', 'au')
             ->leftJoin('i.import', 'ii')
             ->where('i.site =:site');
 
@@ -102,6 +103,7 @@ class IncentiveRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('count(i.id)')
             ->leftJoin('i.user', 'u')
+            ->leftJoin('i.amendedUser', 'au')
             ->leftJoin('i.import', 'ii')
             ->where('i.site =:site');
         if (!empty($params['participantId'])) {
