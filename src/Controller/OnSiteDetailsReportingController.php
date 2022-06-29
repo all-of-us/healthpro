@@ -109,6 +109,37 @@ class OnSiteDetailsReportingController extends BaseController
      */
     public function incentiveTrackingExportAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, IncentiveRepository $incentiveRepository, SiteService $siteService, Request $request)
     {
-        //TODO
+        $queryParams = $request->query->all();
+        $params = [];
+        $params['startDate'] = !empty($queryParams['startDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['startDate']) : '';
+        $params['endDate'] = !empty($queryParams['endDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['endDate']) : '';
+        $patientStatuses = $incentiveRepository->getOnsiteIncentives($siteService->getSiteId(), $params);
+        $records = $onSiteDetailsReportingService->getIncentiveTrackingAjaxData($patientStatuses, true);
+        $exportHeaders = $onSiteDetailsReportingService::$incentiveExportHeaders;
+        $stream = function () use ($records, $exportHeaders) {
+            $output = fopen('php://output', 'w');
+            // Add UTF-8 BOM
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv(
+                $output,
+                ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']
+            );
+            fwrite($output, "\"\"\n");
+
+            fputcsv($output, $exportHeaders);
+
+            foreach ($records as $record) {
+                fputcsv($output, $record);
+            }
+            fwrite($output, "\"\"\n");
+            fputcsv($output, ['Confidential Information']);
+            fclose($output);
+        };
+        $filename = "on_site_details_incentive_tracking_" . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
+
+        return new StreamedResponse($stream, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
     }
 }

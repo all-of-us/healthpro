@@ -17,6 +17,20 @@ class OnSiteDetailsReportingService
         'Imported'
     ];
 
+    public static $incentiveExportHeaders = [
+        'Date Created',
+        'Participant ID',
+        'User',
+        'Date of Service',
+        'Occurrence',
+        'Type',
+        'Amount',
+        'Declined?',
+        'Notes',
+        'Imported',
+        'Amended'
+    ];
+
     public static $patientStatusSortColumns = [
         'psh.createdTs',
         'ps.participantId',
@@ -55,7 +69,7 @@ class OnSiteDetailsReportingService
         return $rows;
     }
 
-    public function getIncentiveTrackingAjaxData($incentives): array
+    public function getIncentiveTrackingAjaxData($incentives, $export = false): array
     {
         $rows = [];
         foreach ($incentives as $incentive) {
@@ -75,15 +89,20 @@ class OnSiteDetailsReportingService
             $row['amount'] = $incentive['incentiveAmount'] ? '$' . $incentive['incentiveAmount'] : '';
             $row['declined'] = $incentive['declined'] ? 'Yes' : 'No';
             $row['notes'] = $incentive['notes'];
-            $type = '';
-            if ($incentive['importId'] && $incentive['amendedUser']) {
-                $type = 'import_amend';
-            } elseif ($incentive['importId']) {
-                $type = 'import';
-            } elseif ($incentive['amendedUser']) {
-                $type = 'amend';
+            if ($export) {
+                $row['imported'] = $incentive['importId'] ? 'Yes' : 'No';
+                $row['amended'] = $incentive['amendedUser'] ? 'Yes' : 'No';
+            } else {
+                $type = '';
+                if ($incentive['importId'] && $incentive['amendedUser']) {
+                    $type = 'import_amend';
+                } elseif ($incentive['importId']) {
+                    $type = 'import';
+                } elseif ($incentive['amendedUser']) {
+                    $type = 'amend';
+                }
+                $row['type'] = $type;
             }
-            $row['type'] = $type;
             array_push($rows, $row);
         }
         return $rows;

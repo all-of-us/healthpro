@@ -32,16 +32,17 @@ class RequestListener
     private $request;
 
     public function __construct(
-        LoggerService $logger,
-        EntityManagerInterface $em,
-        TwigEnvironment $twig,
-        RequestStack $requestStack,
-        UserService $userService,
-        SiteService $siteService,
+        LoggerService                 $logger,
+        EntityManagerInterface        $em,
+        TwigEnvironment               $twig,
+        RequestStack                  $requestStack,
+        UserService                   $userService,
+        SiteService                   $siteService,
         AuthorizationCheckerInterface $authorizationChecker,
-        EnvironmentService $env,
-        TokenStorageInterface $tokenStorage
-    ) {
+        EnvironmentService            $env,
+        TokenStorageInterface         $tokenStorage
+    )
+    {
         $this->logger = $logger;
         $this->em = $em;
         $this->twig = $twig;
@@ -112,9 +113,9 @@ class RequestListener
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
             } elseif (!preg_match(
-                '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
-                $this->request->getPathInfo()
-            ) && !$this->isUpkeepRoute()) {
+                    '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
+                    $this->request->getPathInfo()
+                ) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/site/select');
             }
         }
@@ -131,9 +132,9 @@ class RequestListener
     public function onKernelFinishRequest()
     {
         if ($this->tokenStorage->getToken() && $this->request && !preg_match(
-            '/^\/(login|_wdt)($|\/).*/',
-            $this->request->getPathInfo()
-        ) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+                '/^\/(login|_wdt)($|\/).*/',
+                $this->request->getPathInfo()
+            ) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
             $this->setSessionVariables();
         }
     }
@@ -160,7 +161,8 @@ class RequestListener
         return (in_array($route, [
             'workqueue_export',
             'help_sopFile',
-            'on_site_patient_status_export'
+            'on_site_patient_status_export',
+            'on_site_incentive_tracking_export'
         ]));
     }
 
