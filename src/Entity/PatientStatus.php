@@ -26,6 +26,13 @@ class PatientStatus
         'Unknown: Inconclusive search results' => 'UNKNOWN'
     ];
 
+    public static $onSitePatientStatus = [
+        'Yes' => 'YES',
+        'No' => 'NO',
+        'No Access' => 'NO_ACCESS',
+        'Unknown' => 'UNKNOWN'
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

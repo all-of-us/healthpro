@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\Incentive;
+use App\Entity\PatientStatus;
+
 class OnSiteDetailsReportingService
 {
     public static $patientStatusExportHeaders = [
@@ -45,7 +48,7 @@ class OnSiteDetailsReportingService
             $row['participantId'] = $patientStatus['participantId'];
             $row['user'] = $patientStatus['email'];
             $row['site'] = $patientStatus['site'];
-            $row['patientStatus'] = $patientStatus['status'];
+            $row['patientStatus'] = array_search($patientStatus['status'], PatientStatus::$onSitePatientStatus);
             $row['notes'] = $patientStatus['comments'];
             $row['importId'] = $patientStatus['importId'] ? 'Yes' : 'No';
             array_push($rows, $row);
@@ -63,15 +66,15 @@ class OnSiteDetailsReportingService
             $row['user'] = $incentive['email'];
             $row['site'] = $incentive['site'];
             $row['dateOfService'] = $incentive['incentiveDateGiven']->format('m-d-Y');
-            $row['occurrence'] = $incentive['incentiveOccurrence'] === 'other' ? 'Other, ' . $incentive['otherIncentiveOccurrence'] : $incentive['incentiveOccurrence'];
-            $type = $incentive['incentiveType'];
+            $row['occurrence'] = $incentive['incentiveOccurrence'] === 'other' ? 'Other, ' . $incentive['otherIncentiveOccurrence'] : array_search($incentive['incentiveOccurrence'], Incentive::$incentiveOccurrenceChoices);
+            $type = array_search($incentive['incentiveType'], Incentive::$incentiveTypeChoices);
             if ($type === 'other') {
                 $type = 'Other, ' . $incentive['otherIncentiveType'];
             } elseif ($type === 'gift_card') {
                 $type = 'Gift Card, ' . $incentive['giftCardType'];
             }
             $row['incentiveType'] = $type;
-            $row['amount'] = $incentive['incentiveAmount'];
+            $row['amount'] = $incentive['incentiveAmount'] ? '$' . $incentive['incentiveAmount'] : '';
             $row['declined'] = $incentive['declined'] ? 'Yes' : 'No';
             $row['notes'] = $incentive['notes'];
             $type = '';
