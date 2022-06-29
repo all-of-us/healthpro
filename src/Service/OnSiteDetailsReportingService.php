@@ -21,7 +21,7 @@ class OnSiteDetailsReportingService
         'psh.createdTs',
         'ps.participantId',
         'u.email',
-        'psh.site',
+        's.name',
         'psh.status',
         'psh.comments'
     ];
@@ -47,7 +47,7 @@ class OnSiteDetailsReportingService
             $row['created'] = $patientStatus['createdTs']->format('m-d-Y');
             $row['participantId'] = $patientStatus['participantId'];
             $row['user'] = $patientStatus['email'];
-            $row['site'] = $patientStatus['site'];
+            $row['site'] = $patientStatus['siteName'];
             $row['patientStatus'] = array_search($patientStatus['status'], PatientStatus::$onSitePatientStatus);
             $row['notes'] = $patientStatus['comments'];
             $row['importId'] = $patientStatus['importId'] ? 'Yes' : 'No';
