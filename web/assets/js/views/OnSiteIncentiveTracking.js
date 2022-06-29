@@ -4,7 +4,6 @@ $(document).ready(function () {
         {name: 'created', data: 'created'},
         {name: 'participantId', data: 'participantId'},
         {name: 'user', data: 'user'},
-        {name: 'site', data: 'site'},
         {name: 'dateOfService', data: 'dateOfService'},
         {name: 'occurrence', data: 'occurrence'},
         {name: 'incentiveType', data: 'incentiveType'},
@@ -35,7 +34,7 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: [10],
+                targets: [9],
                 render: function (type) {
                     var html = '';
                     if (type === 'import_amend') {

@@ -30,7 +30,6 @@ class OnSiteDetailsReportingService
         'i.createdTs',
         'i.participantId',
         'u.email',
-        'i.site',
         'i.incentiveDateGiven',
         'i.incentiveOccurrence',
         'i.incentiveType',
@@ -64,7 +63,6 @@ class OnSiteDetailsReportingService
             $row['created'] = $incentive['createdTs']->format('m-d-Y');
             $row['participantId'] = $incentive['participantId'];
             $row['user'] = $incentive['email'];
-            $row['site'] = $incentive['site'];
             $row['dateOfService'] = $incentive['incentiveDateGiven']->format('m-d-Y');
             $row['occurrence'] = $incentive['incentiveOccurrence'] === 'other' ? 'Other, ' . $incentive['otherIncentiveOccurrence'] : array_search($incentive['incentiveOccurrence'], Incentive::$incentiveOccurrenceChoices);
             $type = array_search($incentive['incentiveType'], Incentive::$incentiveTypeChoices);
