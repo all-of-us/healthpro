@@ -52,7 +52,7 @@ class OnSiteDetailsReportingService
         'i.notes'
     ];
 
-    public function getAjaxData($patientStatuses): array
+    public function getPatientStatusAjaxData($patientStatuses): array
     {
         $rows = [];
         foreach ($patientStatuses as $patientStatus) {

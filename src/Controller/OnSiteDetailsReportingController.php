@@ -31,7 +31,7 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxParams['sortDir'] = $ajaxParams['order'][0]['dir'];
             $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($siteService->getSiteAwardee(), $ajaxParams);
             $ajaxData = [];
-            $ajaxData['data'] = $onSiteDetailsReportingService->getAjaxData($patientStatuses);
+            $ajaxData['data'] = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount($siteService->getSiteAwardee(), $params);
             return $this->json($ajaxData);
         } else {
@@ -49,7 +49,7 @@ class OnSiteDetailsReportingController extends BaseController
         $params['startDate'] = !empty($queryParams['startDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['startDate']) : '';
         $params['endDate'] = !empty($queryParams['endDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['endDate']) : '';
         $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($siteService->getSiteAwardee(), $params);
-        $records = $onSiteDetailsReportingService->getAjaxData($patientStatuses);
+        $records = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
         $exportHeaders = $onSiteDetailsReportingService::$patientStatusExportHeaders;
         $stream = function () use ($records, $exportHeaders) {
             $output = fopen('php://output', 'w');
