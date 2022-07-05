@@ -22,6 +22,7 @@ class Order
     public const ORDER_UNLOCK = 'unlock';
     public const ORDER_EDIT = 'edit';
     public const ORDER_REVERT = 'revert';
+    public const INITIAL_VERSION = 1;
 
     private $params;
     private $samples;
@@ -852,8 +853,13 @@ class Order
     public function loadSamplesSchema($params = [])
     {
         $this->currentVersion = $this->getVersion();
-        if (empty($this->currentVersion) && !empty($params['order_samples_version'])) {
-            $this->currentVersion = $params['order_samples_version'];
+        if (empty($this->currentVersion)) {
+            if (!empty($this->getId())) {
+                // Initial orders doesn't have a version so set version for those orders
+                $this->currentVersion = self::INITIAL_VERSION;
+            } elseif (!empty($params['order_samples_version'])) {
+                $this->currentVersion = $params['order_samples_version'];
+            }
         }
         $this->params = $params;
         $file = __DIR__ . "/../Order/versions/{$this->currentVersion}.json";
