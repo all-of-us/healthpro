@@ -1142,7 +1142,7 @@ class Order
 
     public function canUnlock()
     {
-        return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isCancelled();
+        return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isCancelled() && !empty($this->getVersion());
     }
 
     public function hasBloodSample($samples)
