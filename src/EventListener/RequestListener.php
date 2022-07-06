@@ -32,15 +32,15 @@ class RequestListener
     private $request;
 
     public function __construct(
-        LoggerService                 $logger,
-        EntityManagerInterface        $em,
-        TwigEnvironment               $twig,
-        RequestStack                  $requestStack,
-        UserService                   $userService,
-        SiteService                   $siteService,
+        LoggerService $logger,
+        EntityManagerInterface $em,
+        TwigEnvironment $twig,
+        RequestStack $requestStack,
+        UserService $userService,
+        SiteService $siteService,
         AuthorizationCheckerInterface $authorizationChecker,
-        EnvironmentService            $env,
-        TokenStorageInterface         $tokenStorage
+        EnvironmentService $env,
+        TokenStorageInterface $tokenStorage
     ) {
         $this->logger = $logger;
         $this->em = $em;

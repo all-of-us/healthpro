@@ -18,8 +18,12 @@ class OnSiteDetailsReportingController extends BaseController
     /**
      * @Route("/patient-status", name="on_site_patient_status")
      */
-    public function patientStatusAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, PatientStatusRepository $patientStatusRepository, SiteService $siteService, Request $request)
-    {
+    public function patientStatusAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        PatientStatusRepository $patientStatusRepository,
+        SiteService $siteService,
+        Request $request
+    ) {
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
@@ -42,8 +46,12 @@ class OnSiteDetailsReportingController extends BaseController
     /**
      * @Route("/patient-status-export", name="on_site_patient_status_export")
      */
-    public function patientStatusExportAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, PatientStatusRepository $patientStatusRepository, SiteService $siteService, Request $request)
-    {
+    public function patientStatusExportAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        PatientStatusRepository $patientStatusRepository,
+        SiteService $siteService,
+        Request $request
+    ) {
         $queryParams = $request->query->all();
         $params = [];
         $params['startDate'] = !empty($queryParams['startDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['startDate']) : '';
@@ -81,8 +89,12 @@ class OnSiteDetailsReportingController extends BaseController
     /**
      * @Route("/incentive-tracking", name="on_site_incentive_tracking")
      */
-    public function incentiveTrackingAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, IncentiveRepository $incentiveRepository, SiteService $siteService, Request $request)
-    {
+    public function incentiveTrackingAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        IncentiveRepository $incentiveRepository,
+        SiteService $siteService,
+        Request $request
+    ) {
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
@@ -107,8 +119,12 @@ class OnSiteDetailsReportingController extends BaseController
     /**
      * @Route("/incentive-tracking-export", name="on_site_incentive_tracking_export")
      */
-    public function incentiveTrackingExportAction(OnSiteDetailsReportingService $onSiteDetailsReportingService, IncentiveRepository $incentiveRepository, SiteService $siteService, Request $request)
-    {
+    public function incentiveTrackingExportAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        IncentiveRepository $incentiveRepository,
+        SiteService $siteService,
+        Request $request
+    ) {
         $queryParams = $request->query->all();
         $params = [];
         $params['startDate'] = !empty($queryParams['startDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['startDate']) : '';
