@@ -22,7 +22,7 @@ class Order
     public const ORDER_UNLOCK = 'unlock';
     public const ORDER_EDIT = 'edit';
     public const ORDER_REVERT = 'revert';
-    public const INITIAL_VERSION = 1;
+    public const INITIAL_VERSION = '1';
 
     private $params;
     private $samples;
