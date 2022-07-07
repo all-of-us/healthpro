@@ -2621,4 +2621,17 @@ class WorkQueue
         }
         return array_merge($columns, self::$buttonGroups[$groupName], self::$defaultColumns);
     }
+
+    public static function getFilterOptionsKeyValuePairs(): array
+    {
+        $options = [];
+        foreach (self::$consentAdvanceFilters as $filters) {
+            foreach ($filters as $filter) {
+                foreach ($filter['options'] as $key => $filterOption) {
+                    $options[$filterOption] = $key;
+                }
+            }
+        }
+        return $options;
+    }
 }
