@@ -12,25 +12,32 @@ class Incentive
     public const CREATE = 'create';
     public const AMEND = 'amend';
     public const CANCEL = 'cancel';
+    public const CASH = 'cash';
+    public const GIFT_CARD = 'gift_card';
+    public const VOUCHER = 'voucher';
+    public const PROMOTIONAL = 'promotional';
+    public const ONE_TIME = 'one_time';
+    public const REDRAW = 'redraw';
+    public const OTHER = 'other';
 
     public static $incentiveTypeChoices = [
-        'Cash' => 'cash',
-        'Gift Card' => 'gift_card',
-        'Voucher' => 'voucher',
-        'Promotional Item' => 'promotional',
-        'Other' => 'other'
+        'Cash' => self::CASH,
+        'Gift Card' => self::GIFT_CARD,
+        'Voucher' => self::VOUCHER,
+        'Promotional Item' => self::PROMOTIONAL,
+        'Other' => self::OTHER
     ];
 
     public static $incentiveOccurrenceChoices = [
-        'One-time Incentive' => 'one_time',
-        'Redraw' => 'redraw',
-        'Other' => 'other'
+        'One-time Incentive' => self::ONE_TIME,
+        'Redraw' => self::REDRAW,
+        'Other' => self::OTHER
     ];
 
     public static $incentiveAmountChoices = [
         '$25.00' => '25',
         '$15.00' => '15',
-        'Other' => 'other'
+        'Other' => self::OTHER
     ];
 
     public static $giftCardTypes = [

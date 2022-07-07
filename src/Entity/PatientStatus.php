@@ -19,18 +19,23 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class PatientStatus
 {
+    public const YES = 'YES';
+    public const NO = 'NO';
+    public const NO_ACCESS = 'NO_ACCESS';
+    public const UNKNOWN = 'UNKNOWN';
+
     public static $patientStatus = [
-        'Yes: Confirmed in EHR system' => 'YES',
-        'No: Not found in EHR system' => 'NO',
-        'No Access: Unable to check EHR system' => 'NO_ACCESS',
-        'Unknown: Inconclusive search results' => 'UNKNOWN'
+        'Yes: Confirmed in EHR system' => self::YES,
+        'No: Not found in EHR system' => self::NO,
+        'No Access: Unable to check EHR system' => self::NO_ACCESS,
+        'Unknown: Inconclusive search results' => self::UNKNOWN
     ];
 
     public static $onSitePatientStatus = [
-        'Yes' => 'YES',
-        'No' => 'NO',
-        'No Access' => 'NO_ACCESS',
-        'Unknown' => 'UNKNOWN'
+        'Yes' => self::YES,
+        'No' => self::NO,
+        'No Access' => self::NO_ACCESS,
+        'Unknown' => self::UNKNOWN
     ];
 
     /**
