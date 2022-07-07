@@ -99,11 +99,28 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    public function getOnsiteIncentivesCount(): void
+    /**
+     * @dataProvider paramsCountDataProvider
+     */
+    public function testGetOnsiteIncentivesCount($params, $resultCount): void
     {
         $this->createIncentives();
-        $count = $this->repo->getOnsiteIncentivesCount('PS_SITE_TEST', []);
-        $this->assertEquals(5, $count);
+        $count = $this->repo->getOnsiteIncentivesCount('PS_SITE_TEST', $params);
+        $this->assertEquals($resultCount, $count);
+    }
+
+    public function paramsCountDataProvider()
+    {
+        return [
+            [[], 5],
+            [['participantId' => 'P000000001'], 1],
+            [['startDate' => '2022-03-15'], 3],
+            [['endDate' => '2022-04-15'], 4],
+            [['startDateOfService' => '2022-01-15'], 5],
+            [['endDateOfService' => '2022-03-15'], 3],
+            [['startDate' => '2022-02-15', 'endDate' => '2022-04-15'], 3],
+            [['startDateOfService' => '2022-01-15', 'endDateOfService' => '2022-04-15'], 4]
+        ];
     }
 
     private function createIncentives(): void
