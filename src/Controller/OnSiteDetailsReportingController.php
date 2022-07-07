@@ -27,8 +27,8 @@ class OnSiteDetailsReportingController extends BaseController
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
-            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['startDate']) : '';
-            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['endDate']) : '';
+            $ajaxParams['startDate'] = $this->getParamDate($params, 'startDate');
+            $ajaxParams['endDate'] = $this->getParamDate($params, 'endDate');
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
             $sortColumns = $onSiteDetailsReportingService::$patientStatusSortColumns;
             $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
@@ -54,8 +54,8 @@ class OnSiteDetailsReportingController extends BaseController
     ) {
         $queryParams = $request->query->all();
         $params = [];
-        $params['startDate'] = !empty($queryParams['startDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['startDate']) : '';
-        $params['endDate'] = !empty($queryParams['endDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['endDate']) : '';
+        $params['startDate'] = $this->getParamDate($queryParams, 'startDate');
+        $params['endDate'] = $this->getParamDate($queryParams, 'endDate');
         $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($siteService->getSiteAwardee(), $params);
         $records = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
         $exportHeaders = $onSiteDetailsReportingService::$patientStatusExportHeaders;
@@ -98,10 +98,10 @@ class OnSiteDetailsReportingController extends BaseController
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
-            $ajaxParams['startDate'] = !empty($params['startDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['startDate']) : '';
-            $ajaxParams['endDate'] = !empty($params['endDate']) ? \DateTime::createFromFormat('!m/d/Y', $params['endDate']) : '';
-            $ajaxParams['startDateOfService'] = !empty($params['startDateOfService']) ? \DateTime::createFromFormat('!m/d/Y', $params['startDateOfService']) : '';
-            $ajaxParams['endDateOfService'] = !empty($params['endDateOfService']) ? \DateTime::createFromFormat('!m/d/Y', $params['endDateOfService']) : '';
+            $ajaxParams['startDate'] = $this->getParamDate($params, 'startDate');
+            $ajaxParams['endDate'] = $this->getParamDate($params, 'endDate');
+            $ajaxParams['startDateOfService'] = $this->getParamDate($params, 'startDateOfService');
+            $ajaxParams['endDateOfService'] = $this->getParamDate($params, 'endDateOfService');
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
             $sortColumns = $onSiteDetailsReportingService::$incentiveSortColumns;
             $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
@@ -127,8 +127,8 @@ class OnSiteDetailsReportingController extends BaseController
     ) {
         $queryParams = $request->query->all();
         $params = [];
-        $params['startDate'] = !empty($queryParams['startDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['startDate']) : '';
-        $params['endDate'] = !empty($queryParams['endDate']) ? \DateTime::createFromFormat('m/d/Y', $queryParams['endDate']) : '';
+        $params['startDate'] = $this->getParamDate($queryParams, 'startDate');
+        $params['endDate'] = $this->getParamDate($queryParams, 'endDate');
         $patientStatuses = $incentiveRepository->getOnsiteIncentives($siteService->getSiteId(), $params);
         $records = $onSiteDetailsReportingService->getIncentiveTrackingAjaxData($patientStatuses, true);
         $exportHeaders = $onSiteDetailsReportingService::$incentiveExportHeaders;
