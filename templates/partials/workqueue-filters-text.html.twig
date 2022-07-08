@@ -1,7 +1,10 @@
 <div>
     <ul>
-        {% for param in params %}
-            <li class="btn btn-default btn-xs"><span class="fa fa-close"></span> {{ filterOptions[param] }}</li>
+        {% for name, param in params %}
+            <li class="btn btn-default btn-xs">
+                <span class="fa fa-close filter-option-remove" data-name="{{ name }}"></span>
+                {{ filterOptions[param] is defined ? filterOptions[param] : param }}
+            </li>
         {% endfor %}
     </ul>
 </div>
