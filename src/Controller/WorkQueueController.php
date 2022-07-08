@@ -168,7 +168,7 @@ class WorkQueueController extends BaseController
                 'columnsDef' => WorkQueue::$columnsDef,
                 'filterIcons' => WorkQueue::$filterIcons,
                 'columnGroups' => WorkQueue::$columnGroups,
-                'filterOptions' => WorkQueue::getFilterOptionsKeyValuePairs()
+                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters)
             ]);
         }
     }
