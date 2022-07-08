@@ -94,11 +94,25 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
-    public function getOnsitePatientStatusesCount(): void
+    /**
+     * @dataProvider paramsCountDataProvider
+     */
+    public function testGetOnsitePatientStatusesCount($params, $resultCount): void
     {
         $this->createPatientStatus();
-        $count = $this->repo->getOnsitePatientStatuses('PS_AWARDEE_TEST', []);
-        $this->assertEquals(5, $count);
+        $count = $this->repo->getOnsitePatientStatusesCount('PS_AWARDEE_TEST', $params);
+        $this->assertEquals($resultCount, $count);
+    }
+
+    public function paramsCountDataProvider()
+    {
+        return [
+            [[], 5],
+            [['participantId' => 'P000000001'], 1],
+            [['startDate' => '2022-03-15'], 3],
+            [['endDate' => '2022-04-15'], 4],
+            [['startDate' => '2022-02-15', 'endDate' => '2022-04-15'], 3],
+        ];
     }
 
     private function createPatientStatus(): void

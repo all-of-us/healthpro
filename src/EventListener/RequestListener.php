@@ -160,7 +160,8 @@ class RequestListener
         return (in_array($route, [
             'workqueue_export',
             'help_sopFile',
-            'on_site_patient_status_export'
+            'on_site_patient_status_export',
+            'on_site_incentive_tracking_export'
         ]));
     }
 

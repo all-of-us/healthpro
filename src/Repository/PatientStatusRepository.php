@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PatientStatus;
+use App\Entity\Site;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
@@ -130,9 +131,10 @@ class PatientStatusRepository extends ServiceEntityRepository
     public function getOnsitePatientStatuses($awardee, $params): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
-            ->select('ps.participantId, psh.site, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
+            ->select('ps.participantId, s.name as siteName, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
             ->leftJoin('ps.history', 'psh')
             ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin(Site::class, 's', Join::WITH, 'psh.site = s.siteId')
             ->leftJoin('psh.import', 'psi')
             ->where('ps.awardee =:awardee');
 
@@ -178,6 +180,7 @@ class PatientStatusRepository extends ServiceEntityRepository
             ->select('count(psh.id)')
             ->leftJoin('ps.history', 'psh')
             ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin(Site::class, 's', Join::WITH, 'psh.site = s.siteId')
             ->leftJoin('psh.import', 'psi')
             ->where('ps.awardee =:awardee');
         if (!empty($params['participantId'])) {

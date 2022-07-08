@@ -35,4 +35,9 @@ class BaseController extends AbstractController
         }
         throw new \Exception('Invalid user type');
     }
+
+    protected function getParamDate($params, $key): ?\DateTime
+    {
+        return !empty($params[$key]) ? \DateTime::createFromFormat('!m/d/Y', $params[$key]) : null;
+    }
 }

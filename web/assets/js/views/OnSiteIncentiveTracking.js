@@ -4,13 +4,16 @@ $(document).ready(function () {
         {name: 'created', data: 'created'},
         {name: 'participantId', data: 'participantId'},
         {name: 'user', data: 'user'},
-        {name: 'site', data: 'site'},
-        {name: 'patientStatus', data: 'patientStatus'},
+        {name: 'dateOfService', data: 'dateOfService'},
+        {name: 'occurrence', data: 'occurrence'},
+        {name: 'incentiveType', data: 'incentiveType'},
+        {name: 'amount', data: 'amount'},
+        {name: 'declined', data: 'declined'},
         {name: 'notes', data: 'notes'},
-        {name: 'importId', data: 'importId', orderable: false}
+        {name: 'type', data: 'type', orderable: false}
     );
     var url = window.location.href;
-    var onSitePatientStatusTableSelector = $('#on_site_patient_status');
+    var onSitePatientStatusTableSelector = $('#on_site_incentive_tracking');
     var table = onSitePatientStatusTableSelector.DataTable({
         processing: true,
         serverSide: true,
@@ -31,11 +34,15 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: [6],
-                render: function (importId) {
+                targets: [9],
+                render: function (type) {
                     var html = '';
-                    if (importId === 'Yes') {
+                    if (type === 'import_amend') {
+                        html = '<span class="label label-primary">Imported</span> <span class="label label-warning">Amended</span>';
+                    } else if (type === 'import') {
                         html = '<span class="label label-primary">Imported</span>';
+                    } else if (type === 'amend') {
+                        html = '<span class="label label-warning">Amended</span>';
                     }
                     return html;
                 }
@@ -65,10 +72,12 @@ $(document).ready(function () {
 
     $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
 
-    var formSelector = $("#patient_status_filters form");
+    var formSelector = $("#incentive_tracking_filters form");
     var participantIdSelector = $('#participantId');
     var startDateSelector = $('#startDate');
     var endDateSelector = $('#endDate');
+    var startDateOfServiceSelector = $('#startDateOfService');
+    var endDateOfServiceSelector = $('#endDateOfService');
 
     var clearInvalidFields = function () {
         if (startDateSelector.parsley().validate() !== true) {
@@ -77,11 +86,25 @@ $(document).ready(function () {
         if (endDateSelector.parsley().validate() !== true) {
             endDateSelector.val('');
         }
+        if (startDateOfServiceSelector.parsley().validate() !== true) {
+            startDateOfServiceSelector.val('');
+        }
+        if (endDateOfServiceSelector.parsley().validate() !== true) {
+            endDateOfServiceSelector.val('');
+        }
     };
 
     $('#date_filter_apply').on('click', function () {
         if (startDateSelector.parsley().validate() === true && endDateSelector.parsley().validate() === true) {
             if (startDateSelector.val() !== '' || endDateSelector.val() !== '') {
+                formSelector.submit();
+            }
+        }
+    });
+
+    $('#date_service_filter_apply').on('click', function () {
+        if (startDateOfServiceSelector.parsley().validate() === true && endDateOfServiceSelector.parsley().validate() === true) {
+            if (startDateOfServiceSelector.val() !== '' || endDateOfServiceSelector.val() !== '') {
                 formSelector.submit();
             }
         }
@@ -104,6 +127,13 @@ $(document).ready(function () {
     $('#date_filter_reset').on('click', function () {
         startDateSelector.val('');
         endDateSelector.val('');
+        clearInvalidFields();
+        formSelector.submit();
+    });
+
+    $('#date_service_filter_reset').on('click', function () {
+        startDateOfServiceSelector.val('');
+        endDateOfServiceSelector.val('');
         clearInvalidFields();
         formSelector.submit();
     });
