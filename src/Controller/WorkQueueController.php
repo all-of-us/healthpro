@@ -451,7 +451,8 @@ class WorkQueueController extends BaseController
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
                 'columnsDef' => WorkQueue::$columnsDef,
                 'consentColumns' => WorkQueue::$consentColumns,
-                'filterIcons' => WorkQueue::$filterIcons
+                'filterIcons' => WorkQueue::$filterIcons,
+                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters)
             ]);
         }
     }
