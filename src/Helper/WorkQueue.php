@@ -1956,6 +1956,23 @@ class WorkQueue
         ]
     ];
 
+    public static $filterDateFieldLabels = [
+        'consentForStudyEnrollmentAuthoredStartDate' => 'Primary Consent Start Date',
+        'consentForStudyEnrollmentAuthoredEndDate' => 'Primary Consent End Date',
+        'questionnaireOnDnaProgramAuthoredStartDate' => 'Program Update Start Date',
+        'questionnaireOnDnaProgramAuthoredEndDate' => 'Program Update End Date',
+        'consentForElectronicHealthRecordsAuthoredStartDate' => 'EHR Consent Status Start Date',
+        'consentForElectronicHealthRecordsAuthoredEndDate' => 'EHR Consent Status End Date',
+        'consentForGenomicsRORAuthoredStartDate' => 'gRoR Consent Status Start Date',
+        'consentForGenomicsRORAuthoredEndDate' => 'gRoR Consent Status End Date',
+        'consentForDvElectronicHealthRecordsSharingAuthoredStartDate' => 'DV-Only EHR Sharing Start Date',
+        'consentForDvElectronicHealthRecordsSharingAuthoredEndDate' => 'DV-Only EHR Sharing End Date',
+        'consentForCABoRAuthoredStartDate' => 'CABoR Consent Start Date',
+        'consentForCABoRAuthoredEndDate' => 'CABoR Consent End Date',
+        'ehrConsentExpireStatusAuthoredStartDate' => 'EHR Expiration Status Start Date',
+        'ehrConsentExpireStatusAuthoredEndDate' => 'EHR Expiration Status End Date'
+    ];
+
     public static $filterIcons = [
         'Status' => 'fa-user-check',
         'Consents' => 'fa-file-contract',
@@ -2633,6 +2650,7 @@ class WorkQueue
                 }
             }
         }
+        $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'], self::$filterDateFieldLabels);
         return $filterLabelOptionPairs;
     }
 }
