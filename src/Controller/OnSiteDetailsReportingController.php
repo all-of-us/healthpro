@@ -56,6 +56,7 @@ class OnSiteDetailsReportingController extends BaseController
         $params = [];
         $params['startDate'] = $this->getParamDate($queryParams, 'startDate');
         $params['endDate'] = $this->getParamDate($queryParams, 'endDate');
+        $params['participantId'] = $queryParams['participantId'] ?? '';
         $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($siteService->getSiteAwardee(), $params);
         $records = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
         $exportHeaders = $onSiteDetailsReportingService::$patientStatusExportHeaders;
@@ -129,6 +130,9 @@ class OnSiteDetailsReportingController extends BaseController
         $params = [];
         $params['startDate'] = $this->getParamDate($queryParams, 'startDate');
         $params['endDate'] = $this->getParamDate($queryParams, 'endDate');
+        $params['startDateOfService'] = $this->getParamDate($queryParams, 'startDateOfService');
+        $params['endDateOfService'] = $this->getParamDate($queryParams, 'endDateOfService');
+        $params['participantId'] = $queryParams['participantId'] ?? '';
         $patientStatuses = $incentiveRepository->getOnsiteIncentives($siteService->getSiteId(), $params);
         $records = $onSiteDetailsReportingService->getIncentiveTrackingAjaxData($patientStatuses, true);
         $exportHeaders = $onSiteDetailsReportingService::$incentiveExportHeaders;
