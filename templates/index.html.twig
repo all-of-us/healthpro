@@ -26,6 +26,13 @@
                     <div class="description">Review Physical Measurement and Biobank orders that were created today, are unfinalized, or were recently modified.</div>
                 </a>
             </div>
+            <div class="col-sm-6 col-md-4">
+                <a href="{{ path('on_site_incentive_tracking') }}" class="btn btn-lg btn-default btn-block">
+                    <i class="fa fa-clipboard-list" aria-hidden="true"></i>
+                    On-Site Details Reporting
+                    <div class="description">Audit and report on ID Verification, Incentive Tracking, and Patient Status.</div>
+                </a>
+            </div>
         {% endif %}
         {% if (is_granted('ROLE_USER') and app.session.get('site') and app.session.get('siteOrganization')) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees) %}
             <div class="col-sm-6 col-md-4">
