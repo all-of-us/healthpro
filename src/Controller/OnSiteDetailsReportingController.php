@@ -36,7 +36,7 @@ class OnSiteDetailsReportingController extends BaseController
             $patientStatuses = $patientStatusRepository->getOnsitePatientStatuses($siteService->getSiteAwardee(), $ajaxParams);
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
-            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount($siteService->getSiteAwardee(), $params);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount($siteService->getSiteAwardee(), $ajaxParams);
             return $this->json($ajaxData);
         } else {
             return $this->render('onsite/patient-status.html.twig', ['params' => $params]);
@@ -109,7 +109,7 @@ class OnSiteDetailsReportingController extends BaseController
             $incentives = $incentiveRepository->getOnsiteIncentives($siteService->getSiteId(), $ajaxParams);
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getIncentiveTrackingAjaxData($incentives);
-            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $incentiveRepository->getOnsiteIncentivesCount($siteService->getSiteId(), $params);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $incentiveRepository->getOnsiteIncentivesCount($siteService->getSiteId(), $ajaxParams);
             return $this->json($ajaxData);
         } else {
             return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
