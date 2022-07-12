@@ -31,6 +31,7 @@ class AuthController extends BaseController
         }
 
         $dashboardUrl = $params->has('dashboard_url') ? $params->get('dashboard_url') : null;
+        $reportTechnicalIssueUrl = $params->has('report_technical_issue_url') ? $params->get('report_technical_issue_url') : null;
         if ($env->isLocal() && $userService->canMockLogin()) {
             $loginForm = $this->createForm(MockLoginType::class);
 
@@ -56,7 +57,8 @@ class AuthController extends BaseController
 
             return $this->render('login.html.twig', [
                 'loginForm' => $loginForm->createView(),
-                'dashboardUrl' => $dashboardUrl
+                'dashboardUrl' => $dashboardUrl,
+                'reportTechnicalIssueUrl' => $reportTechnicalIssueUrl
             ]);
         }
 
