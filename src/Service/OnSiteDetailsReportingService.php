@@ -82,9 +82,9 @@ class OnSiteDetailsReportingService
             if ($incentive['incentiveOccurrence']) {
                 $occurrence = $incentive['incentiveOccurrence'] === Incentive::OTHER ? 'Other, ' .
                     $incentive['otherIncentiveOccurrence'] : array_search(
-                    $incentive['incentiveOccurrence'],
-                    Incentive::$incentiveOccurrenceChoices
-                );
+                        $incentive['incentiveOccurrence'],
+                        Incentive::$incentiveOccurrenceChoices
+                    );
             }
             $row['occurrence'] = $occurrence;
             $type = '';
