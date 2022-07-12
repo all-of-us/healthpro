@@ -184,21 +184,7 @@ class WorkQueueTest extends TestCase
                 'retentionType' => 'Retention Status',
                 'retentionEligibleStatus' => 'Retention Eligible',
                 'participantOrigin' => 'Participant Origination',
-                'enrollmentSite' => 'Enrollment Site',
-                'consentForStudyEnrollmentAuthoredStartDate' => 'Primary Consent Start Date',
-                'consentForStudyEnrollmentAuthoredEndDate' => 'Primary Consent End Date',
-                'questionnaireOnDnaProgramAuthoredStartDate' => 'Program Update Start Date',
-                'questionnaireOnDnaProgramAuthoredEndDate' => 'Program Update End Date',
-                'consentForElectronicHealthRecordsAuthoredStartDate' => 'EHR Consent Status Start Date',
-                'consentForElectronicHealthRecordsAuthoredEndDate' => 'EHR Consent Status End Date',
-                'consentForGenomicsRORAuthoredStartDate' => 'gRoR Consent Status Start Date',
-                'consentForGenomicsRORAuthoredEndDate' => 'gRoR Consent Status End Date',
-                'consentForDvElectronicHealthRecordsSharingAuthoredStartDate' => 'DV-Only EHR Sharing Start Date',
-                'consentForDvElectronicHealthRecordsSharingAuthoredEndDate' => 'DV-Only EHR Sharing End Date',
-                'consentForCABoRAuthoredStartDate' => 'CABoR Consent Start Date',
-                'consentForCABoRAuthoredEndDate' => 'CABoR Consent End Date',
-                'ehrConsentExpireStatusAuthoredStartDate' => 'EHR Expiration Status Start Date',
-                'ehrConsentExpireStatusAuthoredEndDate' => 'EHR Expiration Status End Date',
+                'enrollmentSite' => 'Enrollment Site'
             ],
             'options' => [
                 '' => 'View All',
@@ -266,6 +252,8 @@ class WorkQueueTest extends TestCase
                 'careevolution' => 'DV Pilot Portal',
             ]
         ];
+        $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'],
+            WorkQueue::$filterDateFieldLabels);
         $advancedFilters = WorkQueue::$consentAdvanceFilters;
         $this->assertSame($filterLabelOptionPairs, WorkQueue::getFilterLabelOptionPairs($advancedFilters));
     }
