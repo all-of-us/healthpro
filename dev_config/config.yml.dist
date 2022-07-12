@@ -149,8 +149,5 @@ ehr_protocol_banner_message:
 # Dashboard URL displayed on the login page
 # dashboard_url:
 
-# Report technical issue url displayed on the login page, help page, and in the help dropdown menu.
-# report_technical_issue_url:
-
 # For getting secret manager credential in local env
 # local_use_secret_manager: false
