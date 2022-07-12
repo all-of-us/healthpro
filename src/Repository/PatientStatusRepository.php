@@ -158,7 +158,7 @@ class PatientStatusRepository extends ServiceEntityRepository
         if (isset($params['sortColumn'])) {
             $queryBuilder->orderBy($params['sortColumn'], $params['sortDir']);
         } else {
-            $queryBuilder->orderBy('ps.id', 'ASC');
+            $queryBuilder->orderBy('psh.createdTs', 'DESC');
         }
 
         if (isset($params['start'])) {

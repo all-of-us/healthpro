@@ -82,7 +82,7 @@ class IncentiveRepository extends ServiceEntityRepository
         if (isset($params['sortColumn'])) {
             $queryBuilder->orderBy($params['sortColumn'], $params['sortDir']);
         } else {
-            $queryBuilder->orderBy('i.id', 'ASC');
+            $queryBuilder->orderBy('i.createdTs', 'DESC');
         }
 
         if (isset($params['start'])) {
