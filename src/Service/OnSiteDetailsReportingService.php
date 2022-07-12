@@ -78,13 +78,24 @@ class OnSiteDetailsReportingService
             $row['participantId'] = $incentive['participantId'];
             $row['user'] = $incentive['email'];
             $row['dateOfService'] = $incentive['incentiveDateGiven']->format('m-d-Y');
-            $row['occurrence'] = $incentive['incentiveOccurrence'] === Incentive::OTHER ? 'Other, ' .
-                $incentive['otherIncentiveOccurrence'] : array_search($incentive['incentiveOccurrence'], Incentive::$incentiveOccurrenceChoices);
-            $type = array_search($incentive['incentiveType'], Incentive::$incentiveTypeChoices);
-            if ($type === Incentive::OTHER) {
-                $type = 'Other, ' . $incentive['otherIncentiveType'];
-            } elseif ($type === Incentive::GIFT_CARD) {
-                $type = 'Gift Card, ' . $incentive['giftCardType'];
+            $occurrence = '';
+            if ($incentive['incentiveOccurrence']) {
+                $occurrence = $incentive['incentiveOccurrence'] === Incentive::OTHER ? 'Other, ' .
+                    $incentive['otherIncentiveOccurrence'] : array_search(
+                        $incentive['incentiveOccurrence'],
+                        Incentive::$incentiveOccurrenceChoices
+                    );
+            }
+            $row['occurrence'] = $occurrence;
+            $type = '';
+            if ($incentive['incentiveType']) {
+                if ($incentive['incentiveType'] === Incentive::OTHER) {
+                    $type = 'Other, ' . $incentive['otherIncentiveType'];
+                } elseif ($incentive['incentiveType'] === Incentive::GIFT_CARD) {
+                    $type = 'Gift Card, ' . $incentive['giftCardType'];
+                } else {
+                    $type = array_search($incentive['incentiveType'], Incentive::$incentiveTypeChoices);
+                }
             }
             $row['incentiveType'] = $type;
             $row['amount'] = $incentive['incentiveAmount'] ? '$' . $incentive['incentiveAmount'] : '';

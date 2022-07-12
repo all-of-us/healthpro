@@ -40,9 +40,9 @@ class PatientStatusRepositoryTest extends KernelTestCase
     public function paginationDataProvider()
     {
         return [
-            [0, 2, 2, 'P000000000'],
-            [1, 1, 1, 'P000000001'],
-            [3, 1, 1, 'P000000003']
+            [0, 2, 2, 'P000000004'],
+            [1, 1, 1, 'P000000003'],
+            [3, 1, 1, 'P000000001']
         ];
     }
 

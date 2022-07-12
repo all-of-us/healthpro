@@ -3,7 +3,7 @@
 {% block body %}
     {% include 'onsite/partials/_page_heading.html.twig' %}
     <div class="row">
-        <div class="col-md-4 dropdown on-site-filters" id="patient_status_filters">
+        <div class="col-md-5 dropdown on-site-filters" id="patient_status_filters">
             {% set participantId = params['participantId']|default('') %}
             {% set startDate = params['startDate']|default('') %}
             {% set endDate = params['endDate']|default('') %}
@@ -16,7 +16,7 @@
                         <button href="#"
                                 class="dropdown-toggle btn btn-default {{ startDate or endDate ? 'btn-primary' : 'btn-default' }}"
                                 data-toggle="dropdown">
-                            <i class="far fa-calendar" aria-hidden="true"></i> Select Dates <b class="caret"></b>
+                            <i class="far fa-calendar" aria-hidden="true"></i> Select Dates Created <b class="caret"></b>
                         </button>
                         <ul class="dropdown-menu on-site-date-filter-dropdown">
                             <li>
@@ -56,7 +56,7 @@
         <div class="col-md-1 on-site-reset-all">
             <a href="{{ path('on_site_patient_status') }}">Reset All</a>
         </div>
-        <div class="col-md-4 col-md-offset-3">
+        <div class="col-md-4 col-md-offset-2">
             {% set exportRoute = 'on_site_patient_status_export' %}
             {% include 'onsite/partials/paging_export.html.twig' %}
         </div>
