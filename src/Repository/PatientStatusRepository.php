@@ -150,7 +150,7 @@ class PatientStatusRepository extends ServiceEntityRepository
 
         if (!empty($params['endDate'])) {
             $queryBuilder->andWhere('psh.createdTs <= :endDate')
-                ->setParameter('endDate', $params['endDate']);
+                ->setParameter('endDate', $params['endDate']->modify('+1 day'));
         }
 
         $queryBuilder->setParameter('awardee', $awardee);
@@ -195,7 +195,7 @@ class PatientStatusRepository extends ServiceEntityRepository
 
         if (!empty($params['endDate'])) {
             $queryBuilder->andWhere('psh.createdTs <= :endDate')
-                ->setParameter('endDate', $params['endDate']);
+                ->setParameter('endDate', $params['endDate']->modify('+1 day'));
         }
         $queryBuilder->setParameter('awardee', $awardee);
 
