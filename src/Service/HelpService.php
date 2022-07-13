@@ -219,7 +219,7 @@ class HelpService
         return 'https://redcap.pmi-ops.org/surveys/?s=JN33K7PKWC';
     }
 
-    public static function getTechnicalIssueUrl(): string
+    public static function getReportTechnicalIssueUrl(): string
     {
         return 'https://redcap.pmi-ops.org/surveys/?s=ND8RJL78X4YWTKRX';
     }

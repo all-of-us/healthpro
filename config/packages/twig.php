@@ -17,6 +17,6 @@ $container->loadFromExtension('twig', [
         'timeZones' => $env->getTimeZones(),
         'confluenceResources' => HelpService::$confluenceResources,
         'feedback_url' => HelpService::getFeedbackUrl(),
-        'report_technical_issue_url' => HelpService::getTechnicalIssueUrl()
+        'report_technical_issue_url' => HelpService::getReportTechnicalIssueUrl()
     ],
 ]);
