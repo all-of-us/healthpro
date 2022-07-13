@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AccessManagementController extends BaseController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
-    public const RESET_PASSWORD_URL = 'https://admin.google.com';
+    public const GOOGLE_ADMIN_URL = 'https://admin.google.com';
 
     private $googleGroupsService;
     private $loggerService;
@@ -70,7 +70,7 @@ class AccessManagementController extends BaseController
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
             'members' => $members,
-            'resetPasswordUrl' => self::RESET_PASSWORD_URL
+            'resetPasswordUrl' => self::GOOGLE_ADMIN_URL
         ]);
     }
 
