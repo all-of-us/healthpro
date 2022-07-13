@@ -115,7 +115,8 @@ class AccessManagementController extends BaseController
         }
         return $this->render('accessmanagement/add-member.html.twig', [
             'group' => $group,
-            'groupMemberForm' => $groupMemberForm->createView()
+            'groupMemberForm' => $groupMemberForm->createView(),
+            'adminConsoleUrl' => self::GOOGLE_ADMIN_URL
         ]);
     }
 
