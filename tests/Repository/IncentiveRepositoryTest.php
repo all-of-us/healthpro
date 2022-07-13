@@ -52,8 +52,8 @@ class IncentiveRepositoryTest extends KernelTestCase
     {
         $this->createIncentives();
         $params = [];
-        $params['startDate'] = $startDate;
-        $params['endDate'] = $endDate;
+        $params['startDate'] = $this->getDate($startDate);
+        $params['endDate'] = $this->getDate($endDate);
         $incentives = $this->repo->getOnSiteIncentives('PS_SITE_TEST', $params);
         $this->assertEquals($resultCount, count($incentives));
 
@@ -114,11 +114,11 @@ class IncentiveRepositoryTest extends KernelTestCase
         return [
             [[], 5],
             [['participantId' => 'P000000001'], 1],
-            [['startDate' => '2022-03-15'], 3],
-            [['endDate' => '2022-04-15'], 4],
+            [['startDate' => $this->getDate('2022-03-15')], 3],
+            [['endDate' => $this->getDate('2022-04-15')], 4],
             [['startDateOfService' => '2022-01-15'], 5],
             [['endDateOfService' => '2022-03-15'], 3],
-            [['startDate' => '2022-02-15', 'endDate' => '2022-04-15'], 3],
+            [['startDate' => $this->getDate('2022-02-15'), 'endDate' => $this->getDate('2022-04-15')], 3],
             [['startDateOfService' => '2022-01-15', 'endDateOfService' => '2022-04-15'], 4]
         ];
     }
@@ -230,5 +230,10 @@ class IncentiveRepositoryTest extends KernelTestCase
                 'declined' => 0,
             ]
         ];
+    }
+
+    private function getDate($date): ?\DateTime
+    {
+        return $date ? new \DateTime($date) : null;
     }
 }

@@ -53,8 +53,8 @@ class PatientStatusRepositoryTest extends KernelTestCase
     {
         $this->createPatientStatus();
         $params = [];
-        $params['startDate'] = $startDate;
-        $params['endDate'] = $endDate;
+        $params['startDate'] = $this->getDate($startDate);
+        $params['endDate'] = $this->getDate($endDate);
         $patientStatuses = $this->repo->getOnsitePatientStatuses('PS_AWARDEE_TEST', $params);
         $this->assertEquals($resultCount, count($patientStatuses));
     }
@@ -109,9 +109,9 @@ class PatientStatusRepositoryTest extends KernelTestCase
         return [
             [[], 5],
             [['participantId' => 'P000000001'], 1],
-            [['startDate' => '2022-03-15'], 3],
-            [['endDate' => '2022-04-15'], 4],
-            [['startDate' => '2022-02-15', 'endDate' => '2022-04-15'], 3],
+            [['startDate' => $this->getDate('2022-03-15')], 3],
+            [['endDate' => $this->getDate('2022-04-15')], 4],
+            [['startDate' => $this->getDate('2022-02-15'), 'endDate' => $this->getDate('2022-04-15')], 3],
         ];
     }
 
@@ -205,5 +205,10 @@ class PatientStatusRepositoryTest extends KernelTestCase
                 'rdrTs' => '2022-05-15'
             ],
         ];
+    }
+
+    private function getDate($date): ?\DateTime
+    {
+        return $date ? new \DateTime($date) : null;
     }
 }

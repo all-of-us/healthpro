@@ -64,7 +64,7 @@ class IncentiveRepository extends ServiceEntityRepository
 
         if (!empty($params['endDate'])) {
             $queryBuilder->andWhere('i.createdTs <= :endDate')
-                ->setParameter('endDate', $params['endDate']);
+                ->setParameter('endDate', $params['endDate']->modify('+1 day'));
         }
 
         if (!empty($params['startDateOfService'])) {
@@ -118,7 +118,7 @@ class IncentiveRepository extends ServiceEntityRepository
 
         if (!empty($params['endDate'])) {
             $queryBuilder->andWhere('i.createdTs <= :endDate')
-                ->setParameter('endDate', $params['endDate']);
+                ->setParameter('endDate', $params['endDate']->modify('+1 day'));
         }
 
         if (!empty($params['startDateOfService'])) {
