@@ -17,11 +17,15 @@
             <div class="page-header">
                 <h4 class="text-success"><i class="fa fa-user" aria-hidden="true"></i> Add Member</h4>
             </div>
-            <div class="alert alert-warning">
-                <i class="fa fa-exclamation-triangle fa-lg"></i>
-                If you have not received an email notification indicating your user has enabled 2FA, please search for
-                the user in the <a href="{{ adminConsoleUrl }}" target="_blank">Admin Console</a> to verify the
-                status before adding to groups.
+            <div class="alert alert-warning row">
+                <div class="col-sm-1 user-add-warning-icon">
+                    <i class="fa fa-exclamation-triangle fa-lg"></i>
+                </div>
+                <div class="col-sm-11 user-add-warning-text">
+                    If you have not received an email notification indicating your user has enabled 2FA, please search
+                    for the user in the <a href="{{ adminConsoleUrl }}" target="_blank">Admin Console</a> to verify the
+                    status before adding to groups.
+                </div>
             </div>
             {{ form_start(groupMemberForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(groupMemberForm) }}
