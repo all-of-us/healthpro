@@ -101,7 +101,7 @@ class AccessManagementController extends BaseController
                         }
                         $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
                     } else {
-                        $errorMessage = ' User cannot be added until 2FA is enabled. Please check the user’s 2FA status in the Admin Console before contacting drcsupport@vumc.org for assistance.';
+                        $errorMessage = 'User cannot be added until 2FA is enabled. Please check the user’s 2FA status in the Admin Console before contacting drcsupport@vumc.org for assistance.';
                     }
                 } else {
                     $errorMessage = 'User does not exist.';

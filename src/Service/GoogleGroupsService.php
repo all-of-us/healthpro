@@ -84,16 +84,18 @@ class GoogleGroupsService
     }
 
     /** Gets all groups to which a user belongs (or all groups if no user). */
-    public function getGroups(string $userEmail): array
+    public function getGroups(string $userEmail, $checkDomain = true): array
     {
         $groups = [];
         $nextToken = null;
         $email = "@{$this->domain}";
         do {
             $params = [
-                'domain' => $this->domain,
                 'userKey' => $userEmail
             ];
+            if ($checkDomain) {
+                $params['domain'] = $this->domain;
+            }
             if ($nextToken) {
                 $params['pageToken'] = $nextToken;
             }
@@ -103,7 +105,7 @@ class GoogleGroupsService
                 // restrict groups to the configured (sub)domain (Google API includes *all* our groups)
                 $domainModels = [];
                 foreach ($models as $model) {
-                    if (strcasecmp(substr($model->getEmail(), -strlen($email)), $email) === 0) {
+                    if (!$checkDomain || strcasecmp(substr($model->getEmail(), -strlen($email)), $email) === 0) {
                         $domainModels[] = $model;
                     }
                 }
@@ -226,18 +228,18 @@ class GoogleGroupsService
         }
     }
 
-    private function getMfaGroupUserEmails(): array
+    private function getUserGroupIds($email): array
     {
-        $users = $this->getMembers(self::MFA_EXCEPTION_GROUP);
-        $emails = [];
-        foreach ($users as $user) {
-            $emails[] = $user->email;
+        $groups = $this->getGroups($email, false);
+        $groupIds = [];
+        foreach ($groups as $group) {
+            $groupIds[] = $group->email;
         }
-        return $emails;
+        return $groupIds;
     }
 
     public function isMfaGroupUser($email): bool
     {
-        return in_array($email, $this->getMfaGroupUserEmails());
+        return in_array(self::MFA_EXCEPTION_GROUP, $this->getUserGroupIds($email));
     }
 }
