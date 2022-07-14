@@ -1,0 +1,16 @@
+<div>
+    <ul>
+        {% for name, param in params %}
+            {% if name not in ['exportType','workqueue_consents_length'] %}
+                <li class="btn btn-default btn-xs">
+                    <span class="fa fa-close filter-option-remove" data-name="{{ name }}"></span>
+                    <strong>
+                        {{ filterLabelOptionPairs['labels'][name] is defined ? filterLabelOptionPairs['labels'][name] : name }}
+                    </strong>
+                    -
+                    {{ filterLabelOptionPairs['options'][param] is defined ? filterLabelOptionPairs['options'][param] : param }}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>

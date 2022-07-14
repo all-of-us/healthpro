@@ -167,7 +167,8 @@ class WorkQueueController extends BaseController
                 'columns' => WorkQueue::$columns,
                 'columnsDef' => WorkQueue::$columnsDef,
                 'filterIcons' => WorkQueue::$filterIcons,
-                'columnGroups' => WorkQueue::$columnGroups
+                'columnGroups' => WorkQueue::$columnGroups,
+                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters)
             ]);
         }
     }
@@ -450,7 +451,8 @@ class WorkQueueController extends BaseController
                 'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
                 'columnsDef' => WorkQueue::$columnsDef,
                 'consentColumns' => WorkQueue::$consentColumns,
-                'filterIcons' => WorkQueue::$filterIcons
+                'filterIcons' => WorkQueue::$filterIcons,
+                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters)
             ]);
         }
     }
