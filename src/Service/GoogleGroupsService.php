@@ -11,6 +11,7 @@ use Google\Service\Directory\Member as GoogleMember;
 class GoogleGroupsService
 {
     public const RETRY_LIMIT = 5;
+    private const MFA_EXCEPTION_GROUP = 'mfa_exception@pmi-ops.org';
     private $domain;
     private $client;
 
@@ -223,5 +224,20 @@ class GoogleGroupsService
                 'message' => $e->getErrors()[0]['message']
             ];
         }
+    }
+
+    private function getMfaGroupUserEmails(): array
+    {
+        $users = $this->getMembers(self::MFA_EXCEPTION_GROUP);
+        $emails = [];
+        foreach ($users as $user) {
+            $emails[] = $user->email;
+        }
+        return $emails;
+    }
+
+    public function isMfaGroupUser($email): bool
+    {
+        return in_array($email, $this->getMfaGroupUserEmails());
     }
 }
