@@ -5,14 +5,24 @@ namespace App\Tests\Entity;
 use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\User;
-use PHPUnit\Framework\TestCase;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class OrderTest extends TestCase
+class OrderTest extends KernelTestCase
 {
+    private $em;
+
+    public function setup(): void
+    {
+        self::bootKernel();
+        $this->em = static::$container->get(EntityManagerInterface::class);
+
+    }
     protected function getUser()
     {
         $user = new User;
         $user->setEmail('test@example.com');
+        $user->setGoogleId('12345');
         return $user;
     }
 
@@ -383,7 +393,7 @@ class OrderTest extends TestCase
         ]);
         $order->setHistory($orderHistory);
 
-        // Assert can restore
+        // Assert can unlock
         $this->assertSame(false, $order->canUnlock());
         $order->setVersion('3.1');
         $order->setFinalizedTs(new \DateTime('2021-01-01 12:00:00'));
@@ -396,6 +406,8 @@ class OrderTest extends TestCase
         $this->assertSame(false, $order->canUnlock());
         $orderHistory->setType('active');
         $this->assertSame(true, $order->canUnlock());
+        $order->setVersion('');
+        $this->assertSame(false, $order->canUnlock());
     }
 
     /**
@@ -556,6 +568,33 @@ class OrderTest extends TestCase
                     'processedTs' => $ts,
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider orderSampleVersionsDataProvider
+     */
+    public function testOrderSampleVersion($sampleVersion, $resultSampleVersion)
+    {
+        $orderData = $this->getOrderData();
+        $order = $this->createOrder($orderData);
+        $this->em->persist($order);
+        $this->em->flush();
+        $params = [
+            'order_samples_version' => '3.1'
+        ];
+        $order->setVersion($sampleVersion);
+        $order->loadSamplesSchema($params);
+        $this->assertSame($resultSampleVersion, $order->getCurrentVersion());
+    }
+
+    public function orderSampleVersionsDataProvider()
+    {
+        return [
+            ['', '1'],
+            ['2', '2'],
+            ['3', '3'],
+            ['3.1', '3.1']
         ];
     }
 }

@@ -4,6 +4,11 @@
         This order has expired and can no longer be updated. Please create a new order to collect or send samples.
     </div>
 {% endif %}
+{% if order.finalizedTs and order.version is empty %}
+    <div class="alert alert-danger custom-alert">
+        This order has expired and can no longer be updated.
+    </div>
+{% endif %}
 <div class="page-header">
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
