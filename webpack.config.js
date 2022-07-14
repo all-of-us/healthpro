@@ -25,6 +25,7 @@ Encore
     .addEntry('workqueue', './web/assets/js/views/workqueue.js')
     .addEntry('workqueue-consents', './web/assets/js/views/WorkQueueConsents.js')
     .addEntry('workqueue-filters', './web/assets/js/views/WorkQueueFilters.js')
+    .addEntry('export-warning-modal', './web/assets/js/views/ExportWarningModal.js')
     .addEntry('order-check', './web/assets/js/views/OrderSafetyChecks.js')
     .addEntry('order-create', './web/assets/js/views/CreateOrder.js')
     .addEntry('order-sub', './web/assets/js/views/OrderSubPage.js')
@@ -55,6 +56,8 @@ Encore
     .addEntry('deceased-report', './web/assets/js/views/DeceasedReport.js')
     .addEntry('incentive-import', './web/assets/js/views/IncentiveImport.js')
     .addEntry('id-verification-import', './web/assets/js/views/IdVerificationImport.js')
+    .addEntry('on-site-patient-status', './web/assets/js/views/OnSitePatientStatus.js')
+    .addEntry('on-site-incentive-tracking', './web/assets/js/views/OnSiteIncentiveTracking.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

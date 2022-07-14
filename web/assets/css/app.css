@@ -616,6 +616,24 @@ table.table-samples td {
     cursor: pointer;
 }
 
+/* On Site Details */
+.on-site-filters .parsley-errors-list {
+    margin-left: -36px
+}
+
+.on-site-filters .parsley-errors-list li {
+    list-style: none;
+    color: #a94442;
+}
+
+.on-site-reset-all {
+    margin-top: 8px;
+}
+
+.on-site-date-filter-dropdown {
+    min-width: 175px;
+}
+
 .btn-readonly {
     pointer-events: none;
     cursor: default;

@@ -7,7 +7,7 @@ const _ = require('underscore');
 require('backbone/backbone.js');
 require('eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js');
 require('parsleyjs/dist/parsley.js');
-require('./parsley-comparison.js'); // customized parsley validator
+require('./parsley-validator.js'); // customized parsley validator
 require('datatables.net/js/jquery.dataTables.js');
 require('datatables.net-bs/js/dataTables.bootstrap.js');
 require('datatables.net-responsive/js/dataTables.responsive.js');
