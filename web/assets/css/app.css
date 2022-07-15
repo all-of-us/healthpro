@@ -751,3 +751,11 @@ table.table-samples td {
 .bg-light {
     background-color: #eeeeee!important;
 }
+
+.user-add-warning-icon {
+    padding-top: 10px;
+}
+
+.user-add-warning-text {
+    margin-left: -15px;
+}
