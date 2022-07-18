@@ -59,6 +59,7 @@ Encore
     .addEntry('on-site-patient-status', './web/assets/js/views/OnSitePatientStatus.js')
     .addEntry('on-site-incentive-tracking', './web/assets/js/views/OnSiteIncentiveTracking.js')
     .addEntry('deceased-report-new', './web/assets/js/views/DeceasedReportNew.js')
+    .addEntry('deceased-report-review', './web/assets/js/views/DeceasedReportReview.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
