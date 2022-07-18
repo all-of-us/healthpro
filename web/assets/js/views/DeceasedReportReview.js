@@ -16,7 +16,6 @@ $(document).ready(function () {
     var reportStatus = $('input[name="deceased_report_review[reportStatus]"]')
     var reportStatusChecked = $('input[name="deceased_report_review[reportStatus]"]:checked')
     var denialReason = $('select[name="deceased_report_review[denialReason]"]')
-    var denialReasonChecked = $('select[name="deceased_report_review[denialReason]"]:checked')
     var denialReasonOtherDescription = $('textarea[name="deceased_report_review[denialReasonOtherDescription]"]')
 
     // Set initial state of form on load
