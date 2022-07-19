@@ -19,21 +19,21 @@ $(document).ready(function () {
         useCurrent: false
     });
 
-    var reportMechanism = $('input[name="deceased_report[reportMechanism]"]')
-    var reportMechanismChecked = $('input[name="deceased_report[reportMechanism]"]:checked')
-    var nextOfKinName = $('input[name="deceased_report[nextOfKinName]"]')
-    var nextOfKinRelationship = $('select[name="deceased_report[nextOfKinRelationship]"]')
-    var reportMechanismOtherDescription = $('textarea[name="deceased_report[reportMechanismOtherDescription]"]')
+    var reportMechanism = $('input[name="deceased_report[reportMechanism]"]');
+    var reportMechanismChecked = $('input[name="deceased_report[reportMechanism]"]:checked');
+    var nextOfKinName = $('input[name="deceased_report[nextOfKinName]"]');
+    var nextOfKinRelationship = $('select[name="deceased_report[nextOfKinRelationship]"]');
+    var reportMechanismOtherDescription = $('textarea[name="deceased_report[reportMechanismOtherDescription]"]');
 
     // Set initial state of form on load
     if (reportMechanismChecked.length == 0
         || reportMechanismChecked.val() == 'EHR'
     ) {
         $('.next_of_kin_details').addClass('collapse');
-        $('.other_details').addClass('collapse')
+        $('.other_details').addClass('collapse');
     } else if (reportMechanismChecked.val() == 'OTHER') {
         $('.next_of_kin_details').addClass('collapse');
-        $('.other_details').removeClass('collapse')
+        $('.other_details').removeClass('collapse');
     }
 
     // Handle onChange event for Report Mechanism
@@ -60,5 +60,5 @@ $(document).ready(function () {
                 nextOfKinRelationship.attr('required', true);
                 reportMechanismOtherDescription.attr('required', false);
         }
-    })
+    });
 });

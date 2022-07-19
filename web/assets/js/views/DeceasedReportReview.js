@@ -13,19 +13,19 @@ $(document).ready(function () {
         trigger: "keyup change"
     });
 
-    var reportStatus = $('input[name="deceased_report_review[reportStatus]"]')
-    var reportStatusChecked = $('input[name="deceased_report_review[reportStatus]"]:checked')
-    var denialReason = $('select[name="deceased_report_review[denialReason]"]')
-    var denialReasonOtherDescription = $('textarea[name="deceased_report_review[denialReasonOtherDescription]"]')
+    var reportStatus = $('input[name="deceased_report_review[reportStatus]"]');
+    var reportStatusChecked = $('input[name="deceased_report_review[reportStatus]"]:checked');
+    var denialReason = $('select[name="deceased_report_review[denialReason]"]');
+    var denialReasonOtherDescription = $('textarea[name="deceased_report_review[denialReasonOtherDescription]"]');
 
     // Set initial state of form on load
     if (reportStatusChecked.length == 0
         || reportStatusChecked.val() == 'final'
     ) {
         $('.denial_reason').addClass('collapse');
-        $('.denial_reason_other').addClass('collapse')
+        $('.denial_reason_other').addClass('collapse');
     } else if (reportMechanismChecked.val() == 'OTHER') {
-        $('.denial_reason_other').removeClass('collapse')
+        $('.denial_reason_other').removeClass('collapse');
     }
 
     // Handle onChange event for Report Mechanism
@@ -41,7 +41,7 @@ $(document).ready(function () {
                 denialReason.attr('required', false);
                 denialReasonOtherDescription.attr('required', false);
         }
-    })
+    });
 
     // Handle onChange event for Denial Reason
     $(denialReason).on('change', function (e) {
