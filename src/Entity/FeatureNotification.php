@@ -45,12 +45,12 @@ class FeatureNotification
     /**
      * @ORM\Column(type="boolean")
      */
-    private $newFeatureStatus;
+    private $newFeatureStatus = false;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $status;
+    private $status = false;
 
     public function getId(): ?int
     {
