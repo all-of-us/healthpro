@@ -47,7 +47,6 @@ $(document).ready(function () {
     $(denialReason).on('change', function (e) {
         switch ($(e.target).val()) {
             case 'OTHER':
-                console.log('OTHER DENIAL REASON')
                 $('.denial_reason_other').removeClass('collapse');
                 denialReasonOtherDescription.attr('required', true);
                 break;
@@ -55,5 +54,5 @@ $(document).ready(function () {
                 $('.denial_reason_other').addClass('collapse');
                 denialReasonOtherDescription.attr('required', false);
         }
-    })
+    });
 });
