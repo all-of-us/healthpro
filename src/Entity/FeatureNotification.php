@@ -53,6 +53,11 @@ class FeatureNotification
      */
     private $status = false;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdTs;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +143,18 @@ class FeatureNotification
     public function setStatus(bool $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCreatedTs(): ?\DateTimeInterface
+    {
+        return $this->createdTs;
+    }
+
+    public function setCreatedTs(\DateTimeInterface $createdTs): self
+    {
+        $this->createdTs = $createdTs;
 
         return $this;
     }
