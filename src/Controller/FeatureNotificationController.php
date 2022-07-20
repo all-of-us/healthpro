@@ -48,14 +48,16 @@ class FeatureNotificationController extends BaseController
             $featureNotification->setStatus(true);
         }
 
-        $form = $this->createForm(FeatureNotificationType::class, $featureNotification, ['timezone' => $this->getSecurityUser()
-            ->getTimezone
-        ()]);
+        $form = $this->createForm(
+            FeatureNotificationType::class,
+            $featureNotification,
+            ['timezone' => $this->getSecurityUser()->getTimezone()]
+        );
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($featureNotification === null) {
+                if ($featureNotification->getId() === null) {
                     $featureNotification = $form->getData();
                     $this->em->persist($featureNotification);
                     $this->em->flush();
