@@ -22,35 +22,29 @@
             <label>Enable "View New Feature" button?</label>
             {{ form_row(form.new_feature_status) }}
             {{ form_row(form.url) }}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Timing</h3>
-                </div>
-                <div class="panel-body">
-                    {% set return = path('admin_feature_notification', { notification: notification ? notification.id : null }) %}
-                    <p>
-                        <strong>Your time zone</strong>: {{ timezone_display(app.user.info.timezone)|default('Not set!') }}
-                        <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a>
-                    </p>
-                    {{ form_rest(form) }}
-                    <div class="alert alert-info">
-                        <ul>
-                            <li><strong>No start or end time</strong>: Notification will be displayed unless until it is
-                                disabled or deleted.
-                            </li>
-                            <li><strong>Start time only</strong>: Notification will display from the start time
-                                indefinitely into the future.
-                            </li>
-                            <li><strong>End time only</strong>: Notification will display starting now until the end
-                                time is reached.
-                            </li>
-                            <li><strong>Start and end time</strong>: Notification will display between the start and end
-                                times.
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+            <label>Schedule Publish? (Optional)</label>
+            <div class="alert alert-info">
+                <p>Select the date and time you want the notification to be published</p>
+                <ul>
+                    <li><strong>No start or end time</strong>: Notification will be displayed unless until it is
+                        disabled or deleted.
+                    </li>
+                    <li><strong>Start time only</strong>: Notification will display from the start time
+                        indefinitely into the future.
+                    </li>
+                    <li><strong>End time only</strong>: Notification will display starting now until the end
+                        time is reached.
+                    </li>
+                    <li><strong>Start and end time</strong>: Notification will display between the start and end
+                        times.
+                    </li>
+                </ul>
             </div>
+            <p>
+                <strong>Your time zone</strong>: {{ timezone_display(app.user.info.timezone)|default('Not set!') }}
+                <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a>
+            </p>
+            {{ form_rest(form) }}
             <p>
                 <button type="submit" class="btn btn-primary">Save</button>
                 <a class="btn btn-default" href="{{ path('admin_feature_notifications') }}">Cancel</a>

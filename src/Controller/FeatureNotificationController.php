@@ -58,7 +58,6 @@ class FeatureNotificationController extends BaseController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 if ($featureNotification->getId() === null) {
-                    $featureNotification = $form->getData();
                     $featureNotification->setCreatedTs(new \DateTime());
                     $this->em->persist($featureNotification);
                     $this->em->flush();

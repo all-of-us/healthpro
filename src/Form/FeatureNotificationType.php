@@ -53,16 +53,15 @@ class FeatureNotificationType extends AbstractType
             ])
             ->add('url', Type\TextType::class, [
                 'label' => 'Direct User To (URL Pattern)',
-                'required' => true,
+                'required' => false,
                 'constraints' => [
-                    new Constraints\NotBlank(),
                     new Constraints\Type('string'),
                     new Constraints\Regex('/^[a-zA-Z0-9_\-\/\*]+$/') // valid URL, with asterisks
                 ]
             ])
             ->add('start_ts', Type\DateTimeType::class, [
                 'required' => false,
-                'label' => 'Start Time (optional)',
+                'label' => 'Start Time (Optional)',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'html5' => false,
@@ -74,7 +73,7 @@ class FeatureNotificationType extends AbstractType
             ])
             ->add('end_ts', Type\DateTimeType::class, [
                 'required' => false,
-                'label' => 'End Time (optional)',
+                'label' => 'End Time (Optional)',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'html5' => false,
