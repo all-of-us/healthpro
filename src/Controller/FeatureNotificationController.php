@@ -28,7 +28,7 @@ class FeatureNotificationController extends BaseController
     {
         $featureNotifications = $this->em->getRepository(FeatureNotification::class)->findBy([], ['id' => 'asc']);
         return $this->render('featurenotification/index.html.twig', [
-            'featureNotifications' => $featureNotifications,
+            'notifications' => $featureNotifications,
         ]);
     }
 
@@ -59,6 +59,7 @@ class FeatureNotificationController extends BaseController
             if ($form->isValid()) {
                 if ($featureNotification->getId() === null) {
                     $featureNotification = $form->getData();
+                    $featureNotification->setCreatedTs(new \DateTime());
                     $this->em->persist($featureNotification);
                     $this->em->flush();
                     $loggerService->log(Log::FEATURE_NOTIFICATION_ADD, $featureNotification->getId());
