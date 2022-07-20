@@ -10,6 +10,10 @@ $(document).ready(function () {
         'User Management': '/access/manage/user/groups'
     });
     $('.confirm').on('click', function () {
-        return confirm('Are you sure you want to delete this notice?');
+        return confirm('Are you sure you want to delete this notification?');
+    });
+    $('table').DataTable({
+        order: [[0, 'asc']],
+        pageLength: 25
     });
 });
