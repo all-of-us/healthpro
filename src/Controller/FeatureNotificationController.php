@@ -41,7 +41,7 @@ class FeatureNotificationController extends BaseController
         if ($id) {
             $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
             if (!$featureNotification) {
-                throw $this->createNotFoundException('Page notice not found.');
+                throw $this->createNotFoundException('Feature notification not found.');
             }
         } else {
             $featureNotification = new FeatureNotification();
@@ -62,17 +62,17 @@ class FeatureNotificationController extends BaseController
                     $this->em->persist($featureNotification);
                     $this->em->flush();
                     $loggerService->log(Log::FEATURE_NOTIFICATION_ADD, $featureNotification->getId());
-                    $this->addFlash('success', 'Feature Notification added');
+                    $this->addFlash('success', 'Feature notification added');
                 } elseif ($request->request->has('delete')) {
                     $this->em->remove($featureNotification);
                     $this->em->flush();
                     $loggerService->log(Log::FEATURE_NOTIFICATION_DELETE, $featureNotification->getId());
-                    $this->addFlash('success', 'Feature Notification removed');
+                    $this->addFlash('success', 'Feature notification removed');
                 } else {
                     $this->em->persist($featureNotification);
                     $this->em->flush();
                     $loggerService->log(Log::FEATURE_NOTIFICATION_EDIT, $featureNotification->getId());
-                    $this->addFlash('success', 'Feature Notification updated');
+                    $this->addFlash('success', 'Feature notification updated');
                 }
                 return $this->redirect($this->generateUrl('admin_feature_notifications'));
             } else {
