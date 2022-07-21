@@ -134,7 +134,7 @@ class CodeBook
 
     public static function display($code)
     {
-        if (is_bool($code) || is_object($code)) {
+        if (is_bool($code) || is_object($code) || is_array($code)) {
             return $code;
         }
         if (array_key_exists($code, self::$map)) {

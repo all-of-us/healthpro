@@ -834,6 +834,16 @@ class WorkQueue
             'group' => 'enrollment',
             'default' => true
         ],
+        'participantIncentive' => [
+            'name' => 'Incentive',
+            'rdrField' => 'participantIncentives',
+            'sortField' => 'participantIncentives',
+            'method' => 'getParticipantIncentive',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
         'physicalMeasurementsStatus' => [
             'name' => 'Phys Measurements',
             'csvNames' => [
@@ -1210,6 +1220,7 @@ class WorkQueue
         'enrollmentSite',
         'pairedSite',
         'pairedOrganization',
+        'participantIncentive',
         'physicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
@@ -1442,6 +1453,7 @@ class WorkQueue
         'enrollmentSite',
         'site',
         'organization',
+        'participantIncentives',
         'physicalMeasurementsFinalizedTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
@@ -2652,5 +2664,17 @@ class WorkQueue
         }
         $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'], self::$filterDateFieldLabels);
         return $filterLabelOptionPairs;
+    }
+
+    public static function getParticipantIncentive($participantIncentives): string
+    {
+        if ($participantIncentives && is_array($participantIncentives)) {
+            $count = count($participantIncentives);
+            $incentive = $participantIncentives[$count - 1];
+            $incentiveDate = date_parse($incentive->dateGiven);
+            return self:: HTML_SUCCESS . ' ' . $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+                $incentiveDate['year'];
+        }
+        return self:: HTML_DANGER;
     }
 }
