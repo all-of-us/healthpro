@@ -20,6 +20,7 @@
             <th>Created</th>
             <th>Title</th>
             <th>Message</th>
+            <th>Url</th>
             <th>Start</th>
             <th>End</th>
             <th>Status</th>
@@ -37,6 +38,7 @@
                     <a href="{{ path('admin_feature_notification', { id: notification.id }) }}">{{ notification.title }}</a>
                 </td>
                 <td>{{ notification.message|length > 100 ? notification.message|slice(0, 100) ~ '...' : notification.message }}</td>
+                <td>{{ notification.url }}</td>
                 <td>{{ notification.startTs ? notification.startTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                 <td>{{ notification.endTs ? notification.endTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                 <td>

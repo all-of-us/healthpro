@@ -42,11 +42,11 @@ class FeatureNotificationType extends AbstractType
                 ]
             ])
             ->add('url', Type\TextType::class, [
-                'label' => 'Direct User To (URL Pattern)',
+                'label' => 'Direct User To URL',
                 'required' => false,
                 'constraints' => [
                     new Constraints\Type('string'),
-                    new Constraints\Regex('/^[a-zA-Z0-9_\-\/\*]+$/') // valid URL, with asterisks
+                    new Constraints\Regex('/^[a-zA-Z0-9_\-\/]+$/')
                 ]
             ])
             ->add('start_ts', Type\DateTimeType::class, [
