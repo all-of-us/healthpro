@@ -836,9 +836,11 @@ class WorkQueue
         ],
         'participantIncentive' => [
             'name' => 'Incentive',
+            'csvName' => 'Incentive Date',
             'rdrField' => 'participantIncentives',
             'sortField' => 'participantIncentives',
             'method' => 'getParticipantIncentive',
+            'csvMethod' => 'getParticipantIncentiveDateGiven',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
@@ -1385,7 +1387,8 @@ class WorkQueue
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
         'CopeVaccineMinute4',
-        'enrollmentSite'
+        'enrollmentSite',
+        'participantIncentive'
     ];
 
     public static $sortColumns = [
@@ -2668,13 +2671,21 @@ class WorkQueue
 
     public static function getParticipantIncentive($participantIncentives): string
     {
+        if ($incentiveDateGiven = self::getParticipantIncentiveDateGiven($participantIncentives)) {
+            return self:: HTML_SUCCESS . ' ' . $incentiveDateGiven;
+        }
+        return self:: HTML_DANGER;
+    }
+
+    public static function getParticipantIncentiveDateGiven($participantIncentives): string
+    {
         if ($participantIncentives && is_array($participantIncentives)) {
             $count = count($participantIncentives);
             $incentive = $participantIncentives[$count - 1];
             $incentiveDate = date_parse($incentive->dateGiven);
-            return self:: HTML_SUCCESS . ' ' . $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+            return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
                 $incentiveDate['year'];
         }
-        return self:: HTML_DANGER;
+        return '';
     }
 }
