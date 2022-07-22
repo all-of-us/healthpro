@@ -41,16 +41,6 @@ class FeatureNotificationType extends AbstractType
                     new Constraints\Type('string')
                 ]
             ])
-            ->add('new_feature_status', Type\CheckboxType::class, [
-                'label' => false,
-                'required' => false,
-                'attr' => [
-                    'data-toggle' => 'toggle',
-                    'data-on' => 'Enable',
-                    'data-off' => 'Disable',
-                    'data-onstyle' => 'success'
-                ]
-            ])
             ->add('url', Type\TextType::class, [
                 'label' => 'Direct User To (URL Pattern)',
                 'required' => false,
@@ -86,16 +76,6 @@ class FeatureNotificationType extends AbstractType
 
         // Convert status field int values into boolean
         $builder->get('status')
-            ->addModelTransformer(new CallbackTransformer(
-                function ($int) {
-                    return (bool)$int;
-                },
-                function ($bool) {
-                    return $bool ? 1 : 0;
-                }
-            ));
-
-        $builder->get('new_feature_status')
             ->addModelTransformer(new CallbackTransformer(
                 function ($int) {
                     return (bool)$int;

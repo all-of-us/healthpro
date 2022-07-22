@@ -46,11 +46,6 @@ class FeatureNotification
     /**
      * @ORM\Column(type="boolean")
      */
-    private $newFeatureStatus = false;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
     private $status = false;
 
     /**
@@ -119,18 +114,6 @@ class FeatureNotification
     public function setEndTs(?\DateTimeInterface $endTs): self
     {
         $this->endTs = $endTs;
-
-        return $this;
-    }
-
-    public function getNewFeatureStatus(): ?bool
-    {
-        return $this->newFeatureStatus;
-    }
-
-    public function setNewFeatureStatus(bool $newFeatureStatus): self
-    {
-        $this->newFeatureStatus = $newFeatureStatus;
 
         return $this;
     }
