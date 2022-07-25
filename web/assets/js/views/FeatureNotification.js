@@ -4,7 +4,10 @@ $(document).ready(function () {
         'Home Page': '/',
         'Work Queue': '/workqueue/',
         'Management Tools': '/access/manage/dashboard',
-        'User Management': '/access/manage/user/groups'
+        'User Management': '/access/manage/user/groups',
+        'Participant Review': '/review',
+        'On-Site Details Reporting': '/on-site/incentive-tracking',
+        'Help and Training Resources': '/help'
     });
     $('.confirm').on('click', function () {
         return confirm('Are you sure you want to delete this notification?');
