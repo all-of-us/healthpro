@@ -844,6 +844,7 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
+            'csvFormatDate' => true,
             'group' => 'enrollment'
         ],
         'participantIncentive' => [
@@ -1401,6 +1402,7 @@ class WorkQueue
         'CopeVaccineMinute3',
         'CopeVaccineMinute4',
         'enrollmentSite',
+        'onsiteIdVerificationTime',
         'participantIncentive'
     ];
 
@@ -2703,7 +2705,7 @@ class WorkQueue
         return '';
     }
 
-    public static function displayDateStatus($time, $userTimezone, $displayTime = false): string
+    public static function displayDateStatus($time, $userTimezone, $displayTime = true): string
     {
         if (!empty($time)) {
             return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
