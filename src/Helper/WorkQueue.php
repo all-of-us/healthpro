@@ -834,6 +834,18 @@ class WorkQueue
             'group' => 'enrollment',
             'default' => true
         ],
+        'onsiteIdVerificationTime' => [
+            'name' => 'ID Verification',
+            'csvName' => 'ID Verification Date',
+            'rdrField' => 'onsiteIdVerificationTime',
+            'sortField' => 'onsiteIdVerificationTime',
+            'method' => 'displayDateStatus',
+            'userTimezone' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
         'participantIncentive' => [
             'name' => 'Incentive',
             'csvName' => 'Incentive Date',
@@ -1222,6 +1234,7 @@ class WorkQueue
         'enrollmentSite',
         'pairedSite',
         'pairedOrganization',
+        'onsiteIdVerificationTime',
         'participantIncentive',
         'physicalMeasurementsStatus',
         'evaluationFinalizedSite',
@@ -1456,6 +1469,7 @@ class WorkQueue
         'enrollmentSite',
         'site',
         'organization',
+        'onsiteIdVerificationTime',
         'participantIncentives',
         'physicalMeasurementsFinalizedTime',
         'physicalMeasurementsFinalizedSite',
@@ -2687,5 +2701,13 @@ class WorkQueue
                 $incentiveDate['year'];
         }
         return '';
+    }
+
+    public static function displayDateStatus($time, $userTimezone, $displayTime = false): string
+    {
+        if (!empty($time)) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
+        }
+        return self::HTML_DANGER;
     }
 }
