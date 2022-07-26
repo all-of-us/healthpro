@@ -148,6 +148,7 @@
             "biospecimenFinalizedSite": "UNSET",
             "site": "hpo-site-bannerdesert",
             "enrollmentSite": "hpo-site-bannerdesert",
+            "onsiteIdVerificationTime": "2022-07-26T20:00:00",
             "participantIncentives": [
                 {
                     "incentiveId": 1,
@@ -286,6 +287,7 @@
             "biospecimenFinalizedSite": "UNSET",
             "site": "hpo-site-bannerthunderbird",
             "enrollmentSite": "hpo-site-bannerthunderbird",
+            "onsiteIdVerificationTime": "2022-07-27T20:00:00",
             "participantIncentives": [
                 {
                     "incentiveId": 2,
