@@ -2646,7 +2646,7 @@ class WorkQueue
             foreach ($filters as $labelKey => $filter) {
                 $filterLabelOptionPairs['labels'][$labelKey] = $filter['label'];
                 foreach ($filter['options'] as $optionKey => $filterOption) {
-                    $filterLabelOptionPairs['options'][$filterOption] = $optionKey;
+                    $filterLabelOptionPairs['options'][$labelKey][$filterOption] = $optionKey;
                 }
             }
         }
