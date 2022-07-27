@@ -179,7 +179,7 @@ class WorkQueue
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
-            'method' => 'displayConsentStatus',
+            'method' => 'displayHistoricalConsentStatus',
             'params' => 5,
             'displayTime' => true,
             'htmlClass' => 'text-center',
@@ -2328,6 +2328,17 @@ class WorkQueue
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
+    }
+
+    public static function displayHistoricalConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null): string
+    {
+        if (!empty($time)) {
+            return self::HTML_SUCCESS . ' '
+                . self::dateFromString($time, $userTimezone, true)
+                . ' (Re-consented Yes)'
+                . ' <a data-href="#" class="view-consent-histories">View Histories</a>';
+        }
+        return self::HTML_DANGER;
     }
 
     public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
