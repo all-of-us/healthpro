@@ -43,7 +43,7 @@ class IncentiveService
         } else {
             $obj->createdBy = $email;
             $obj->site = $this->siteService->getSiteIdWithPrefix();
-            $obj->dateGiven = $incentive->getIncentiveDateGiven();
+            $obj->dateGiven = $incentive->getIncentiveDateGiven()->format('Y-m-d\TH:i:s\Z');
             $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
             $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
             if ($incentive->getGiftCardType()) {
