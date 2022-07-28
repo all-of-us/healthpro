@@ -184,4 +184,11 @@ $(document).ready(function () {
     $('.date-filter').pmiDateTimePicker({format: 'MM/DD/YYYY', useCurrent: false});
 
     $('#dateOfBirth').inputmask("99/99/9999");
+
+    $('.filter-option-remove').on('click', function () {
+        let filterName = $(this).data('name');
+        $('input[name=' + filterName + ']').val('');
+        $(this).parent().hide();
+        $('#filters').submit();
+    });
 });

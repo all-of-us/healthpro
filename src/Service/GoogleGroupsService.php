@@ -11,6 +11,7 @@ use Google\Service\Directory\Member as GoogleMember;
 class GoogleGroupsService
 {
     public const RETRY_LIMIT = 5;
+    private const MFA_EXCEPTION_GROUP = 'mfa_exception@pmi-ops.org';
     private $domain;
     private $client;
 
@@ -83,16 +84,18 @@ class GoogleGroupsService
     }
 
     /** Gets all groups to which a user belongs (or all groups if no user). */
-    public function getGroups(string $userEmail): array
+    public function getGroups(string $userEmail, $checkDomain = true): array
     {
         $groups = [];
         $nextToken = null;
         $email = "@{$this->domain}";
         do {
             $params = [
-                'domain' => $this->domain,
                 'userKey' => $userEmail
             ];
+            if ($checkDomain) {
+                $params['domain'] = $this->domain;
+            }
             if ($nextToken) {
                 $params['pageToken'] = $nextToken;
             }
@@ -102,7 +105,7 @@ class GoogleGroupsService
                 // restrict groups to the configured (sub)domain (Google API includes *all* our groups)
                 $domainModels = [];
                 foreach ($models as $model) {
-                    if (strcasecmp(substr($model->getEmail(), -strlen($email)), $email) === 0) {
+                    if (!$checkDomain || strcasecmp(substr($model->getEmail(), -strlen($email)), $email) === 0) {
                         $domainModels[] = $model;
                     }
                 }
@@ -223,5 +226,20 @@ class GoogleGroupsService
                 'message' => $e->getErrors()[0]['message']
             ];
         }
+    }
+
+    private function getUserGroupIds($email): array
+    {
+        $groups = $this->getGroups($email, false);
+        $groupIds = [];
+        foreach ($groups as $group) {
+            $groupIds[] = $group->email;
+        }
+        return $groupIds;
+    }
+
+    public function isMfaGroupUser($email): bool
+    {
+        return in_array(self::MFA_EXCEPTION_GROUP, $this->getUserGroupIds($email));
     }
 }

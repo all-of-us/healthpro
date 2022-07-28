@@ -53,8 +53,7 @@ class NoticeController extends BaseController
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                if ($notice === null) {
-                    $notice = $form->getData();
+                if ($notice->getId() === null) {
                     $this->em->persist($notice);
                     $this->em->flush();
                     $loggerService->log(Log::NOTICE_ADD, $notice->getId());

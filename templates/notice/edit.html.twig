@@ -5,10 +5,10 @@
         <li><a href="{{ path('home') }}">Home</a></li>
         <li><a href="{{ path('admin_home') }}">Admin</a></li>
         <li><a href="{{ path('admin_notices') }}">Page Notices</a></li>
-        <li class="active">{{ notice ? 'Edit' : 'Create' }} Page Notice</li>
+        <li class="active">{{ notice.id ? 'Edit' : 'Create' }} Page Notice</li>
     </ol>
     <div class="page-header">
-        <h2><i class="fa fa-info-circle" aria-hidden="true"></i> {{ notice ? 'Edit' : 'Create' }} Page Notice</h2>
+        <h2><i class="fa fa-info-circle" aria-hidden="true"></i> {{ notice.id ? 'Edit' : 'Create' }} Page Notice</h2>
     </div>
     <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
@@ -31,7 +31,6 @@
                     <h3 class="panel-title">Timing</h3>
                 </div>
                 <div class="panel-body">
-                    {% set return = path('admin_notice', { notice: notice ? notice.id : null }) %}
                     <p><strong>Your time zone</strong>: {{ timezone_display(app.user.info.timezone)|default('Not set!') }} <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a></p>
                     {{ form_rest(form) }}
                     <div class="alert alert-info">

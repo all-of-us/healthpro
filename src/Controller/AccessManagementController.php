@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class AccessManagementController extends BaseController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
-    public const RESET_PASSWORD_URL = 'https://admin.google.com';
+    public const GOOGLE_ADMIN_URL = 'https://admin.google.com';
 
     private $googleGroupsService;
     private $loggerService;
@@ -70,7 +70,7 @@ class AccessManagementController extends BaseController
         return $this->render('accessmanagement/group-members.html.twig', [
             'group' => $group,
             'members' => $members,
-            'resetPasswordUrl' => self::RESET_PASSWORD_URL
+            'resetPasswordUrl' => self::GOOGLE_ADMIN_URL
         ]);
     }
 
@@ -89,16 +89,20 @@ class AccessManagementController extends BaseController
             if ($groupMemberForm->isValid()) {
                 $email = $groupMemberForm->get('email')->getData() . self::MEMBER_DOMAIN;
                 if ($this->googleGroupsService->getUser($email)) {
-                    $result = $this->googleGroupsService->addMember($group->email, $email);
-                    if ($result['status'] === 'success') {
-                        $this->addFlash('success', $result['message']);
-                        $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
-                            'member' => $email,
-                            'result' => 'success'
-                        ]);
-                        return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                    if (!$this->googleGroupsService->isMfaGroupUser($email)) {
+                        $result = $this->googleGroupsService->addMember($group->email, $email);
+                        if ($result['status'] === 'success') {
+                            $this->addFlash('success', $result['message']);
+                            $this->loggerService->log(Log::GROUP_MEMBER_ADD, [
+                                'member' => $email,
+                                'result' => 'success'
+                            ]);
+                            return $this->redirectToRoute('access_manage_user_group', ['groupId' => $groupId]);
+                        }
+                        $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
+                    } else {
+                        $errorMessage = 'User cannot be added until 2FA is enabled. Please check the user’s 2FA status in the Admin Console before contacting drcsupport@vumc.org for assistance.';
                     }
-                    $errorMessage = isset($result['code']) && $result['code'] === 409 ? 'Member already exists.' : 'Error occurred. Please try again.';
                 } else {
                     $errorMessage = 'User does not exist.';
                 }
@@ -115,7 +119,8 @@ class AccessManagementController extends BaseController
         }
         return $this->render('accessmanagement/add-member.html.twig', [
             'group' => $group,
-            'groupMemberForm' => $groupMemberForm->createView()
+            'groupMemberForm' => $groupMemberForm->createView(),
+            'adminConsoleUrl' => self::GOOGLE_ADMIN_URL
         ]);
     }
 
