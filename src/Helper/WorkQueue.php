@@ -834,6 +834,31 @@ class WorkQueue
             'group' => 'enrollment',
             'default' => true
         ],
+        'onsiteIdVerificationTime' => [
+            'name' => 'ID Verification',
+            'csvName' => 'ID Verification Date',
+            'rdrField' => 'onsiteIdVerificationTime',
+            'sortField' => 'onsiteIdVerificationTime',
+            'method' => 'displayDateStatus',
+            'userTimezone' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'csvFormatDate' => true,
+            'group' => 'enrollment'
+        ],
+        'participantIncentive' => [
+            'name' => 'Incentive',
+            'csvName' => 'Incentive Date',
+            'rdrField' => 'participantIncentives',
+            'sortField' => 'participantIncentives',
+            'method' => 'getParticipantIncentive',
+            'csvMethod' => 'getParticipantIncentiveDateGiven',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
         'physicalMeasurementsStatus' => [
             'name' => 'Phys Measurements',
             'csvNames' => [
@@ -1210,6 +1235,8 @@ class WorkQueue
         'enrollmentSite',
         'pairedSite',
         'pairedOrganization',
+        'onsiteIdVerificationTime',
+        'participantIncentive',
         'physicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
@@ -1374,7 +1401,9 @@ class WorkQueue
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
         'CopeVaccineMinute4',
-        'enrollmentSite'
+        'enrollmentSite',
+        'onsiteIdVerificationTime',
+        'participantIncentive'
     ];
 
     public static $sortColumns = [
@@ -1442,6 +1471,8 @@ class WorkQueue
         'enrollmentSite',
         'site',
         'organization',
+        'onsiteIdVerificationTime',
+        'participantIncentives',
         'physicalMeasurementsFinalizedTime',
         'physicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
@@ -2652,5 +2683,33 @@ class WorkQueue
         }
         $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'], self::$filterDateFieldLabels);
         return $filterLabelOptionPairs;
+    }
+
+    public static function getParticipantIncentive($participantIncentives): string
+    {
+        if ($incentiveDateGiven = self::getParticipantIncentiveDateGiven($participantIncentives)) {
+            return self:: HTML_SUCCESS . ' ' . $incentiveDateGiven;
+        }
+        return self:: HTML_DANGER;
+    }
+
+    public static function getParticipantIncentiveDateGiven($participantIncentives): string
+    {
+        if ($participantIncentives && is_array($participantIncentives)) {
+            $count = count($participantIncentives);
+            $incentive = $participantIncentives[$count - 1];
+            $incentiveDate = date_parse($incentive->dateGiven);
+            return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+                $incentiveDate['year'];
+        }
+        return '';
+    }
+
+    public static function displayDateStatus($time, $userTimezone, $displayTime = true): string
+    {
+        if (!empty($time)) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
+        }
+        return self::HTML_DANGER;
     }
 }
