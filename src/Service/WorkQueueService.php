@@ -332,7 +332,8 @@ class WorkQueueService
                                         'id' => $participant->id,
                                         'consentType' => $columnDef['rdrField']
                                     ])
-                                        : null
+                                        : null,
+                                    $columnDef['historyType'] ?? null
                                 );
                             } elseif ($columnDef['params'] === 4) {
                                 $row[$field] = WorkQueue::{$columnDef['method']}(

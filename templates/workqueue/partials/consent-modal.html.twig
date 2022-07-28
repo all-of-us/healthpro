@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <button type="button" class="close pmi-x-out hidden"><span>&times;</span></button>
+    <h4 class="modal-title">View Historical Consent</h4>
+</div>
+<div class="modal-body">
+    <dl class="dl-horizontal">
+        <dt>Name</dt>
+        <dd>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }}</dd>
+        <dt>DOB</dt>
+        <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
+        <dt>Participant ID</dt>
+        <dd>{{ participant.id }}</dd>
+    </dl>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div>

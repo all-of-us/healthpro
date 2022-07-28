@@ -332,9 +332,11 @@ $(document).ready(function() {
 
     $('#workqueue tbody').on( 'click', 'td .view-consent-histories', function () {
         let data = table.row($(this).closest('tr')).data()
-        console.log(data);
-        let html = '<dl class="dl-horizontal"><dt>Name</dt><dd>'+ data.firstName + ', '+ data.lastName + '</dd></dl>';
-        $('#consentModal .modal-body').html(html);
-        $('#consentModal').modal();
+        let consentModal = $('#consentModal');
+        $(consentModal).removeData('bs.modal');
+        $("#consentModal .modal-content").load(
+            $(this).attr('data-href') + '&participantId=' + data.participantId
+        );
+        $(consentModal).modal('show');
     } );
 });

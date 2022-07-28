@@ -179,14 +179,15 @@ class WorkQueue
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
-            'method' => 'displayHistoricalConsentStatus',
+            'method' => 'displayConsentStatus',
             'params' => 5,
             'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForStudyEnrollmentFilePath',
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'historyType' => 'primary'
         ],
         'questionnaireOnDnaProgram' => [
             'name' => 'Program Update',
@@ -2345,31 +2346,46 @@ class WorkQueue
         return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
-    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
+    public static function displayConsentStatus(
+        $value,
+        $time,
+        $userTimezone,
+        $displayTime = true,
+        $link = null,
+        $historyType = null): string
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+                $html = self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+                break;
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+                $html = self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+                break;
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+                $html = self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+                break;
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+                $html = self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+                break;
             default:
-                return self::HTML_DANGER . ' (Consent Not Completed)';
+                $html = self::HTML_DANGER . ' (Consent Not Completed)';
         }
+        if ($historyType) {
+            $html .= ' <a data-href="/workqueue/consent-histories/?type=' . $historyType . '" class="view-consent-histories">View Histories</a>';
+        }
+        return $html;
     }
 
-    public static function displayHistoricalConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null): string
-    {
-        if (!empty($time)) {
-            return self::HTML_SUCCESS . ' '
-                . self::dateFromString($time, $userTimezone, true)
-                . ' (Re-consented Yes)'
-                . ' <a data-href="#" class="view-consent-histories">View Histories</a>';
-        }
-        return self::HTML_DANGER;
+    public static function displayHistoricalConsentStatus(
+        $value,
+        $time,
+        $userTimezone,
+        $displayTime = true,
+        $link = null
+    ): string {
+        $html = static::displayConsentStatus($value, $time, $userTimezone, $displayTime, $link);
+        $html .= ' <a data-href="/workqueue/consent-histories" class="view-consent-histories">View Histories</a>';
+        return $html;
     }
 
     public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
