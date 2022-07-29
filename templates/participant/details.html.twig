@@ -316,6 +316,23 @@
                                         <hr />
                                         <div class="text-center">
                                             <div class="participant-detail-status">
+                                                <strong>Remote Physical Measurements</strong>
+                                                {% if participant.selfReportedPhysicalMeasurementsStatus == 'COMPLETED' %}
+                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                    {% if participant.selfReportedPhysicalMeasurementsAuthored %}
+                                                        <small>{{ participant.selfReportedPhysicalMeasurementsAuthored|date('m/d/Y', app.user.timezone) }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                    <small>(not completed)</small>
+                                                {% endif %}
+                                            </div>
+                                            <br />
+                                            Location: <samp>Self Reported</samp>
+                                        </div>
+                                        <hr />
+                                        <div class="text-center">
+                                            <div class="participant-detail-status">
                                                 <strong>Physical Measurements</strong>
                                                 {% if participant.clinicPhysicalMeasurementsStatus == 'COMPLETED' %}
                                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -428,23 +445,41 @@
                                         <h3 class="panel-title">Physical Measurements and Biospecimens</h3>
                                     </div>
                                     <div class="panel-body">
-                                        <div class="text-center">
-                                            <div class="participant-detail-status">
-                                                <strong>Physical Measurements</strong>
-                                                {% if participant.clinicPhysicalMeasurementsStatus == 'COMPLETED' %}
-                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                                    {% if participant.clinicPhysicalMeasurementsFinalizedTime %}
-                                                        <small>{{ participant.clinicPhysicalMeasurementsFinalizedTime|date('m/d/Y', app.user.timezone) }}</small>
+                                        <div class="row text-center">
+                                            <div class="col-sm-6">
+                                                <div class="participant-detail-status">
+                                                    <strong>Physical Measurements</strong>
+                                                    {% if participant.clinicPhysicalMeasurementsStatus == 'COMPLETED' %}
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        {% if participant.clinicPhysicalMeasurementsFinalizedTime %}
+                                                            <small>{{ participant.clinicPhysicalMeasurementsFinalizedTime|date('m/d/Y', app.user.timezone) }}</small>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        <small>(not completed)</small>
                                                     {% endif %}
-                                                {% else %}
-                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                    <small>(not completed)</small>
+                                                </div>
+                                                <br />
+                                                {% if participant.evaluationFinalizedSite %}
+                                                    Location: <samp>{{ siteInfo.getSiteDisplayName(participant.evaluationFinalizedSite) }}</samp>
                                                 {% endif %}
                                             </div>
-                                            <br />
-                                            {% if participant.evaluationFinalizedSite %}
-                                                Location: <samp>{{ siteInfo.getSiteDisplayName(participant.evaluationFinalizedSite) }}</samp>
-                                            {% endif %}
+                                            <div class="col-sm-6">
+                                                <div class="participant-detail-status">
+                                                    <strong>Remote Physical Measurements</strong>
+                                                    {% if participant.selfReportedPhysicalMeasurementsStatus == 'COMPLETED' %}
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        {% if participant.selfReportedPhysicalMeasurementsAuthored %}
+                                                            <small>{{ participant.selfReportedPhysicalMeasurementsAuthored|date('m/d/Y', app.user.timezone) }}</small>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        <small>(not completed)</small>
+                                                    {% endif %}
+                                                </div>
+                                                <br />
+                                                Location: <samp>Self Reported</samp>
+                                            </div>
                                         </div>
                                         <hr />
                                         <dl class="dl-horizontal dl-horizontal-lg samples-received">
