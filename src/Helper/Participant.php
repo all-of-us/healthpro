@@ -113,7 +113,7 @@ class Participant
             }
         }
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
-            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
+            if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->editExistingOnly = true;
@@ -128,7 +128,7 @@ class Participant
         }
 
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_1') {
-            if (isset($participant->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
+            if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->editExistingOnly = true;
@@ -204,8 +204,8 @@ class Participant
         $this->age = $this->getAge();
 
         // Remove site prefix
-        if (!empty($participant->physicalMeasurementsFinalizedSite) && $participant->physicalMeasurementsFinalizedSite !== 'UNSET') {
-            $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->physicalMeasurementsFinalizedSite);
+        if (!empty($participant->clinicPhysicalMeasurementsFinalizedSite) && $participant->clinicPhysicalMeasurementsFinalizedSite !== 'UNSET') {
+            $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->clinicPhysicalMeasurementsFinalizedSite);
         }
 
         if (!empty($participant->biospecimenSourceSite) && $participant->biospecimenSourceSite !== 'UNSET') {

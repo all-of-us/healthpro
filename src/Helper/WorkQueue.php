@@ -859,15 +859,15 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
-        'physicalMeasurementsStatus' => [
+        'clinicPhysicalMeasurementsStatus' => [
             'name' => 'Phys Measurements',
             'csvNames' => [
                 'Physical Measurements Status',
                 'Physical Measurements Completion Date'
             ],
-            'rdrField' => 'physicalMeasurementsStatus',
-            'sortField' => 'physicalMeasurementsStatus',
-            'rdrDateField' => 'physicalMeasurementsFinalizedTime',
+            'rdrField' => 'clinicPhysicalMeasurementsStatus',
+            'sortField' => 'clinicPhysicalMeasurementsStatus',
+            'rdrDateField' => 'clinicPhysicalMeasurementsFinalizedTime',
             'method' => 'displayStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
@@ -1237,7 +1237,7 @@ class WorkQueue
         'pairedOrganization',
         'onsiteIdVerificationTime',
         'participantIncentive',
-        'physicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1368,7 +1368,7 @@ class WorkQueue
         'CopeDec',
         'pairedSite',
         'pairedOrganization',
-        'physicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1473,8 +1473,8 @@ class WorkQueue
         'organization',
         'onsiteIdVerificationTime',
         'participantIncentives',
-        'physicalMeasurementsFinalizedTime',
-        'physicalMeasurementsFinalizedSite',
+        'clinicPhysicalMeasurementsFinalizedTime',
+        'clinicPhysicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
         'biospecimenSourceSite',
@@ -2145,7 +2145,7 @@ class WorkQueue
             'ppiSurveys',
             'pairedSite',
             'pairedOrganization',
-            'physicalMeasurementsStatus',
+            'clinicPhysicalMeasurementsStatus',
             'biobankDnaStatus',
             'biobankSamples'
         ],

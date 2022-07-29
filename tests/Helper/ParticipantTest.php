@@ -140,7 +140,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'UNSET',
             'consentForGenomicsROR' => 'UNSET',
             'questionnaireOnDnaProgram' => 'SUBMITTED'
@@ -151,7 +151,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'RECEIVED',
             'consentForGenomicsROR' => 'UNSET',
             'questionnaireOnDnaProgram' => 'SUBMITTED'
@@ -162,7 +162,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'COMPLETED',
+            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
             'samplesToIsolateDNA' => 'UNSET',
             'consentForGenomicsROR' => 'UNSET',
             'questionnaireOnDnaProgram' => 'SUBMITTED'
@@ -174,7 +174,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'UNSET',
             'consentForGenomicsROR' => 'UNSET'
         ]);
@@ -184,7 +184,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'RECEIVED',
             'consentForGenomicsROR' => 'UNSET'
         ]);
@@ -194,7 +194,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'COMPLETED',
+            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
             'samplesToIsolateDNA' => 'UNSET',
             'consentForGenomicsROR' => 'UNSET'
         ]);
@@ -300,7 +300,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'UNSET',
             'questionnaireOnDnaProgram' => 'UNSET'
         ]);
@@ -310,7 +310,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'RECEIVED',
             'questionnaireOnDnaProgram' => 'UNSET'
         ]);
@@ -320,7 +320,7 @@ class ParticipantTest extends TestCase
         $participant = new Participant((object)[
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'COMPLETED',
+            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
             'samplesToIsolateDNA' => 'UNSET',
             'questionnaireOnDnaProgram' => 'UNSET'
         ]);
@@ -332,7 +332,7 @@ class ParticipantTest extends TestCase
             'consentForStudyEnrollment' => 'SUBMITTED',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'physicalMeasurementsStatus' => 'COMPLETED',
+            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
             'samplesToIsolateDNA' => 'RECEIVED',
             'questionnaireOnDnaProgram' => 'SUBMITTED',
             'consentForGenomicsROR' => 'SUBMITTED',
@@ -352,7 +352,7 @@ class ParticipantTest extends TestCase
             'options' => $options,
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'UNSET',
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:43:33'
@@ -364,7 +364,7 @@ class ParticipantTest extends TestCase
             'options' => $options,
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'RECEIVED',
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:43:33'
@@ -376,7 +376,7 @@ class ParticipantTest extends TestCase
             'options' => $options,
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'COMPLETED',
+            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
             'samplesToIsolateDNA' => 'UNSET',
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:43:33'
@@ -390,7 +390,7 @@ class ParticipantTest extends TestCase
             'consentForStudyEnrollment' => 'SUBMITTED',
             'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
-            'physicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'UNSET',
             'samplesToIsolateDNA' => 'RECEIVED',
             'consentForGenomicsROR' => 'SUBMITTED',
             'consentForStudyEnrollmentAuthored' => '2020-03-24T12:45:33'
