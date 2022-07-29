@@ -859,6 +859,24 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
+        'selfReportedPhysicalMeasurementsStatus' => [
+            'name' => 'Remote Phys Measurements',
+            'csvNames' => [
+                'Remote Physical Measurements Status',
+                'Remote Physical Measurements Completion Date'
+            ],
+            'rdrField' => 'selfReportedPhysicalMeasurementsStatus',
+            'sortField' => 'selfReportedPhysicalMeasurementsStatus',
+            'rdrDateField' => 'selfReportedPhysicalMeasurementsAuthored',
+            'method' => 'displayStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'statusText' => 'COMPLETED',
+            'csvStatusText' => 'COMPLETED',
+            'csvDisplayTime' => false,
+            'group' => 'enrollment',
+            'default' => false
+        ],
         'clinicPhysicalMeasurementsStatus' => [
             'name' => 'Phys Measurements',
             'csvNames' => [
@@ -1237,6 +1255,7 @@ class WorkQueue
         'pairedOrganization',
         'onsiteIdVerificationTime',
         'participantIncentive',
+        'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
@@ -1403,7 +1422,8 @@ class WorkQueue
         'CopeVaccineMinute4',
         'enrollmentSite',
         'onsiteIdVerificationTime',
-        'participantIncentive'
+        'participantIncentive',
+        'selfReportedPhysicalMeasurementsStatus'
     ];
 
     public static $sortColumns = [
@@ -1473,6 +1493,7 @@ class WorkQueue
         'organization',
         'onsiteIdVerificationTime',
         'participantIncentives',
+        'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsFinalizedTime',
         'clinicPhysicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
