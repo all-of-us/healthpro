@@ -443,42 +443,4 @@ class ParticipantTest extends TestCase
         ]);
         $this->assertSame('deactivated', $participant->activityStatus);
     }
-
-    /**
-     * @dataProvider physicalMeasurementsDataProvider
-     */
-    public function testParticipantPhysicalMeasurementsFields($fields): void
-    {
-        $participant = new Participant((object)$fields);
-        $values = array_values($fields);
-        $this->assertSame($values[0], $participant->physicalMeasurementsStatus);
-        $this->assertSame($values[1], $participant->physicalMeasurementsTime);
-        $this->assertSame($values[2], $participant->physicalMeasurementsFinalizedTime);
-        $this->assertSame($values[3], $participant->physicalMeasurementsCreatedSite);
-        $this->assertSame($values[4], $participant->physicalMeasurementsFinalizedSite);
-    }
-
-    public function physicalMeasurementsDataProvider(): array
-    {
-        return [
-            [
-                [
-                    'physicalMeasurementsStatus' => 'COMPLETED',
-                    'physicalMeasurementsTime' => '2020-07-25T10:00:00',
-                    'physicalMeasurementsFinalizedTime' => '2020-07-25T10:30:00',
-                    'physicalMeasurementsCreatedSite' => 'hpo-site-test1',
-                    'physicalMeasurementsFinalizedSite' => 'hpo-site-test2',
-                ]
-            ],
-            [
-                [
-                    'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
-                    'clinicPhysicalMeasurementsTime' => '2020-07-25T11:00:00',
-                    'clinicPhysicalMeasurementsFinalizedTime' => '2020-07-25T11:30:00',
-                    'clinicPhysicalMeasurementsCreatedSite' => 'hpo-site-test3',
-                    'clinicPhysicalMeasurementsFinalizedSite' => 'hpo-site-test4'
-                ]
-            ]
-        ];
-    }
 }
