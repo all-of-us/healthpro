@@ -859,15 +859,15 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
-        'physicalMeasurementsStatus' => [
-            'name' => 'Phys Measurements',
+        'selfReportedPhysicalMeasurementsStatus' => [
+            'name' => 'Remote Phys Measurements',
             'csvNames' => [
-                'Physical Measurements Status',
-                'Physical Measurements Completion Date'
+                'Remote Physical Measurements Status',
+                'Remote Physical Measurements Completion Date'
             ],
-            'rdrField' => 'physicalMeasurementsStatus',
-            'sortField' => 'physicalMeasurementsStatus',
-            'rdrDateField' => 'physicalMeasurementsFinalizedTime',
+            'rdrField' => 'selfReportedPhysicalMeasurementsStatus',
+            'sortField' => 'selfReportedPhysicalMeasurementsStatus',
+            'rdrDateField' => 'selfReportedPhysicalMeasurementsAuthored',
             'method' => 'displayStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
@@ -875,14 +875,31 @@ class WorkQueue
             'csvStatusText' => 'COMPLETED',
             'csvDisplayTime' => false,
             'group' => 'enrollment',
-            'default' => true,
-            'orderable' => false
+            'default' => false
+        ],
+        'clinicPhysicalMeasurementsStatus' => [
+            'name' => 'Phys Measurements',
+            'csvNames' => [
+                'Physical Measurements Status',
+                'Physical Measurements Completion Date'
+            ],
+            'rdrField' => 'clinicPhysicalMeasurementsStatus',
+            'sortField' => 'clinicPhysicalMeasurementsStatus',
+            'rdrDateField' => 'clinicPhysicalMeasurementsFinalizedTime',
+            'method' => 'displayStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'statusText' => 'COMPLETED',
+            'csvStatusText' => 'COMPLETED',
+            'csvDisplayTime' => false,
+            'group' => 'enrollment',
+            'default' => true
         ],
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',
             'csvName' => 'Physical Measurements Site',
             'rdrField' => 'evaluationFinalizedSite',
-            'sortField' => 'evaluationFinalizedSite',
+            'sortField' => 'clinicPhysicalMeasurementsFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
@@ -1239,7 +1256,8 @@ class WorkQueue
         'pairedOrganization',
         'onsiteIdVerificationTime',
         'participantIncentive',
-        'physicalMeasurementsStatus',
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1370,7 +1388,7 @@ class WorkQueue
         'CopeDec',
         'pairedSite',
         'pairedOrganization',
-        'physicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1405,7 +1423,8 @@ class WorkQueue
         'CopeVaccineMinute4',
         'enrollmentSite',
         'onsiteIdVerificationTime',
-        'participantIncentive'
+        'participantIncentive',
+        'selfReportedPhysicalMeasurementsStatus'
     ];
 
     public static $sortColumns = [
@@ -1475,8 +1494,9 @@ class WorkQueue
         'organization',
         'onsiteIdVerificationTime',
         'participantIncentives',
-        'physicalMeasurementsFinalizedTime',
-        'physicalMeasurementsFinalizedSite',
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsFinalizedTime',
+        'clinicPhysicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
         'biospecimenSourceSite',
@@ -2147,7 +2167,7 @@ class WorkQueue
             'ppiSurveys',
             'pairedSite',
             'pairedOrganization',
-            'physicalMeasurementsStatus',
+            'clinicPhysicalMeasurementsStatus',
             'biobankDnaStatus',
             'biobankSamples'
         ],

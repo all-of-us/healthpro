@@ -40,12 +40,6 @@ class Participant
     public $siteSuffix;
     public $enrollmentSiteSuffix;
 
-    public $physicalMeasurementsStatus;
-    public $physicalMeasurementsTime;
-    public $physicalMeasurementsFinalizedTime;
-    public $physicalMeasurementsCreatedSite;
-    public $physicalMeasurementsFinalizedSite;
-
     private $disableTestAccess;
     private $cohortOneLaunchTime;
     private $siteType;
@@ -91,8 +85,6 @@ class Participant
             return;
         }
 
-        $this->handlePhysicalMeasurementsFields($participant);
-
         // Use participant id as id
         if (isset($participant->participantId)) {
             $this->id = $participant->participantId;
@@ -121,9 +113,7 @@ class Participant
             }
         }
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
-            if (isset($this->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) &&
-                ($this->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !==
-                    'RECEIVED')) {
+            if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->editExistingOnly = true;
@@ -138,9 +128,7 @@ class Participant
         }
 
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_1') {
-            if (isset($this->physicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) &&
-                ($this->physicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !==
-                    'RECEIVED')) {
+            if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->editExistingOnly = true;
@@ -216,8 +204,8 @@ class Participant
         $this->age = $this->getAge();
 
         // Remove site prefix
-        if (!empty($participant->physicalMeasurementsFinalizedSite) && $participant->physicalMeasurementsFinalizedSite !== 'UNSET') {
-            $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->physicalMeasurementsFinalizedSite);
+        if (!empty($participant->clinicPhysicalMeasurementsFinalizedSite) && $participant->clinicPhysicalMeasurementsFinalizedSite !== 'UNSET') {
+            $this->evaluationFinalizedSite = $this->getSiteSuffix($participant->clinicPhysicalMeasurementsFinalizedSite);
         }
 
         if (!empty($participant->biospecimenSourceSite) && $participant->biospecimenSourceSite !== 'UNSET') {
@@ -448,24 +436,6 @@ class Participant
             return self::$consentCohortValues[$participant->cohort2PilotFlag];
         } else {
             return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;
-        }
-    }
-
-    private function handlePhysicalMeasurementsFields($participant): void
-    {
-        $this->setField($participant, 'physicalMeasurementsStatus', 'clinicPhysicalMeasurementsStatus');
-        $this->setField($participant, 'physicalMeasurementsTime', 'clinicPhysicalMeasurementsTime');
-        $this->setField($participant, 'physicalMeasurementsFinalizedTime', 'clinicPhysicalMeasurementsFinalizedTime');
-        $this->setField($participant, 'physicalMeasurementsCreatedSite', 'clinicPhysicalMeasurementsCreatedSite');
-        $this->setField($participant, 'physicalMeasurementsFinalizedSite', 'clinicPhysicalMeasurementsFinalizedSite');
-    }
-
-    private function setField($participant, $oldField, $newField): void
-    {
-        if (isset($participant->{$newField})) {
-            $this->{$oldField} = $participant->{$newField};
-        } elseif (isset($participant->{$oldField})) {
-            $this->{$oldField} = $participant->{$oldField};
         }
     }
 }
