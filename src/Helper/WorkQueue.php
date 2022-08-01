@@ -893,8 +893,7 @@ class WorkQueue
             'csvStatusText' => 'COMPLETED',
             'csvDisplayTime' => false,
             'group' => 'enrollment',
-            'default' => true,
-            'orderable' => false
+            'default' => true
         ],
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',
