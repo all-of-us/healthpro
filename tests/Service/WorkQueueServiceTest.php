@@ -65,6 +65,7 @@ class WorkQueueServiceTest extends ServiceTestCase
         $this->assertStringContainsString('11/3/2021 2:08 pm', $row1['TheBasics']);
         $this->assertStringContainsString('7/22/2022', $row1['participantIncentive']);
         $this->assertStringContainsString('7/26/2022', $row1['onsiteIdVerificationTime']);
+        $this->assertStringContainsString('8/1/2022', $row1['selfReportedPhysicalMeasurementsStatus']);
 
         $row2 = $rows[1];
         $this->assertEmpty($row2['patientStatusYes']);
@@ -79,6 +80,7 @@ class WorkQueueServiceTest extends ServiceTestCase
         $this->assertStringContainsString('text-danger', $row2['TheBasics']);
         $this->assertStringContainsString('7/23/2022', $row2['participantIncentive']);
         $this->assertStringContainsString('7/27/2022', $row2['onsiteIdVerificationTime']);
+        $this->assertStringContainsString('text-danger', $row2['selfReportedPhysicalMeasurementsStatus']);
     }
 
     public function testGenerateConsentExportRow()
@@ -258,6 +260,8 @@ class WorkQueueServiceTest extends ServiceTestCase
             'bannerdesert',
             '7/26/2022 3:00 pm',
             '7/22/2022',
+            1,
+            '8/1/2022'
         ], $row);
     }
 
