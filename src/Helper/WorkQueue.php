@@ -875,7 +875,8 @@ class WorkQueue
             'csvStatusText' => 'COMPLETED',
             'csvDisplayTime' => false,
             'group' => 'enrollment',
-            'default' => true
+            'default' => true,
+            'orderable' => false
         ],
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',
@@ -885,7 +886,8 @@ class WorkQueue
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'orderable' => false
         ],
         'biobankDnaStatus' => [
             'name' => 'Samples to Isolate DNA?',
