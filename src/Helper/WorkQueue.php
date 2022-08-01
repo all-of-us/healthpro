@@ -898,8 +898,8 @@ class WorkQueue
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',
             'csvName' => 'Physical Measurements Site',
-            'rdrField' => 'evaluationFinalizedSite',
-            'sortField' => 'evaluationFinalizedSite',
+            'rdrField' => 'clinicPhysicalMeasurementsFinalizedSite',
+            'sortField' => 'clinicPhysicalMeasurementsFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
