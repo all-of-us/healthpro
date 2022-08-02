@@ -235,7 +235,8 @@ class WorkQueue
             'toggleColumn' => true,
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'historyType' => 'ehr'
         ],
         'ehrConsentExpireStatus' => [
             'name' => 'EHR Expiration Status',

@@ -333,8 +333,9 @@ $(document).ready(function() {
     $('#workqueue tbody').on( 'click', 'td .view-consent-histories', function () {
         let data = table.row($(this).closest('tr')).data()
         let consentModal = $('#consentModal');
-        $(consentModal).removeData('bs.modal');
-        $("#consentModal .modal-content").load(
+        let modelContent = $("#consentModal .modal-content");
+        modelContent.html('');
+        modelContent.load(
             $(this).attr('data-href') + '&participantId=' + data.participantId
         );
         $(consentModal).modal('show');
