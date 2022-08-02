@@ -179,7 +179,9 @@ class WorkQueue
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
-            'method' => 'displayConsentStatus',
+            'method' => 'displayHistoricalConsentStatus',
+            'reconsentField' => 'reconsentForStudyEnrollmentAuthored',
+            'reconsentPdfPath' => 'reconsentForStudyEnrollmentFilePath',
             'params' => 5,
             'displayTime' => true,
             'htmlClass' => 'text-center',
@@ -187,7 +189,8 @@ class WorkQueue
             'pdfPath' => 'consentForStudyEnrollmentFilePath',
             'group' => 'consent',
             'default' => true,
-            'historyType' => 'primary'
+            'type' => 'historical',
+            'historicalType' => 'primary'
         ],
         'questionnaireOnDnaProgram' => [
             'name' => 'Program Update',
@@ -228,7 +231,9 @@ class WorkQueue
             'rdrField' => 'consentForElectronicHealthRecords',
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
-            'method' => 'displayConsentStatus',
+            'method' => 'displayHistoricalConsentStatus',
+            'reconsentField' => 'rconsentForElectronicHealthRecordsAuthored',
+            'reconsentPdfPath' => 'rconsentForElectronicHealthRecordsFilePath',
             'params' => 5,
             'displayTime' => true,
             'htmlClass' => 'text-center',
@@ -236,7 +241,8 @@ class WorkQueue
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
             'group' => 'consent',
             'default' => true,
-            'historyType' => 'ehr'
+            'type' => 'historical',
+            'historicalType' => 'ehr'
         ],
         'ehrConsentExpireStatus' => [
             'name' => 'EHR Expiration Status',
@@ -2347,45 +2353,41 @@ class WorkQueue
         return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
-    public static function displayConsentStatus(
-        $value,
-        $time,
-        $userTimezone,
-        $displayTime = true,
-        $link = null,
-        $historyType = null): string
+    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
     {
         switch ($value) {
             case 'SUBMITTED':
-                $html = self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
-                break;
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
             case 'SUBMITTED_NO_CONSENT':
-                $html = self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
-                break;
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
             case 'SUBMITTED_NOT_SURE':
-                $html = self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
-                break;
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
             case 'SUBMITTED_INVALID':
-                $html = self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
-                break;
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
             default:
-                $html = self::HTML_DANGER . ' (Consent Not Completed)';
+                return self::HTML_DANGER . ' (Consent Not Completed)';
         }
-        if ($historyType) {
-            $html .= ' <a data-href="/workqueue/consent-histories/?type=' . $historyType . '" class="view-consent-histories">View Histories</a>';
-        }
-        return $html;
     }
 
     public static function displayHistoricalConsentStatus(
-        $value,
-        $time,
-        $userTimezone,
-        $displayTime = true,
-        $link = null
+        $participantId,
+        $reconsentTime,
+        $reconsentPdfLink,
+        $consentStatus,
+        $consentTime,
+        $consentPdfLink,
+        $historyType,
+        $userTimezone
     ): string {
-        $html = static::displayConsentStatus($value, $time, $userTimezone, $displayTime, $link);
-        $html .= ' <a data-href="/workqueue/consent-histories" class="view-consent-histories">View Histories</a>';
+        if ($reconsentTime) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($reconsentTime, $userTimezone, true, $reconsentPdfLink) . ' (Consented Yes)';
+        }
+        $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
+        if ($consentTime) {
+            $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/?type=' .
+                $historyType .
+                '" class="view-consent-histories">View Histories</a>';
+        }
         return $html;
     }
 

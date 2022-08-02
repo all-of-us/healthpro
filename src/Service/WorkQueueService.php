@@ -303,6 +303,23 @@ class WorkQueueService
                             $row[$field] = WorkQueue::HTML_DANGER;
                         }
                     }
+                    elseif ($columnDef['type'] === 'historical') {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant->id,
+                            $participant->{$columnDef['reconsentField']},
+                            $participant->{$columnDef['reconsentPdfPath']} ? $this->urlGenerator->generate('participant_consent', [
+                                'id' => $participant->id,
+                                'consentType' => $columnDef['reconsentPdfPath']
+                            ]) : null,
+                            $participant->{$columnDef['rdrField']},
+                            $participant->{$columnDef['rdrDateField']},
+                            $participant->{$columnDef['pdfPath']} ? $this->urlGenerator->generate('participant_consent', [
+                                'id' => $participant->id,
+                                'consentType' => $columnDef['pdfPath']
+                            ]) : null,
+                            $columnDef['historicalType'],
+                            $userTimezone);
+                    }
                 } elseif (isset($columnDef['method'])) {
                     if (isset($columnDef['rdrDateField'])) {
                         if (isset($columnDef['otherField'])) {
@@ -332,8 +349,7 @@ class WorkQueueService
                                         'id' => $participant->id,
                                         'consentType' => $columnDef['rdrField']
                                     ])
-                                        : null,
-                                    $columnDef['historyType'] ?? null
+                                        : null
                                 );
                             } elseif ($columnDef['params'] === 4) {
                                 $row[$field] = WorkQueue::{$columnDef['method']}(
