@@ -936,7 +936,8 @@ class WorkQueue
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'orderable' => false
         ],
         '1SST8' => [
             'name' => '8 mL SST',
