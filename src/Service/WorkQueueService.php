@@ -303,23 +303,6 @@ class WorkQueueService
                             $row[$field] = WorkQueue::HTML_DANGER;
                         }
                     }
-                    elseif ($columnDef['type'] === 'historical') {
-                        $row[$field] = WorkQueue::{$columnDef['method']}(
-                            $participant->id,
-                            $participant->{$columnDef['reconsentField']},
-                            $participant->{$columnDef['reconsentPdfPath']} ? $this->urlGenerator->generate('participant_consent', [
-                                'id' => $participant->id,
-                                'consentType' => $columnDef['reconsentPdfPath']
-                            ]) : null,
-                            $participant->{$columnDef['rdrField']},
-                            $participant->{$columnDef['rdrDateField']},
-                            $participant->{$columnDef['pdfPath']} ? $this->urlGenerator->generate('participant_consent', [
-                                'id' => $participant->id,
-                                'consentType' => $columnDef['pdfPath']
-                            ]) : null,
-                            $columnDef['historicalType'],
-                            $userTimezone);
-                    }
                 } elseif (isset($columnDef['method'])) {
                     if (isset($columnDef['rdrDateField'])) {
                         if (isset($columnDef['otherField'])) {
@@ -405,7 +388,23 @@ class WorkQueueService
             $row = [];
             foreach (WorkQueue::$consentColumns as $field) {
                 $columnDef = WorkQueue::$columnsDef[$field];
-                if (isset($columnDef['generateLink'])) {
+                if (isset($columnDef['consentMethod'])) {
+                    $row[$field] = WorkQueue::{$columnDef['consentMethod']}(
+                        $participant->id,
+                        $participant->{$columnDef['reconsentField']},
+                        $participant->{$columnDef['reconsentPdfPath']} ? $this->urlGenerator->generate('participant_consent', [
+                            'id' => $participant->id,
+                            'consentType' => $columnDef['reconsentPdfPath']
+                        ]) : null,
+                        $participant->{$columnDef['rdrField']},
+                        $participant->{$columnDef['rdrDateField']},
+                        $participant->{$columnDef['pdfPath']} ? $this->urlGenerator->generate('participant_consent', [
+                            'id' => $participant->id,
+                            'consentType' => $columnDef['pdfPath']
+                        ]) : null,
+                        $columnDef['historicalType'],
+                        $userTimezone);
+                } else if (isset($columnDef['generateLink'])) {
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
                         $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
                     } else {
@@ -434,9 +433,9 @@ class WorkQueueService
                                 true,
                                 (isset($columnDef['pdfPath']) && $participant->{$columnDef['pdfPath']})
                                     ? $this->urlGenerator->generate('participant_consent', [
-                                        'id' => $participant->id,
-                                        'consentType' => $columnDef['rdrField']
-                                    ])
+                                    'id' => $participant->id,
+                                    'consentType' => $columnDef['rdrField']
+                                ])
                                     : null
                             );
                         }

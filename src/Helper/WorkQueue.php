@@ -179,7 +179,8 @@ class WorkQueue
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
-            'method' => 'displayHistoricalConsentStatus',
+            'method' => 'displayConsentStatus',
+            'consentMethod' => 'displayHistoricalConsentStatus',
             'reconsentField' => 'reconsentForStudyEnrollmentAuthored',
             'reconsentPdfPath' => 'reconsentForStudyEnrollmentFilePath',
             'params' => 5,
@@ -189,7 +190,6 @@ class WorkQueue
             'pdfPath' => 'consentForStudyEnrollmentFilePath',
             'group' => 'consent',
             'default' => true,
-            'type' => 'historical',
             'historicalType' => 'primary'
         ],
         'questionnaireOnDnaProgram' => [
@@ -231,7 +231,8 @@ class WorkQueue
             'rdrField' => 'consentForElectronicHealthRecords',
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
-            'method' => 'displayHistoricalConsentStatus',
+            'method' => 'displayConsentStatus',
+            'consentMethod' => 'displayHistoricalConsentStatus',
             'reconsentField' => 'rconsentForElectronicHealthRecordsAuthored',
             'reconsentPdfPath' => 'rconsentForElectronicHealthRecordsFilePath',
             'params' => 5,
@@ -241,7 +242,6 @@ class WorkQueue
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
             'group' => 'consent',
             'default' => true,
-            'type' => 'historical',
             'historicalType' => 'ehr'
         ],
         'ehrConsentExpireStatus' => [
