@@ -328,7 +328,9 @@
                                                 {% endif %}
                                             </div>
                                             <br />
-                                            Location: <samp>Self Reported</samp>
+                                            {% if participant.selfReportedPhysicalMeasurementsStatus == 'COMPLETED' %}
+                                                Location: <samp>Self Reported</samp>
+                                            {% endif %}
                                         </div>
                                         <hr />
                                         <div class="text-center">
@@ -478,7 +480,9 @@
                                                     {% endif %}
                                                 </div>
                                                 <br />
-                                                Location: <samp>Self Reported</samp>
+                                                {% if participant.selfReportedPhysicalMeasurementsStatus == 'COMPLETED' %}
+                                                    Location: <samp>Self Reported</samp>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <hr />
