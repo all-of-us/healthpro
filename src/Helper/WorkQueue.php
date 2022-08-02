@@ -2252,6 +2252,13 @@ class WorkQueue
         'dateOfBirth'
     ];
 
+    public static $consentStatusDisplayText = [
+        'SUBMITTED' => '(Consented Yes)',
+        'SUBMITTED_NO_CONSENT' => '(Refused Consent)',
+        'SUBMITTED_NOT_SURE' => '(Responded Not Sure)',
+        'SUBMITTED_INVALID' => '(Invalid)'
+    ];
+
     public static function dateFromString($string, $timezone = null, $displayTime = true, $link = null)
     {
         if (!empty($string)) {

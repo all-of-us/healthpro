@@ -524,7 +524,8 @@ class WorkQueueController extends BaseController
         $participant = $participantSummaryService->getParticipantById($id);
         return $this->render('workqueue/partials/consent-modal.html.twig', [
             'consentType' => $request->query->get('type'),
-            'participant' => $participant
+            'participant' => $participant,
+            'consentStatusDisplayText' => WorkQueue::$consentStatusDisplayText
         ]);
     }
 }
