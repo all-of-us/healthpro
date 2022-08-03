@@ -34,4 +34,14 @@ $(document).ready(function () {
             btnTextTrue: 'Accept'
         });
     });
+
+    $('tbody').on( 'click', 'td .view-consent-histories', function () {
+        let consentModal = $('#consentModal');
+        let modelContent = $("#consentModal .modal-content");
+        modelContent.html('');
+        modelContent.load(
+            $(this).attr('data-href')
+        );
+        $(consentModal).modal('show');
+    });
 });
