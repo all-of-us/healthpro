@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var exportLimit = $('#workqueue').data('export-limit');
+    var exportLimit = $('.workqueue-table').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {
         var exportLimitFormatted = exportLimit;
