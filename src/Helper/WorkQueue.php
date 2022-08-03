@@ -158,17 +158,8 @@ class WorkQueue
             'default' => true
         ],
         'firstPrimaryConsent' => [
-            'name' => 'First Primary Consent',
-            'csvName' => 'Date of First Primary Consent',
+            'name' => 'Date of First Primary Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'method' => 'displayFirstConsentStatusTime',
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'userTimezone' => true,
-            'visible' => false,
-            'csvFormatDate' => true,
-            'group' => 'consent'
         ],
         'primaryConsent' => [
             'name' => 'Primary Consent',
@@ -209,18 +200,8 @@ class WorkQueue
             'default' => true
         ],
         'firstEhrConsent' => [
-            'name' => 'First EHR Consent',
-            'csvName' => 'Date of First EHR Consent',
+            'name' => 'Date of First EHR Consent',
             'rdrField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
-            'sortField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
-            'method' => 'displayFirstConsentStatusTime',
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'firstEhrConsent',
-            'visible' => false,
-            'csvFormatDate' => true,
-            'group' => 'consent',
-            'default' => true
         ],
         'ehrConsent' => [
             'name' => 'EHR Consent',
@@ -1212,10 +1193,8 @@ class WorkQueue
         'withdrawalReason',
         'participantOrigin',
         'consentCohort',
-        'firstPrimaryConsent',
         'primaryConsent',
         'questionnaireOnDnaProgram',
-        'firstEhrConsent',
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
@@ -1448,10 +1427,8 @@ class WorkQueue
         'withdrawalReason',
         'participantOrigin',
         'consentCohort',
-        'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
-        'consentForElectronicHealthRecordsFirstYesAuthored',
         'consentForElectronicHealthRecordsAuthored',
         'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
@@ -2436,16 +2413,6 @@ class WorkQueue
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
-    }
-
-    public static function displayFirstConsentStatusTime($time, $userTimezone, $type = 'primary', $displayTime = true)
-    {
-        if (!empty($time)) {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
-        } elseif ($type === 'ehr') {
-            return self::HTML_DANGER . ' (never consented yes)';
-        }
-        return '';
     }
 
     public static function displayEhrConsentExpireStatus(
