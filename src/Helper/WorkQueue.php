@@ -160,6 +160,7 @@ class WorkQueue
         'firstPrimaryConsent' => [
             'name' => 'Date of First Primary Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
+            'csvFormatDate' => true,
         ],
         'primaryConsent' => [
             'name' => 'Primary Consent',
@@ -202,6 +203,7 @@ class WorkQueue
         'firstEhrConsent' => [
             'name' => 'Date of First EHR Consent',
             'rdrField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
+            'csvFormatDate' => true,
         ],
         'ehrConsent' => [
             'name' => 'EHR Consent',
@@ -1179,6 +1181,16 @@ class WorkQueue
             'rdrField' => 'digitalHealthSharingStatus',
             'csvMethod' => 'csvDigitalHealthSharingStatus',
         ],
+        'reconsentForStudyEnrollmentAuthored' => [
+            'name' => 'Date of Primary Re-Consent',
+            'rdrField' => 'reconsentForStudyEnrollmentAuthored',
+            'csvFormatDate' => true
+        ],
+        'rconsentForElectronicHealthRecordsAuthored' => [
+            'name' => 'Date of EHR Re-Consent',
+            'rdrField' => 'reconsentForStudyEnrollmentAuthored',
+            'csvFormatDate' => true
+        ]
     ];
 
     public static $columns = [
@@ -1315,7 +1327,11 @@ class WorkQueue
         'appleHealthKit',
         'appleEHR',
         'consentCohort',
-        'primaryLanguage'
+        'primaryLanguage',
+        'firstPrimaryConsent',
+        'firstEhrConsent',
+        'reconsentForStudyEnrollmentAuthored',
+        'rconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $exportColumns = [
@@ -1412,7 +1428,9 @@ class WorkQueue
         'enrollmentSite',
         'onsiteIdVerificationTime',
         'participantIncentive',
-        'selfReportedPhysicalMeasurementsStatus'
+        'selfReportedPhysicalMeasurementsStatus',
+        'reconsentForStudyEnrollmentAuthored',
+        'rconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $sortColumns = [
@@ -2225,6 +2243,16 @@ class WorkQueue
     ];
 
     public static $tableExportMap = [
+        'primaryConsent' => [
+            'primaryConsent',
+            'firstPrimaryConsent',
+            'reconsentForStudyEnrollmentAuthored'
+        ],
+        'ehrConsent' => [
+            'ehrConsent',
+            'firstEhrConsent',
+            'rconsentForElectronicHealthRecordsAuthored'
+        ],
         'participantStatus' => [
             'participantStatus',
             'coreParticipant',
@@ -2521,6 +2549,7 @@ class WorkQueue
     public static function getConsentExportHeaders($sessionConsentColumns)
     {
         $headers = [];
+        self::mapExportColumns($sessionConsentColumns);
         foreach (self::$consentExportColumns as $field) {
             $columnDef = self::$columnsDef[$field];
             if (in_array($field, $sessionConsentColumns)) {

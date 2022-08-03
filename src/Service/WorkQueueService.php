@@ -523,6 +523,9 @@ class WorkQueueService
     {
         $userTimezone = $this->userService->getUser()->getTimezone();
         $row = [];
+        if ($workQueueConsentColumns) {
+            WorkQueue::mapExportColumns($workQueueConsentColumns);
+        }
         foreach (WorkQueue::$consentExportColumns as $field) {
             $columnDef = WorkQueue::$columnsDef[$field];
             if (in_array($field, $workQueueConsentColumns)) {
