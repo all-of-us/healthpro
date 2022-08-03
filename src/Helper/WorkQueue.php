@@ -867,15 +867,33 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
-        'physicalMeasurementsStatus' => [
+        'selfReportedPhysicalMeasurementsStatus' => [
+            'name' => 'Remote Phys Measurements',
+            'csvNames' => [
+                'Remote Physical Measurements Status',
+                'Remote Physical Measurements Completion Date'
+            ],
+            'rdrField' => 'selfReportedPhysicalMeasurementsStatus',
+            'sortField' => 'selfReportedPhysicalMeasurementsStatus',
+            'rdrDateField' => 'selfReportedPhysicalMeasurementsAuthored',
+            'method' => 'displayStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'statusText' => 'COMPLETED',
+            'csvStatusText' => 'COMPLETED',
+            'csvDisplayTime' => false,
+            'group' => 'enrollment',
+            'default' => false
+        ],
+        'clinicPhysicalMeasurementsStatus' => [
             'name' => 'Phys Measurements',
             'csvNames' => [
                 'Physical Measurements Status',
                 'Physical Measurements Completion Date'
             ],
-            'rdrField' => 'physicalMeasurementsStatus',
-            'sortField' => 'physicalMeasurementsStatus',
-            'rdrDateField' => 'physicalMeasurementsFinalizedTime',
+            'rdrField' => 'clinicPhysicalMeasurementsStatus',
+            'sortField' => 'clinicPhysicalMeasurementsStatus',
+            'rdrDateField' => 'clinicPhysicalMeasurementsFinalizedTime',
             'method' => 'displayStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
@@ -889,11 +907,12 @@ class WorkQueue
             'name' => 'Phys Meas Site',
             'csvName' => 'Physical Measurements Site',
             'rdrField' => 'evaluationFinalizedSite',
-            'sortField' => 'evaluationFinalizedSite',
+            'sortField' => 'clinicPhysicalMeasurementsFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'orderable' => false
         ],
         'biobankDnaStatus' => [
             'name' => 'Samples to Isolate DNA?',
@@ -925,7 +944,8 @@ class WorkQueue
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'orderable' => false
         ],
         '1SST8' => [
             'name' => '8 mL SST',
@@ -1245,7 +1265,8 @@ class WorkQueue
         'pairedOrganization',
         'onsiteIdVerificationTime',
         'participantIncentive',
-        'physicalMeasurementsStatus',
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1376,7 +1397,7 @@ class WorkQueue
         'CopeDec',
         'pairedSite',
         'pairedOrganization',
-        'physicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1411,7 +1432,8 @@ class WorkQueue
         'CopeVaccineMinute4',
         'enrollmentSite',
         'onsiteIdVerificationTime',
-        'participantIncentive'
+        'participantIncentive',
+        'selfReportedPhysicalMeasurementsStatus'
     ];
 
     public static $sortColumns = [
@@ -1481,8 +1503,9 @@ class WorkQueue
         'organization',
         'onsiteIdVerificationTime',
         'participantIncentives',
-        'physicalMeasurementsFinalizedTime',
-        'physicalMeasurementsFinalizedSite',
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsFinalizedTime',
+        'clinicPhysicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
         'biospecimenSourceSite',
@@ -2153,7 +2176,7 @@ class WorkQueue
             'ppiSurveys',
             'pairedSite',
             'pairedOrganization',
-            'physicalMeasurementsStatus',
+            'clinicPhysicalMeasurementsStatus',
             'biobankDnaStatus',
             'biobankSamples'
         ],
