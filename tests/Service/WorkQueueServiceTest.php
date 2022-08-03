@@ -114,7 +114,11 @@ class WorkQueueServiceTest extends ServiceTestCase
             0,
             '',
             'Cohort 3',
-            'English'
+            'English',
+            '11/3/2021 2:08 pm',
+            '11/3/2021 2:08 pm',
+            '',
+            ''
         ], $row);
     }
 
@@ -261,7 +265,9 @@ class WorkQueueServiceTest extends ServiceTestCase
             '7/26/2022 3:00 pm',
             '7/22/2022',
             1,
-            '8/1/2022'
+            '8/1/2022',
+            '',
+            ''
         ], $row);
     }
 
@@ -285,10 +291,12 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             'Cohort 3',
+            '11/3/2021 2:08 pm',
             1,
             '11/3/2021 2:08 pm',
             0,
             '',
+            '11/3/2021 2:08 pm',
             1,
             '11/3/2021 2:08 pm',
             1,
@@ -302,6 +310,8 @@ class WorkQueueServiceTest extends ServiceTestCase
             '11/3/2021',
             '0',
             0,
+            '',
+            '',
             ''
         ], $row);
     }
