@@ -77,6 +77,8 @@ class RequestListener
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
         }
+
+        $this->checkFeatureNotifications();
     }
 
     private function logRequest()
@@ -102,8 +104,11 @@ class RequestListener
         }
 
         $this->twig->addGlobal('global_notices', $activeNotices);
+    }
 
-        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->findAll();
+    private function checkFeatureNotifications(): void
+    {
+        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
         $this->twig->addGlobal('global_notifications', $activeNotifications);
     }
 
