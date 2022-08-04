@@ -49,7 +49,7 @@
         {% if attribute(participant, updatedDateField) %}
             <tr>
                 <td>
-                    {{ _self.displayConsent(attribute(participant, updatedDateField), attribute(participant, updatedFilePathField), updatedDateField, participant.id) }}
+                    {{ _self.displayConsent(attribute(participant, updatedDateField), attribute(participant, updatedFilePathField), updatedStatusField, participant.id) }}
                     {{ attribute(participant, updatedStatusField) ? consentStatusDisplayText[attribute(participant, updatedStatusField)] : '(Consent Not Completed)' }}
                 </td>
                 <td>Updated</td>
@@ -58,7 +58,7 @@
         {% if attribute(participant, firstAgreedDateField) %}
             <tr>
                 <td>
-                    {{ _self.displayConsent(attribute(participant, firstAgreedDateField), attribute(participant, updatedFilePathField), firstAgreedDateField, participant.id) }}
+                    {{ _self.displayConsent(attribute(participant, firstAgreedDateField), attribute(participant, updatedFilePathField), updatedStatusField, participant.id) }}
                     (Consented Yes)
                 </td>
                 <td>First Agree to Participate</td>

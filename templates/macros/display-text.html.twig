@@ -96,7 +96,7 @@
     {% set firstTime = attribute(participant, field ~ 'FirstYesAuthored') %}
     {% if value in consentValues %}
         {% if currentTime %}
-            {{ _self.displayConsent(currentTime, attribute(participant, currentFilePathField), currentDateField, participant.id, showConsentPDFs) }} (updated)
+            {{ _self.displayConsent(currentTime, attribute(participant, currentFilePathField), currentDateField, participant.id, showConsentPDFs) }} (current status, re-consented)
         {% endif %}
         <br>
         {% if time %}

@@ -1182,7 +1182,7 @@ class WorkQueue
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
         ],
-        'rconsentForElectronicHealthRecordsAuthored' => [
+        'reconsentForElectronicHealthRecordsAuthored' => [
             'name' => 'Date of EHR Re-Consent',
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
@@ -1327,7 +1327,7 @@ class WorkQueue
         'firstPrimaryConsent',
         'firstEhrConsent',
         'reconsentForStudyEnrollmentAuthored',
-        'rconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $exportColumns = [
@@ -1426,7 +1426,7 @@ class WorkQueue
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
-        'rconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $sortColumns = [
@@ -2247,7 +2247,7 @@ class WorkQueue
         'ehrConsent' => [
             'ehrConsent',
             'firstEhrConsent',
-            'rconsentForElectronicHealthRecordsAuthored'
+            'reconsentForElectronicHealthRecordsAuthored'
         ],
         'participantStatus' => [
             'participantStatus',
@@ -2411,10 +2411,12 @@ class WorkQueue
         $userTimezone
     ): string {
         if ($reconsentTime) {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($reconsentTime, $userTimezone, true, $reconsentPdfLink) . ' (Consented Yes)';
+            $html = self::HTML_SUCCESS . ' ' . self::dateFromString($reconsentTime, $userTimezone, true,
+                $reconsentPdfLink) . ' (Consented Yes)';
+        } else {
+            $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
         }
-        $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
-        if ($consentTime) {
+        if ($reconsentTime || $consentTime) {
             $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/?type=' .
                 $historyType .
                 '" class="view-consent-histories">View Histories</a>';
