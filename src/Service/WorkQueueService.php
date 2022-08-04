@@ -392,7 +392,7 @@ class WorkQueueService
                 $columnDef = WorkQueue::$columnsDef[$field];
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
-                } else if (isset($columnDef['generateLink'])) {
+                } elseif (isset($columnDef['generateLink'])) {
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
                         $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
                     } else {
@@ -654,6 +654,7 @@ class WorkQueueService
                 'consentType' => $columnDef['pdfPath']
             ]) : null,
             $columnDef['historicalType'],
-            $this->userService->getUser()->getTimezone());
+            $this->userService->getUser()->getTimezone()
+        );
     }
 }
