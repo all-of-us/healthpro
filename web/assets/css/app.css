@@ -655,6 +655,13 @@ table.table-samples td {
     background-color: #5cb85c;
 }
 
+.badge-notify{
+    background:red;
+    position:relative;
+    top: -12px;
+    left: -10px;
+}
+
 .today-filter-well {
     position: relative;
 }
