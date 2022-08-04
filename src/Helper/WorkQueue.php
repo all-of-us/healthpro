@@ -2411,8 +2411,12 @@ class WorkQueue
         $userTimezone
     ): string {
         if ($reconsentTime) {
-            $html = self::HTML_SUCCESS . ' ' . self::dateFromString($reconsentTime, $userTimezone, true,
-                $reconsentPdfLink) . ' (Consented Yes)';
+            $html = self::HTML_SUCCESS . ' ' . self::dateFromString(
+                $reconsentTime,
+                $userTimezone,
+                true,
+                $reconsentPdfLink
+            ) . ' (Consented Yes)';
         } else {
             $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
         }
