@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Audit\Log;
+use App\Entity\FeatureNotification;
 use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -101,6 +102,9 @@ class RequestListener
         }
 
         $this->twig->addGlobal('global_notices', $activeNotices);
+
+        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->findAll();
+        $this->twig->addGlobal('global_notifications', $activeNotifications);
     }
 
     private function checkSiteSelect()

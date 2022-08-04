@@ -1,0 +1,37 @@
+<div class="dropdown-menu" style="width:600px; padding: 20px">
+    <div class="row">
+        <div class="col-sm-4">
+            Notifications
+            {% if global_notifications|length > 0 %}
+                ({{ global_notifications|length }})
+            {% endif %}
+        </div>
+        <div class="col-sm-3 col-sm-offset-5">
+            <a>Mark all as read</a>
+        </div>
+    </div>
+    <hr>
+    {% for notification in global_notifications %}
+        <div class="row">
+            <div class="col-sm-1">
+                <i class='fa fa-circle text-danger'></i>
+            </div>
+            <div class="col-sm-9">
+                <p><a>{{ notification.title }}</a></p>
+                <p>{{ notification.message }}</p>
+            </div>
+            <div class="col-sm-2">
+                {{ notification.createdTs|date('n/j/Y', app.user.timezone) }}
+            </div>
+        </div>
+        {% if notification.url %}
+            <div>
+                <a href="{{ notification.url }}" target="_blank">View New Feature <i class="fa fa-arrow-right"></i></a>
+            </div>
+        {% endif %}
+        <hr>
+    {% endfor %}
+    <div class="text-center">
+        <a href="https://www.aoucollaborations.net/x/MQElvw" target="_blank">View release notes on confluence</a>
+    </div>
+</div>
