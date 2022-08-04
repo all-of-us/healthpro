@@ -645,13 +645,13 @@ class WorkQueueService
             $participant->{$columnDef['reconsentField']},
             $participant->{$columnDef['reconsentPdfPath']} ? $this->urlGenerator->generate('participant_consent', [
                 'id' => $participant->id,
-                'consentType' => $columnDef['reconsentPdfPath']
+                'consentType' => $columnDef['reconsentField']
             ]) : null,
             $participant->{$columnDef['rdrField']},
             $participant->{$columnDef['rdrDateField']},
             $participant->{$columnDef['pdfPath']} ? $this->urlGenerator->generate('participant_consent', [
                 'id' => $participant->id,
-                'consentType' => $columnDef['pdfPath']
+                'consentType' => $columnDef['rdrField']
             ]) : null,
             $columnDef['historicalType'],
             $this->userService->getUser()->getTimezone()
