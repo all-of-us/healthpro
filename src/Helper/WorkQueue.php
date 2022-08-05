@@ -2388,13 +2388,17 @@ class WorkQueue
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED'];
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NO_CONSENT'];
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NOT_SURE'];
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_INVALID'];
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
@@ -2433,13 +2437,17 @@ class WorkQueue
         switch ($value) {
             // Note the icons differ from ::displayConsentStatus
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED'];
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NO_CONSENT'];
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NOT_SURE'];
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_INVALID'];
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
