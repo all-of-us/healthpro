@@ -168,6 +168,18 @@ label.label-normal {
     margin-left: 50px;
 }
 
+.notifications-dropdown {
+    width: 600px;
+    padding: 20px;
+}
+
+.badge-notify {
+    background: red;
+    position: relative;
+    top: -12px;
+    left: -10px;
+}
+
 /*
    IE >= 10 hack
    https://philipnewcomer.net/2014/04/target-internet-explorer-10-11-css/
@@ -653,13 +665,6 @@ table.table-samples td {
 
 .badge-success {
     background-color: #5cb85c;
-}
-
-.badge-notify{
-    background:red;
-    position:relative;
-    top: -12px;
-    left: -10px;
 }
 
 .today-filter-well {
