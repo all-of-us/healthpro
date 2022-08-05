@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var exportLimit = $('#workqueue').data('export-limit');
+    var exportLimit = $('.workqueue-table').data('export-limit');
 
     var workQueueExportWarningModel = function (location) {
         var exportLimitFormatted = exportLimit;
@@ -33,5 +33,15 @@ $(document).ready(function () {
             },
             btnTextTrue: 'Accept'
         });
+    });
+
+    $('tbody').on( 'click', 'td .view-consent-histories', function () {
+        let consentModal = $('#consentModal');
+        let modelContent = $("#consentModal .modal-content");
+        modelContent.html('');
+        modelContent.load(
+            $(this).data('href')
+        );
+        $(consentModal).modal('show');
     });
 });

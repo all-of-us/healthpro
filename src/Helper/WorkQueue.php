@@ -158,17 +158,9 @@ class WorkQueue
             'default' => true
         ],
         'firstPrimaryConsent' => [
-            'name' => 'First Primary Consent',
-            'csvName' => 'Date of First Primary Consent',
+            'name' => 'Date of First Primary Consent',
             'rdrField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'sortField' => 'consentForStudyEnrollmentFirstYesAuthored',
-            'method' => 'displayFirstConsentStatusTime',
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'userTimezone' => true,
-            'visible' => false,
             'csvFormatDate' => true,
-            'group' => 'consent'
         ],
         'primaryConsent' => [
             'name' => 'Primary Consent',
@@ -179,14 +171,16 @@ class WorkQueue
             'rdrField' => 'consentForStudyEnrollment',
             'sortField' => 'consentForStudyEnrollmentAuthored',
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
-            'method' => 'displayConsentStatus',
-            'params' => 5,
+            'consentMethod' => 'displayHistoricalConsentStatus',
+            'reconsentField' => 'reconsentForStudyEnrollmentAuthored',
+            'reconsentPdfPath' => 'reconsentForStudyEnrollementFilePath',
             'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForStudyEnrollmentFilePath',
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'historicalType' => 'primary'
         ],
         'questionnaireOnDnaProgram' => [
             'name' => 'Program Update',
@@ -205,18 +199,9 @@ class WorkQueue
             'default' => true
         ],
         'firstEhrConsent' => [
-            'name' => 'First EHR Consent',
-            'csvName' => 'Date of First EHR Consent',
+            'name' => 'Date of First EHR Consent',
             'rdrField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
-            'sortField' => 'consentForElectronicHealthRecordsFirstYesAuthored',
-            'method' => 'displayFirstConsentStatusTime',
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'type' => 'firstEhrConsent',
-            'visible' => false,
             'csvFormatDate' => true,
-            'group' => 'consent',
-            'default' => true
         ],
         'ehrConsent' => [
             'name' => 'EHR Consent',
@@ -227,14 +212,16 @@ class WorkQueue
             'rdrField' => 'consentForElectronicHealthRecords',
             'sortField' => 'consentForElectronicHealthRecordsAuthored',
             'rdrDateField' => 'consentForElectronicHealthRecordsAuthored',
-            'method' => 'displayConsentStatus',
-            'params' => 5,
+            'consentMethod' => 'displayHistoricalConsentStatus',
+            'reconsentField' => 'reconsentForElectronicHealthRecordsAuthored',
+            'reconsentPdfPath' => 'reconsentForElectronicHealthRecordsFilePath',
             'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'historicalType' => 'ehr'
         ],
         'ehrConsentExpireStatus' => [
             'name' => 'EHR Expiration Status',
@@ -1190,6 +1177,16 @@ class WorkQueue
             'rdrField' => 'digitalHealthSharingStatus',
             'csvMethod' => 'csvDigitalHealthSharingStatus',
         ],
+        'reconsentForStudyEnrollmentAuthored' => [
+            'name' => 'Date of Primary Re-Consent',
+            'rdrField' => 'reconsentForStudyEnrollmentAuthored',
+            'csvFormatDate' => true
+        ],
+        'reconsentForElectronicHealthRecordsAuthored' => [
+            'name' => 'Date of EHR Re-Consent',
+            'rdrField' => 'reconsentForStudyEnrollmentAuthored',
+            'csvFormatDate' => true
+        ]
     ];
 
     public static $columns = [
@@ -1204,10 +1201,8 @@ class WorkQueue
         'withdrawalReason',
         'participantOrigin',
         'consentCohort',
-        'firstPrimaryConsent',
         'primaryConsent',
         'questionnaireOnDnaProgram',
-        'firstEhrConsent',
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
@@ -1328,7 +1323,11 @@ class WorkQueue
         'appleHealthKit',
         'appleEHR',
         'consentCohort',
-        'primaryLanguage'
+        'primaryLanguage',
+        'firstPrimaryConsent',
+        'firstEhrConsent',
+        'reconsentForStudyEnrollmentAuthored',
+        'reconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $exportColumns = [
@@ -1425,7 +1424,9 @@ class WorkQueue
         'enrollmentSite',
         'onsiteIdVerificationTime',
         'participantIncentive',
-        'selfReportedPhysicalMeasurementsStatus'
+        'selfReportedPhysicalMeasurementsStatus',
+        'reconsentForStudyEnrollmentAuthored',
+        'reconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $sortColumns = [
@@ -1440,10 +1441,8 @@ class WorkQueue
         'withdrawalReason',
         'participantOrigin',
         'consentCohort',
-        'consentForStudyEnrollmentFirstYesAuthored',
         'consentForStudyEnrollmentAuthored',
         'questionnaireOnDnaProgramAuthored',
-        'consentForElectronicHealthRecordsFirstYesAuthored',
         'consentForElectronicHealthRecordsAuthored',
         'ehrConsentExpireStatus',
         'consentForGenomicsRORAuthored',
@@ -2240,6 +2239,16 @@ class WorkQueue
     ];
 
     public static $tableExportMap = [
+        'primaryConsent' => [
+            'primaryConsent',
+            'firstPrimaryConsent',
+            'reconsentForStudyEnrollmentAuthored'
+        ],
+        'ehrConsent' => [
+            'ehrConsent',
+            'firstEhrConsent',
+            'reconsentForElectronicHealthRecordsAuthored'
+        ],
         'participantStatus' => [
             'participantStatus',
             'coreParticipant',
@@ -2265,6 +2274,13 @@ class WorkQueue
         'firstName',
         'lastName',
         'dateOfBirth'
+    ];
+
+    public static $consentStatusDisplayText = [
+        'SUBMITTED' => '(Consented Yes)',
+        'SUBMITTED_NO_CONSENT' => '(Refused Consent)',
+        'SUBMITTED_NOT_SURE' => '(Responded Not Sure)',
+        'SUBMITTED_INVALID' => '(Invalid)'
     ];
 
     public static function dateFromString($string, $timezone = null, $displayTime = true, $link = null)
@@ -2372,16 +2388,48 @@ class WorkQueue
     {
         switch ($value) {
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED'];
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NO_CONSENT'];
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+                return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NOT_SURE'];
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_INVALID'];
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
+    }
+
+    public static function displayHistoricalConsentStatus(
+        $participantId,
+        $reconsentTime,
+        $reconsentPdfLink,
+        $consentStatus,
+        $consentTime,
+        $consentPdfLink,
+        $historyType,
+        $userTimezone
+    ): string {
+        if ($reconsentTime) {
+            $html = self::HTML_SUCCESS . ' ' . self::dateFromString(
+                $reconsentTime,
+                $userTimezone,
+                true,
+                $reconsentPdfLink
+            ) . ' (Consented Yes)';
+        } else {
+            $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
+        }
+        if ($reconsentTime || $consentTime) {
+            $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/?type=' .
+                $historyType .
+                '" class="view-consent-histories">View Historical</a>';
+        }
+        return $html;
     }
 
     public static function displayGenomicsConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
@@ -2389,26 +2437,20 @@ class WorkQueue
         switch ($value) {
             // Note the icons differ from ::displayConsentStatus
             case 'SUBMITTED':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Consented Yes)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED'];
             case 'SUBMITTED_NO_CONSENT':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Refused Consent)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NO_CONSENT'];
             case 'SUBMITTED_NOT_SURE':
-                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Responded Not Sure)';
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NOT_SURE'];
             case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link) . ' (Invalid)';
+                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_INVALID'];
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
-    }
-
-    public static function displayFirstConsentStatusTime($time, $userTimezone, $type = 'primary', $displayTime = true)
-    {
-        if (!empty($time)) {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
-        } elseif ($type === 'ehr') {
-            return self::HTML_DANGER . ' (never consented yes)';
-        }
-        return '';
     }
 
     public static function displayEhrConsentExpireStatus(
@@ -2517,6 +2559,7 @@ class WorkQueue
     public static function getConsentExportHeaders($sessionConsentColumns)
     {
         $headers = [];
+        self::mapExportColumns($sessionConsentColumns);
         foreach (self::$consentExportColumns as $field) {
             $columnDef = self::$columnsDef[$field];
             if (in_array($field, $sessionConsentColumns)) {
