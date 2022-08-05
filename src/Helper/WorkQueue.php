@@ -2423,7 +2423,7 @@ class WorkQueue
         if ($reconsentTime || $consentTime) {
             $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/?type=' .
                 $historyType .
-                '" class="view-consent-histories">View Histories</a>';
+                '" class="view-consent-histories">View Historical</a>';
         }
         return $html;
     }
