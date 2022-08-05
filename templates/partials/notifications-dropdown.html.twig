@@ -1,10 +1,12 @@
 <div class="dropdown-menu" style="width:600px; padding: 20px">
     <div class="row">
         <div class="col-sm-4">
-            Notifications
-            {% if global_notifications|length > 0 %}
-                ({{ global_notifications|length }})
-            {% endif %}
+            <strong>
+                Notifications
+                {% if global_notifications|length > 0 %}
+                    ({{ global_notifications|length }})
+                {% endif %}
+            </strong>
         </div>
         <div class="col-sm-3 col-sm-offset-5">
             <a>Mark all as read</a>
