@@ -407,7 +407,7 @@ $(document).ready(function()
         let modelContent = $("#notificationsModal .modal-content");
         modelContent.html('');
         modelContent.load(
-            $(this).attr('data-href')
+            $(this).data('href')
         );
         $(notificationsModal).modal('show');
     });
