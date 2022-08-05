@@ -13,6 +13,7 @@
         </div>
     </div>
     <hr>
+    {% if global_notifications %}
     {% for notification in global_notifications %}
         <div class="row">
             <div class="col-sm-1">
@@ -33,6 +34,12 @@
         {% endif %}
         <hr>
     {% endfor %}
+    {% else %}
+        <div class="text-center text-muted">
+            <em>No new notifications at this time</em>
+        </div>
+        <hr>
+    {% endif %}
     <div class="text-center">
         <a href="https://www.aoucollaborations.net/x/MQElvw" target="_blank">View release notes on confluence</a>
     </div>
