@@ -834,15 +834,40 @@ class WorkQueue
             'group' => 'enrollment',
             'default' => true
         ],
-        'physicalMeasurementsStatus' => [
-            'name' => 'Phys Measurements',
+        'onsiteIdVerificationTime' => [
+            'name' => 'ID Verification',
+            'csvName' => 'ID Verification Date',
+            'rdrField' => 'onsiteIdVerificationTime',
+            'sortField' => 'onsiteIdVerificationTime',
+            'method' => 'displayDateStatus',
+            'userTimezone' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'csvFormatDate' => true,
+            'group' => 'enrollment'
+        ],
+        'participantIncentive' => [
+            'name' => 'Incentive',
+            'csvName' => 'Incentive Date',
+            'rdrField' => 'participantIncentives',
+            'sortField' => 'participantIncentives',
+            'method' => 'getParticipantIncentive',
+            'csvMethod' => 'getParticipantIncentiveDateGiven',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
+        'selfReportedPhysicalMeasurementsStatus' => [
+            'name' => 'Remote Phys Measurements',
             'csvNames' => [
-                'Physical Measurements Status',
-                'Physical Measurements Completion Date'
+                'Remote Physical Measurements Status',
+                'Remote Physical Measurements Completion Date'
             ],
-            'rdrField' => 'physicalMeasurementsStatus',
-            'sortField' => 'physicalMeasurementsStatus',
-            'rdrDateField' => 'physicalMeasurementsFinalizedTime',
+            'rdrField' => 'selfReportedPhysicalMeasurementsStatus',
+            'sortField' => 'selfReportedPhysicalMeasurementsStatus',
+            'rdrDateField' => 'selfReportedPhysicalMeasurementsAuthored',
             'method' => 'displayStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
@@ -850,14 +875,31 @@ class WorkQueue
             'csvStatusText' => 'COMPLETED',
             'csvDisplayTime' => false,
             'group' => 'enrollment',
-            'default' => true,
-            'orderable' => false
+            'default' => false
+        ],
+        'clinicPhysicalMeasurementsStatus' => [
+            'name' => 'Phys Measurements',
+            'csvNames' => [
+                'Physical Measurements Status',
+                'Physical Measurements Completion Date'
+            ],
+            'rdrField' => 'clinicPhysicalMeasurementsStatus',
+            'sortField' => 'clinicPhysicalMeasurementsStatus',
+            'rdrDateField' => 'clinicPhysicalMeasurementsFinalizedTime',
+            'method' => 'displayStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'statusText' => 'COMPLETED',
+            'csvStatusText' => 'COMPLETED',
+            'csvDisplayTime' => false,
+            'group' => 'enrollment',
+            'default' => true
         ],
         'evaluationFinalizedSite' => [
             'name' => 'Phys Meas Site',
             'csvName' => 'Physical Measurements Site',
             'rdrField' => 'evaluationFinalizedSite',
-            'sortField' => 'evaluationFinalizedSite',
+            'sortField' => 'clinicPhysicalMeasurementsFinalizedSite',
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
@@ -894,7 +936,8 @@ class WorkQueue
             'serviceMethod' => 'getSiteDisplayName',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'orderable' => false
         ],
         '1SST8' => [
             'name' => '8 mL SST',
@@ -1212,7 +1255,10 @@ class WorkQueue
         'enrollmentSite',
         'pairedSite',
         'pairedOrganization',
-        'physicalMeasurementsStatus',
+        'onsiteIdVerificationTime',
+        'participantIncentive',
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1343,7 +1389,7 @@ class WorkQueue
         'CopeDec',
         'pairedSite',
         'pairedOrganization',
-        'physicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
         'evaluationFinalizedSite',
         'biobankDnaStatus',
         'biobankSamples',
@@ -1376,7 +1422,10 @@ class WorkQueue
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
         'CopeVaccineMinute4',
-        'enrollmentSite'
+        'enrollmentSite',
+        'onsiteIdVerificationTime',
+        'participantIncentive',
+        'selfReportedPhysicalMeasurementsStatus'
     ];
 
     public static $sortColumns = [
@@ -1444,8 +1493,11 @@ class WorkQueue
         'enrollmentSite',
         'site',
         'organization',
-        'physicalMeasurementsFinalizedTime',
-        'physicalMeasurementsFinalizedSite',
+        'onsiteIdVerificationTime',
+        'participantIncentives',
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsFinalizedTime',
+        'clinicPhysicalMeasurementsFinalizedSite',
         'samplesToIsolateDNA',
         'numBaselineSamplesArrived',
         'biospecimenSourceSite',
@@ -2116,7 +2168,7 @@ class WorkQueue
             'ppiSurveys',
             'pairedSite',
             'pairedOrganization',
-            'physicalMeasurementsStatus',
+            'clinicPhysicalMeasurementsStatus',
             'biobankDnaStatus',
             'biobankSamples'
         ],
@@ -2654,5 +2706,33 @@ class WorkQueue
         }
         $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'], self::$filterDateFieldLabels);
         return $filterLabelOptionPairs;
+    }
+
+    public static function getParticipantIncentive($participantIncentives): string
+    {
+        if ($incentiveDateGiven = self::getParticipantIncentiveDateGiven($participantIncentives)) {
+            return self:: HTML_SUCCESS . ' ' . $incentiveDateGiven;
+        }
+        return self:: HTML_DANGER;
+    }
+
+    public static function getParticipantIncentiveDateGiven($participantIncentives): string
+    {
+        if ($participantIncentives && is_array($participantIncentives)) {
+            $count = count($participantIncentives);
+            $incentive = $participantIncentives[$count - 1];
+            $incentiveDate = date_parse($incentive->dateGiven);
+            return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+                $incentiveDate['year'];
+        }
+        return '';
+    }
+
+    public static function displayDateStatus($time, $userTimezone, $displayTime = true): string
+    {
+        if (!empty($time)) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
+        }
+        return self::HTML_DANGER;
     }
 }

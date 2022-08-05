@@ -347,7 +347,7 @@ class IncentiveImportService
         $obj = new \StdClass();
         $obj->createdBy = $user ? $user->getEmail() : '';
         $obj->site = $this->siteService->getSiteWithPrefix($incentive->getSite());
-        $obj->dateGiven = $incentive->getIncentiveDateGiven();
+        $obj->dateGiven = $incentive->getIncentiveDateGiven()->format('Y-m-d\TH:i:s\Z');
         $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
         $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
         if ($incentive->getGiftCardType()) {

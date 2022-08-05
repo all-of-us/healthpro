@@ -27,7 +27,7 @@ class IncentiveServiceTest extends ServiceTestCase
         self::assertEquals('test@example.com', $rdrObject->createdBy);
         self::assertEquals('hpo-site-test', $rdrObject->site);
         self::assertEquals('redraw', $rdrObject->occurrence);
-        self::assertEquals(new \DateTime('2022-03-22'), $rdrObject->dateGiven);
+        self::assertEquals('2022-03-22T00:00:00Z', $rdrObject->dateGiven);
         self::assertEquals('redraw', $rdrObject->occurrence);
         self::assertEquals('gift_card', $rdrObject->incentiveType);
         self::assertEquals('target', $rdrObject->giftcardType);
