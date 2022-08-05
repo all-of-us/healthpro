@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{ notification.title }}</h4>
+</div>
+<div class="modal-body">
+    <p>{{ notification.message }}</p>
+    {% if notification.url %}
+        <div>
+            <a href="{{ notification.url }}" target="_blank">View New Feature <i class="fa fa-arrow-right"></i></a>
+        </div>
+    {% endif %}
+    <div class="text-center">
+        <a href="https://www.aoucollaborations.net/x/MQElvw" target="_blank">View release notes on confluence</a>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+</div>

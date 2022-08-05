@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\FeatureNotificationRepository;
 use App\Service\AuthService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
@@ -160,5 +161,15 @@ class DefaultController extends BaseController
     public function importsIndex()
     {
         return $this->render('imports/index.html.twig');
+    }
+
+    /**
+     * @Route("/notification/{id}", name="notification_details")
+     */
+    public function notificationDetails($id, FeatureNotificationRepository $featureNotificationRepository)
+    {
+        return $this->render('notifications-modal.html.twig', [
+            'notification' => $featureNotificationRepository->find($id)
+        ]);
     }
 }

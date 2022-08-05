@@ -19,7 +19,7 @@
                 <i class='fa fa-circle text-danger'></i>
             </div>
             <div class="col-sm-9">
-                <p><a>{{ notification.title }}</a></p>
+                <p><a data-href="{{ path('notification_details', {id: notification.id}) }}" class="notification-title">{{ notification.title }}</a></p>
                 <p>{{ notification.message }}</p>
             </div>
             <div class="col-sm-2">
