@@ -40,7 +40,7 @@ $(document).ready(function () {
         let modelContent = $("#consentModal .modal-content");
         modelContent.html('');
         modelContent.load(
-            $(this).attr('data-href')
+            $(this).data('href')
         );
         $(consentModal).modal('show');
     });
