@@ -9,7 +9,7 @@
             </strong>
         </div>
         <div class="col-sm-3 col-sm-offset-5">
-            <a>Mark all as read</a>
+            <a href="{{ path('notifications_mark_read', { return: app.request.pathinfo }) }}">Mark all as read</a>
         </div>
     </div>
     <hr>

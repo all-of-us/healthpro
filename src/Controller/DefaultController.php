@@ -171,6 +171,27 @@ class DefaultController extends BaseController
     public function notificationDetails($id)
     {
         $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
+        $this->createFeatureNotificationUserMap($featureNotification);
+        return $this->render('notifications-modal.html.twig', [
+            'notification' => $featureNotification
+        ]);
+    }
+
+    /**
+     * @Route("/notifications/mark/read", name="notifications_mark_read")
+     */
+    public function notificationsMarkRead(Request $request)
+    {
+        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
+
+        foreach ($activeNotifications as $activeNotification) {
+            $this->createFeatureNotificationUserMap($activeNotification);
+        }
+        return $this->redirect($request->query->get('return'));
+    }
+
+    private function createFeatureNotificationUserMap($featureNotification): void
+    {
         $featureNotificationUserMap = $this->em->getRepository(FeatureNotificationUserMap::class)->findOneBy([
             'featureNotification' => $featureNotification,
             'user' => $this->getUserEntity()
@@ -183,8 +204,5 @@ class DefaultController extends BaseController
             $this->em->persist($featureNotificationUserMap);
             $this->em->flush();
         }
-        return $this->render('notifications-modal.html.twig', [
-            'notification' => $featureNotification
-        ]);
     }
 }
