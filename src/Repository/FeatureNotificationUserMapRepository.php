@@ -19,32 +19,21 @@ class FeatureNotificationUserMapRepository extends ServiceEntityRepository
         parent::__construct($registry, FeatureNotificationUserMap::class);
     }
 
-    // /**
-    //  * @return FeatureNotificationUserMap[] Returns an array of FeatureNotificationUserMap objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return FeatureNotificationUserMap[] Returns an array of FeatureNotificationUserMap objects
+     */
+    public function getUserNotificationIds($user)
     {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('f.id', 'ASC')
-            ->setMaxResults(10)
+        $userNotificationIds = $this->createQueryBuilder('fum')
+            ->select('identity(fum.featureNotification)')
+            ->where('fum.user = :user')
+            ->setParameter('user', $user)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
+        $ids = [];
+        foreach ($userNotificationIds as $userNotificationId) {
+            $ids[] = $userNotificationId[1];
+        }
+        return $ids;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?FeatureNotificationUserMap
-    {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

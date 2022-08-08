@@ -17,7 +17,9 @@
     {% for notification in global_notifications %}
         <div class="row">
             <div class="col-sm-1">
-                <i class='fa fa-circle text-danger'></i>
+                {% if notification.id not in user_notification_ids %}
+                    <i class='fa fa-circle text-danger'></i>
+                {% endif %}
             </div>
             <div class="col-sm-9">
                 <p><a data-href="{{ path('notification_details', {id: notification.id}) }}" class="notification-title">{{ notification.title }}</a></p>
