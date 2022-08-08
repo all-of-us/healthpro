@@ -401,4 +401,14 @@ $(document).ready(function()
             btnTextTrue: 'Continue'
         });
     });
+
+    $('.notification-title').on('click', function () {
+        let notificationsModal = $('#notificationsModal');
+        let modelContent = $("#notificationsModal .modal-content");
+        modelContent.html('');
+        modelContent.load(
+            $(this).data('href')
+        );
+        $(notificationsModal).modal('show');
+    });
 });
