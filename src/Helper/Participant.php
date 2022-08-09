@@ -39,6 +39,7 @@ class Participant
     public $editExistingOnly = false;
     public $siteSuffix;
     public $enrollmentSiteSuffix;
+    public $participantIncentiveDateGiven;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -241,6 +242,11 @@ class Participant
         if (isset($participant->consentCohort)) {
             $this->consentCohortText = $this->getConsentCohortText($participant);
         }
+
+        // Set most recent participant incentive date given
+        if (isset($participant->participantIncentives)) {
+            $this->participantIncentiveDateGiven = $this->getParticipantIncentiveDateGiven($participant->participantIncentives);
+        }
     }
 
     public function getShortId()
@@ -437,5 +443,17 @@ class Participant
         } else {
             return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;
         }
+    }
+
+    private function getParticipantIncentiveDateGiven($participantIncentives): string
+    {
+        if ($participantIncentives && is_array($participantIncentives)) {
+            $count = count($participantIncentives);
+            $incentive = $participantIncentives[$count - 1];
+            $incentiveDate = date_parse($incentive->dateGiven);
+            return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+                $incentiveDate['year'];
+        }
+        return '';
     }
 }

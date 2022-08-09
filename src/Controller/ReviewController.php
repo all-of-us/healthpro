@@ -201,7 +201,9 @@ class ReviewController extends BaseController
         return $this->json([
             'id' => $id,
             'firstName' => $participant->firstName,
-            'lastName' => $participant->lastName
+            'lastName' => $participant->lastName,
+            'onsiteIdVerificationTime' => $participant->onsiteIdVerificationTime,
+            'participantIncentiveDateGiven' => $participant->participantIncentiveDateGiven
         ]);
     }
 }
