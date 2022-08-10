@@ -26,12 +26,11 @@
         <tr>
             <th rowspan="2">Participant ID</th>
             <th rowspan="2">Name</th>
-            <th colspan="2" class="text-center td-left-border" style="background-color: #f9f9f9">On-Site Details</th>
+            <th class="text-center td-left-border" style="background-color: #f9f9f9">On-Site Details</th>
             <th colspan="3" class="text-center td-left-border" style="background-color: #f9f9f9">Physical Measurement</th>
             <th colspan="9" class="text-center td-left-border" style="background-color: #f9f9f9">Biobank Order</th>
         </tr>
         <tr>
-            <th class="td-left-border">ID Verification</th>
             <th class="td-left-border">Incentive</th>
             <th class="td-left-border">Status</th>
             <th>Created <span class="badge" id="measurement_created_ts"></span></th>
@@ -49,7 +48,7 @@
         </thead>
         <tbody>
         {% for id, participant in participants %}
-            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
+            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
                 <tr>
@@ -70,38 +69,10 @@
                             </td>
                         {% endif %}
                     {% endif %}
-                    {% if i == 0 %}
-                        {% if participant.participant is defined %}
-                            <td {{ rowSpan }}>
-                                {% if participant.participant.onsiteIdVerificationTime %}
-                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                    {{ participant.participant.onsiteIdVerificationTime|date('n/j/Y g:ia', app.user.timezone) }}
-                                {% else %}
-                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                {% endif %}
-                            </td>
-                        {% else %}
-                            <td {{ rowSpan }} data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-idv align-middle">
-                                <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                                <span class="sr-only">Loading...</span>
-                            </td>
-                        {% endif %}
-                        {% if participant.participant is defined %}
-                            <td {{ rowSpan }}>
-                            {% if participant.participant.participantIncentiveDateGiven %}
-                                <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                {{ participant.participant.participantIncentiveDateGiven|date('n/j/Y g:ia', app.user.timezone) }}
-                            {% else %}
-                                <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                            {% endif %}
-                            </td>
-                        {% else %}
-                            <td {{ rowSpan }} data-participant-id="{{ id }}" data-href="{{ path('participant', { id: id }) }}" class="load-incentive align-middle">
-                                <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                                <span class="sr-only">Loading...</span>
-                            </td>
-                        {% endif %}
-                    {% endif %}
+                    {% set incentive = participant.incentives[i] is defined ? participant.incentives[i] : '' %}
+                    <td class="td-left-border">
+                        {{ today.displayDate(incentive, 'created_ts') }}
+                    </td>
                     {% set physicalMeasurement = participant.physicalMeasurements[i] is defined ? participant.physicalMeasurements[i] : '' %}
                     <td class="td-left-border">
                         {{ today.displayLink(physicalMeasurement, 'status', id) }}
