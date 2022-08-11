@@ -1,13 +1,13 @@
 $(document).ready(function () {
-    var verificationFormSelector = '#id_verification_form';
+    let verificationFormSelector = '#id_verification_form';
     $(verificationFormSelector).parsley();
-    $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
+    $(verificationFormSelector + ' :input:not(:checkbox, #id_verification_cancel)').prop("disabled", true);
 
     $('#id_verification_confirmation_0').change(function () {
         if (this.checked) {
-            $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", false);
+            $(verificationFormSelector + ' :input:not(:checkbox, #id_verification_cancel)').prop("disabled", false);
         } else {
-            $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
+            $(verificationFormSelector + ' :input:not(:checkbox, #id_verification_cancel)').prop("disabled", true);
             $(verificationFormSelector + ' :input:not(:checkbox)').val('');
             $(verificationFormSelector).parsley().reset();
         }
@@ -15,8 +15,10 @@ $(document).ready(function () {
 
     $('#id_verification_cancel').on('click', function () {
         $(verificationFormSelector)[0].reset();
-        $(verificationFormSelector + ' :input:not(:checkbox)').prop("disabled", true);
+        $(verificationFormSelector + ' :input:not(:checkbox, #id_verification_cancel)').prop("disabled", true);
         $(verificationFormSelector).parsley().reset();
+        $('#id-verification-data-box').show();
+        $('#id-verification-form-box').hide();
     });
 
     $('.toggle-id-verification-help-text').on('click', function () {
@@ -24,5 +26,17 @@ $(document).ready(function () {
         let html = $('#' + id).html();
         $('#helpModal .modal-body').html(html);
         $('#helpModal').modal();
+    });
+
+    let hasIdVerifications = $('#id_verification').data('has-id-verifications');
+
+    if (hasIdVerifications) {
+        $('#id-verification-data-box').show();
+        $('#id-verification-form-box').hide();
+    }
+
+    $('.btn-id-verification-add-new').on('click', function () {
+        $('#id-verification-data-box').hide();
+        $('#id-verification-form-box').show();
     });
 });
