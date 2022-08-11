@@ -1,5 +1,6 @@
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}">
+<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}"
+     data-has-incentives="{{ incentives is defined and incentives ? 1 : 0 }}">
     <div class="panel-heading">
         <h3 class="panel-title">
             {% if type is defined and type == 'edit' %}
@@ -10,43 +11,86 @@
         </h3>
     </div>
     <div class="panel-body">
-        {% set actionUrl = incentiveId is defined ? path('participant_incentive', { id: participant.id, incentiveId: incentiveId }) : path('participant_incentive', { id: participant.id }) %}
-        {{ form_start(incentiveForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
-        {{ form_errors(incentiveForm) }}
-        <div class="row">
-            <div class="col-md-6">
-                {{ form_row(incentiveForm.incentive_date_given) }}
-                {{ form_row(incentiveForm.incentive_occurrence) }}
-                {{ form_row(incentiveForm.other_incentive_occurrence) }}
-            </div>
-            <div class="col-md-6">
-                {{ form_row(incentiveForm.incentive_type) }}
-                <div id="gift_card">
-                    {{ form_row(incentiveForm.gift_card_type) }}
+        <div id="incentives-data-box">
+            {% if incentives is defined and incentives is not empty %}
+                {% set incentive = incentives[0] %}
+                <dl class="dl-horizontal">
+                    <dt>Date Created</dt>
+                    <dd>
+                        {{ incentive.createdTs|date('n/j/Y g:ia', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}
+                        {% if incentive.import %}
+                            <span class="label label-primary">Imported</span>
+                        {% endif %}
+                    </dd>
+                    <dt>Date of Service</dt>
+                    <dd>{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
+                    <dt>Incentive Occurrence</dt>
+                    <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
+                    {% if incentive.otherIncentiveOccurrence %}
+                        <dt>Other Incentive Occurrence</dt>
+                        <dd>{{ incentive.otherIncentiveOccurrence }}</dd>
+                    {% endif %}
+                    <dt>Incentive Type</dt>
+                    <dd>
+                        {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
+                    </dd>
+                    {% if incentive.otherIncentiveType %}
+                        <dt>Other Incentive Type</dt>
+                        <dd>{{ incentive.otherIncentiveType }}</dd>
+                    {% endif %}
+                    <dt>Incentive Amount</dt>
+                    <dd>{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                    <dt>Notes</dt>
+                    <dd>{{ incentive.notes }}</dd>
+                    <dt>Declined</dt>
+                    <dd>{{ incentive.declined ? 'Yes' : 'No' }}</dd>
+                </dl>
+                {% if not readOnlyView %}
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-sm btn-incentive-add-new">Add New</button>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div id="incentives-form-box">
+            {% set actionUrl = incentiveId is defined ? path('participant_incentive', { id: participant.id, incentiveId: incentiveId }) : path('participant_incentive', { id: participant.id }) %}
+            {{ form_start(incentiveForm, { attr: { class: 'disable-enter prevent-resubmit incentive-form', action: actionUrl } }) }}
+            {{ form_errors(incentiveForm) }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(incentiveForm.incentive_date_given) }}
+                    {{ form_row(incentiveForm.incentive_occurrence) }}
+                    {{ form_row(incentiveForm.other_incentive_occurrence) }}
                 </div>
-                {{ form_row(incentiveForm.other_incentive_type) }}
-                {{ form_row(incentiveForm.incentive_amount) }}
-                {{ form_row(incentiveForm.other_incentive_amount) }}
+                <div class="col-md-6">
+                    {{ form_row(incentiveForm.incentive_type) }}
+                    <div id="gift_card">
+                        {{ form_row(incentiveForm.gift_card_type) }}
+                    </div>
+                    {{ form_row(incentiveForm.other_incentive_type) }}
+                    {{ form_row(incentiveForm.incentive_amount) }}
+                    {{ form_row(incentiveForm.other_incentive_amount) }}
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            {{ form_label(incentiveForm.notes) }}
-            {{ form_widget(incentiveForm.notes) }}
-            {% if type is defined and type == 'edit' %}
-                <small class="text-warning">Please provide a reason for amending this incentive.</small>
+            <div class="form-group">
+                {{ form_label(incentiveForm.notes) }}
+                {{ form_widget(incentiveForm.notes) }}
+                {% if type is defined and type == 'edit' %}
+                    <small class="text-warning">Please provide a reason for amending this incentive.</small>
+                {% endif %}
+            </div>
+            {{ form_row(incentiveForm.declined, { 'id': incentiveId is defined ? 'incentive_edit_declined' : 'incentive_create_declined' }) }}
+            {{ form_rest(incentiveForm) }}
+            {% if not readOnlyView %}
+                <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
+                {% if type is defined and type == 'edit' %}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                {% else %}
+                    <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+                {% endif %}
             {% endif %}
+            {{ form_end(incentiveForm) }}
         </div>
-        {{ form_row(incentiveForm.declined, { 'id': incentiveId is defined ? 'incentive_edit_declined' : 'incentive_create_declined' }) }}
-        {{ form_rest(incentiveForm) }}
-        {% if not readOnlyView %}
-            <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
-            {% if type is defined and type == 'edit' %}
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            {% else %}
-                <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
-            {% endif %}
-        {% endif %}
-        {{ form_end(incentiveForm) }}
     </div>
     {% if incentives is defined and incentives is not empty %}
         <div class="panel-group view-details" id="accordion" role="tablist" aria-multiselectable="true">
