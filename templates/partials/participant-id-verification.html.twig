@@ -18,10 +18,6 @@
                     <dd>
                         {{ idVerification.verifiedTime|date('H:i:s') == '00:00:00' ? idVerification.verifiedTime|date('n/j/Y') : idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}
                     </dd>
-                    <dt>User</dt>
-                    <dd>{{ idVerification.userEmail }}</dd>
-                    <dt>Site</dt>
-                    <dd>{{ idVerification.siteName }}</dd>
                     <dt>Verification Type</dt>
                     <dd>{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
                     <dt>Visit Type</dt>

@@ -13,12 +13,16 @@ $(document).ready(function () {
         }
     });
 
+    let hasIdVerifications = $('#id_verification').data('has-id-verifications');
+
     $('#id_verification_cancel').on('click', function () {
         $(verificationFormSelector)[0].reset();
         $(verificationFormSelector + ' :input:not(:checkbox, #id_verification_cancel)').prop("disabled", true);
         $(verificationFormSelector).parsley().reset();
-        $('#id-verification-data-box').show();
-        $('#id-verification-form-box').hide();
+        if (hasIdVerifications) {
+            $('#id-verification-data-box').show();
+            $('#id-verification-form-box').hide();
+        }
     });
 
     $('.toggle-id-verification-help-text').on('click', function () {
@@ -27,8 +31,6 @@ $(document).ready(function () {
         $('#helpModal .modal-body').html(html);
         $('#helpModal').modal();
     });
-
-    let hasIdVerifications = $('#id_verification').data('has-id-verifications');
 
     if (hasIdVerifications) {
         $('#id-verification-data-box').show();
