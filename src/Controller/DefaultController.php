@@ -180,14 +180,14 @@ class DefaultController extends BaseController
     /**
      * @Route("/notifications/mark/read", name="notifications_mark_read")
      */
-    public function notificationsMarkRead(Request $request)
+    public function notificationsMarkRead(): JsonResponse
     {
         $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
 
         foreach ($activeNotifications as $activeNotification) {
             $this->createFeatureNotificationUserMap($activeNotification);
         }
-        return $this->redirect($request->query->get('return'));
+        return $this->json(['success' => true]);
     }
 
     private function createFeatureNotificationUserMap($featureNotification): void

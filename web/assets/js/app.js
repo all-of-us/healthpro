@@ -411,4 +411,13 @@ $(document).ready(function()
         );
         $(notificationsModal).modal('show');
     });
+
+    $('#notifications_mark_all_read').on('click', function () {
+        if (parseInt($(this).data('notifications-count')) > 0) {
+            $.get($(this).data('href'), function () {
+                $('#notifications_count, .notifications-circle').html('');
+                $('#notifications_mark_all_read').attr('data-notifications-count', 0);
+            });
+        }
+    });
 });

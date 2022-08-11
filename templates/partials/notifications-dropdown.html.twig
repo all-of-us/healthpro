@@ -9,14 +9,15 @@
             </strong>
         </div>
         <div class="col-sm-3 col-sm-offset-5">
-            <a href="{{ path('notifications_mark_read', { return: app.request.pathinfo }) }}">Mark all as read</a>
+            <a data-href="{{ path('notifications_mark_read') }}" id="notifications_mark_all_read"
+               data-notifications-count="{{ notifications_count }}">Mark all as read</a>
         </div>
     </div>
     <hr>
     {% if global_notifications %}
     {% for notification in global_notifications %}
         <div class="row">
-            <div class="col-sm-1">
+            <div class="col-sm-1 notifications-circle">
                 {% if notification.id not in user_notification_ids %}
                     <i class='fa fa-circle text-danger'></i>
                 {% endif %}
