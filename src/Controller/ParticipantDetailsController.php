@@ -154,13 +154,13 @@ class ParticipantDetailsController extends BaseController
                     $patientStatusId = !empty($patientStatus) ? $patientStatus->getId() : null;
                     $patientStatusService->loadData($id, $patientStatusId, $patientStatusForm->getData());
                     if ($patientStatusService->sendToRdr() && $patientStatusService->saveData()) {
-                        $this->addFlash('patient-status-success', 'Patient status saved');
+                        $this->addFlash('patient-status-success', 'Patient Status Saved');
                         // Load newly entered data
                         $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id, $siteService->getSiteOrganization());
                         // Get new form
                         $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => true]);
                     } else {
-                        $this->addFlash('error', 'Failed to create patient status. Please try again.');
+                        $this->addFlash('patient-status-error', 'Failed to create patient status. Please try again.');
                     }
                 } else {
                     $patientStatusForm->addError(new FormError('Please correct the errors below'));
@@ -190,9 +190,9 @@ class ParticipantDetailsController extends BaseController
                     $this->addFlash('id-verification-success', 'ID Verification Saved');
                     return $this->redirectToRoute("participant", ['id' => $id]);
                 }
-                $this->addFlash('error', 'Error saving id verification . Please try again');
+                $this->addFlash('id-verification-error', 'Error saving id verification . Please try again');
             } else {
-                $this->addFlash('error', 'Invalid form');
+                $this->addFlash('id-verification-error', 'Invalid form');
             }
         }
         $idVerifications = $idVerificationService->getIdVerifications($id);
@@ -208,9 +208,9 @@ class ParticipantDetailsController extends BaseController
                     throw $this->createAccessDeniedException();
                 }
                 if ($incentiveService->cancelIncentive($id, $incentive)) {
-                    $this->addFlash('success', 'Incentive Deleted');
+                    $this->addFlash('incentive-success', 'Incentive Deleted');
                 } else {
-                    $this->addFlash('error', 'Error deleting incentive. Please try again');
+                    $this->addFlash('incentive-error', 'Error deleting incentive. Please try again');
                 }
                 $this->redirectToRoute('participant', ['id' => $id]);
             }
@@ -320,17 +320,17 @@ class ParticipantDetailsController extends BaseController
                     if ($incentiveService->amendIncentive($id, $incentiveForm)) {
                         $this->addFlash('incentive-success', 'Incentive Updated');
                     } else {
-                        $this->addFlash('error', 'Error updating incentive. Please try again');
+                        $this->addFlash('incentive-error', 'Error updating incentive. Please try again');
                     }
                 } else {
                     if ($incentiveService->createIncentive($id, $incentiveForm)) {
-                        $this->addFlash('incentive-success', 'Incentive Created');
+                        $this->addFlash('incentive-success', 'Incentive Saved');
                     } else {
-                        $this->addFlash('error', 'Error creating incentive. Please try again');
+                        $this->addFlash('incentive-error', 'Error creating incentive. Please try again');
                     }
                 }
             } else {
-                $this->addFlash('error', 'Invalid form');
+                $this->addFlash('incentive-error', 'Invalid form');
             }
             return $this->redirectToRoute("participant", ['id' => $id]);
         }

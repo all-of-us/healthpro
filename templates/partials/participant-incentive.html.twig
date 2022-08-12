@@ -10,9 +10,8 @@
             {% endif %}
         </h3>
     </div>
-    {% for flashMessage in app.session.flashbag.get('incentive-success') %}
-        <div class="alert alert-success well-sm text-center">{{ flashMessage }}</div>
-    {% endfor %}
+    {% import 'macros/display-text.html.twig' as macros %}
+    {{ macros.displayFalshMessage('incentive') }}
     <div class="panel-body">
         <div id="incentives-data-box">
             {% if incentives is defined and incentives is not empty %}

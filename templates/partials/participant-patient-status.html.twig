@@ -4,6 +4,8 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
             </div>
+            {% import 'macros/display-text.html.twig' as macros %}
+            {{ macros.displayFalshMessage('patient-status') }}
             {% for flashMessage in app.session.flashbag.get('patient-status-success') %}
                 <div class="alert alert-success well-sm text-center">{{ flashMessage }}</div>
             {% endfor %}
