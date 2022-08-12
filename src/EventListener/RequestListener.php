@@ -112,8 +112,8 @@ class RequestListener
         $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
         $this->twig->addGlobal('global_notifications', $activeNotifications);
 
-        $userNotificationIds = $this->em->getRepository(FeatureNotificationUserMap::class)
-            ->getUserNotificationIds($this->userService->getUserEntity());
+        $userNotificationIds = $activeNotifications ? $this->em->getRepository(FeatureNotificationUserMap::class)
+            ->getUserNotificationIds($this->userService->getUserEntity()) : null;
         $this->twig->addGlobal('user_notification_ids', $userNotificationIds);
 
         $notificationsCount = 0;
