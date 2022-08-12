@@ -34,6 +34,8 @@ class ReviewService
         'ordersCount' => 0,
         'physicalMeasurements' => null,
         'physicalMeasurementsCount' => 0,
+        'incentives' => null,
+        'incentivesCount' => 0
     ];
 
     protected function getTodayRows($startTime, $endTime, $site)
@@ -65,7 +67,15 @@ class ReviewService
             'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
             'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
             'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
-        $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
+        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.created_ts, null, null, null, null, null, null, ' .
+            'null, ' .
+            'null, ' .
+            'null ' .
+            'FROM incentive i ' .
+            'WHERE i.site = :site ' .
+            'AND i.created_ts >= :startTime ' .
+            'AND i.created_ts < :endTime ';
+        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) ORDER BY latest_ts DESC";
 
         return $this->em->getConnection()->fetchAll($query, [
             'startTime' => $startTime,
@@ -106,6 +116,10 @@ class ReviewService
                     }
                     $participants[$participantId]['physicalMeasurements'][] = $row;
                     $participants[$participantId]['physicalMeasurementsCount']++;
+                    break;
+                case 'incentive':
+                    $participants[$participantId]['incentives'][] = $row;
+                    $participants[$participantId]['incentivesCount']++;
                     break;
             }
         }

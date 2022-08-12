@@ -26,10 +26,12 @@
         <tr>
             <th rowspan="2">Participant ID</th>
             <th rowspan="2">Name</th>
+            <th class="text-center td-left-border" style="background-color: #f9f9f9">On-Site Details</th>
             <th colspan="3" class="text-center td-left-border" style="background-color: #f9f9f9">Physical Measurement</th>
             <th colspan="9" class="text-center td-left-border" style="background-color: #f9f9f9">Biobank Order</th>
         </tr>
         <tr>
+            <th class="td-left-border">Incentive <span class="badge badge-success" id="incentive_created_ts"></span></th>
             <th class="td-left-border">Status</th>
             <th>Created <span class="badge" id="measurement_created_ts"></span></th>
             <th>Finalized <span class="badge badge-success" id="measurement_finalized_ts"></span></th>
@@ -46,7 +48,7 @@
         </thead>
         <tbody>
         {% for id, participant in participants %}
-            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
+            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
                 <tr>
@@ -67,6 +69,10 @@
                             </td>
                         {% endif %}
                     {% endif %}
+                    {% set incentive = participant.incentives[i] is defined ? participant.incentives[i] : '' %}
+                    <td class="td-left-border">
+                        {{ today.displayDate(incentive, 'created_ts') }}
+                    </td>
                     {% set physicalMeasurement = participant.physicalMeasurements[i] is defined ? participant.physicalMeasurements[i] : '' %}
                     <td class="td-left-border">
                         {{ today.displayLink(physicalMeasurement, 'status', id) }}
