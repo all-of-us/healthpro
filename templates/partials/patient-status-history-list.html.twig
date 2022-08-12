@@ -1,10 +1,10 @@
 <div class="panel-group view-details" id="accordion_patient_status_history" role="tablist" aria-multiselectable="true">
     <div class="panel-heading bg-secondary text-white view-history-dropdown" role="tab">
-        <h5>
-            <span role="button" data-toggle="collapse" data-parent="#accordion_patient_status_history" href="#collapse_patient_status_history" aria-expanded="true" aria-controls="collapseOne">
-                View Patient Status History: {{ app.session.get('siteOrganizationDisplayName') }}
-            </span>
-        </h5>
+        <div role="button" data-toggle="collapse" data-parent="#accordion_patient_status_history"
+             href="#collapse_patient_status_history" aria-expanded="true" aria-controls="collapseOne">
+            View Patient Status History: {{ app.session.get('siteOrganizationDisplayName') }}
+            <span class="badge badge-light">{{ orgPatientStatusHistoryData|length }}</span>
+        </div>
     </div>
     <div id="collapse_patient_status_history" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
         <div class="panel-body">
