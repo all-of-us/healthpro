@@ -6,7 +6,7 @@ use App\Repository\FeatureNotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\FeatureNotificationRepository")
  * @ORM\Table(name="feature_notifications")
  */
 class FeatureNotification
