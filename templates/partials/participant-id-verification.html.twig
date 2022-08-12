@@ -9,6 +9,9 @@
             </span>
         </h3>
     </div>
+    {% for flashMessage in app.session.flashbag.get('id-verification-success') %}
+        <div class="alert alert-success well-sm text-center">{{ flashMessage }}</div>
+    {% endfor %}
     <div class="panel-body">
         <div id="id-verification-data-box">
             {% if idVerifications is not empty %}

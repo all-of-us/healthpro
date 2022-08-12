@@ -154,7 +154,7 @@ class ParticipantDetailsController extends BaseController
                     $patientStatusId = !empty($patientStatus) ? $patientStatus->getId() : null;
                     $patientStatusService->loadData($id, $patientStatusId, $patientStatusForm->getData());
                     if ($patientStatusService->sendToRdr() && $patientStatusService->saveData()) {
-                        $this->addFlash('success', 'Patient status saved');
+                        $this->addFlash('patient-status-success', 'Patient status saved');
                         // Load newly entered data
                         $orgPatientStatusData = $patientStatusRepository->getOrgPatientStatusData($id, $siteService->getSiteOrganization());
                         // Get new form
@@ -187,7 +187,7 @@ class ParticipantDetailsController extends BaseController
         if ($idVerificationForm->isSubmitted()) {
             if ($idVerificationForm->isValid()) {
                 if ($idVerificationService->createIdVerification($id, $idVerificationForm->getData())) {
-                    $this->addFlash('success', 'ID Verification Saved');
+                    $this->addFlash('id-verification-success', 'ID Verification Saved');
                     return $this->redirectToRoute("participant", ['id' => $id]);
                 }
                 $this->addFlash('error', 'Error saving id verification . Please try again');
@@ -318,13 +318,13 @@ class ParticipantDetailsController extends BaseController
             if ($incentiveForm->isValid()) {
                 if ($incentiveId) {
                     if ($incentiveService->amendIncentive($id, $incentiveForm)) {
-                        $this->addFlash('success', 'Incentive Updated');
+                        $this->addFlash('incentive-success', 'Incentive Updated');
                     } else {
                         $this->addFlash('error', 'Error updating incentive. Please try again');
                     }
                 } else {
                     if ($incentiveService->createIncentive($id, $incentiveForm)) {
-                        $this->addFlash('success', 'Incentive Created');
+                        $this->addFlash('incentive-success', 'Incentive Created');
                     } else {
                         $this->addFlash('error', 'Error creating incentive. Please try again');
                     }

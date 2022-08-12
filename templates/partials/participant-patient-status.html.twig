@@ -4,6 +4,9 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
             </div>
+            {% for flashMessage in app.session.flashbag.get('patient-status-success') %}
+                <div class="alert alert-success well-sm text-center">{{ flashMessage }}</div>
+            {% endfor %}
             <div class="panel-body">
                 {% if orgPatientStatusData is empty %}
                     <p class="text-danger">Please complete the patient status information for your organization. User should have access to EHR system information for verification.</p>
