@@ -156,7 +156,10 @@ class UserService
 
     public function getUserEntity()
     {
-        return $this->em->getRepository(User::class)->find($this->getUser()->getId());
+        if ($this->getUser()) {
+            return $this->em->getRepository(User::class)->find($this->getUser()->getId());
+        }
+        return null;
     }
 
     public function getUserEntityFromEmail($email): ?User

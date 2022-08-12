@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Audit\Log;
 use App\Entity\FeatureNotification;
+use App\Entity\FeatureNotificationUserMap;
 use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -110,6 +111,18 @@ class RequestListener
     {
         $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
         $this->twig->addGlobal('global_notifications', $activeNotifications);
+
+        $userNotificationIds = $activeNotifications ? $this->em->getRepository(FeatureNotificationUserMap::class)
+            ->getUserNotificationIds($this->userService->getUserEntity()) : null;
+        $this->twig->addGlobal('user_notification_ids', $userNotificationIds);
+
+        $notificationsCount = 0;
+        foreach ($activeNotifications as $activeNotification) {
+            if (!in_array($activeNotification->getId(), $userNotificationIds)) {
+                $notificationsCount++;
+            }
+        }
+        $this->twig->addGlobal('notifications_count', $notificationsCount);
     }
 
     private function checkSiteSelect()

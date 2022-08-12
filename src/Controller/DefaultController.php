@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\FeatureNotification;
+use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
 use App\Repository\FeatureNotificationRepository;
 use App\Service\AuthService;
@@ -166,10 +168,41 @@ class DefaultController extends BaseController
     /**
      * @Route("/notification/{id}", name="notification_details")
      */
-    public function notificationDetails($id, FeatureNotificationRepository $featureNotificationRepository)
+    public function notificationDetails($id)
     {
+        $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
+        $this->createFeatureNotificationUserMap($featureNotification);
         return $this->render('notifications-modal.html.twig', [
-            'notification' => $featureNotificationRepository->find($id)
+            'notification' => $featureNotification
         ]);
+    }
+
+    /**
+     * @Route("/notifications/mark/read", name="notifications_mark_read")
+     */
+    public function notificationsMarkRead(): JsonResponse
+    {
+        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
+
+        foreach ($activeNotifications as $activeNotification) {
+            $this->createFeatureNotificationUserMap($activeNotification);
+        }
+        return $this->json(['success' => true]);
+    }
+
+    private function createFeatureNotificationUserMap($featureNotification): void
+    {
+        $featureNotificationUserMap = $this->em->getRepository(FeatureNotificationUserMap::class)->findOneBy([
+            'featureNotification' => $featureNotification,
+            'user' => $this->getUserEntity()
+        ]);
+        if ($featureNotificationUserMap === null) {
+            $featureNotificationUserMap = new FeatureNotificationUserMap();
+            $featureNotificationUserMap->setFeatureNotification($featureNotification);
+            $featureNotificationUserMap->setUser($this->getUserEntity());
+            $featureNotificationUserMap->setCreatedTs(new \DateTime());
+            $this->em->persist($featureNotificationUserMap);
+            $this->em->flush();
+        }
     }
 }

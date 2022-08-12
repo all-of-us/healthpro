@@ -161,8 +161,8 @@
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-bell" aria-hidden="true"></i>
-                            {% if global_notifications|length > 0 %}
-                                <span class="badge badge-notify">{{ global_notifications|length }}</span>
+                            {% if notifications_count > 0 %}
+                                <span class="badge badge-notify" id="notifications_count">{{ notifications_count }}</span>
                             {% endif %}
                         </a>
                         {% include 'partials/notifications-dropdown.html.twig' %}

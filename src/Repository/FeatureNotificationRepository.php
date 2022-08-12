@@ -20,7 +20,7 @@ class FeatureNotificationRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return FeatureNotification[] Returns an array of currently active Notice objects that match a URL path
+     * @return FeatureNotification[] Returns an array of currently active FeatureNotification objects
      */
     public function getActiveNotifications()
     {
@@ -29,6 +29,7 @@ class FeatureNotificationRepository extends ServiceEntityRepository
             ->andWhere('f.startTs is null OR f.startTs <= :now')
             ->andWhere('f.endTs is null OR f.endTs >= :now')
             ->setParameter('now', new \DateTime())
+            ->orderBy('f.id', 'DESC')
             ->getQuery()
             ->getResult()
         ;
