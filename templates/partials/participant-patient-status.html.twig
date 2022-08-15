@@ -5,10 +5,7 @@
                 <h3 class="panel-title">Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
             </div>
             {% import 'macros/display-text.html.twig' as macros %}
-            {{ macros.displayFalshMessage('patient-status') }}
-            {% for flashMessage in app.session.flashbag.get('patient-status-success') %}
-                <div class="alert alert-success well-sm text-center">{{ flashMessage }}</div>
-            {% endfor %}
+            {{ macros.displayFlashMessage('patient-status') }}
             <div class="panel-body">
                 {% if orgPatientStatusData is empty %}
                     <p class="text-danger">Please complete the patient status information for your organization. User should have access to EHR system information for verification.</p>

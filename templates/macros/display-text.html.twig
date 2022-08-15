@@ -185,7 +185,7 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro displayFalshMessage(type) %}
+{% macro displayFlashMessage(type) %}
     {% for flashMessage in app.session.flashbag.get(type ~ '-error') %}
         <div class="alert alert-danger well-sm text-center">{{ flashMessage }}</div>
     {% endfor %}
