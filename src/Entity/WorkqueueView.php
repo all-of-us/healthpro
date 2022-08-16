@@ -23,16 +23,6 @@ class WorkqueueView
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $site;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $awardee;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $name;
@@ -52,6 +42,16 @@ class WorkqueueView
      */
     private $createdTs;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $filters;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $columns;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -65,30 +65,6 @@ class WorkqueueView
     public function setUser(?User $user): self
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    public function getSite(): ?string
-    {
-        return $this->site;
-    }
-
-    public function setSite(string $site): self
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
-    public function getAwardee(): ?string
-    {
-        return $this->awardee;
-    }
-
-    public function setAwardee(?string $awardee): self
-    {
-        $this->awardee = $awardee;
 
         return $this;
     }
@@ -137,6 +113,30 @@ class WorkqueueView
     public function setCreatedTs(\DateTimeInterface $createdTs): self
     {
         $this->createdTs = $createdTs;
+
+        return $this;
+    }
+
+    public function getFilters(): ?string
+    {
+        return $this->filters;
+    }
+
+    public function setFilters(?string $filters): self
+    {
+        $this->filters = $filters;
+
+        return $this;
+    }
+
+    public function getColumns(): ?string
+    {
+        return $this->columns;
+    }
+
+    public function setColumns(?string $columns): self
+    {
+        $this->columns = $columns;
 
         return $this;
     }
