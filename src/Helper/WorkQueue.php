@@ -844,6 +844,7 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
+            'orderable' => false,
             'group' => 'enrollment'
         ],
         'selfReportedPhysicalMeasurementsStatus' => [
