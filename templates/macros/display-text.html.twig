@@ -97,12 +97,12 @@
     {% if value in consentValues %}
         {% if currentTime %}
             {{ _self.displayConsent(currentTime, attribute(participant, currentFilePathField), currentDateField, participant.id, showConsentPDFs) }} (current status, re-consented)
+            <br>
         {% endif %}
-        <br>
         {% if time %}
             {{ _self.displayConsent(time, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) }} (updated)
+            <br>
         {% endif %}
-        <br>
         {% if firstTime %}
             {{ _self.displayConsent(firstTime, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) }}
             {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>

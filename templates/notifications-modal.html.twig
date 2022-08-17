@@ -4,7 +4,7 @@
 <div class="modal-body">
     <p>{{ notification.message }}</p>
     {% if notification.url %}
-        <div>
+        <div class="text-right">
             <a href="{{ notification.url }}" target="_blank">View New Feature <i class="fa fa-arrow-right"></i></a>
         </div>
     {% endif %}

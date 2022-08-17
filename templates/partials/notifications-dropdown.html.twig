@@ -23,7 +23,14 @@
                 {% endif %}
             </div>
             <div class="col-sm-9">
-                <p><a data-href="{{ path('notification_details', {id: notification.id}) }}" class="notification-title">{{ notification.title }}</a></p>
+                <p>
+                    <strong>
+                        <a data-href="{{ path('notification_details', {id: notification.id}) }}"
+                           class="notification-title">
+                            {{ notification.title }}
+                        </a>
+                    </strong>
+                </p>
                 <p>{{ notification.message|length > 125 ? notification.message|slice(0, 125) ~ '...' : notification.message  }}</p>
             </div>
             <div class="col-sm-2">
@@ -31,7 +38,7 @@
             </div>
         </div>
         {% if notification.url %}
-            <div>
+            <div class="text-right">
                 <a href="{{ notification.url }}" target="_blank">View New Feature <i class="fa fa-arrow-right"></i></a>
             </div>
         {% endif %}

@@ -844,6 +844,7 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
+            'orderable' => false,
             'group' => 'enrollment'
         ],
         'selfReportedPhysicalMeasurementsStatus' => [
@@ -2425,9 +2426,8 @@ class WorkQueue
             $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
         }
         if ($reconsentTime || $consentTime) {
-            $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/?type=' .
-                $historyType .
-                '" class="view-consent-histories">View Historical</a>';
+            $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/' .
+                $historyType . '" class="view-consent-histories">View Historical</a>';
         }
         return $html;
     }
