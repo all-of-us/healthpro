@@ -7,6 +7,8 @@ use App\Entity\PatientStatus;
 
 class OnSiteDetailsReportingService
 {
+    protected $participantSummaryService;
+
     public static $patientStatusExportHeaders = [
         'Date Created',
         'Participant ID',
@@ -51,6 +53,11 @@ class OnSiteDetailsReportingService
         'i.declined',
         'i.notes'
     ];
+
+    public function __construct(ParticipantSummaryService $participantSummaryService)
+    {
+        $this->participantSummaryService = $participantSummaryService;
+    }
 
     public function getPatientStatusAjaxData($patientStatuses): array
     {
@@ -118,5 +125,33 @@ class OnSiteDetailsReportingService
             array_push($rows, $row);
         }
         return $rows;
+    }
+
+    public function getIdVerificationAjaxData($siteId, $params): array
+    {
+        $rdrParams['site'] = $siteId;
+        $rdrParams['_count'] = $params['length'] ?? 10;
+        $rdrParams['_offset'] = $params['start'] ?? 0;
+        $participantSummaries = $this->participantSummaryService->listWorkQueueParticipantSummaries($rdrParams);
+        $rows = [];
+        foreach ($participantSummaries as $participantSummary) {
+            if (isset($participantSummary->resource)) {
+                $participantResource = $participantSummary->resource;
+                $row = [];
+                $row['created'] = $participantResource->onsiteIdVerificationTime ?? '';
+                $row['participantId'] = $participantResource->participantId;
+                $row['user'] = '';
+                $row['verificationType'] = $participantResource->onsiteIdVerificationType ?? '';
+                $row['visitType'] = $participantResource->onsiteIdVerificationVisitType ?? '';
+                $rows[] = $row;
+            }
+
+        }
+        return $rows;
+    }
+
+    public function getIdVerificationsTotal(): ?int
+    {
+        return $this->participantSummaryService->getTotal();
     }
 }

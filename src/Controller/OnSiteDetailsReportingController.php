@@ -162,4 +162,42 @@ class OnSiteDetailsReportingController extends BaseController
             'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
     }
+
+    /**
+     * @Route("/id-verification", name="on_site_id_verification")
+     */
+    public function idVerificationAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        SiteService $siteService,
+        Request $request
+    ) {
+        $params = $request->query->all();
+        if ($request->isXmlHttpRequest()) {
+            $ajaxParams = $request->request->all();
+            $ajaxParams['startDate'] = $this->getParamDate($params, 'startDate');
+            $ajaxParams['endDate'] = $this->getParamDate($params, 'endDate');
+            $ajaxParams['participantId'] = $params['participantId'] ?? '';
+            $sortColumns = $onSiteDetailsReportingService::$incentiveSortColumns;
+            $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
+            $ajaxParams['sortDir'] = $ajaxParams['order'][0]['dir'];
+            $ajaxData = [];
+            $ajaxData['data'] = $onSiteDetailsReportingService->getIdVerificationAjaxData($siteService->getSiteIdWithPrefix(), $ajaxParams);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $onSiteDetailsReportingService->getIdVerificationsTotal();
+            return $this->json($ajaxData);
+        } else {
+            return $this->render('onsite/id-verification.html.twig', ['params' => $params]);
+        }
+    }
+
+    /**
+     * @Route("/id-verification-export", name="on_site_id_verification_export")
+     */
+    public function onSiteIdVerificationExportAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        SiteService $siteService,
+        Request $request
+    )
+    {
+        return '';
+    }
 }
