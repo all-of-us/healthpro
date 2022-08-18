@@ -174,8 +174,8 @@ class OnSiteDetailsReportingController extends BaseController
         $params = $request->query->all();
         if ($request->isXmlHttpRequest()) {
             $ajaxParams = $request->request->all();
-            $ajaxParams['startDate'] = $this->getParamDate($params, 'startDate');
-            $ajaxParams['endDate'] = $this->getParamDate($params, 'endDate');
+            $ajaxParams['startDate'] = $params['startDate'] ?? '';
+            $ajaxParams['endDate'] = $params['endDate'] ?? '';
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
             $sortColumns = $onSiteDetailsReportingService::$incentiveSortColumns;
             $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];

@@ -140,6 +140,11 @@ class OnSiteDetailsReportingService
         $rdrParams['site'] = $siteId;
         $rdrParams['_count'] = $params['length'] ?? 10;
         $rdrParams['_offset'] = $params['start'] ?? 0;
+
+        if (!empty($params['participantId'])) {
+            $rdrParams['participantId'] = substr($params['participantId'], 1);
+        }
+
         if (!empty($params['order'][0])) {
             $sortColumnIndex = $params['order'][0]['column'];
             $sortColumnName = self::$idVerificationSortColumns[$sortColumnIndex];
@@ -148,6 +153,16 @@ class OnSiteDetailsReportingService
                 $rdrParams['_sort'] = $sortColumnName;
             } else {
                 $rdrParams['_sort:desc'] = $sortColumnName;
+            }
+        }
+
+        if (!empty($params['startDate']) || !empty($params['endDate'])) {
+            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
+            if (!empty($params['startDate'])) {
+                $rdrParams .= '&onsiteIdVerificationTime=gt' . $params['startDate'];
+            }
+            if (!empty($params['endDate'])) {
+                $rdrParams .= '&onsiteIdVerificationTime=lt' . $params['endDate'];
             }
         }
         $participantSummaries = $this->participantSummaryService->listWorkQueueParticipantSummaries($rdrParams);
