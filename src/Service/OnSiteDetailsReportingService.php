@@ -54,6 +54,14 @@ class OnSiteDetailsReportingService
         'i.notes'
     ];
 
+    public static $idVerificationSortColumns = [
+        'onsiteIdVerificationTime',
+        'participantId',
+        'onsiteIdVerificationUser',
+        'onsiteIdVerificationType',
+        'onsiteIdVerificationVisitType'
+    ];
+
     public function __construct(ParticipantSummaryService $participantSummaryService)
     {
         $this->participantSummaryService = $participantSummaryService;
@@ -132,6 +140,16 @@ class OnSiteDetailsReportingService
         $rdrParams['site'] = $siteId;
         $rdrParams['_count'] = $params['length'] ?? 10;
         $rdrParams['_offset'] = $params['start'] ?? 0;
+        if (!empty($params['order'][0])) {
+            $sortColumnIndex = $params['order'][0]['column'];
+            $sortColumnName = self::$idVerificationSortColumns[$sortColumnIndex];
+            $sortDir = $params['order'][0]['dir'];
+            if ($sortDir === 'asc') {
+                $rdrParams['_sort'] = $sortColumnName;
+            } else {
+                $rdrParams['_sort:desc'] = $sortColumnName;
+            }
+        }
         $participantSummaries = $this->participantSummaryService->listWorkQueueParticipantSummaries($rdrParams);
         $rows = [];
         foreach ($participantSummaries as $participantSummary) {
