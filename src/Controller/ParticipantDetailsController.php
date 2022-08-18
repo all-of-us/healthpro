@@ -46,6 +46,8 @@ class ParticipantDetailsController extends BaseController
         'consentForElectronicHealthRecords' => 'consentForElectronicHealthRecordsFilePath',
         'consentForGenomicsROR' => 'consentForGenomicsRORFilePath',
         'consentForCABoR' => 'consentForCABoRFilePath',
+        'reconsentForStudyEnrollmentAuthored' => 'reconsentForStudyEnrollementFilePath',
+        'reconsentForElectronicHealthRecordsAuthored' => 'rconsentForElectronicHealthRecordsFilePath'
     ];
 
     /**

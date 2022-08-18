@@ -37,7 +37,11 @@ class WorkQueueTest extends TestCase
             'Apple EHR Consent',
             'Apple EHR Consent Date',
             'Consent Cohort',
-            'Language of Primary Consent'
+            'Language of Primary Consent',
+            'Date of First Primary Consent',
+            'Date of First EHR Consent',
+            'Date of Primary Re-Consent',
+            'Date of EHR Re-Consent'
         ], $exportHeaders);
     }
 
@@ -60,10 +64,12 @@ class WorkQueueTest extends TestCase
             'Date of Death',
             'Date of Death Approval',
             'Consent Cohort',
+            'Date of First Primary Consent',
             'Primary Consent Status',
             'Primary Consent Date',
             'Program Update',
             'Date of Program Update',
+            'Date of First EHR Consent',
             'EHR Consent Status',
             'EHR Consent Date',
             'gRoR Consent Status',
@@ -77,7 +83,9 @@ class WorkQueueTest extends TestCase
             'Physical Measurements Completion Date',
             'Samples to Isolate DNA',
             'Baseline Samples',
-            'Core Participant Minus PM Date'
+            'Core Participant Minus PM Date',
+            'Date of Primary Re-Consent',
+            'Date of EHR Re-Consent'
         ], $exportHeaders);
     }
 
@@ -140,10 +148,12 @@ class WorkQueueTest extends TestCase
             'Date of Death',
             'Date of Death Approval',
             'Consent Cohort',
+            'Date of First Primary Consent',
             'Primary Consent Status',
             'Primary Consent Date',
             'Program Update',
             'Date of Program Update',
+            'Date of First EHR Consent',
             'EHR Consent Status',
             'EHR Consent Date',
             'EHR Expiration Status',
@@ -157,7 +167,9 @@ class WorkQueueTest extends TestCase
             'Patient Status: No',
             'Patient Status: No Access',
             'Patient Status: Unknown',
-            'Core Participant Minus PM Date'
+            'Core Participant Minus PM Date',
+            'Date of Primary Re-Consent',
+            'Date of EHR Re-Consent'
         ], $exportHeaders);
     }
 

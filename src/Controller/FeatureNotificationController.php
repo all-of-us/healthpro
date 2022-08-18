@@ -26,7 +26,7 @@ class FeatureNotificationController extends BaseController
      */
     public function index()
     {
-        $featureNotifications = $this->em->getRepository(FeatureNotification::class)->findBy([], ['id' => 'asc']);
+        $featureNotifications = $this->em->getRepository(FeatureNotification::class)->findAll();
         return $this->render('featurenotification/index.html.twig', [
             'notifications' => $featureNotifications,
         ]);

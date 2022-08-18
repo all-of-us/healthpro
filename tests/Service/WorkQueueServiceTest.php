@@ -27,8 +27,8 @@ class WorkQueueServiceTest extends ServiceTestCase
         $this->assertMatchesRegularExpression('/<a href=".*P100000001.*>LN1/', $row1['lastName']);
         $this->assertSame('01/01/1990', $row1['dateOfBirth']);
         $this->assertSame('P100000001', $row1['participantId']);
-        $this->assertStringContainsString('11/3/2021 2:08 pm (Consented Yes)', $row1['primaryConsent']);
-        $this->assertStringContainsString('11/3/2021 2:08 pm (Consented Yes)', $row1['ehrConsent']);
+        $this->assertStringContainsString('8/3/2022 3:00 pm (Consented Yes)', $row1['primaryConsent']);
+        $this->assertStringContainsString('8/3/2022 3:00 pm (Consented Yes)', $row1['ehrConsent']);
         $this->assertStringContainsString('Active', $row1['ehrConsentExpireStatus']);
         $this->assertStringContainsString('(Consent Not Completed)', $row1['dvEhrStatus']);
         $this->assertSame('Cohort 3', $row1['consentCohort']);
@@ -114,7 +114,11 @@ class WorkQueueServiceTest extends ServiceTestCase
             0,
             '',
             'Cohort 3',
-            'English'
+            'English',
+            '11/3/2021 2:08 pm',
+            '11/3/2021 2:08 pm',
+            '8/3/2022 3:00 pm',
+            '8/3/2022 3:00 pm'
         ], $row);
     }
 
@@ -261,7 +265,9 @@ class WorkQueueServiceTest extends ServiceTestCase
             '7/26/2022 3:00 pm',
             '7/22/2022',
             1,
-            '8/1/2022'
+            '8/1/2022',
+            '8/3/2022 3:00 pm',
+            '8/3/2022 3:00 pm'
         ], $row);
     }
 
@@ -285,10 +291,12 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             'Cohort 3',
+            '11/3/2021 2:08 pm',
             1,
             '11/3/2021 2:08 pm',
             0,
             '',
+            '11/3/2021 2:08 pm',
             1,
             '11/3/2021 2:08 pm',
             1,
@@ -302,7 +310,9 @@ class WorkQueueServiceTest extends ServiceTestCase
             '11/3/2021',
             '0',
             0,
-            ''
+            '',
+            '8/3/2022 3:00 pm',
+            '8/3/2022 3:00 pm'
         ], $row);
     }
 
