@@ -189,3 +189,13 @@
         {{ key }}
     {% endfor %}
 {% endmacro %}
+
+{% macro displayFlashMessage(type) %}
+    {% for flashMessage in app.session.flashbag.get(type ~ '-error') %}
+        <div class="alert alert-danger well-sm text-center">{{ flashMessage }}</div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get(type ~ '-success') %}
+        <div class="alert alert-success well-sm text-center">{{ flashMessage }}</div>
+    {% endfor %}
+{% endmacro %}
+
