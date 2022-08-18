@@ -13,7 +13,7 @@ $(document).ready(function () {
         return confirm('Are you sure you want to delete this notification?');
     });
     $('table').DataTable({
-        order: [[0, 'asc']],
+        order: [[0, 'desc']],
         pageLength: 25
     });
 });

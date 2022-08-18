@@ -517,13 +517,13 @@ class WorkQueueController extends BaseController
     }
 
     /**
-     * @Route("/participant/{id}/consent-histories", name="workqueue_consent_histories")
+     * @Route("/participant/{id}/consent-histories/{type}", name="workqueue_consent_histories")
      */
-    public function consentHistories($id, Request $request, ParticipantSummaryService $participantSummaryService)
+    public function consentHistories($id, $type, ParticipantSummaryService $participantSummaryService)
     {
         $participant = $participantSummaryService->getParticipantById($id);
         return $this->render('workqueue/partials/consent-modal.html.twig', [
-            'consentType' => $request->query->get('type'),
+            'consentType' => $type,
             'participant' => $participant,
             'consentStatusDisplayText' => WorkQueue::$consentStatusDisplayText
         ]);

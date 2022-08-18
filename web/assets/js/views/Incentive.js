@@ -83,11 +83,17 @@ $(document).ready(function () {
         $('[href="#on_site_details"]').tab('show');
     }
 
+    let hasIncentives = $('#incentive_create').data('has-incentives');
+
     $('#incentive_cancel').on('click', function () {
-        var incentiveFormSelector = $('#incentive_create .incentive-form');
+        let incentiveFormSelector = $('#incentive_create .incentive-form');
         incentiveFormSelector[0].reset();
         showHideIncentiveFormFields();
         incentiveFormSelector.parsley().reset();
+        if (hasIncentives) {
+            $('#incentives-data-box').show();
+            $('#incentives-form-box').hide();
+        }
     });
 
     $(".incentive-amend").on('click', function () {
@@ -151,4 +157,14 @@ $(document).ready(function () {
 
     setIncentiveDateGiven();
     handleGiftCardAutoPopulate();
+
+    if (hasIncentives) {
+        $('#incentives-data-box').show();
+        $('#incentives-form-box').hide();
+    }
+
+    $('.btn-incentive-add-new').on('click', function () {
+        $('#incentives-data-box').hide();
+        $('#incentives-form-box').show();
+    });
 });
