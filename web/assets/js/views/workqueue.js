@@ -62,7 +62,7 @@ $(document).ready(function() {
             url: url,
             type: "POST"
         },
-        order: [[12, 'desc']],
+        order: [[11, 'desc']],
         dom: 'lBrtip',
         columns: tableColumns,
         pageLength: 25,
