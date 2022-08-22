@@ -31,7 +31,8 @@
                         </a>
                     </strong>
                 </p>
-                <p>{{ notification.message|length > 125 ? notification.message|slice(0, 125) ~ '...' : notification.message  }}</p>
+                {% set notificationMessage = notification.message|length > 125 ? notification.message|slice(0, 125) ~ '...' : notification.message %}
+                <p>{{ notificationMessage|nl2br  }}</p>
             </div>
             <div class="col-sm-2">
                 {{ notification.createdTs|date('n/j/Y', app.user.timezone) }}
