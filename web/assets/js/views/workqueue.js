@@ -329,4 +329,8 @@ $(document).ready(function() {
         }
         $.get(columnsUrl, params);
     });
+
+    $('#save_view').on( 'click', function () {
+        $('#save_view_modal').modal('show');
+    });
 });

@@ -1,6 +1,10 @@
 <div class="page-header">
     <h2><i class="fa fa-table" aria-hidden="true"></i> Work Queues</h2>
 </div>
+<div class="text-right">
+    <button class="btn btn-success btn-xs" id="save_view">Save View</button>
+    <button class="btn btn-default btn-xs" id="manage_views">Manage Views</button>
+</div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
     <li role="presentation" {% if current_route == 'workqueue_index' %}class="active"{% endif %}><a href="{{ path('workqueue_index') }}">Participant Work Queue</a></li>

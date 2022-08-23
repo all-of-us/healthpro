@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Entity\Problem;
 use App\Form\WorkQueueParticipantLookupIdType;
 use App\Form\WorkQueueParticipantLookupSearchType;
+use App\Form\WorkQueueSaveViewType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -131,6 +132,8 @@ class WorkQueueController extends BaseController
             $advancedFilters['Pairing'] = array_merge($advancedFilters['Pairing'], $organizationsList);
         }
 
+        $saveViewForm = $this->createForm(WorkQueueSaveViewType::class);
+
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
@@ -168,7 +171,8 @@ class WorkQueueController extends BaseController
                 'columnsDef' => WorkQueue::$columnsDef,
                 'filterIcons' => WorkQueue::$filterIcons,
                 'columnGroups' => WorkQueue::$columnGroups,
-                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters)
+                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
+                'saveViewForm' => $saveViewForm->createView()
             ]);
         }
     }
