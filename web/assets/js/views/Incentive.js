@@ -55,6 +55,7 @@ $(document).ready(function () {
                 $(incentiveAmountSelector).attr('required', 'required');
             }
         }
+        $(idPrefix +' .incentive-form').parsley().reset();
     };
 
     var showHideIncentiveFormFields = function (idPrefix = '#incentive_create') {
@@ -66,7 +67,6 @@ $(document).ready(function () {
         });
 
         incentiveFormSelect.change(function () {
-            toggleFormFieldsRequired(idPrefix);
             handleIncentiveFormFields(this, idPrefix);
         });
 
