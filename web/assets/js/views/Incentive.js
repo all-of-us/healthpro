@@ -16,6 +16,12 @@ $(document).ready(function () {
             $(idPrefix + ' input, select, textarea').not('.incentive-date-given').removeAttr('required');
         } else {
             $(idPrefix + ' .toggle-required').attr('required', 'required');
+            // For promotional item remove required attribute for amount field
+            let incentiveTypeSelector = idPrefix + ' #' + incentivePrefix + 'incentive_type';
+            if ($(incentiveTypeSelector).val() === 'promotional') {
+                let incentiveAmountSelector = idPrefix + ' #' + incentivePrefix + 'incentive_amount';
+                $(incentiveAmountSelector).removeAttr('required');
+            }
         }
         $(idPrefix +' .incentive-form').parsley().reset();
     };
