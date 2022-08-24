@@ -173,7 +173,8 @@ class WorkQueueController extends BaseController
                 'filterIcons' => WorkQueue::$filterIcons,
                 'columnGroups' => WorkQueue::$columnGroups,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
-                'workQueueViewForm' => $workQueueViewForm->createView()
+                'workQueueViewForm' => $workQueueViewForm->createView(),
+                'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' => $this->getUserEntity()])
             ]);
         }
     }
@@ -537,7 +538,7 @@ class WorkQueueController extends BaseController
     /**
      * @Route("/view/{id}", name="workqueue_view", defaults={"id": null})
      */
-    public function workQueueViewAction($id, Request $request, EntityManagerInterface $em)
+    public function workQueueViewAction($id, Request $request)
     {
         if ($id) {
             $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($id);
@@ -558,8 +559,8 @@ class WorkQueueController extends BaseController
                     $workQueueView->setUser($this->getUserEntity());
                     $workQueueView->setType('main');
                     $workQueueView->setCreatedTs(new \DateTime());
-                    $em->persist($workQueueView);
-                    $em->flush();
+                    $this->em->persist($workQueueView);
+                    $this->em->flush();
                     $this->addFlash('success', 'WorkQueue View Saved');
                 }
             } else {

@@ -135,10 +135,12 @@
     <br>
     {% include 'workqueue/partials/consent-modal-placeholder.html.twig' %}
     {% include 'workqueue/partials/save-view-modal-placeholder.html.twig' %}
+    {% include 'workqueue/partials/manage-views-modal.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}
     {{ encore_entry_script_tags('workqueue') }}
     {{ encore_entry_script_tags('workqueue-filters') }}
+    {{ encore_entry_script_tags('workqueue-views') }}
     {{ encore_entry_script_tags('export-warning-modal') }}
 {% endblock %}

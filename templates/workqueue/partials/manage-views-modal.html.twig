@@ -1,0 +1,46 @@
+<div class="modal fade" id="manage_views_modal" tabindex="-1" role="dialog" aria-labelledby="manage_views_modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pmi-x-out hidden"><span>&times;</span></button>
+                <h4 class="modal-title"><i class="fa fa-save"></i> Manage Views</h4>
+            </div>
+            <div class="modal-body">
+                <h5>My Views</h5>
+                <table class="table table-small">
+                    <thead>
+                    <tr>
+                        <td></td>
+                        <td>Edit</td>
+                        <td>Delete</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for workQueueView in workQueueViews %}
+                        <tr>
+                            <td>
+                                {{ workQueueView.name }}
+                            </td>
+                            <td>
+                                <i class="fa fa-edit wq-view-edit" aria-hidden="true"
+                                   data-href="{{ path('workqueue_view', { id: workQueueView.id }) }}"
+                                   data-type="edit" role="button"></i>
+                            </td>
+                            <td>
+                                <i class="fa fa-trash wq-view-delete" aria-hidden="true"
+                                   data-id="{{ workQueueView.id }}" data-type="remove" role="button"></i>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <h5>Other Views</h5>
+                <p>Participant Work Queue</p>
+                <p>Participant Consents</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
