@@ -3,9 +3,10 @@
     <h4 class="modal-title"><i class="fa fa-save"></i> Save View</h4>
 </div>
 <div class="modal-body">
-    {{ form_start(saveViewForm) }}
-    {{ form_rest(saveViewForm) }}
-    <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+    {% set actionUrl = workQueueViewId is defined ? path('workqueue_view', { id: workQueueViewId }) : path('workqueue_view') %}
+    {{ form_start(workQueueViewForm, { attr: { action: actionUrl } }) }}
+    {{ form_rest(workQueueViewForm) }}
+    <button type="submit" class="btn btn-primary">Save</button>
     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-    {{ form_end(saveViewForm) }}
+    {{ form_end(workQueueViewForm) }}
 </div>

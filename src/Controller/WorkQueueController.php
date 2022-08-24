@@ -5,9 +5,10 @@ namespace App\Controller;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Problem;
+use App\Entity\WorkqueueView;
 use App\Form\WorkQueueParticipantLookupIdType;
 use App\Form\WorkQueueParticipantLookupSearchType;
-use App\Form\WorkQueueSaveViewType;
+use App\Form\WorkQueueViewType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -132,7 +133,7 @@ class WorkQueueController extends BaseController
             $advancedFilters['Pairing'] = array_merge($advancedFilters['Pairing'], $organizationsList);
         }
 
-        $saveViewForm = $this->createForm(WorkQueueSaveViewType::class);
+        $workQueueViewForm = $this->createForm(WorkQueueViewType::class);
 
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
@@ -172,7 +173,7 @@ class WorkQueueController extends BaseController
                 'filterIcons' => WorkQueue::$filterIcons,
                 'columnGroups' => WorkQueue::$columnGroups,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
-                'saveViewForm' => $saveViewForm->createView()
+                'workQueueViewForm' => $workQueueViewForm->createView()
             ]);
         }
     }
@@ -530,6 +531,45 @@ class WorkQueueController extends BaseController
             'consentType' => $type,
             'participant' => $participant,
             'consentStatusDisplayText' => WorkQueue::$consentStatusDisplayText
+        ]);
+    }
+
+    /**
+     * @Route("/view/{id}", name="workqueue_view", defaults={"id": null})
+     */
+    public function workQueueViewAction($id, Request $request, EntityManagerInterface $em)
+    {
+        if ($id) {
+            $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($id);
+            if (!$workQueueView) {
+                throw $this->createNotFoundException('WorkQueue view not found.');
+            }
+        } else {
+            $workQueueView = new WorkqueueView();
+        }
+
+        $workQueueViewForm = $this->createForm(WorkQueueViewType::class, $workQueueView);
+        $workQueueViewForm->handleRequest($request);
+        if ($workQueueViewForm->isSubmitted()) {
+            if ($workQueueViewForm->isValid()) {
+                if ($id) {
+                    $this->addFlash('success', 'WorkQueue View Updated');
+                } else {
+                    $workQueueView->setUser($this->getUserEntity());
+                    $workQueueView->setType('main');
+                    $workQueueView->setCreatedTs(new \DateTime());
+                    $em->persist($workQueueView);
+                    $em->flush();
+                    $this->addFlash('success', 'WorkQueue View Saved');
+                }
+            } else {
+                $this->addFlash('error', 'Invalid form');
+            }
+            return $this->redirectToRoute("workqueue_index");
+        }
+
+        return $this->render('workqueue/partials/save-view-modal.html.twig', [
+            'workQueueViewForm' => $workQueueViewForm->createView()
         ]);
     }
 }
