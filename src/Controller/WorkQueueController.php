@@ -588,6 +588,11 @@ class WorkQueueController extends BaseController
                     $workQueueView->setCreatedTs(new \DateTime());
                     $this->addFlash('success', 'WorkQueue View Saved');
                 }
+                $columnType = $workQueueViewForm->get('type')->getData() === 'main' ? 'workQueueColumns' : 'workQueueConsentColumns';
+                $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columnType)));
+                if ($request->query->get('params')) {
+                    $workQueueView->setFilters(json_encode($request->query->get('params')));
+                }
                 $this->em->persist($workQueueView);
                 $this->em->flush();
             } else {
