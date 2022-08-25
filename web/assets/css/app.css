@@ -334,18 +334,25 @@ label.label-normal {
     font-size: 20px;
 }
 
+.view-history-dropdown {
+    padding: 6px 8px;
+    border-radius: 3px;
+    margin: 10px;
+}
+
 .toggle-help-image, .toggle-help-text {
     cursor: pointer;
     color: #337ab7;
 }
 
-.view-details .panel-heading span:before {
+.view-details .panel-heading div:after {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
+    float: right;
     content: "\f107";
 }
 
-.view-details .panel-heading.active span:before {
+.view-details .panel-heading.active div:after {
     content: "\f106";
 }
 
@@ -564,6 +571,23 @@ label.label-normal {
 
 .bg-light {
     background-color: #f8f9fa !important;
+}
+
+.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+.bg-warning-new {
+    background-color: #ffc107 !important;
+}
+
+.badge-light {
+    color: #212529;
+    background-color: #f8f9fa;
+}
+
+.text-white {
+    color: #fff !important
 }
 
 .dropdown-toggle.active {

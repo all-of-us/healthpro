@@ -16,6 +16,12 @@ $(document).ready(function () {
             $(idPrefix + ' input, select, textarea').not('.incentive-date-given').removeAttr('required');
         } else {
             $(idPrefix + ' .toggle-required').attr('required', 'required');
+            // For promotional item remove required attribute for amount field
+            let incentiveTypeSelector = idPrefix + ' #' + incentivePrefix + 'incentive_type';
+            if ($(incentiveTypeSelector).val() === 'promotional') {
+                let incentiveAmountSelector = idPrefix + ' #' + incentivePrefix + 'incentive_amount';
+                $(incentiveAmountSelector).removeAttr('required');
+            }
         }
         $(idPrefix +' .incentive-form').parsley().reset();
     };
@@ -55,6 +61,7 @@ $(document).ready(function () {
                 $(incentiveAmountSelector).attr('required', 'required');
             }
         }
+        $(idPrefix +' .incentive-form').parsley().reset();
     };
 
     var showHideIncentiveFormFields = function (idPrefix = '#incentive_create') {
@@ -67,7 +74,6 @@ $(document).ready(function () {
 
         incentiveFormSelect.change(function () {
             handleIncentiveFormFields(this, idPrefix);
-            toggleFormFieldsRequired(idPrefix);
         });
 
         incentiveFormSelectDeclined.change(function () {
@@ -83,11 +89,17 @@ $(document).ready(function () {
         $('[href="#on_site_details"]').tab('show');
     }
 
+    let hasIncentives = $('#incentive_create').data('has-incentives');
+
     $('#incentive_cancel').on('click', function () {
-        var incentiveFormSelector = $('#incentive_create .incentive-form');
+        let incentiveFormSelector = $('#incentive_create .incentive-form');
         incentiveFormSelector[0].reset();
         showHideIncentiveFormFields();
         incentiveFormSelector.parsley().reset();
+        if (hasIncentives) {
+            $('#incentives-data-box').show();
+            $('#incentives-form-box').hide();
+        }
     });
 
     $(".incentive-amend").on('click', function () {
@@ -151,4 +163,14 @@ $(document).ready(function () {
 
     setIncentiveDateGiven();
     handleGiftCardAutoPopulate();
+
+    if (hasIncentives) {
+        $('#incentives-data-box').show();
+        $('#incentives-form-box').hide();
+    }
+
+    $('.btn-incentive-add-new').on('click', function () {
+        $('#incentives-data-box').hide();
+        $('#incentives-form-box').show();
+    });
 });

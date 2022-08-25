@@ -1,10 +1,10 @@
-<div class="panel-group" id="accordion_org_patient_status_details" role="tablist" aria-multiselectable="true">
-    <div class="panel-heading" role="tab">
-        <h5>
-            <span role="button" data-toggle="collapse" data-parent="#accordion_org_patient_status_detaiils" href="#collapse_org_patient_status_details" aria-expanded="true" aria-controls="collapseOne">
-                View Patient Status Details: Other Organizations
-            </span>
-        </h5>
+<div class="panel-group view-details" id="accordion_org_patient_status_details" role="tablist" aria-multiselectable="true">
+    <div class="panel-heading bg-warning-new view-history-dropdown" role="tab">
+        <div role="button" data-toggle="collapse" data-parent="#accordion_org_patient_status_detaiils"
+             href="#collapse_org_patient_status_details" aria-expanded="true" aria-controls="collapseOne">
+            View Patient Status Details: Other Organizations
+            <span class="badge badge-light">{{ awardeePatientStatusData|length }}</span>
+        </div>
     </div>
     <div id="collapse_org_patient_status_details" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
         <div class="panel-body">

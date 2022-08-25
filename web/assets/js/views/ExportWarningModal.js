@@ -8,7 +8,7 @@ $(document).ready(function () {
         }
         new PmiConfirmModal({
             title: 'Warning',
-            msg: 'Note that the export reaches the limit of ' + exportLimitFormatted + ' participants. If your intent was to capture all participants, you may need to apply filters to ensure each export is less than ' + exportLimitFormatted + ' or utilize the Ops Data API. Please contact <em>sysadmin@pmi-ops.org</em> for more information.',
+            msg: 'Note that the export reaches the limit of ' + exportLimitFormatted + ' participants. If your intent was to capture all participants, you may need to apply filters to ensure each export is less than ' + exportLimitFormatted + ' or utilize the Ops Data API. Please contact <em>drcsupport@pmi-ops.org</em> for more information.',
             isHTML: true,
             onTrue: function () {
                 window.location = location;
