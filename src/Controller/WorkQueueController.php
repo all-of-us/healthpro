@@ -8,6 +8,7 @@ use App\Entity\Problem;
 use App\Entity\WorkqueueView;
 use App\Form\WorkQueueParticipantLookupIdType;
 use App\Form\WorkQueueParticipantLookupSearchType;
+use App\Form\WorkQueueViewDeleteType;
 use App\Form\WorkQueueViewType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
@@ -174,7 +175,9 @@ class WorkQueueController extends BaseController
                 'columnGroups' => WorkQueue::$columnGroups,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
                 'workQueueViewForm' => $workQueueViewForm->createView(),
-                'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' => $this->getUserEntity()])
+                'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
+                    $this->getUserEntity()]),
+                'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
             ]);
         }
     }
@@ -458,7 +461,10 @@ class WorkQueueController extends BaseController
                 'columnsDef' => WorkQueue::$columnsDef,
                 'consentColumns' => WorkQueue::$consentColumns,
                 'filterIcons' => WorkQueue::$filterIcons,
-                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters)
+                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters),
+                'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
+                    $this->getUserEntity()]),
+                'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
             ]);
         }
     }
@@ -533,6 +539,27 @@ class WorkQueueController extends BaseController
             'participant' => $participant,
             'consentStatusDisplayText' => WorkQueue::$consentStatusDisplayText
         ]);
+    }
+
+    /**
+     * @Route("/view/delete", name="workqueue_view_delete")
+     */
+    public function workQueueViewDeleteAction(Request $request)
+    {
+        $workQueueViewDeleteForm = $this->createForm(WorkQueueViewDeleteType::class);
+        $workQueueViewDeleteForm->handleRequest($request);
+        if ($workQueueViewDeleteForm->isSubmitted() && $workQueueViewDeleteForm->isValid()) {
+            $workQueueViewId = $workQueueViewDeleteForm['id']->getData();
+            $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($workQueueViewId);
+            if ($workQueueView) {
+                $this->em->remove($workQueueView);
+                $this->em->flush();
+                $this->addFlash('success', 'WorkQueue View Deleted');
+            } else {
+                $this->addFlash('error', 'Error deleting view. Please try again');
+            }
+        }
+        return $this->redirectToRoute('workqueue_index');
     }
 
     /**
