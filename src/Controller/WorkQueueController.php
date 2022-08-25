@@ -559,10 +559,10 @@ class WorkQueueController extends BaseController
                     $workQueueView->setUser($this->getUserEntity());
                     $workQueueView->setType('main');
                     $workQueueView->setCreatedTs(new \DateTime());
-                    $this->em->persist($workQueueView);
-                    $this->em->flush();
                     $this->addFlash('success', 'WorkQueue View Saved');
                 }
+                $this->em->persist($workQueueView);
+                $this->em->flush();
             } else {
                 $this->addFlash('error', 'Invalid form');
             }
@@ -570,7 +570,8 @@ class WorkQueueController extends BaseController
         }
 
         return $this->render('workqueue/partials/save-view-modal.html.twig', [
-            'workQueueViewForm' => $workQueueViewForm->createView()
+            'workQueueViewForm' => $workQueueViewForm->createView(),
+            'workQueueViewId' => $id
         ]);
     }
 }

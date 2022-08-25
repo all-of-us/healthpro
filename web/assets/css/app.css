@@ -480,6 +480,10 @@ label.label-normal {
     display: block;
 }
 
+.table-borderless td, .table-borderless th {
+    border: none !important;
+}
+
 .dropdown-submenu {
     position: relative;
 }
