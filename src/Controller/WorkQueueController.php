@@ -134,8 +134,6 @@ class WorkQueueController extends BaseController
             $advancedFilters['Pairing'] = array_merge($advancedFilters['Pairing'], $organizationsList);
         }
 
-        $workQueueViewForm = $this->createForm(WorkQueueViewType::class);
-
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = array_merge($params, array_filter($request->request->all()));
@@ -174,7 +172,8 @@ class WorkQueueController extends BaseController
                 'filterIcons' => WorkQueue::$filterIcons,
                 'columnGroups' => WorkQueue::$columnGroups,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
-                'workQueueViewForm' => $workQueueViewForm->createView(),
+                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class, null, ['type' => 'main'])
+                    ->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
                     $this->getUserEntity()]),
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
@@ -462,6 +461,8 @@ class WorkQueueController extends BaseController
                 'consentColumns' => WorkQueue::$consentColumns,
                 'filterIcons' => WorkQueue::$filterIcons,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters),
+                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class, null, ['type' => 'consent'])
+                    ->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
                     $this->getUserEntity()]),
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
@@ -584,7 +585,6 @@ class WorkQueueController extends BaseController
                     $this->addFlash('success', 'WorkQueue View Updated');
                 } else {
                     $workQueueView->setUser($this->getUserEntity());
-                    $workQueueView->setType('main');
                     $workQueueView->setCreatedTs(new \DateTime());
                     $this->addFlash('success', 'WorkQueue View Saved');
                 }
