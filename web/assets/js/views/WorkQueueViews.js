@@ -8,12 +8,12 @@ $(document).ready(function () {
     });
 
     $('.wq-view-edit').on('click', function () {
-        let saveViewFormModal = $('#save_view_modal');
-        let modelContent = $("#save_view_modal .modal-content");
+        let editViewFormModal = $('#edit_view_modal');
+        let modelContent = $("#edit_view_modal .modal-content");
         modelContent.html('');
         // Load data from url
         modelContent.load($(this).data('href'), function () {
-            saveViewFormModal.modal('show');
+            editViewFormModal.modal('show');
         });
     });
 
