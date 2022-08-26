@@ -20,6 +20,11 @@
                         <tr>
                             <td>
                                 {{ workQueueView.name }}
+                                {% if workQueueView.defaultView %}
+                                    <span title="Default View" data-toggle="tooltip">
+                                        <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+                                    </span>
+                                {% endif %}
                             </td>
                             <td>
                                 <i class="fa fa-edit wq-view-edit" aria-hidden="true"
