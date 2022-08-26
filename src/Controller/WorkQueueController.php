@@ -174,7 +174,7 @@ class WorkQueueController extends BaseController
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
                 'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
-                    $this->getUserEntity()]),
+                    $this->getUserEntity()], ['id' => 'desc']),
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
             ]);
         }
@@ -462,7 +462,7 @@ class WorkQueueController extends BaseController
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters),
                 'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
-                    $this->getUserEntity()]),
+                    $this->getUserEntity()], ['id' => 'desc']),
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
             ]);
         }
@@ -606,10 +606,10 @@ class WorkQueueController extends BaseController
             $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_index';
             return $this->redirectToRoute($route);
         }
-
         return $this->render('workqueue/partials/save-view-modal.html.twig', [
             'workQueueViewForm' => $workQueueViewForm->createView(),
-            'workQueueViewId' => $id
+            'workQueueViewId' => $id,
+            'viewType' => $request->query->get('viewType')
         ]);
     }
 }
