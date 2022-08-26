@@ -28,12 +28,12 @@
                             </td>
                             <td>
                                 <i class="fa fa-edit wq-view-edit" aria-hidden="true"
-                                   data-href="{{ path('workqueue_view', { id: workQueueView.id }) }}"
-                                   data-type="edit" role="button"></i>
+                                   data-href="{{ path('workqueue_view', { id: workQueueView.id, viewType: viewType })
+                                   }}" data-type="edit" role="button"></i>
                             </td>
                             <td>
                                 <i class="fa fa-trash wq-view-delete" aria-hidden="true"
-                                   data-id="{{ workQueueView.id }}" data-type="remove" role="button"></i>
+                                   data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
                             </td>
                         </tr>
                     {% endfor %}

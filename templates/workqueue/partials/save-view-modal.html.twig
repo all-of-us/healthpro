@@ -4,8 +4,9 @@
 </div>
 <div class="modal-body">
     {% set queryParams = params is defined ? params : '' %}
-    {% set actionUrl = workQueueViewId is defined ? path('workqueue_view', { id: workQueueViewId, params: queryParams }) :
-        path('workqueue_view', { params: queryParams }) %}
+    {% set actionUrl = workQueueViewId is defined ? path('workqueue_view', { id: workQueueViewId, params:
+        queryParams, viewType: viewType }) :
+        path('workqueue_view', { params: queryParams, viewType: viewType }) %}
     {{ form_start(workQueueViewForm, { attr: { action: actionUrl } }) }}
     {{ form_rest(workQueueViewForm) }}
     <button type="submit" class="btn btn-primary">Save</button>

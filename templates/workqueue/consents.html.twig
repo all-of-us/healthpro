@@ -2,6 +2,7 @@
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% set viewType = 'consent' %}
     {% include 'workqueue/_page_heading.html.twig' %}
 
     {% if isRdrError %}
@@ -61,12 +62,12 @@
             {% include 'partials/workqueue-page-export.html.twig' %}
             <br>
             {% include 'workqueue/partials/consent-modal-placeholder.html.twig' %}
-            {% include 'workqueue/partials/save-view-modal-placeholder.html.twig' %}
-            {% include 'workqueue/partials/edit-view-modal-placeholder.html.twig' %}
-            {% include 'workqueue/partials/manage-views-modal.html.twig' %}
-            {% include 'workqueue/partials/delete-view-modal.html.twig' %}
         </form>
     </div>
+    {% include 'workqueue/partials/save-view-modal-placeholder.html.twig' %}
+    {% include 'workqueue/partials/edit-view-modal-placeholder.html.twig' %}
+    {% include 'workqueue/partials/manage-views-modal.html.twig' %}
+    {% include 'workqueue/partials/delete-view-modal.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}

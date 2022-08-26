@@ -172,8 +172,7 @@ class WorkQueueController extends BaseController
                 'filterIcons' => WorkQueue::$filterIcons,
                 'columnGroups' => WorkQueue::$columnGroups,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
-                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class, null, ['type' => 'main'])
-                    ->createView(),
+                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
                     $this->getUserEntity()]),
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
@@ -461,8 +460,7 @@ class WorkQueueController extends BaseController
                 'consentColumns' => WorkQueue::$consentColumns,
                 'filterIcons' => WorkQueue::$filterIcons,
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters),
-                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class, null, ['type' => 'consent'])
-                    ->createView(),
+                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
                     $this->getUserEntity()]),
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
@@ -560,7 +558,8 @@ class WorkQueueController extends BaseController
                 $this->addFlash('error', 'Error deleting view. Please try again');
             }
         }
-        return $this->redirectToRoute('workqueue_index');
+        $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_index';
+        return $this->redirectToRoute($route);
     }
 
     /**
@@ -586,12 +585,14 @@ class WorkQueueController extends BaseController
                 } else {
                     $workQueueView->setUser($this->getUserEntity());
                     $workQueueView->setCreatedTs(new \DateTime());
+                    $type = $request->query->get('viewType') === 'consent' ? 'consent' : 'main';
+                    $columnType = $type === 'main' ? 'workQueueColumns' : 'workQueueConsentColumns';
+                    $workQueueView->setType($type);
+                    $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columnType)));
+                    if ($request->query->get('params')) {
+                        $workQueueView->setFilters(json_encode($request->query->get('params')));
+                    }
                     $this->addFlash('success', 'WorkQueue View Saved');
-                }
-                $columnType = $workQueueViewForm->get('type')->getData() === 'main' ? 'workQueueColumns' : 'workQueueConsentColumns';
-                $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columnType)));
-                if ($request->query->get('params')) {
-                    $workQueueView->setFilters(json_encode($request->query->get('params')));
                 }
                 $this->em->persist($workQueueView);
                 $this->em->flush();
@@ -602,7 +603,8 @@ class WorkQueueController extends BaseController
             } else {
                 $this->addFlash('error', 'Invalid form');
             }
-            return $this->redirectToRoute("workqueue_index");
+            $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_index';
+            return $this->redirectToRoute($route);
         }
 
         return $this->render('workqueue/partials/save-view-modal.html.twig', [
