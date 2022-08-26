@@ -26,7 +26,7 @@ class WorkQueueViewType extends AbstractType
                 'required' => false
             ])
             ->add('type', Type\HiddenType::class, [
-                'data' => $options['type']
+                'data' => $options['type'] ?? $builder->getData()->getType()
             ]);
     }
 
