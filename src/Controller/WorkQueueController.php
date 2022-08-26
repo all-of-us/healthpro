@@ -595,6 +595,10 @@ class WorkQueueController extends BaseController
                 }
                 $this->em->persist($workQueueView);
                 $this->em->flush();
+                if ($workQueueViewForm->get('defaultView')->getData()) {
+                    $this->em->getRepository(WorkqueueView::class)->updateDefaultView($workQueueView->getId(),
+                        $this->getUserEntity());
+                }
             } else {
                 $this->addFlash('error', 'Invalid form');
             }
