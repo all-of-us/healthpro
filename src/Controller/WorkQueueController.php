@@ -541,7 +541,7 @@ class WorkQueueController extends BaseController
     }
 
     /**
-     * @Route("/view/delete", name="workqueue_view_delete")
+     * @Route("/view/delete", name="workqueue_view_delete", methods={"POST"})
      */
     public function workQueueViewDeleteAction(Request $request)
     {
