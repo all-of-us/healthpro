@@ -484,6 +484,10 @@ label.label-normal {
     border: none !important;
 }
 
+.table-manage-views {
+    width: auto !important;
+}
+
 .dropdown-submenu {
     position: relative;
 }
