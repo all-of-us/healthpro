@@ -153,6 +153,10 @@ class WorkQueueController extends BaseController
             if (!$this->requestStack->getSession()->has('workQueueColumns')) {
                 $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
             }
+            // Unset view id
+            if (isset($params['viewId'])) {
+                unset($params['viewId']);
+            }
             return $this->render('workqueue/index.html.twig', [
                 'filters' => $filters,
                 'advancedFilters' => $advancedFilters,
