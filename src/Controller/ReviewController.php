@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ReviewController extends BaseController
 {
-    public const DATE_RANGE_LIMIT = 7;
+    public const DATE_RANGE_LIMIT = 30;
 
     protected $participantSummaryService;
 
@@ -68,7 +68,7 @@ class ReviewController extends BaseController
                     $endDate = $todayFilterForm->get('end_date')->getData();
                     // Check date range
                     if ($startDate->diff($endDate)->days >= self::DATE_RANGE_LIMIT) {
-                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 7 days'));
+                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 30 days'));
                     }
                     $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
                 } else {
