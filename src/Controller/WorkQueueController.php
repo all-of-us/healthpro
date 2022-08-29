@@ -553,7 +553,7 @@ class WorkQueueController extends BaseController
             if ($workQueueView) {
                 $this->em->remove($workQueueView);
                 $this->em->flush();
-                $this->addFlash('success', 'WorkQueue View Deleted');
+                $this->addFlash('success', 'Work Queue view deleted');
             } else {
                 $this->addFlash('error', 'Error deleting view. Please try again');
             }
@@ -570,7 +570,7 @@ class WorkQueueController extends BaseController
         if ($id) {
             $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($id);
             if (!$workQueueView) {
-                throw $this->createNotFoundException('WorkQueue view not found.');
+                throw $this->createNotFoundException('Work Queue view not found.');
             }
         } else {
             $workQueueView = new WorkqueueView();
@@ -581,7 +581,7 @@ class WorkQueueController extends BaseController
         if ($workQueueViewForm->isSubmitted()) {
             if ($workQueueViewForm->isValid()) {
                 if ($id) {
-                    $this->addFlash('success', 'WorkQueue View Updated');
+                    $this->addFlash('success', 'Work Queue view updated');
                 } else {
                     $workQueueView->setUser($this->getUserEntity());
                     $workQueueView->setCreatedTs(new \DateTime());
@@ -592,7 +592,7 @@ class WorkQueueController extends BaseController
                     if ($request->query->get('params')) {
                         $workQueueView->setFilters(json_encode($request->query->get('params')));
                     }
-                    $this->addFlash('success', 'WorkQueue View Saved');
+                    $this->addFlash('success', 'Work Queue view saved');
                 }
                 $this->em->persist($workQueueView);
                 $this->em->flush();
