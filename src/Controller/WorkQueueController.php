@@ -50,8 +50,9 @@ class WorkQueueController extends BaseController
 
     /**
      * @Route("/", name="workqueue_index")
+     * @Route("/customized-view/{viewId}", name="workqueue_customized_view")
      */
-    public function index(Request $request)
+    public function index(Request $request, $viewId = null)
     {
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
@@ -152,10 +153,6 @@ class WorkQueueController extends BaseController
         } else {
             if (!$this->requestStack->getSession()->has('workQueueColumns')) {
                 $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
-            }
-            // Unset view id
-            if (isset($params['viewId'])) {
-                unset($params['viewId']);
             }
             return $this->render('workqueue/index.html.twig', [
                 'filters' => $filters,

@@ -7,7 +7,7 @@
 </div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
-    {% set viewId = app.request.query.get('viewId') %}
+    {% set viewId = app.request.get('viewId') %}
     <li role="presentation" {% if current_route == 'workqueue_index' and viewId is empty %}class="active"{% endif %}>
         <a href="{{ path('workqueue_index') }}">Participant Work Queue</a>
     </li>
@@ -16,7 +16,10 @@
     </li>
     {% for workQueueView in workQueueViews %}
         <li role="presentation" {% if viewId == workQueueView.id %}class="active"{% endif %}>
-            <a href="{{ path('workqueue_index', { viewId: workQueueView.id }) }}">{{ workQueueView.name }}</a>
+            {% set queryParms = workQueueView.filtersQueryParams ? '?' ~ workQueueView.filtersQueryParams : '' %}
+            <a href="{{ path('workqueue_customized_view', { viewId: workQueueView.id }) ~ queryParms }}">
+                {{ workQueueView.name }}
+            </a>
         </li>
     {% endfor %}
 </ul>
