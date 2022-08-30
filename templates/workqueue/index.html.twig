@@ -2,13 +2,8 @@
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% if displayParticipantConsentsTab %}
-        {% include 'workqueue/_page_heading.html.twig' %}
-    {% else %}
-        <div class="page-header">
-            <h2><i class="fa fa-table" aria-hidden="true"></i> Participant Work Queue</h2>
-        </div>
-    {% endif %}
+    {% set viewType = 'main' %}
+    {% include 'workqueue/_page_heading.html.twig' %}
 
     {% if isRdrError %}
         <div class="alert alert-danger">
@@ -140,10 +135,15 @@
     {% include 'partials/workqueue-page-export.html.twig' %}
     <br>
     {% include 'workqueue/partials/consent-modal-placeholder.html.twig' %}
+    {% include 'workqueue/partials/save-view-modal-placeholder.html.twig' %}
+    {% include 'workqueue/partials/edit-view-modal-placeholder.html.twig' %}
+    {% include 'workqueue/partials/manage-views-modal.html.twig' %}
+    {% include 'workqueue/partials/delete-view-modal.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}
     {{ encore_entry_script_tags('workqueue') }}
     {{ encore_entry_script_tags('workqueue-filters') }}
+    {{ encore_entry_script_tags('workqueue-views') }}
     {{ encore_entry_script_tags('export-warning-modal') }}
 {% endblock %}
