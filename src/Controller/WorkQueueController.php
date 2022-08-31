@@ -54,6 +54,15 @@ class WorkQueueController extends BaseController
      */
     public function index(Request $request, $viewId = null)
     {
+        if ($viewId) {
+            $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
+                'user' => $this->getUserEntity(),
+                'id' => $viewId
+            ]);
+            if ($workQueueView === null) {
+                return $this->createAccessDeniedException();
+            }
+        }
         if ($this->isGranted('ROLE_USER')) {
             $awardee = $this->siteService->getSiteAwardee();
         }
@@ -153,6 +162,10 @@ class WorkQueueController extends BaseController
         } else {
             if (!$this->requestStack->getSession()->has('workQueueColumns')) {
                 $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            }
+            if ($viewId) {
+                $workQueueViewColumns = json_decode($workQueueView->getColumns(), true);
+                $this->requestStack->getSession()->set('workQueueColumns', $workQueueViewColumns);
             }
             return $this->render('workqueue/index.html.twig', [
                 'filters' => $filters,
