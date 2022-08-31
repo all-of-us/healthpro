@@ -19,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Helper\WorkQueue;
@@ -52,7 +53,26 @@ class WorkQueueController extends BaseController
      * @Route("/", name="workqueue_index")
      * @Route("/customized-view/{viewId}", name="workqueue_customized_view")
      */
-    public function index(Request $request, $viewId = null)
+    public function index(): Response
+    {
+        $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
+            'user' => $this->getUserEntity(),
+            'defaultView' => 1
+        ]);
+
+        if ($workQueueView) {
+            $redirectUrl = $this->generateUrl('workqueue_customized_view', [
+                    'viewId' => $workQueueView->getId()]) . '?' . $workQueueView->getFiltersQueryParams();
+            return $this->redirect($redirectUrl);
+        }
+        return $this->redirectToRoute('workqueue_main');
+    }
+
+    /**
+     * @Route("/main", name="workqueue_main")
+     * @Route("/customized-view/{viewId}", name="workqueue_customized_view")
+     */
+    public function mainAction(Request $request, $viewId = null): Response
     {
         if ($viewId) {
             $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
@@ -60,7 +80,7 @@ class WorkQueueController extends BaseController
                 'id' => $viewId
             ]);
             if ($workQueueView === null) {
-                return $this->createAccessDeniedException();
+                throw $this->createAccessDeniedException();
             }
         }
         if ($this->isGranted('ROLE_USER')) {
@@ -83,7 +103,7 @@ class WorkQueueController extends BaseController
         }
         if ($request->query->has('reset')) {
             $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
-            return $this->redirectToRoute('workqueue_index');
+            return $this->redirectToRoute('workqueue_main');
         }
 
         $params = array_filter($request->query->all());
@@ -557,7 +577,7 @@ class WorkQueueController extends BaseController
     /**
      * @Route("/view/delete", name="workqueue_view_delete", methods={"POST"})
      */
-    public function workQueueViewDeleteAction(Request $request)
+    public function workQueueViewDeleteAction(Request $request): Response
     {
         $workQueueViewDeleteForm = $this->createForm(WorkQueueViewDeleteType::class);
         $workQueueViewDeleteForm->handleRequest($request);
@@ -572,14 +592,14 @@ class WorkQueueController extends BaseController
                 $this->addFlash('error', 'Error deleting view. Please try again');
             }
         }
-        $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_index';
+        $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_main';
         return $this->redirectToRoute($route);
     }
 
     /**
      * @Route("/view/{id}", name="workqueue_view", defaults={"id": null})
      */
-    public function workQueueViewAction($id, Request $request)
+    public function workQueueViewAction($id, Request $request): Response
     {
         if ($id) {
             $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($id);
@@ -624,7 +644,7 @@ class WorkQueueController extends BaseController
             } else {
                 $this->addFlash('error', 'Invalid form');
             }
-            $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_index';
+            $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_main';
             return $this->redirectToRoute($route);
         }
         return $this->render('workqueue/partials/save-view-modal.html.twig', [

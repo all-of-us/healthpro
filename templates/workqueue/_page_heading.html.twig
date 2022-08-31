@@ -10,8 +10,8 @@
 </div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
-    <li role="presentation" {% if current_route == 'workqueue_index' and viewId is empty %}class="active"{% endif %}>
-        <a href="{{ path('workqueue_index') }}">Participant Work Queue</a>
+    <li role="presentation" {% if current_route == 'workqueue_main' and viewId is empty %}class="active"{% endif %}>
+        <a href="{{ path('workqueue_main') }}">Participant Work Queue</a>
     </li>
     <li role="presentation" {% if current_route == 'workqueue_consents' and viewId is empty %}class="active"{% endif %}>
         <a href="{{ path('workqueue_consents') }}">Participant Consents</a>
