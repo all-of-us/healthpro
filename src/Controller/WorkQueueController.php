@@ -595,6 +595,8 @@ class WorkQueueController extends BaseController
         if ($workQueueViewForm->isSubmitted()) {
             if ($workQueueViewForm->isValid()) {
                 if ($id) {
+                    $this->em->persist($workQueueView);
+                    $this->em->flush();
                     $this->addFlash('success', 'Work Queue view updated');
                 } else {
                     $workQueueView->setUser($this->getUserEntity());
@@ -606,10 +608,13 @@ class WorkQueueController extends BaseController
                     if ($request->query->get('params')) {
                         $workQueueView->setFilters(json_encode($request->query->get('params')));
                     }
+                    $this->em->persist($workQueueView);
+                    $this->em->flush();
                     $this->addFlash('success', 'Work Queue view saved');
+                    $redirectUrl = $this->generateUrl('workqueue_customized_view', [
+                            'viewId' => $workQueueView->getId()]) . '?' . $workQueueView->getFiltersQueryParams();
+                    return $this->redirect($redirectUrl);
                 }
-                $this->em->persist($workQueueView);
-                $this->em->flush();
                 if ($workQueueViewForm->get('defaultView')->getData()) {
                     $this->em->getRepository(WorkqueueView::class)->updateDefaultView(
                         $workQueueView->getId(),
