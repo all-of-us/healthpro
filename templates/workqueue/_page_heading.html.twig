@@ -16,13 +16,28 @@
     <li role="presentation" {% if current_route == 'workqueue_consents' and viewId is empty %}class="active"{% endif %}>
         <a href="{{ path('workqueue_consents') }}">Participant Consents</a>
     </li>
-    {% for workQueueView in workQueueViews %}
-        <li role="presentation" {% if viewId == workQueueView.id %}class="active"{% endif %}>
-            {% set queryParms = workQueueView.filtersQueryParams ? '?' ~ workQueueView.filtersQueryParams : '' %}
-            <a href="{{ path('workqueue_customized_view', { viewId: workQueueView.id }) ~ queryParms }}">
-                {{ workQueueView.name }}
-            </a>
-        </li>
+    {% for key, workQueueView in workQueueViews %}
+        {% set queryParms = workQueueView.filtersQueryParams ? '?' ~ workQueueView.filtersQueryParams : '' %}
+        {% set viewPath = path('workqueue_customized_view', { viewId: workQueueView.id }) ~ queryParms %}
+        {% if key < 6 %}
+            <li role="presentation" {% if viewId == workQueueView.id %}class="active"{% endif %}>
+                <a href="{{ viewPath }}">{{ workQueueView.name }}</a>
+            </li>
+        {% else %}
+            {% if key == 6 %}
+                <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">More
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+            {% endif %}
+            <li {% if viewId == workQueueView.id %}class="active"{% endif %}>
+                <a href="{{ viewPath }}">{{ workQueueView.name }}</a>
+            </li>
+            {% if key == workQueueViews|length - 1 %}
+                </ul>
+                </li>
+            {% endif %}
+        {% endif %}
     {% endfor %}
 </ul>
 <br/>
