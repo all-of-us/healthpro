@@ -2,7 +2,7 @@
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% set viewType = 'main' %}
+    {% set viewType = app.request.get('viewId') ? 'custom' : 'main' %}
     {% include 'workqueue/_page_heading.html.twig' %}
 
     {% if isRdrError %}

@@ -185,7 +185,7 @@ class WorkQueueController extends BaseController
             }
             if ($viewId) {
                 $workQueueViewColumns = json_decode($workQueueView->getColumns(), true);
-                $this->requestStack->getSession()->set('workQueueColumns', $workQueueViewColumns);
+                $this->requestStack->getSession()->set('workQueueViewColumns', $workQueueViewColumns);
             }
             return $this->render('workqueue/index.html.twig', [
                 'filters' => $filters,
@@ -251,8 +251,9 @@ class WorkQueueController extends BaseController
             $exportRowMethod = 'generateConsentExportRow';
             $fileName = 'workqueue_consents';
         } else {
-            if ($exportType === 'main') {
-                $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
+            if ($exportType === 'main' || $exportType === 'custom') {
+                $columns = $exportType === 'custom' ? 'workQueueViewColumns' : 'workQueueColumns';
+                $workQueueColumns = $this->requestStack->getSession()->get($columns);
                 $exportHeaders = WorkQueue::getSessionExportHeaders($workQueueColumns);
             } else {
                 $exportHeaders = WorkQueue::getExportHeaders();
@@ -536,19 +537,20 @@ class WorkQueueController extends BaseController
      */
     public function columnsAction(Request $request)
     {
+        $columns = $request->query->has('columnType') ? 'workQueueViewColumns' : 'workQueueColumns';
         if ($request->query->has('select')) {
-            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+            $this->requestStack->getSession()->set($columns, WorkQueue::getWorkQueueColumns());
             return $this->json(['success' => true]);
         }
         if ($request->query->has('deselect')) {
-            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::$defaultColumns);
+            $this->requestStack->getSession()->set($columns, WorkQueue::$defaultColumns);
             return $this->json(['success' => true]);
         }
         if ($request->query->has('groupName')) {
-            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueGroupColumns($request->query->get('groupName')));
+            $this->requestStack->getSession()->set($columns, WorkQueue::getWorkQueueGroupColumns($request->query->get('groupName')));
             return $this->json(['success' => true]);
         }
-        $workQueueColumns = $this->requestStack->getSession()->get('workQueueColumns');
+        $workQueueColumns = $this->requestStack->getSession()->get($columns);
         $columnName = $request->query->get('columnName');
         if ($request->query->get('checked') === 'true') {
             $workQueueColumns[] = $columnName;
@@ -557,7 +559,7 @@ class WorkQueueController extends BaseController
                 unset($workQueueColumns[$key]);
             }
         }
-        $this->requestStack->getSession()->set('workQueueColumns', $workQueueColumns);
+        $this->requestStack->getSession()->set($columns, $workQueueColumns);
         return $this->json(['success' => true]);
     }
 
@@ -621,10 +623,16 @@ class WorkQueueController extends BaseController
                 } else {
                     $workQueueView->setUser($this->getUserEntity());
                     $workQueueView->setCreatedTs(new \DateTime());
-                    $type = $request->query->get('viewType') === 'consent' ? 'consent' : 'main';
-                    $columnType = $type === 'main' ? 'workQueueColumns' : 'workQueueConsentColumns';
+                    $type = $request->query->get('viewType');
+                    if ($type === 'custom') {
+                        $columns = 'workQueueViewColumns';
+                    } elseif ($type === 'consent') {
+                        $columns = 'workQueueConsentColumns';
+                    } else {
+                        $columns = 'workQueueColumns';
+                    }
                     $workQueueView->setType($type);
-                    $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columnType)));
+                    $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columns)));
                     if ($request->query->get('params')) {
                         $workQueueView->setFilters(json_encode($request->query->get('params')));
                     }
