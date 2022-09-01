@@ -28,11 +28,6 @@ class WorkqueueView
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $type;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $defaultView;
@@ -77,18 +72,6 @@ class WorkqueueView
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
 
         return $this;
     }

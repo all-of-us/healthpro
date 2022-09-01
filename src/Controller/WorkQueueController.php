@@ -632,7 +632,6 @@ class WorkQueueController extends BaseController
                     } else {
                         $columns = 'workQueueColumns';
                     }
-                    $workQueueView->setType($type);
                     $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columns)));
                     if ($request->query->get('params')) {
                         $workQueueView->setFilters(json_encode($request->query->get('params')));
