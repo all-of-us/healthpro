@@ -209,6 +209,7 @@ class WorkQueueController extends BaseController
                 'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
                     $this->getUserEntity()], ['id' => 'desc']),
+                'workQueueView' => $workQueueView ?? null,
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
             ]);
         }

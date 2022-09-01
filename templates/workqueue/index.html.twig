@@ -25,7 +25,13 @@
                 <br/>
             {% endif %}
             <p><strong>Filters</strong>
-                <small><a href="{{ path('workqueue_index', { reset: 'all' }) }}">Reset All</a></small>
+                {% if workQueueView %}
+                    {% set queryParms = workQueueView.filtersQueryParams ? '?' ~ workQueueView.filtersQueryParams : '' %}
+                    {% set resetPath = path('workqueue_customized_view', { viewId: workQueueView.id }) ~ queryParms %}
+                {% else %}
+                    {% set resetPath = path('workqueue_main', { reset: 'all' }) %}
+                {% endif %}
+                <small><a href="{{ resetPath }}">Reset All</a></small>
             </p>
             <div class="form-inline">
                 {% include 'partials/workqueue-advance-filters.html.twig' %}
