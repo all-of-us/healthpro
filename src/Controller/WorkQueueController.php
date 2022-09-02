@@ -170,7 +170,8 @@ class WorkQueueController extends BaseController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$sortColumns);
+            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable',
+                WorkQueue::$sortColumns, $sites);
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
             $ajaxData['data'] = $this->workQueueService->generateTableRows($participants);
@@ -234,6 +235,8 @@ class WorkQueueController extends BaseController
             return $this->render('workqueue/no-organization.html.twig');
         }
 
+        $sites = $this->siteService->getAwardeeSites($awardee);
+
         $exportConfiguration = $this->workQueueService->getExportConfiguration();
         $limit = $exportConfiguration['limit'];
         $pageSize = $exportConfiguration['pageSize'];
@@ -262,7 +265,8 @@ class WorkQueueController extends BaseController
             $exportRowMethod = 'generateExportRow';
             $fileName = 'workqueue';
         }
-        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod, $workQueueColumns) {
+        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod,
+            $workQueueColumns, $sites) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -275,7 +279,7 @@ class WorkQueueController extends BaseController
             fputcsv($output, $exportHeaders);
 
             for ($i = 0; $i < ceil($limit / $pageSize); $i++) {
-                $participants = $this->workQueueService->participantSummarySearch($awardee, $params);
+                $participants = $this->workQueueService->participantSummarySearch($awardee, $params, null, null, $sites);
                 foreach ($participants as $participant) {
                     fputcsv($output, $this->workQueueService->$exportRowMethod($participant, $workQueueColumns));
                 }
@@ -459,7 +463,8 @@ class WorkQueueController extends BaseController
                 if (!empty($params['patientStatus'])) {
                     $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
                 }
-                $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable', WorkQueue::$consentSortColumns);
+                $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable',
+                    WorkQueue::$consentSortColumns, $sites);
                 $ajaxData = [];
                 $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
                 $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);

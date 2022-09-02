@@ -46,7 +46,7 @@ class WorkQueueService
         $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
     }
 
-    public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null)
+    public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null, $sites = null)
     {
         $rdrParams = [];
         $next = true;
@@ -85,6 +85,22 @@ class WorkQueueService
             $rdrParams['sampleStatus1SAL2'] = 'RECEIVED';
         } else {
             $rdrParams['hpoId'] = $organization;
+        }
+
+        // Unset site & organization filter if the value doesn't exist in sites & organizations list
+        $sitesList = $organizationsList = [];
+
+        foreach ($sites as $site) {
+            $sitesList[] = $site->getGoogleGroup();
+            $organizationsList[] = $site->getOrganizationId();
+        }
+
+        if ($sitesList && !empty($params['site']) && !in_array($params['site'], $sitesList)) {
+            unset($params['site']);
+        }
+        if ($organizationsList && !empty($params['organization_id']) && !in_array($params['organization_id'],
+            $organizationsList)) {
+            unset($params['organization_id']);
         }
 
         //Pass export params
