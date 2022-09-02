@@ -208,7 +208,7 @@ class WorkQueueController extends BaseController
                 'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
                 'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
-                    $this->getUserEntity()], ['id' => 'desc']),
+                    $this->getUserEntity()], ['defaultView' => 'desc', 'id' => 'desc']),
                 'workQueueView' => $workQueueView ?? null,
                 'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
             ]);
