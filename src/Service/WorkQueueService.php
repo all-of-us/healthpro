@@ -98,8 +98,10 @@ class WorkQueueService
         if ($sitesList && !empty($params['site']) && !in_array($params['site'], $sitesList)) {
             unset($params['site']);
         }
-        if ($organizationsList && !empty($params['organization_id']) && !in_array($params['organization_id'],
-            $organizationsList)) {
+        if ($organizationsList && !empty($params['organization_id']) && !in_array(
+            $params['organization_id'],
+            $organizationsList
+        )) {
             unset($params['organization_id']);
         }
 

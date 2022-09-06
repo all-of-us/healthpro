@@ -170,8 +170,13 @@ class WorkQueueController extends BaseController
             if (!empty($params['patientStatus'])) {
                 $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
             }
-            $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable',
-                WorkQueue::$sortColumns, $sites);
+            $participants = $this->workQueueService->participantSummarySearch(
+                $awardee,
+                $params,
+                'wQTable',
+                WorkQueue::$sortColumns,
+                $sites
+            );
             $ajaxData = [];
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
             $ajaxData['data'] = $this->workQueueService->generateTableRows($participants);
@@ -265,8 +270,16 @@ class WorkQueueController extends BaseController
             $exportRowMethod = 'generateExportRow';
             $fileName = 'workqueue';
         }
-        $stream = function () use ($params, $awardee, $limit, $pageSize, $exportHeaders, $exportRowMethod,
-            $workQueueColumns, $sites) {
+        $stream = function () use (
+            $params,
+            $awardee,
+            $limit,
+            $pageSize,
+            $exportHeaders,
+            $exportRowMethod,
+            $workQueueColumns,
+            $sites
+        ) {
             $output = fopen('php://output', 'w');
             // Add UTF-8 BOM
             fwrite($output, "\xEF\xBB\xBF");
@@ -463,8 +476,13 @@ class WorkQueueController extends BaseController
                 if (!empty($params['patientStatus'])) {
                     $params['siteOrganizationId'] = $this->siteService->getSiteOrganization();
                 }
-                $participants = $this->workQueueService->participantSummarySearch($awardee, $params, 'wQTable',
-                    WorkQueue::$consentSortColumns, $sites);
+                $participants = $this->workQueueService->participantSummarySearch(
+                    $awardee,
+                    $params,
+                    'wQTable',
+                    WorkQueue::$consentSortColumns,
+                    $sites
+                );
                 $ajaxData = [];
                 $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $this->workQueueService->getTotal();
                 $ajaxData['data'] = $this->workQueueService->generateConsentTableRows($participants);
