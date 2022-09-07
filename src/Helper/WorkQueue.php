@@ -1092,6 +1092,26 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
+        '1SAL2' => [
+            'name' => 'Remote Saliva Kit',
+            'csvNames' => [
+                'Remote Saliva Kit Received',
+                'Remote Saliva Kit Received Date',
+                'Remote Saliva Kit Requested',
+                'Remote Saliva Kit Requested Date'
+            ],
+            'rdrField' => 'sampleStatus1SAL2',
+            'sortField' => 'sampleStatus1SAL2Time',
+            'rdrDateField' => 'sampleStatus1SALTime',
+            'otherField' => 'sampleOrderStatus1SAL2',
+            'otherDateField' => 'sampleOrderStatus1SAL2Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'remoteSaliva',
+            'visible' => false,
+            'group' => 'enrollment',
+            'method' => 'displayRemoteSalivaKit'
+        ],
         '1SAL' => [
             'name' => 'Saliva',
             'csvNames' => [
@@ -1270,6 +1290,7 @@ class WorkQueue
         '1PXR2',
         '1UR10',
         '1UR90',
+        '1SAL2',
         '1SAL',
         'age',
         'sex',
@@ -1512,6 +1533,7 @@ class WorkQueue
         'sampleStatus1PXR2Time',
         'sampleStatus1UR10Time',
         'sampleStatus1UR90Time',
+        'sampleStatus1SAL2Time',
         'sampleStatus1SALTime',
         'dateOfBirth',
         'sex',
@@ -2129,6 +2151,7 @@ class WorkQueue
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
         '1UR90' => 'Urine 90 mL',
+        '2SAL' => 'Remote Saliva Kit',
         '1SAL' => 'Saliva'
     ];
 
@@ -2775,6 +2798,21 @@ class WorkQueue
     {
         if (!empty($time)) {
             return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
+        }
+        return self::HTML_DANGER;
+    }
+
+    public static function displayRemoteSalivaKit($participant, $userTimezone, $rdrField, $otherField): string
+    {
+        if ($participant->{$rdrField} === 'RECEIVED') {
+            $time = $participant->{$rdrField . 'Time'};
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, null) . '<br>'
+                . '(sample received)';
+        }
+        if ($participant->{$rdrField} === 'COMPLETED') {
+            $time = $participant->{$otherField . 'Time'};
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, null) . '<br>'
+                . '(kit requested)';
         }
         return self::HTML_DANGER;
     }

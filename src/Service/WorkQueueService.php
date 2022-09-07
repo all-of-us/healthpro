@@ -286,6 +286,9 @@ class WorkQueueService
                         if ($field === '1SAL' && $participant->{'sampleStatus' . $newSample} === 'RECEIVED' && $participant->{'sampleStatus' . $newSample . 'Time'} && $participant->sample1SAL2CollectionMethod) {
                             $row[$field] .= ' ' . $e($participant->sample1SAL2CollectionMethod);
                         }
+                    } elseif ($columnDef['type'] === 'remoteSaliva') {
+                        $row[$field] = WorkQueue::{$columnDef['method']}($participant, $userTimezone, $columnDef['rdrField'],
+                            $columnDef['otherField']);
                     } elseif ($columnDef['type'] === 'participantStatus') {
                         $row[$field] = $e($participant->{$columnDef['rdrField']}) . $this->getEnrollmentStatusTime($participant, $userTimezone);
                     } elseif ($columnDef['type'] === 'patientStatus') {
