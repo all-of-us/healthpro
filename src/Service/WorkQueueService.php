@@ -461,6 +461,13 @@ class WorkQueueService
                 $row[] = $participant->dateOfDeath ? date('n/j/Y', strtotime($participant->dateOfDeath)) : '';
             } elseif (isset($columnDef['type']) && $columnDef['type'] === 'patientStatus') {
                 $row[] = $this->{$columnDef['method']}($participant, $columnDef['value'], 'export');
+            } elseif (isset($columnDef['type']) && $columnDef['type'] === 'remoteSaliva') {
+                $row[] = $participant->{$columnDef['rdrField']} === 'RECEIVED' ? '1' : '0';
+                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrField'] . 'Time'}, $userTimezone,
+                    false);
+                $row[] = $participant->{$columnDef['otherField']} === 'COMPLETED' ? '1' : '0';
+                $row[] = WorkQueue::dateFromString($participant->{$columnDef['otherField'] . 'Time'}, $userTimezone,
+                    false);
             } elseif (isset($columnDef['type']) && $columnDef['type'] === 'sample') {
                 $newSample = $field;
                 foreach (WorkQueue::$samplesAlias as $sampleAlias) {

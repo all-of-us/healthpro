@@ -1448,7 +1448,8 @@ class WorkQueue
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored',
+        '1SAL2'
     ];
 
     public static $sortColumns = [
