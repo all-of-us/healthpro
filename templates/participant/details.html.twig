@@ -512,18 +512,55 @@
                                                         {% set break = true %}
                                                     {% endif %}
                                                 {% endfor %}
-                                                <div class="participant-detail-status">
+                                                {% if field == '1SAL2' %}
+                                                    <div class="participant-detail-status">
+                                                        <strong>{{ label }}</strong>
+                                                        {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
+                                                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                            {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
+                                                                <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.user.timezone) }}</small>
+                                                                {% if (field == '1SAL' or field == '1SAL2') and attribute(participant, 'sample1SAL2CollectionMethod') %}
+                                                                    <br>
+                                                                    <small>
+                                                                        {{ attribute(participant, 'sample1SAL2CollectionMethod') }}
+                                                                        <br>(sample received)
+                                                                    </small>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% elseif attribute(participant, 'sampleOrderStatus' ~ field) ==
+                                                            'COMPLETED' %}
+                                                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                            {% if attribute(participant, 'sampleOrderStatus' ~ field ~
+                                                                'Time') %}
+                                                                <small>
+                                                                    {{ attribute(participant, 'sampleOrderStatus' ~
+                                                                        field ~ 'Time')|date('m/d/Y', app.user.timezone) }}
+                                                                    <br>(kit requested)
+                                                                </small>
+
+                                                            {% endif %}
+                                                        {% else %}
+                                                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                            <small>(not received)</small>
+                                                        {% endif %}
+                                                    </div>
+                                                {% else %}
+                                                    <div class="participant-detail-status">
                                                     <strong>{{ label }}</strong>
                                                     {% if attribute(participant, 'sampleStatus' ~ field) == 'RECEIVED' %}
                                                         <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
                                                             <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.user.timezone) }}</small>
+                                                            {% if (field == '1SAL' or field == '1SAL2') and attribute(participant, 'sample1SAL2CollectionMethod') %}
+                                                                <br><small>{{ attribute(participant, 'sample1SAL2CollectionMethod') }}</small>
+                                                            {% endif %}
                                                         {% endif %}
                                                     {% else %}
                                                         <i class="fa fa-times text-danger" aria-hidden="true"></i>
                                                         <small>(not received)</small>
                                                     {% endif %}
                                                 </div>
+                                                {% endif %}
                                             {% endfor %}
                                             <br />
                                             {% if participant.orderCreatedSite %}

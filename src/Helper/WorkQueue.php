@@ -2147,7 +2147,7 @@ class WorkQueue
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
         '1UR90' => 'Urine 90 mL',
-        '2SAL' => 'Remote Saliva Kit',
+        '1SAL2' => 'Remote Saliva Kit',
         '1SAL' => 'Saliva'
     ];
 
