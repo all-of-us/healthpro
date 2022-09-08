@@ -14,6 +14,7 @@ class WorkQueue
     public const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
+    public const HTML_HISTORY = '<i class="fa fa-history" aria-hidden="true"></i>';
 
     public static $columnsDef = [
         'lastName' => [
@@ -2795,12 +2796,12 @@ class WorkQueue
     {
         if ($participant->{$rdrField} === 'RECEIVED') {
             $time = $participant->{$rdrField . 'Time'};
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, null) . '<br>'
+            return self::HTML_SUCCESS . '<br>' . self::dateFromString($time, $userTimezone, null) . '<br>'
                 . '(sample received)';
         }
-        if ($participant->{$rdrField} === 'COMPLETED') {
+        if ($participant->{$otherField} === 'COMPLETED') {
             $time = $participant->{$otherField . 'Time'};
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, null) . '<br>'
+            return self::HTML_HISTORY . '<br>' . self::dateFromString($time, $userTimezone, null) . '<br>'
                 . '(kit requested)';
         }
         return self::HTML_DANGER;
