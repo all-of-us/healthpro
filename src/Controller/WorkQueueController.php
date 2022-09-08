@@ -61,8 +61,8 @@ class WorkQueueController extends BaseController
         ]);
 
         if ($workQueueView) {
-            $redirectUrl = $this->generateUrl('workqueue_customized_view', [
-                    'viewId' => $workQueueView->getId()]) . '?' . $workQueueView->getFiltersQueryParams();
+            $params = array_merge($workQueueView->getFiltersArray(), ['viewId' => $workQueueView->getId()]);
+            $redirectUrl = $this->generateUrl('workqueue_customized_view', $params);
             return $this->redirect($redirectUrl);
         }
         return $this->redirectToRoute('workqueue_main');
@@ -662,8 +662,8 @@ class WorkQueueController extends BaseController
                     $this->em->persist($workQueueView);
                     $this->em->flush();
                     $this->addFlash('success', 'Work Queue view saved');
-                    $redirectUrl = $this->generateUrl('workqueue_customized_view', [
-                            'viewId' => $workQueueView->getId()]) . '?' . $workQueueView->getFiltersQueryParams();
+                    $params = array_merge($workQueueView->getFiltersArray(), ['viewId' => $workQueueView->getId()]);
+                    $redirectUrl = $this->generateUrl('workqueue_customized_view', $params);
                     return $this->redirect($redirectUrl);
                 }
                 if ($workQueueViewForm->get('defaultView')->getData()) {
