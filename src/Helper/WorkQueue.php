@@ -1127,10 +1127,6 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
-        'sample1SAL2CollectionMethod' => [
-            'name' => 'Saliva Collection',
-            'rdrField' => 'sample1SAL2CollectionMethod'
-        ],
         'age' => [
             'name' => 'Age',
             'rdrField' => 'age',
@@ -1427,7 +1423,6 @@ class WorkQueue
         '1UR10',
         '1UR90',
         '1SAL',
-        'sample1SAL2CollectionMethod',
         'sex',
         'genderIdentity',
         'race',
@@ -2285,10 +2280,6 @@ class WorkQueue
             'deceasedStatus',
             'dateOfDeath',
             'dateOfDeathApproval'
-        ],
-        '1SAL' => [
-            '1SAL',
-            'sample1SAL2CollectionMethod'
         ]
     ];
 
