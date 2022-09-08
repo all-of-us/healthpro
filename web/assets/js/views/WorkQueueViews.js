@@ -22,4 +22,8 @@ $(document).ready(function () {
         $('#work_queue_view_delete_id').val(viewId);
         $('#view_delete_modal').modal('show');
     });
+
+    if ($('.more-views ul li').hasClass('active')) {
+        $('.more-views').addClass('active');
+    }
 });

@@ -1,13 +1,43 @@
+{% set viewId = app.request.get('viewId') %}
 <div class="page-header">
     <h2><i class="fa fa-table" aria-hidden="true"></i> Work Queues</h2>
 </div>
 <div class="text-right">
-    <button class="btn btn-success btn-xs" id="save_view">Save View</button>
-    <button class="btn btn-default btn-xs" id="manage_views">Manage Views</button>
+    <button class="btn btn-success btn-xs" id="save_view">Save View {% if viewId %} As {% endif %}</button>
+    {% if viewId is empty %}
+        <button class="btn btn-default btn-xs" id="manage_views">Manage Views</button>
+    {% endif %}
 </div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
-    <li role="presentation" {% if current_route == 'workqueue_index' %}class="active"{% endif %}><a href="{{ path('workqueue_index') }}">Participant Work Queue</a></li>
-    <li role="presentation" {% if current_route == 'workqueue_consents' %}class="active"{% endif %}><a href="{{ path('workqueue_consents') }}">Participant Consents</a></li>
+    <li role="presentation" {% if current_route == 'workqueue_main' and viewId is empty %}class="active"{% endif %}>
+        <a href="{{ path('workqueue_main') }}">Participant Work Queue</a>
+    </li>
+    <li role="presentation" {% if current_route == 'workqueue_consents' and viewId is empty %}class="active"{% endif %}>
+        <a href="{{ path('workqueue_consents') }}">Participant Consents</a>
+    </li>
+    {% for key, view in workQueueViews %}
+        {% set queryParams = view.filtersArray|merge({ 'viewId': view.Id }) %}
+        {% set viewPath = path('workqueue_customized_view', queryParams) %}
+        {% if key < 6 %}
+            <li role="presentation" {% if viewId == view.id %}class="active"{% endif %}>
+                <a href="{{ viewPath }}">{{ view.name }}</a>
+            </li>
+        {% else %}
+            {% if key == 6 %}
+                <li class="dropdown more-views">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">More
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+            {% endif %}
+            <li {% if viewId == view.id %}class="active"{% endif %}>
+                <a href="{{ viewPath }}">{{ view.name }}</a>
+            </li>
+            {% if key == workQueueViews|length - 1 %}
+                </ul>
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 </ul>
 <br/>

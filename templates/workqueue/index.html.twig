@@ -2,7 +2,7 @@
 {% block title %}Participant Work Queue - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% set viewType = 'main' %}
+    {% set viewType = app.request.get('viewId') ? 'custom' : 'main' %}
     {% include 'workqueue/_page_heading.html.twig' %}
 
     {% if isRdrError %}
@@ -25,7 +25,13 @@
                 <br/>
             {% endif %}
             <p><strong>Filters</strong>
-                <small><a href="{{ path('workqueue_index', { reset: 'all' }) }}">Reset All</a></small>
+                {% if workQueueView %}
+                    {% set queryParams = workQueueView.filtersArray|merge({ 'viewId': workQueueView.id }) %}
+                    {% set resetPath = path('workqueue_customized_view', queryParams) %}
+                {% else %}
+                    {% set resetPath = path('workqueue_main', { reset: 'all' }) %}
+                {% endif %}
+                <small><a href="{{ resetPath }}">Reset All</a></small>
             </p>
             <div class="form-inline">
                 {% include 'partials/workqueue-advance-filters.html.twig' %}
