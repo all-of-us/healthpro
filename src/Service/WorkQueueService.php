@@ -284,8 +284,12 @@ class WorkQueueService
                             false
                         );
                     } elseif ($columnDef['type'] === 'remoteSaliva') {
-                        $row[$field] = WorkQueue::{$columnDef['method']}($participant, $userTimezone, $columnDef['rdrField'],
-                            $columnDef['otherField']);
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant,
+                            $userTimezone,
+                            $columnDef['rdrField'],
+                            $columnDef['otherField']
+                        );
                     } elseif ($columnDef['type'] === 'participantStatus') {
                         $row[$field] = $e($participant->{$columnDef['rdrField']}) . $this->getEnrollmentStatusTime($participant, $userTimezone);
                     } elseif ($columnDef['type'] === 'patientStatus') {
@@ -460,11 +464,17 @@ class WorkQueueService
                 $row[] = $this->{$columnDef['method']}($participant, $columnDef['value'], 'export');
             } elseif (isset($columnDef['type']) && $columnDef['type'] === 'remoteSaliva') {
                 $row[] = $participant->{$columnDef['rdrField']} === 'RECEIVED' ? '1' : '0';
-                $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrField'] . 'Time'}, $userTimezone,
-                    false);
+                $row[] = WorkQueue::dateFromString(
+                    $participant->{$columnDef['rdrField'] . 'Time'},
+                    $userTimezone,
+                    false
+                );
                 $row[] = $participant->{$columnDef['otherField']} === 'COMPLETED' ? '1' : '0';
-                $row[] = WorkQueue::dateFromString($participant->{$columnDef['otherField'] . 'Time'}, $userTimezone,
-                    false);
+                $row[] = WorkQueue::dateFromString(
+                    $participant->{$columnDef['otherField'] . 'Time'},
+                    $userTimezone,
+                    false
+                );
             } elseif (isset($columnDef['type']) && $columnDef['type'] === 'sample') {
                 $newSample = $field;
                 foreach (WorkQueue::$samplesAlias as $sampleAlias) {
