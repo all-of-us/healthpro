@@ -2159,9 +2159,6 @@ class WorkQueue
         [
             '1SST8' => '2SST8',
             '1PST8' => '2PST8'
-        ],
-        [
-            '1SAL' => '1SAL2'
         ]
     ];
 
