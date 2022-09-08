@@ -1286,8 +1286,8 @@ class WorkQueue
         '1PXR2',
         '1UR10',
         '1UR90',
-        '1SAL2',
         '1SAL',
+        '1SAL2',
         'age',
         'sex',
         'genderIdentity',
@@ -2147,8 +2147,8 @@ class WorkQueue
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
         '1UR90' => 'Urine 90 mL',
+        '1SAL' => 'Saliva',
         '1SAL2' => 'Remote Saliva Kit',
-        '1SAL' => 'Saliva'
     ];
 
     public static $samplesAlias = [
