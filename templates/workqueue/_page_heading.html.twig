@@ -17,8 +17,8 @@
         <a href="{{ path('workqueue_consents') }}">Participant Consents</a>
     </li>
     {% for key, view in workQueueViews %}
-        {% set queryParms = view.filtersQueryParams ? '?' ~ view.filtersQueryParams : '' %}
-        {% set viewPath = path('workqueue_customized_view', { viewId: view.id }) ~ queryParms %}
+        {% set queryParams = view.filtersArray|merge({ 'viewId': view.Id }) %}
+        {% set viewPath = path('workqueue_customized_view', queryParams) %}
         {% if key < 6 %}
             <li role="presentation" {% if viewId == view.id %}class="active"{% endif %}>
                 <a href="{{ viewPath }}">{{ view.name }}</a>

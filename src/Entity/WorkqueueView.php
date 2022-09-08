@@ -127,17 +127,8 @@ class WorkqueueView
     public function getFiltersArray(): array
     {
         if (!empty($this->filters)) {
-            return  json_decode($this->filters, true);
+            return json_decode($this->filters, true);
         }
         return [];
-    }
-
-    public function getFiltersQueryParams(): ?string
-    {
-        $filters = json_decode($this->filters, true);
-        if (!empty($filters)) {
-            return http_build_query($filters);
-        }
-        return '';
     }
 }

@@ -26,8 +26,8 @@
             {% endif %}
             <p><strong>Filters</strong>
                 {% if workQueueView %}
-                    {% set queryParms = workQueueView.filtersQueryParams ? '?' ~ workQueueView.filtersQueryParams : '' %}
-                    {% set resetPath = path('workqueue_customized_view', { viewId: workQueueView.id }) ~ queryParms %}
+                    {% set queryParams = workQueueView.filtersArray|merge({ 'viewId': workQueueView.id }) %}
+                    {% set resetPath = path('workqueue_customized_view', queryParams) %}
                 {% else %}
                     {% set resetPath = path('workqueue_main', { reset: 'all' }) %}
                 {% endif %}
