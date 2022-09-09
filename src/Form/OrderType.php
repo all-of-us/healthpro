@@ -193,9 +193,10 @@ class OrderType extends AbstractType
         }
         // Display fedex tracking for kit and diversion type orders
         if ($options['step'] === 'finalized' && ($options['order']->getType() === 'kit' || $options['order']->getType() === 'diversion')) {
-            $builder->add('sampleShippingMethod', Type\ChoiceType::class, [
+            $shippingMethodOptions = [
                 'label' => 'Select the sample shipping method',
                 'required' => true,
+                'disabled' => $disabled,
                 'choices' => [
                     'Shipped via FedEx or UPS' => 'fedex',
                     'Shipped via Courier Service' => 'courier'
@@ -203,30 +204,36 @@ class OrderType extends AbstractType
                 'multiple' => false,
                 'expanded' => true,
                 'constraints' => new Constraints\NotBlank([
-                    'message' => 'Please select shipping method'
+                    'message' => 'Shipping method required'
                 ])
-            ])->add('fedexTracking', Type\RepeatedType::class, [
-                'type' => Type\TextType::class,
-                'disabled' => $disabled,
-                'invalid_message' => 'Tracking numbers must match.',
-                'first_options' => [
-                    'label' => 'FedEx or UPS tracking number (optional)'
-                ],
-                'second_options' => [
-                    'label' => 'Verify tracking number',
-                ],
-                'required' => false,
-                'error_mapping' => [
-                    '.' => 'second' // target the second (repeated) field for non-matching error
-                ],
-                'constraints' => [
-                    new Constraints\Type('string'),
-                    new Constraints\Regex([
-                        'pattern' => '/^\d{12,14}$|^[a-zA-Z0-9]{18}$/',
-                        'message' => 'Tracking numbers must be a string of 12 to 14 digits for FedEX and 18 digits for UPS'
-                    ])
-                ]
-            ]);
+            ];
+            if ($options['order']->getFinalizedTs()) {
+                $shippingMethodOptions['data'] = $options['order']->getFedexTracking() ? 'fedex' : 'courier';
+            }
+            $builder
+                ->add('sampleShippingMethod', Type\ChoiceType::class, $shippingMethodOptions)
+                ->add('fedexTracking', Type\RepeatedType::class, [
+                    'type' => Type\TextType::class,
+                    'disabled' => $disabled,
+                    'invalid_message' => 'Tracking numbers must match.',
+                    'first_options' => [
+                        'label' => 'FedEx or UPS tracking number'
+                    ],
+                    'second_options' => [
+                        'label' => 'Verify tracking number',
+                    ],
+                    'required' => false,
+                    'error_mapping' => [
+                        '.' => 'second' // target the second (repeated) field for non-matching error
+                    ],
+                    'constraints' => [
+                        new Constraints\Type('string'),
+                        new Constraints\Regex([
+                            'pattern' => '/^\d{12,14}$|^[a-zA-Z0-9]{18}$/',
+                            'message' => 'Tracking numbers must be a string of 12 to 14 digits for FedEX and 18 digits for UPS'
+                        ])
+                    ]
+                ]);
         }
         $builder->add("{$options['step']}Notes", Type\TextareaType::class, [
             'label' => $notesLabel,
@@ -234,8 +241,7 @@ class OrderType extends AbstractType
             'required' => false,
             'constraints' => new Constraints\Type('string')
         ]);
-        $form = $builder->getForm();
-        return $form;
+        return $builder->getForm();
     }
 
     public function configureOptions(OptionsResolver $resolver)
