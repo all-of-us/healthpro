@@ -26,37 +26,39 @@
         {% else %}
             {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled ? false : true, samplesInfo, version) }}
         {% endif %}
+        {{ form_errors(finalizeForm.finalizedSamples) }}
         {% if finalizeForm.sampleShippingMethod is defined %}
             {{ form_row(finalizeForm.sampleShippingMethod) }}
         {% endif %}
-        {{ form_errors(finalizeForm.finalizedSamples) }}
     </div>
 
     {% if finalizeForm.fedexTracking is defined %}
-        <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="#" id="enable-number">
-                    <i class="fa fa-keyboard-o" aria-hidden="true"></i>
-                    Enter tracking number
-                </a></li>
-            <li role="presentation"><a href="#" id="enable-barcode">
-                    <i class="fa fa-barcode" aria-hidden="true"></i>
-                    Scan barcode
-                </a></li>
-        </ul>
-        <br />
-        <div class="row">
-            <div class="col-xs-6" id="fedex-barcode" style="display:none">
-                <div class="form-group">
-                    <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
-                    <input type="text" id="fedex_barcode_first" class="form-control">
+        <div id="shipping_fields" {% if order.fedexTracking is null %} style="display:none;" {% endif %}>
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#" id="enable-number">
+                        <i class="fa fa-keyboard-o" aria-hidden="true"></i>
+                        Enter tracking number
+                    </a></li>
+                <li role="presentation"><a href="#" id="enable-barcode">
+                        <i class="fa fa-barcode" aria-hidden="true"></i>
+                        Scan barcode
+                    </a></li>
+            </ul>
+            <br />
+            <div class="row">
+                <div class="col-xs-6" id="fedex-barcode" style="display:none">
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
+                        <input type="text" id="fedex_barcode_first" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_second">Verify barcode</label>
+                        <input type="text" id="fedex_barcode_second" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label" for="fedex_barcode_second">Verify barcode</label>
-                    <input type="text" id="fedex_barcode_second" class="form-control">
+                <div class="col-xs-12" id="fedex-number">
+                    {{ form_row(finalizeForm.fedexTracking) }}
                 </div>
-            </div>
-            <div class="col-xs-12" id="fedex-number">
-                {{ form_row(finalizeForm.fedexTracking) }}
             </div>
         </div>
         <hr />

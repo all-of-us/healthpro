@@ -127,4 +127,20 @@ $(document).ready(function () {
         });
         return confirm(message);
     });
+
+    let handleShippingFields = function () {
+        if ($('input:radio[name="order[sampleShippingMethod]"]').is(':checked')) {
+            if ($('input:radio[name="order[sampleShippingMethod]"]:checked').val() === 'fedex') {
+                $('#shipping_fields').show();
+            } else {
+                $('#shipping_fields').hide();
+            }
+        }
+    };
+
+    $('#order_sampleShippingMethod input[type=radio]').on('change', function () {
+        handleShippingFields();
+    });
+
+    handleShippingFields();
 });
