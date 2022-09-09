@@ -193,7 +193,19 @@ class OrderType extends AbstractType
         }
         // Display fedex tracking for kit and diversion type orders
         if ($options['step'] === 'finalized' && ($options['order']->getType() === 'kit' || $options['order']->getType() === 'diversion')) {
-            $builder->add('fedexTracking', Type\RepeatedType::class, [
+            $builder->add('sampleShippingMethod', Type\ChoiceType::class, [
+                'label' => 'Select the sample shipping method',
+                'required' => true,
+                'choices' => [
+                    'Shipped via FedEx or UPS' => 'fedex',
+                    'Shipped via Courier Service' => 'courier'
+                ],
+                'multiple' => false,
+                'expanded' => true,
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select shipping method'
+                ])
+            ])->add('fedexTracking', Type\RepeatedType::class, [
                 'type' => Type\TextType::class,
                 'disabled' => $disabled,
                 'invalid_message' => 'Tracking numbers must match.',
