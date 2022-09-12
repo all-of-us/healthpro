@@ -146,4 +146,8 @@ $(document).ready(function () {
     });
 
     handleShippingFields();
+
+    $('#toggleShippingHelpModal').on('click', function () {
+        $('#shipping_method_help_modal').modal();
+    });
 });
