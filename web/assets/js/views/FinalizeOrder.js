@@ -130,10 +130,13 @@ $(document).ready(function () {
 
     let handleShippingFields = function () {
         if ($('input:radio[name="order[sampleShippingMethod]"]').is(':checked')) {
-            if ($('input:radio[name="order[sampleShippingMethod]"]:checked').val() === 'fedex') {
+            let sampleShippingMethod = $('input:radio[name="order[sampleShippingMethod]"]:checked').val();
+            if (sampleShippingMethod === 'fedex') {
                 $('#shipping_fields').show();
-            } else {
+                $('#courier_warning').hide();
+            } else if (sampleShippingMethod === 'courier') {
                 $('#shipping_fields').hide();
+                $('#courier_warning').show();
             }
         }
     };

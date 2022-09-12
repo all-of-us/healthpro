@@ -29,6 +29,11 @@
         {{ form_errors(finalizeForm.finalizedSamples) }}
         {% if finalizeForm.sampleShippingMethod is defined %}
             {{ form_row(finalizeForm.sampleShippingMethod) }}
+            <div class="alert alert-warning well-sm" id="courier_warning" style="display:none;">
+                <i class="fa fa-exclamation-triangle"></i>
+                You have indicated the biospecimen kit will be shipped via a <strong>courier service</strong>. If this option
+                was selected by error, please switch to the FedEx or UPS shipping method.
+            </div>
         {% endif %}
     </div>
 
