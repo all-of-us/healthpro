@@ -56,7 +56,7 @@ class IdVerification
     /**
      * @ORM\ManyToOne(targetEntity=IdVerificationImport::class)
      */
-    private $importId;
+    private $import;
 
     public function getId(): ?int
     {
@@ -147,14 +147,14 @@ class IdVerification
         return $this;
     }
 
-    public function getImportId(): ?IdVerificationImport
+    public function getImport(): ?IdVerificationImport
     {
-        return $this->importId;
+        return $this->import;
     }
 
-    public function setImportId(?IdVerificationImport $importId): self
+    public function setImport(?IdVerificationImport $import): self
     {
-        $this->importId = $importId;
+        $this->import = $import;
 
         return $this;
     }
