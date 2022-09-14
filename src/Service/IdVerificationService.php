@@ -35,7 +35,7 @@ class IdVerificationService
         if (isset($verificationData['userEmail'])) {
             $obj->userEmail = $verificationData['userEmail'];
         }
-        $obj->verifiedTime = $verificationData['verifiedTime'];
+        $obj->verifiedTime = $verificationData['verifiedDate'];
         $obj->siteGoogleGroup = $verificationData['siteGoogleGroup'];
         if (isset($verificationData['verificationType'])) {
             $obj->verificationType = $verificationData['verificationType'];
@@ -54,11 +54,11 @@ class IdVerificationService
         $verificationData['userEmail'] = $this->userService->getUser()->getEmail();
         $verificationData['participantId'] = $participantId;
         $now = new \DateTime();
-        $verificationData['verifiedTime'] = $now->format('Y-m-d\TH:i:s\Z');
+        $verificationData['verifiedDate'] = $now->format('Y-m-d\TH:i:s\Z');
         $verificationData['siteGoogleGroup'] = $this->siteService->getSiteIdWithPrefix();
         $postData = $this->getRdrObject($verificationData);
         if ($this->sendToRdr($postData)) {
-            $verificationData['verifiedTime'] = $now;
+            $verificationData['verifiedDate'] = $now;
             $verificationData['user'] = $this->userService->getUserEntity();
             $verificationData['site'] = $this->siteService->getSiteId();
             $this->saveIdVerification($verificationData);
@@ -107,7 +107,7 @@ class IdVerificationService
         $idVerification->setSite($data['site']);
         $idVerification->setVisitType($data['visitType']);
         $idVerification->setVerificationType($data['verificationType']);
-        $idVerification->setVerifiedDate($data['verifiedTime']);
+        $idVerification->setVerifiedDate($data['verifiedDate']);
         if (isset($data['import'])) {
             $idVerification->setImport($data['import']);
         }
