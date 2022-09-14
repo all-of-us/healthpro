@@ -6,7 +6,8 @@ $(document).ready(function () {
         'order_collected_ts',
         'order_processed_ts',
         'order_finalized_ts',
-        'incentive_created_ts'
+        'incentive_created_ts',
+        'idVerification_created_ts'
     ];
 
     // Display total count for each step in the date column headers
