@@ -71,12 +71,31 @@
                         {% endif %}
                     {% endif %}
                     {% set idVerification = participant.idVerifications[i] is defined ? participant.idVerifications[i] : '' %}
-                    <td class="td-left-border">
-                        {{ today.displayDate(idVerification, 'created_ts') }}
+                    <td class="td-left-border text-center">
+                        {% if idVerification['created_ts'] is defined and idVerification['created_ts'] is not empty %}
+                            {% set statusText = 'ID Verified ' ~ idVerification['created_ts']|date('n/j/Y g:ia', app.user.timezone) %}
+                            <span data-date-type="idVerification_created_ts">
+                                <i class="fa fa-user-check fa-lg text-success" aria-hidden="true" data-toggle="tooltip"
+                                   data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
+                            </span>
+                        {% else %}
+                            <i class="fa fa-user-times fa-lg text-danger" aria-hidden="true" data-toggle="tooltip"
+                               data-container="body" data-placement="bottom" title="ID Not Verified"></i>
+                        {% endif %}
                     </td>
                     {% set incentive = participant.incentives[i] is defined ? participant.incentives[i] : '' %}
-                    <td class="td-left-border">
-                        {{ today.displayDate(incentive, 'created_ts') }}
+                    <td class="td-left-border text-center">
+                        {% if incentive['created_ts'] is defined and incentive['created_ts'] is not empty %}
+                            {% set statusText = 'Incentive Received ' ~ incentive['created_ts']|date('n/j/Y g:ia', app.user.timezone) %}
+                            <span data-date-type="incentive_created_ts">
+                                <i class="fa fa-hand-holding-usd fa-lg text-success" aria-hidden="true"
+                                   data-toggle="tooltip"
+                                    data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
+                            </span>
+                        {% else %}
+                            <i class="fa fa-hand-holding fa-lg text-danger" aria-hidden="true" data-toggle="tooltip"
+                               data-container="body" data-placement="bottom" title="Incentive Not Received"></i>
+                        {% endif %}
                     </td>
                     {% set physicalMeasurement = participant.physicalMeasurements[i] is defined ? participant.physicalMeasurements[i] : '' %}
                     <td class="td-left-border">
