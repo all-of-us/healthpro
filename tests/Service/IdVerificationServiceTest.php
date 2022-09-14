@@ -7,6 +7,7 @@ use App\Service\LoggerService;
 use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Response;
 
 class IdVerificationServiceTest extends ServiceTestCase
@@ -67,7 +68,8 @@ class IdVerificationServiceTest extends ServiceTestCase
             $mockRdrApiService,
             static::getContainer()->get(SiteService::class),
             static::getContainer()->get(UserService::class),
-            $this->createMock(LoggerService::class)
+            $this->createMock(LoggerService::class),
+            static::getContainer()->get(EntityManagerInterface::class),
         );
     }
 
@@ -82,7 +84,7 @@ class IdVerificationServiceTest extends ServiceTestCase
             'participantId' => 'P123456789',
             'userEmail' => 'test@example.com',
             'siteGoogleGroup' => 'hpo-site-test',
-            'verifiedTime' => '2022-04-19T20:52:23',
+            'verifiedDate' => '2022-04-19T20:52:23',
             'verification_type' => 'PHOTO_AND_ONE_OF_PII',
             'visit_type' => 'PHYSICAL_MEASUREMENTS_ONLY'
         ];
