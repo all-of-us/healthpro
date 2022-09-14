@@ -68,7 +68,7 @@
                                     {% endif %}
                                 </dd>
                                 <dt>User</dt>
-                                <dd>{{ idVerification.user.email }}</dd>
+                                <dd>{{ idVerification.user ? idVerification.user.email : '' }}</dd>
                                 <dt>Site</dt>
                                 <dd>{{ siteInfo.siteDisplayName(idVerification.site) }}</dd>
                                 <dt>Verification Type</dt>
