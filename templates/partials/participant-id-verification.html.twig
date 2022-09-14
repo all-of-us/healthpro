@@ -63,6 +63,9 @@
                                 <dt>Verified</dt>
                                 <dd>
                                     {{ idVerification.verifiedDate|date('H:i:s') == '00:00:00' ? idVerification.verifiedDate|date('n/j/Y') : idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) }}
+                                    {% if idVerification.import %}
+                                        <span class="label label-primary">Imported</span>
+                                    {% endif %}
                                 </dd>
                                 <dt>User</dt>
                                 <dd>{{ idVerification.user.email }}</dd>
