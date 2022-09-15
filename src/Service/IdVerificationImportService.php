@@ -172,6 +172,9 @@ class IdVerificationImportService
             if ($idVerificationImportRow) {
                 if ($validUser) {
                     if ($this->sendIdVerification($idVerification)) {
+                        $importRowData['user'] = $user;
+                        $importRowData['import'] = $this->em->getRepository(IdVerificationImport::class)->find($importRowData['import_id']);
+                        $this->idVerificationService->saveIdVerification($importRowData);
                         $idVerificationImportRow->setRdrStatus(Import::STATUS_SUCCESS);
                     } else {
                         $this->logger->error("#{$importRowData['id']} failed sending to RDR: " . $this->rdrApiService->getLastError());
@@ -198,7 +201,7 @@ class IdVerificationImportService
     {
         $idVerification = [];
         $idVerification['participantId'] = $importData['participantId'];
-        $idVerification['verifiedTime'] = $importData['verifiedDate']->format('Y-m-d\TH:i:s\Z');
+        $idVerification['verifiedDate'] = $importData['verifiedDate']->format('Y-m-d\TH:i:s\Z');
         $idVerification['siteGoogleGroup'] = $this->siteService->getSiteWithPrefix($importData['site']);
         if ($importData['userEmail']) {
             $idVerification['userEmail'] = $importData['userEmail'];

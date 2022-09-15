@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\IdVerification;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
@@ -195,7 +196,7 @@ class ParticipantDetailsController extends BaseController
                 $this->addFlash('id-verification-error', 'Invalid form');
             }
         }
-        $idVerifications = $idVerificationService->getIdVerifications($id);
+        $idVerifications = $this->em->getRepository(IdVerification::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
