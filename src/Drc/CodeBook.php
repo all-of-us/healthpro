@@ -128,8 +128,8 @@ class CodeBook
         'es' => 'Spanish',
         'vibrent' => 'PTSC Portal',
         'careevolution' => 'DV Pilot Portal',
-        'MAIL_KIT' => 'Mail Kit',
-        'ON_SITE' => 'On Site'
+        'MAIL_KIT' => 'kit received',
+        'ON_SITE' => 'on-site received'
     ];
 
     public static function display($code)

@@ -519,7 +519,7 @@
                                                         {% if attribute(participant, 'sampleStatus' ~ field ~ 'Time') %}
                                                             <small>{{ attribute(participant, 'sampleStatus' ~ field ~ 'Time')|date('m/d/Y', app.user.timezone) }}</small>
                                                             {% if (field == '1SAL' or field == '1SAL2') and attribute(participant, 'sample1SAL2CollectionMethod') %}
-                                                                <br><small>{{ attribute(participant, 'sample1SAL2CollectionMethod') }}</small>
+                                                                <br><small>({{ attribute(participant,'sample1SAL2CollectionMethod') }})</small>
                                                             {% endif %}
                                                         {% endif %}
                                                     {% else %}
