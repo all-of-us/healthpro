@@ -69,7 +69,7 @@
 
             <th colspan="{{ (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
 
-            <th colspan="{{ (samples|length) + 11 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
+            <th colspan="{{ (samples|length) + 12 }}" class="topheader multiheader-inperson">In-Person Enrollment</th>
 
             <th colspan="5" class="topheader multiheader-demographics">Demographics</th>
         </tr>
@@ -127,7 +127,7 @@
             {% for field, label in samples %}
                 <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
             {% endfor %}
-
+            <th class="secondaryheader col-group-inperson multiheader-inperson">Remote Saliva Kit Requested</th>
             <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
             <th class="secondaryheader col-group-demographics multiheader-demographics">Sex</th>
             <th class="secondaryheader col-group-demographics multiheader-demographics">Gender Identity</th>

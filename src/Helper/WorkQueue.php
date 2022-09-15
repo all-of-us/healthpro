@@ -1107,6 +1107,22 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
+        'sampleOrderStatus1SAL2' => [
+            'name' => 'Saliva',
+            'csvNames' => [
+                'Remote Saliva Kit Requested',
+                'Remote Saliva Kit Requested Date'
+            ],
+            'rdrField' => 'sampleOrderStatus1SAL2',
+            'sortField' => 'sampleOrderStatus1SAL2Time',
+            'rdrDateField' => 'sampleOrderStatus1SAL2Time',
+            'otherField' => 'isRemoteKitRequested',
+            'method' => 'getRemoteSalivaKit',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
         'sample1SAL2CollectionMethod' => [
             'name' => 'Saliva Collection',
             'rdrField' => 'sample1SAL2CollectionMethod'
@@ -1271,6 +1287,7 @@ class WorkQueue
         '1UR10',
         '1UR90',
         '1SAL',
+        'sampleOrderStatus1SAL2',
         'age',
         'sex',
         'genderIdentity',
@@ -1427,7 +1444,8 @@ class WorkQueue
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored',
+        'sampleOrderStatus1SAL2'
     ];
 
     public static $sortColumns = [
@@ -1513,6 +1531,7 @@ class WorkQueue
         'sampleStatus1UR10Time',
         'sampleStatus1UR90Time',
         'sampleStatus1SALTime',
+        'sampleOrderStatus1SAL2Time',
         'dateOfBirth',
         'sex',
         'genderIdentity',
@@ -2775,6 +2794,15 @@ class WorkQueue
     {
         if (!empty($time)) {
             return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
+        }
+        return self::HTML_DANGER;
+    }
+
+    public static function getRemoteSalivaKit($isRemoteKitRequested, $sampleOrderStatus, $sampleTime, $userTimezone): string
+    {
+        if ($isRemoteKitRequested && $sampleOrderStatus === 'CREATED' && $sampleTime) {
+            return self::HTML_SUCCESS . '<br>' . self::dateFromString($sampleTime, $userTimezone, false)
+                . '<br>' . '(kit requested)';
         }
         return self::HTML_DANGER;
     }
