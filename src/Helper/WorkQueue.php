@@ -1108,9 +1108,9 @@ class WorkQueue
             'group' => 'enrollment'
         ],
         'sampleOrderStatus1SAL2' => [
-            'name' => 'Saliva',
+            'name' => 'Remote Saliva Kit Requested',
             'csvNames' => [
-                'Remote Saliva Kit Requested',
+                'Remote Saliva Kit Requested Status',
                 'Remote Saliva Kit Requested Date'
             ],
             'rdrField' => 'sampleOrderStatus1SAL2',
@@ -1118,6 +1118,7 @@ class WorkQueue
             'rdrDateField' => 'sampleOrderStatus1SAL2Time',
             'otherField' => 'isRemoteKitRequested',
             'method' => 'getRemoteSalivaKit',
+            'csvMethod' => 'getWorkQueueRemoteSalivaKitStatus',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
@@ -2805,5 +2806,10 @@ class WorkQueue
                 . '<br>' . '(kit requested)';
         }
         return self::HTML_DANGER;
+    }
+
+    public static function getWorkQueueRemoteSalivaKitStatus($sampleOrderStatus, $isRemoteKitRequested): int
+    {
+        return $isRemoteKitRequested && $sampleOrderStatus === 'CREATED' ? 1 : 0;
     }
 }
