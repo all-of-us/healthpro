@@ -99,7 +99,7 @@
             "sampleStatus1UR90": "UNSET",
             "sampleStatus1SAL": "UNSET",
             "sampleStatus1SAL2": "UNSET",
-            "sample1SAL2CollectionMethod": "UNSET",
+            "sample1SAL2CollectionMethod": "MAIL_KIT",
             "sampleStatus1ED02": "UNSET",
             "sampleStatus1CFD9": "UNSET",
             "sampleStatus1PXR2": "UNSET",
@@ -118,7 +118,7 @@
             "sampleOrderStatus1UR10": "UNSET",
             "sampleOrderStatus1UR90": "UNSET",
             "sampleOrderStatus1SAL": "UNSET",
-            "sampleOrderStatus1SAL2": "UNSET",
+            "sampleOrderStatus1SAL2": "CREATED",
             "sampleOrderStatus1ED02": "UNSET",
             "sampleOrderStatus1CFD9": "UNSET",
             "sampleOrderStatus1PXR2": "UNSET",
@@ -163,7 +163,8 @@
                 }
             ],
             "reconsentForStudyEnrollmentAuthored": "2022-08-03T20:00:00",
-            "reconsentForElectronicHealthRecordsAuthored": "2022-08-03T20:00:00"
+            "reconsentForElectronicHealthRecordsAuthored": "2022-08-03T20:00:00",
+            "sampleOrderStatus1SAL2Time" : "2022-09-15T20:00:00"
         }
     },
     {
