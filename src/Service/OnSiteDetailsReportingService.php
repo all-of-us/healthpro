@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Incentive;
 use App\Entity\PatientStatus;
+use App\Form\IdVerificationType;
 
 class OnSiteDetailsReportingService
 {
@@ -136,8 +137,10 @@ class OnSiteDetailsReportingService
             $row['created'] = $idVerification['createdTs']->format('m-d-Y');
             $row['participantId'] = $idVerification['participantId'];
             $row['user'] = $idVerification['email'];
-            $row['verificationType'] = $idVerification['verificationType'];
-            $row['visitType'] = $idVerification['visitType'];
+            $row['verificationType'] = $idVerification['verificationType'] ? array_search($idVerification['verificationType'],
+                IdVerificationType::$idVerificationChoices['verificationType']) : '';
+            $row['visitType'] = $idVerification['visitType'] ? array_search($idVerification['visitType'],
+                IdVerificationType::$idVerificationChoices['visitType']) : '';
             if ($export) {
                 $row['imported'] = $idVerification['importId'] ? 'Yes' : 'No';
             } else {
