@@ -49,7 +49,7 @@
         </thead>
         <tbody>
         {% for id, participant in participants %}
-            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount) %}
+            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount, participant.idVerificationsCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
                 <tr>
