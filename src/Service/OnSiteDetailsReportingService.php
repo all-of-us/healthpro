@@ -52,6 +52,14 @@ class OnSiteDetailsReportingService
         'i.notes'
     ];
 
+    public static $idVerificationSortColumns = [
+        'idv.createdTs',
+        'idv.participantId',
+        'u.email',
+        'idv.verificationType',
+        'idv.visitType'
+    ];
+
     public function getPatientStatusAjaxData($patientStatuses): array
     {
         $rows = [];
@@ -114,6 +122,26 @@ class OnSiteDetailsReportingService
                     $type = 'amend';
                 }
                 $row['type'] = $type;
+            }
+            array_push($rows, $row);
+        }
+        return $rows;
+    }
+
+    public function getIdVerificationAjaxData($idVerifications, $export = false): array
+    {
+        $rows = [];
+        foreach ($idVerifications as $idVerification) {
+            $row = [];
+            $row['created'] = $idVerification['createdTs']->format('m-d-Y');
+            $row['participantId'] = $idVerification['participantId'];
+            $row['user'] = $idVerification['email'];
+            $row['verificationType'] = $idVerification['verificationType'];
+            $row['visitType'] = $idVerification['visitType'];
+            if ($export) {
+                $row['imported'] = $idVerification['importId'] ? 'Yes' : 'No';
+            } else {
+                $row['type'] = $idVerification['importId'] ? 'import' : '';
             }
             array_push($rows, $row);
         }
