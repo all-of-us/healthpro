@@ -491,8 +491,7 @@ class WorkQueueService
                         $participant->{$columnDef['otherField']}
                     );
                     if ($columnDef['csvMethod'] === 'getWorkQueueRemoteSalivaKitStatus') {
-                        $row[] = $participant->{$columnDef['otherField']} ? WorkQueue::dateFromString
-                        ($participant->{$columnDef['rdrDateField']}, $userTimezone) : '';
+                        $row[] = $participant->{$columnDef['otherField']} ? WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone) : '';
                     } else {
                         $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
                     }
