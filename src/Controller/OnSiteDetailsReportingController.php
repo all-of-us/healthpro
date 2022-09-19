@@ -202,6 +202,38 @@ class OnSiteDetailsReportingController extends BaseController
         SiteService $siteService,
         Request $request
     ) {
-        return '';
+        $queryParams = $request->query->all();
+        $params = [];
+        $params['startDate'] = $this->getParamDate($queryParams, 'startDate');
+        $params['endDate'] = $this->getParamDate($queryParams, 'endDate');
+        $params['participantId'] = $queryParams['participantId'] ?? '';
+        $idVerifications = $idVerificationRepository->getOnsiteIdVerifications($siteService->getSiteId(), $params);
+        $records = $onSiteDetailsReportingService->getIdVerificationAjaxData($idVerifications, true);
+        $exportHeaders = $onSiteDetailsReportingService::$idVerificationExportHeaders;
+        $stream = function () use ($records, $exportHeaders) {
+            $output = fopen('php://output', 'w');
+            // Add UTF-8 BOM
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv(
+                $output,
+                ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']
+            );
+            fwrite($output, "\"\"\n");
+
+            fputcsv($output, $exportHeaders);
+
+            foreach ($records as $record) {
+                fputcsv($output, $record);
+            }
+            fwrite($output, "\"\"\n");
+            fputcsv($output, ['Confidential Information']);
+            fclose($output);
+        };
+        $filename = "on_site_details_id_verification_" . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
+
+        return new StreamedResponse($stream, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
     }
 }

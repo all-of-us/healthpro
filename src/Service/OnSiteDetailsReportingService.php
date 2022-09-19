@@ -32,6 +32,15 @@ class OnSiteDetailsReportingService
         'Amended'
     ];
 
+    public static $idVerificationExportHeaders = [
+        'Date Created',
+        'Participant ID',
+        'User',
+        'Verification Type',
+        'Visit Type',
+        'Imported'
+    ];
+
     public static $patientStatusSortColumns = [
         'psh.createdTs',
         'ps.participantId',
