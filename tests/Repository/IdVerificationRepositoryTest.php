@@ -55,8 +55,8 @@ class IdVerificationRepositoryTest extends KernelTestCase
         $params = [];
         $params['startDate'] = $this->getDate($startDate);
         $params['endDate'] = $this->getDate($endDate);
-        $incentives = $this->repo->getOnsiteIdVerifications('PS_SITE_TEST', $params);
-        $this->assertEquals($resultCount, count($incentives));
+        $idVerifications = $this->repo->getOnsiteIdVerifications('PS_SITE_TEST', $params);
+        $this->assertEquals($resultCount, count($idVerifications));
     }
 
     public function dateFilterDataProvider()
@@ -79,8 +79,8 @@ class IdVerificationRepositoryTest extends KernelTestCase
         $this->createIdVerifications();
         $params = [];
         $params['participantId'] = $participantId;
-        $incentives = $this->repo->getOnsiteIdVerifications('PS_SITE_TEST', $params);
-        $this->assertEquals($participantId, $incentives[0]['participantId']);
+        $idVerifications = $this->repo->getOnsiteIdVerifications('PS_SITE_TEST', $params);
+        $this->assertEquals($participantId, $idVerifications[0]['participantId']);
     }
 
     public function participantIdDataProvider()
