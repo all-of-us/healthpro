@@ -23,27 +23,9 @@ class IdVerificationRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('idv')
             ->select('idv.createdTs, idv.participantId, idv.verificationType, idv.visitType, 
-                u.email, idvi.id as importId')
-            ->leftJoin('idv.user', 'u')
-            ->leftJoin('idv.import', 'idvi')
-            ->where('idv.site =:site');
+                u.email, idvi.id as importId');
 
-        if (!empty($params['participantId'])) {
-            $queryBuilder->andWhere('idv.participantId = :participantId')
-                ->setParameter('participantId', $params['participantId']);
-        }
-
-        if (!empty($params['startDate'])) {
-            $queryBuilder->andWhere('idv.createdTs >= :startDate')
-                ->setParameter('startDate', $params['startDate']);
-        }
-
-        if (!empty($params['endDate'])) {
-            $queryBuilder->andWhere('idv.createdTs <= :endDate')
-                ->setParameter('endDate', $params['endDate']->modify('+1 day'));
-        }
-
-        $queryBuilder->setParameter('site', $site);
+        $this->setQueryBuilder($queryBuilder, $params, $site);
 
         if (isset($params['sortColumn'])) {
             $queryBuilder->orderBy($params['sortColumn'], $params['sortDir']);
@@ -67,10 +49,21 @@ class IdVerificationRepository extends ServiceEntityRepository
     public function getOnsiteIdVerificationsCount($site, $params): int
     {
         $queryBuilder = $this->createQueryBuilder('idv')
-            ->select('count(idv.id)')
-            ->leftJoin('idv.user', 'u')
+            ->select('count(idv.id)');
+
+        $this->setQueryBuilder($queryBuilder, $params, $site);
+
+        return $queryBuilder
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    private function setQueryBuilder(&$queryBuilder, $params, $site): void
+    {
+        $queryBuilder->leftJoin('idv.user', 'u')
             ->leftJoin('idv.import', 'idvi')
             ->where('idv.site =:site');
+
         if (!empty($params['participantId'])) {
             $queryBuilder->andWhere('idv.participantId = :participantId')
                 ->setParameter('participantId', $params['participantId']);
@@ -87,9 +80,5 @@ class IdVerificationRepository extends ServiceEntityRepository
         }
 
         $queryBuilder->setParameter('site', $site);
-
-        return $queryBuilder
-            ->getQuery()
-            ->getSingleScalarResult();
     }
 }
