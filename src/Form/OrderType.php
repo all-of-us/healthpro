@@ -179,8 +179,10 @@ class OrderType extends AbstractType
                         'required' => true,
                         'disabled' => $disabled,
                         'choices' => [
-                            'Swinging Bucket (Produces a sample with a non-slanted gel layer)' => $options['order']::SWINGING_BUCKET,
-                            'Fixed Angle (Produces a sample with a slanted gel layer)' => $options['order']::FIXED_ANGLE
+                            'Swinging Bucket (Produces a sample with a <b>non-slanted gel layer</b>)' =>
+                                $options['order']::SWINGING_BUCKET,
+                            'Fixed Angle (Produces a sample with a <b>slanted gel layer</b>)' =>
+                                $options['order']::FIXED_ANGLE
                         ],
                         'multiple' => false,
                         'expanded' => true,
