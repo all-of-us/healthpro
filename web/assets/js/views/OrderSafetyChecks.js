@@ -37,6 +37,23 @@ $(document).ready(function () {
         }
     };
 
+    var handleBoneMarrowQuestion = function () {
+        showFields(['bone-marrow-qn']);
+        if (!isChecked('bone_marrow')) {
+            return;
+        }
+        var boneMarrow = $('input:radio[name=bone_marrow]:checked').val();
+        if (boneMarrow === 'yes') {
+            showFields(['order-info-text', 'info-text-bone-marrow']);
+            hideFields(['syncope-qn', 'syncope-sub-qn']);
+        } else {
+            // hideFields(['syncope-sub-qn']);
+            // showFields(['continue']);
+            // allowCollection('all');
+            handleSyncopeQuestion();
+        }
+    };
+
     var handleSyncopeQuestion = function () {
         showFields(['syncope-qn']);
         if (!isChecked('syncope')) {
@@ -113,7 +130,7 @@ $(document).ready(function () {
             var isTransfusionPPCChecked = $('input:checkbox[name=transfusion_ppc]').is(':checked');
             // #3 Show Question 3
             showFields(['transfusion-qn']);
-            hideFields(['continue']);
+            hideFields(['continue', 'bone-marrow-qn']);
             if (isTransfusionWBChecked) {
                 // #3 Display info text 4 and continue
                 hideFields(['rbc-qn', 'ppc-qn', 'order-info-text', 'syncope-qn']);
@@ -164,7 +181,8 @@ $(document).ready(function () {
             hideFields(['transfusion-qn', 'rbc-qn', 'ppc-qn', 'order-info-text']);
             if (donate === 'no') {
                 // #3 Answer syncope question and continue
-                handleSyncopeQuestion();
+                //handleSyncopeQuestion();
+                handleBoneMarrowQuestion();
             } else {
                 // #3 Display info text 1 and continue
                 hideFields(['syncope-qn', 'syncope-sub-qn', 'info-text-5']);

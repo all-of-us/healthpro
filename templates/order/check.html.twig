@@ -73,6 +73,15 @@
                     <label><input type="radio" name="ppc_qn" value="no"/> No</label>
                 </div>
             </div>
+            <div style="display:none;" id="bone-marrow-qn">
+                <h3>Has the participant ever had a bone marrow and/or organ transplant?</h3>
+                <div class="radio">
+                    <label><input type="radio" name="bone_marrow" value="yes"/> Yes</label>
+                </div>
+                <div class="radio">
+                    <label><input type="radio" name="bone_marrow" value="no"/> No</label>
+                </div>
+            </div>
             <div style="display:none;" id="syncope-qn">
                 <h3>Has the participant ever felt dizzy, nauseous, or lost consciousness when having blood drawn?</h3>
                 <div class="radio">
@@ -113,6 +122,9 @@
             <span id="info-text-5">
                 Caution! In order to minimize risk to participants, those who experience syncope should be offered {{ siteType == 'dv' ? 'a urine collection' : 'saliva and urine collections' }} as an alternative.
                 <strong>Please select whether the participant would like to continue with a full Biobank order or a modified order with {{ siteType == 'dv' ? 'urine only' : 'urine only and a saliva order' }}.</strong>
+            </span>
+            <span id="info-text-bone-marrow">
+                Participant is not eligible for blood or saliva collection.
             </span>
         </div>
         <div id="continue" style="display:none;">
