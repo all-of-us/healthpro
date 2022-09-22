@@ -27,33 +27,47 @@
             {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled ? false : true, samplesInfo, version) }}
         {% endif %}
         {{ form_errors(finalizeForm.finalizedSamples) }}
+        {% if finalizeForm.sampleShippingMethod is defined %}
+            {{ form_label(finalizeForm.sampleShippingMethod) }}
+            <span class="toggle-help-text" id="toggleShippingHelpModal">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+            {{ form_widget(finalizeForm.sampleShippingMethod) }}
+            <div class="alert alert-warning well-sm" id="courier_warning" style="display:none;">
+                <i class="fa fa-exclamation-triangle"></i>
+                You have indicated the biospecimen kit will be shipped via a <strong>courier service</strong>. If this option
+                was selected by error, please switch to the FedEx or UPS shipping method.
+            </div>
+        {% endif %}
     </div>
 
     {% if finalizeForm.fedexTracking is defined %}
-        <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="#" id="enable-number">
-                    <i class="fa fa-keyboard-o" aria-hidden="true"></i>
-                    Enter tracking number
-                </a></li>
-            <li role="presentation"><a href="#" id="enable-barcode">
-                    <i class="fa fa-barcode" aria-hidden="true"></i>
-                    Scan barcode
-                </a></li>
-        </ul>
-        <br />
-        <div class="row">
-            <div class="col-xs-6" id="fedex-barcode" style="display:none">
-                <div class="form-group">
-                    <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
-                    <input type="text" id="fedex_barcode_first" class="form-control">
+        <div id="shipping_fields" {% if order.fedexTracking is null %} style="display:none;" {% endif %}>
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#" id="enable-number">
+                        <i class="fa fa-keyboard-o" aria-hidden="true"></i>
+                        Enter tracking number
+                    </a></li>
+                <li role="presentation"><a href="#" id="enable-barcode">
+                        <i class="fa fa-barcode" aria-hidden="true"></i>
+                        Scan barcode
+                    </a></li>
+            </ul>
+            <br />
+            <div class="row">
+                <div class="col-xs-6" id="fedex-barcode" style="display:none">
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
+                        <input type="text" id="fedex_barcode_first" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="fedex_barcode_second">Verify barcode</label>
+                        <input type="text" id="fedex_barcode_second" class="form-control">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="control-label" for="fedex_barcode_second">Verify barcode</label>
-                    <input type="text" id="fedex_barcode_second" class="form-control">
+                <div class="col-xs-12" id="fedex-number">
+                    {{ form_row(finalizeForm.fedexTracking) }}
                 </div>
-            </div>
-            <div class="col-xs-12" id="fedex-number">
-                {{ form_row(finalizeForm.fedexTracking) }}
             </div>
         </div>
         <hr />
@@ -82,6 +96,21 @@
         {{ form_errors(revertForm) }}
         {{ form_end(revertForm) }}
     {% endif %}
+    <div class="modal fade" id="shipping_method_help_modal" tabindex="-1" role="dialog" aria-labelledby="shipping_method_help_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>FedEx or UPS Tracking Number</h4>
+                    <p>Sites who use FedEx or UPS to ship biospecimen kits to the Biobank are <u>required</u> to enter a tracking number.</p>
+                    <h4>Courier Service</h4>
+                    <p>A tracking number is not required for sites who use a courier service to ship biospecimen kits to the Biobank.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block pagejs %}
