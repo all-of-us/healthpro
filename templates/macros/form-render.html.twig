@@ -1,0 +1,10 @@
+{% macro form_raw_choices_widget(form) %}
+    <table>
+        {% for choice in form.children %}
+        <tr>
+            <td>{{ form_widget(choice, { 'label': false }) }}</td>
+            <td><label class="label-normal" for="{{ choice.vars.id }}">{{ choice.vars.label|raw }}</label></td>
+        <tr>
+            {% endfor %}
+    </table>
+{% endmacro %}
