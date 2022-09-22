@@ -267,7 +267,9 @@ class WorkQueueServiceTest extends ServiceTestCase
             1,
             '8/1/2022',
             '8/3/2022 3:00 pm',
-            '8/3/2022 3:00 pm'
+            '8/3/2022 3:00 pm',
+            1,
+            '9/22/2022 3:00 pm'
         ], $row);
     }
 

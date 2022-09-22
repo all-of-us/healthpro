@@ -82,6 +82,8 @@
             "questionnaireOnCopeVaccineMinute4": "SUBMITTED",
             "questionnaireOnCopeVaccineMinute4Authored": "2022-01-12T19:09:37",
             "questionnaireOnDnaProgram": "UNSET",
+            "questionnaireOnLifeFunctioning": "SUBMITTED",
+            "questionnaireOnLifeFunctioningAuthored": "2022-09-22T20:00:00",
             "numCompletedBaselinePPIModules": 3,
             "numCompletedPPIModules": 4,
             "biospecimenStatus": "UNSET",
