@@ -33,8 +33,10 @@
                                    }}" data-type="edit" role="button"></i>
                             </td>
                             <td>
-                                <i class="fa fa-trash wq-view-delete" aria-hidden="true"
-                                   data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
+                                {% if viewId != workQueueView.id %}
+                                    <i class="fa fa-trash wq-view-delete" aria-hidden="true"
+                                       data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
