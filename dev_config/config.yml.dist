@@ -6,8 +6,8 @@
 #   is deployed to GAE projects and is only valid in dev.
 #
 # Google service account keys
-#   Store key files in this directory as specified in the comments below
-#   (rdr_key.json and googleapps_key.json)
+#   Get the key from secret manager gaAuthJson field and store key files in this directory
+#   (rdr_key.json and googleapps_key.json) Both will have the same key
 ###
 
 # MySQL connection
