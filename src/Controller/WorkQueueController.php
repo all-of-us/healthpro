@@ -618,6 +618,9 @@ class WorkQueueController extends BaseController
                 $this->addFlash('error', 'Error deleting view. Please try again');
             }
         }
+        if ($request->query->get('viewType') === 'custom') {
+            return $this->redirect($request->query->get('currentUrl'));
+        }
         $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_main';
         return $this->redirectToRoute($route);
     }
@@ -675,13 +678,17 @@ class WorkQueueController extends BaseController
             } else {
                 $this->addFlash('error', 'Invalid form');
             }
+            if ($request->query->get('viewType') === 'custom') {
+                return $this->redirect($request->query->get('currentUrl'));
+            }
             $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_main';
             return $this->redirectToRoute($route);
         }
         return $this->render('workqueue/partials/save-view-modal.html.twig', [
             'workQueueViewForm' => $workQueueViewForm->createView(),
             'workQueueViewId' => $id,
-            'viewType' => $request->query->get('viewType')
+            'viewType' => $request->query->get('viewType'),
+            'currentUrl' => $request->query->get('currentUrl')
         ]);
     }
 }

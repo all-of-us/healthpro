@@ -5,7 +5,7 @@
 <div class="modal-body">
     {% set queryParams = params is defined ? params : '' %}
     {% set actionUrl = workQueueViewId is defined ? path('workqueue_view', { id: workQueueViewId, params:
-        queryParams, viewType: viewType }) :
+        queryParams, viewType: viewType, currentUrl: currentUrl }) :
         path('workqueue_view', { params: queryParams, viewType: viewType }) %}
     {{ form_start(workQueueViewForm, { attr: { action: actionUrl } }) }}
     {{ form_rest(workQueueViewForm) }}
