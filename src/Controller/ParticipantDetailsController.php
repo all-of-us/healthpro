@@ -196,7 +196,7 @@ class ParticipantDetailsController extends BaseController
                 $this->addFlash('id-verification-error', 'Invalid form');
             }
         }
-        $idVerifications = $this->em->getRepository(IdVerification::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
+        $idVerifications = $idVerificationService->getIdVerifications($id);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
