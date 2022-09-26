@@ -611,7 +611,10 @@ class WorkQueueController extends BaseController
         $workQueueViewDeleteForm->handleRequest($request);
         if ($workQueueViewDeleteForm->isSubmitted() && $workQueueViewDeleteForm->isValid()) {
             $workQueueViewId = $workQueueViewDeleteForm['id']->getData();
-            $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($workQueueViewId);
+            $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
+                'id' => $workQueueViewId,
+                'user' => $this->getUserEntity()
+            ]);
             if ($workQueueView) {
                 $this->em->remove($workQueueView);
                 $this->em->flush();
@@ -659,7 +662,10 @@ class WorkQueueController extends BaseController
     public function workQueueViewAction($id, Request $request): Response
     {
         if ($id) {
-            $workQueueView = $this->em->getRepository(WorkqueueView::class)->find($id);
+            $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
+                'id' => $id,
+                'user' => $this->getUserEntity()
+            ]);
             if (!$workQueueView) {
                 throw $this->createNotFoundException('Work Queue view not found.');
             }
