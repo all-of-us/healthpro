@@ -10,6 +10,7 @@ use App\Form\WorkQueueParticipantLookupIdType;
 use App\Form\WorkQueueParticipantLookupSearchType;
 use App\Form\WorkQueueViewDeleteType;
 use App\Form\WorkQueueViewType;
+use App\Form\WorkQueueViewUpdateType;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -216,7 +217,8 @@ class WorkQueueController extends BaseController
                 'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
                     $this->getUserEntity()], ['defaultView' => 'desc', 'id' => 'desc']),
                 'workQueueView' => $workQueueView ?? null,
-                'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
+                'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView(),
+                'workQueueViewUpdateForm' => $this->createForm(WorkQueueViewUpdateType::class)->createView(),
             ]);
         }
     }
@@ -626,6 +628,32 @@ class WorkQueueController extends BaseController
     }
 
     /**
+     * @Route("/view/update", name="workqueue_view_update", methods={"POST"})
+     */
+    public function workQueueViewUpdateAction(Request $request): Response
+    {
+        $workQueueViewUpdateForm = $this->createForm(WorkQueueViewUpdateType::class);
+        $workQueueViewUpdateForm->handleRequest($request);
+        if ($workQueueViewUpdateForm->isSubmitted() && $workQueueViewUpdateForm->isValid()) {
+            $workQueueViewId = $workQueueViewUpdateForm['id']->getData();
+            $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
+                'id' => $workQueueViewId,
+                'user' => $this->getUserEntity()
+            ]);
+            if ($workQueueView) {
+                $this->updateWorkQueueView($workQueueView, $request->query->get('viewType'), $request->query->get('params'));
+                $this->addFlash('success', 'Work Queue view updated');
+            } else {
+                $this->addFlash('error', 'Error updating view. Please try again');
+            }
+            $params = array_merge($workQueueView->getFiltersArray(), ['viewId' => $workQueueView->getId()]);
+            $redirectUrl = $this->generateUrl('workqueue_customized_view', $params);
+            return $this->redirect($redirectUrl);
+        }
+        return $this->redirect('workqueue_main');
+    }
+
+    /**
      * @Route("/view/{id}", name="workqueue_view", defaults={"id": null})
      */
     public function workQueueViewAction($id, Request $request): Response
@@ -650,20 +678,7 @@ class WorkQueueController extends BaseController
                 } else {
                     $workQueueView->setUser($this->getUserEntity());
                     $workQueueView->setCreatedTs(new \DateTime());
-                    $type = $request->query->get('viewType');
-                    if ($type === 'custom') {
-                        $columns = 'workQueueViewColumns';
-                    } elseif ($type === 'consent') {
-                        $columns = 'workQueueConsentColumns';
-                    } else {
-                        $columns = 'workQueueColumns';
-                    }
-                    $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columns)));
-                    if ($request->query->get('params')) {
-                        $workQueueView->setFilters(json_encode($request->query->get('params')));
-                    }
-                    $this->em->persist($workQueueView);
-                    $this->em->flush();
+                    $this->updateWorkQueueView($workQueueView, $request->query->get('viewType'), $request->query->get('params'));
                     $this->addFlash('success', 'Work Queue view saved');
                     $params = array_merge($workQueueView->getFiltersArray(), ['viewId' => $workQueueView->getId()]);
                     $redirectUrl = $this->generateUrl('workqueue_customized_view', $params);
@@ -690,5 +705,16 @@ class WorkQueueController extends BaseController
             'viewType' => $request->query->get('viewType'),
             'currentUrl' => $request->query->get('currentUrl')
         ]);
+    }
+
+    private function updateWorkQueueView($workQueueView, $viewType, $params): void
+    {
+        $columnsType = $workQueueView->getColumnsType($viewType);
+        $workQueueView->setColumns(json_encode($this->requestStack->getSession()->get($columnsType)));
+        if ($params) {
+            $workQueueView->setFilters(json_encode($params));
+        }
+        $this->em->persist($workQueueView);
+        $this->em->flush();
     }
 }

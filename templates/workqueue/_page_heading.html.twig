@@ -2,8 +2,16 @@
     <h2><i class="fa fa-table" aria-hidden="true"></i> Work Queues</h2>
 </div>
 <div class="text-right">
-    <button class="btn btn-success btn-xs" id="save_view">Save View {% if viewId %} As {% endif %}</button>
-    <button class="btn btn-default btn-xs" id="manage_views">Manage Views</button>
+    {% if viewId and workQueueViewUpdateForm is defined %}
+        {% set actionUrl = path('workqueue_view_update', { params: params, viewType: viewType }) %}
+        {{ form_start(workQueueViewUpdateForm, { attr: { action: actionUrl } }) }}
+        <button type="submit" class="btn btn-primary btn-xs">Update View</button>
+        {{ form_widget(workQueueViewUpdateForm.id, {'value' : viewId}) }}
+        {% include 'workqueue/partials/save-manage-view-buttons.twig' %}
+        {{ form_end(workQueueViewUpdateForm) }}
+    {% else %}
+        {% include 'workqueue/partials/save-manage-view-buttons.twig' %}
+    {% endif %}
 </div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
