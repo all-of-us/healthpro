@@ -17,7 +17,7 @@ class GoogleGroupsService
 
     public function __construct(ContainerBagInterface $params, EnvironmentService $env)
     {
-        if (!$env->values['isUnitTest']) {
+        if (!$env->values['isUnitTest'] && (($params->has('gaBypass') && !$params->has('gaBypass')))) {
             $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');
             $keyFile = realpath(__DIR__ . '/../../') . '/dev_config/googleapps_key.json';
