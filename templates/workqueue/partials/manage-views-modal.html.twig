@@ -37,7 +37,13 @@
                                        data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
                                 {% endif %}
                             </td>
-                            <td></td>
+                            <td>
+                                <input type="checkbox" id="default_view_status_{{ workQueueView.id }}"
+                                       class="default-view-status" name="default_view_status"
+                                       data-toggle="toggle" data-onstyle="success" data-size="mini"
+                                       data-id="{{ workQueueView.id }}" value="1"
+                                        {% if workQueueView.defaultView %} checked="checked" {% endif %}>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

@@ -26,4 +26,9 @@ $(document).ready(function () {
     if ($('.more-views ul li').hasClass('active')) {
         $('.more-views').addClass('active');
     }
+
+    $('.default-view-status').change(function() {
+        let viewId = $(this).data('id');
+        $.get('/workqueue/view/change/default/'+viewId, {checked: $(this).prop('checked')});
+    })
 });

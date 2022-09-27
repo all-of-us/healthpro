@@ -713,6 +713,34 @@ class WorkQueueController extends BaseController
         ]);
     }
 
+    /**
+     * @Route("/view/change/default/{id}", name="workqueue_view_change_default")
+     */
+    public function workQueueViewChangeDefaultAction($id, Request $request): Response
+    {
+        $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
+            'id' => $id,
+            'user' => $this->getUserEntity()
+        ]);
+        if (!$workQueueView) {
+            throw $this->createNotFoundException('Work Queue view not found.');
+        }
+        if ($request->query->get('checked') === 'true') {
+            $workQueueView->setDefaultView(1);
+        } else {
+            $workQueueView->setDefaultView(0);
+        }
+        $this->em->persist($workQueueView);
+        $this->em->flush();
+
+        $this->em->getRepository(WorkqueueView::class)->updateDefaultView(
+            $workQueueView->getId(),
+            $this->getUserEntity()
+        );
+
+        return $this->json(['success' => true]);
+    }
+
     private function updateWorkQueueView($workQueueView, $viewType, $params): void
     {
         $columnsType = $workQueueView->getColumnsType($viewType);
