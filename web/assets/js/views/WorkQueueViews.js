@@ -27,8 +27,25 @@ $(document).ready(function () {
         $('.more-views').addClass('active');
     }
 
-    $('.default-view-status').change(function() {
-        let viewId = $(this).data('id');
-        $.get('/workqueue/view/change/default/'+viewId, {checked: $(this).prop('checked')});
-    })
+    let triggerChangeEvent = true;
+
+    $('.default-view-status').change(function () {
+        if (triggerChangeEvent) {
+            let url = $(this).data('url');
+            let viewId = $(this).data('id');
+            let isChecked = $(this).prop('checked');
+            $.ajax({
+                url: url,
+                data: {
+                    checked: isChecked
+                }
+            }).done(function () {
+                triggerChangeEvent = false;
+                if (isChecked) {
+                    $('.default-view-status').not('#default_view_status_' + viewId).bootstrapToggle('off');
+                }
+                triggerChangeEvent = true;
+            });
+        }
+    });
 });
