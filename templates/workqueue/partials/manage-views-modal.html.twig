@@ -6,13 +6,13 @@
                 <h4 class="modal-title"><i class="fa fa-save"></i> Manage Views</h4>
             </div>
             <div class="modal-body">
-                <h5>My Views</h5>
-                <table class="table table-borderless table-manage-views">
+                <table class="table table-manage-views">
                     <thead>
                     <tr>
-                        <td></td>
+                        <td><strong>My Views</strong></td>
                         <td>Edit</td>
                         <td>Delete</td>
+                        <td>Default</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -29,8 +29,7 @@
                             <td>
                                 <i class="fa fa-edit wq-view-edit" aria-hidden="true"
                                    data-href="{{ path('workqueue_view', { id: workQueueView.id, viewType: viewType,
-                                       currentUrl: currentUrl })
-                                   }}" data-type="edit" role="button"></i>
+                                       currentUrl: currentUrl }) }}" data-type="edit" role="button"></i>
                             </td>
                             <td>
                                 {% if viewId != workQueueView.id %}
@@ -38,13 +37,26 @@
                                        data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
                                 {% endif %}
                             </td>
+                            <td></td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-                <h5>Other Views</h5>
-                <p>Participant Work Queue</p>
-                <p>Participant Consents</p>
+                <table class="table table-manage-views">
+                    <thead>
+                    <tr>
+                        <td><strong>Present Views</strong></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Participant Work Queue</td>
+                    </tr>
+                    <tr>
+                        <td>Participant Consents</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
