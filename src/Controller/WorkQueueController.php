@@ -624,6 +624,10 @@ class WorkQueueController extends BaseController
             }
         }
         if ($request->query->get('viewType') === 'custom') {
+            // Redirect to the main workqueue if user delete the same view that they are in
+            if (isset($workQueueViewId) && $request->query->get('currentViewId') === $workQueueViewId) {
+                return $this->redirectToRoute('workqueue_main');
+            }
             return $this->redirect($request->query->get('currentUrl'));
         }
         $route = $request->query->get('viewType') === 'consent' ? 'workqueue_consents' : 'workqueue_main';

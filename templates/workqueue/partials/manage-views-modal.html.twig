@@ -27,10 +27,8 @@
                                        currentUrl: currentUrl }) }}" data-type="edit" role="button"></i>
                             </td>
                             <td>
-                                {% if viewId != workQueueView.id %}
-                                    <i class="fa fa-trash wq-view-delete" aria-hidden="true"
-                                       data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
-                                {% endif %}
+                                <i class="fa fa-trash wq-view-delete" aria-hidden="true"
+                                   data-id="{{ workQueueView.id }}" data-type="delete" role="button"></i>
                             </td>
                             <td>
                                 <input type="checkbox" id="default_view_status_{{ workQueueView.id }}"
