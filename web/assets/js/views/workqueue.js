@@ -299,7 +299,7 @@ $(document).ready(function() {
     };
 
     var hideColumns = function () {
-        for (let i = 3; i <= 80; i++) {
+        for (let i = 3; i <= wQColumns.length + 1; i++) {
             var column = table.column(i);
             column.visible(false);
         }
