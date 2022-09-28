@@ -14,5 +14,7 @@
     </div>
     <div class="text-right"><a class="pull-right" href="{{ path('help_sopFile', { id: sop }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a></div>
     <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: sop }) }}#view=FitH"></iframe>
-    {% include 'help/footer.html.twig' %}
+<footer class="footer help-footer">
+    {% include 'help/helptext.html.twig' %}
+</footer>
 {% endblock %}
