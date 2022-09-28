@@ -30,7 +30,9 @@ $(document).ready(function () {
     let triggerChangeEvent = true;
 
     $('.default-view-status').change(function () {
+        let defaultViewStatus = $('.default-view-status');
         if (triggerChangeEvent) {
+            defaultViewStatus.bootstrapToggle('disable');
             let url = $(this).data('url');
             let viewId = $(this).data('id');
             let isChecked = $(this).prop('checked');
@@ -40,11 +42,14 @@ $(document).ready(function () {
                     checked: isChecked
                 }
             }).done(function () {
+                defaultViewStatus.bootstrapToggle('enable');
                 triggerChangeEvent = false;
                 if (isChecked) {
-                    $('.default-view-status').not('#default_view_status_' + viewId).bootstrapToggle('off');
+                    defaultViewStatus.not('#default_view_status_' + viewId).bootstrapToggle('off');
                 }
                 triggerChangeEvent = true;
+            }).fail(function () {
+                defaultViewStatus.bootstrapToggle('enable');
             });
         }
     });
