@@ -741,6 +741,17 @@ class WorkQueueController extends BaseController
         return $this->json(['success' => true]);
     }
 
+    /**
+     * @Route("/view/check/name/{id}", name="workqueue_view_check_name", defaults={"id": null})
+     */
+    public function workQueueViewCheckNameAction($id, Request $request): Response
+    {
+        $workQueueView = $this->em->getRepository(WorkqueueView::class)
+            ->checkDuplicateName($id, $request->query->get('name'), $this->getUserEntity());
+        $status = $workQueueView ? 1 : 0;
+        return $this->json(['success' => true, 'status' => $status]);
+    }
+
     private function updateWorkQueueView($workQueueView, $viewType, $params): void
     {
         $columnsType = $workQueueView->getColumnsType($viewType);

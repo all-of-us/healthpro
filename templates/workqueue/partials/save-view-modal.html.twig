@@ -4,12 +4,20 @@
 </div>
 <div class="modal-body">
     {% set queryParams = params is defined ? params : '' %}
-    {% set actionUrl = workQueueViewId is defined ? path('workqueue_view', { id: workQueueViewId, params:
-        queryParams, viewType: viewType, currentUrl: currentUrl }) :
-        path('workqueue_view', { params: queryParams, viewType: viewType }) %}
-    {{ form_start(workQueueViewForm, { attr: { action: actionUrl } }) }}
+    {% if workQueueViewId is defined %}
+        {% set actionUrl = path('workqueue_view', { id: workQueueViewId, params: queryParams, viewType: viewType,
+            currentUrl: currentUrl }) %}
+        {% set nameCheckUrl = path('workqueue_view_check_name', { id: workQueueViewId }) %}
+        {% set formId = 'workqueue_view_form_' ~ workQueueViewId %}
+    {% else %}
+        {% set actionUrl = path('workqueue_view', { params: queryParams, viewType: viewType }) %}
+        {% set nameCheckUrl = path('workqueue_view_check_name') %}
+        {% set formId = 'workqueue_view_form' %}
+    {% endif %}
+    {{ form_start(workQueueViewForm, { attr: { action: actionUrl, id: formId } }) }}
     {{ form_rest(workQueueViewForm) }}
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary save-view-btn" data-url="{{ nameCheckUrl }}"
+            data-form-id="{{ formId }}">Save</button>
     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
     {{ form_end(workQueueViewForm) }}
 </div>

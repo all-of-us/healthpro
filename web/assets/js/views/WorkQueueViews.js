@@ -1,4 +1,33 @@
 $(document).ready(function () {
+    let saveViewNameCheck = function () {
+        $('.save-view-btn').on('click', function () {
+            let $this = $(this);
+            let url = $(this).data('url');
+            let formId = $(this).data('form-id');
+            let inputNameSelector = $('#' + formId + ' input[name="work_queue_view[name]"]');
+            let viewName = inputNameSelector.val();
+            $this.prop('disabled', true);
+            $.ajax({
+                url: url,
+                data: {
+                    name: viewName
+                }
+            }).done(function (data) {
+                let viewNameErrorSelector = $('.view-name-error');
+                viewNameErrorSelector.remove();
+                if (data.status) {
+                    inputNameSelector.after('<p class="view-name-error text-danger">Name has already been used.</p>');
+                    $this.prop('disabled', false);
+                } else {
+                    viewNameErrorSelector.remove();
+                    $('#' + formId).submit();
+                }
+            }).fail(function () {
+                $this.prop('disabled', false);
+            });
+        });
+    }
+
     $('#save_view').on('click', function () {
         $('#save_view_modal').modal('show');
     });
@@ -14,6 +43,7 @@ $(document).ready(function () {
         // Load data from url
         modelContent.load($(this).data('href'), function () {
             editViewFormModal.modal('show');
+            saveViewNameCheck();
         });
     });
 
@@ -53,4 +83,6 @@ $(document).ready(function () {
             });
         }
     });
+
+    saveViewNameCheck();
 });
