@@ -2697,6 +2697,22 @@ class WorkQueue
         return $workQueueColumns;
     }
 
+    public static function getWorkQueueAllColumns(): array
+    {
+        $workQueueColumns = [];
+        foreach (self::$consentColumns as $column) {
+            $columnDef = self::$columnsDef[$column];
+            if (isset($columnDef['names'])) {
+                foreach (array_keys($columnDef['names']) as $subColumn) {
+                    $workQueueColumns[] = $subColumn;
+                }
+            } else {
+                $workQueueColumns[] = $column;
+            }
+        }
+        return $workQueueColumns;
+    }
+
     public static function isValidDate($date)
     {
         $dt = \DateTime::createFromFormat("m/d/Y", $date);

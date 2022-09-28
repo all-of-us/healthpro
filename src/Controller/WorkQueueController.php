@@ -565,7 +565,7 @@ class WorkQueueController extends BaseController
     {
         $columns = $request->query->has('columnType') ? 'workQueueViewColumns' : 'workQueueColumns';
         if ($request->query->has('select')) {
-            $this->requestStack->getSession()->set($columns, WorkQueue::getWorkQueueColumns());
+            $this->requestStack->getSession()->set($columns, WorkQueue::getWorkQueueAllColumns());
             return $this->json(['success' => true]);
         }
         if ($request->query->has('deselect')) {
