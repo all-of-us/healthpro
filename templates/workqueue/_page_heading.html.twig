@@ -1,3 +1,13 @@
+{% macro displayViewTitle(view) %}
+    {% set queryParams = view.filtersArray|merge({ 'viewId': view.Id }) %}
+    {% set viewPath = path('workqueue_customized_view', queryParams) %}
+    <a href="{{ viewPath }}">
+        {{ view.name }}
+        {% if view.defaultView %}
+            <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+        {% endif %}
+    </a>
+{% endmacro %}
 <div class="page-header">
     <h2><i class="fa fa-table" aria-hidden="true"></i> Work Queues</h2>
 </div>
@@ -22,11 +32,9 @@
         <a href="{{ path('workqueue_consents') }}">Participant Consents</a>
     </li>
     {% for key, view in workQueueViews %}
-        {% set queryParams = view.filtersArray|merge({ 'viewId': view.Id }) %}
-        {% set viewPath = path('workqueue_customized_view', queryParams) %}
         {% if key < 6 %}
             <li role="presentation" {% if viewId == view.id %}class="active"{% endif %}>
-                <a href="{{ viewPath }}">{{ view.name }}</a>
+                {{ _self.displayViewTitle(view) }}
             </li>
         {% else %}
             {% if key == 6 %}
@@ -36,7 +44,7 @@
                 <ul class="dropdown-menu">
             {% endif %}
             <li {% if viewId == view.id %}class="active"{% endif %}>
-                <a href="{{ viewPath }}">{{ view.name }}</a>
+                {{ _self.displayViewTitle(view) }}
             </li>
             {% if key == workQueueViews|length - 1 %}
                 </ul>
