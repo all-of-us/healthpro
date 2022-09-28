@@ -69,10 +69,7 @@
             <iframe class="embed-responsive-item" src="{{ playlist.widget }}?iframeembed=true&amp;playerId={{ playlist.player_id }}&amp;flashvars[playlistAPI.kpl0Id]={{ playlist.playlist_id }}&amp;flashvars[playlistAPI.autoContinue]=true&amp;flashvars[playlistAPI.autoInsert]=true&amp;flashvars[ks]=&amp;flashvars[streamerType]=auto&amp;flashvars[localizationCode]=en" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow="autoplay *; fullscreen *; encrypted-media *" title="Kaltura Player"></iframe>
         </div>
     {% endif %}
-
-<footer class="footer help-footer">
-    {% include 'help/helptext.html.twig' %}
-</footer>
+    {% include 'help/footer.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}
