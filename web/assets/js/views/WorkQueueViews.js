@@ -26,7 +26,7 @@ $(document).ready(function () {
                 $this.prop('disabled', false);
             });
         });
-    }
+    };
 
     $('#save_view').on('click', function () {
         $('#save_view_modal').modal('show');
