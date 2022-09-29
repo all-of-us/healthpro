@@ -482,7 +482,7 @@ label.label-normal {
 
 .workqueue-main-tab {
     background-color: #337ab7 !important;
-    margin-left: 1px;
+    margin-left: 4px;
 }
 
 .workqueue-main-tab > a:hover, .workqueue-main-tab > a:focus{
