@@ -108,4 +108,44 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
             ]
         ];
     }
+
+    public function testIdVerificationAjaxData(): void
+    {
+        $ajaxData = $this->service->getIdVerificationAjaxData($this->getIdVerificationsData());
+        $this->assertEquals('test1@example.com', $ajaxData[0]['user']);
+        $this->assertEquals('09-19-2022', $ajaxData[0]['created']);
+        $this->assertEquals('A photo and at least one piece of PII', $ajaxData[0]['verificationType']);
+        $this->assertEquals('PM&B Initial Visit', $ajaxData[0]['visitType']);
+        $this->assertEquals('test2@example.com', $ajaxData[1]['user']);
+        $this->assertEquals('09-19-2022', $ajaxData[1]['created']);
+        $this->assertEquals('At least two separate pieces of PII', $ajaxData[1]['verificationType']);
+        $this->assertEquals('Biospecimen Redraw', $ajaxData[1]['visitType']);
+    }
+
+    private function getIdVerificationsData(): array
+    {
+        $now = new \Datetime('2022-09-19');
+        return [
+            [
+                'participantId' => 'P000000000',
+                'siteName' => 'PS_SITE_TEST',
+                'email' => 'test1@example.com',
+                'verifiedDate' => $now,
+                'verificationType' => 'PHOTO_AND_ONE_OF_PII',
+                'visitType' => 'PMB_INITIAL_VISIT',
+                'createdTs' => $now,
+                'importId' => 1
+            ],
+            [
+                'participantId' => 'P000000001',
+                'siteName' => 'PS_SITE_TEST',
+                'email' => 'test2@example.com',
+                'verifiedDate' => $now,
+                'verificationType' => 'TWO_OF_PII',
+                'visitType' => 'BIOSPECIMEN_REDRAW_ONLY',
+                'createdTs' => $now,
+                'importId' => 2
+            ]
+        ];
+    }
 }

@@ -179,11 +179,13 @@ class OrderType extends AbstractType
                         'required' => true,
                         'disabled' => $disabled,
                         'choices' => [
-                            '-- Select centrifuge type --' => null,
-                            'Fixed Angle' => $options['order']::FIXED_ANGLE,
-                            'Swinging Bucket' => $options['order']::SWINGING_BUCKET
+                            'Swinging Bucket (Produces a sample with a <b>non-slanted gel layer</b>)' =>
+                                $options['order']::SWINGING_BUCKET,
+                            'Fixed Angle (Produces a sample with a <b>slanted gel layer</b>)' =>
+                                $options['order']::FIXED_ANGLE
                         ],
                         'multiple' => false,
+                        'expanded' => true,
                         'constraints' => new Constraints\NotBlank([
                             'message' => 'Please select centrifuge type'
                         ])
