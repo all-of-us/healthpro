@@ -485,7 +485,7 @@ label.label-normal {
     margin-left: 1px;
 }
 
-.workqueue-main-tab > a:hover{
+.workqueue-main-tab > a:hover, .workqueue-main-tab > a:focus{
     background-color: #337ab7 !important;
     border-color: #337ab7 !important;
 }
