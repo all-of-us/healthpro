@@ -480,6 +480,25 @@ label.label-normal {
     display: block;
 }
 
+.workqueue-main-tab {
+    background-color: #337ab7 !important;
+    margin-left: 1px;
+}
+
+.workqueue-main-tab > a:hover{
+    background-color: #337ab7 !important;
+    border-color: #337ab7 !important;
+}
+
+.workqueue-main-tab a {
+    color: #ffffff !important;
+}
+
+.workqueue-tabs .active, .workqueue-tabs .main-active {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 .table-borderless td, .table-borderless th {
     border: none !important;
 }

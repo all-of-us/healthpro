@@ -24,11 +24,11 @@
     {% endif %}
 </div>
 {% set current_route = app.request.get('_route') %}
-<ul class="nav nav-tabs">
-    <li role="presentation" {% if current_route == 'workqueue_main' and viewId is empty %}class="active"{% endif %}>
+<ul class="nav nav-tabs workqueue-tabs">
+    <li role="presentation" class="workqueue-main-tab {% if current_route == 'workqueue_main' and viewId is empty %}main-active{% endif %}">
         <a href="{{ path('workqueue_main') }}">Participant Work Queue</a>
     </li>
-    <li role="presentation" {% if current_route == 'workqueue_consents' and viewId is empty %}class="active"{% endif %}>
+    <li role="presentation" class="workqueue-main-tab {% if current_route == 'workqueue_consents' and viewId is empty %}main-active{% endif %}">
         <a href="{{ path('workqueue_consents') }}">Participant Consents</a>
     </li>
     {% for key, view in workQueueViews %}
