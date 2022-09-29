@@ -25,6 +25,23 @@ class WorkqueueViewRepositoryTest extends KernelTestCase
 
     }
 
+    public function testUpdateDefaultView(): void
+    {
+        $this->createViews();
+        $workqueueView = $this->repo->findOneBy([
+            'name' => 'Test View 1',
+            'user' => $this->user
+        ]);
+        $id = $workqueueView->getId();
+        $this->repo->updateDefaultView($id, $this->user);
+        $workqueueView = $this->repo->findOneBy([
+            'name' => 'Test View 2',
+            'user' => $this->user
+        ]);
+        $this->em->refresh($workqueueView);
+        $this->assertEquals(false, $workqueueView->getDefaultView());
+    }
+
     /**
      * @dataProvider duplicateViewDataProvider
      */
