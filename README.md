@@ -12,12 +12,15 @@ Prerequisites:
 
 * [Google Cloud SDK](https://cloud.google.com/sdk/docs/)
     1. Follow platform-specific instructions for downloading and installing the [Google Cloud SDK](https://cloud.google.com/sdk/docs/)
-    2. Run the optional `install.sh` command so that `gcloud` is available from path
+        * **NOTE**: For WSL, use the generic Linux directions and the tar.gz file, NOT the apt-get option for Ubuntu. Gcloud has a built-in package manager that doesn't work if it's installed through apt.
+    2. Run the `install.sh` command so that `gcloud` is available from your path (for Mac and WSL)
     3. Run `gcloud init`
+        * When asked for your "authorization code", sign into Google with your PMI-OPS account
+        * When asked to "pick cloud project to use", enter `pmi-hpo-dev`
     4. Install additional gcloud components:
-        * `gcloud components install app-engine-php`
         * `gcloud components install cloud-datastore-emulator`
         * `gcloud components install cloud_sql_proxy`
+        * `gcloud components install app-engine-php`  **NOTE:** This is not available in WSL and may not be required
 * [NodeJS](https://nodejs.org/) (latest LTS should be fine)
 * [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 5.7 which is used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)

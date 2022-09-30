@@ -183,7 +183,8 @@ class RequestListener
             'workqueue_export',
             'help_sopFile',
             'on_site_patient_status_export',
-            'on_site_incentive_tracking_export'
+            'on_site_incentive_tracking_export',
+            'on_site_id_verification_export'
         ]));
     }
 

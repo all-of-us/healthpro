@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Audit\Log;
+use App\Entity\IdVerification;
+use Doctrine\ORM\EntityManagerInterface;
 
 class IdVerificationService
 {
@@ -10,17 +12,20 @@ class IdVerificationService
     protected $siteService;
     protected $userService;
     protected $loggerService;
+    protected $em;
 
     public function __construct(
         RdrApiService $rdrApiService,
         SiteService $siteService,
         UserService $userService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        EntityManagerInterface $em
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->siteService = $siteService;
         $this->userService = $userService;
         $this->loggerService = $loggerService;
+        $this->em = $em;
     }
 
     public function getRdrObject($verificationData): \stdClass
@@ -30,7 +35,7 @@ class IdVerificationService
         if (isset($verificationData['userEmail'])) {
             $obj->userEmail = $verificationData['userEmail'];
         }
-        $obj->verifiedTime = $verificationData['verifiedTime'];
+        $obj->verifiedTime = $verificationData['verifiedDate'];
         $obj->siteGoogleGroup = $verificationData['siteGoogleGroup'];
         if (isset($verificationData['verificationType'])) {
             $obj->verificationType = $verificationData['verificationType'];
@@ -49,10 +54,17 @@ class IdVerificationService
         $verificationData['userEmail'] = $this->userService->getUser()->getEmail();
         $verificationData['participantId'] = $participantId;
         $now = new \DateTime();
-        $verificationData['verifiedTime'] = $now->format('Y-m-d\TH:i:s\Z');
+        $verificationData['verifiedDate'] = $now->format('Y-m-d\TH:i:s\Z');
         $verificationData['siteGoogleGroup'] = $this->siteService->getSiteIdWithPrefix();
         $postData = $this->getRdrObject($verificationData);
-        return $this->sendToRdr($postData);
+        if ($this->sendToRdr($postData)) {
+            $verificationData['verifiedDate'] = $now;
+            $verificationData['user'] = $this->userService->getUserEntity();
+            $verificationData['site'] = $this->siteService->getSiteId();
+            $this->saveIdVerification($verificationData);
+            return true;
+        }
+        return false;
     }
 
     public function getIdVerifications($participantId): array
@@ -85,5 +97,22 @@ class IdVerificationService
             return false;
         }
         return false;
+    }
+
+    public function saveIdVerification($data): void
+    {
+        $idVerification = new IdVerification();
+        $idVerification->setParticipantId($data['participantId']);
+        $idVerification->setUser($data['user']);
+        $idVerification->setSite($data['site']);
+        $idVerification->setVisitType($data['visitType']);
+        $idVerification->setVerificationType($data['verificationType']);
+        $idVerification->setVerifiedDate($data['verifiedDate']);
+        if (isset($data['import'])) {
+            $idVerification->setImport($data['import']);
+        }
+        $idVerification->setCreatedTs(new \DateTime());
+        $this->em->persist($idVerification);
+        $this->em->flush();
     }
 }

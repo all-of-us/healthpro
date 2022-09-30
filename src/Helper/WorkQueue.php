@@ -633,6 +633,22 @@ class WorkQueue
             'visible' => false,
             'group' => 'surveys'
         ],
+        'LifeFunctioning' => [
+            'name' => 'Life Functioning',
+            'csvNames' => [
+                'Life Functioning PPI Survey Complete',
+                'Life Functioning PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnLifeFunctioning',
+            'sortField' => 'questionnaireOnLifeFunctioningAuthored',
+            'rdrDateField' => 'questionnaireOnLifeFunctioningAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ],
         'CopeMay' => [
             'name' => 'COPE May',
             'csvNames' => [
@@ -1238,6 +1254,7 @@ class WorkQueue
         'PersonalAndFamilyHealthHistory',
         'HealthcareAccess',
         'SocialDeterminantsOfHealth',
+        'LifeFunctioning',
         'CopeMay',
         'CopeJune',
         'CopeJuly',
@@ -1427,7 +1444,8 @@ class WorkQueue
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored',
+        'LifeFunctioning'
     ];
 
     public static $sortColumns = [
@@ -1480,6 +1498,7 @@ class WorkQueue
         'questionnaireOnPersonalAndFamilyHealthHistoryAuthored',
         'questionnaireOnHealthcareAccessAuthored',
         'questionnaireOnSocialDeterminantsOfHealthAuthored',
+        'questionnaireOnLifeFunctioningAuthored',
         'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJulyAuthored',
@@ -2091,6 +2110,7 @@ class WorkQueue
         'PersonalAndFamilyHealthHistory' => 'Personal & Family Hx',
         'HealthcareAccess' => 'Access',
         'SocialDeterminantsOfHealth' => 'SDOH',
+        'LifeFunctioning' => 'Life Functioning',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',

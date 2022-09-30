@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\IdVerificationRepository;
 use App\Repository\IncentiveRepository;
 use App\Repository\PatientStatusRepository;
 use App\Service\OnSiteDetailsReportingService;
@@ -156,6 +157,79 @@ class OnSiteDetailsReportingController extends BaseController
             fclose($output);
         };
         $filename = "on_site_details_incentive_tracking_" . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
+
+        return new StreamedResponse($stream, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
+    }
+
+    /**
+     * @Route("/id-verification", name="on_site_id_verification")
+     */
+    public function idVerificationAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        IdVerificationRepository $idVerificationRepository,
+        SiteService $siteService,
+        Request $request
+    ) {
+        $params = $request->query->all();
+        if ($request->isXmlHttpRequest()) {
+            $ajaxParams = $request->request->all();
+            $ajaxParams['startDate'] = $this->getParamDate($params, 'startDate');
+            $ajaxParams['endDate'] = $this->getParamDate($params, 'endDate');
+            $ajaxParams['participantId'] = $params['participantId'] ?? '';
+            $sortColumns = $onSiteDetailsReportingService::$idVerificationSortColumns;
+            $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
+            $ajaxParams['sortDir'] = $ajaxParams['order'][0]['dir'];
+            $idVerifications = $idVerificationRepository->getOnsiteIdVerifications($siteService->getSiteId(), $ajaxParams);
+            $ajaxData = [];
+            $ajaxData['data'] = $onSiteDetailsReportingService->getIdVerificationAjaxData($idVerifications);
+            $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] =
+                $idVerificationRepository->getOnsiteIdVerificationsCount($siteService->getSiteId(), $ajaxParams);
+            return $this->json($ajaxData);
+        } else {
+            return $this->render('onsite/id-verification.html.twig', ['params' => $params]);
+        }
+    }
+
+    /**
+     * @Route("/id-verification-export", name="on_site_id_verification_export")
+     */
+    public function idVerificationExportAction(
+        OnSiteDetailsReportingService $onSiteDetailsReportingService,
+        IdVerificationRepository $idVerificationRepository,
+        SiteService $siteService,
+        Request $request
+    ) {
+        $queryParams = $request->query->all();
+        $params = [];
+        $params['startDate'] = $this->getParamDate($queryParams, 'startDate');
+        $params['endDate'] = $this->getParamDate($queryParams, 'endDate');
+        $params['participantId'] = $queryParams['participantId'] ?? '';
+        $idVerifications = $idVerificationRepository->getOnsiteIdVerifications($siteService->getSiteId(), $params);
+        $records = $onSiteDetailsReportingService->getIdVerificationAjaxData($idVerifications, true);
+        $exportHeaders = $onSiteDetailsReportingService::$idVerificationExportHeaders;
+        $stream = function () use ($records, $exportHeaders) {
+            $output = fopen('php://output', 'w');
+            // Add UTF-8 BOM
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv(
+                $output,
+                ['This file contains information that is sensitive and confidential. Do not distribute either the file or its contents.']
+            );
+            fwrite($output, "\"\"\n");
+
+            fputcsv($output, $exportHeaders);
+
+            foreach ($records as $record) {
+                fputcsv($output, $record);
+            }
+            fwrite($output, "\"\"\n");
+            fputcsv($output, ['Confidential Information']);
+            fclose($output);
+        };
+        $filename = "on_site_details_id_verification_" . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
 
         return new StreamedResponse($stream, 200, [
             'Content-Type' => 'text/csv',

@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Incentive;
 use App\Entity\PatientStatus;
+use App\Form\IdVerificationType;
 
 class OnSiteDetailsReportingService
 {
@@ -31,6 +32,15 @@ class OnSiteDetailsReportingService
         'Amended'
     ];
 
+    public static $idVerificationExportHeaders = [
+        'Date Created',
+        'Participant ID',
+        'User',
+        'Verification Type',
+        'Visit Type',
+        'Imported'
+    ];
+
     public static $patientStatusSortColumns = [
         'psh.createdTs',
         'ps.participantId',
@@ -50,6 +60,14 @@ class OnSiteDetailsReportingService
         'i.incentiveAmount',
         'i.declined',
         'i.notes'
+    ];
+
+    public static $idVerificationSortColumns = [
+        'idv.createdTs',
+        'idv.participantId',
+        'u.email',
+        'idv.verificationType',
+        'idv.visitType'
     ];
 
     public function getPatientStatusAjaxData($patientStatuses): array
@@ -114,6 +132,32 @@ class OnSiteDetailsReportingService
                     $type = 'amend';
                 }
                 $row['type'] = $type;
+            }
+            array_push($rows, $row);
+        }
+        return $rows;
+    }
+
+    public function getIdVerificationAjaxData($idVerifications, $export = false): array
+    {
+        $rows = [];
+        foreach ($idVerifications as $idVerification) {
+            $row = [];
+            $row['created'] = $idVerification['createdTs']->format('m-d-Y');
+            $row['participantId'] = $idVerification['participantId'];
+            $row['user'] = $idVerification['email'];
+            $row['verificationType'] = $idVerification['verificationType'] ? array_search(
+                $idVerification['verificationType'],
+                IdVerificationType::$idVerificationChoices['verificationType']
+            ) : '';
+            $row['visitType'] = $idVerification['visitType'] ? array_search(
+                $idVerification['visitType'],
+                IdVerificationType::$idVerificationChoices['visitType']
+            ) : '';
+            if ($export) {
+                $row['imported'] = $idVerification['importId'] ? 'Yes' : 'No';
+            } else {
+                $row['type'] = $idVerification['importId'] ? 'import' : '';
             }
             array_push($rows, $row);
         }

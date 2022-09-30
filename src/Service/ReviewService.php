@@ -35,7 +35,9 @@ class ReviewService
         'physicalMeasurements' => null,
         'physicalMeasurementsCount' => 0,
         'incentives' => null,
-        'incentivesCount' => 0
+        'incentivesCount' => 0,
+        'idVerifications' => null,
+        'idVerificationsCount' => 0
     ];
 
     protected function getTodayRows($startTime, $endTime, $site)
@@ -75,7 +77,15 @@ class ReviewService
             'WHERE i.site = :site ' .
             'AND i.created_ts >= :startTime ' .
             'AND i.created_ts < :endTime ';
-        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) ORDER BY latest_ts DESC";
+        $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
+            'null, ' .
+            'null, ' .
+            'null ' .
+            'FROM id_verification idv ' .
+            'WHERE idv.site = :site ' .
+            'AND idv.created_ts >= :startTime ' .
+            'AND idv.created_ts < :endTime ';
+        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) UNION ($idVerificationsQuery) ORDER BY latest_ts DESC";
 
         return $this->em->getConnection()->fetchAll($query, [
             'startTime' => $startTime,
@@ -120,6 +130,10 @@ class ReviewService
                 case 'incentive':
                     $participants[$participantId]['incentives'][] = $row;
                     $participants[$participantId]['incentivesCount']++;
+                    break;
+                case 'idVerification':
+                    $participants[$participantId]['idVerifications'][] = $row;
+                    $participants[$participantId]['idVerificationsCount']++;
                     break;
             }
         }
