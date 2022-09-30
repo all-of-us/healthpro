@@ -33,4 +33,23 @@ class WorkqueueViewRepository extends ServiceEntityRepository
             ->getQuery();
         $query->execute();
     }
+
+    public function checkDuplicateName($id, $name, $user): int
+    {
+        $queryBuilder =  $this->createQueryBuilder('w')
+            ->select('count(w.id)')
+            ->where('w.user = :user')
+            ->andWhere('w.name = :name')
+            ->setParameter('user', $user)
+            ->setParameter('name', $name);
+
+        if ($id) {
+            $queryBuilder->andWhere('w.id != :id')
+                ->setParameter('id', $id);
+        }
+
+        return $queryBuilder
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

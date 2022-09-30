@@ -131,4 +131,16 @@ class WorkqueueView
         }
         return [];
     }
+
+    public function getColumnsType($type): string
+    {
+        if ($type === 'custom') {
+            $columns = 'workQueueViewColumns';
+        } elseif ($type === 'consent') {
+            $columns = 'workQueueConsentColumns';
+        } else {
+            $columns = 'workQueueColumns';
+        }
+        return $columns;
+    }
 }

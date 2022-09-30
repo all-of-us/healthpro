@@ -480,12 +480,31 @@ label.label-normal {
     display: block;
 }
 
+.workqueue-main-tab {
+    background-color: #337ab7 !important;
+    margin-left: 4px;
+}
+
+.workqueue-main-tab > a:hover, .workqueue-main-tab > a:focus{
+    background-color: #337ab7 !important;
+    border-color: #337ab7 !important;
+}
+
+.workqueue-main-tab a {
+    color: #ffffff !important;
+}
+
+.workqueue-tabs .active, .workqueue-tabs .main-active {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 .table-borderless td, .table-borderless th {
     border: none !important;
 }
 
-.table-manage-views {
-    width: auto !important;
+.table-manage-views thead {
+    background-color: #efefef;
 }
 
 .dropdown-submenu {
