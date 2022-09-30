@@ -21,6 +21,7 @@ $(document).ready(function() {
     var wQColumns = $('#workqueue').data('wq-columns');
     var columnsDef = $('#workqueue').data('columns-def');
     var isDvType = $('#workqueue').data('dv-type');
+    var viewId = $('#workqueue').data('view-id');
 
     var tableColumns = [];
 
@@ -234,6 +235,11 @@ $(document).ready(function() {
         ]
     });
 
+    // Hide filter buttons in customized WQ views
+    if (viewId) {
+        table.buttons().nodes().addClass('hidden');
+    }
+
     $('.page-drop-down select').change(function () {
         table.page(parseInt($(this).val())).draw('page');
     });
@@ -293,7 +299,7 @@ $(document).ready(function() {
     };
 
     var hideColumns = function () {
-        for (let i = 3; i <= 80; i++) {
+        for (let i = 3; i <= wQColumns.length + 1; i++) {
             var column = table.column(i);
             column.visible(false);
         }
