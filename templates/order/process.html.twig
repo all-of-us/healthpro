@@ -1,5 +1,6 @@
 {% extends 'render-base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
+{% import 'macros/form-render.html.twig' as formRender %}
 {% if order.type != 'saliva' %}
     {% form_theme processForm 'form/simple_checkbox.html.twig' %}
 {% endif %}
@@ -23,7 +24,7 @@
     {% if order.type != 'saliva' and processForm.processedCentrifugeType is defined %}
         <div class="form-group{% if not processForm.processedCentrifugeType.vars.valid %} has-error{% endif %}">
             {{ form_label(processForm.processedCentrifugeType) }}
-            {{ form_widget(processForm.processedCentrifugeType) }}
+            {{ formRender.form_raw_choices_widget(processForm.processedCentrifugeType) }}
             {{ form_errors(processForm.processedCentrifugeType) }}
         </div>
     {% endif %}

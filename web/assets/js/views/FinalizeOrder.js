@@ -127,4 +127,27 @@ $(document).ready(function () {
         });
         return confirm(message);
     });
+
+    let handleShippingFields = function () {
+        if ($('input:radio[name="order[sampleShippingMethod]"]').is(':checked')) {
+            let sampleShippingMethod = $('input:radio[name="order[sampleShippingMethod]"]:checked').val();
+            if (sampleShippingMethod === 'fedex') {
+                $('#shipping_fields').show();
+                $('#courier_warning').hide();
+            } else if (sampleShippingMethod === 'courier') {
+                $('#shipping_fields').hide();
+                $('#courier_warning').show();
+            }
+        }
+    };
+
+    $('#order_sampleShippingMethod input[type=radio]').on('change', function () {
+        handleShippingFields();
+    });
+
+    handleShippingFields();
+
+    $('#toggleShippingHelpModal').on('click', function () {
+        $('#shipping_method_help_modal').modal();
+    });
 });

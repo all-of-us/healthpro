@@ -96,6 +96,14 @@
             {% endif %}
             <div role="tabpanel" class="tab-pane" id="finalize">
                 {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'finalized' } %}
+                {% if order.fedexTracking %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3><i class="fa fa-truck" aria-hidden="true"></i>Tracking Number</h3>
+                            {{ order.fedexTracking }}
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

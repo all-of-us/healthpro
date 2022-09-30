@@ -114,7 +114,7 @@ class IdVerificationImportServiceTest extends ServiceTestCase
     {
         $idVerification = $this->service->getIdVerificationFromImportData($importData);
         $this->assertEquals($idVerification['participantId'], $importData['participantId']);
-        $this->assertEquals($idVerification['verifiedTime'], $importData['verifiedDate']->format('Y-m-d\TH:i:s\Z'));
+        $this->assertEquals($idVerification['verifiedDate'], $importData['verifiedDate']->format('Y-m-d\TH:i:s\Z'));
         $this->assertEquals($idVerification['siteGoogleGroup'], 'hpo-site-' . $importData['site']);
         $this->assertEquals($idVerification['userEmail'], $importData['userEmail']);
         $this->assertEquals($idVerification['verificationType'], $importData['verificationType']);
