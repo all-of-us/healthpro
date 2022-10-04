@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\HelpService;
 
 class MeasurementsController extends BaseController
 {
@@ -29,6 +30,7 @@ class MeasurementsController extends BaseController
     protected $loggerService;
     protected $siteService;
     protected $params;
+    protected $helpService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -36,7 +38,8 @@ class MeasurementsController extends BaseController
         ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
         SiteService $siteService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        HelpService $helpService
     ) {
         parent::__construct($em);
         $this->measurementService = $measurementService;
@@ -44,6 +47,7 @@ class MeasurementsController extends BaseController
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
         $this->params = $params;
+        $this->helpService = $helpService;
     }
 
     /**
@@ -258,7 +262,8 @@ class MeasurementsController extends BaseController
             'revertForm' => $this->createForm(MeasurementRevertType::class, null)->createView(),
             'displayEhrBannerMessage' => $this->measurementService->requireEhrModificationProtocol() || $measurement->isEhrProtocolForm(),
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
         ]);
     }
 
