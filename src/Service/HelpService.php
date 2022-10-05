@@ -214,7 +214,7 @@ class HelpService
         return false;
     }
 
-    public function getDocumentTitlesList()
+    public function getDocumentTitlesList(): array
     {
         $documentTitles = [];
         foreach (self::$documentGroups as $documentGroup) {
