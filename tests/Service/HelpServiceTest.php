@@ -5,10 +5,16 @@ use App\Service\HelpService;
 
 class HelpServiceTest extends ServiceTestCase
 {
+    protected $helpService;
+
+    public function setUp(): void
+    {
+        $this->helpService = static::getContainer()->get(HelpService::class);
+    }
+
     public function testGetDocumentTitlesList(): void
     {
-        $helpService = static::getContainer()->get(HelpService::class);
-        $documentList = $helpService->getDocumentTitlesList();
+        $documentList = $this->helpService->getDocumentTitlesList();
         self::assertIsArray($documentList);
         self::assertGreaterThan(0, count($documentList));
         self::assertArrayHasKey('SOP-014', $documentList);
