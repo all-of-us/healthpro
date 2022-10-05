@@ -13,6 +13,6 @@ class HelpServiceTest extends ServiceTestCase {
         self::assertIsArray($documentList);
         self::assertGreaterThan(0, count($documentList));
         self::assertArrayHasKey('SOP-014', $documentList);
-        self::assertIsString($documentList['SOP-014'])asdasd;
+        self::assertIsString($documentList['SOP-014']);
     }
 }
