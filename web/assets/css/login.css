@@ -57,6 +57,9 @@ body {
     right: 0;
     top: 75px;
 }
+#login-carousel > div {
+    min-height: 155px;
+}
 @media (max-width: 970px){
     #login-logo {
         margin-top: 2rem;
