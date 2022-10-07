@@ -122,6 +122,16 @@ label.label-normal {
 .navbar-allofus .navbar-nav>.open>a, .navbar-allofus .navbar-nav>.open>a:focus, .navbar-allofus .navbar-nav>.open>a:hover {
     background-color: #161252;
 }
+.navbar-nph, .navbar-nph .navbar-toggle {
+    background-color: #719500;
+}
+
+.navbar-nph .navbar-toggle:focus, .navbar-nph .navbar-toggle:hover {
+    background-color: #9ed101;
+}
+.navbar-allofus .navbar-nav>.open>a, .navbar-nph .navbar-nav>.open>a:focus, .navbar-nph .navbar-nav>.open>a:hover {
+    background-color: #526801;
+}
 .navbar-warning-below {
     margin-bottom: 0;
 }
