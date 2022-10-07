@@ -129,7 +129,7 @@ label.label-normal {
 .navbar-nph .navbar-toggle:focus, .navbar-nph .navbar-toggle:hover {
     background-color: #9ed101;
 }
-.navbar-allofus .navbar-nav>.open>a, .navbar-nph .navbar-nav>.open>a:focus, .navbar-nph .navbar-nav>.open>a:hover {
+.navbar-nph .navbar-nav>.open>a, .navbar-nph .navbar-nav>.open>a:focus, .navbar-nph .navbar-nav>.open>a:hover {
     background-color: #526801;
 }
 .navbar-warning-below {
