@@ -5,6 +5,10 @@ $(document).ready(function () {
             let url = $(this).data('url');
             let formId = $(this).data('form-id');
             let inputNameSelector = $('#' + formId + ' input[name="work_queue_view[name]"]');
+            let isValidName = inputNameSelector.parsley().validate();
+            if (isValidName !== true) {
+                return false;
+            }
             let viewName = inputNameSelector.val();
             $this.prop('disabled', true);
             $.ajax({

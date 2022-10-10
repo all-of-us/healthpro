@@ -14,7 +14,7 @@
         {% set nameCheckUrl = path('workqueue_view_check_name') %}
         {% set formId = 'workqueue_view_form' %}
     {% endif %}
-    {{ form_start(workQueueViewForm, { attr: { action: actionUrl, id: formId } }) }}
+    {{ form_start(workQueueViewForm, { attr: { action: actionUrl, id: formId, class: 'workqueue-view-form' } }) }}
     {{ form_rest(workQueueViewForm) }}
     <button type="button" class="btn btn-primary save-view-btn" data-url="{{ nameCheckUrl }}"
             data-form-id="{{ formId }}">Save</button>
