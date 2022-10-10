@@ -74,8 +74,8 @@
             {{ form_errors(orderModifyForm) }}
             {{ form_rest(orderModifyForm) }}
             <p>
-                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
                 <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Order</button>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
             {{ form_end(orderModifyForm) }}
         </div>

@@ -42,8 +42,8 @@
                 {{ form_row(removeGoupMemberForm.attestation) }}
             </div>
             <p>
-                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
                 <button type="submit" class="btn btn-primary" style="display:none">Submit</button>
+                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
             </p>
             {{ form_end(removeGoupMemberForm) }}
         </div>
