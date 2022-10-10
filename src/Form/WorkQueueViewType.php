@@ -18,10 +18,6 @@ class WorkQueueViewType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
                 ]
-            ])
-            ->add('defaultView', Type\CheckboxType::class, [
-                'label' => 'Set as default',
-                'required' => false
             ]);
     }
 }
