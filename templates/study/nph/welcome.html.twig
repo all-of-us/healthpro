@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>Welcome!</h2>
+    </div>
+    <div class="row home-menu row-equal-height">
+        {% if is_granted('ROLE_USER') and app.session.get('site') %}
+            <div class="col-sm-6 col-md-4">
+                <a href="{# TODO: Path to nph participant lookup #}" class="btn btn-lg btn-default btn-block">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    Participant Lookup
+                    <div class="description">Search for participants by first name, last name, and date of birth, PID, email, or phone number.</div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <a href="{# TODO: Path to nph order lookup #}" class="btn btn-lg btn-default btn-block">
+                    <i class="fa fa-medkit" aria-hidden="true"></i>
+                    Order Lookup
+                    <div class="description">Search for a biospecimen order by order ID and view recent biospecimen orders.</div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <a href="{# TODO: Path to nph Participant Review #}" class="btn btn-lg btn-default btn-block">
+                    <i class="fa fa-list" aria-hidden="true"></i>
+                    Participant Review
+                    <div class="description">Review Physical Measurement and Biobank orders that were created today, are unfinalized, or were recently modified.</div>
+                </a>
+            </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            // Add badge for count of Deceased Participant Reports for review
+            if ($('#deceased_report_block').length) {
+                var deceasedReportCount = 0;
+                $.ajax({
+                    url: '/deceased-reports/stats'
+                }).done(function (data) {
+                    deceasedReportCount = data.pending
+                    if (deceasedReportCount > 0) {
+                        $('#deceased_report_block > a').prepend($('<div class="welcome-page-badge">' + deceasedReportCount +'</div>'));
+                    }
+                })
+            }
+        })
+    </script>
+{% endblock %}
