@@ -30,7 +30,7 @@ class WorkqueueView
     /**
      * @ORM\Column(type="boolean")
      */
-    private $defaultView;
+    private $defaultView = false;
 
     /**
      * @ORM\Column(type="datetime")
