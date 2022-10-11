@@ -125,6 +125,20 @@ class RequestListener
         $this->twig->addGlobal('notifications_count', $notificationsCount);
     }
 
+    private function checkProgramSelect()
+    {
+        if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('nphSite') &&
+            ($this->authorizationChecker->isGranted('ROLE_USER') && $this->authorizationChecker->isGranted('ROLE_NPH_USER'))) {
+            $user = $this->userService->getUser();
+            if (!preg_match(
+                    '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
+                    $this->request->getPathInfo()
+                ) && !$this->isUpkeepRoute()) {
+                return new RedirectResponse('/program/select');
+            }
+        }
+    }
+
     private function checkSiteSelect()
     {
         if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
@@ -134,7 +148,7 @@ class RequestListener
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
             } elseif (!preg_match(
-                '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
+                '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
                 $this->request->getPathInfo()
             ) && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/site/select');

@@ -13,6 +13,7 @@ use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -57,6 +58,14 @@ class DefaultController extends BaseController
     public function adminIndex()
     {
         return $this->render('admin/index.html.twig');
+    }
+
+    /**
+     * @Route("/program/select", name="program_select")
+     */
+    public function programSelectAction(Request $request, SiteService $siteService): Response
+    {
+        return $this->render('program-select.html.twig');
     }
 
     /**
