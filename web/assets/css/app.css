@@ -822,3 +822,10 @@ table.table-samples td {
 .user-add-warning-text {
     margin-left: -15px;
 }
+
+.program-select img {
+    max-width: 100%;
+    border: 1px solid #cecece;
+    border-radius: 10px;
+    padding: 25px;
+}
