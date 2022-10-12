@@ -230,6 +230,15 @@ class SiteService
         return true;
     }
 
+    public function isValidNphSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if (!$user || !$user->belongsToSite($email, 'nphSites')) {
+            return false;
+        }
+        return true;
+    }
+
     public function switchSite($email)
     {
         $user = $this->userService->getUser();
@@ -244,6 +253,20 @@ class SiteService
             $this->requestStack->getSession()->remove('site');
             $this->setNewRoles($user);
             // Clears previously set site meta data
+            $this->saveSiteMetaDataInSession();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function switchNphSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if ($user && $user->belongsToSite($email, 'nphSites')) {
+            $this->requestStack->getSession()->set('site', $user->getSite($email, 'nphSites'));
+            $this->requestStack->getSession()->remove('awardee');
+            $this->setNewRoles($user);
             $this->saveSiteMetaDataInSession();
             return true;
         } else {

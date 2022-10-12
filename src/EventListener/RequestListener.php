@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Audit\Log;
 use App\Entity\FeatureNotification;
 use App\Entity\FeatureNotificationUserMap;
+use App\Entity\User;
 use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -146,13 +147,24 @@ class RequestListener
     {
         if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
             $user = $this->userService->getUser();
-            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($user->getSites()[0]->email)) {
-                $this->siteService->switchSite($user->getSites()[0]->email);
-            } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
-                $this->siteService->switchSite($user->getAwardees()[0]->email);
-            } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
-                return new RedirectResponse('/site/select');
+            $program = $this->requestStack->getSession()->get('program');
+            $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
+            if ($program === User::PROGRAM_HPO) {
+                if (count($sites) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($sites[0]->email)) {
+                    $this->siteService->switchSite($sites[0]->email);
+                } elseif (count($user->getAwardees()) === 1 && empty($sites)) {
+                    $this->siteService->switchSite($user->getAwardees()[0]->email);
+                } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                    return new RedirectResponse('/site/select');
+                }
+            } else {
+                if (count($sites) === 1 && $this->siteService->isValidNphSite($sites[0]->email)) {
+                    $this->siteService->switchNphSite($sites[0]->email);
+                } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                    return new RedirectResponse('/site/select');
+                }
             }
+
         }
     }
 

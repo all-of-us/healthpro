@@ -196,10 +196,10 @@ class User implements UserInterface
         return $this->awardees;
     }
 
-    public function getSite($email)
+    public function getSite($email, $siteType = 'sites')
     {
         $site = null;
-        foreach ($this->sites as $s) {
+        foreach ($this->{$siteType} as $s) {
             if ($s->email === $email) {
                 $site = $s;
                 break;
@@ -220,10 +220,10 @@ class User implements UserInterface
         return $awardee;
     }
 
-    public function belongsToSite($email)
+    public function belongsToSite($email, $siteType = 'sites')
     {
         $belongs = false;
-        foreach ($this->sites as $site) {
+        foreach ($this->{$siteType} as $site) {
             if ($site->email === $email) {
                 $belongs = true;
                 break;

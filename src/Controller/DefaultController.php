@@ -98,7 +98,7 @@ class DefaultController extends BaseController
                 throw $this->createAccessDeniedException();
             }
         }
-        return $this->render('site-select.html.twig');
+        return $this->render('site-select.html.twig', ['program' => $request->getSession()->get('program')]);
     }
     /**
      * @Route("/keepalive", name="keep_alive")
