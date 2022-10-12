@@ -65,6 +65,16 @@ class DefaultController extends BaseController
      */
     public function programSelectAction(Request $request, SiteService $siteService): Response
     {
+        if (!$this->isGranted('ROLE_USER') || !$this->isGranted('ROLE_NPH_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($request->query->has('program')) {
+            $program = $request->query->get('program');
+            if (in_array($program, User::PROGRAMS)) {
+                $request->getSession()->set('program', $program);
+                return $this->redirectToRoute('site_select');
+            }
+        }
         return $this->render('program-select.html.twig');
     }
 

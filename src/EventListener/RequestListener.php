@@ -75,8 +75,14 @@ class RequestListener
             return;
         }
 
-        if ($siteSelectResponse = $this->checkSiteSelect()) {
-            $event->setResponse($siteSelectResponse);
+        if ($programSelectResponse = $this->checkProgramSelect()) {
+            $event->setResponse($programSelectResponse);
+        }
+
+        if ($this->requestStack->getSession()->has('program')) {
+            if ($siteSelectResponse = $this->checkSiteSelect()) {
+                $event->setResponse($siteSelectResponse);
+            }
         }
 
         $this->checkFeatureNotifications();
@@ -127,13 +133,10 @@ class RequestListener
 
     private function checkProgramSelect()
     {
-        if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('nphSite') &&
-            ($this->authorizationChecker->isGranted('ROLE_USER') && $this->authorizationChecker->isGranted('ROLE_NPH_USER'))) {
-            $user = $this->userService->getUser();
-            if (!preg_match(
-                    '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
-                    $this->request->getPathInfo()
-                ) && !$this->isUpkeepRoute()) {
+        if (!$this->requestStack->getSession()->has('program') &&
+            $this->authorizationChecker->isGranted('ROLE_USER') &&
+            $this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+            if (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/program/select');
             }
         }
@@ -147,10 +150,7 @@ class RequestListener
                 $this->siteService->switchSite($user->getSites()[0]->email);
             } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
                 $this->siteService->switchSite($user->getAwardees()[0]->email);
-            } elseif (!preg_match(
-                '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
-                $this->request->getPathInfo()
-            ) && !$this->isUpkeepRoute()) {
+            } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/site/select');
             }
         }
@@ -188,6 +188,13 @@ class RequestListener
             'client_timeout',
             'agree_usage'
         ]));
+    }
+
+    private function ignoreRoutes(): bool
+    {
+        return preg_match(
+            '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|nph\/site|access\/manage)($|\/).*/',
+            $this->request->getPathInfo());
     }
 
     public function isStreamingResponseRoute()
