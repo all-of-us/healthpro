@@ -16,12 +16,12 @@ class WorkQueueViewType extends AbstractType
                 'label' => 'View Name',
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Type('string')
+                    new Constraints\Type('string'),
+                    new Constraints\Length(['max' => 50])
+                ],
+                'attr' => [
+                    'data-parsley-maxlength' => 50
                 ]
-            ])
-            ->add('defaultView', Type\CheckboxType::class, [
-                'label' => 'Set as default',
-                'required' => false
             ]);
     }
 }
