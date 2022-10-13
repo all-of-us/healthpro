@@ -101,7 +101,11 @@
         {% if siteInfo.siteId != order.site and not readOnlyView %}
             <div class="alert alert-danger well-sm">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
-                <strong>Warning! The site you are logged into [{{ app.session.get('currentSiteDisplayName') }}] does not match the site of order creation [{{ siteInfo.siteDisplayName(order.site) }}]. If you logged into a different site by error, please switch to the correct site.</strong>
+                <strong>
+                    Warning! The site you are logged into [{{ app.session.get('siteEntity').name }}] does not
+                    match the site of order creation [{{ siteInfo.siteDisplayName(order.site) }}]. If you logged into
+                    a different site by error, please switch to the correct site.
+                </strong>
                 <button class="btn btn-xs btn-info" data-toggle="modal" data-target="#siteModal">Switch Site</button>
             </div>
         {% endif %}

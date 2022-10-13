@@ -38,7 +38,8 @@ class SiteService
 
     public function isTestSite(): bool
     {
-        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->requestStack->getSession()->get('siteAwardeeId') === 'TEST';
+        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) &&
+            $this->requestStack->getSession()->get('siteEntity')->getAwardeeId() === 'TEST';
     }
 
 
@@ -96,13 +97,13 @@ class SiteService
 
     public function getSiteAwardee()
     {
-        return $this->requestStack->getSession()->get('siteOrganization');
+        return $this->requestStack->getSession()->get('siteEntity')->getOrganization();
     }
 
 
     public function getSiteOrganization()
     {
-        return $this->requestStack->getSession()->get('siteOrganizationId');
+        return $this->requestStack->getSession()->get('siteEntity')->getOrganizationId();
     }
 
     public function getSuperUserAwardees()
@@ -287,27 +288,17 @@ class SiteService
     {
         $site = $this->getSiteEntity();
         if (!empty($site)) {
-            $this->requestStack->getSession()->set('siteOrganization', $site->getOrganization());
-            $this->requestStack->getSession()->set('siteOrganizationId', $site->getOrganizationId());
+            $this->requestStack->getSession()->set('siteEntity', $site);
             $this->requestStack->getSession()->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site->getOrganizationId()));
-            $this->requestStack->getSession()->set('siteAwardee', $site->getAwardee());
-            $this->requestStack->getSession()->set('siteAwardeeId', $site->getAwardeeId());
             $this->requestStack->getSession()->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site->getAwardeeId()));
-            $this->requestStack->getSession()->set('currentSiteDisplayName', $site->getName());
             $this->requestStack->getSession()->set('siteType', $this->getSiteType());
             $this->requestStack->getSession()->set('orderType', $this->getOrderType());
-            $this->requestStack->getSession()->set('siteState', $site->getState());
         } else {
-            $this->requestStack->getSession()->remove('siteOrganization');
-            $this->requestStack->getSession()->remove('siteOrganizationId');
+            $this->requestStack->getSession()->remove('siteEntity');
             $this->requestStack->getSession()->remove('siteOrganizationDisplayName');
-            $this->requestStack->getSession()->remove('siteAwardee');
-            $this->requestStack->getSession()->remove('siteAwardeeId');
             $this->requestStack->getSession()->remove('siteAwardeeDisplayName');
-            $this->requestStack->getSession()->remove('currentSiteDisplayName');
             $this->requestStack->getSession()->remove('siteType');
             $this->requestStack->getSession()->remove('orderType');
-            $this->requestStack->getSession()->remove('siteState');
         }
     }
 
@@ -336,7 +327,7 @@ class SiteService
 
     public function displayCaborConsent(): bool
     {
-        return $this->requestStack->getSession()->get('siteState') === self::CABOR_STATE ? true : false;
+        return $this->requestStack->getSession()->get('siteEntity')->getState() === self::CABOR_STATE ? true : false;
     }
 
     public function getSiteWithPrefix($siteId): string

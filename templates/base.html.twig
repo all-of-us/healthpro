@@ -122,7 +122,7 @@
                                 <li><a href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
                             </ul>
                         </li>
-                        {% if app.session.get('siteOrganization') %}
+                        {% if app.session.get('siteEntity').organization %}
                             <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
                         {% endif %}
                     {% endif %}
@@ -144,7 +144,7 @@
                             <li>
                                 <a href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
-                                    {{ app.session.get('currentSiteDisplayName')|default(app.session.get('site').name) }}
+                                    {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
                                 </a>
                             </li>
                         {% endif %}
