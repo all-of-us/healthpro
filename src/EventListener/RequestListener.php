@@ -140,6 +140,8 @@ class RequestListener
             if (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/program/select');
             }
+        } else {
+            $this->setProgramSessionVariable();
         }
     }
 
@@ -164,7 +166,6 @@ class RequestListener
                     return new RedirectResponse('/site/select');
                 }
             }
-
         }
     }
 
@@ -232,6 +233,15 @@ class RequestListener
                 }
                 $this->requestStack->getSession()->set('userSiteDisplayNames', $userSiteDisplayNames);
             }
+        }
+    }
+
+    private function setProgramSessionVariable(): void
+    {
+        if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+            $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
+        } else {
+            $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);
         }
     }
 }
