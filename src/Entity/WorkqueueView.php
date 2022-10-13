@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\WorkqueueViewRepository")
  */
 class WorkqueueView
 {
@@ -28,14 +28,9 @@ class WorkqueueView
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     */
-    private $type;
-
-    /**
      * @ORM\Column(type="boolean")
      */
-    private $defaultView;
+    private $defaultView = false;
 
     /**
      * @ORM\Column(type="datetime")
@@ -77,18 +72,6 @@ class WorkqueueView
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
 
         return $this;
     }
@@ -139,5 +122,25 @@ class WorkqueueView
         $this->columns = $columns;
 
         return $this;
+    }
+
+    public function getFiltersArray(): array
+    {
+        if (!empty($this->filters)) {
+            return json_decode($this->filters, true);
+        }
+        return [];
+    }
+
+    public function getColumnsType($type): string
+    {
+        if ($type === 'custom') {
+            $columns = 'workQueueViewColumns';
+        } elseif ($type === 'consent') {
+            $columns = 'workQueueConsentColumns';
+        } else {
+            $columns = 'workQueueColumns';
+        }
+        return $columns;
     }
 }

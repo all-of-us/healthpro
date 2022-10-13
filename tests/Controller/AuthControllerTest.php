@@ -56,7 +56,7 @@ class AuthControllerTest extends AppWebTestCase
         $this->assertNull($this->session->get('awardee'));
         $this->client->request('GET', '/');
         $this->assertSame($awardeeId . '@' . static::GROUP_DOMAIN, $this->session->get('awardee')->email);
-        $this->assertEquals('/workqueue/', $this->client->getRequest()->getRequestUri());
+        $this->assertEquals('/workqueue/main', $this->client->getRequest()->getRequestUri());
     }
 
     public function testDvAdminAutoselect()

@@ -21,6 +21,7 @@ $(document).ready(function() {
     var wQColumns = $('#workqueue').data('wq-columns');
     var columnsDef = $('#workqueue').data('columns-def');
     var isDvType = $('#workqueue').data('dv-type');
+    var viewId = $('#workqueue').data('view-id');
 
     var tableColumns = [];
 
@@ -234,6 +235,11 @@ $(document).ready(function() {
         ]
     });
 
+    // Hide filter buttons in customized WQ views
+    if (viewId) {
+        table.buttons().nodes().addClass('hidden');
+    }
+
     $('.page-drop-down select').change(function () {
         table.page(parseInt($(this).val())).draw('page');
     });
@@ -270,12 +276,36 @@ $(document).ready(function() {
 
     var columnsUrl = $('#columns_group').data('columns-url');
 
+    let disableViewButtons = function () {
+        $('.view-btn').addClass('disabled');
+    };
+
+    let enableViewButtons = function () {
+        $('.view-btn').removeClass('disabled');
+    };
+
+    let setColumnNames = function (params) {
+        disableViewButtons();
+        $.ajax({
+            url: columnsUrl,
+            data: params
+        }).done(function () {
+            enableViewButtons();
+        }).fail(function () {
+            enableViewButtons();
+        });
+    };
+
     $('.toggle-vis').on('click', function () {
         var column = table.column($(this).attr('data-column'));
         column.visible(!column.visible());
         var columnName = $(this).data('name');
         // Set column names in session
-        $.get(columnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
+        let params = {
+            columnName: columnName,
+            checked: $(this).prop('checked')
+        };
+        setColumnNames(params);
     });
 
     var toggleColumns = function () {
@@ -293,7 +323,7 @@ $(document).ready(function() {
     };
 
     var hideColumns = function () {
-        for (let i = 3; i <= 80; i++) {
+        for (let i = 3; i <= wQColumns.length + 1; i++) {
             var column = table.column(i);
             column.visible(false);
         }
@@ -302,13 +332,19 @@ $(document).ready(function() {
     $('#columns_select_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
         showColumns();
-        $.get(columnsUrl, {select: true});
+        let params = {
+            select: true
+        };
+        setColumnNames(params);
     });
 
     $('#columns_deselect_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', false);
         hideColumns();
-        $.get(columnsUrl, {deselect: true});
+        let params = {
+            deselect: true
+        };
+        setColumnNames(params);
     });
 
     // Check/uncheck columns when clicked on group buttons
