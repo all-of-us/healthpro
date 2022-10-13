@@ -207,7 +207,8 @@ class RequestListener
     {
         return preg_match(
             '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|nph\/site|access\/manage)($|\/).*/',
-            $this->request->getPathInfo());
+            $this->request->getPathInfo()
+        );
     }
 
     public function isStreamingResponseRoute()
