@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
+use App\Entity\User;
 use App\Form\SiteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -210,6 +211,14 @@ class SiteService
 
     public function isValidSite($email)
     {
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+            return $this->isValidHpoSite($email);
+        }
+        return $this->isValidNphSite($email);
+    }
+
+    public function isValidHpoSite($email)
+    {
         $user = $this->userService->getUser();
         if (!$user || !$user->belongsToSite($email)) {
             return false;
@@ -240,7 +249,15 @@ class SiteService
         return true;
     }
 
-    public function switchSite($email)
+    public function switchSite($email): bool
+    {
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+            return $this->switchHpoSite($email);
+        }
+        return $this->switchNphSite($email);
+    }
+
+    public function switchHpoSite($email): bool
     {
         $user = $this->userService->getUser();
         if ($user && $user->belongsToSite($email)) {

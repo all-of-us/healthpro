@@ -14,11 +14,11 @@
                 <div class="form-group">
                     <label>Choose Site</label>
                     <select class="form-control" name="site">
-                        {% set sites = program == 'hpo' ? app.user.sites : app.user.nphSites %}
+                        {% set sites = app.session.get('program') == 'hpo' ? app.user.sites : app.user.nphSites %}
                         {% for site in sites %}
                             <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : '' }} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
                         {% endfor %}
-                        {% if program == 'hpo' %}
+                        {% if app.session.get('program') == 'hpo' %}
                             {% for awardee in app.user.awardees %}
                                 <option value="{{ awardee.email }}"{{ (siteEmail is not defined and app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : '' }} >{{ awardee.name }}</option>
                             {% endfor %}
