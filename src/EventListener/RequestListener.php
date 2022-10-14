@@ -142,7 +142,13 @@ class RequestListener
 
     private function checkSiteSelect()
     {
-        if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
+        if ($this->requestStack->getSession()->has('program') &&
+            !$this->requestStack->getSession()->has('site') &&
+            !$this->requestStack->getSession()->has('awardee') &&
+            ($this->authorizationChecker->isGranted('ROLE_USER')
+                || $this->authorizationChecker->isGranted('ROLE_NPH_USER')
+                ||$this->authorizationChecker->isGranted('ROLE_AWARDEE')
+            )) {
             $user = $this->userService->getUser();
             $program = $this->requestStack->getSession()->get('program');
             $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
