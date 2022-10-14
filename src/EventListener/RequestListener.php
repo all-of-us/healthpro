@@ -142,6 +142,9 @@ class RequestListener
 
     private function checkSiteSelect()
     {
+        if (!$this->requestStack->getSession()->has('program') && $this->canSetSessionVariables()) {
+            $this->setDefaultProgramSessionVariable();
+        }
         if ($this->requestStack->getSession()->has('program') &&
             !$this->requestStack->getSession()->has('site') &&
             !$this->requestStack->getSession()->has('awardee') &&
@@ -180,10 +183,7 @@ class RequestListener
 
     public function onKernelFinishRequest()
     {
-        if ($this->tokenStorage->getToken() && $this->request && !preg_match(
-            '/^\/(login|_wdt)($|\/).*/',
-            $this->request->getPathInfo()
-        ) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->canSetSessionVariables()) {
             $this->setSessionVariables();
         }
     }
@@ -260,5 +260,13 @@ class RequestListener
             return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
         }
         return false;
+    }
+
+    private function canSetSessionVariables(): bool
+    {
+        return $this->tokenStorage->getToken() &&
+            $this->request && !preg_match('/^\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) &&
+            !$this->isUpkeepRoute() &&
+            !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
     }
 }
