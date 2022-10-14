@@ -78,12 +78,11 @@ class RequestListener
 
         if ($programSelectResponse = $this->checkProgramSelect()) {
             $event->setResponse($programSelectResponse);
+            return;
         }
 
-        if ($this->requestStack->getSession()->has('program')) {
-            if ($siteSelectResponse = $this->checkSiteSelect()) {
-                $event->setResponse($siteSelectResponse);
-            }
+        if ($siteSelectResponse = $this->checkSiteSelect()) {
+            $event->setResponse($siteSelectResponse);
         }
 
         $this->checkFeatureNotifications();
@@ -134,14 +133,10 @@ class RequestListener
 
     private function checkProgramSelect()
     {
-        if (!$this->requestStack->getSession()->has('program') &&
-            $this->authorizationChecker->isGranted('ROLE_USER') &&
-            $this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+        if (!$this->requestStack->getSession()->has('program') && $this->canSwitchProgram()) {
             if (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/program/select');
             }
-        } else {
-            $this->setProgramSessionVariable();
         }
     }
 
@@ -160,8 +155,8 @@ class RequestListener
                     return new RedirectResponse('/site/select');
                 }
             } else {
-                if (count($sites) === 1 && $this->siteService->isValidNphSite($sites[0]->email)) {
-                    $this->siteService->switchNphSite($sites[0]->email);
+                if (count($sites) === 1 && $this->siteService->isValidSite($sites[0]->email)) {
+                    $this->siteService->switchSite($sites[0]->email);
                 } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                     return new RedirectResponse('/site/select');
                 }
@@ -206,7 +201,7 @@ class RequestListener
     private function ignoreRoutes(): bool
     {
         return preg_match(
-            '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|nph\/site|access\/manage)($|\/).*/',
+            '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
             $this->request->getPathInfo()
         );
     }
@@ -235,14 +230,29 @@ class RequestListener
                 $this->requestStack->getSession()->set('userSiteDisplayNames', $userSiteDisplayNames);
             }
         }
+        if (!$this->requestStack->getSession()->has('program')) {
+            $this->setDefaultProgramSessionVariable();
+        }
     }
 
-    private function setProgramSessionVariable(): void
+    private function setDefaultProgramSessionVariable(): void
     {
-        if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
-            $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
-        } else {
-            $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);
+        // Default program should not be set if user has option to switch programs
+        if (!$this->canSwitchProgram()) {
+            if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+                $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
+            } else {
+                $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);
+            }
         }
+    }
+
+    private function canSwitchProgram(): bool
+    {
+        if ($this->userService->getUser()) {
+            $roles = $this->userService->getUser()->getRoles();
+            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
+        }
+        return false;
     }
 }
