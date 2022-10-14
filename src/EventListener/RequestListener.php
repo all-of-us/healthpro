@@ -148,7 +148,8 @@ class RequestListener
         if ($this->requestStack->getSession()->has('program') &&
             !$this->requestStack->getSession()->has('site') &&
             !$this->requestStack->getSession()->has('awardee') &&
-            ($this->authorizationChecker->isGranted('ROLE_USER')
+            (
+                $this->authorizationChecker->isGranted('ROLE_USER')
                 || $this->authorizationChecker->isGranted('ROLE_NPH_USER')
                 ||$this->authorizationChecker->isGranted('ROLE_AWARDEE')
             )) {
