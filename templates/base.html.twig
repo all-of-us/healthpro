@@ -48,10 +48,30 @@
                 <span class="icon-bar"></span>
             </button>
             {% if showRoleDropdown %}
-            <ul class="nav navbar-nav navbar-nav-role">
+            <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-role">
+                        {% if siteInfo.canSwitchProgram %}
+                            <li>
+                                <a href="{{ path('program_select', { program: 'hpo' }) }}">
+                                    <i class="fas fa-arrow-circle-right"></i><strong> All Of Us</strong>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ path('program_select', { program: 'nph' }) }}">
+                                    <i class="fas fa-arrow-circle-right"></i><strong> NPH</strong>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-nav-role">
+                <li class="dropdown">
+                    <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         HealthPro
                         {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
                             <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
