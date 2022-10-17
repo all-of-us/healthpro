@@ -65,7 +65,7 @@ class DefaultController extends BaseController
      */
     public function programSelectAction(Request $request, SiteService $siteService): Response
     {
-        if (!$this->isGranted('ROLE_USER') || !$this->isGranted('ROLE_NPH_USER')) {
+        if (!$siteService->canSwitchProgram()) {
             throw $this->createAccessDeniedException();
         }
         if ($request->query->has('program')) {
