@@ -1,0 +1,155 @@
+<nav class="navbar navbar-default navbar-inverse{% if isTraining %} navbar-warning-below{% else %} navbar {% endif %}">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            {% if showRoleDropdown %}
+                <ul class="nav navbar-nav navbar-nav-role">
+                    <li class="dropdown">
+                        <a class="navbar-brand dropdown-toggle" href="{# TODO: Path to NPH Home #}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <img src="{{ asset('img/nph-logo.svg') }}" alt="NPH Logo"/>
+                            NPH
+                            {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
+                                <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
+                            {% endif %}
+                            <span class="caret"></span>
+                            {% if isTraining %}
+                                <div class="navbar-brand-subtitle">training</div>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-role">
+                            {% if is_granted('ROLE_USER') or is_granted('ROLE_AWARDEE') %}
+                                <li>
+                                    <a href="{# TODO: Path to NPH Home #}">
+                                        <i class="fas fa-arrow-circle-right"></i>
+                                        {% if not currentRoleNav %}
+                                            <strong>HealthPro</strong>
+                                        {% else %}
+                                            HealthPro
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endif %}
+                            {% for key, roleNav in roleNavs|filter((roleNav, key) =>
+                                is_granted(roleNav.role) and
+                                not (key == 'biobank' and is_granted('ROLE_SCRIPPS'))
+                                ) %}
+                                {# Scripps and biobank roles point to the same route, so only display one if user has both roles #}
+                                <li>
+                                    <a href="{{ path(roleNav.path) }}">
+                                        <i class="fas fa-arrow-circle-right"></i>
+                                        {% if key == currentRoleNav %}
+                                            <strong>{{ roleNav.title }}</strong>
+                                        {% else %}
+                                            {{ roleNav.title }}
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            {% else %}
+                <a class="navbar-brand" href="{# TODO: Path to NPH Home #}">
+                    <img src="{{ asset('img/nph-logo.svg') }}" alt="NPH Logo"/>
+                    HealthPro
+                    {% if isTraining %}
+                        <div class="navbar-brand-subtitle">training</div>
+                    {% endif %}
+                </a>
+            {% endif %}
+        </div>
+        <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
+            <ul class="nav navbar-nav">
+                {% if not currentRoleNav %}
+                    {% if is_granted('ROLE_USER') and app.session.get('site') %}
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lookup <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{# TODO: Path to NPH Participant Lookup #}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
+                                <li><a href="{# TODO: Path to NPH Order Lookup #}"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Order Lookup</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{# TODO: Path to NPH Participant Lookup #}"><i class="fa fa-list" aria-hidden="true"></i> Participant Review</a></li>
+                            </ul>
+                        </li>
+                        {% if app.session.get('siteOrganization') %}
+                            <li><a href="{# TODO: Path to NPH Work Queue #}">Work Queues</a></li>
+                        {% endif %}
+                    {% endif %}
+                    {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees %}
+                        <li><a href="{# TODO: Path to NPH Work Queue #}">Work Queues</a></li>
+                    {% endif %}
+                    {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
+                        <li><a data-href="{# TODO: Path to NPH Kit Problem Page #}" class="external-link">Report Kit Problem</a></li>
+                    {% endif %}
+                {% endif %}
+                {% if is_granted('ROLE_MANAGE_USERS') %}
+                    <li><a href="{# TODO: Path to NPH Management page #}">Management Tools</a></li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    {% if not currentRoleNav %}
+                        {% if app.session.get('site') %}
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
+                                    <i class="fa fa-hospital-o" aria-hidden="true"></i>
+                                    {{ app.session.get('currentSiteDisplayName')|default(app.session.get('site').name) }}
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if app.session.get('awardee') %}
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
+                                    <i class="fa fa-hospital-o" aria-hidden="true"></i>
+                                    {{ app.session.get('awardee').name }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if app.request.get('_route') != 'site_select' %}
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bell" aria-hidden="true"></i>
+                                {% if notifications_count > 0 %}
+                                    <span class="badge badge-notify" id="notifications_count">{{ notifications_count }}</span>
+                                {% endif %}
+                            </a>
+                            {% include '../../partials/notifications-dropdown.html.twig' %}
+                        </li>
+                    {% endif %}
+
+                    <li class="dropdown">
+                        <a href="{# TODO: Path to NPH Help #}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{# TODO: Path to NPH Training #}"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
+                            <li><a href="{# TODO: Path to NPH FAQ #}"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</a></li>
+                            <li><a href="{# TODO: Path to NPH SOP's #}"><i class="fa fa-file-text-o" aria-hidden="true"></i> NPH SOPs</a></li>
+                            <li><a href="{{ confluenceResources.ops_data_api }}" target="_blank"><i class="fa fa-files-o" aria-hidden="true"></i> OpsData API Resources</a></li>
+                            <li><a href="{{ confluenceResources.data_dictionaries }}" target="_blank"><i class="fa fa-table" aria-hidden="true"></i> HealthPro Data Dictionaries</a></li>
+                            <li><a href="{{ confluenceResources.release_notes }}" target="_blank"><i class="fa fa-sticky-note" aria-hidden="true"></i> HealthPro Release Notes</a></li>
+                            <li><a href="{{ feedback_url }}" target="_blank"><i class="fa fa-comment-dots" aria-hidden="true"></i> Submit Feedback</a></li>
+                            <li><a href="{{ report_technical_issue_url }}" target="_blank"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Report Technical Issue</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="{# TODO: NPH Settings #}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{# TODO: NPH Settings #}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
+                            <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
