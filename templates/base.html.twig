@@ -51,7 +51,12 @@
             <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                        {% if app.session.get('program') == 'nph' %}
+                            {# TODO: Replace logo with NPH logo #}
+                            <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="NPH Logo"/>
+                        {% else %}
+                            <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                        {% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-role navbar-program">
                         {% if siteInfo.canSwitchProgram %}
