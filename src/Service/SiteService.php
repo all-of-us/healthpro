@@ -351,4 +351,13 @@ class SiteService
     {
         return \App\Security\User::SITE_PREFIX . $siteId;
     }
+
+    public function canSwitchProgram(): bool
+    {
+        if ($this->userService->getUser()) {
+            $roles = $this->userService->getUser()->getRoles();
+            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
+        }
+        return false;
+    }
 }

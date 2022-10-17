@@ -133,7 +133,7 @@ class RequestListener
 
     private function checkProgramSelect()
     {
-        if (!$this->requestStack->getSession()->has('program') && $this->canSwitchProgram()) {
+        if (!$this->requestStack->getSession()->has('program') && $this->siteService->canSwitchProgram()) {
             if (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/program/select');
             }
@@ -245,22 +245,13 @@ class RequestListener
     private function setDefaultProgramSessionVariable(): void
     {
         // Default program should not be set if user has option to switch programs
-        if (!$this->canSwitchProgram()) {
+        if (!$this->siteService->canSwitchProgram()) {
             if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
                 $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
             } else {
                 $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);
             }
         }
-    }
-
-    private function canSwitchProgram(): bool
-    {
-        if ($this->userService->getUser()) {
-            $roles = $this->userService->getUser()->getRoles();
-            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
-        }
-        return false;
     }
 
     private function canSetSessionVariables(): bool
