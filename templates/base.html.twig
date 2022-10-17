@@ -53,17 +53,22 @@
                     <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-role">
+                    <ul class="dropdown-menu dropdown-menu-role navbar-program">
                         {% if siteInfo.canSwitchProgram %}
                             <li>
-                                <a href="{{ path('program_select', { program: 'hpo' }) }}">
-                                    <i class="fas fa-arrow-circle-right"></i><strong> All Of Us</strong>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ path('program_select', { program: 'nph' }) }}">
-                                    <i class="fas fa-arrow-circle-right"></i><strong> NPH</strong>
-                                </a>
+                                {% if app.session.get('program') == 'nph' %}
+                                    <a href="{{ path('program_select', { program: 'hpo' }) }}">
+                                        {# TODO: Replace logo with new AOU logo #}
+                                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                                        All Of Us Research Program
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('program_select', { program: 'nph' }) }}">
+                                        {# TODO: Replace logo with NPH logo #}
+                                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="NPH logo"/>
+                                        NPH
+                                    </a>
+                                {% endif %}
                             </li>
                         {% endif %}
                     </ul>
