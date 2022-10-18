@@ -72,6 +72,9 @@ class DefaultController extends BaseController
             $program = $request->query->get('program');
             if (in_array($program, User::PROGRAMS)) {
                 $request->getSession()->set('program', $program);
+                if ($siteService->autoSwitchSite()) {
+                    return $this->redirectToRoute('home');
+                }
                 return $this->redirectToRoute('site_select');
             }
         }

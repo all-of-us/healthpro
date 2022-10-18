@@ -360,4 +360,27 @@ class SiteService
         }
         return false;
     }
+
+    public function autoSwitchSite(): bool
+    {
+        $program = $this->requestStack->getSession()->get('program');
+        $user = $this->userService->getUser();
+        $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
+        $autoSwitch = false;
+        if ($program === User::PROGRAM_HPO) {
+            if (count($sites) === 1 && empty($user->getAwardees()) && $this->isValidSite($sites[0]->email)) {
+                $this->switchSite($sites[0]->email);
+                $autoSwitch = true;
+            } elseif (count($user->getAwardees()) === 1 && empty($sites)) {
+                $this->switchSite($user->getAwardees()[0]->email);
+                $autoSwitch = true;
+            }
+        } else {
+            if (count($sites) === 1 && $this->isValidSite($sites[0]->email)) {
+                $this->switchSite($sites[0]->email);
+                $autoSwitch = true;
+            }
+        }
+        return $autoSwitch;
+    }
 }
