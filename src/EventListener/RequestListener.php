@@ -153,23 +153,8 @@ class RequestListener
                 || $this->authorizationChecker->isGranted('ROLE_NPH_USER')
                 ||$this->authorizationChecker->isGranted('ROLE_AWARDEE')
             )) {
-            $user = $this->userService->getUser();
-            $program = $this->requestStack->getSession()->get('program');
-            $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
-            if ($program === User::PROGRAM_HPO) {
-                if (count($sites) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($sites[0]->email)) {
-                    $this->siteService->switchSite($sites[0]->email);
-                } elseif (count($user->getAwardees()) === 1 && empty($sites)) {
-                    $this->siteService->switchSite($user->getAwardees()[0]->email);
-                } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
-                    return new RedirectResponse('/site/select');
-                }
-            } else {
-                if (count($sites) === 1 && $this->siteService->isValidSite($sites[0]->email)) {
-                    $this->siteService->switchSite($sites[0]->email);
-                } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
-                    return new RedirectResponse('/site/select');
-                }
+            if (!$this->siteService->autoSwitchSite() && !$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                return new RedirectResponse('/site/select');
             }
         }
     }
