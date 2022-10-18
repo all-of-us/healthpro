@@ -21,7 +21,7 @@ final class Version20221018202212 extends AbstractMigration
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('CREATE TABLE nph_sites (id INT AUTO_INCREMENT NOT NULL, status TINYINT(1) NOT NULL, name VARCHAR(255) NOT NULL, google_group VARCHAR(255) NOT NULL, organization_id VARCHAR(255) DEFAULT NULL, awardee_id VARCHAR(255) DEFAULT NULL, type VARCHAR(100) DEFAULT NULL, site_type VARCHAR(100) DEFAULT NULL, centrifuge_type VARCHAR(50) DEFAULT NULL, deleted TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE nph_sites (id INT AUTO_INCREMENT NOT NULL, status TINYINT(1) NOT NULL, name VARCHAR(255) NOT NULL, google_group VARCHAR(255) NOT NULL, organization_id VARCHAR(255) DEFAULT NULL, awardee_id VARCHAR(255) DEFAULT NULL, type VARCHAR(100) DEFAULT NULL, site_type VARCHAR(100) DEFAULT NULL, centrifuge_type VARCHAR(50) DEFAULT NULL, email VARCHAR(512) DEFAULT NULL, deleted TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
     }
 
     public function down(Schema $schema): void

@@ -62,6 +62,11 @@ class NphSite
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="string", length=512, nullable=true)
+     */
+    private $email;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -171,6 +176,18 @@ class NphSite
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }
