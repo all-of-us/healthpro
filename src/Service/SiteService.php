@@ -331,7 +331,6 @@ class SiteService
             return !empty($site) ? $site[0] : null;
         }
         return null;
-
     }
 
     public function getOrderType()
