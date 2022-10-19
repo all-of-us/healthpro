@@ -31,7 +31,7 @@ class NphAdminController extends BaseController
      */
     public function index(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params)
     {
-        return '';
+        return $this->render('nphadmin/sites/index.html.twig');
     }
 
     /**
