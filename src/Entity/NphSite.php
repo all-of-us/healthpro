@@ -6,6 +6,7 @@ use App\Repository\NphSiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table(name="nph_sites")
  * @ORM\Entity(repositoryClass=NphSiteRepository::class)
  */
 class NphSite
@@ -60,7 +61,7 @@ class NphSite
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted = false;
 
     /**
      * @ORM\Column(type="string", length=512, nullable=true)

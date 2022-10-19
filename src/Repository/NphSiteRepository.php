@@ -19,32 +19,27 @@ class NphSiteRepository extends ServiceEntityRepository
         parent::__construct($registry, NphSite::class);
     }
 
-    // /**
-    //  * @return NphSite[] Returns an array of NphSite objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return NphSite[] Returns an array of NphSite objects
+     */
+    public function getDuplicateGoogleGroup($googleGroup, $id = null)
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $queryBuilder = $this->createQueryBuilder('ns')
+            ->select('ns.id');
 
-    /*
-    public function findOneBySomeField($value): ?NphSite
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
+        $queryBuilder
+            ->where('ns.deleted = 0')
+            ->andWhere('ns.googleGroup = :googleGroup')
+            ->setParameter('googleGroup', $googleGroup);
+
+        if ($id) {
+            $queryBuilder
+                ->andWhere('ns.id != :id')
+                ->setParameter('id', $id);
+        }
+
+        return $queryBuilder
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getResult();
     }
-    */
 }

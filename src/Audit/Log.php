@@ -20,6 +20,9 @@ class Log
     public const SITE_EDIT = 'SITE_EDIT';
     public const SITE_ADD = 'SITE_ADD';
     public const SITE_DELETE = 'SITE_DELETE';
+    public const NPH_SITE_EDIT = 'NPH_SITE_EDIT';
+    public const NPH_SITE_ADD = 'NPH_SITE_ADD';
+    public const NPH_SITE_DELETE = 'NPH_SITE_DELETE';
     public const WORKQUEUE_EXPORT = 'WORKQUEUE_EXPORT';
     public const CROSS_ORG_PARTICIPANT_ATTEMPT = 'CROSS_ORG_PARTICIPANT_ATTEMPT';
     public const CROSS_ORG_PARTICIPANT_AGREE = 'CROSS_ORG_PARTICIPANT_AGREE';

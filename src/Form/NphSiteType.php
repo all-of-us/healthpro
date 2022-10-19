@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Site;
+use App\Entity\NphSite;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -117,7 +117,7 @@ class NphSiteType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Site::class,
+            'data_class' => NphSite::class,
             'isDisabled' => false,
             'isProd' => false
         ]);
