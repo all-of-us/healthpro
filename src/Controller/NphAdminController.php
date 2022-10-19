@@ -52,6 +52,13 @@ class NphAdminController extends BaseController
             if (!$site) {
                 throw $this->createNotFoundException('Site not found.');
             }
+            if ($request->request->has('delete')) {
+                $this->em->remove($site);
+                $this->em->flush();
+                $loggerService->log(Log::NPH_SITE_DELETE, $site->getId());
+                $this->addFlash('success', 'Site removed.');
+                return $this->redirectToRoute('nph_admin_sites');
+            }
         } else {
             if ($syncEnabled) {
                 // can't create new sites if syncing from rdr
