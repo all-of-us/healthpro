@@ -44,8 +44,7 @@ class NphAdminController extends BaseController
         ParameterBagInterface $params,
         EnvironmentService $env,
         $id = null
-    )
-    {
+    ) {
         $syncEnabled = $params->has('nph_sites_use_rdr') ? $params->get('nph_sites_use_rdr') : false;
         if ($id) {
             $site = $nphSiteRepository->find($id);
