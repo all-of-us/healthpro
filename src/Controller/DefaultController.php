@@ -55,9 +55,9 @@ class DefaultController extends BaseController
     /**
      * @Route("/admin", name="admin_home")
      */
-    public function adminIndex()
+    public function adminIndex(ContextTemplateService $contextTemplate)
     {
-        return $this->render('admin/index.html.twig');
+        return $this->render($contextTemplate->GetProgramTemplate('admin/index.html.twig'));
     }
 
     /**
