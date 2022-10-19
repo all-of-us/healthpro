@@ -122,7 +122,7 @@
                                 <li><a href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
                             </ul>
                         </li>
-                        {% if app.session.get('siteOrganization') %}
+                        {% if app.session.get('siteEntity') and app.session.get('siteEntity').organization %}
                             <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
                         {% endif %}
                     {% endif %}
@@ -144,7 +144,7 @@
                             <li>
                                 <a href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
-                                    {{ app.session.get('currentSiteDisplayName')|default(app.session.get('site').name) }}
+                                    {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
                                 </a>
                             </li>
                         {% endif %}
@@ -234,16 +234,19 @@
                         <h4 class="modal-title" id="siteModalLabel">Current site</h4>
                     </div>
                     <div class="modal-body">
-                        {% if app.user.sites|length == 0 and app.user.awardees|length == 0 %}
+                        {% set sites = app.session.get('program') == 'hpo' ? app.user.sites : app.user.nphSites %}
+                        {% if sites|length == 0 and app.user.awardees|length == 0 %}
                             <span class="text-danger">You do not belong to any HPO sites!</span>
                         {% else %}
                             <select class="form-control" name="site">
-                                {% for site in app.user.sites %}
+                                {% for site in sites %}
                                     <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
                                 {% endfor %}
-                                {% for awardee in app.user.awardees %}
-                                    <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
-                                {% endfor %}
+                                {% if app.session.get('program') == 'hpo' %}
+                                    {% for awardee in app.user.awardees %}
+                                        <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
+                                    {% endfor %}
+                                {% endif %}
                             </select>
                         {% endif %}
                     </div>

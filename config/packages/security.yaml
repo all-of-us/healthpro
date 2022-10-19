@@ -21,9 +21,10 @@ security:
         - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
-        - { path: ^/problem($|\/).*, roles: ROLE_DV_ADMIN }
+        - { path: ^/problem($|\/).*, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/settings($|\/), roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS, ROLE_READ_ONLY] }
         - { path: ^/site($|\/), roles: [ROLE_USER, ROLE_AWARDEE] }
+        - { path: ^/program($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_NPH_USER] }
         - { path: ^/help($|\/).*, roles: [ROLE_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS, ROLE_READ_ONLY] }
         - { path: ^/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
         - { path: ^/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }

@@ -135,4 +135,51 @@ class UserTest extends WebTestCase
         self::assertEquals($hpoGroup, $user->getGroupFromId('my-siteA')->email);
         self::assertEquals($readOnlyGroup, $user->getGroupFromId(User::READ_ONLY_GROUP)->email);
     }
+
+
+
+    public function testNphSites()
+    {
+        $email = 'user-test9@example.com';
+        MockUserHelper::switchCurrentUser($email);
+        $groups = [
+            new GoogleGroup('test-group1@gapps.com', 'Test Group 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteA@gapps.com', 'Test Site 1', 'lorem ipsum 1'),
+            new GoogleGroup('test-group2@gapps.com', 'Test Group 2', 'lorem ipsum 2'),
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteB@gapps.com', 'Test Site 2', 'lorem ipsum 2'),
+        ];
+        $user = new User(MockUserHelper::getCurrentUser(), $groups);
+        $this->assertEquals($email, $user->getEmail());
+        $this->assertEquals(count($groups), count($user->getGroups()));
+        $this->assertEquals(2, count($user->getNphSites()));
+        $this->assertEquals($groups[1]->getEmail(), $user->getNphSites()[0]->email);
+        $this->assertEquals($groups[3]->getName(), $user->getNphSites()[1]->name);
+    }
+
+    public function testGetNphSite()
+    {
+        $email = 'user-test4@example.com';
+        MockUserHelper::switchCurrentUser($email);
+        $groups = [
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteA@gapps.com', 'Test Site 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteB@gapps.com', 'Test Site 2', 'lorem ipsum 2'),
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteC@gapps.com', 'Test Site 3', 'lorem ipsum 3')
+        ];
+        $user = new User(MockUserHelper::getCurrentUser(), $groups);
+        $this->assertEquals($groups[1]->getName(), $user->getSite($groups[1]->getEmail(), 'nphSites')->name);
+    }
+
+    public function testBelongsNphToSite()
+    {
+        $email = 'user-test5@example.com';
+        MockUserHelper::switchCurrentUser($email);
+        $groups = [
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteA@gapps.com', 'Test Site 1', 'lorem ipsum 1'),
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteB@gapps.com', 'Test Site 2', 'lorem ipsum 2'),
+            new GoogleGroup(User::SITE_NPH_PREFIX . 'my-siteC@gapps.com', 'Test Site 3', 'lorem ipsum 3')
+        ];
+        $user = new User(MockUserHelper::getCurrentUser(), $groups);
+        $this->assertEquals(true, $user->belongsToSite($groups[2]->getEmail(), 'nphSites'));
+        $this->assertEquals(false, $user->belongsToSite(User::SITE_NPH_PREFIX . 'my-siteD@gapps.com', 'nphSites'));
+    }
 }

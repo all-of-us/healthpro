@@ -35,7 +35,7 @@ class DeceasedReportsController extends BaseController
     public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
         $statusFilter = $request->query->get('status', 'preliminary');
-        $organizationId = $session->get('siteOrganizationId');
+        $organizationId = $session->get('siteEntity')->getOrganizationId();
         if (!$organizationId) {
             throw $this->createAccessDeniedException('Must be associated with a valid Organization.');
         }
@@ -53,7 +53,7 @@ class DeceasedReportsController extends BaseController
      */
     public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
     {
-        $organizationId = $session->get('siteOrganizationId');
+        $organizationId = $session->get('siteEntity')->getOrganizationId();
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -94,7 +94,7 @@ class DeceasedReportsController extends BaseController
      */
     public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId)
     {
-        $organizationId = $session->get('siteOrganizationId');
+        $organizationId = $session->get('siteEntity')->getOrganizationId();
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -170,7 +170,7 @@ class DeceasedReportsController extends BaseController
      */
     public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
     {
-        $organizationId = $session->get('siteOrganizationId');
+        $organizationId = $session->get('siteEntity')->getOrganizationId();
         $pendingReportCountCache = $this->cache->getItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
         if ($cacheHit = $pendingReportCountCache->isHit()) {
             $pendingReportCount = (int) $pendingReportCountCache->get();

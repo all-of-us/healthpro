@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Audit\Log;
 use App\Entity\FeatureNotification;
 use App\Entity\FeatureNotificationUserMap;
+use App\Entity\User;
 use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -75,6 +76,11 @@ class RequestListener
             return;
         }
 
+        if ($programSelectResponse = $this->checkProgramSelect()) {
+            $event->setResponse($programSelectResponse);
+            return;
+        }
+
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
         }
@@ -125,19 +131,45 @@ class RequestListener
         $this->twig->addGlobal('notifications_count', $notificationsCount);
     }
 
+    private function checkProgramSelect()
+    {
+        if (!$this->requestStack->getSession()->has('program') && $this->canSwitchProgram()) {
+            if (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                return new RedirectResponse('/program/select');
+            }
+        }
+    }
+
     private function checkSiteSelect()
     {
-        if (!$this->requestStack->getSession()->has('site') && !$this->requestStack->getSession()->has('awardee') && ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE'))) {
+        if (!$this->requestStack->getSession()->has('program') && $this->canSetSessionVariables()) {
+            $this->setDefaultProgramSessionVariable();
+        }
+        if ($this->requestStack->getSession()->has('program') &&
+            !$this->requestStack->getSession()->has('site') &&
+            !$this->requestStack->getSession()->has('awardee') &&
+            (
+                $this->authorizationChecker->isGranted('ROLE_USER')
+                || $this->authorizationChecker->isGranted('ROLE_NPH_USER')
+                ||$this->authorizationChecker->isGranted('ROLE_AWARDEE')
+            )) {
             $user = $this->userService->getUser();
-            if (count($user->getSites()) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($user->getSites()[0]->email)) {
-                $this->siteService->switchSite($user->getSites()[0]->email);
-            } elseif (count($user->getAwardees()) === 1 && empty($user->getSites())) {
-                $this->siteService->switchSite($user->getAwardees()[0]->email);
-            } elseif (!preg_match(
-                '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|access\/manage)($|\/).*/',
-                $this->request->getPathInfo()
-            ) && !$this->isUpkeepRoute()) {
-                return new RedirectResponse('/site/select');
+            $program = $this->requestStack->getSession()->get('program');
+            $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
+            if ($program === User::PROGRAM_HPO) {
+                if (count($sites) === 1 && empty($user->getAwardees()) && $this->siteService->isValidSite($sites[0]->email)) {
+                    $this->siteService->switchSite($sites[0]->email);
+                } elseif (count($user->getAwardees()) === 1 && empty($sites)) {
+                    $this->siteService->switchSite($user->getAwardees()[0]->email);
+                } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                    return new RedirectResponse('/site/select');
+                }
+            } else {
+                if (count($sites) === 1 && $this->siteService->isValidSite($sites[0]->email)) {
+                    $this->siteService->switchSite($sites[0]->email);
+                } elseif (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                    return new RedirectResponse('/site/select');
+                }
             }
         }
     }
@@ -152,10 +184,7 @@ class RequestListener
 
     public function onKernelFinishRequest()
     {
-        if ($this->tokenStorage->getToken() && $this->request && !preg_match(
-            '/^\/(login|_wdt)($|\/).*/',
-            $this->request->getPathInfo()
-        ) && !$this->isUpkeepRoute() && !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if ($this->canSetSessionVariables()) {
             $this->setSessionVariables();
         }
     }
@@ -174,6 +203,14 @@ class RequestListener
             'client_timeout',
             'agree_usage'
         ]));
+    }
+
+    private function ignoreRoutes(): bool
+    {
+        return preg_match(
+            '/^\/(_profiler|_wdt|cron|admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
+            $this->request->getPathInfo()
+        );
     }
 
     public function isStreamingResponseRoute()
@@ -200,5 +237,37 @@ class RequestListener
                 $this->requestStack->getSession()->set('userSiteDisplayNames', $userSiteDisplayNames);
             }
         }
+        if (!$this->requestStack->getSession()->has('program')) {
+            $this->setDefaultProgramSessionVariable();
+        }
+    }
+
+    private function setDefaultProgramSessionVariable(): void
+    {
+        // Default program should not be set if user has option to switch programs
+        if (!$this->canSwitchProgram()) {
+            if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+                $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
+            } else {
+                $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);
+            }
+        }
+    }
+
+    private function canSwitchProgram(): bool
+    {
+        if ($this->userService->getUser()) {
+            $roles = $this->userService->getUser()->getRoles();
+            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
+        }
+        return false;
+    }
+
+    private function canSetSessionVariables(): bool
+    {
+        return $this->tokenStorage->getToken() &&
+            $this->request && !preg_match('/^\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) &&
+            !$this->isUpkeepRoute() &&
+            !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
     }
 }
