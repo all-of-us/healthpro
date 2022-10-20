@@ -1,0 +1,35 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %} {{ site ? 'Edit Site' : 'Create Site' }} - {% endblock %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li><a href="{{ path('admin_sites') }}">Site Management</a></li>
+        <li class="active">{{ site ? 'Edit' : 'Create' }} Site</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> {{ site ? 'Edit' : 'Create' }} Site</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            {{ form_start(siteForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(siteForm) }}
+            {{ form_rest(siteForm) }}
+            <button type="submit" class="btn btn-primary">Save Site</button>
+            <a class="btn btn-default" href="{{ path('nph_admin_sites') }}">Cancel</a>
+            {% if site %}
+                <button type="submit" name="delete" class="btn btn-danger pull-right confirm">Delete Site</button>
+            {% endif %}
+            {{ form_end(siteForm) }}
+            <br>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $('.confirm').on('click', function () {
+            return confirm('Are you sure you want to delete the site?');
+        });
+    </script>
+{% endblock %}

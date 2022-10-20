@@ -10,6 +10,7 @@ class User implements UserInterface
     public const SITE_NPH_PREFIX = 'nph-site-';
     public const AWARDEE_PREFIX = 'awardee-';
     public const ADMIN_GROUP = 'site-admin';
+    public const NPH_ADMIN_GROUP = 'nph-site-admin';
     public const TWOFACTOR_GROUP = 'mfa_exception';
     public const TWOFACTOR_PREFIX = 'x-site-';
     public const ADMIN_DV = 'dv-admin';
@@ -26,6 +27,7 @@ class User implements UserInterface
     private $nphSites;
     private $awardees;
     private $adminAccess;
+    private $nphAdminAccess;
     private $info;
     private $timezone;
     private $lastLogin;
@@ -46,7 +48,8 @@ class User implements UserInterface
         $this->sites = $this->computeSites('hpo');
         $this->nphSites = $this->computeSites('nph');
         $this->awardees = $this->computeAwardees();
-        $this->adminAccess = $this->computeAdminAccess();
+        $this->adminAccess = $this->computeAdminAccess('hpo');
+        $this->nphAdminAccess = $this->computeAdminAccess('nph');
         $this->adminDvAccess = $this->computeAdminDvAccess();
         $this->biobankAccess = $this->computeBiobankAccess();
         $this->scrippsAccess = $this->computeScrippsAccess();
@@ -104,11 +107,12 @@ class User implements UserInterface
         return $awardees;
     }
 
-    private function computeAdminAccess()
+    private function computeAdminAccess($type)
     {
         $hasAccess = false;
+        $groupPrefix = $type === 'hpo' ? self::ADMIN_GROUP : self::NPH_ADMIN_GROUP;
         foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::ADMIN_GROUP . '@') === 0) {
+            if (strpos($group->getEmail(), $groupPrefix . '@') === 0) {
                 $hasAccess = true;
             }
         }
@@ -263,6 +267,9 @@ class User implements UserInterface
         }
         if ($this->adminAccess) {
             $roles[] = 'ROLE_ADMIN';
+        }
+        if ($this->nphAdminAccess) {
+            $roles[] = 'ROLE_NPH_ADMIN';
         }
         if ($this->adminDvAccess) {
             $roles[] = 'ROLE_DV_ADMIN';
