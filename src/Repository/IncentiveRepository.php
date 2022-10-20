@@ -50,7 +50,8 @@ class IncentiveRepository extends ServiceEntityRepository
             ->leftJoin('i.user', 'u')
             ->leftJoin('i.amendedUser', 'au')
             ->leftJoin('i.import', 'ii')
-            ->where('i.site =:site');
+            ->where('i.site =:site')
+            ->andWhere('i.cancelledUser is null');
 
         if (!empty($params['participantId'])) {
             $queryBuilder->andWhere('i.participantId = :participantId')
@@ -105,7 +106,8 @@ class IncentiveRepository extends ServiceEntityRepository
             ->leftJoin('i.user', 'u')
             ->leftJoin('i.amendedUser', 'au')
             ->leftJoin('i.import', 'ii')
-            ->where('i.site =:site');
+            ->where('i.site =:site')
+            ->andWhere('i.cancelledUser is null');
         if (!empty($params['participantId'])) {
             $queryBuilder->andWhere('i.participantId = :participantId')
                 ->setParameter('participantId', $params['participantId']);
