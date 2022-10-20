@@ -52,8 +52,7 @@
                 <li class="dropdown">
                     <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {% if app.session.get('program') == 'nph' %}
-                            {# TODO: Replace logo with NPH logo #}
-                            <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="NPH Logo"/>
+                            <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH Logo"/>
                         {% else %}
                             <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
                         {% endif %}
@@ -63,14 +62,12 @@
                             <li>
                                 {% if app.session.get('program') == 'nph' %}
                                     <a href="{{ path('program_select', { program: 'hpo' }) }}">
-                                        {# TODO: Replace logo with new AOU logo #}
-                                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                                        <img src="{{ asset('img/all-of-us-logo.svg') }}" alt="All of Us logo"/>
                                         All Of Us Research Program
                                     </a>
                                 {% else %}
                                     <a href="{{ path('program_select', { program: 'nph' }) }}">
-                                        {# TODO: Replace logo with NPH logo #}
-                                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="NPH logo"/>
+                                        <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH logo"/>
                                         NPH
                                     </a>
                                 {% endif %}
