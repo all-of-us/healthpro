@@ -17,6 +17,14 @@
                 <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
                 <dt>Paired Site</dt>
                 <dd>{{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
+                <dt>AI/AN</dt>
+                <dd>
+                    {% if participant.rdrData.race == "AMERICAN_INDIAN_OR_ALASKA_NATIVE" %}
+                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                    {% else %}
+                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    {% endif %}
+                </dd>
             </dl>
         </div>
     </div>
