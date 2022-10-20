@@ -325,8 +325,12 @@ class SiteService
         if (!$googleGroup) {
             return null;
         }
-        $site = $this->em->getRepository(Site::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
-        return !empty($site) ? $site[0] : null;
+        //TODO: Use nph site class if the progam is nph
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+            $site = $this->em->getRepository(Site::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
+            return !empty($site) ? $site[0] : null;
+        }
+        return null;
     }
 
     public function getOrderType()
@@ -350,5 +354,37 @@ class SiteService
     public function getSiteWithPrefix($siteId): string
     {
         return \App\Security\User::SITE_PREFIX . $siteId;
+    }
+
+    public function canSwitchProgram(): bool
+    {
+        if ($this->userService->getUser()) {
+            $roles = $this->userService->getUser()->getRoles();
+            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
+        }
+        return false;
+    }
+
+    public function autoSwitchSite(): bool
+    {
+        $program = $this->requestStack->getSession()->get('program');
+        $user = $this->userService->getUser();
+        $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
+        $autoSwitch = false;
+        if ($program === User::PROGRAM_HPO) {
+            if (count($sites) === 1 && empty($user->getAwardees()) && $this->isValidSite($sites[0]->email)) {
+                $this->switchSite($sites[0]->email);
+                $autoSwitch = true;
+            } elseif (count($user->getAwardees()) === 1 && empty($sites)) {
+                $this->switchSite($user->getAwardees()[0]->email);
+                $autoSwitch = true;
+            }
+        } else {
+            if (count($sites) === 1 && $this->isValidSite($sites[0]->email)) {
+                $this->switchSite($sites[0]->email);
+                $autoSwitch = true;
+            }
+        }
+        return $autoSwitch;
     }
 }
