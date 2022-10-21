@@ -173,7 +173,7 @@ class WorkQueue
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'consentMethod' => 'displayHistoricalConsentStatus',
             'reconsentField' => 'reconsentForStudyEnrollmentAuthored',
-            'reconsentPdfPath' => 'reconsentForStudyEnrollementFilePath',
+            'reconsentPdfPath' => 'reconsentForStudyEnrollmentFilePath',
             'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
