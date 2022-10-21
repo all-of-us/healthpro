@@ -369,4 +369,64 @@ class WorkQueueTest extends TestCase
         $advancedFilters = WorkQueue::$consentAdvanceFilters;
         $this->assertSame($filterLabelOptionPairs, WorkQueue::getFilterLabelOptionPairs($advancedFilters));
     }
+
+    /**
+     * @dataProvider getIncentivesDataProvider
+     */
+    public function testGetParticipantIncentiveDateGiven($incentives, $incentiveDate): void
+    {
+        $this->assertSame($incentiveDate, WorkQueue::getParticipantIncentiveDateGiven($incentives));
+    }
+
+    public function getIncentivesDataProvider(): array
+    {
+        return [
+            [
+                [
+                    (object)[
+                        'incentiveId' => 1,
+                        'cancelled' => false,
+                        'dateGiven' => '2022-10-19T00:00:00Z'
+                    ],
+                    (object)[
+                        'incentiveId' => 2,
+                        'cancelled' => true,
+                        'dateGiven' => '2022-10-20T00:00:00Z'
+                    ],
+                ],
+                '10/19/2022'
+            ],
+            [
+                [
+                    (object)[
+                        'incentiveId' => 1,
+                        'cancelled' => false,
+                        'dateGiven' => '2022-10-12T00:00:00Z'
+                    ],
+                    (object)[
+                        'incentiveId' => 2,
+                        'cancelled' => true,
+                        'dateGiven' => '2022-10-19T00:00:00Z'
+                    ],
+                    (object)[
+                        'incentiveId' => 3,
+                        'cancelled' => true,
+                        'dateGiven' => '2022-10-20T00:00:00Z'
+                    ],
+                ],
+                '10/12/2022'
+            ],
+            [
+                [
+                    (object)[
+                        'incentiveId' => 1,
+                        'cancelled' => true,
+                        'dateGiven' => '2022-10-12T00:00:00Z'
+                    ]
+                ],
+                ''
+            ]
+        ];
+    }
+
 }

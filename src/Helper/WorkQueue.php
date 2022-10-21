@@ -2799,10 +2799,17 @@ class WorkQueue
     {
         if ($participantIncentives && is_array($participantIncentives)) {
             $count = count($participantIncentives);
-            $incentive = $participantIncentives[$count - 1];
-            $incentiveDate = date_parse($incentive->dateGiven);
-            return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
-                $incentiveDate['year'];
+            for ($i = $count - 1; $i >= 0; $i--) {
+                if ($participantIncentives[$i]->cancelled === false) {
+                    $incentive = $participantIncentives[$i];
+                    break;
+                }
+            }
+            if (!empty($incentive)) {
+                $incentiveDate = date_parse($incentive->dateGiven);
+                return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+                    $incentiveDate['year'];
+            }
         }
         return '';
     }
