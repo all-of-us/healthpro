@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/nph/admin/sites")
+ * @Route("/nph/admin")
  */
 class NphAdminController extends BaseController
 {
@@ -27,15 +27,28 @@ class NphAdminController extends BaseController
     }
 
     /**
-     * @Route("/", name="nph_admin_sites")
+     * @Route("/", name="nph_admin_home")
      */
-    public function index(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params)
+    public function index()
     {
-        return $this->render('nphadmin/sites/index.html.twig');
+        return '';
     }
 
     /**
-     * @Route("/site/{id}", name="nph_admin_site")
+     * @Route("/sites", name="nph_admin_sites")
+     */
+    public function sitesAction(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params)
+    {
+        $sites = $nphSiteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
+        return $this->render('program/nph/admin/sites/index.html.twig', [
+            'sites' => $sites,
+            'sync' => $params->has('nph_sites_use_rdr') ? $params->get('nph_sites_use_rdr') : false,
+            'siteChoices' => NphSiteType::$siteChoices
+        ]);
+    }
+
+    /**
+     * @Route("/sites/site/{id}", name="nph_admin_site")
      */
     public function edit(
         NphSiteRepository $nphSiteRepository,
@@ -100,7 +113,7 @@ class NphAdminController extends BaseController
             }
         }
         $form = $this->createForm(NphSiteType::class, $site, ['isDisabled' => false, 'isProd' => $env->isProd()]);
-        return $this->render('nphadmin/sites/edit.html.twig', [
+        return $this->render('program/nph/admin/sites/edit.html.twig', [
             'site' => $site,
             'siteForm' => $form->createView()
         ]);
