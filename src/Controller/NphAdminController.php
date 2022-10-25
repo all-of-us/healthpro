@@ -31,7 +31,7 @@ class NphAdminController extends BaseController
      */
     public function index()
     {
-        return $this->render('nphadmin/index.html.twig');
+        return '';
     }
 
     /**
@@ -40,7 +40,7 @@ class NphAdminController extends BaseController
     public function sitesAction(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params)
     {
         $sites = $nphSiteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
-        return $this->render('nphadmin/sites/index.html.twig', [
+        return $this->render('program/nph/admin/sites/index.html.twig', [
             'sites' => $sites,
             'sync' => $params->has('nph_sites_use_rdr') ? $params->get('nph_sites_use_rdr') : false,
             'siteChoices' => NphSiteType::$siteChoices
@@ -113,7 +113,7 @@ class NphAdminController extends BaseController
             }
         }
         $form = $this->createForm(NphSiteType::class, $site, ['isDisabled' => false, 'isProd' => $env->isProd()]);
-        return $this->render('nphadmin/sites/edit.html.twig', [
+        return $this->render('program/nph/admin/sites/edit.html.twig', [
             'site' => $site,
             'siteForm' => $form->createView()
         ]);
