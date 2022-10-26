@@ -101,6 +101,12 @@ label.label-normal {
     vertical-align: top;
     display: inline-block;
 }
+.navbar-program {
+    width: 300px;
+}
+.navbar-program img{
+    width: 30px;
+}
 .navbar-inverse {
     border: 0;
     border-radius: 0;

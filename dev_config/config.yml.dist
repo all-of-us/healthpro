@@ -151,3 +151,6 @@ ehr_protocol_banner_message:
 
 # For getting secret manager credential in local env
 # local_use_secret_manager: false
+
+# enable site sync using RDR Organization API
+# nph_sites_use_rdr: false
