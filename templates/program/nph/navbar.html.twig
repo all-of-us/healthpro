@@ -8,11 +8,27 @@
                 <span class="icon-bar"></span>
             </button>
             {% if showRoleDropdown %}
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH Logo"/>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-role navbar-program">
+                            {% if siteInfo.canSwitchProgram %}
+                                <li>
+                                    <a href="{{ path('program_select', { program: 'hpo' }) }}">
+                                        <img src="{{ asset('img/all-of-us-logo.svg') }}" alt="All of Us logo"/>
+                                        All Of Us Research Program
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
                 <ul class="nav navbar-nav navbar-nav-role">
                     <li class="dropdown">
                         <a class="navbar-brand dropdown-toggle" href="{# TODO: Path to NPH Home #}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="{{ asset('img/nph-logo.svg') }}" alt="NPH Logo"/>
-                            NPH
+                            HealthPro
                             {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
                                 <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
                             {% endif %}
@@ -24,7 +40,7 @@
                         <ul class="dropdown-menu dropdown-menu-role">
                             {% if is_granted('ROLE_USER') or is_granted('ROLE_AWARDEE') %}
                                 <li>
-                                    <a href="{# TODO: Path to NPH Home #}">
+                                    <a href="{{path('home')}}">
                                         <i class="fas fa-arrow-circle-right"></i>
                                         {% if not currentRoleNav %}
                                             <strong>HealthPro</strong>

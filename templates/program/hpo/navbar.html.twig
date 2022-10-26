@@ -8,10 +8,26 @@
                 <span class="icon-bar"></span>
             </button>
             {% if showRoleDropdown %}
-                <ul class="nav navbar-nav navbar-nav-role">
+                <ul class="nav navbar-nav">
                     <li class="dropdown">
                         <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-role navbar-program">
+                            {% if siteInfo.canSwitchProgram %}
+                                <li>
+                                    <a href="{{ path('program_select', { program: 'hpo' }) }}">
+                                        <img src="{{ asset('img/all-of-us-logo.svg') }}" alt="All of Us logo"/>
+                                        All Of Us Research Program
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-nav-role">
+                    <li class="dropdown">
+                        <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             HealthPro
                             {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
                                 <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
@@ -82,7 +98,7 @@
                                 <li><a href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
                             </ul>
                         </li>
-                        {% if app.session.get('siteOrganization') %}
+                        {% if app.session.get('siteEntity') and app.session.get('siteEntity').organization %}
                             <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
                         {% endif %}
                     {% endif %}
@@ -104,7 +120,7 @@
                             <li>
                                 <a href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
-                                    {{ app.session.get('currentSiteDisplayName')|default(app.session.get('site').name) }}
+                                    {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
                                 </a>
                             </li>
                         {% endif %}
