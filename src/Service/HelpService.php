@@ -214,6 +214,17 @@ class HelpService
         return false;
     }
 
+    public function getDocumentTitlesList(): array
+    {
+        $documentTitles = [];
+        foreach (self::$documentGroups as $documentGroup) {
+            foreach (array_keys($documentGroup['documents']) as $documentID) {
+                $documentTitles[$documentID] = $documentGroup['documents'][$documentID]['title'];
+            }
+        }
+        return $documentTitles;
+    }
+
     public static function getFeedbackUrl(): string
     {
         return 'https://redcap.pmi-ops.org/surveys/?s=JN33K7PKWC';

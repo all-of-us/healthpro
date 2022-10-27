@@ -46,8 +46,8 @@
             {{ form_errors(measurementModifyForm) }}
             {{ form_rest(measurementModifyForm) }}
             <p>
-                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
                 <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Physical Measurements</button>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
             {{ form_end(measurementModifyForm) }}
         </div>
