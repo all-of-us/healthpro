@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Nph\Module1;
-use App\Nph\Module1MMTT;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,7 +21,9 @@ class NphOrderController extends BaseController
      */
     public function generateOrderAction($moduleType, $visitType, $color = null): Response
     {
-        $module = new Module1MMTT();
+        $moduleClass = 'App\Nph\Module' . $visitType;
+        $module = new $moduleClass($moduleType, $color);
+        dd($module->getTimePointsWithSamples());
         return $this->render('program/nph/order/generate-orders.html.twig');
     }
 }
