@@ -6,6 +6,8 @@ class VisitMMTT
 {
     public $module;
 
+    public $allowedModules = [1,2,3];
+
     public $color;
 
     public $timePoints = [

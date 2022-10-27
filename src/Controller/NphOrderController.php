@@ -23,7 +23,6 @@ class NphOrderController extends BaseController
     {
         $moduleClass = 'App\Nph\Module' . $visitType;
         $module = new $moduleClass($moduleType, $color);
-        dd($module->getTimePointsWithSamples());
         return $this->render('program/nph/order/generate-orders.html.twig');
     }
 }

@@ -12,6 +12,9 @@ class ModuleDiet extends VisitDiet
 
     public function __construct($module, $color)
     {
+        if (!in_array($module, $this->allowedModules)) {
+            throw new \Exception('Module not supported');
+        }
         $this->color = $color;
         $this->module = 'module' . $module;
     }

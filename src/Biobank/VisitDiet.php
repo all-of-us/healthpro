@@ -6,6 +6,8 @@ class VisitDiet
 {
     public $module;
 
+    public $allowedModules = [2,3];
+
     public $timePoints = [
         'day0' => 'Day 0'
     ];

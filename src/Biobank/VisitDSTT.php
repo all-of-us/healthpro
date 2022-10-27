@@ -6,6 +6,8 @@ class VisitDSTT
 {
     public $module;
 
+    public $allowedModules = [2,3];
+
     public $timePoints = [
         'preDSTT' => 'Pre DSTT',
         '-15min' => '-15 Min',
