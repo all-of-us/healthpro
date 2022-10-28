@@ -21,8 +21,8 @@ class NphOrderController extends BaseController
      */
     public function generateOrderAction($module, $visit): Response
     {
-        $moduleClass = 'App\Nph\Module' .$module . $visit;
-        $module = new $moduleClass;
+        $moduleClass = 'App\Nph\Order\Module' .$module . $visit;
+        $module = new $moduleClass();
         //dd($module->getTimePointsWithSamples());
         return $this->render('program/nph/order/generate-orders.html.twig');
     }

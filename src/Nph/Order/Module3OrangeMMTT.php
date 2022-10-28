@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Nph;
+namespace App\Nph\Order;
 
 use App\Biobank\VisitMMTT;
 
