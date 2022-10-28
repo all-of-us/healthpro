@@ -17,12 +17,13 @@ class NphOrderController extends BaseController
     }
 
     /**
-     * @Route("/module/{moduleType}/visit/{visitType}/{color}", name="nph_generate_oder")
+     * @Route("/module/{module}/visit/{visit}/{color}", name="nph_generate_oder")
      */
-    public function generateOrderAction($moduleType, $visitType, $color = null): Response
+    public function generateOrderAction($module, $visit, $color = null): Response
     {
-        $moduleClass = 'App\Nph\Module' . $visitType;
-        $module = new $moduleClass($moduleType, $color);
+        $moduleClass = 'App\Nph\Module' .$module . $visit;
+        $module = new $moduleClass($color);
+        //dd($module->getTimePointsWithSamples());
         return $this->render('program/nph/order/generate-orders.html.twig');
     }
 }

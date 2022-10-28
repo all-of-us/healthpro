@@ -6,8 +6,6 @@ class VisitDSTT
 {
     public $module;
 
-    public $allowedModules = [2,3];
-
     public $timePoints = [
         'preDSTT' => 'Pre DSTT',
         '-15min' => '-15 Min',
@@ -23,12 +21,13 @@ class VisitDSTT
 
     public function getTimePointsWithSamples(): array
     {
+        $module = 'module' . $this->module;
         $timePointSamples = [];
         foreach ($this->timePoints as $key => $timePoint) {
             if ($key === 'preDSTT' || $key === 'postDSTT') {
-                $timePointSamples[$key] = Samples::${$this->module . ucfirst($key)};
+                $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
             } else {
-                $timePointSamples[$key] = Samples::${$this->module . 'BloodSamples'};
+                $timePointSamples[$key] = Samples::${$module . 'BloodSamples'};
             }
         }
         return $timePointSamples;

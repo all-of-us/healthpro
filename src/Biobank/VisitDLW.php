@@ -6,8 +6,6 @@ class VisitDLW
 {
     public $module;
 
-    public $allowedModules = [3];
-
     public $timePoints = [
         'day0PreDoseA' => 'Day 0 Pre Dose A',
         'day0PreDoseB' => 'Day 0 Pre Dose B',
@@ -21,9 +19,10 @@ class VisitDLW
 
     public function getTimePointsWithSamples(): array
     {
+        $module = 'module' . $this->module;
         $timePointSamples = [];
         foreach ($this->timePoints as $key => $timePoint) {
-            $timePointSamples[$key] = Samples::${$this->module . 'UrineSample'};
+            $timePointSamples[$key] = Samples::${$module . 'UrineSample'};
         }
         return $timePointSamples;
     }

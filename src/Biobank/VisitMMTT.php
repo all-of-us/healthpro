@@ -6,8 +6,6 @@ class VisitMMTT
 {
     public $module;
 
-    public $allowedModules = [1,2,3];
-
     public $color;
 
     public $timePoints = [
@@ -25,12 +23,13 @@ class VisitMMTT
 
     public function getTimePointsWithSamples(): array
     {
+        $module = 'module' . $this->module;
         $timePointSamples = [];
         foreach ($this->timePoints as $key => $timePoint) {
             if ($key === 'preMMTT' || $key === 'postMMTT') {
-                $timePointSamples[$key] = Samples::${$this->module . ucfirst($key)};
+                $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
             } else {
-                $timePointSamples[$key] = Samples::${$this->module . 'BloodSamples'};
+                $timePointSamples[$key] = Samples::${$module . 'BloodSamples'};
             }
         }
         return $timePointSamples;
