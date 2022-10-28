@@ -10,8 +10,8 @@ class VisitMMTT
 
     public $timePoints = [
         'preMMTT' => 'Pre MMTT',
-        '-15min' => '-15 Min',
-        '-5min' => '-5 Min',
+        'minus15min' => '-15 Min',
+        'minus5min' => '-5 Min',
         '15min' => '15 Min',
         '30min' => '30 Min',
         '60min' => '60 Min',

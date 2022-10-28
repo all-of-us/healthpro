@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %} Generate Orders - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2>Generate Order and Print Labels</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            {{ form_start(orderForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(orderForm) }}
+            {{ form_rest(orderForm) }}
+            <button type="submit" class="btn btn-primary">Next</button>
+            <a class="btn btn-default" href="{{ path('nph_admin_sites') }}">Cancel</a>
+            {{ form_end(orderForm) }}
+            <br>
+        </div>
+    </div>
+{% endblock %}
