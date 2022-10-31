@@ -4,12 +4,13 @@ namespace App\Controller;
 
 use App\Form\Nph\NphOrderType;
 use App\Service\Nph\NphOrderService;
+use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/nph/order")
+ * @Route("/nph")
  */
 class NphOrderController extends BaseController
 {
@@ -19,12 +20,28 @@ class NphOrderController extends BaseController
     }
 
     /**
-     * @Route("/module/{module}/visit/{visit}", name="nph_generate_oder")
+     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}", name="nph_generate_oder")
      */
-    public function generateOrderAction($module, $visit, NphOrderService $nphOrderService): Response
+    public function generateOrderAction(
+        $participantId,
+        $module,
+        $visit,
+        NphOrderService $nphOrderService,
+        ParticipantSummaryService $participantSummaryService): Response
     {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $timePointSamples = $nphOrderService->getTimePointsWithSamples($module, $visit);
         $oderForm = $this->createForm(NphOrderType::class, null,
-            ['timePointSamples' => $nphOrderService->getTimePointsWithSamples($module, $visit)]);
-        return $this->render('program/nph/order/generate-orders.html.twig', ['orderForm' => $oderForm->createView()]);
+            ['timePointSamples' => $timePointSamples]);
+        return $this->render('program/nph/order/generate-orders.html.twig', [
+            'orderForm' => $oderForm->createView(),
+            'timePointSamples' => $timePointSamples,
+            'participant' => $participant,
+            'module' => $module,
+            'visit' => $visit
+        ]);
     }
 }
