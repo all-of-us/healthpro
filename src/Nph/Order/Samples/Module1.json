@@ -1,0 +1,69 @@
+{
+  "version": "1",
+  "notes": "Module 1 samples",
+  "samplesInformation": {
+    "1SST8": {
+      "label": "8.5 mL SST",
+      "color": "Red and gray",
+      "temperature": "Refrigerated",
+      "specimen": "Serum SST",
+      "type": "blood"
+    },
+    "1PST8": {
+      "label": "8 mL PST",
+      "color": "Green and gray",
+      "temperature": "Refrigerated",
+      "specimen": "Plasma PST",
+      "type": "blood"
+    },
+    "1ED10": {
+      "label": "10 mL EDTA",
+      "color": "Lavender",
+      "temperature": "Refrigerated",
+      "specimen": "Whole Blood EDTA",
+      "type": "blood"
+    },
+    "1P8T2": {
+      "label": "2 mL P800",
+      "color": "Lavender",
+      "temperature": "Refrigerated",
+      "specimen": "Whole Blood EDTA",
+      "type": "blood"
+    },
+    "spot_urine": {
+      "label": "Spot Urine",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Urine",
+      "type": "urine"
+    },
+    "saliva": {
+      "label": "Saliva",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Saliva",
+      "type": "saliva"
+    },
+    "stool": {
+      "label": "Stool",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool"
+    },
+    "hair": {
+      "label": "Hair",
+      "color": "black",
+      "temperature": "Refrigerated",
+      "specimen": "Hair",
+      "type": "hair"
+    },
+    "nail": {
+      "label": "Spot Urine",
+      "color": "White",
+      "temperature": "Refrigerated",
+      "specimen": "Nail",
+      "type": "nail"
+    }
+  }
+}

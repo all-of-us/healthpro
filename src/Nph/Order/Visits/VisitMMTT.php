@@ -19,15 +19,30 @@ class VisitMMTT
         'postMMTT' => 'Post MMTT'
     ];
 
+    public static $timePointSampleTypes = [
+        'preMMTT' => ['urine', 'saliva', 'stool', 'hair', 'nail'],
+        'postMMTT' => ['urine', 'saliva']
+    ];
+
     public static function getSamples($module): array
     {
         $module = 'module' . $module;
+        $file = __DIR__ . "/../Samples/{$module}.json";
+        if (!file_exists($file)) {
+            throw new \Exception('Samples version file not found');
+        }
+        $schema = json_decode(file_get_contents($file), true);
+        $samples = $schema['samplesInformation'];
         $timePointSamples = [];
         foreach (self::$timePoints as $key => $timePoint) {
-            if ($key === 'preMMTT' || $key === 'postMMTT') {
-                $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
-            } else {
-                $timePointSamples[$key] = Samples::${$module . 'BloodSamples'};
+            foreach ($samples as $sampleCode => $sample) {
+                if (isset(self::$timePointSampleTypes[$key])) {
+                    if (in_array($sample['type'], self::$timePointSampleTypes[$key])) {
+                        $timePointSamples[$key][$sampleCode] = $sample['label'];
+                    }
+                } elseif ($sample['type'] === 'blood') {
+                    $timePointSamples[$key][$sampleCode] = $sample['label'];
+                }
             }
         }
         return $timePointSamples;
