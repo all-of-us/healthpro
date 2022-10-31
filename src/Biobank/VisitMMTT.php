@@ -4,11 +4,7 @@ namespace App\Biobank;
 
 class VisitMMTT
 {
-    public $module;
-
-    public $color;
-
-    public $timePoints = [
+    public static $timePoints = [
         'preMMTT' => 'Pre MMTT',
         'minus15min' => '-15 Min',
         'minus5min' => '-5 Min',
@@ -21,11 +17,11 @@ class VisitMMTT
         'postMMTT' => 'Post MMTT'
     ];
 
-    public function getTimePointsWithSamples(): array
+    public static function getTimePointsWithSamples($module): array
     {
-        $module = 'module' . $this->module;
+        $module = 'module' . $module;
         $timePointSamples = [];
-        foreach ($this->timePoints as $key => $timePoint) {
+        foreach (self::$timePoints as $key => $timePoint) {
             if ($key === 'preMMTT' || $key === 'postMMTT') {
                 $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
             } else {

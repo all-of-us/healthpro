@@ -4,9 +4,7 @@ namespace App\Biobank;
 
 class VisitDLW
 {
-    public $module;
-
-    public $timePoints = [
+    public static $timePoints = [
         'day0PreDoseA' => 'Day 0 Pre Dose A',
         'day0PreDoseB' => 'Day 0 Pre Dose B',
         'day0PostDoseA' => 'Day 0 Post Dose A',
@@ -17,11 +15,11 @@ class VisitDLW
         'day14F' => 'Day 14 F'
     ];
 
-    public function getTimePointsWithSamples(): array
+    public function getTimePointsWithSamples($module): array
     {
-        $module = 'module' . $this->module;
+        $module = 'module' . $module;
         $timePointSamples = [];
-        foreach ($this->timePoints as $key => $timePoint) {
+        foreach (self::$timePoints as $key => $timePoint) {
             $timePointSamples[$key] = Samples::${$module . 'UrineSample'};
         }
         return $timePointSamples;

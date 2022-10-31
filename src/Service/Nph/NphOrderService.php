@@ -6,8 +6,8 @@ class NphOrderService
 {
     public function getTimePointsWithSamples($module, $visit): array
     {
-        $moduleClass = 'App\Nph\Order\Module' . $module . $visit;
-        $module = new $moduleClass();
-        return $module->getTimePointsWithSamples();
+        $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
+        $module = new $moduleClass($visit);
+        return $module->getSamples();
     }
 }
