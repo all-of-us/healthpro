@@ -1,28 +1,30 @@
 <?php
 
-namespace App\Biobank;
+namespace App\Nph\Order\Visits;
 
-class VisitDSMT
+use App\Biobank\Samples;
+
+class VisitMMTT
 {
     public static $timePoints = [
-        'preDSTT' => 'Pre DSTT',
+        'preMMTT' => 'Pre MMTT',
         'minus15min' => '-15 Min',
-        'min5min' => '-5 Min',
+        'minus5min' => '-5 Min',
         '15min' => '15 Min',
         '30min' => '30 Min',
         '60min' => '60 Min',
         '90min' => '90 Min',
         '120min' => '120 Min',
         '240min' => '240 Min',
-        'postDSTT' => 'Post DSTT'
+        'postMMTT' => 'Post MMTT'
     ];
 
-    public function getTimePointsWithSamples($module): array
+    public static function getSamples($module): array
     {
         $module = 'module' . $module;
         $timePointSamples = [];
         foreach (self::$timePoints as $key => $timePoint) {
-            if ($key === 'preDSTT' || $key === 'postDSTT') {
+            if ($key === 'preMMTT' || $key === 'postMMTT') {
                 $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
             } else {
                 $timePointSamples[$key] = Samples::${$module . 'BloodSamples'};

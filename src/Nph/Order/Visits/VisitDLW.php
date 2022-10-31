@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Biobank;
+namespace App\Nph\Order\Visits;
+
+use App\Biobank\Samples;
 
 class VisitDLW
 {
@@ -15,7 +17,7 @@ class VisitDLW
         'day14F' => 'Day 14 F'
     ];
 
-    public function getTimePointsWithSamples($module): array
+    public function getSamples($module): array
     {
         $module = 'module' . $module;
         $timePointSamples = [];

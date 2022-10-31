@@ -10,7 +10,7 @@ class Samples
 
     public function getSamples(): array
     {
-        $visitClass = 'App\Biobank\Visit' . $this->visit;
-        return $visitClass::getTimePointsWithSamples($this->module);
+        $visitClass = 'App\Nph\Order\Visits\Visit' . $this->visit;
+        return $visitClass::getSamples($this->module);
     }
 }
