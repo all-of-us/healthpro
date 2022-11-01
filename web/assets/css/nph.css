@@ -8,17 +8,3 @@
 .navbar .navbar-nav>.open>a, .navbar .navbar-nav>.open>a:focus, .navbar .navbar-nav>.open>a:hover {
     background-color: #526801;
 }
-
-.page-header h2 {
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #9ed101;
-    font-weight: 700;
-}
-.home-menu .btn-block i.fa {
-    display: block;
-    font-size: 150%;
-    color: #9ed101;
-    margin-top: 5px;
-    margin-bottom: 3px;
-}
