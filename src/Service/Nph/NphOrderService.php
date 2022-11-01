@@ -17,7 +17,7 @@ class NphOrderService
         $this->visit = new $visitClass($module);
     }
 
-    public function getTimePointsWithSamples(): array
+    public function getTimePointSamples(): array
     {
         return $this->module->getSamples();
     }

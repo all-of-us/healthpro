@@ -34,7 +34,7 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $nphOrderService->loadModules($module, $visit);
-        $timePointSamples = $nphOrderService->getTimePointsWithSamples();
+        $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $oderForm = $this->createForm(NphOrderType::class, null,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints]);
