@@ -12,11 +12,12 @@ class NphOrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $timePointSamples = $options['timePointSamples'];
+        $timePoints = $options['timePoints'];
         foreach ($timePointSamples as $timePoint => $samples) {
             $builder->add($timePoint, Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
-                'label' => $timePoint,
+                'label' => $timePoints[$timePoint],
                 'choices' => array_flip($samples),
                 'required' => false
             ]);
@@ -27,7 +28,8 @@ class NphOrderType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'timePointSamples' => null
+            'timePointSamples' => null,
+            'timePoints' => null
         ]);
     }
 }

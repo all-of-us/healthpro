@@ -33,9 +33,11 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $timePointSamples = $nphOrderService->getTimePointsWithSamples($module, $visit);
+        $nphOrderService->loadModules($module, $visit);
+        $timePointSamples = $nphOrderService->getTimePointsWithSamples();
+        $timePoints = $nphOrderService->getTimePoints();
         $oderForm = $this->createForm(NphOrderType::class, null,
-            ['timePointSamples' => $timePointSamples]);
+            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints]);
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
             'timePointSamples' => $timePointSamples,
