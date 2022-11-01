@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "notes": "Module 1 samples",
+  "notes": "Module 2 samples",
   "samplesInformation": {
     "1SST8": {
       "label": "8.5 mL SST",
@@ -50,20 +50,6 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool"
-    },
-    "hair": {
-      "label": "Hair",
-      "color": "black",
-      "temperature": "Refrigerated",
-      "specimen": "Hair",
-      "type": "hair"
-    },
-    "nail": {
-      "label": "Spot Urine",
-      "color": "White",
-      "temperature": "Refrigerated",
-      "specimen": "Nail",
-      "type": "nail"
     }
   }
 }

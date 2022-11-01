@@ -11,6 +11,7 @@ class Samples
     public function getSamples(): array
     {
         $visitClass = 'App\Nph\Order\Visits\Visit' . $this->visit;
-        return $visitClass::getSamples($this->module);
+        $visitType = new $visitClass($this->module);
+        return $visitType->getSamples();
     }
 }

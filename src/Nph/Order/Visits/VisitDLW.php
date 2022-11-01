@@ -2,11 +2,11 @@
 
 namespace App\Nph\Order\Visits;
 
-use App\Biobank\Samples;
+use App\Nph\Order\TimePoints;
 
-class VisitDLW
+class VisitDLW extends TimePoints
 {
-    public static $timePoints = [
+    public $timePoints = [
         'day0PreDoseA' => 'Day 0 Pre Dose A',
         'day0PreDoseB' => 'Day 0 Pre Dose B',
         'day0PostDoseA' => 'Day 0 Post Dose A',
@@ -17,13 +17,19 @@ class VisitDLW
         'day14F' => 'Day 14 F'
     ];
 
-    public function getSamples($module): array
+    public $timePointSampleTypes = [
+        'day0PreDoseA' => ['urineDlw'],
+        'day0PreDoseB' => ['urineDlw'],
+        'day0PostDoseA' => ['urineDlw'],
+        'day0PostDoseB' => ['urineDlw'],
+        'day6E' => ['urineDlw'],
+        'day7F' => ['urineDlw'],
+        'day13G' => ['urineDlw'],
+        'day14F' => ['urineDlw'],
+    ];
+
+    public function __construct($module)
     {
-        $module = 'module' . $module;
-        $timePointSamples = [];
-        foreach (self::$timePoints as $key => $timePoint) {
-            $timePointSamples[$key] = Samples::${$module . 'UrineSample'};
-        }
-        return $timePointSamples;
+        $this->module = $module;
     }
 }

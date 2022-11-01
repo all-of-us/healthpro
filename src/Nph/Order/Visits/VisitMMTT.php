@@ -2,11 +2,11 @@
 
 namespace App\Nph\Order\Visits;
 
-use App\Biobank\Samples;
+use App\Nph\Order\TimePoints;
 
-class VisitMMTT
+class VisitMMTT extends TimePoints
 {
-    public static $timePoints = [
+    public $timePoints = [
         'preMMTT' => 'Pre MMTT',
         'minus15min' => '-15 Min',
         'minus5min' => '-5 Min',
@@ -19,32 +19,13 @@ class VisitMMTT
         'postMMTT' => 'Post MMTT'
     ];
 
-    public static $timePointSampleTypes = [
+    public $timePointSampleTypes = [
         'preMMTT' => ['urine', 'saliva', 'stool', 'hair', 'nail'],
         'postMMTT' => ['urine', 'saliva']
     ];
 
-    public static function getSamples($module): array
+    public function __construct($module)
     {
-        $module = 'module' . $module;
-        $file = __DIR__ . "/../Samples/{$module}.json";
-        if (!file_exists($file)) {
-            throw new \Exception('Samples version file not found');
-        }
-        $schema = json_decode(file_get_contents($file), true);
-        $samples = $schema['samplesInformation'];
-        $timePointSamples = [];
-        foreach (self::$timePoints as $key => $timePoint) {
-            foreach ($samples as $sampleCode => $sample) {
-                if (isset(self::$timePointSampleTypes[$key])) {
-                    if (in_array($sample['type'], self::$timePointSampleTypes[$key])) {
-                        $timePointSamples[$key][$sampleCode] = $sample['label'];
-                    }
-                } elseif ($sample['type'] === 'blood') {
-                    $timePointSamples[$key][$sampleCode] = $sample['label'];
-                }
-            }
-        }
-        return $timePointSamples;
+        $this->module = $module;
     }
 }

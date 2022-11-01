@@ -2,21 +2,20 @@
 
 namespace App\Nph\Order\Visits;
 
-use App\Biobank\Samples;
+use App\Nph\Order\TimePoints;
 
-class VisitDiet
+class VisitDiet extends TimePoints
 {
-    public static $timePoints = [
+    public $timePoints = [
         'day0' => 'Day 0'
     ];
 
-    public function getSamples($module): array
+    public $timePointSampleTypes = [
+        'day0' => ['urine', 'saliva', 'blood']
+    ];
+
+    public function __construct($module)
     {
-        $module = 'module' . $module;
-        $timePointSamples = [];
-        foreach (self::$timePoints as $key => $timePoint) {
-            $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
-        }
-        return $timePointSamples;
+        $this->module = $module;
     }
 }

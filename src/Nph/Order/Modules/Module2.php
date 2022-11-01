@@ -8,8 +8,6 @@ class Module2 extends Samples
 {
     public $module = 2;
 
-    public $visit;
-
     public static $visitTypes = [
         'OrangeDiet' => 'Orange Diet',
         'OrangeDSMT' => 'Orange DSMT',

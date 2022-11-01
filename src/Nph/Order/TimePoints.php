@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Nph\Order;
+
+class TimePoints
+{
+    public $module;
+
+    public $timePoints;
+
+    public $timePointSampleTypes;
+
+    public function getSamples(): array
+    {
+        $module = 'module' . $this->module;
+        $file = __DIR__ . "/Samples/{$module}.json";
+        if (!file_exists($file)) {
+            throw new \Exception('Samples version file not found');
+        }
+        $schema = json_decode(file_get_contents($file), true);
+        $samples = $schema['samplesInformation'];
+        $timePointSamples = [];
+        foreach ($this->timePoints as $key => $timePoint) {
+            foreach ($samples as $sampleCode => $sample) {
+                if (isset($this->timePointSampleTypes[$key])) {
+                    if (in_array($sample['type'], $this->timePointSampleTypes[$key])) {
+                        $timePointSamples[$key][$sampleCode] = $sample['label'];
+                    }
+                } elseif ($sample['type'] === 'blood') {
+                    $timePointSamples[$key][$sampleCode] = $sample['label'];
+                }
+            }
+        }
+        return $timePointSamples;
+    }
+}

@@ -2,12 +2,12 @@
 
 namespace App\Nph\Order\Visits;
 
-use App\Biobank\Samples;
+use App\Nph\Order\TimePoints;
 
-class VisitDSMT
+class VisitDSMT extends TimePoints
 {
-    public static $timePoints = [
-        'preDSTT' => 'Pre DSTT',
+    public $timePoints = [
+        'preDSMT' => 'Pre DSMT',
         'minus15min' => '-15 Min',
         'min5min' => '-5 Min',
         '15min' => '15 Min',
@@ -16,20 +16,16 @@ class VisitDSMT
         '90min' => '90 Min',
         '120min' => '120 Min',
         '240min' => '240 Min',
-        'postDSTT' => 'Post DSTT'
+        'postDSMT' => 'Post DSMT'
     ];
 
-    public function getSamples($module): array
+    public $timePointSampleTypes = [
+        'preDSMT' => ['urine', 'saliva'],
+        'postDSMT' => ['urine']
+    ];
+
+    public function __construct($module)
     {
-        $module = 'module' . $module;
-        $timePointSamples = [];
-        foreach (self::$timePoints as $key => $timePoint) {
-            if ($key === 'preDSTT' || $key === 'postDSTT') {
-                $timePointSamples[$key] = Samples::${$module . ucfirst($key)};
-            } else {
-                $timePointSamples[$key] = Samples::${$module . 'BloodSamples'};
-            }
-        }
-        return $timePointSamples;
+        $this->module = $module;
     }
 }
