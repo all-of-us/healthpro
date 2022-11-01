@@ -27,7 +27,8 @@ class NphOrderController extends BaseController
         $module,
         $visit,
         NphOrderService $nphOrderService,
-        ParticipantSummaryService $participantSummaryService): Response
+        ParticipantSummaryService $participantSummaryService
+    ): Response
     {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -36,8 +37,11 @@ class NphOrderController extends BaseController
         $nphOrderService->loadModules($module, $visit);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
-        $oderForm = $this->createForm(NphOrderType::class, null,
-            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints]);
+        $oderForm = $this->createForm(
+            NphOrderType::class,
+            null,
+            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints]
+        );
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
             'timePointSamples' => $timePointSamples,
