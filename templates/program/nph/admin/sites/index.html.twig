@@ -14,8 +14,6 @@
                 Add Site
             </a>
         {% endif %}
-        {# TODO: Link to preview site sync #}
-        <a href="#" class="btn btn-default"><i class="fa fa-exchange" aria-hidden="true"></i> Preview Site Sync</a>
     </div>
     <div class="page-header">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management</h2>
@@ -35,7 +33,6 @@
                 <th>Site Type</th>
                 <th>Email</th>
                 <th>Centrifuge type</th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -51,9 +48,6 @@
                     <td>{{ site.siteType }}</td>
                     <td>{{ site.email|length > 30 ? site.email|slice(0, 30) ~ '...' : site.email }}</td>
                     <td>{{ site.centrifugeType ? macros.displayChoiceText(site.centrifugeType, siteChoices['centrifuge_type']) }}</td>
-                    {# TODO: Link to email sync #}
-                    <td><a href="#" class="btn btn-xs btn-default" data-toggle="tooltip" title="Sync Site Email with
-                    Google"><i class="fa fa-envelope fa-fw"></i><i class="fa fa-refresh fa-fw"></i></a></td>
                 </tr>
             {% endfor %}
             </tbody>
