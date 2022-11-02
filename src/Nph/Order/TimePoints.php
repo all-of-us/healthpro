@@ -20,7 +20,7 @@ class TimePoints
         $schema = json_decode(file_get_contents($file), true);
         $samples = $schema['samplesInformation'];
         $timePointSamples = [];
-        foreach ($this->timePoints as $key => $timePoint) {
+        foreach (array_keys($this->timePoints) as $key) {
             foreach ($samples as $sampleCode => $sample) {
                 if (isset($this->timePointSampleTypes[$key])) {
                     if (in_array($sample['type'], $this->timePointSampleTypes[$key])) {

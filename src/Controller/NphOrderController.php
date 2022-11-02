@@ -28,8 +28,7 @@ class NphOrderController extends BaseController
         $visit,
         NphOrderService $nphOrderService,
         ParticipantSummaryService $participantSummaryService
-    ): Response
-    {
+    ): Response {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
