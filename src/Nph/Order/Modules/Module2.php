@@ -28,7 +28,7 @@ class Module2 extends Samples
 
     public function __construct($visit)
     {
-        if (!in_array($visit, self::$visitTypes)) {
+        if (!in_array($visit, array_keys(self::$visitTypes))) {
             throw new \Exception('Visit Type not supported');
         }
         $this->visit = $visit;
