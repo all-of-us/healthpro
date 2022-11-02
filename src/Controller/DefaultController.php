@@ -7,6 +7,7 @@ use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
 use App\Repository\FeatureNotificationRepository;
 use App\Service\AuthService;
+use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Audit\Log;
@@ -28,7 +29,7 @@ class DefaultController extends BaseController
     /**
      * @Route("/", name="home")
      */
-    public function index()
+    public function index(Request $request, ContextTemplateService $contextTemplate)
     {
         $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
         if ($checkTimeZone && !$this->getSecurityUser()->getTimezone()) {
@@ -36,7 +37,7 @@ class DefaultController extends BaseController
             return $this->redirectToRoute('settings');
         }
         if ($this->isGranted('ROLE_USER') || ($this->isGranted('ROLE_AWARDEE') && $this->isGranted('ROLE_DV_ADMIN'))) {
-            return $this->render('index.html.twig');
+            return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
         } elseif ($this->isGranted('ROLE_AWARDEE')) {
             return $this->redirectToRoute('workqueue_index');
         } elseif ($this->isGranted('ROLE_DV_ADMIN')) {
