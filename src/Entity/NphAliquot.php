@@ -7,6 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=NphAliquotRepository::class)
+ * @ORM\Table(name="nph_aliquots", uniqueConstraints={
+ *   @ORM\UniqueConstraint(name="aliquot_id", columns={"aliquot_id"})
+ * })
  */
 class NphAliquot
 {

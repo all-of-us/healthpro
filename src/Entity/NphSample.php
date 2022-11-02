@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=NphSampleRepository::class)
+ * @ORM\Table(name="nph_samples", uniqueConstraints={
+ *   @ORM\UniqueConstraint(name="sample_id", columns={"sample_id"})
+ * })
  */
 class NphSample
 {
