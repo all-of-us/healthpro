@@ -7,7 +7,6 @@ use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
 use App\Repository\FeatureNotificationRepository;
 use App\Service\AuthService;
-use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Audit\Log;
@@ -56,9 +55,9 @@ class DefaultController extends BaseController
     /**
      * @Route("/admin", name="admin_home")
      */
-    public function adminIndex(ContextTemplateService $contextTemplate)
+    public function adminIndex()
     {
-        return $this->render($contextTemplate->GetProgramTemplate('admin/index.html.twig'));
+        return $this->render('admin/index.html.twig');
     }
 
     /**
