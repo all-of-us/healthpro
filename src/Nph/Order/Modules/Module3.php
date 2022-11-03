@@ -12,30 +12,30 @@ class Module3 extends Samples
         'OrangeDiet' => 'Orange Diet',
         'OrangeDLW' => 'Orange DLW',
         'OrangeDSMT' => 'Orange DSMT',
-        'OrangeMMTT' => 'Orange MMTT',
+        'OrangeLMT' => 'Orange LMT',
         'BlueDiet' => 'Blue Diet',
         'BlueDLW' => 'Blue DLW',
         'BlueDSMT' => 'Blue DSMT',
-        'BlueMMTT' => 'Blue MMTT',
+        'BlueLMT' => 'Blue LMT',
         'PurpleDiet' => 'Purple Diet',
         'PurpleDLW' => 'Purple DLW',
         'PurpleDSMT' => 'Purple DSMT',
-        'PurpleMMTT' => 'Purple MMTT',
+        'PurpleLMT' => 'Purple LMT',
     ];
 
     public $visitTypeMapper = [
         'OrangeDiet' => 'Diet',
         'OrangeDLW' => 'DLW',
         'OrangeDSMT' => 'DSMT',
-        'OrangeMMTT' => 'MMTT',
+        'OrangeLMT' => 'LMT',
         'BlueDiet' => 'Diet',
         'BlueDLW' => 'DLW',
         'BlueDSMT' => 'DSMT',
-        'BlueMMTT' => 'MMTT',
+        'BlueLMT' => 'LMT',
         'PurpleDiet' => 'Diet',
         'PurpleDLW' => 'DLW',
         'PurpleDSMT' => 'DSMT',
-        'PurpleMMTT' => 'MMTT',
+        'PurpleLMT' => 'LMT',
     ];
 
     public function __construct($visit)

@@ -9,7 +9,7 @@ class Module1 extends Samples
     public $module = 1;
 
     public static $visitTypes = [
-        'MMTT' => 'MMTT'
+        'LMT' => 'LMT'
     ];
 
     public function __construct($visit)

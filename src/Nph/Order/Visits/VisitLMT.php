@@ -4,10 +4,10 @@ namespace App\Nph\Order\Visits;
 
 use App\Nph\Order\TimePoints;
 
-class VisitMMTT extends TimePoints
+class VisitLMT extends TimePoints
 {
     public $timePoints = [
-        'preMMTT' => 'Pre MMTT',
+        'preLMT' => 'Pre LMT',
         'minus15min' => '-15 Min',
         'minus5min' => '-5 Min',
         '15min' => '15 Min',
@@ -16,12 +16,12 @@ class VisitMMTT extends TimePoints
         '90min' => '90 Min',
         '120min' => '120 Min',
         '240min' => '240 Min',
-        'postMMTT' => 'Post MMTT'
+        'postLMT' => 'Post LMT'
     ];
 
     public $timePointSampleTypes = [
-        'preMMTT' => ['urine', 'saliva', 'stool', 'hair', 'nail'],
-        'postMMTT' => ['urine', 'saliva']
+        'preLMT' => ['urine', 'saliva', 'stool', 'hair', 'nail'],
+        'postLMT' => ['urine', 'saliva']
     ];
 
     public function __construct($module)
