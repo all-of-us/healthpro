@@ -33,6 +33,11 @@ class NphOrder
     private $participantId;
 
     /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $module;
+
+    /**
      * @ORM\Column(type="string", length=50)
      */
     private $timepoint;
@@ -108,6 +113,18 @@ class NphOrder
     public function setParticipantId(string $participantId): self
     {
         $this->participantId = $participantId;
+
+        return $this;
+    }
+
+    public function getModule(): ?string
+    {
+        return $this->module;
+    }
+
+    public function setModule(string $module): self
+    {
+        $this->module = $module;
 
         return $this;
     }
