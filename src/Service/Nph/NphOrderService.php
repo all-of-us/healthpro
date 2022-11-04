@@ -4,38 +4,66 @@ namespace App\Service\Nph;
 
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\User;
+use App\Service\LoggerService;
+use App\Service\SiteService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use DateTime;
 
 class NphOrderService
 {
-    public $module;
-
-    public $visit;
-
     private $em;
+    private $userService;
+    private $siteService;
+    private $loggerService;
 
-    public function __construct(EntityManagerInterface $em)
-    {
+    private $module;
+    private $visit;
+    private $moduleObj;
+    private $visitObj;
+    private $participantId;
+    private $user;
+    private $site;
+
+    private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
+
+    public function __construct(
+        EntityManagerInterface $em,
+        UserService $userService,
+        SiteService $siteService,
+        LoggerService $loggerService
+    ) {
         $this->em = $em;
+        $this->userService = $userService;
+        $this->siteService = $siteService;
+        $this->loggerService = $loggerService;
     }
 
-    public function loadModules($module, $visit): void
+    public function loadModules($module, $visit, $participantId): void
     {
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
-        $this->module = new $moduleClass($visit);
+        $this->moduleObj = new $moduleClass($visit);
 
-        $visitClass = 'App\Nph\Order\Visits\Visit' . $this->module->visit;
-        $this->visit = new $visitClass($module);
+        $visitClass = 'App\Nph\Order\Visits\Visit' . $this->moduleObj->visit;
+        $this->visitObj = new $visitClass($module);
+
+        $this->module = $module;
+        $this->visit = $visit;
+        $this->participantId = $participantId;
+
+        $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
+        $this->site = $this->siteService->getSiteId();
     }
 
     public function getTimePointSamples(): array
     {
-        return $this->module->getSamples();
+        return $this->moduleObj->getSamples();
     }
 
     public function getTimePoints()
     {
-        return $this->visit->timePoints;
+        return $this->visitObj->timePoints;
     }
 
     public function generateOrderId(): string
@@ -83,5 +111,50 @@ class NphOrderService
             $id .= (string)rand(0, 9);
         }
         return $id;
+    }
+
+    public function createOrdersAndSamples($formData)
+    {
+        foreach ($formData as $timePoint => $samples) {
+            if (!empty($samples)) {
+                if (in_array($timePoint, self::$nonBloodTimePoints)) {
+                    foreach ($samples as $sample) {
+                        $nphOrder = $this->createOrder($timePoint);
+                        $this->createSample($sample, $nphOrder);
+                    }
+                } else {
+                    $nphOrder = $this->createOrder($timePoint);
+                    foreach ($samples as $sample) {
+                        $this->createSample($sample, $nphOrder);
+                    }
+                }
+            }
+        }
+    }
+
+    public function createOrder($timePoint): NphOrder
+    {
+        $nphOrder = new NphOrder();
+        $nphOrder->setModule($this->module);
+        $nphOrder->setVisitType($this->visit);
+        $nphOrder->setTimepoint($timePoint);
+        $nphOrder->setOrderId($this->generateOrderId());
+        $nphOrder->setParticipantId($this->participantId);
+        $nphOrder->setUser($this->user);
+        $nphOrder->setSite($this->site);
+        $nphOrder->setCreatedTs(new DateTime());
+        $this->em->persist($nphOrder);
+        $this->em->flush();
+        return $nphOrder;
+    }
+
+    public function createSample($sample, $nphOrder): void
+    {
+        $nphSample = new NphSample();
+        $nphSample->setNphOrder($nphOrder);
+        $nphSample->setSampleId($this->generateSampleId());
+        $nphSample->setSampleCode($sample);
+        $this->em->persist($nphSample);
+        $this->em->flush();
     }
 }
