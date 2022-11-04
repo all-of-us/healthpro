@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+{% block title %} Generate Orders - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            Generate Order and Print Labels
+        </h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            {% include 'program/nph/order/partials/participant-dl.html.twig' %}
+        </div>
+        <div class="col-sm-6">
+            <div class="alert well-sm bg-warning-new">Module | NPH Module {{ module }}</div>
+            <div class="alert well-sm bg-primary">Visit | {{ visit }}</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_start(orderForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(orderForm) }}
+            <div>
+                <label>Select the sample and timepoints:</label>
+                <span class="well-sm bg-primary">
+                    <input type="checkbox">
+                    Check All Timepoints and Samples
+                </span>
+            </div>
+            <br>
+            {% for timePoint, samples in timePointSamples %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
+                    </div>
+                    <div class="panel-body">
+                        {{ form_widget(orderForm[timePoint]) }}
+                    </div>
+                </div>
+            {% endfor %}
+            {{ form_rest(orderForm) }}
+            <a class="btn btn-default" href="{{ path('nph_admin_sites') }}">Cancel</a>
+            <button type="submit" class="btn btn-primary">Next</button>
+            {{ form_end(orderForm) }}
+            <br>
+        </div>
+    </div>
+{% endblock %}
