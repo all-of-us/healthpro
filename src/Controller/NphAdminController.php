@@ -31,7 +31,7 @@ class NphAdminController extends BaseController
      */
     public function index()
     {
-        return '';
+        return $this->render('program/nph/admin/index.html.twig');
     }
 
     /**
