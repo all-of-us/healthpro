@@ -1,12 +1,15 @@
-{% macro form_widget(form, showCheckAll, samplesInfo, version) %}
+{% macro form_widget(form, orderForm, stoolSamples) %}
     {% for sample in form.children %}
         {% if sample.vars.value == 'NA1' or sample.vars.value == 'NA2' %}
-            {% if sample.vars.value == 'NA1' %}
-                <div class="checkbox">
-                    <label><input type="checkbox">Nail</label>
-                </div>
-            {% endif %}
             <div class="sub-samples">{{ form_widget(sample) }}</div>
+        {% elseif sample.vars.value == 'stool' %}
+            {{ form_widget(sample) }}
+            {{ form_label(orderForm.stoolKit) }}
+            {{ form_widget(orderForm.stoolKit) }}
+            {% for stoolSample in stoolSamples %}
+                {{ form_label(orderForm[stoolSample]) }}
+                {{ form_widget(orderForm[stoolSample]) }}
+            {% endfor %}
         {% else %}
             {{ form_widget(sample) }}
         {% endif %}

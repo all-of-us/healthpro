@@ -30,13 +30,13 @@
                 </span>
             </div>
             <br>
-            {% for timePoint, samples in timePointSamples %}
+            {% for timePoint, orderSamples in timePointSamples %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
                     <div class="panel-body">
-                        {{ samples.form_widget(orderForm[timePoint]) }}
+                        {{ samples.form_widget(orderForm[timePoint], orderForm, stoolSamples) }}
                     </div>
                 </div>
             {% endfor %}

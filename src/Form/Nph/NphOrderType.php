@@ -2,10 +2,12 @@
 
 namespace App\Form\Nph;
 
+use App\Nph\Order\Samples;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class NphOrderType extends AbstractType
 {
@@ -14,6 +16,23 @@ class NphOrderType extends AbstractType
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
         foreach ($timePointSamples as $timePoint => $samples) {
+            foreach ($samples as $sampleCode => $sample) {
+                if ($sampleCode === 'ST1') {
+                    $builder->add('stoolKit', Type\TextType::class, [
+                        'label' => 'Stool Kit ID',
+                        'required' => false,
+                        'constraints' => new Constraints\Type('string')
+                    ]);
+                }
+                if (in_array($sampleCode, Samples::$stoolSamples)) {
+                    $builder->add($sampleCode, Type\TextType::class, [
+                        'label' => $sample,
+                        'required' => false,
+                        'constraints' => new Constraints\Type('string')
+                    ]);
+                    unset($samples[$sampleCode]);
+                }
+            }
             $builder->add($timePoint, Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,

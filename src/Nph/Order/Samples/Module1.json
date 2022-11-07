@@ -51,6 +51,13 @@
       "specimen": "Hair",
       "type": "hair"
     },
+    "nail": {
+      "label": "Nail",
+      "color": "White",
+      "temperature": "Refrigerated",
+      "specimen": "Nail",
+      "type": "nail"
+    },
     "NA1": {
       "label": "Big Toenails",
       "color": "White",
@@ -67,6 +74,34 @@
     },
     "stool": {
       "label": "Stool",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool"
+    },
+    "ST1": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool"
+    },
+    "ST2": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool"
+    },
+    "ST3": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool"
+    },
+    "ST4": {
+      "label": "DNA/RNA Shield Tube 2",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",

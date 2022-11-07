@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\Nph\NphOrderType;
+use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,7 +55,8 @@ class NphOrderController extends BaseController
             'timePointSamples' => $timePointSamples,
             'participant' => $participant,
             'module' => $module,
-            'visit' => $visit
+            'visit' => $visit,
+            'stoolSamples' => Samples::$stoolSamples
         ]);
     }
 }
