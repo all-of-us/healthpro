@@ -5,6 +5,7 @@ namespace App\Service\Nph;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
+use App\Nph\Order\Samples;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -27,6 +28,8 @@ class NphOrderService
     private $site;
 
     private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
+
+    private static $placeholderSamples = ['nail', 'stool'];
 
     public function __construct(
         EntityManagerInterface $em,
@@ -116,11 +119,13 @@ class NphOrderService
     public function createOrdersAndSamples($formData)
     {
         foreach ($formData as $timePoint => $samples) {
-            if (!empty($samples)) {
+            if (!empty($samples) && is_array($samples)) {
                 if (in_array($timePoint, self::$nonBloodTimePoints)) {
                     foreach ($samples as $sample) {
-                        $nphOrder = $this->createOrder($timePoint);
-                        $this->createSample($sample, $nphOrder);
+                        if (!in_array($sample, self::$placeholderSamples)) {
+                            $nphOrder = $this->createOrder($timePoint);
+                            $this->createSample($sample, $nphOrder);
+                        }
                     }
                 } else {
                     $nphOrder = $this->createOrder($timePoint);
@@ -130,15 +135,25 @@ class NphOrderService
                 }
             }
         }
+        // For stool kit samples
+        if (!empty($formData['stoolKit'])) {
+            $nphOrder = $this->createOrder('LMT', $formData['stoolKit']);
+            foreach (Samples::$stoolSamples as $stoolSample) {
+                $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
+            }
+        }
     }
 
-    public function createOrder($timePoint): NphOrder
+    public function createOrder($timePoint, $orderId = null): NphOrder
     {
+        if ($orderId === null) {
+            $orderId = $this->generateOrderId();
+        }
         $nphOrder = new NphOrder();
         $nphOrder->setModule($this->module);
         $nphOrder->setVisitType($this->visit);
         $nphOrder->setTimepoint($timePoint);
-        $nphOrder->setOrderId($this->generateOrderId());
+        $nphOrder->setOrderId($orderId);
         $nphOrder->setParticipantId($this->participantId);
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
@@ -148,11 +163,14 @@ class NphOrderService
         return $nphOrder;
     }
 
-    public function createSample($sample, $nphOrder): void
+    public function createSample($sample, $nphOrder, $sampleId = null): void
     {
+        if ($sampleId === null) {
+            $sampleId = $this->generateSampleId();
+        }
         $nphSample = new NphSample();
         $nphSample->setNphOrder($nphOrder);
-        $nphSample->setSampleId($this->generateSampleId());
+        $nphSample->setSampleId($sampleId);
         $nphSample->setSampleCode($sample);
         $this->em->persist($nphSample);
         $this->em->flush();
