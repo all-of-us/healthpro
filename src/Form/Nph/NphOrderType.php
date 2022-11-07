@@ -21,14 +21,20 @@ class NphOrderType extends AbstractType
                     $builder->add('stoolKit', Type\TextType::class, [
                         'label' => 'Stool Kit ID',
                         'required' => false,
-                        'constraints' => new Constraints\Type('string')
+                        'constraints' => new Constraints\Type('string'),
+                        'attr' => [
+                            'placeholder' => 'Scan Kit ID'
+                        ]
                     ]);
                 }
                 if (in_array($sampleCode, Samples::$stoolSamples)) {
                     $builder->add($sampleCode, Type\TextType::class, [
                         'label' => $sample,
                         'required' => false,
-                        'constraints' => new Constraints\Type('string')
+                        'constraints' => new Constraints\Type('string'),
+                        'attr' => [
+                            'placeholder' => 'Scan Tube'
+                        ]
                     ]);
                     unset($samples[$sampleCode]);
                 }
