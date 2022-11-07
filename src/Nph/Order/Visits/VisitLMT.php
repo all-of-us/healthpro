@@ -20,7 +20,7 @@ class VisitLMT extends TimePoints
     ];
 
     public $timePointSampleTypes = [
-        'preLMT' => ['urine', 'saliva', 'stool', 'hair', 'nail'],
+        'preLMT' => ['urine', 'saliva', 'hair', 'nail', 'stool'],
         'postLMT' => ['urine', 'saliva']
     ];
 

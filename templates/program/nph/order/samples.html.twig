@@ -1,0 +1,14 @@
+{% macro form_widget(form, showCheckAll, samplesInfo, version) %}
+    {% for sample in form.children %}
+        {% if sample.vars.value == 'NA1' or sample.vars.value == 'NA2' %}
+            {% if sample.vars.value == 'NA1' %}
+                <div class="checkbox">
+                    <label><input type="checkbox">Nail</label>
+                </div>
+            {% endif %}
+            <div class="sub-samples">{{ form_widget(sample) }}</div>
+        {% else %}
+            {{ form_widget(sample) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

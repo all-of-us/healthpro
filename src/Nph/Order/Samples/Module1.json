@@ -44,13 +44,6 @@
       "specimen": "Saliva",
       "type": "saliva"
     },
-    "stool": {
-      "label": "Stool",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool"
-    },
     "hair": {
       "label": "Hair",
       "color": "black",
@@ -58,12 +51,26 @@
       "specimen": "Hair",
       "type": "hair"
     },
-    "nail": {
-      "label": "Nail",
+    "NA1": {
+      "label": "Big Toenails",
       "color": "White",
       "temperature": "Refrigerated",
       "specimen": "Nail",
       "type": "nail"
+    },
+    "NA2": {
+      "label": "Other Toenails",
+      "color": "White",
+      "temperature": "Refrigerated",
+      "specimen": "Nail",
+      "type": "nail"
+    },
+    "stool": {
+      "label": "Stool",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool"
     }
   }
 }

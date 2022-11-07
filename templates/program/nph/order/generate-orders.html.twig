@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'program/nph/order/samples.html.twig' as samples %}
 {% block title %} Generate Orders - {% endblock %}
 {% block body %}
     <div class="page-header">
@@ -35,7 +36,7 @@
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
                     <div class="panel-body">
-                        {{ form_widget(orderForm[timePoint]) }}
+                        {{ samples.form_widget(orderForm[timePoint]) }}
                     </div>
                 </div>
             {% endfor %}

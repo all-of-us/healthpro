@@ -836,3 +836,9 @@ table.table-samples td {
     padding: 25px;
     height: 120px;
 }
+
+/* NPH Order */
+
+.sub-samples {
+    margin-left: 20px;
+}
