@@ -18,9 +18,10 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="order_create">
         <div class="col-sm-12">
-            {{ form_start(orderForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
+                'order_create_form' } }) }}
             {{ form_errors(orderForm) }}
             <div>
                 <label>Select the sample and timepoints:</label>
@@ -35,16 +36,46 @@
                     <div class="panel-heading">
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
                         {{ samples.form_widget(orderForm[timePoint], orderForm, stoolSamples) }}
                     </div>
                 </div>
             {% endfor %}
             {{ form_rest(orderForm) }}
-            <a class="btn btn-default" href="{{ path('nph_admin_sites') }}">Cancel</a>
-            <button type="submit" class="btn btn-primary">Next</button>
+            <a class="btn btn-default" href="#">Cancel</a>
+            <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
             {{ form_end(orderForm) }}
             <br>
         </div>
     </div>
+
+    <div class="row" id="order_review" style="display: none">
+        <div class="col-sm-12">
+            <div>
+                <label>Review Timepoints/Samples</label>
+                <span class="alert well-sm bg-secondary pull-right text-white">
+                    Total # of Samples
+                    <span class="badge badge-light" id="sample_count">1</span>
+                </span>
+            </div>
+            <table class="table table-bordered" id="order_review_table">
+                <thead>
+                    <tr>
+                        <th>Timepoint</th>
+                        <th>Samples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-default" id="order_review_back_btn">Back</button>
+            <button type="button" class="btn btn-primary" id="order_generate_btn">
+                Generate Orders and Print Labels
+            </button>
+        </div>
+    </div>
+    <br>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order-create') }}
 {% endblock %}
