@@ -24,13 +24,13 @@ $(document).ready(function () {
                         let sample = $(this).val();
                         if (sample === 'nail') {
                             let nailSubSamples = [];
-                            $('#nail_sub_samples').find('input:checkbox').each(function () {
+                            $('.nail-sub-samples').find('input:checkbox').each(function () {
                                 if ($(this).prop('checked') === true) {
                                     nailSubSamples.push(samples[$(this).val()]);
                                 }
                             });
                             if (nailSubSamples.length > 0) {
-                                addTimePointSamples(timePoints[timePoint], 'Nail: ' + nailSubSamples.join(',') + '');
+                                addTimePointSamples(timePoints[timePoint], 'Nail: ' + nailSubSamples.join(', ') + '');
                             }
                         } else if (sample === 'stool') {
                             let stoolKitSelector = $('#nph_order_stoolKit');
