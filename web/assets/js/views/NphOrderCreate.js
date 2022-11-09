@@ -6,6 +6,7 @@ $(document).ready(function () {
         orderReviewSelector.show();
         $('#order_review_table tbody').html('');
         let nailSamples = orderCreateSelector.data('nail-samples');
+        let stoolSamples = orderCreateSelector.data('stool-samples');
         $('.timepoint-samples').each(function () {
             let timePoint = $(this).data('timepoint');
             if (timePoint === 'preLMT' || timePoint === 'postLMT') {
@@ -21,8 +22,24 @@ $(document).ready(function () {
                             });
                             if (nailSubSamples.length > 0) {
                                 $('#order_review_table tbody').append(
-                                    '' + '<tr><td>' + timePoint + '</td><td>Nail: ' + nailSubSamples.join(',') + '</td></tr>'
+                                    '<tr><td>' + timePoint + '</td><td>Nail: ' + nailSubSamples.join(',') + '</td></tr>'
                                 );
+                            }
+                        } else if (sample === 'stool') {
+                            let stoolKitSelector = $('#nph_order_stoolKit');
+                            if (stoolKitSelector.val()) {
+                                let stoolKitSamples = '';
+                                stoolSamples.forEach(function (stoolSample) {
+                                    let stoolInputSelector = $('#nph_order_' + stoolSample);
+                                    if (stoolInputSelector.val()) {
+                                        stoolKitSamples += ', ' + stoolSample + ': ' + stoolInputSelector.val();
+                                    }
+                                });
+                                if (stoolKitSamples) {
+                                    $('#order_review_table tbody').append(
+                                        '<tr><td>' + timePoint + '</td><td>Stool: KIT ID ' + stoolKitSelector.val() + stoolKitSamples + '</td></tr>'
+                                    );
+                                }
                             }
                         } else if (!nailSamples.includes(sample)) {
                             $('#order_review_table tbody').append(

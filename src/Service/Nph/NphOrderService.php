@@ -148,7 +148,7 @@ class NphOrderService
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
             $nphOrder = $this->createOrder('LMT', $formData['stoolKit']);
-            foreach (Samples::$stoolSamples as $stoolSample) {
+            foreach ($this->getStoolSamples() as $stoolSample) {
                 $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
             }
         }

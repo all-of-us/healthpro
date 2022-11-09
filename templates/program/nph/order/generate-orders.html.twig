@@ -18,7 +18,8 @@
         </div>
     </div>
 
-    <div class="row" id="order_create" data-nail-samples="{{ nailSamples|json_encode() }}">
+    <div class="row" id="order_create" data-nail-samples="{{ nailSamples|json_encode() }}"
+         data-stool-samples="{{ stoolSamples|json_encode() }}">
         <div class="col-sm-12">
             {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
                 'order_create_form' } }) }}
