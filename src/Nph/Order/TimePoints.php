@@ -12,6 +12,16 @@ class TimePoints
 
     public function getSamples(): array
     {
+        $samplesInfo = $this->getSamplesInformation();
+        $samples = [];
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            $samples[$sampleCode] = $sample['label'];
+        }
+        return $samples;
+    }
+
+    public function getTimePointSamples(): array
+    {
         $samples = $this->getSamplesInformation();
         $timePointSamples = [];
         foreach (array_keys($this->timePoints) as $key) {
