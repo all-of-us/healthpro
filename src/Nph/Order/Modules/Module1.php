@@ -18,6 +18,5 @@ class Module1 extends Samples
         if (!in_array($visit, array_keys(self::$visitTypes))) {
             throw new \Exception('Visit Type not supported');
         }
-        $this->visit = $visit;
     }
 }
