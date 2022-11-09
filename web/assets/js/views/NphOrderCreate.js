@@ -1,15 +1,34 @@
 $(document).ready(function () {
+    let orderCreateSelector = $('#order_create');
+    let orderReviewSelector = $('#order_review');
     $('#order_next_btn').on('click', function () {
-        $('#order_create').hide();
-        $('#order_review').show();
-
+        orderCreateSelector.hide();
+        orderReviewSelector.show();
+        $('#order_review_table tbody').html('');
+        let nailSamples = orderCreateSelector.data('nail-samples');
         $('.timepoint-samples').each(function () {
             let timePoint = $(this).data('timepoint');
             if (timePoint === 'preLMT' || timePoint === 'postLMT') {
                 $(this).find('input:checkbox').each(function () {
                     if ($(this).prop('checked') === true) {
                         let sample = $(this).val();
-                        $('#order_review_table tbody').append('<tr><td>' + timePoint + '</td><td>' + sample + '</td></tr>');
+                        if (sample === 'nail') {
+                            let nailSubSamples = [];
+                            $('#nail_sub_samples').find('input:checkbox').each(function () {
+                                if ($(this).prop('checked') === true) {
+                                    nailSubSamples.push($(this).val());
+                                }
+                            });
+                            if (nailSubSamples.length > 0) {
+                                $('#order_review_table tbody').append(
+                                    '' + '<tr><td>' + timePoint + '</td><td>Nail: ' + nailSubSamples.join(',') + '</td></tr>'
+                                );
+                            }
+                        } else if (!nailSamples.includes(sample)) {
+                            $('#order_review_table tbody').append(
+                                '<tr><td>' + timePoint + '</td><td>' + sample + '</td></tr>'
+                            );
+                        }
                     }
                 });
             } else {
@@ -28,8 +47,8 @@ $(document).ready(function () {
     });
 
     $('#order_review_back_btn').on('click', function () {
-        $('#order_create').show();
-        $('#order_review').hide();
+        orderCreateSelector.show();
+        orderReviewSelector.hide();
     });
 
     $('#order_generate_btn').on('click', function () {

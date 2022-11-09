@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div class="row" id="order_create">
+    <div class="row" id="order_create" data-nail-samples="{{ nailSamples|json_encode() }}">
         <div class="col-sm-12">
             {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
                 'order_create_form' } }) }}
@@ -37,7 +37,7 @@
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
                     <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
-                        {{ samples.form_widget(orderForm[timePoint], orderForm, stoolSamples) }}
+                        {{ samples.form_widget(orderForm[timePoint], orderForm, nailSamples, stoolSamples) }}
                     </div>
                 </div>
             {% endfor %}
