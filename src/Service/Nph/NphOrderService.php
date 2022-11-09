@@ -69,6 +69,16 @@ class NphOrderService
         return $this->visitObj->timePoints;
     }
 
+    public function getStoolSamples(): array
+    {
+        return $this->visitObj->getStoolSamples();
+    }
+
+    public function getNailSamples(): array
+    {
+        return $this->visitObj->getNailSamples();
+    }
+
     public function generateOrderId(): string
     {
         $attempts = 0;

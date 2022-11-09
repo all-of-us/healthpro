@@ -27,7 +27,7 @@ class NphOrderType extends AbstractType
                         ]
                     ]);
                 }
-                if (in_array($sampleCode, Samples::$stoolSamples)) {
+                if (in_array($sampleCode, $options['stoolSamples'])) {
                     $builder->add($sampleCode, Type\TextType::class, [
                         'label' => $sample,
                         'required' => false,
@@ -54,7 +54,8 @@ class NphOrderType extends AbstractType
     {
         $resolver->setDefaults([
             'timePointSamples' => null,
-            'timePoints' => null
+            'timePoints' => null,
+            'stoolSamples' => null
         ]);
     }
 }
