@@ -16,6 +16,7 @@ $(document).ready(function () {
         let timePoints = orderCreateSelector.data('time-points');
         let nailSamples = orderCreateSelector.data('nail-samples');
         let stoolSamples = orderCreateSelector.data('stool-samples');
+        let samplesCount = 0;
         $('.timepoint-samples').each(function () {
             let timePoint = $(this).data('timepoint');
             if (timePoint === 'preLMT' || timePoint === 'postLMT') {
@@ -27,6 +28,7 @@ $(document).ready(function () {
                             $('.nail-sub-samples').find('input:checkbox').each(function () {
                                 if ($(this).prop('checked') === true) {
                                     nailSubSamples.push(samples[$(this).val()]);
+                                    samplesCount++;
                                 }
                             });
                             if (nailSubSamples.length > 0) {
@@ -40,6 +42,7 @@ $(document).ready(function () {
                                     let stoolInputSelector = $('#nph_order_' + stoolSample);
                                     if (stoolInputSelector.val()) {
                                         stoolKitSamples += ', ' + samples[stoolSample] + ': ' + stoolInputSelector.val();
+                                        samplesCount++;
                                     }
                                 });
                                 if (stoolKitSamples) {
@@ -48,6 +51,7 @@ $(document).ready(function () {
                             }
                         } else if (!nailSamples.includes(sample)) {
                             addTimePointSamples(timePoints[timePoint], samples[sample]);
+                            samplesCount++;
                         }
                     }
                 });
@@ -56,6 +60,7 @@ $(document).ready(function () {
                 $(this).find('input:checkbox').each(function () {
                     if ($(this).prop('checked') === true) {
                         bloodSamples.push(samples[$(this).val()]);
+                        samplesCount++;
                     }
                 });
                 if (bloodSamples.length > 0) {
@@ -64,6 +69,7 @@ $(document).ready(function () {
                 }
             }
         });
+        $('#samples_count').html(samplesCount);
     });
 
     $('#order_review_back_btn').on('click', function () {
