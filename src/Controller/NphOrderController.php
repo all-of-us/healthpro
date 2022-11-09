@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Form\Nph\NphOrderType;
+use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -27,13 +29,14 @@ class NphOrderController extends BaseController
         $module,
         $visit,
         NphOrderService $nphOrderService,
-        ParticipantSummaryService $participantSummaryService
+        ParticipantSummaryService $participantSummaryService,
+        Request $request
     ): Response {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $nphOrderService->loadModules($module, $visit);
+        $nphOrderService->loadModules($module, $visit, $participantId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $oderForm = $this->createForm(
@@ -41,12 +44,19 @@ class NphOrderController extends BaseController
             null,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints]
         );
+        $oderForm->handleRequest($request);
+        if ($oderForm->isSubmitted() && $oderForm->isValid()) {
+            $formData = $oderForm->getData();
+            $nphOrderService->createOrdersAndSamples($formData);
+            $this->addFlash('success', 'Orders Created');
+        }
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
             'timePointSamples' => $timePointSamples,
             'participant' => $participant,
             'module' => $module,
-            'visit' => $visit
+            'visit' => $visit,
+            'stoolSamples' => Samples::$stoolSamples
         ]);
     }
 }
