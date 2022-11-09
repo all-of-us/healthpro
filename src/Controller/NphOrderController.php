@@ -56,6 +56,8 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getStoolSamples(),
             'nailSamples' => $nphOrderService->getNailSamples()
         ]);
