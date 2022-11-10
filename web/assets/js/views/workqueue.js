@@ -276,12 +276,36 @@ $(document).ready(function() {
 
     var columnsUrl = $('#columns_group').data('columns-url');
 
+    let disableViewButtons = function () {
+        $('.view-btn').addClass('disabled');
+    };
+
+    let enableViewButtons = function () {
+        $('.view-btn').removeClass('disabled');
+    };
+
+    let setColumnNames = function (params) {
+        disableViewButtons();
+        $.ajax({
+            url: columnsUrl,
+            data: params
+        }).done(function () {
+            enableViewButtons();
+        }).fail(function () {
+            enableViewButtons();
+        });
+    };
+
     $('.toggle-vis').on('click', function () {
         var column = table.column($(this).attr('data-column'));
         column.visible(!column.visible());
         var columnName = $(this).data('name');
         // Set column names in session
-        $.get(columnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
+        let params = {
+            columnName: columnName,
+            checked: $(this).prop('checked')
+        };
+        setColumnNames(params);
     });
 
     var toggleColumns = function () {
@@ -308,13 +332,19 @@ $(document).ready(function() {
     $('#columns_select_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
         showColumns();
-        $.get(columnsUrl, {select: true});
+        let params = {
+            select: true
+        };
+        setColumnNames(params);
     });
 
     $('#columns_deselect_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', false);
         hideColumns();
-        $.get(columnsUrl, {deselect: true});
+        let params = {
+            deselect: true
+        };
+        setColumnNames(params);
     });
 
     // Check/uncheck columns when clicked on group buttons

@@ -15,7 +15,7 @@
     {% if viewId and workQueueViewUpdateForm is defined %}
         {% set actionUrl = path('workqueue_view_update', { params: params, viewType: viewType }) %}
         {{ form_start(workQueueViewUpdateForm, { attr: { action: actionUrl } }) }}
-        <button type="submit" class="btn btn-primary btn-xs">Update View</button>
+        <button type="submit" class="btn btn-primary btn-xs view-btn">Update View</button>
         {{ form_widget(workQueueViewUpdateForm.id, {'value' : viewId}) }}
         {% include 'workqueue/partials/save-manage-view-buttons.twig' %}
         {{ form_end(workQueueViewUpdateForm) }}

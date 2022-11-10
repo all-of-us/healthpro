@@ -694,12 +694,6 @@ class WorkQueueController extends BaseController
                     $redirectUrl = $this->generateUrl('workqueue_customized_view', $params);
                     return $this->redirect($redirectUrl);
                 }
-                if ($workQueueViewForm->get('defaultView')->getData()) {
-                    $this->em->getRepository(WorkqueueView::class)->updateDefaultView(
-                        $workQueueView->getId(),
-                        $this->getUserEntity()
-                    );
-                }
             } else {
                 $this->addFlash('error', 'Invalid form');
             }

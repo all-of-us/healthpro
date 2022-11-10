@@ -466,10 +466,10 @@ label.label-normal {
 #workqueue_consents_row .list-group-item.radio{
     margin-top: 0;
 }
-#filters .parsley-errors-list {
+#filters .parsley-errors-list, .workqueue-view-form .parsley-errors-list {
     margin-left: -36px
 }
-#filters .parsley-errors-list li {
+#filters .parsley-errors-list li, .workqueue-view-form .parsley-errors-list li {
     list-style: none;
     color: #a94442;
 }
@@ -488,7 +488,8 @@ label.label-normal {
 
 .workqueue-main-tab {
     background-color: #337ab7 !important;
-    margin-left: 4px;
+    margin: 0 4px 0 4px;
+    border-radius: 4px 4px 0 0;
 }
 
 .workqueue-main-tab > a:hover, .workqueue-main-tab > a:focus{

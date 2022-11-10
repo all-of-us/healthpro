@@ -82,16 +82,44 @@ $(document).ready(function () {
         }
     };
 
+    let consentColumnsUrl = $('#columns_group').data('consent-columns-url');
+
+    let disableViewButtons = function () {
+        $('.view-btn').addClass('disabled');
+    };
+
+    let enableViewButtons = function () {
+        $('.view-btn').removeClass('disabled');
+    };
+
+    let setColumnNames = function (params) {
+        disableViewButtons();
+        $.ajax({
+            url: consentColumnsUrl,
+            data: params
+        }).done(function () {
+            enableViewButtons();
+        }).fail(function () {
+            enableViewButtons();
+        });
+    };
+
     $('#columns_select_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', true);
         showColumns();
-        $.get("/workqueue/consent/columns", {select: true});
+        let params = {
+            select: true
+        };
+        setColumnNames(params);
     });
 
     $('#columns_deselect_all').on('click', function () {
         $('#columns_group input[type=checkbox]').prop('checked', false);
         hideColumns();
-        $.get("/workqueue/consent/columns", {deselect: true});
+        let params = {
+            deselect: true
+        };
+        setColumnNames(params);
     });
 
     // Populate count in header
@@ -128,8 +156,11 @@ $(document).ready(function () {
         column.visible(!column.visible());
         var columnName = $(this).data('name');
         // Set column names in session
-        var consentColumnsUrl = $('#columns_group').data('consent-columns-url');
-        $.get(consentColumnsUrl, {columnName: columnName, checked: $(this).prop('checked')});
+        let params = {
+            columnName: columnName,
+            checked: $(this).prop('checked')
+        };
+        setColumnNames(params);
     });
 
     var toggleColumns = function () {
