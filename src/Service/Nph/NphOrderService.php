@@ -85,10 +85,19 @@ class NphOrderService
         $ordersData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType($this->user,
             $this->participantId, $this->visit);
+        $addStoolKit = true;
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
-                $ordersData[$order->getTimepoint()][] = $sample->getSampleCode();
+                if (in_array($sample->getSampleCode(), $this->getStoolSamples())) {
+                    if ($addStoolKit) {
+                        $ordersData['stoolKit'] = $order->getOrderId();
+                        $addStoolKit = false;
+                    }
+                    $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
+                } else {
+                    $ordersData[$order->getTimepoint()][] = $sample->getSampleCode();
+                }
             }
         }
         return $ordersData;
