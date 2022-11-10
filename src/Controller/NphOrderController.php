@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\NphOrder;
 use App\Form\Nph\NphOrderType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
@@ -39,9 +40,10 @@ class NphOrderController extends BaseController
         $nphOrderService->loadModules($module, $visit, $participantId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
+        $ordersData = $nphOrderService->getExistingOrdersData();
         $oderForm = $this->createForm(
             NphOrderType::class,
-            null,
+            $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' => $nphOrderService->getStoolSamples()]
         );
         $oderForm->handleRequest($request);

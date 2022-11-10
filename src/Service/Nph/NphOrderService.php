@@ -80,6 +80,20 @@ class NphOrderService
         return $this->moduleObj->getNailSamples();
     }
 
+    public function getExistingOrdersData(): array
+    {
+        $ordersData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType($this->user,
+            $this->participantId, $this->visit);
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                $ordersData[$order->getTimepoint()][] = $sample->getSampleCode();
+            }
+        }
+        return $ordersData;
+    }
+
     public function generateOrderId(): string
     {
         $attempts = 0;
