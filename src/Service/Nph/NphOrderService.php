@@ -22,7 +22,6 @@ class NphOrderService
     private $module;
     private $visit;
     private $moduleObj;
-    private $visitObj;
     private $participantId;
     private $user;
     private $site;
@@ -48,9 +47,6 @@ class NphOrderService
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $this->moduleObj = new $moduleClass($visit);
 
-        $visitClass = 'App\Nph\Order\Visits\Visit' . $this->moduleObj->visit;
-        $this->visitObj = new $visitClass($module);
-
         $this->module = $module;
         $this->visit = $visit;
         $this->participantId = $participantId;
@@ -61,12 +57,27 @@ class NphOrderService
 
     public function getTimePointSamples(): array
     {
-        return $this->moduleObj->getSamples();
+        return $this->moduleObj->getTimePointSamples();
     }
 
     public function getTimePoints()
     {
-        return $this->visitObj->timePoints;
+        return $this->moduleObj->getTimePoints();
+    }
+
+    public function getSamples()
+    {
+        return $this->moduleObj->getSamples();
+    }
+
+    public function getStoolSamples(): array
+    {
+        return $this->moduleObj->getStoolSamples();
+    }
+
+    public function getNailSamples(): array
+    {
+        return $this->moduleObj->getNailSamples();
     }
 
     public function generateOrderId(): string
@@ -138,7 +149,7 @@ class NphOrderService
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
             $nphOrder = $this->createOrder('LMT', $formData['stoolKit']);
-            foreach (Samples::$stoolSamples as $stoolSample) {
+            foreach ($this->getStoolSamples() as $stoolSample) {
                 $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
             }
         }

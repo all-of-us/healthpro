@@ -42,7 +42,7 @@ class NphOrderController extends BaseController
         $oderForm = $this->createForm(
             NphOrderType::class,
             null,
-            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints]
+            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' => $nphOrderService->getStoolSamples()]
         );
         $oderForm->handleRequest($request);
         if ($oderForm->isSubmitted() && $oderForm->isValid()) {
@@ -56,7 +56,10 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
-            'stoolSamples' => Samples::$stoolSamples
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
+            'stoolSamples' => $nphOrderService->getStoolSamples(),
+            'nailSamples' => $nphOrderService->getNailSamples()
         ]);
     }
 }

@@ -14,9 +14,9 @@ class Module1 extends Samples
 
     public function __construct($visit)
     {
+        parent::__construct($this->module, $visit);
         if (!in_array($visit, array_keys(self::$visitTypes))) {
             throw new \Exception('Visit Type not supported');
         }
-        $this->visit = $visit;
     }
 }

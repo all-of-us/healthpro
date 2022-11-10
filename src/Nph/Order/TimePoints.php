@@ -12,13 +12,17 @@ class TimePoints
 
     public function getSamples(): array
     {
-        $module = 'module' . $this->module;
-        $file = __DIR__ . "/Samples/{$module}.json";
-        if (!file_exists($file)) {
-            throw new \Exception('Samples version file not found');
+        $samplesInfo = $this->getSamplesInformation();
+        $samples = [];
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            $samples[$sampleCode] = $sample['label'];
         }
-        $schema = json_decode(file_get_contents($file), true);
-        $samples = $schema['samplesInformation'];
+        return $samples;
+    }
+
+    public function getTimePointSamples(): array
+    {
+        $samples = $this->getSamplesInformation();
         $timePointSamples = [];
         foreach (array_keys($this->timePoints) as $key) {
             foreach ($samples as $sampleCode => $sample) {
@@ -32,5 +36,38 @@ class TimePoints
             }
         }
         return $timePointSamples;
+    }
+
+    public function getStoolSamples(): array
+    {
+        return $this->getSamplesByType('stool');
+    }
+
+    public function getNailSamples(): array
+    {
+        return $this->getSamplesByType('nail');
+    }
+
+    public function getSamplesInformation(): array
+    {
+        $module = 'module' . $this->module;
+        $file = __DIR__ . "/Samples/{$module}.json";
+        if (!file_exists($file)) {
+            throw new \Exception('Samples version file not found');
+        }
+        $schema = json_decode(file_get_contents($file), true);
+        return $schema['samplesInformation'];
+    }
+
+    public function getSamplesByType($type): array
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        $samples = [];
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            if ($sample['type'] === $type && $sampleCode !== $type) {
+                $samples[] = $sampleCode;
+            }
+        }
+        return $samples;
     }
 }

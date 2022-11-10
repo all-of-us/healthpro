@@ -31,9 +31,9 @@ class Module2 extends Samples
         if (!in_array($visit, array_keys(self::$visitTypes))) {
             throw new \Exception('Visit Type not supported');
         }
-        $this->visit = $visit;
         if (isset($this->visitTypeMapper[$visit])) {
-            $this->visit = $this->visitTypeMapper[$visit];
+            $visit = $this->visitTypeMapper[$visit];
         }
+        parent::__construct($this->module, $visit);
     }
 }

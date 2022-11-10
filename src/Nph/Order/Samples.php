@@ -4,16 +4,36 @@ namespace App\Nph\Order;
 
 class Samples
 {
-    public $module;
+    public $visitObj;
 
-    public $visit;
+    public function __construct($module, $visit)
+    {
+        $visitClass = 'App\Nph\Order\Visits\Visit' . $visit;
+        $this->visitObj = new $visitClass($module);
+    }
 
-    public static $stoolSamples = ['ST1', 'ST2', 'ST3', 'ST4'];
+    public function getTimePointSamples(): array
+    {
+        return $this->visitObj->getTimePointSamples();
+    }
+
+    public function getTimePoints(): array
+    {
+        return $this->visitObj->timePoints;
+    }
 
     public function getSamples(): array
     {
-        $visitClass = 'App\Nph\Order\Visits\Visit' . $this->visit;
-        $visitType = new $visitClass($this->module);
-        return $visitType->getSamples();
+        return $this->visitObj->getSamples();
+    }
+
+    public function getStoolSamples(): array
+    {
+        return $this->visitObj->getStoolSamples();
+    }
+
+    public function getNailSamples(): array
+    {
+        return $this->visitObj->getNailSamples();
     }
 }

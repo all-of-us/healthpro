@@ -1,7 +1,7 @@
-{% macro form_widget(form, orderForm, stoolSamples) %}
+{% macro form_widget(form, orderForm, nailSamples, stoolSamples) %}
     {% for sample in form.children %}
-        {% if sample.vars.value == 'NA1' or sample.vars.value == 'NA2' %}
-            <div class="sub-samples">{{ form_widget(sample) }}</div>
+        {% if sample.vars.value in nailSamples %}
+            <div class="sub-samples nail-sub-samples">{{ form_widget(sample) }}</div>
         {% elseif sample.vars.value == 'stool' %}
             {{ form_widget(sample) }}
             {{ form_label(orderForm.stoolKit) }}
