@@ -51,6 +51,9 @@ class NphOrderController extends BaseController
             $formData = $oderForm->getData();
             $nphOrderService->createOrdersAndSamples($formData);
             $this->addFlash('success', 'Orders Created');
+            // TODO: Redirect to generate orders & print labels page
+            return $this->redirectToRoute('nph_generate_oder', ['participantId' => $participantId, 'module' => $module,
+                'visit' => $visit]);
         }
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),

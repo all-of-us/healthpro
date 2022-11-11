@@ -21,10 +21,10 @@ class NphOrderType extends AbstractType
                     $builder->add('stoolKit', Type\TextType::class, [
                         'label' => 'Stool Kit ID',
                         'required' => false,
-                        'disabled' => !empty($ordersData['stoolKit']),
                         'constraints' => new Constraints\Type('string'),
                         'attr' => [
-                            'placeholder' => 'Scan Kit ID'
+                            'placeholder' => 'Scan Kit ID',
+                            'disabled' => !empty($ordersData['stoolKit'])
                         ]
                     ]);
                 }
@@ -35,7 +35,8 @@ class NphOrderType extends AbstractType
                         'disabled' => !empty($ordersData[$sampleCode]),
                         'constraints' => new Constraints\Type('string'),
                         'attr' => [
-                            'placeholder' => 'Scan Tube'
+                            'placeholder' => 'Scan Tube',
+                            'disabled' => !empty($ordersData['stoolKit'])
                         ]
                     ]);
                     unset($samples[$sampleCode]);
