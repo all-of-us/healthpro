@@ -8,15 +8,8 @@
             Generate Order and Print Labels
         </h2>
     </div>
-    <div class="row">
-        <div class="col-sm-6">
-            {% include 'program/nph/order/partials/participant-dl.html.twig' %}
-        </div>
-        <div class="col-sm-6">
-            <div class="alert well-sm bg-warning-new text-white">Module | NPH Module {{ module }}</div>
-            <div class="alert well-sm bg-primary">Visit | {{ visit }}</div>
-        </div>
-    </div>
+
+    {% include 'program/nph/order/partials/generate-orders-header.html.twig' %}
 
     <div class="row" id="order_create"
          data-samples="{{ samples|json_encode() }}"
@@ -41,13 +34,13 @@
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
                     <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
-                        {{ samples.form_widget(orderForm[timePoint], orderForm, nailSamples, stoolSamples) }}
+                        {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds) }}
                     </div>
                 </div>
             {% endfor %}
             {{ form_rest(orderForm) }}
             <a class="btn btn-default" href="#">Cancel</a>
-            <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
+            <button type="submit" class="btn btn-primary" id="order_next_btn">Next</button>
             {{ form_end(orderForm) }}
             <br>
         </div>

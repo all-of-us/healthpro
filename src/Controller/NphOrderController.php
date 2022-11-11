@@ -61,7 +61,8 @@ class NphOrderController extends BaseController
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getStoolSamples(),
-            'nailSamples' => $nphOrderService->getNailSamples()
+            'nailSamples' => $nphOrderService->getNailSamples(),
+            'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds()
         ]);
     }
 }

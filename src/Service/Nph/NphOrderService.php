@@ -103,6 +103,20 @@ class NphOrderService
         return $ordersData;
     }
 
+    public function getSamplesWithOrderIds(): array
+    {
+        $samplesData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType($this->user,
+            $this->participantId, $this->visit);
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $order->getOrderId();
+            }
+        }
+        return $samplesData;
+    }
+
     public function generateOrderId(): string
     {
         $attempts = 0;
