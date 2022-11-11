@@ -83,8 +83,11 @@ class NphOrderService
     public function getExistingOrdersData(): array
     {
         $ordersData = [];
-        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType($this->user,
-            $this->participantId, $this->visit);
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->user,
+            $this->participantId,
+            $this->visit
+        );
         $addStoolKit = true;
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
@@ -106,8 +109,11 @@ class NphOrderService
     public function getSamplesWithOrderIds(): array
     {
         $samplesData = [];
-        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType($this->user,
-            $this->participantId, $this->visit);
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->user,
+            $this->participantId,
+            $this->visit
+        );
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
