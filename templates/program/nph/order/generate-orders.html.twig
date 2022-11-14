@@ -8,15 +8,15 @@
             Generate Order and Print Labels
         </h2>
     </div>
-    <div class="row">
-        <div class="col-sm-6">
-            {% include 'program/nph/order/partials/participant-dl.html.twig' %}
+
+    {% include 'program/nph/order/partials/generate-orders-header.html.twig' %}
+
+    {% if samplesOrderIds is not empty %}
+        <div class="alert alert-warning">
+            <p><strong>Existing order found within this visit.</strong></p>
+            If you need to create a new order while a previous order exists, please cancel the existing order first.
         </div>
-        <div class="col-sm-6">
-            <div class="alert well-sm bg-warning-new">Module | NPH Module {{ module }}</div>
-            <div class="alert well-sm bg-primary">Visit | {{ visit }}</div>
-        </div>
-    </div>
+    {% endif %}
 
     <div class="row" id="order_create"
          data-samples="{{ samples|json_encode() }}"
@@ -41,7 +41,7 @@
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
                     <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
-                        {{ samples.form_widget(orderForm[timePoint], orderForm, nailSamples, stoolSamples) }}
+                        {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds) }}
                     </div>
                 </div>
             {% endfor %}

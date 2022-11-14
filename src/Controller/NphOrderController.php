@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\NphOrder;
 use App\Form\Nph\NphOrderType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
@@ -39,9 +40,10 @@ class NphOrderController extends BaseController
         $nphOrderService->loadModules($module, $visit, $participantId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
+        $ordersData = $nphOrderService->getExistingOrdersData();
         $oderForm = $this->createForm(
             NphOrderType::class,
-            null,
+            $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' => $nphOrderService->getStoolSamples()]
         );
         $oderForm->handleRequest($request);
@@ -49,6 +51,9 @@ class NphOrderController extends BaseController
             $formData = $oderForm->getData();
             $nphOrderService->createOrdersAndSamples($formData);
             $this->addFlash('success', 'Orders Created');
+            // TODO: Redirect to generate orders & print labels page
+            return $this->redirectToRoute('nph_generate_oder', ['participantId' => $participantId, 'module' => $module,
+                'visit' => $visit]);
         }
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
@@ -59,7 +64,8 @@ class NphOrderController extends BaseController
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getStoolSamples(),
-            'nailSamples' => $nphOrderService->getNailSamples()
+            'nailSamples' => $nphOrderService->getNailSamples(),
+            'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds()
         ]);
     }
 }

@@ -80,6 +80,49 @@ class NphOrderService
         return $this->moduleObj->getNailSamples();
     }
 
+    public function getExistingOrdersData(): array
+    {
+        $ordersData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->user,
+            $this->participantId,
+            $this->visit
+        );
+        $addStoolKit = true;
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                if (in_array($sample->getSampleCode(), $this->getStoolSamples())) {
+                    if ($addStoolKit) {
+                        $ordersData['stoolKit'] = $order->getOrderId();
+                        $addStoolKit = false;
+                    }
+                    $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
+                } else {
+                    $ordersData[$order->getTimepoint()][] = $sample->getSampleCode();
+                }
+            }
+        }
+        return $ordersData;
+    }
+
+    public function getSamplesWithOrderIds(): array
+    {
+        $samplesData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->user,
+            $this->participantId,
+            $this->visit
+        );
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $order->getOrderId();
+            }
+        }
+        return $samplesData;
+    }
+
     public function generateOrderId(): string
     {
         $attempts = 0;
@@ -148,7 +191,8 @@ class NphOrderService
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            $nphOrder = $this->createOrder('LMT', $formData['stoolKit']);
+            // TODO: dynamically load stool visit type
+            $nphOrder = $this->createOrder('preLMT', $formData['stoolKit']);
             foreach ($this->getStoolSamples() as $stoolSample) {
                 $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
             }

@@ -19,32 +19,17 @@ class NphOrderRepository extends ServiceEntityRepository
         parent::__construct($registry, NphOrder::class);
     }
 
-    // /**
-    //  * @return NphOrder[] Returns an array of NphOrder objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getOrdersByVisitType($user, $participantId, $visitType): array
     {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('no')
+            ->where('no.user = :user')
+            ->andWhere('no.participantId = :participantId')
+            ->andWhere('no.visitType = :visitType')
+            ->setParameter('user', $user)
+            ->setParameter('participantId', $participantId)
+            ->setParameter('visitType', $visitType)
+            ->orderBy('no.id', 'ASC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?NphOrder
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
