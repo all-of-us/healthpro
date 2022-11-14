@@ -15,6 +15,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
         zlib1g-dev \
         autoconf \
         g++ \
+        libpng-dev \
       && docker-php-ext-install pdo_mysql \
       && docker-php-ext-install gd \
       && rm -rf /var/lib/apt/lists/*
