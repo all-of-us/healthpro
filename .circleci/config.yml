@@ -20,6 +20,7 @@ jobs:
     steps:
     - run: sudo apt-get update && sudo apt-get install -y default-mysql-client
     - run: sudo docker-php-ext-install pdo_mysql
+    - run: sudo docker-php-ext-install gd
     - checkout
 
     # Our primary container isn't MYSQL so run a sleep command until it's ready.
