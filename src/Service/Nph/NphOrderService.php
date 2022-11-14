@@ -80,6 +80,11 @@ class NphOrderService
         return $this->moduleObj->getNailSamples();
     }
 
+    public function getSampleType($sample): string
+    {
+        return $this->moduleObj->getSampleType($sample);
+    }
+
     public function getExistingOrdersData(): array
     {
         $ordersData = [];
@@ -177,12 +182,12 @@ class NphOrderService
                 if (in_array($timePoint, self::$nonBloodTimePoints)) {
                     foreach ($samples as $sample) {
                         if (!in_array($sample, self::$placeholderSamples)) {
-                            $nphOrder = $this->createOrder($timePoint);
+                            $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
                             $this->createSample($sample, $nphOrder);
                         }
                     }
                 } else {
-                    $nphOrder = $this->createOrder($timePoint);
+                    $nphOrder = $this->createOrder($timePoint, 'blood');
                     foreach ($samples as $sample) {
                         $this->createSample($sample, $nphOrder);
                     }
@@ -192,14 +197,14 @@ class NphOrderService
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
             // TODO: dynamically load stool visit type
-            $nphOrder = $this->createOrder('preLMT', $formData['stoolKit']);
+            $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
             foreach ($this->getStoolSamples() as $stoolSample) {
                 $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
             }
         }
     }
 
-    public function createOrder($timePoint, $orderId = null): NphOrder
+    public function createOrder($timePoint, $orderType, $orderId = null): NphOrder
     {
         if ($orderId === null) {
             $orderId = $this->generateOrderId();
@@ -213,6 +218,7 @@ class NphOrderService
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
         $nphOrder->setCreatedTs(new DateTime());
+        $nphOrder->setOrderType($orderType);
         $this->em->persist($nphOrder);
         $this->em->flush();
         return $nphOrder;
