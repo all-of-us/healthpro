@@ -9,6 +9,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json" : "*",
+        "ext-gd": "*",
         "beberlei/doctrineextensions": "^1.2",
         "composer/package-versions-deprecated": "1.11.99.4",
         "doctrine/doctrine-bundle": "^2.4",
@@ -44,7 +45,9 @@
         "symfony/yaml": "*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12",
-        "google/cloud-secret-manager": "^1.7"
+        "google/cloud-secret-manager": "^1.7",
+        "ext-mbstring": "*",
+        "mpdf/mpdf": "^8.1"
     },
     "config": {
         "platform": {
