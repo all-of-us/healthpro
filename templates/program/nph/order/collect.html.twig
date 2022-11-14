@@ -3,6 +3,19 @@
 {% block title %} Order Collect - {% endblock %}
 {% block body %}
     {% include 'program/nph/order/partials/order-header.html.twig' %}
+    <p class="alert bg-light well-sm">
+        {{ order.timepoint }} {{ order.orderType }}
+    </p>
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+            {{ form_errors(orderCollectForm) }}
+            {{ form_rest(orderCollectForm) }}
+            <button type="submit" class="btn btn-primary" id="order_next_btn">Save and Close</button>
+            <a class="btn btn-default" href="#">Cancel</a>
+            {{ form_end(orderCollectForm) }}
+        </div>
+    </div>
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}

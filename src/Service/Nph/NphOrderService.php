@@ -85,6 +85,16 @@ class NphOrderService
         return $this->moduleObj->getSampleType($sample);
     }
 
+    public function getSamplesWithLabels($samplesObj): array
+    {
+        $samples = $this->getSamples();
+        $sampleLabels = [];
+        foreach ($samplesObj as $sampleObj) {
+            $sampleLabels[$sampleObj->getSampleCode()] = $samples[$sampleObj->getSampleCode()];
+        }
+        return $sampleLabels;
+    }
+
     public function getExistingOrdersData(): array
     {
         $ordersData = [];

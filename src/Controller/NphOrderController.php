@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\NphOrder;
+use App\Form\Nph\NphOrderCollectType;
 use App\Form\Nph\NphOrderType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
@@ -88,8 +89,15 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Order not found.');
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $sampleLabels = $nphOrderService->getSamplesWithLabels($order->getNphSamples());
+        $oderCollectForm = $this->createForm(
+            NphOrderCollectType::class,
+            null,
+            ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
+        );
         return $this->render('program/nph/order/collect.html.twig', [
             'order' => $order,
+            'orderCollectForm' => $oderCollectForm->createView(),
             'participant' => $participant,
             'sampleType' => 'Spot Urine'
         ]);
