@@ -192,6 +192,7 @@ class NphOrderService
         $OrderRepository = $this->em->getRepository(NphOrder::class);
         $orderInfo = $OrderRepository->findBy(['participantId' => $participantid]);
         $ModuleVisitSampleNames = array();
+        $returnArray = array();
         foreach ($orderInfo as $order) {
             if (!array_key_exists($order->getModule(), $ModuleVisitSampleNames)) {
                 $ModuleVisitSampleNames[$order->getModule()] = array();
