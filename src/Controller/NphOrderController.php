@@ -68,4 +68,30 @@ class NphOrderController extends BaseController
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds()
         ]);
     }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/collect", name="nph_order_collect")
+     */
+    public function orderCollectAction(
+        $participantId,
+        $orderId,
+        NphOrderService $nphOrderService,
+        ParticipantSummaryService $participantSummaryService,
+        Request $request
+    ): Response {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        return $this->render('program/nph/order/collect.html.twig', [
+            'order' => $order,
+            'participant' => $participant,
+            'sampleType' => 'Spot Urine'
+        ]);
+    }
 }
