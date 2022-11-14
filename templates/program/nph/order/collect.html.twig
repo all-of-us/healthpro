@@ -4,3 +4,6 @@
 {% block body %}
     {% include 'program/nph/order/partials/order-header.html.twig' %}
 {% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order') }}
+{% endblock %}

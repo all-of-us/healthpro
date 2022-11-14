@@ -2,17 +2,17 @@
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
         {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
-        <small><a href="">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+        <small><a href="#">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 </div>
-<div class="row">
+<div class="row" id="order_info" data-order-id="{{ order.orderId }}">
     <div class="col-sm-6">
         {% include 'program/nph/order/partials/participant-dl.html.twig' %}
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6 text-center">
         <strong class="text-primary">
             Module {{ order.module }} | Visit {{ order.visitType }} | {{ order.timepoint }} | {{ sampleType }}
         </strong>
-        <p>{{ order.orderId }}</p>
+        <div><svg id="order-barcode"></svg></div>
     </div>
 </div>
