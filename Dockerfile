@@ -16,6 +16,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
         autoconf \
         g++ \
       && docker-php-ext-install pdo_mysql \
+      && docker-php-ext-install gd \
       && rm -rf /var/lib/apt/lists/*
 
 # Install GRPC module for PHP

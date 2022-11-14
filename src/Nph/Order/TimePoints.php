@@ -70,4 +70,10 @@ class TimePoints
         }
         return $samples;
     }
+
+    public function getSampleLabelFromCode(string $sampleCode): string
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        return $samplesInfo[$sampleCode]['label'];
+    }
 }

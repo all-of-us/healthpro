@@ -36,4 +36,9 @@ class Samples
     {
         return $this->visitObj->getNailSamples();
     }
+
+    public function getSampleLabelFromCode($sampleCode): string
+    {
+        return $this->visitObj->getSampleLabelFromCode($sampleCode);
+    }
 }

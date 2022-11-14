@@ -186,4 +186,33 @@ class NphOrderService
         $this->em->persist($nphSample);
         $this->em->flush();
     }
+
+    public function getParticipantOrderSummary(string $participantid): array
+    {
+        $OrderRepository = $this->em->getRepository(NphOrder::class);
+        $orderInfo = $OrderRepository->findBy(['participantId' => $participantid]);
+        $ModuleVisitSampleNames = array();
+        foreach ($orderInfo as $order) {
+            if (!array_key_exists($order->getModule(), $ModuleVisitSampleNames)) {
+                $ModuleVisitSampleNames[$order->getModule()] = array();
+            }
+            if (!array_key_exists($order->getVisitType(), $ModuleVisitSampleNames[$order->getModule()])) {
+                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
+                $module = new $moduleClass($order->getVisitType());
+                $ModuleVisitSampleNames[$order->getModule()] = $module;
+            }
+            $samples = $order->getNphSamples()->toArray();
+            foreach ($samples as $sample) {
+                $module = $ModuleVisitSampleNames[$order->getModule()];
+                $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
+                $returnArray[$order->getModule()]
+                [$order->getVisitType()]
+                [$order->getTimepoint()]
+                [$sample->getSampleCode()] = ['SampleID' => $sample->getSampleID(),
+                                              'SampleName' => $sampleName,
+                                              'OrderID' => $order->getOrderId()];
+            }
+        }
+        return $returnArray;
+    }
 }
