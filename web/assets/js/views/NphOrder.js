@@ -7,5 +7,5 @@ $(document).ready(function () {
         });
     }
 
-    $('.order-collection-ts').pmiDateTimePicker();
+    $('.order-collected-ts').pmiDateTimePicker();
 });

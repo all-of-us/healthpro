@@ -80,6 +80,11 @@ class NphOrderService
         return $this->moduleObj->getNailSamples();
     }
 
+    public function getSamplesByType($type): array
+    {
+        return $this->moduleObj->getSamplesByType($type);
+    }
+
     public function getSampleType($sample): string
     {
         return $this->moduleObj->getSampleType($sample);
@@ -185,7 +190,7 @@ class NphOrderService
         return $id;
     }
 
-    public function createOrdersAndSamples($formData)
+    public function createOrdersAndSamples($formData): void
     {
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
@@ -255,6 +260,29 @@ class NphOrderService
         $nphOrder = $this->createOrder($timePoint, $orderType);
         foreach ($samples as $sample) {
             $this->createSample($sample, $nphOrder);
+        }
+    }
+
+    public function saveOrderCollection($formData, $order)
+    {
+        foreach ($order->getNphSamples() as $nphSample) {
+            $sampleCode = $nphSample->getSampleCode();
+            $nphSample->setCollectedUser($this->user);
+            $nphSample->setCollectedSite($this->site);
+            $nphSample->setCollectedTs($formData[$sampleCode . 'CollectedTs']);
+            $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+            if ($order->getOrderType() === 'urine') {
+                $sampleMetaData = [];
+                if (!empty($formData['urineColor'])) {
+                    $sampleMetaData['color'] = $formData['urineColor'];
+                }
+                if (!empty($formData['urineClarity'])) {
+                    $sampleMetaData['clarity'] = $formData['urineClarity'];
+                }
+                $nphSample->setSampleMetadata(!empty($sampleMetaData) ? json_encode($sampleMetaData) : null);
+            }
+            $this->em->persist($nphSample);
+            $this->em->flush();
         }
     }
 }

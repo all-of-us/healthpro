@@ -37,6 +37,11 @@ class Samples
         return $this->visitObj->getNailSamples();
     }
 
+    public function getSamplesByType($type): array
+    {
+        return $this->visitObj->getSamplesByType($type);
+    }
+
     public function getSampleType($sample): string
     {
         return $this->visitObj->getSampleType($sample);

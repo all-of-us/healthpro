@@ -95,6 +95,12 @@ class NphOrderController extends BaseController
             null,
             ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
         );
+        $oderCollectForm->handleRequest($request);
+        if ($oderCollectForm->isSubmitted() && $oderCollectForm->isValid()) {
+            $formData = $oderCollectForm->getData();
+            $nphOrderService->saveOrderCollection($formData, $order);
+            $this->addFlash('success', 'Order collection saved');
+        }
         return $this->render('program/nph/order/collect.html.twig', [
             'order' => $order,
             'orderCollectForm' => $oderCollectForm->createView(),

@@ -41,13 +41,13 @@ class NphOrderCollectType extends AbstractType
                 'required' => false
             ]);
             $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
-            $builder->add("{$sample}CollectionTs", Type\DateTimeType::class, [
+            $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
                 'required' => false,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
                 'html5' => false,
-                'model_timezone' => $options['timeZone'],
+                'model_timezone' => 'UTC',
                 'view_timezone' => $options['timeZone'],
                 'constraints' => [
                     new Constraints\Type('datetime'),
@@ -57,7 +57,7 @@ class NphOrderCollectType extends AbstractType
                     ])
                 ],
                 'attr' => [
-                    'class' => 'order-collection-ts',
+                    'class' => 'order-collected-ts',
                 ]
             ]);
             $builder->add("{$sample}Notes", Type\TextareaType::class, [
