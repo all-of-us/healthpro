@@ -33,7 +33,7 @@ class NphOrderCollectType extends AbstractType
         $samples = $options['samples'];
         $orderType = $options['orderType'];
         foreach ($samples as $sample => $sampleLabel) {
-            $builder->add($orderType . $sample, Type\ChoiceType::class, [
+            $builder->add($sample, Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Sample',
@@ -55,6 +55,9 @@ class NphOrderCollectType extends AbstractType
                         'value' => $constraintDateTime,
                         'message' => 'Date cannot be in the future'
                     ])
+                ],
+                'attr' => [
+                    'class' => 'order-collection-ts',
                 ]
             ]);
             $builder->add("{$sample}Notes", Type\TextareaType::class, [

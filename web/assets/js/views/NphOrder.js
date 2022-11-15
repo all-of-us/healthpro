@@ -6,4 +6,6 @@ $(document).ready(function () {
             displayValue: true
         });
     }
+
+    $('.order-collection-ts').pmiDateTimePicker();
 });
