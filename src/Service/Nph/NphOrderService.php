@@ -191,20 +191,12 @@ class NphOrderService
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
         $orderInfo = $OrderRepository->findBy(['participantId' => $participantid]);
-        $ModuleVisitSampleNames = array();
         $returnArray = array();
         foreach ($orderInfo as $order) {
-            if (!array_key_exists($order->getModule(), $ModuleVisitSampleNames)) {
-                $ModuleVisitSampleNames[$order->getModule()] = array();
-            }
-            if (!array_key_exists($order->getVisitType(), $ModuleVisitSampleNames[$order->getModule()])) {
-                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
-                $module = new $moduleClass($order->getVisitType());
-                $ModuleVisitSampleNames[$order->getModule()] = $module;
-            }
             $samples = $order->getNphSamples()->toArray();
             foreach ($samples as $sample) {
-                $module = $ModuleVisitSampleNames[$order->getModule()];
+                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
+                $module = new $moduleClass($order->getVisitType());
                 $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
                 $returnArray[$order->getModule()]
                 [$order->getVisitType()]
