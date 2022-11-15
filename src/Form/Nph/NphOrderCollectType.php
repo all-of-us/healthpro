@@ -33,11 +33,8 @@ class NphOrderCollectType extends AbstractType
         $samples = $options['samples'];
         $orderType = $options['orderType'];
         foreach ($samples as $sample => $sampleLabel) {
-            $builder->add($sample, Type\ChoiceType::class, [
-                'expanded' => true,
-                'multiple' => true,
-                'label' => 'Sample',
-                'choices' => [$sampleLabel => $sample],
+            $builder->add($sample, Type\CheckboxType::class, [
+                'label' => $sampleLabel,
                 'required' => false
             ]);
             $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew

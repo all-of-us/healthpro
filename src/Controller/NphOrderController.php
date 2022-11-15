@@ -90,9 +90,10 @@ class NphOrderController extends BaseController
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
         $sampleLabels = $nphOrderService->getSamplesWithLabels($order->getNphSamples());
+        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
             NphOrderCollectType::class,
-            null,
+            $orderCollectionData,
             ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
         );
         $oderCollectForm->handleRequest($request);

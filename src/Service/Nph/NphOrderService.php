@@ -285,4 +285,29 @@ class NphOrderService
             $this->em->flush();
         }
     }
+
+    public function getExistingOrderCollectionData($order): array
+    {
+        $orderCollectionData = [];
+        foreach ($order->getNphSamples() as $nphSample) {
+            $sampleCode = $nphSample->getSampleCode();
+            if ($nphSample->getCollectedTs()) {
+                $orderCollectionData[$sampleCode] = true;
+            }
+            $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
+            $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
+            if ($order->getOrderType() === 'urine') {
+                if ($nphSample->getSampleMetaData()) {
+                    $sampleMetaData = json_decode($nphSample->getSampleMetaData(), true);
+                    if (!empty($sampleMetaData['color'])) {
+                        $orderCollectionData['urineColor'] = $sampleMetaData['color'];
+                    }
+                    if (!empty($sampleMetaData['clarity'])) {
+                        $orderCollectionData['urineClarity'] = $sampleMetaData['clarity'];
+                    }
+                }
+            }
+        }
+        return $orderCollectionData;
+    }
 }
