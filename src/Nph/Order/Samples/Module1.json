@@ -2,49 +2,49 @@
   "version": "1",
   "notes": "Module 1 samples",
   "samplesInformation": {
-    "1SST8": {
+    "SST8": {
       "label": "8.5 mL SST",
       "color": "Red and gray",
       "temperature": "Refrigerated",
       "specimen": "Serum SST",
       "type": "blood"
     },
-    "1PST8": {
+    "PST8": {
       "label": "8 mL PST",
       "color": "Green and gray",
       "temperature": "Refrigerated",
       "specimen": "Plasma PST",
       "type": "blood"
     },
-    "1ED10": {
+    "EDTA10": {
       "label": "10 mL EDTA",
       "color": "Lavender",
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
       "type": "blood"
     },
-    "1P8T2": {
+    "P800": {
       "label": "2 mL P800",
       "color": "Lavender",
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
       "type": "blood"
     },
-    "urine": {
+    "UrineS": {
       "label": "Spot Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Urine",
       "type": "urine"
     },
-    "saliva": {
+    "Saliva": {
       "label": "Saliva",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Saliva",
       "type": "saliva"
     },
-    "hair": {
+    "Hair": {
       "label": "Hair",
       "color": "black",
       "temperature": "Refrigerated",
@@ -58,14 +58,14 @@
       "specimen": "Nail",
       "type": "nail"
     },
-    "NA1": {
+    "NailB": {
       "label": "Big Toenails",
       "color": "White",
       "temperature": "Refrigerated",
       "specimen": "Nail",
       "type": "nail"
     },
-    "NA2": {
+    "NailL": {
       "label": "Other Toenails",
       "color": "White",
       "temperature": "Refrigerated",
