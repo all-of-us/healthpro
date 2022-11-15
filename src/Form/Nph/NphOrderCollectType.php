@@ -10,6 +10,24 @@ use Symfony\Component\Validator\Constraints;
 
 class NphOrderCollectType extends AbstractType
 {
+    public static $urineColors = [
+        'Color 1' => 1,
+        'Color 2' => 2,
+        'Color 3' => 3,
+        'Color 4' => 4,
+        'Color 5' => 5,
+        'Color 6' => 6,
+        'Color 7' => 7,
+        'Color 8' => 8,
+    ];
+
+    public static $urineClarity = [
+        'Clean' => 'clean',
+        'Slightly Cloudy' => 'slightly_cloudy',
+        'Cloudy' => 'cloudy',
+        'Turbid' => 'turbid'
+    ];
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $samples = $options['samples'];
@@ -18,7 +36,7 @@ class NphOrderCollectType extends AbstractType
             $builder->add($orderType . $sample, Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
-                'label' => $sampleLabel,
+                'label' => 'Sample',
                 'choices' => [$sampleLabel => $sample],
                 'required' => false
             ]);
@@ -44,6 +62,24 @@ class NphOrderCollectType extends AbstractType
                 'required' => false,
                 'constraints' => new Constraints\Type('string')
             ]);
+
+            if ($orderType === 'urine') {
+                $builder->add('urineColor', Type\ChoiceType::class, [
+                    'label' => 'Urine Color',
+                    'required' => false,
+                    'choices' => self::$urineColors,
+                    'multiple' => false,
+                    'placeholder' => 'Select Urine Color'
+                ]);
+
+                $builder->add('urineClarity', Type\ChoiceType::class, [
+                    'label' => 'Urine Clarity',
+                    'required' => false,
+                    'choices' => self::$urineClarity,
+                    'multiple' => false,
+                    'placeholder' => 'Select Urine Clarity'
+                ]);
+            }
         }
         return $builder->getForm();
     }
