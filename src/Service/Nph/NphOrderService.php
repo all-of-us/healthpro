@@ -190,17 +190,20 @@ class NphOrderService
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
                 if (in_array($timePoint, self::$nonBloodTimePoints)) {
+                    $nailSamples = [];
                     foreach ($samples as $sample) {
-                        if (!in_array($sample, self::$placeholderSamples)) {
+                        if (in_array($sample, $this->getNailSamples())) {
+                            $nailSamples[] = $sample;
+                        } elseif (!in_array($sample, self::$placeholderSamples)) {
                             $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
                             $this->createSample($sample, $nphOrder);
                         }
                     }
-                } else {
-                    $nphOrder = $this->createOrder($timePoint, 'blood');
-                    foreach ($samples as $sample) {
-                        $this->createSample($sample, $nphOrder);
+                    if (!empty($nailSamples)) {
+                        $this->createOrderWithSamples($timePoint, 'nail', $nailSamples);
                     }
+                } else {
+                    $this->createOrderWithSamples($timePoint, 'blood', $samples);
                 }
             }
         }
@@ -245,5 +248,13 @@ class NphOrderService
         $nphSample->setSampleCode($sample);
         $this->em->persist($nphSample);
         $this->em->flush();
+    }
+
+    public function createOrderWithSamples($timePoint, $orderType, $samples): void
+    {
+        $nphOrder = $this->createOrder($timePoint, $orderType);
+        foreach ($samples as $sample) {
+            $this->createSample($sample, $nphOrder);
+        }
     }
 }
