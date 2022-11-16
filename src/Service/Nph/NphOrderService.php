@@ -272,14 +272,12 @@ class NphOrderService
             $nphSample->setCollectedTs($formData[$sampleCode . 'CollectedTs']);
             $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
             if ($order->getOrderType() === 'urine') {
-                $sampleMetaData = [];
-                if (!empty($formData['urineColor'])) {
-                    $sampleMetaData['color'] = $formData['urineColor'];
-                }
-                if (!empty($formData['urineClarity'])) {
-                    $sampleMetaData['clarity'] = $formData['urineClarity'];
-                }
-                $nphSample->setSampleMetadata(!empty($sampleMetaData) ? json_encode($sampleMetaData) : null);
+                $nphSample->setSampleMetadata($this->jsonEncodeSampleMetaData($formData, ['urineColor',
+                    'urineClarity']));
+            }
+            if ($order->getOrderType() === 'stool') {
+                $nphSample->setSampleMetadata($this->jsonEncodeSampleMetaData($formData, ['bowelType',
+                    'bowelQuality']));
             }
             $this->em->persist($nphSample);
             $this->em->flush();
@@ -299,15 +297,37 @@ class NphOrderService
             if ($order->getOrderType() === 'urine') {
                 if ($nphSample->getSampleMetaData()) {
                     $sampleMetaData = json_decode($nphSample->getSampleMetaData(), true);
-                    if (!empty($sampleMetaData['color'])) {
-                        $orderCollectionData['urineColor'] = $sampleMetaData['color'];
+                    if (!empty($sampleMetaData['urineColor'])) {
+                        $orderCollectionData['urineColor'] = $sampleMetaData['urineColor'];
                     }
-                    if (!empty($sampleMetaData['clarity'])) {
-                        $orderCollectionData['urineClarity'] = $sampleMetaData['clarity'];
+                    if (!empty($sampleMetaData['urineClarity'])) {
+                        $orderCollectionData['urineClarity'] = $sampleMetaData['urineClarity'];
+                    }
+                }
+            }
+            if ($order->getOrderType() === 'stool') {
+                if ($nphSample->getSampleMetaData()) {
+                    $sampleMetaData = json_decode($nphSample->getSampleMetaData(), true);
+                    if (!empty($sampleMetaData['bowelType'])) {
+                        $orderCollectionData['bowelType'] = $sampleMetaData['bowelType'];
+                    }
+                    if (!empty($sampleMetaData['bowelQuality'])) {
+                        $orderCollectionData['bowelQuality'] = $sampleMetaData['bowelQuality'];
                     }
                 }
             }
         }
         return $orderCollectionData;
+    }
+
+    public function jsonEncodeSampleMetaData($formData, $metaDataTypes): ?string
+    {
+        $sampleMetaData = [];
+        foreach ($metaDataTypes as $metaDataType) {
+            if (!empty($formData[$metaDataType])) {
+                $sampleMetaData[$metaDataType] = $formData[$metaDataType];
+            }
+        }
+        return !empty($sampleMetaData) ? json_encode($sampleMetaData) : null;
     }
 }

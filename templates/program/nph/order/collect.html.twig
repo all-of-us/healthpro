@@ -21,10 +21,10 @@
                 {% endfor %}
                 <h4>Bristol Stool Chart Questions</h4>
                 <p>Enter the participant provided answers to the following questions:</p>
-                {{ form_label(orderCollectForm['bowelMovement']) }}
-                {{ form_widget(orderCollectForm['bowelMovement']) }}
-                {{ form_label(orderCollectForm['bowelMovementQuality']) }}
-                {{ form_widget(orderCollectForm['bowelMovementQuality']) }}
+                {{ form_label(orderCollectForm['bowelType']) }}
+                {{ form_widget(orderCollectForm['bowelType']) }}
+                {{ form_label(orderCollectForm['bowelQuality']) }}
+                {{ form_widget(orderCollectForm['bowelQuality']) }}
                 <br>
             {% endif %}
             {{ form_rest(orderCollectForm) }}

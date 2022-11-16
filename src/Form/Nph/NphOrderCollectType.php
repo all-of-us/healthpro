@@ -95,7 +95,7 @@ class NphOrderCollectType extends AbstractType
         }
 
         if ($orderType === 'stool') {
-            $builder->add('bowelMovement', Type\ChoiceType::class, [
+            $builder->add('bowelType', Type\ChoiceType::class, [
                 'label' => 'Describe the bowel movement for this collection',
                 'required' => false,
                 'choices' => self::$bowelMovements,
@@ -103,7 +103,7 @@ class NphOrderCollectType extends AbstractType
                 'placeholder' => 'Select bowel movement type'
             ]);
 
-            $builder->add('bowelMovementQuality', Type\ChoiceType::class, [
+            $builder->add('bowelQuality', Type\ChoiceType::class, [
                 'label' => 'Describe the typical quality of your bowel movements',
                 'required' => false,
                 'choices' => self::$bowelMovementQuality,
