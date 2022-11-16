@@ -28,11 +28,10 @@ class PDFService
      * @throws RuntimeError
      * @throws LoaderError
      */
-    private function renderPDF(string $name, string $orderID, \DateTime $DOB, string $specimenID, string $moduleNum, $timePoint, $sampleCode, $VisitType): void
+    private function renderPDF(string $name, string $orderID, \DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
     {
-        $specimenID = mb_strimwidth($specimenID, 0, 8, '');
         $this->mpdf->WriteHTML(
-            $this->twig->render('program/nph/PDF/biospecimenLabel2.html.twig', [
+            $this->twig->render('program/nph/PDF/biospecimenLabel.html.twig', [
                     'PatientName' => $name,
                     'OrderID' => $orderID,
                     'dob' => $DOB->format('Y-m-d'),
@@ -40,34 +39,32 @@ class PDFService
                     'ModuleNum' => $moduleNum,
                     'TimePoint' => $timePoint,
                     'SampleType' => $sampleCode,
-                    'VisitType' => $VisitType
+                    'VisitType' => $VisitType,
+                    'CollectionVolume' => $collectionVolume
                 ])
         );
     }
 
     //TODO: Refactor to work off shyams NPHOrderService->getExistingOrdersData
-    public function batchPDF(array $OrderSummary, Participant $participant): string
+    public function batchPDF(array $OrderSummary, Participant $participant, string $module, string $visit): string
     {
-        foreach ($OrderSummary as $moduleNumber => $moduleInfo) {
-            foreach ($moduleInfo as $VisitType => $currentVisit) {
-                foreach ($currentVisit as $timePoint => $timePointSample) {
-                    foreach ($timePointSample as $sampleCode => $sampleInfo) {
-                        $timePoint = str_replace('minus', '-', $timePoint);
-                        try {
-                            $this->renderPDF(
-                                $participant->firstName . ' ' . $participant->lastName,
-                                $sampleInfo['OrderID'],
-                                $participant->dob,
-                                $sampleInfo['SampleID'],
-                                $moduleNumber,
-                                $timePoint,
-                                $sampleCode,
-                                $VisitType
-                            );
-                        } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
-                            return "Unable to render PDF";
-                        }
-                    }
+        foreach ($OrderSummary as $timePoint => $timePointSample) {
+            foreach ($timePointSample as $sampleCode => $sampleInfo) {
+                $timePoint = str_replace('minus', '-', $timePoint);
+                try {
+                    $this->renderPDF(
+                        $participant->firstName . ' ' . $participant->lastName,
+                        $sampleInfo['OrderID'],
+                        $participant->dob,
+                        $sampleInfo['SampleID'],
+                        $module,
+                        $timePoint,
+                        $sampleCode,
+                        $visit,
+                        $sampleInfo['SampleCollectionVolume']
+                    );
+                } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
+                    return "Unable to render PDF";
                 }
             }
         }

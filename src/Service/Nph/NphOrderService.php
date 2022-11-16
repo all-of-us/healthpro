@@ -208,4 +208,26 @@ class NphOrderService
         }
         return $returnArray;
     }
+
+    public function getParticipantOrderSummaryByModuleAndVisit(string $participantid, string $module, string $visit): array
+    {
+        $OrderRepository = $this->em->getRepository(NphOrder::class);
+        $orderInfo = $OrderRepository->findBy(['participantId' => $participantid, 'visitType' => $visit, 'module' => $module]);
+        $returnArray = array();
+        foreach ($orderInfo as $order) {
+            $samples = $order->getNphSamples()->toArray();
+            foreach ($samples as $sample) {
+                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
+                $module = new $moduleClass($order->getVisitType());
+                $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
+                $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
+                $returnArray[$order->getTimepoint()][$sample->getSampleCode()] =
+                    ['SampleID' => $sample->getSampleID(),
+                    'SampleName' => $sampleName,
+                    'OrderID' => $order->getOrderId(),
+                    'SampleCollectionVolume' => $sampleCollectionVolume];
+            }
+        }
+        return $returnArray;
+    }
 }

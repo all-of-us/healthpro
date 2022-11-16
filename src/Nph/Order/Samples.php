@@ -41,4 +41,9 @@ class Samples
     {
         return $this->visitObj->getSampleLabelFromCode($sampleCode);
     }
+
+    public function getSampleCollectionVolumeFromCode(string $sampleCode): string
+    {
+        return $this->visitObj->getSampleCollectionVolumeFromCode($sampleCode);
+    }
 }

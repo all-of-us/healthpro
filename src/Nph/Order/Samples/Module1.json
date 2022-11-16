@@ -7,42 +7,48 @@
       "color": "Red and gray",
       "temperature": "Refrigerated",
       "specimen": "Serum SST",
-      "type": "blood"
+      "type": "blood",
+      "collectionVolume": "8.5 mL"
     },
     "1PST8": {
       "label": "8 mL PST",
       "color": "Green and gray",
       "temperature": "Refrigerated",
       "specimen": "Plasma PST",
-      "type": "blood"
+      "type": "blood",
+      "collectionVolume": "8 mL"
     },
     "1ED10": {
       "label": "10 mL EDTA",
       "color": "Lavender",
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
-      "type": "blood"
+      "type": "blood",
+      "collectionVolume": "10 mL"
     },
     "1P8T2": {
       "label": "2 mL P800",
       "color": "Lavender",
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
-      "type": "blood"
+      "type": "blood",
+      "collectionVolume": "2 mL"
     },
     "urine": {
       "label": "Spot Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Urine",
-      "type": "urine"
+      "type": "urine",
+      "collectionVolume": "100 mL"
     },
     "saliva": {
       "label": "Saliva",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Saliva",
-      "type": "saliva"
+      "type": "saliva",
+      "collectionVolume": "50 mL"
     },
     "hair": {
       "label": "Hair",
