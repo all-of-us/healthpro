@@ -20,13 +20,22 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for nphSample in order.nphSamples %}
+                {% for index, nphSample in order.nphSamples %}
                     <tr>
                         <td>{{ form_widget(orderCollectForm[nphSample.sampleCode]) }}</td>
                         <td style="position: relative">
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~'CollectedTs']) }}
                         </td>
-                        <td>{{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}</td>
+                        <td>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {% if index == order.nphSamples|length - 1 %}
+                                <small class="text-warning">
+                                    Comments entered in this field are transmitted to the Biobank via reconciliation reporting.
+                                    <br>
+                                    Do  not enter any participant identifying information here.
+                                </small>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
