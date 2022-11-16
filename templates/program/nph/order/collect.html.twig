@@ -11,7 +11,7 @@
             <h5>Which samples where successfully collected?</h5>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(orderCollectForm) }}
-            {% if order.orderType == 'stool' %}
+            {% if order.orderType == 'urine' or  order.orderType == 'stool' %}
                 {% for nphSample in order.nphSamples %}
                     {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
                     {{ form_label(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
@@ -19,12 +19,31 @@
                     {{ form_label(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                     {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                 {% endfor %}
-                <h4>Bristol Stool Chart Questions</h4>
-                <p>Enter the participant provided answers to the following questions:</p>
-                {{ form_label(orderCollectForm['bowelType']) }}
-                {{ form_widget(orderCollectForm['bowelType']) }}
-                {{ form_label(orderCollectForm['bowelQuality']) }}
-                {{ form_widget(orderCollectForm['bowelQuality']) }}
+                {% if order.orderType == 'urine' %}
+                    <h4>
+                        Color and Clarity
+                        <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
+                    </h4>
+                    {{ form_label(orderCollectForm['urineColor']) }}
+                    {{ form_widget(orderCollectForm['urineColor']) }}
+                    {{ form_label(orderCollectForm['urineClarity']) }}
+                    {{ form_widget(orderCollectForm['urineClarity']) }}
+                {% endif %}
+                {% if order.orderType == 'stool' %}
+                    <h4>
+                        Bristol Stool Chart Questions
+                        <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
+                    </h4>
+                    <p>Enter the participant provided answers to the following questions:</p>
+                    {{ form_label(orderCollectForm['bowelType']) }}
+                    {{ form_widget(orderCollectForm['bowelType']) }}
+                    {{ form_label(orderCollectForm['bowelQuality']) }}
+                    {{ form_widget(orderCollectForm['bowelQuality']) }}
+                {% endif %}
                 <br>
             {% endif %}
             {{ form_rest(orderCollectForm) }}
