@@ -11,6 +11,22 @@
             <h5>Which samples where successfully collected?</h5>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(orderCollectForm) }}
+            {% if order.orderType == 'stool' %}
+                {% for nphSample in order.nphSamples %}
+                    {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
+                    {{ form_label(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                    {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                    {{ form_label(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                    {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                {% endfor %}
+                <h4>Bristol Stool Chart Questions</h4>
+                <p>Enter the participant provided answers to the following questions:</p>
+                {{ form_label(orderCollectForm['bowelMovement']) }}
+                {{ form_widget(orderCollectForm['bowelMovement']) }}
+                {{ form_label(orderCollectForm['bowelMovementQuality']) }}
+                {{ form_widget(orderCollectForm['bowelMovementQuality']) }}
+                <br>
+            {% endif %}
             {{ form_rest(orderCollectForm) }}
             <button type="submit" class="btn btn-primary" id="order_next_btn">Save and Close</button>
             <a class="btn btn-default" href="#">Cancel</a>
