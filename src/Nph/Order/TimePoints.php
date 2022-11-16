@@ -75,7 +75,7 @@ class TimePoints
         $samplesInfo = $this->getSamplesInformation();
         $samples = [];
         foreach ($samplesInfo as $sampleCode => $sample) {
-            if ($sample['type'] === $type && $sampleCode !== $type) {
+            if (empty($sample['placeholder']) && $sample['type'] === $type) {
                 $samples[] = $sampleCode;
             }
         }
