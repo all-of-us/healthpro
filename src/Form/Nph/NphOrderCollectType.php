@@ -29,15 +29,15 @@ class NphOrderCollectType extends AbstractType
     ];
 
     public static $bowelMovements = [
-        'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2' => 'type12',
-        'I had diarrhea (watery stool), and my stool looks like Type 5, 6, and/or 7' => 'type567',
-        'I had normal formed stool, and my stool looks like Type 3 and/or 4' => 'type34'
+        'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2' => 'difficult',
+        'I had diarrhea (watery stool), and my stool looks like Type 5, 6, and/or 7' => 'watery',
+        'I had normal formed stool, and my stool looks like Type 3 and/or 4' => 'normal'
     ];
 
     public static $bowelMovementQuality = [
-        'I tend to be constipated (have difficulty passing stool) - Type 1 and 2' => 'qtype12',
-        'I tend to have diarrhea (watery stool) - Type 5, 6, and 7' => 'qtype567',
-        'I tend to have normal formed stool - Type 3 and 4' => 'qtype34'
+        'I tend to be constipated (have difficulty passing stool) - Type 1 and 2' => 'difficult',
+        'I tend to have diarrhea (watery stool) - Type 5, 6, and 7' => 'watery',
+        'I tend to have normal formed stool - Type 3 and 4' => 'normal'
     ];
 
     public function buildForm(FormBuilderInterface $builder, array $options)

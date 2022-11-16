@@ -272,14 +272,16 @@ class NphOrderService
             $nphSample->setCollectedTs($formData[$sampleCode . 'CollectedTs']);
             $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
             if ($order->getOrderType() === 'urine') {
-                $nphSample->setSampleMetadata($this->jsonEncodeSampleMetaData($formData, ['urineColor',
+                $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                     'urineClarity']));
             }
-            if ($order->getOrderType() === 'stool') {
-                $nphSample->setSampleMetadata($this->jsonEncodeSampleMetaData($formData, ['bowelType',
-                    'bowelQuality']));
-            }
             $this->em->persist($nphSample);
+            $this->em->flush();
+        }
+        if ($order->getOrderType() === 'stool') {
+            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
+                'bowelQuality']));
+            $this->em->persist($order);
             $this->em->flush();
         }
     }
@@ -296,38 +298,38 @@ class NphOrderService
             $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
             if ($order->getOrderType() === 'urine') {
                 if ($nphSample->getSampleMetaData()) {
-                    $sampleMetaData = json_decode($nphSample->getSampleMetaData(), true);
-                    if (!empty($sampleMetaData['urineColor'])) {
-                        $orderCollectionData['urineColor'] = $sampleMetaData['urineColor'];
+                    $sampleMetadata = json_decode($nphSample->getSampleMetaData(), true);
+                    if (!empty($sampleMetadata['urineColor'])) {
+                        $orderCollectionData['urineColor'] = $sampleMetadata['urineColor'];
                     }
-                    if (!empty($sampleMetaData['urineClarity'])) {
-                        $orderCollectionData['urineClarity'] = $sampleMetaData['urineClarity'];
+                    if (!empty($sampleMetadata['urineClarity'])) {
+                        $orderCollectionData['urineClarity'] = $sampleMetadata['urineClarity'];
                     }
                 }
             }
-            if ($order->getOrderType() === 'stool') {
-                if ($nphSample->getSampleMetaData()) {
-                    $sampleMetaData = json_decode($nphSample->getSampleMetaData(), true);
-                    if (!empty($sampleMetaData['bowelType'])) {
-                        $orderCollectionData['bowelType'] = $sampleMetaData['bowelType'];
-                    }
-                    if (!empty($sampleMetaData['bowelQuality'])) {
-                        $orderCollectionData['bowelQuality'] = $sampleMetaData['bowelQuality'];
-                    }
+        }
+        if ($order->getOrderType() === 'stool') {
+            if ($order->getMetadata()) {
+                $metadata = json_decode($order->getMetadata(), true);
+                if (!empty($metadata['bowelType'])) {
+                    $orderCollectionData['bowelType'] = $metadata['bowelType'];
+                }
+                if (!empty($metadata['bowelQuality'])) {
+                    $orderCollectionData['bowelQuality'] = $metadata['bowelQuality'];
                 }
             }
         }
         return $orderCollectionData;
     }
 
-    public function jsonEncodeSampleMetaData($formData, $metaDataTypes): ?string
+    public function jsonEncodeMetadata($formData, $metaDataTypes): ?string
     {
-        $sampleMetaData = [];
+        $metadata = [];
         foreach ($metaDataTypes as $metaDataType) {
             if (!empty($formData[$metaDataType])) {
-                $sampleMetaData[$metaDataType] = $formData[$metaDataType];
+                $metadata[$metaDataType] = $formData[$metaDataType];
             }
         }
-        return !empty($sampleMetaData) ? json_encode($sampleMetaData) : null;
+        return !empty($metadata) ? json_encode($metadata) : null;
     }
 }
