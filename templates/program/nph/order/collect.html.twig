@@ -11,44 +11,64 @@
             <h5>Which samples where successfully collected?</h5>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(orderCollectForm) }}
-            {% if order.orderType == 'urine' or  order.orderType == 'stool' %}
+            <table class="table table-samples">
+                <thead>
+                <tr>
+                    <th>Sample</th>
+                    <th>Collection Time</th>
+                    <th>Notes</th>
+                </tr>
+                </thead>
+                <tbody>
                 {% for nphSample in order.nphSamples %}
-                    {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
-                    {{ form_label(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
-                    {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
-                    {{ form_label(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
-                    {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                    <tr>
+                        <td>{{ form_widget(orderCollectForm[nphSample.sampleCode]) }}</td>
+                        <td style="position: relative">
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~'CollectedTs']) }}
+                        </td>
+                        <td>{{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}</td>
+                    </tr>
                 {% endfor %}
-                {% if order.orderType == 'urine' %}
-                    <h4>
-                        Color and Clarity
-                        <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
-                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                        </span>
-                    </h4>
+                </tbody>
+            </table>
+            {% if order.orderType == 'urine' %}
+                <h4>
+                    Color and Clarity
+                    <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                    </span>
+                </h4>
+                <div class="form-group">
                     {{ form_label(orderCollectForm['urineColor']) }}
                     {{ form_widget(orderCollectForm['urineColor']) }}
+                </div>
+                <div class="form-group">
                     {{ form_label(orderCollectForm['urineClarity']) }}
                     {{ form_widget(orderCollectForm['urineClarity']) }}
-                {% endif %}
-                {% if order.orderType == 'stool' %}
-                    <h4>
-                        Bristol Stool Chart Questions
-                        <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
-                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                        </span>
-                    </h4>
-                    <p>Enter the participant provided answers to the following questions:</p>
+                </div>
+            {% endif %}
+            {% if order.orderType == 'stool' %}
+                <h4>
+                    Bristol Stool Chart Questions
+                    <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                    </span>
+                </h4>
+                <p>Enter the participant provided answers to the following questions:</p>
+                <div class="form-group">
                     {{ form_label(orderCollectForm['bowelType']) }}
                     {{ form_widget(orderCollectForm['bowelType']) }}
+                </div>
+                <div class="form-group">
                     {{ form_label(orderCollectForm['bowelQuality']) }}
                     {{ form_widget(orderCollectForm['bowelQuality']) }}
-                {% endif %}
-                <br>
+                </div>
             {% endif %}
             {{ form_rest(orderCollectForm) }}
-            <button type="submit" class="btn btn-primary" id="order_next_btn">Save and Close</button>
-            <a class="btn btn-default" href="#">Cancel</a>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="order_next_btn">Save and Close</button>
+                <a class="btn btn-default" href="#">Cancel</a>
+            </div>
             {{ form_end(orderCollectForm) }}
         </div>
     </div>
