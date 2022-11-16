@@ -105,7 +105,9 @@ class NphOrderController extends BaseController
         return $this->render('program/nph/order/collect.html.twig', [
             'order' => $order,
             'orderCollectForm' => $oderCollectForm->createView(),
-            'participant' => $participant
+            'participant' => $participant,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
         ]);
     }
 }

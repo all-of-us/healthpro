@@ -14,7 +14,8 @@
     </div>
     <div class="col-sm-6 text-center">
         <strong class="text-primary">
-            Module {{ order.module }} | Visit {{ order.visitType }} | {{ order.timepoint }} | {{ order.orderType }}
+            Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }} | {{ order
+            .orderType|capitalize }}
         </strong>
         <div><svg id="order-barcode"></svg></div>
     </div>
