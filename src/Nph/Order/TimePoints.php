@@ -51,7 +51,7 @@ class TimePoints
 
     public function getSamplesInformation(): array
     {
-        $module = 'module' . $this->module;
+        $module = 'Module' . $this->module;
         $file = __DIR__ . "/Samples/{$module}.json";
         if (!file_exists($file)) {
             throw new \Exception('Samples version file not found');
