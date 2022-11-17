@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Service\Nph\NphOrderService;
 use App\Service\SiteService;
@@ -87,5 +88,35 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->service->loadModules(1, 'LMT', 'P0000000005');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
         $this->assertSame($this->module1Data['formData'], $this->service->getExistingOrdersData());
+    }
+
+    public function testGetSamplesWithOrderIds()
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000006');
+        $this->service->createOrdersAndSamples($this->module1Data['formData']);
+
+        $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
+            'participantId' => 'P0000000006', 'visitType' => 'LMT'
+        ]);
+        $samplesWithOrderIds = $this->service->getSamplesWithOrderIds();
+        $timePointSamples = [
+            ['preLMT', 'saliva', 'SALIVA'],
+            ['preLMT', 'urine', 'URINES'],
+            ['preLMT', 'nail', 'NAILB'],
+            ['30min', 'blood', 'SST8P5'],
+        ];
+        foreach ($nphOrders as $nphOrder) {
+            foreach ($timePointSamples as $timePointSample) {
+                $timePoint = $timePointSample[0];
+                $sampleType = $timePointSample[1];
+                $sampleCode = $timePointSample[2];
+                if ($nphOrder->getTimepoint() === $timePoint) {
+                    if ($nphOrder->getOrderType() === $sampleType) {
+                        $this->assertSame($nphOrder->getOrderId(), $samplesWithOrderIds[$timePoint][$sampleCode]);
+                    }
+                }
+            }
+        }
     }
 }
