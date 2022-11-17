@@ -28,7 +28,7 @@ class NphOrderService
 
     private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
 
-    private static $placeholderSamples = ['nail', 'stool'];
+    private static $placeholderSamples = ['NAIL', 'STOOL'];
 
     public function __construct(
         EntityManagerInterface $em,
@@ -245,7 +245,7 @@ class NphOrderService
         $this->em->flush();
     }
 
-    public function createOrderWithSamples($timePoint, $orderType, $samples): void
+    private function createOrderWithSamples($timePoint, $orderType, $samples): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType);
         foreach ($samples as $sample) {
