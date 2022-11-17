@@ -27,16 +27,6 @@ class Samples
         return $this->visitObj->getSamples();
     }
 
-    public function getStoolSamples(): array
-    {
-        return $this->visitObj->getStoolSamples();
-    }
-
-    public function getNailSamples(): array
-    {
-        return $this->visitObj->getNailSamples();
-    }
-
     public function getSamplesByType($type): array
     {
         return $this->visitObj->getSamplesByType($type);

@@ -38,16 +38,6 @@ class TimePoints
         return $timePointSamples;
     }
 
-    public function getStoolSamples(): array
-    {
-        return $this->getSamplesByType('stool');
-    }
-
-    public function getNailSamples(): array
-    {
-        return $this->getSamplesByType('nail');
-    }
-
     public function getSampleType($sampleIdentifier): string
     {
         $samplesInfo = $this->getSamplesInformation();

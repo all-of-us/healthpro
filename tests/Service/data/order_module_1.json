@@ -104,5 +104,11 @@
     "ST2",
     "ST3",
     "ST4"
+  ],
+  "bloodSamples": [
+    "SST8P5",
+    "PST8",
+    "EDTA10",
+    "P800"
   ]
 }
