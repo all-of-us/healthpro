@@ -123,7 +123,8 @@ class NphSample
     public function setNphOrder(?NphOrder $nphOrder): self
     {
         $this->nphOrder = $nphOrder;
-
+        // This loads collection data in phpunit
+        $nphOrder->addNphSample($this);
         return $this;
     }
 
