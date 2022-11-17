@@ -2,7 +2,6 @@
 
 namespace App\Form\Nph;
 
-use App\Nph\Order\Samples;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -13,6 +12,7 @@ class NphOrderType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $ordersData = $builder->getData();
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
         foreach ($timePointSamples as $timePoint => $samples) {
@@ -23,7 +23,8 @@ class NphOrderType extends AbstractType
                         'required' => false,
                         'constraints' => new Constraints\Type('string'),
                         'attr' => [
-                            'placeholder' => 'Scan Kit ID'
+                            'placeholder' => 'Scan Kit ID',
+                            'disabled' => !empty($ordersData['stoolKit'])
                         ]
                     ]);
                 }
@@ -31,9 +32,11 @@ class NphOrderType extends AbstractType
                     $builder->add($sampleCode, Type\TextType::class, [
                         'label' => $sample,
                         'required' => false,
+                        'disabled' => !empty($ordersData[$sampleCode]),
                         'constraints' => new Constraints\Type('string'),
                         'attr' => [
-                            'placeholder' => 'Scan Tube'
+                            'placeholder' => 'Scan Tube',
+                            'disabled' => !empty($ordersData['stoolKit'])
                         ]
                     ]);
                     unset($samples[$sampleCode]);
@@ -44,7 +47,15 @@ class NphOrderType extends AbstractType
                 'multiple' => true,
                 'label' => $timePoints[$timePoint],
                 'choices' => array_flip($samples),
-                'required' => false
+                'required' => false,
+                'choice_attr' => function ($val) use ($ordersData, $timePoint) {
+                    $attr = [];
+                    if (isset($ordersData[$timePoint]) && in_array($val, $ordersData[$timePoint])) {
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                    }
+                    return $attr;
+                }
             ]);
         }
         return $builder->getForm();

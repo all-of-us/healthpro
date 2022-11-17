@@ -1,17 +1,38 @@
-{% macro form_widget(form, orderForm, nailSamples, stoolSamples) %}
-    {% for sample in form.children %}
+{% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds) %}
+    {% set formField = orderForm[timePoint] %}
+    {% for sample in formField.children %}
         {% if sample.vars.value in nailSamples %}
-            <div class="sub-samples nail-sub-samples">{{ form_widget(sample) }}</div>
-        {% elseif sample.vars.value == 'stool' %}
+            <div class="sub-samples nail-sub-samples">
+                {{ form_widget(sample) }}
+                {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
+                    {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value]) }}
+                {% endif %}
+            </div>
+        {% elseif sample.vars.value == 'STOOL' %}
             {{ form_widget(sample) }}
             {{ form_label(orderForm.stoolKit) }}
             {{ form_widget(orderForm.stoolKit) }}
+            <br>
             {% for stoolSample in stoolSamples %}
                 {{ form_label(orderForm[stoolSample]) }}
+                {% if samplesOrderIds[timePoint][stoolSample] is defined %}
+                    {{ _self.displayOrderId(samplesOrderIds[timePoint][stoolSample]) }}
+                {% endif %}
                 {{ form_widget(orderForm[stoolSample]) }}
+                <br>
             {% endfor %}
         {% else %}
             {{ form_widget(sample) }}
+            {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
+                {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value]) }}
+            {% endif %}
         {% endif %}
     {% endfor %}
+{% endmacro %}
+
+{% macro displayOrderId(orderId) %}
+    <div>
+        Order ID: <a href="#">{{ orderId }}</a>
+        <button class="btn btn-primary btn-xs">Reprint Labels</button>
+    </div>
 {% endmacro %}

@@ -2,116 +2,133 @@
   "version": "1",
   "notes": "Module 1 samples",
   "samplesInformation": {
-    "1SST8": {
+    "SST8P5": {
       "label": "8.5 mL SST",
       "color": "Red and gray",
       "temperature": "Refrigerated",
       "specimen": "Serum SST",
       "type": "blood",
+      "identifier": "SST8.5"
       "collectionVolume": "8.5 mL"
     },
-    "1PST8": {
+    "PST8": {
       "label": "8 mL PST",
       "color": "Green and gray",
       "temperature": "Refrigerated",
       "specimen": "Plasma PST",
       "type": "blood",
+      "identifier": "PST8"
       "collectionVolume": "8 mL"
     },
-    "1ED10": {
+    "EDTA10": {
       "label": "10 mL EDTA",
       "color": "Lavender",
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
       "type": "blood",
+      "identifier": "EDTA10"
       "collectionVolume": "10 mL"
     },
-    "1P8T2": {
+    "P800": {
       "label": "2 mL P800",
       "color": "Lavender",
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
       "type": "blood",
+      "identifier": "P800"
       "collectionVolume": "2 mL"
     },
-    "urine": {
+    "URINES": {
       "label": "Spot Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Urine",
       "type": "urine",
+      "identifier": "UrineS"
       "collectionVolume": "100 mL"
     },
-    "saliva": {
+    "SALIVA": {
       "label": "Saliva",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Saliva",
       "type": "saliva",
+      "identifier": "Saliva"
       "collectionVolume": "50 mL"
     },
-    "hair": {
+    "HAIR": {
       "label": "Hair",
       "color": "black",
       "temperature": "Refrigerated",
       "specimen": "Hair",
-      "type": "hair"
+      "type": "hair",
+      "identifier": "Hair"
     },
-    "nail": {
+    "NAIL": {
       "label": "Nail",
       "color": "White",
       "temperature": "Refrigerated",
       "specimen": "Nail",
-      "type": "nail"
+      "type": "nail",
+      "placeholder": true,
+      "identifier": "Nail"
     },
-    "NA1": {
+    "NAILB": {
       "label": "Big Toenails",
       "color": "White",
       "temperature": "Refrigerated",
       "specimen": "Nail",
-      "type": "nail"
+      "type": "nail",
+      "identifier": "Nail-B"
     },
-    "NA2": {
+    "NAILL": {
       "label": "Other Toenails",
       "color": "White",
       "temperature": "Refrigerated",
       "specimen": "Nail",
-      "type": "nail"
+      "type": "nail",
+      "identifier": "Nail-L"
     },
-    "stool": {
+    "STOOL": {
       "label": "Stool",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool"
+      "type": "stool",
+      "placeholder": true,
+      "identifier": "Stool"
     },
     "ST1": {
       "label": "95% Ethanol Tube 1",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool"
+      "type": "stool",
+      "identifier": "ST1"
     },
     "ST2": {
       "label": "95% Ethanol Tube 2",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool"
+      "type": "stool",
+      "identifier": "ST2"
     },
     "ST3": {
       "label": "DNA/RNA Shield Tube 1",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool"
+      "type": "stool",
+      "identifier": "ST3"
     },
     "ST4": {
       "label": "DNA/RNA Shield Tube 2",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool"
+      "type": "stool",
+      "identifier": "ST4"
     }
   }
 }
