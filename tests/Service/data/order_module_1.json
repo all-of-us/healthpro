@@ -110,5 +110,37 @@
     "PST8",
     "EDTA10",
     "P800"
-  ]
+  ],
+  "formData": {
+    "preLMT": [
+      "URINES",
+      "SALIVA",
+      "HAIR",
+      "NAIL",
+      "STOOL",
+      "NAILB",
+      "NAILL"
+    ],
+    "30min": [
+      "SST8P5",
+      "PST8",
+      "EDTA10",
+      "P800"
+    ],
+    "240min": [
+      "SST8P5",
+      "PST8",
+      "EDTA10",
+      "P800"
+    ],
+    "postLMT": [
+      "URINES",
+      "SALIVA"
+    ],
+    "stoolKit": "KIT-000000001",
+    "ST1": "T0000000001",
+    "ST2": "T0000000002",
+    "ST3": "T0000000003",
+    "ST4": "T0000000004"
+  }
 }
