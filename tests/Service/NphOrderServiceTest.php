@@ -31,4 +31,24 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($module1Data['bloodSamples'], $this->service->getSamplesByType('blood'));
         $this->assertSame($module1Data['nailSamples'], $this->service->getSamplesByType('nail'));
     }
+
+    /**
+     * @dataProvider sampleTypeDataProvider
+     */
+    public function testGetSampleType($sampleType, $sampleCode): void
+    {
+        $this->service->loadModules(1, 'LMT', 'P0000000001');
+        $this->assertSame($sampleType, $this->service->getSampleType($sampleCode));
+    }
+
+    public function sampleTypeDataProvider(): array
+    {
+        return [
+            ['nail', 'NAILB'],
+            ['blood', 'SST8P5'],
+            ['stool', 'ST2'],
+            ['urine', 'URINES'],
+            ['saliva', 'SALIVA']
+        ];
+    }
 }
