@@ -232,7 +232,7 @@ class NphOrderService
         return $nphOrder;
     }
 
-    public function createSample($sample, $nphOrder, $sampleId = null): void
+    public function createSample($sample, $nphOrder, $sampleId = null): NphSample
     {
         if ($sampleId === null) {
             $sampleId = $this->generateSampleId();
@@ -243,6 +243,7 @@ class NphOrderService
         $nphSample->setSampleCode($sample);
         $this->em->persist($nphSample);
         $this->em->flush();
+        return $nphSample;
     }
 
     private function createOrderWithSamples($timePoint, $orderType, $samples): void
@@ -274,6 +275,7 @@ class NphOrderService
             $this->em->persist($order);
             $this->em->flush();
         }
+        return $order;
     }
 
     public function getExistingOrderCollectionData($order): array

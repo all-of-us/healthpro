@@ -3,7 +3,6 @@
 namespace App\Tests\Service;
 
 use App\Entity\NphOrder;
-use App\Entity\NphSample;
 use App\Service\Nph\NphOrderService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -76,9 +75,8 @@ class NphOrderServiceTest extends ServiceTestCase
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000004');
         $nphOrder = $this->service->createOrder('preLMT', 'saliva');
-        $this->service->createSample('SALIVA', $nphOrder);
+        $nphSample = $this->service->createSample('SALIVA', $nphOrder);
 
-        $nphSample = $this->em->getRepository(NphSample::class)->findOneBy(['nphOrder' => $nphOrder]);
         $this->assertSame('SALIVA', $nphSample->getSampleCode());
     }
 
@@ -118,5 +116,34 @@ class NphOrderServiceTest extends ServiceTestCase
                 }
             }
         }
+    }
+
+    /**
+     * @dataProvider orderCollectionDataProvider
+     */
+    public function testSaveOrderCollection($timePoint, $orderType, $sampleCode, $collectedTs, $notes): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000004');
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+        $collectionFormData = [
+            "{$sampleCode}CollectedTs" => $collectedTs,
+            "{$sampleCode}Notes" => $notes,
+        ];
+        $this->service->saveOrderCollection($collectionFormData, $nphOrder);
+        $this->assertSame($collectedTs, $nphSample->getCollectedTs());
+        $this->assertSame($notes, $nphSample->getCollectedNotes());
+    }
+
+    public function orderCollectionDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2022-11-18');
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1'],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2'],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 3'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 4'],
+        ];
     }
 }
