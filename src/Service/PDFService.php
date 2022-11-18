@@ -38,7 +38,7 @@ class PDFService
                     'SpecimenID' => $specimenID,
                     'ModuleNum' => $moduleNum,
                     'TimePoint' => $timePoint,
-                    'SampleType' => $sampleCode,
+                    'SampleCode' => $sampleCode,
                     'VisitType' => $VisitType,
                     'CollectionVolume' => $collectionVolume
                 ])

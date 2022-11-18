@@ -8,7 +8,7 @@
       "temperature": "Refrigerated",
       "specimen": "Serum SST",
       "type": "blood",
-      "identifier": "SST8.5"
+      "identifier": "SST8.5",
       "collectionVolume": "8.5 mL"
     },
     "PST8": {
@@ -17,7 +17,7 @@
       "temperature": "Refrigerated",
       "specimen": "Plasma PST",
       "type": "blood",
-      "identifier": "PST8"
+      "identifier": "PST8",
       "collectionVolume": "8 mL"
     },
     "EDTA10": {
@@ -26,7 +26,7 @@
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
       "type": "blood",
-      "identifier": "EDTA10"
+      "identifier": "EDTA10",
       "collectionVolume": "10 mL"
     },
     "P800": {
@@ -35,7 +35,7 @@
       "temperature": "Refrigerated",
       "specimen": "Whole Blood EDTA",
       "type": "blood",
-      "identifier": "P800"
+      "identifier": "P800",
       "collectionVolume": "2 mL"
     },
     "URINES": {
@@ -44,7 +44,7 @@
       "temperature": "Refrigerated",
       "specimen": "Urine",
       "type": "urine",
-      "identifier": "UrineS"
+      "identifier": "UrineS",
       "collectionVolume": "100 mL"
     },
     "SALIVA": {
@@ -53,7 +53,7 @@
       "temperature": "Refrigerated",
       "specimen": "Saliva",
       "type": "saliva",
-      "identifier": "Saliva"
+      "identifier": "Saliva",
       "collectionVolume": "50 mL"
     },
     "HAIR": {
