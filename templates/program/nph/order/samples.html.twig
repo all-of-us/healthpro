@@ -8,7 +8,7 @@
                     {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value]) }}
                 {% endif %}
             </div>
-        {% elseif sample.vars.value == 'stool' %}
+        {% elseif sample.vars.value == 'STOOL' %}
             {{ form_widget(sample) }}
             {{ form_label(orderForm.stoolKit) }}
             {{ form_widget(orderForm.stoolKit) }}

@@ -48,6 +48,17 @@ class TimePoints
         return $this->getSamplesByType('nail');
     }
 
+    public function getSampleType($sampleIdentifier): string
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            if ($sampleIdentifier === $sampleCode) {
+                return $sample['type'];
+            }
+        }
+        return '';
+    }
+
     public function getSamplesInformation(): array
     {
         $module = 'module' . $this->module;
@@ -64,7 +75,7 @@ class TimePoints
         $samplesInfo = $this->getSamplesInformation();
         $samples = [];
         foreach ($samplesInfo as $sampleCode => $sample) {
-            if ($sample['type'] === $type && $sampleCode !== $type) {
+            if (empty($sample['placeholder']) && $sample['type'] === $type) {
                 $samples[] = $sampleCode;
             }
         }

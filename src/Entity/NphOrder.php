@@ -83,6 +83,16 @@ class NphOrder
      */
     private $nphSamples;
 
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $orderType;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $metadata;
+
     public function __construct()
     {
         $this->nphSamples = new ArrayCollection();
@@ -251,6 +261,30 @@ class NphOrder
                 $nphSample->setNphOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOrderType(): ?string
+    {
+        return $this->orderType;
+    }
+
+    public function setOrderType(string $orderType): self
+    {
+        $this->orderType = $orderType;
+
+        return $this;
+    }
+
+    public function getMetadata(): ?string
+    {
+        return $this->metadata;
+    }
+
+    public function setMetadata(?string $metadata): self
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }
