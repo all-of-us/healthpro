@@ -18,7 +18,7 @@ class NphOrderServiceTest extends ServiceTestCase
     {
         parent::setUp();
         $this->program = 'nph';
-        $this->login('test@example.com', ['nph-site-test'], 'America/Chicago');
+        $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
         $siteService = static::$container->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
         $this->service = static::$container->get(NphOrderService::class);
