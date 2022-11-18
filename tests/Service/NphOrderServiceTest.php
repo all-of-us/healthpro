@@ -90,7 +90,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testCreateOrder()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $this->service->loadModules(1, 'LMT', 'P0000000004');
         $nphOrder = $this->service->createOrder('preLMT', 'saliva');
         $this->assertSame('LMT', $nphOrder->getVisitType());
         $this->assertSame('preLMT', $nphOrder->getTimepoint());
@@ -100,7 +100,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testCreateSample()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000004');
+        $this->service->loadModules(1, 'LMT', 'P0000000005');
         $nphOrder = $this->service->createOrder('preLMT', 'saliva');
         $nphSample = $this->service->createSample('SALIVA', $nphOrder);
 
@@ -110,7 +110,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testCreateOrdersAndSamples()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000005');
+        $this->service->loadModules(1, 'LMT', 'P0000000006');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
         $this->assertSame($this->module1Data['formData'], $this->service->getExistingOrdersData());
     }
@@ -118,11 +118,11 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetSamplesWithOrderIds()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000006');
+        $this->service->loadModules(1, 'LMT', 'P0000000007');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
 
         $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
-            'participantId' => 'P0000000006', 'visitType' => 'LMT'
+            'participantId' => 'P0000000007', 'visitType' => 'LMT'
         ]);
         $samplesWithOrderIds = $this->service->getSamplesWithOrderIds();
         $timePointSamples = [
@@ -151,7 +151,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testSaveOrderCollection($timePoint, $orderType, $sampleCode, $collectedTs, $notes): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000004');
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
         $collectionFormData = [
@@ -175,5 +175,19 @@ class NphOrderServiceTest extends ServiceTestCase
             ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 3'],
             ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 4'],
         ];
+    }
+
+    public function testGenerateOrderAndSampleIds(): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
+
+        $orderId = $this->service->generateOrderId();
+        $this->assertSame(10, strlen($orderId));
+        $this->assertSame(false, strpos($orderId, 0));
+
+        $sampleId = $this->service->generateSampleId();
+        $this->assertSame(10, strlen($sampleId));
+        $this->assertSame(false, strpos($sampleId, 0));
     }
 }
