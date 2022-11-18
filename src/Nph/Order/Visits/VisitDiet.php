@@ -6,11 +6,11 @@ use App\Nph\Order\TimePoints;
 
 class VisitDiet extends TimePoints
 {
-    public $timePoints = [
+    protected $timePoints = [
         'day0' => 'Day 0'
     ];
 
-    public $timePointSampleTypes = [
+    protected $timePointSampleTypes = [
         'day0' => ['urine', 'saliva', 'blood']
     ];
 
