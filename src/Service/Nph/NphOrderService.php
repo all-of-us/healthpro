@@ -2,6 +2,7 @@
 
 namespace App\Service\Nph;
 
+use App\Audit\Log;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
@@ -229,6 +230,7 @@ class NphOrderService
         $nphOrder->setOrderType($orderType);
         $this->em->persist($nphOrder);
         $this->em->flush();
+        $this->loggerService->log(Log::NPH_ORDER_CREATE, $nphOrder->getId());
         return $nphOrder;
     }
 
@@ -243,6 +245,7 @@ class NphOrderService
         $nphSample->setSampleCode($sample);
         $this->em->persist($nphSample);
         $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_CREATE, $nphSample->getId());
         return $nphSample;
     }
 
@@ -268,12 +271,14 @@ class NphOrderService
             }
             $this->em->persist($nphSample);
             $this->em->flush();
+            $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
         }
         if ($order->getOrderType() === 'stool') {
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                 'bowelQuality']));
             $this->em->persist($order);
             $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
         }
         return $order;
     }
