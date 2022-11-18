@@ -128,12 +128,15 @@ class NphOrderServiceTest extends ServiceTestCase
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
         $collectionFormData = [
+            $sampleCode => true,
             "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => $notes,
         ];
         $this->service->saveOrderCollection($collectionFormData, $nphOrder);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($notes, $nphSample->getCollectedNotes());
+
+        $this->assertSame($collectionFormData, $this->service->getExistingOrderCollectionData($nphOrder));
     }
 
     public function orderCollectionDataProvider(): array
