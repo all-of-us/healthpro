@@ -3,8 +3,10 @@
 namespace App\Tests\Service;
 
 use App\Entity\NphOrder;
+use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\SiteService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class NphOrderServiceTest extends ServiceTestCase
@@ -20,7 +22,12 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
         $siteService = static::$container->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
-        $this->service = static::$container->get(NphOrderService::class);
+        $this->service =  new NphOrderService(
+            static::getContainer()->get(EntityManagerInterface::class),
+            static::getContainer()->get(UserService::class),
+            static::getContainer()->get(SiteService::class),
+            $this->createMock(LoggerService::class)
+        );
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
