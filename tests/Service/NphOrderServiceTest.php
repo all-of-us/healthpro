@@ -148,32 +148,61 @@ class NphOrderServiceTest extends ServiceTestCase
     /**
      * @dataProvider orderCollectionDataProvider
      */
-    public function testSaveOrderCollection($timePoint, $orderType, $sampleCode, $collectedTs, $notes): void
+    public function testSaveOrderCollection(
+        $timePoint,
+        $orderType,
+        $sampleCode,
+        $collectedTs,
+        $notes,
+        $metaData = []): void
     {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008');
-        $nphOrder = $this->service->createOrder($timePoint, $orderType);
-        $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+        if ($orderType === 'stool') {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
+            $nphSample = $this->service->createSample($sampleCode, $nphOrder, 'T0000000001');
+        } else {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType);
+            $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+        }
         $collectionFormData = [
             $sampleCode => true,
             "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => $notes,
         ];
+        if ($orderType === 'urine' || $orderType === 'stool') {
+            foreach ($metaData as $type => $data) {
+                $collectionFormData[$type] = $data;
+            }
+         }
         $this->service->saveOrderCollection($collectionFormData, $nphOrder);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($notes, $nphSample->getCollectedNotes());
-
         $this->assertSame($collectionFormData, $this->service->getExistingOrderCollectionData($nphOrder));
+
+        if ($metaData) {
+            $this->assertSame(json_encode($metaData), $this->service->jsonEncodeMetadata($collectionFormData,
+                array_keys($metaData)));
+        }
     }
 
     public function orderCollectionDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
+        $urineMetaData = [
+            'urineColor' => 1,
+            'urineClarity' => 'clean'
+        ];
+        $stoolMetaData = [
+            'bowelType' => 'difficult',
+            'bowelQuality' => 'normal'
+        ];
         return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1'],
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData],
             ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2'],
-            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 3'],
-            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 4'],
+            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', $stoolMetaData],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5'],
         ];
     }
 
@@ -184,10 +213,10 @@ class NphOrderServiceTest extends ServiceTestCase
 
         $orderId = $this->service->generateOrderId();
         $this->assertSame(10, strlen($orderId));
-        $this->assertSame(false, strpos($orderId, 0));
+        $this->assertNotEquals(0, $orderId[0]);
 
         $sampleId = $this->service->generateSampleId();
         $this->assertSame(10, strlen($sampleId));
-        $this->assertSame(false, strpos($sampleId, 0));
+        $this->assertNotEquals(0, $sampleId[0]);
     }
 }
