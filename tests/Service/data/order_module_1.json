@@ -1,0 +1,144 @@
+{
+  "timePoints": {
+    "preLMT": "Pre LMT",
+    "minus15min": "-15 Min",
+    "minus5min": "-5 Min",
+    "15min": "15 Min",
+    "30min": "30 Min",
+    "60min": "60 Min",
+    "90min": "90 Min",
+    "120min": "120 Min",
+    "240min": "240 Min",
+    "postLMT": "Post LMT"
+  },
+  "samples": {
+    "SST8P5": "8.5 mL SST",
+    "PST8": "8 mL PST",
+    "EDTA10": "10 mL EDTA",
+    "P800": "2 mL P800",
+    "URINES": "Spot Urine",
+    "SALIVA": "Saliva",
+    "HAIR": "Hair",
+    "NAIL": "Nail",
+    "NAILB": "Big Toenails",
+    "NAILL": "Other Toenails",
+    "STOOL": "Stool",
+    "ST1": "95% Ethanol Tube 1",
+    "ST2": "95% Ethanol Tube 2",
+    "ST3": "DNA/RNA Shield Tube 1",
+    "ST4": "DNA/RNA Shield Tube 2"
+  },
+  "timePointSamples": {
+    "preLMT": {
+      "URINES": "Spot Urine",
+      "SALIVA": "Saliva",
+      "HAIR": "Hair",
+      "NAIL": "Nail",
+      "NAILB": "Big Toenails",
+      "NAILL": "Other Toenails",
+      "STOOL": "Stool",
+      "ST1": "95% Ethanol Tube 1",
+      "ST2": "95% Ethanol Tube 2",
+      "ST3": "DNA/RNA Shield Tube 1",
+      "ST4": "DNA/RNA Shield Tube 2"
+    },
+    "minus15min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "minus5min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "15min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "30min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "60min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "90min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "120min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "240min": {
+      "SST8P5": "8.5 mL SST",
+      "PST8": "8 mL PST",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "postLMT": {
+      "URINES": "Spot Urine",
+      "SALIVA": "Saliva"
+    }
+  },
+  "nailSamples": [
+    "NAILB",
+    "NAILL"
+  ],
+  "stoolSamples": [
+    "ST1",
+    "ST2",
+    "ST3",
+    "ST4"
+  ],
+  "bloodSamples": [
+    "SST8P5",
+    "PST8",
+    "EDTA10",
+    "P800"
+  ],
+  "formData": {
+    "preLMT": [
+      "URINES",
+      "SALIVA",
+      "HAIR",
+      "NAILB",
+      "NAILL"
+    ],
+    "30min": [
+      "SST8P5",
+      "PST8",
+      "EDTA10",
+      "P800"
+    ],
+    "240min": [
+      "SST8P5",
+      "PST8",
+      "EDTA10",
+      "P800"
+    ],
+    "postLMT": [
+      "URINES",
+      "SALIVA"
+    ],
+    "stoolKit": "KIT-000000001",
+    "ST1": "T0000000001",
+    "ST2": "T0000000002",
+    "ST3": "T0000000003",
+    "ST4": "T0000000004"
+  }
+}

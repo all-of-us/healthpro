@@ -6,7 +6,7 @@ use App\Nph\Order\TimePoints;
 
 class VisitDSMT extends TimePoints
 {
-    public $timePoints = [
+    protected $timePoints = [
         'preDSMT' => 'Pre DSMT',
         'minus15min' => '-15 Min',
         'min5min' => '-5 Min',
@@ -19,7 +19,7 @@ class VisitDSMT extends TimePoints
         'postDSMT' => 'Post DSMT'
     ];
 
-    public $timePointSampleTypes = [
+    protected $timePointSampleTypes = [
         'preDSMT' => ['urine', 'saliva'],
         'postDSMT' => ['urine']
     ];

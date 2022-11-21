@@ -6,7 +6,7 @@ use App\Nph\Order\TimePoints;
 
 class VisitDLW extends TimePoints
 {
-    public $timePoints = [
+    protected $timePoints = [
         'day0PreDoseA' => 'Day 0 Pre Dose A',
         'day0PreDoseB' => 'Day 0 Pre Dose B',
         'day0PostDoseA' => 'Day 0 Post Dose A',
@@ -17,7 +17,7 @@ class VisitDLW extends TimePoints
         'day14F' => 'Day 14 F'
     ];
 
-    public $timePointSampleTypes = [
+    protected $timePointSampleTypes = [
         'day0PreDoseA' => ['urineDlw'],
         'day0PreDoseB' => ['urineDlw'],
         'day0PostDoseA' => ['urineDlw'],
