@@ -55,5 +55,4 @@ class TimePoints
         }
         return $samples;
     }
-
 }
