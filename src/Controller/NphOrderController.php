@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\NphOrder;
+use App\Entity\NphSample;
 use App\Form\Nph\NphOrderCollectType;
 use App\Form\Nph\NphOrderType;
+use App\Form\Nph\SampleLookupType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
@@ -113,5 +115,56 @@ class NphOrderController extends BaseController
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
         ]);
+    }
+
+    /**
+     * @Route("/samples/aliquot", name="nph_samples_aliquot")
+     */
+    public function sampleAliquotLookupAction(Request $request): Response
+    {
+        $sampleIdForm = $this->createForm(SampleLookupType::class, null);
+        $sampleIdForm->handleRequest($request);
+
+        if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
+            $id = $sampleIdForm->get('sampleId')->getData();
+
+            $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+                'sampleId' => $id
+            ]);
+            if ($sample) {
+                return $this->redirectToRoute('nph_sample_finalize', [
+                    'participantId' => $sample->getNphOrder()->getParticipantId(),
+                    'orderId' => $sample->getNphOrder()->getId(),
+                    'sampleId' => $sample->getId()
+                ]);
+            }
+            $this->addFlash('error', 'Order ID not found');
+        }
+
+        return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
+            'sampleIdForm' => $sampleIdForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/finalize", name="nph_sample_finalize")
+     */
+    public function sampleFinalizeAction(
+        $participantId,
+        $orderId,
+        $sampleId,
+        NphOrderService $nphOrderService,
+        ParticipantSummaryService $participantSummaryService,
+        Request $request
+    ): Response {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        dd($sampleId);
     }
 }
