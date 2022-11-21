@@ -43,16 +43,4 @@ class TimePoints
         $schema = json_decode(file_get_contents($file), true);
         return $schema['samplesInformation'];
     }
-
-    public function getSamplesByType($type): array
-    {
-        $samplesInfo = $this->getSamplesInformation();
-        $samples = [];
-        foreach ($samplesInfo as $sampleCode => $sample) {
-            if (empty($sample['placeholder']) && $sample['type'] === $type) {
-                $samples[] = $sampleCode;
-            }
-        }
-        return $samples;
-    }
 }
