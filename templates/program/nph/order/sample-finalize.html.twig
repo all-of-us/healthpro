@@ -6,7 +6,8 @@
     </div>
     <div class="row">
         <div class="col-sm-5">
-            {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+            {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
+                path('nph_samples_aliquot') } }) }}
             {{ form_widget(sampleIdForm) }}
             <p>
                 <button type="submit" class="btn btn-primary">Go</button>

@@ -138,7 +138,7 @@ class NphOrderController extends BaseController
                     'sampleId' => $sample->getId()
                 ]);
             }
-            $this->addFlash('error', 'Order ID not found');
+            $this->addFlash('error', 'Sample ID not found');
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
@@ -165,7 +165,7 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $sample = $this->em->getRepository(NphSample::class)->findOneBy($sampleId);
+        $sample = $this->em->getRepository(NphSample::class)->find($sampleId);
         if (empty($sample)) {
             throw $this->createNotFoundException('Sample not found.');
         }
