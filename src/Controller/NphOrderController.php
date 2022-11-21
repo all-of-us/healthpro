@@ -165,6 +165,18 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        dd($sampleId);
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy($sampleId);
+        if (empty($sample)) {
+            throw $this->createNotFoundException('Sample not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $sampleIdForm = $this->createForm(SampleLookupType::class, null);
+        return $this->render('program/nph/order/sample-finalize.html.twig', [
+            'sampleIdForm' => $sampleIdForm->createView(),
+            'sample' => $sample,
+            'participant' => $participant,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
+        ]);
     }
 }
