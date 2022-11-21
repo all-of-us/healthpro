@@ -100,8 +100,11 @@ class NphOrderController extends BaseController
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted() && $oderCollectForm->isValid()) {
             $formData = $oderCollectForm->getData();
-            $nphOrderService->saveOrderCollection($formData, $order);
-            $this->addFlash('success', 'Order collection saved');
+            if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                $this->addFlash('success', 'Order collection saved');
+            } else {
+                $this->addFlash('error', 'Order collection failed');
+            }
         }
         return $this->render('program/nph/order/collect.html.twig', [
             'order' => $order,

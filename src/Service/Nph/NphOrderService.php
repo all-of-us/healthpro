@@ -2,10 +2,10 @@
 
 namespace App\Service\Nph;
 
+use App\Audit\Log;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
-use App\Nph\Order\Samples;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -229,10 +229,11 @@ class NphOrderService
         $nphOrder->setOrderType($orderType);
         $this->em->persist($nphOrder);
         $this->em->flush();
+        $this->loggerService->log(Log::NPH_ORDER_CREATE, $nphOrder->getId());
         return $nphOrder;
     }
 
-    public function createSample($sample, $nphOrder, $sampleId = null): void
+    public function createSample($sample, $nphOrder, $sampleId = null): NphSample
     {
         if ($sampleId === null) {
             $sampleId = $this->generateSampleId();
@@ -243,6 +244,8 @@ class NphOrderService
         $nphSample->setSampleCode($sample);
         $this->em->persist($nphSample);
         $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_CREATE, $nphSample->getId());
+        return $nphSample;
     }
 
     private function createOrderWithSamples($timePoint, $orderType, $samples): void
@@ -267,13 +270,16 @@ class NphOrderService
             }
             $this->em->persist($nphSample);
             $this->em->flush();
+            $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
         }
         if ($order->getOrderType() === 'stool') {
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                 'bowelQuality']));
             $this->em->persist($order);
             $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
         }
+        return $order;
     }
 
     public function getExistingOrderCollectionData($order): array
