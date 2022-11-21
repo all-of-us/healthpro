@@ -6,9 +6,9 @@ use App\Nph\Order\Samples;
 
 class Module3 extends Samples
 {
-    public $module = 3;
+    private $module = 3;
 
-    public static $visitTypes = [
+    private static $visitTypes = [
         'OrangeDiet' => 'Orange Diet',
         'OrangeDLW' => 'Orange DLW',
         'OrangeDSMT' => 'Orange DSMT',
@@ -23,7 +23,7 @@ class Module3 extends Samples
         'PurpleLMT' => 'Purple LMT',
     ];
 
-    public $visitTypeMapper = [
+    private static $visitTypeMapper = [
         'OrangeDiet' => 'Diet',
         'OrangeDLW' => 'DLW',
         'OrangeDSMT' => 'DSMT',
@@ -43,8 +43,8 @@ class Module3 extends Samples
         if (!in_array($visit, array_keys(self::$visitTypes))) {
             throw new \Exception('Visit Type not supported');
         }
-        if (isset($this->visitTypeMapper[$visit])) {
-            $visit = $this->visitTypeMapper[$visit];
+        if (isset(self::$visitTypeMapper[$visit])) {
+            $visit = self::$visitTypeMapper[$visit];
         }
         parent::__construct($this->module, $visit);
     }

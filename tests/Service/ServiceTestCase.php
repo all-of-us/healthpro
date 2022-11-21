@@ -19,6 +19,7 @@ abstract class ServiceTestCase extends KernelTestCase
     protected $session;
     protected $request;
     protected $requestStack;
+    protected $program = 'hpo';
 
     public function setUp(): void
     {
@@ -58,7 +59,7 @@ abstract class ServiceTestCase extends KernelTestCase
 
         $this->session->set('_security_main', serialize($token));
         $this->session->set('isLoginReturn', true);
-        $this->session->set('program', 'hpo');
+        $this->session->set('program', $this->program);
         $this->session->save();
     }
 }

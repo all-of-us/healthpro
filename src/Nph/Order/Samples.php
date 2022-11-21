@@ -4,7 +4,7 @@ namespace App\Nph\Order;
 
 class Samples
 {
-    public $visitObj;
+    private $visitObj;
 
     public function __construct($module, $visit)
     {
@@ -12,38 +12,51 @@ class Samples
         $this->visitObj = new $visitClass($module);
     }
 
+    public function getTimePoints(): array
+    {
+        return $this->visitObj->getTimePoints();
+    }
+
     public function getTimePointSamples(): array
     {
         return $this->visitObj->getTimePointSamples();
     }
 
-    public function getTimePoints(): array
-    {
-        return $this->visitObj->timePoints;
-    }
-
     public function getSamples(): array
     {
-        return $this->visitObj->getSamples();
-    }
-
-    public function getStoolSamples(): array
-    {
-        return $this->visitObj->getStoolSamples();
-    }
-
-    public function getNailSamples(): array
-    {
-        return $this->visitObj->getNailSamples();
+        $samplesInfo = $this->getSamplesInformation();
+        $samples = [];
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            $samples[$sampleCode] = $sample['label'];
+        }
+        return $samples;
     }
 
     public function getSamplesByType($type): array
     {
-        return $this->visitObj->getSamplesByType($type);
+        $samplesInfo = $this->getSamplesInformation();
+        $samples = [];
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            if (empty($sample['placeholder']) && $sample['type'] === $type) {
+                $samples[] = $sampleCode;
+            }
+        }
+        return $samples;
     }
 
-    public function getSampleType($sample): string
+    public function getSampleType($sampleIdentifier): string
     {
-        return $this->visitObj->getSampleType($sample);
+        $samplesInfo = $this->getSamplesInformation();
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            if ($sampleIdentifier === $sampleCode) {
+                return $sample['type'];
+            }
+        }
+        return '';
+    }
+
+    public function getSamplesInformation(): array
+    {
+        return $this->visitObj->getSamplesInformation();
     }
 }

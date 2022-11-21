@@ -45,7 +45,8 @@ class NphOrderController extends BaseController
         $oderForm = $this->createForm(
             NphOrderType::class,
             $ordersData,
-            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' => $nphOrderService->getStoolSamples()]
+            ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
+                $nphOrderService->getSamplesByType('stool')]
         );
         $oderForm->handleRequest($request);
         if ($oderForm->isSubmitted() && $oderForm->isValid()) {
@@ -64,8 +65,8 @@ class NphOrderController extends BaseController
             'visit' => $visit,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'stoolSamples' => $nphOrderService->getStoolSamples(),
-            'nailSamples' => $nphOrderService->getNailSamples(),
+            'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
+            'nailSamples' => $nphOrderService->getSamplesByType('nail'),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds()
         ]);
     }
@@ -99,8 +100,11 @@ class NphOrderController extends BaseController
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted() && $oderCollectForm->isValid()) {
             $formData = $oderCollectForm->getData();
-            $nphOrderService->saveOrderCollection($formData, $order);
-            $this->addFlash('success', 'Order collection saved');
+            if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                $this->addFlash('success', 'Order collection saved');
+            } else {
+                $this->addFlash('error', 'Order collection failed');
+            }
         }
         return $this->render('program/nph/order/collect.html.twig', [
             'order' => $order,

@@ -2,10 +2,10 @@
 
 namespace App\Service\Nph;
 
+use App\Audit\Log;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
-use App\Nph\Order\Samples;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -28,7 +28,7 @@ class NphOrderService
 
     private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
 
-    private static $placeholderSamples = ['nail', 'stool'];
+    private static $placeholderSamples = ['NAIL', 'STOOL'];
 
     public function __construct(
         EntityManagerInterface $em,
@@ -70,16 +70,6 @@ class NphOrderService
         return $this->moduleObj->getSamples();
     }
 
-    public function getStoolSamples(): array
-    {
-        return $this->moduleObj->getStoolSamples();
-    }
-
-    public function getNailSamples(): array
-    {
-        return $this->moduleObj->getNailSamples();
-    }
-
     public function getSamplesByType($type): array
     {
         return $this->moduleObj->getSamplesByType($type);
@@ -112,7 +102,7 @@ class NphOrderService
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
-                if (in_array($sample->getSampleCode(), $this->getStoolSamples())) {
+                if (in_array($sample->getSampleCode(), $this->getSamplesByType('stool'))) {
                     if ($addStoolKit) {
                         $ordersData['stoolKit'] = $order->getOrderId();
                         $addStoolKit = false;
@@ -197,7 +187,7 @@ class NphOrderService
                 if (in_array($timePoint, self::$nonBloodTimePoints)) {
                     $nailSamples = [];
                     foreach ($samples as $sample) {
-                        if (in_array($sample, $this->getNailSamples())) {
+                        if (in_array($sample, $this->getSamplesByType('nail'))) {
                             $nailSamples[] = $sample;
                         } elseif (!in_array($sample, self::$placeholderSamples)) {
                             $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
@@ -216,7 +206,7 @@ class NphOrderService
         if (!empty($formData['stoolKit'])) {
             // TODO: dynamically load stool visit type
             $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
-            foreach ($this->getStoolSamples() as $stoolSample) {
+            foreach ($this->getSamplesByType('stool') as $stoolSample) {
                 $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
             }
         }
@@ -239,10 +229,11 @@ class NphOrderService
         $nphOrder->setOrderType($orderType);
         $this->em->persist($nphOrder);
         $this->em->flush();
+        $this->loggerService->log(Log::NPH_ORDER_CREATE, $nphOrder->getId());
         return $nphOrder;
     }
 
-    public function createSample($sample, $nphOrder, $sampleId = null): void
+    public function createSample($sample, $nphOrder, $sampleId = null): NphSample
     {
         if ($sampleId === null) {
             $sampleId = $this->generateSampleId();
@@ -253,9 +244,11 @@ class NphOrderService
         $nphSample->setSampleCode($sample);
         $this->em->persist($nphSample);
         $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_CREATE, $nphSample->getId());
+        return $nphSample;
     }
 
-    public function createOrderWithSamples($timePoint, $orderType, $samples): void
+    private function createOrderWithSamples($timePoint, $orderType, $samples): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType);
         foreach ($samples as $sample) {
@@ -277,13 +270,16 @@ class NphOrderService
             }
             $this->em->persist($nphSample);
             $this->em->flush();
+            $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
         }
         if ($order->getOrderType() === 'stool') {
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                 'bowelQuality']));
             $this->em->persist($order);
             $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
         }
+        return $order;
     }
 
     public function getExistingOrderCollectionData($order): array

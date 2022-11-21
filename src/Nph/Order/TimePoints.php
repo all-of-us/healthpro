@@ -4,20 +4,15 @@ namespace App\Nph\Order;
 
 class TimePoints
 {
-    public $module;
+    protected $module;
 
-    public $timePoints;
+    protected $timePoints;
 
-    public $timePointSampleTypes;
+    protected $timePointSampleTypes;
 
-    public function getSamples(): array
+    public function getTimePoints(): array
     {
-        $samplesInfo = $this->getSamplesInformation();
-        $samples = [];
-        foreach ($samplesInfo as $sampleCode => $sample) {
-            $samples[$sampleCode] = $sample['label'];
-        }
-        return $samples;
+        return $this->timePoints;
     }
 
     public function getTimePointSamples(): array
@@ -38,47 +33,14 @@ class TimePoints
         return $timePointSamples;
     }
 
-    public function getStoolSamples(): array
-    {
-        return $this->getSamplesByType('stool');
-    }
-
-    public function getNailSamples(): array
-    {
-        return $this->getSamplesByType('nail');
-    }
-
-    public function getSampleType($sampleIdentifier): string
-    {
-        $samplesInfo = $this->getSamplesInformation();
-        foreach ($samplesInfo as $sampleCode => $sample) {
-            if ($sampleIdentifier === $sampleCode) {
-                return $sample['type'];
-            }
-        }
-        return '';
-    }
-
     public function getSamplesInformation(): array
     {
-        $module = 'module' . $this->module;
+        $module = 'Module' . $this->module;
         $file = __DIR__ . "/Samples/{$module}.json";
         if (!file_exists($file)) {
             throw new \Exception('Samples version file not found');
         }
         $schema = json_decode(file_get_contents($file), true);
         return $schema['samplesInformation'];
-    }
-
-    public function getSamplesByType($type): array
-    {
-        $samplesInfo = $this->getSamplesInformation();
-        $samples = [];
-        foreach ($samplesInfo as $sampleCode => $sample) {
-            if (empty($sample['placeholder']) && $sample['type'] === $type) {
-                $samples[] = $sampleCode;
-            }
-        }
-        return $samples;
     }
 }
