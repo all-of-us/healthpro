@@ -31,7 +31,7 @@ class PDFService
     private function renderPDF(string $name, string $orderID, \DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
     {
         $this->mpdf->WriteHTML(
-            $this->twig->render('program/nph/PDF/biospecimenLabel.html.twig', [
+            $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
                     'PatientName' => $name,
                     'OrderID' => $orderID,
                     'dob' => $DOB->format('Y-m-d'),

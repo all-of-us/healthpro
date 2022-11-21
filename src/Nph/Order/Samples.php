@@ -60,13 +60,18 @@ class Samples
         return $this->visitObj->getSamplesInformation();
     }
 
-    public function getSampleLabelFromCode($sampleCode): string
+    public function getSampleLabelFromCode(string $sampleCode): string
     {
-        return $this->visitObj->getSampleLabelFromCode($sampleCode);
+        $samplesInfo = $this->getSamplesInformation();
+        return $samplesInfo[$sampleCode]['label'];
     }
 
     public function getSampleCollectionVolumeFromCode(string $sampleCode): string
     {
-        return $this->visitObj->getSampleCollectionVolumeFromCode($sampleCode);
+        $samplesInfo = $this->getSamplesInformation();
+        if (key_exists('collectionVolume', $samplesInfo[$sampleCode])) {
+            return $samplesInfo[$sampleCode]['collectionVolume'];
+        }
+        return "";
     }
 }
