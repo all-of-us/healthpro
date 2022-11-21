@@ -48,6 +48,13 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit', action:
+                        path('nph_samples_aliquot') } }) }}
+                    {{ form_widget(sampleFinalizeForm) }}
+                    <p>
+                        <button type="submit" class="btn btn-primary">Go</button>
+                    </p>
+                    {{ form_end(sampleFinalizeForm) }}
                 </div>
             </div>
         </div>

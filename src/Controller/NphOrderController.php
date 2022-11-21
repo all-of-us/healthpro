@@ -6,7 +6,8 @@ use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphOrderCollectType;
 use App\Form\Nph\NphOrderType;
-use App\Form\Nph\SampleLookupType;
+use App\Form\Nph\NphSampleFinalizeType;
+use App\Form\Nph\NphSampleLookupType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
@@ -122,7 +123,7 @@ class NphOrderController extends BaseController
      */
     public function sampleAliquotLookupAction(Request $request): Response
     {
-        $sampleIdForm = $this->createForm(SampleLookupType::class, null);
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleIdForm->handleRequest($request);
 
         if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
@@ -170,9 +171,16 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Sample not found.');
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
-        $sampleIdForm = $this->createForm(SampleLookupType::class, null);
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleFinalizeForm = $this->createForm(
+            NphSampleFinalizeType::class,
+            null,
+            ['sample' => $sample->getSampleCode(), 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
+                ->getTimezone()]
+        );
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
+            'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
             'sample' => $sample,
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),

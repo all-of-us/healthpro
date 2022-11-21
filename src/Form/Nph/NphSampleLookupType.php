@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class SampleLookupType extends AbstractType
+class NphSampleLookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
