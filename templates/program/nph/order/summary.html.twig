@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello NphParticipantSummaryController!{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-sm-6">
+            {% include 'program/nph/order/partials/participant-dl.html.twig' %}
+        </div>
+        <div class="col-sm-6">
+            <div class="alert well-sm bg-warning-new">Module | NPH Module {{ module }}</div>
+            <div class="alert well-sm bg-primary">Visit | {{ visit }}</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <table class="table table-small table-striped table-bordered table-auto-width">
+                <tr class="">
+                    <th>Order ID</th>
+                    <th>Timepoint</th>
+                    <th>Sample Type</th>
+                    <th>Samples</th>
+                    <th>Sample ID</th>
+                </tr>
+                {% for timepointName,timepoint in orderSummary %}
+                    {% for samplecode,sampleInfo in timepoint %}
+                        <tr>
+                            <td>{{ sampleInfo.OrderID }}</td>
+                            <td>{{ timepointName }}</td>
+                            <td>{{ samplecode }}</td>
+                            <td>{{ sampleInfo.SampleName }}</td>
+                            <td>{{ sampleInfo.SampleID }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-sm-6" style="height: 600px">
+                <embed style="height: 100%; width: 100%" src="{{ path('nph_render_pdf', {'participantid': participant.id,'module': module,'visit': visit}) }}">
+        </div>
+    </div>
+{% endblock %}

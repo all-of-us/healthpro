@@ -114,4 +114,21 @@ class NphOrderController extends BaseController
             'samples' => $nphOrderService->getSamples(),
         ]);
     }
+
+    /**
+     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/OrderSummary", name="nph_order_summary")
+     */
+    public function orderSummary($participantId, $module, $visit, ParticipantSummaryService $participantSummaryService, NphOrderService $nphOrderService): Response
+    {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        $nphOrderService->loadModules($module, $visit, $participantId);
+        $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit);
+        return $this->render(
+            'program/nph/order/summary.html.twig',
+            ['participant' => $participant,
+             'orderSummary' => $orderInfo,
+                'module' => $module,
+                'visit' => $visit]
+        );
+    }
 }
