@@ -65,7 +65,7 @@ class NphOrderForm extends AbstractType
                 ])
             ],
             'attr' => [
-                'class' => 'order-collected-ts',
+                'class' => 'order-ts',
             ]
         ]);
         $builder->add("{$sample}Notes", Type\TextareaType::class, [

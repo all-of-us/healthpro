@@ -51,7 +51,7 @@ class NphSampleFinalize extends NphOrderForm
                         ])
                     ],
                     'attr' => [
-                        'class' => 'sample-aliquot-ts',
+                        'class' => 'order-ts',
                     ]
                 ]);
 
