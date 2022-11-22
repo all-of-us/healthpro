@@ -177,7 +177,7 @@ class NphOrderController extends BaseController
             NphSampleFinalize::class,
             null,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
-                ->getTimezone(), 'aliquotIdentifiers' => $nphOrderService->getAliquotIdentifiers($sampleCode)]
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode)]
         );
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
@@ -186,6 +186,7 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
+            'aliquots' => $nphOrderService->getAliquots($sampleCode)
         ]);
     }
 }

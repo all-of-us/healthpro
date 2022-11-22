@@ -80,9 +80,9 @@ class NphOrderService
         return $this->moduleObj->getSampleType($sampleCode);
     }
 
-    public function getAliquotIdentifiers($sampleCode): ?array
+    public function getAliquots($sampleCode): ?array
     {
-        return $this->moduleObj->getAliquotIdentifiers($sampleCode);
+        return $this->moduleObj->getAliquots($sampleCode);
     }
 
     public function getSamplesWithLabels($samplesObj): array

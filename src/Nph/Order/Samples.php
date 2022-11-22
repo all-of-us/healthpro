@@ -55,12 +55,12 @@ class Samples
         return '';
     }
 
-    public function getAliquotIdentifiers(string $sampleIdentifier): ?array
+    public function getAliquots(string $sampleIdentifier): ?array
     {
         $samplesInfo = $this->getSamplesInformation();
         foreach ($samplesInfo as $sampleCode => $sample) {
             if ($sampleIdentifier === $sampleCode) {
-                return $sample['aliquotIdentifiers'];
+                return $sample['aliquots'];
             }
         }
         return null;

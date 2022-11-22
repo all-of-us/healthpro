@@ -24,7 +24,7 @@ class NphSampleFinalize extends NphOrderForm
             $this->addStoolMetadataFields($builder);
         }
 
-        foreach ($options['aliquotIdentifiers'] as $aliquotCode => $aliquot) {
+        foreach ($options['aliquots'] as $aliquotCode => $aliquot) {
             for($i = 0; $i < $aliquot['expectedAliquots']; $i++) {
                 $builder->add("{$aliquotCode}_{$i}", Type\TextType::class, [
                     'label' => $aliquot['container'],
@@ -72,7 +72,7 @@ class NphSampleFinalize extends NphOrderForm
             'sample' => null,
             'orderType' => null,
             'timeZone' => null,
-            'aliquotIdentifiers' => null
+            'aliquots' => null
         ]);
     }
 }

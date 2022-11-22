@@ -16,13 +16,13 @@
         </div>
         <div class="col-sm-7">
             {% set order = sample.nphOrder %}
+            {% set sampleCode =  sample.sampleCode %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="pull-right">
                         <strong class="text-primary">
                             Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
-                            | {{ order
-                            .orderType|capitalize }}
+                            | {{ samples[sampleCode]}}
                         </strong>
                         <dl class="dl-horizontal">
                             <dt>Order ID</dt>
@@ -50,6 +50,70 @@
                 <div class="panel-body">
                     {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit', action:
                         path('nph_samples_aliquot') } }) }}
+                    <div class="form-group">
+                        {{ form_label(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
+                        {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
+                    </div>
+                    <hr>
+                    <label>
+                        Color and Clarity
+                        <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
+                    </label>
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            {{ form_label(sampleFinalizeForm['urineColor']) }}
+                            {{ form_widget(sampleFinalizeForm['urineColor']) }}
+                        </div>
+                        <div class="form-group col-sm-6">
+                            {{ form_label(sampleFinalizeForm['urineClarity']) }}
+                            {{ form_widget(sampleFinalizeForm['urineClarity']) }}
+                        </div>
+                    </div>
+                    <hr>
+                    <label>Aliquot</label>
+                    <table class="table table-samples">
+                        <thead>
+                        <tr>
+                            <td class="col-md-5">Matrix Aliquot Tube/Aliquot Container</td>
+                            <td class="col-md-3">Aliquot Time</td>
+                            <td class="col-md-2">Volume</td>
+                            <td class="col-md-1"></td>
+                            <td class="col-md-1"></td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for aliquotCode, aliquot in aliquots %}
+                                <tr>
+                                    <td colspan="4">
+                                        {{ aliquot['container'] }}
+                                    </td>
+                                </tr>
+                                {% for i in range(0, aliquot['expectedAliquots']-1) %}
+                                    <tr>
+                                        <td>
+                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ '_' ~ i]) }}
+                                        </td>
+                                        <td>
+                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs_' ~ i]) }}
+                                        </td>
+                                        <td>
+                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume_' ~ i]) }}
+                                        </td>
+                                        <td>
+                                            {{ aliquot['units'] }}
+                                        </td>
+                                        <td>
+                                            <i class="fa fa-eraser" role="button"></i>
+                                            <i class="fa fa-trash" role="button"></i>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <hr>
                     {{ form_widget(sampleFinalizeForm) }}
                     <p>
                         <button type="submit" class="btn btn-primary">Go</button>
