@@ -10,22 +10,22 @@
       "type": "blood",
       "identifier": "SST8.5",
       "collectionVolume": "8.5 mL",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "SST8P5A1": {
           "identifier": "SSTS1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "uL"
         },
-        {
+        "SST8P5A2": {
           "identifier": "SSTS1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
           "units": "uL"
         }
-      ]
+      }
     },
     "PST8": {
       "label": "8 mL PST",
@@ -35,22 +35,22 @@
       "type": "blood",
       "identifier": "PST8",
       "collectionVolume": "8 mL",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "PST8A1": {
           "identifier": "LHPSTP1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "uL"
         },
-        {
+        "PST8A2": {
           "identifier": "LHPSTP1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
           "units": "uL"
         }
-      ]
+      }
     },
     "EDTA10": {
       "label": "10 mL EDTA",
@@ -60,22 +60,22 @@
       "type": "blood",
       "identifier": "EDTA10",
       "collectionVolume": "10 mL",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "EDTA10A1": {
           "identifier": "EDPAP1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "uL"
         },
-        {
+        "EDTA10A2": {
           "identifier": "EDPAP1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 4,
           "expectedVolume": 1000,
           "units": "uL"
         }
-      ]
+      }
     },
     "P800": {
       "label": "2 mL P800",
@@ -85,15 +85,15 @@
       "type": "blood",
       "identifier": "P800",
       "collectionVolume": "2 mL",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "P800A1": {
           "identifier": "P800P1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 500,
           "units": "uL"
         }
-      ]
+      }
     },
     "URINES": {
       "label": "Spot Urine",
@@ -103,22 +103,22 @@
       "type": "urine",
       "identifier": "UrineS",
       "collectionVolume": "100 mL",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "URINESA1": {
           "identifier": "RU1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 7,
           "expectedVolume": 500,
           "units": "uL"
         },
-        {
+        "URINESA2": {
           "identifier": "RU2",
           "container": "6mL Urine Aliquot tube",
           "expectedAliquots": 1,
           "expectedVolume": 5,
           "units": "mL"
         }
-      ]
+      }
     },
     "SALIVA": {
       "label": "Saliva",
@@ -128,15 +128,15 @@
       "type": "saliva",
       "identifier": "Saliva",
       "collectionVolume": "50 mL",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "SALIVAA1": {
           "identifier": "SA1",
           "container": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 4,
           "units": "mL"
         }
-      ]
+      }
     },
     "HAIR": {
       "label": "Hair",
@@ -145,15 +145,15 @@
       "specimen": "Hair",
       "type": "hair",
       "identifier": "Hair",
-      "aliquotIdentifiers": [
-        {
-          "identifier": "SA1",
+      "aliquotIdentifiers": {
+        "HAIRA1": {
+          "identifier": "HA1",
           "container": "Plastic Storage Bag",
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null
         }
-      ]
+      }
     },
     "NAIL": {
       "label": "Nail",
@@ -171,15 +171,15 @@
       "specimen": "Nail",
       "type": "nail",
       "identifier": "Nail-B",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "NAILBA1": {
           "identifier": "NA1",
           "container": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null
         }
-      ]
+      }
     },
     "NAILL": {
       "label": "Other Toenails",
@@ -188,15 +188,15 @@
       "specimen": "Nail",
       "type": "nail",
       "identifier": "Nail-L",
-      "aliquotIdentifiers": [
-        {
+      "aliquotIdentifiers": {
+        "NAILLA1": {
           "identifier": "NA2",
           "container": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null
         }
-      ]
+      }
     },
     "STOOL": {
       "label": "Stool",
