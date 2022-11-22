@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
-use App\Form\Nph\NphOrderCollectType;
+use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
-use App\Form\Nph\NphSampleFinalizeType;
+use App\Form\Nph\NphSampleFinalize;
 use App\Form\Nph\NphSampleLookupType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
@@ -96,7 +96,7 @@ class NphOrderController extends BaseController
         $sampleLabels = $nphOrderService->getSamplesWithLabels($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
-            NphOrderCollectType::class,
+            NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
         );
@@ -173,7 +173,7 @@ class NphOrderController extends BaseController
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleFinalizeForm = $this->createForm(
-            NphSampleFinalizeType::class,
+            NphSampleFinalize::class,
             null,
             ['sample' => $sample->getSampleCode(), 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone()]
