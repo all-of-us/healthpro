@@ -55,6 +55,17 @@ class Samples
         return '';
     }
 
+    public function getAliquotIdentifiers(string $sampleIdentifier): ?array
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            if ($sampleIdentifier === $sampleCode) {
+                return $sample['aliquotIdentifiers'];
+            }
+        }
+        return null;
+    }
+
     public function getSamplesInformation(): array
     {
         return $this->visitObj->getSamplesInformation();

@@ -75,9 +75,14 @@ class NphOrderService
         return $this->moduleObj->getSamplesByType($type);
     }
 
-    public function getSampleType($sample): string
+    public function getSampleType($sampleCode): string
     {
-        return $this->moduleObj->getSampleType($sample);
+        return $this->moduleObj->getSampleType($sampleCode);
+    }
+
+    public function getAliquotIdentifiers($sampleCode): ?array
+    {
+        return $this->moduleObj->getAliquotIdentifiers($sampleCode);
     }
 
     public function getSamplesWithLabels($samplesObj): array

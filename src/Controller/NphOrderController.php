@@ -172,11 +172,12 @@ class NphOrderController extends BaseController
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleCode = $sample->getSampleCode();
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalize::class,
             null,
-            ['sample' => $sample->getSampleCode(), 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
-                ->getTimezone()]
+            ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
+                ->getTimezone(), 'aliquotIdentifiers' => $nphOrderService->getAliquotIdentifiers($sampleCode)]
         );
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
