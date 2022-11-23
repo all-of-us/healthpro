@@ -1,5 +1,9 @@
 $(document).ready(function () {
     $('#labels-loaded').hide();
+    if ($('iframe[name="labels"]')[0].contentWindow.document.readyState === 'complete') {
+        $('#labels-loading').hide();
+        $('#labels-loaded').show();
+    }
     $('iframe[name=labels]').on('load', function () {
         try {
             if (typeof window.labels.print === 'function') {

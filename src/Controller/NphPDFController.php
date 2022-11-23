@@ -17,7 +17,7 @@ class NphPDFController extends AbstractController
      */
     public function render_pdf($participantid, $module, $visit, PDFService $PDF, NphOrderService $nphOrderService, ParticipantSummaryService $participantSummaryService): Response
     {
-        $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantid, $module, $visit), $participantSummaryService->getParticipantById($participantid), $module, $visit);
+        $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantid, $module, $visit)['order'], $participantSummaryService->getParticipantById($participantid), $module, $visit);
         return new Response($OrderPDF, Response::HTTP_OK, ['content-type' => 'application/pdf']);
     }
 }

@@ -126,9 +126,10 @@ class NphOrderController extends BaseController
         return $this->render(
             'program/nph/order/summary.html.twig',
             ['participant' => $participant,
-             'orderSummary' => $orderInfo,
+             'orderSummary' => $orderInfo['order'],
                 'module' => $module,
-                'visit' => $visit]
+                'visit' => $visit,
+                'sampleCount' => $orderInfo['sampleCount']]
         );
     }
 }

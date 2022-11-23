@@ -45,26 +45,26 @@ class PDFService
         );
     }
 
-    //TODO: Refactor to work off shyams NPHOrderService->getExistingOrdersData
     public function batchPDF(array $OrderSummary, Participant $participant, string $module, string $visit): string
     {
-        foreach ($OrderSummary as $timePoint => $timePointSample) {
-            foreach ($timePointSample as $sampleCode => $sampleInfo) {
-                $timePoint = str_replace('minus', '-', $timePoint);
-                try {
-                    $this->renderPDF(
-                        $participant->firstName . ' ' . $participant->lastName,
-                        $sampleInfo['OrderID'],
-                        $participant->dob,
-                        $sampleInfo['SampleID'],
-                        $module,
-                        $timePoint,
-                        $sampleCode,
-                        $visit,
-                        $sampleInfo['SampleCollectionVolume']
-                    );
-                } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
-                    return "Unable to render PDF";
+        foreach ($OrderSummary as $timePoint => $timePointOrder) {
+            foreach ($timePointOrder as $orderID => $sampleInfo) {
+                foreach ($sampleInfo as $sampleCode => $sample) {
+                    try {
+                        $this->renderPDF(
+                            $participant->firstName . ' ' . $participant->lastName,
+                            $orderID,
+                            $participant->dob,
+                            $sample['SampleID'],
+                            $module,
+                            $sample['TimepointDisplayName'],
+                            $sampleCode,
+                            $visit,
+                            $sample['SampleCollectionVolume']
+                        );
+                    } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
+                        return "Unable to render PDF";
+                    }
                 }
             }
         }
