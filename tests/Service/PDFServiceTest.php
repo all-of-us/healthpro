@@ -13,13 +13,16 @@ class PDFServiceTest extends ServiceTestCase
     {
         return [
             'minus15min' => [
-                'SST8P5' => [
-                    'SampleID' => '9292338307',
-                    'SampleName' => '8.5 mL SST',
-                    'OrderID' => '6505378640',
-                    'SampleCollectionVolume' => '8.5 mL'
+                    '6505378640' => [
+                        'SST8P5' => [
+                            'SampleID' => '9292338307',
+                            'SampleName' => '8.5 mL SST',
+                            'OrderID' => '6505378640',
+                            'SampleCollectionVolume' => '8.5 mL',
+                            'TimepointDisplayName' => '-15 min',
+                        ]
+                    ]
                 ]
-            ]
         ];
     }
 
