@@ -55,23 +55,25 @@
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                     </div>
                     <hr>
-                    <label>
-                        Color and Clarity
-                        <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                    {% if order.orderType == 'urine' %}
+                        <label>
+                            Color and Clarity
+                            <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
-                    </label>
-                    <div class="row">
-                        <div class="form-group col-sm-6">
-                            {{ form_label(sampleFinalizeForm['urineColor']) }}
-                            {{ form_widget(sampleFinalizeForm['urineColor']) }}
+                        </label>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                {{ form_label(sampleFinalizeForm['urineColor']) }}
+                                {{ form_widget(sampleFinalizeForm['urineColor']) }}
+                            </div>
+                            <div class="form-group col-sm-6">
+                                {{ form_label(sampleFinalizeForm['urineClarity']) }}
+                                {{ form_widget(sampleFinalizeForm['urineClarity']) }}
+                            </div>
                         </div>
-                        <div class="form-group col-sm-6">
-                            {{ form_label(sampleFinalizeForm['urineClarity']) }}
-                            {{ form_widget(sampleFinalizeForm['urineClarity']) }}
-                        </div>
-                    </div>
-                    <hr>
+                        <hr>
+                    {% endif %}
                     <label>Aliquot</label>
                     <table class="table table-samples">
                         <thead>
