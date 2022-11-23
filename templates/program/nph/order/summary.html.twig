@@ -3,6 +3,12 @@
 {% block title %}Hello NphParticipantSummaryController!{% endblock %}
 
 {% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            Generate Order and Print Labels
+        </h2>
+    </div>
     <div class="row">
         <div class="col-sm-6">
             {% include 'program/nph/order/partials/participant-dl.html.twig' %}
@@ -14,7 +20,14 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <table class="table table-small table-striped table-bordered table-auto-width">
+            <div class="row">
+                <label>Order Summary</label>
+                <span class="alert well-sm bg-secondary pull-right text-white">
+                    Total # of Samples
+                    <span class="badge badge-light" id="samples_count">{{ sampleCount }}</span>
+                </span>
+            </div>
+            <table class="table table-small table-striped table-bordered">
                 <tr class="">
                     <th>Order ID</th>
                     <th>Timepoint</th>
@@ -22,21 +35,53 @@
                     <th>Samples</th>
                     <th>Sample ID</th>
                 </tr>
+                {% set lastOrderID = '' %}
                 {% for timepointName,timepoint in orderSummary %}
-                    {% for samplecode,sampleInfo in timepoint %}
-                        <tr>
-                            <td>{{ sampleInfo.OrderID }}</td>
-                            <td>{{ timepointName }}</td>
-                            <td>{{ samplecode }}</td>
-                            <td>{{ sampleInfo.SampleName }}</td>
-                            <td>{{ sampleInfo.SampleID }}</td>
-                        </tr>
+                    {% for orderid, orderInfo in timepoint %}
+                        {% if orderid != lastOrderID %}
+                            {% set printOrderTD = true %}
+                        {% else %}
+                            {% set printOrderTD = false %}
+                        {% endif %}
+                        {% for samplecode,sampleInfo in orderInfo %}
+                             <tr>
+                                 {% if printOrderTD %}
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderid}) }}">{{ orderid }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.TimepointDisplayName }}</td>
+                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.SampleTypeDisplayName }}</td>
+                                    {% set printOrderTD = false %}
+                                 {% endif %}
+                                 <td>{{ sampleInfo.SampleName }}</td>
+                                 <td>{{ sampleInfo.SampleID }}</td>
+                             </tr>
+                         {% endfor %}
                     {% endfor %}
                 {% endfor %}
             </table>
         </div>
         <div class="col-sm-6" style="height: 600px">
-                <embed style="height: 100%; width: 100%" src="{{ path('nph_render_pdf', {'participantid': participant.id,'module': module,'visit': visit}) }}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                        <a class="pull-right" href="{{ path('nph_render_pdf', {'participantid': participant.id,'module': module,'visit': visit}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                    <h3 class="panel-title">Labels</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="labels-loading-widget" class="text-center hidden-ie">
+                        <p id="labels-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
+                        <p id="labels-loaded">
+                            <a href="javascript:window.labels.print();" class="btn btn-primary btn-sm">
+                                <i class="fa fa-print" aria-hidden="true"></i> Print
+                            </a>
+                        </p>
+                    </div>
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('nph_render_pdf', {'participantid': participant.id,'module': module,'visit': visit}) }}"></iframe>
+                </div>
+            </div>
         </div>
     </div>
+    <button class="btn btn-primary" onclick="window.history.back();">close</button>
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('order-print-labels') }}
 {% endblock %}

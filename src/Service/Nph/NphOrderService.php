@@ -374,6 +374,7 @@ class NphOrderService
                 ];
             }
         }
+        $returnArray['sampleCount'] = $sampleCount;
         return $returnArray;
     }
 }
