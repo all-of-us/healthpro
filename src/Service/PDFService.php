@@ -47,7 +47,7 @@ class PDFService
 
     public function batchPDF(array $OrderSummary, Participant $participant, string $module, string $visit): string
     {
-        foreach ($OrderSummary as $timePoint => $timePointOrder) {
+        foreach ($OrderSummary as $timePointOrder) {
             foreach ($timePointOrder as $orderID => $sampleInfo) {
                 foreach ($sampleInfo as $sampleCode => $sample) {
                     try {
