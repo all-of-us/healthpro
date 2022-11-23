@@ -48,8 +48,7 @@
                     </div>
                 </div>
                 <div class="panel-body">
-                    {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit', action:
-                        path('nph_samples_aliquot') } }) }}
+                    {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
                     <div class="form-group">
                         {{ form_label(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
@@ -95,13 +94,13 @@
                                 {% for i in range(0, aliquot['expectedAliquots']-1) %}
                                     <tr>
                                         <td>
-                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ '_' ~ i]) }}
+                                            {{ form_widget(sampleFinalizeForm[aliquotCode][i]) }}
+                                        </td>
+                                        <td style="position: relative;">
+                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
                                         </td>
                                         <td>
-                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs_' ~ i]) }}
-                                        </td>
-                                        <td>
-                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume_' ~ i]) }}
+                                            {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
                                         </td>
                                         <td>
                                             {{ aliquot['units'] }}

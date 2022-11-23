@@ -6,7 +6,7 @@ use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
-use App\Form\Nph\NphSampleFinalize;
+use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
@@ -174,11 +174,15 @@ class NphOrderController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleFinalizeForm = $this->createForm(
-            NphSampleFinalize::class,
+            NphSampleFinalizeType::class,
             null,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode)]
         );
+        $sampleFinalizeForm->handleRequest($request);
+        if ($sampleFinalizeForm->isSubmitted() && $sampleFinalizeForm->isValid()) {
+            $formData = $sampleFinalizeForm->getData();
+        }
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),

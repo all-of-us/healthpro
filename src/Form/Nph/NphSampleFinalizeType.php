@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
-class NphSampleFinalize extends NphOrderForm
+class NphSampleFinalizeType extends NphOrderForm
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -25,42 +25,56 @@ class NphSampleFinalize extends NphOrderForm
         }
 
         foreach ($options['aliquots'] as $aliquotCode => $aliquot) {
-            for($i = 0; $i < $aliquot['expectedAliquots']; $i++) {
-                $builder->add("{$aliquotCode}_{$i}", Type\TextType::class, [
-                    'label' => $aliquot['container'],
-                    'required' => false,
-                    'constraints' => new Constraints\Type('string'),
+            $data = [];
+            for ($i = 0; $i < $aliquot['expectedAliquots']; $i++) {
+                $data[] = null;
+            }
+
+            $builder->add("{$aliquotCode}", Type\CollectionType::class, [
+                'entry_type' => Type\TextType::class,
+                'entry_options' => [
                     'attr' => [
                         'placeholder' => 'Scan Aliquot Barcode'
-                    ]
-                ]);
+                    ],
+                ],
+                'label' => $aliquot['container'],
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'allow_add' => true,
+                'data' => $data,
+            ]);
 
-                $builder->add("{$aliquotCode}AliquotTs_{$i}", Type\DateTimeType::class, [
-                    'required' => false,
-                    'label' => 'Aliquot Time',
+            $builder->add("{$aliquotCode}AliquotTs", Type\CollectionType::class, [
+                'entry_type' => Type\DateTimeType::class,
+                'label' => false,
+                'entry_options' => [
                     'widget' => 'single_text',
                     'format' => 'M/d/yyyy h:mm a',
                     'html5' => false,
-                    'model_timezone' => 'UTC',
                     'view_timezone' => $options['timeZone'],
+                    'model_timezone' => 'UTC',
+                    'label' => false,
                     'constraints' => [
-                        new Constraints\Type('datetime'),
                         new Constraints\LessThanOrEqual([
                             'value' => new \DateTime('+5 minutes'),
-                            'message' => 'Date cannot be in the future'
+                            'message' => 'Timestamp cannot be in the future'
                         ])
                     ],
                     'attr' => [
                         'class' => 'order-ts',
                     ]
-                ]);
+                ],
+                'required' => false,
+                'data' => $data,
+            ]);
 
-                $builder->add("{$aliquotCode}Volume_{$i}", Type\TextType::class, [
-                    'label' => 'Volume',
-                    'required' => false,
-                    'constraints' => new Constraints\Type('string')
-                ]);
-            }
+            $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
+                'entry_type' => Type\TextType::class,
+                'label' => 'Volume',
+                'required' => false,
+                'allow_add' => true,
+                'data' => $data,
+            ]);
         }
 
         return $builder->getForm();
