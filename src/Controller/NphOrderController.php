@@ -182,6 +182,11 @@ class NphOrderController extends BaseController
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted() && $sampleFinalizeForm->isValid()) {
             $formData = $sampleFinalizeForm->getData();
+            if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                $this->addFlash('success', 'Order finalized');
+            } else {
+                $this->addFlash('error', 'Failed finalizing order');
+            }
         }
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),

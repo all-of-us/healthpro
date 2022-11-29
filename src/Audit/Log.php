@@ -69,4 +69,5 @@ class Log
     public const NPH_ORDER_UPDATE = 'NPH_ORDER_UPDATE';
     public const NPH_SAMPLE_CREATE = 'NPH_SAMPLE_CREATE';
     public const NPH_SAMPLE_UPDATE = 'NPH_SAMPLE_UPDATE';
+    public const NPH_ALIQUOT_CREATE = 'NPH_ALIQUOT_CREATE';
 }

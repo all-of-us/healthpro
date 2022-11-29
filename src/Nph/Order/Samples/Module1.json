@@ -16,14 +16,14 @@
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "uL"
+          "units": "μL"
         },
         "SST8P5A2": {
           "identifier": "SSTS1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
-          "units": "uL"
+          "units": "μL"
         }
       }
     },
@@ -41,14 +41,14 @@
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "uL"
+          "units": "μL"
         },
         "PST8A2": {
           "identifier": "LHPSTP1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
-          "units": "uL"
+          "units": "μL"
         }
       }
     },
@@ -66,14 +66,14 @@
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "uL"
+          "units": "μL"
         },
         "EDTA10A2": {
           "identifier": "EDPAP1",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 4,
           "expectedVolume": 1000,
-          "units": "uL"
+          "units": "μL"
         }
       }
     },
@@ -91,7 +91,7 @@
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 500,
-          "units": "uL"
+          "units": "μL"
         }
       }
     },
@@ -109,7 +109,7 @@
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 7,
           "expectedVolume": 500,
-          "units": "uL"
+          "units": "μL"
         },
         "URINESA2": {
           "identifier": "RU2",

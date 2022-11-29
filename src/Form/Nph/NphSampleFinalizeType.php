@@ -33,13 +33,13 @@ class NphSampleFinalizeType extends NphOrderForm
             $builder->add("{$aliquotCode}", Type\CollectionType::class, [
                 'entry_type' => Type\TextType::class,
                 'entry_options' => [
+                    'constraints' => new Constraints\Type('string'),
                     'attr' => [
                         'placeholder' => 'Scan Aliquot Barcode'
                     ],
                 ],
                 'label' => $aliquot['container'],
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
                 'allow_add' => true,
                 'data' => $data,
             ]);

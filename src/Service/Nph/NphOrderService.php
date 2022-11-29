@@ -3,6 +3,7 @@
 namespace App\Service\Nph;
 
 use App\Audit\Log;
+use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
@@ -376,5 +377,36 @@ class NphOrderService
             }
         }
         return $returnArray;
+    }
+
+    public function saveOrderFinalization($formData, $sample)
+    {
+        $sampleCode = $sample->getSampleCode();
+        $aliquots = $this->getAliquots($sampleCode);
+        foreach ($aliquots as $aliquotCode => $aliquot) {
+            foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                if ($aliquotId) {
+                    $nphAliquot = new NphAliquot();
+                    $nphAliquot->setNphSample($sample);
+                    $nphAliquot->setAliquotId($aliquotId);
+                    $nphAliquot->setAliquotCode($aliquotCode);
+                    $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                    $nphAliquot->setUnits($aliquot['units']);
+                    $this->em->persist($nphAliquot);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                }
+            }
+        }
+        $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
+        $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
+        $sample->setFinalizedUser($this->user);
+        $sample->setFinalizedSite($this->site);
+        $sample->setFinalizedTs(new DateTime());
+        $this->em->persist($sample);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
+        return $sample;
     }
 }
