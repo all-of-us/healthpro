@@ -40,7 +40,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Symfony CLI
 RUN curl -sSL https://get.symfony.com/cli/installer | bash - \
-      && mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+      && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
 
 # Start emulator and the web server
 WORKDIR /app
