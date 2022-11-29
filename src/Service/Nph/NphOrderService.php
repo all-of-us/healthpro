@@ -404,6 +404,10 @@ class NphOrderService
         $sample->setFinalizedUser($this->user);
         $sample->setFinalizedSite($this->site);
         $sample->setFinalizedTs(new DateTime());
+        if ($sample->getNphOrder()->getOrderType() === 'urine') {
+            $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
+                'urineClarity']));
+        }
         $this->em->persist($sample);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
