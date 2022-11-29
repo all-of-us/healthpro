@@ -615,6 +615,10 @@ label.label-normal {
     background-color: #ffc107 !important;
 }
 
+.bg-white {
+    background-color: #ffffff !important;
+}
+
 .badge-light {
     color: #212529;
     background-color: #f8f9fa;

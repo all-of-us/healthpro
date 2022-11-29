@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
 {% block body %}
+    {% set order = sample.nphOrder %}
+    {% set sampleCode =  sample.sampleCode %}
     <div class="page-header">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
@@ -13,10 +15,20 @@
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
             {{ form_end(sampleIdForm) }}
+            <div class="well bg-white">
+                <div class="text-center">
+                    <p><strong>Aliquot Instructions for {{ samples[sampleCode]}}</strong></p>
+                    <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
+                    {% for aliquot in aliquots %}
+                        <p>
+                            {{ aliquot.container }}: {{ aliquot.expectedAliquots }} Volume: {{ aliquot
+                            .expectedVolume }} {{ aliquot.units }}
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
         <div class="col-sm-7">
-            {% set order = sample.nphOrder %}
-            {% set sampleCode =  sample.sampleCode %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="pull-right">
