@@ -413,4 +413,23 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
         return $sample;
     }
+
+    public function getExistingSampleData($sample): array
+    {
+        $sampleData = [];
+        $sampleCode = $sample->getSampleCode();
+        $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
+        if ($sample->getNphOrder()->getOrderType() === 'urine') {
+            if ($sample->getSampleMetaData()) {
+                $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
+                if (!empty($sampleMetadata['urineColor'])) {
+                    $sampleData['urineColor'] = $sampleMetadata['urineColor'];
+                }
+                if (!empty($sampleMetadata['urineClarity'])) {
+                    $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
+                }
+            }
+        }
+        return $sampleData;
+    }
 }
