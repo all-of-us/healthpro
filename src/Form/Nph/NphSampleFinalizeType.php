@@ -24,12 +24,15 @@ class NphSampleFinalizeType extends NphOrderForm
             $this->addStoolMetadataFields($builder);
         }
 
-        foreach ($options['aliquots'] as $aliquotCode => $aliquot) {
-            $data = [];
-            for ($i = 0; $i < $aliquot['expectedAliquots']; $i++) {
-                $data[] = null;
-            }
+        $formData = $builder->getData();
 
+        foreach ($options['aliquots'] as $aliquotCode => $aliquot) {
+            $idData = $tsData = $volumeData = [];
+            for ($i = 0; $i < $aliquot['expectedAliquots']; $i++) {
+                $idData[] = $formData[$aliquotCode][$i] ?? null;
+                $tsData[] = $formData["{$aliquotCode}AliquotTs"][$i] ?? null;
+                $volumeData[] = $formData["{$aliquotCode}Volume"][$i] ?? null;
+            }
             $builder->add("{$aliquotCode}", Type\CollectionType::class, [
                 'entry_type' => Type\TextType::class,
                 'entry_options' => [
@@ -41,7 +44,7 @@ class NphSampleFinalizeType extends NphOrderForm
                 'label' => $aliquot['container'],
                 'required' => false,
                 'allow_add' => true,
-                'data' => $data,
+                'data' => $idData,
             ]);
 
             $builder->add("{$aliquotCode}AliquotTs", Type\CollectionType::class, [
@@ -65,7 +68,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]
                 ],
                 'required' => false,
-                'data' => $data,
+                'data' => $tsData,
             ]);
 
             $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
@@ -73,7 +76,7 @@ class NphSampleFinalizeType extends NphOrderForm
                 'label' => 'Volume',
                 'required' => false,
                 'allow_add' => true,
-                'data' => $data,
+                'data' => $volumeData,
             ]);
         }
 

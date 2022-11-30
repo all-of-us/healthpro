@@ -419,6 +419,7 @@ class NphOrderService
         $sampleData = [];
         $sampleCode = $sample->getSampleCode();
         $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
+        $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
         if ($sample->getNphOrder()->getOrderType() === 'urine') {
             if ($sample->getSampleMetaData()) {
                 $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
@@ -429,6 +430,12 @@ class NphOrderService
                     $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
                 }
             }
+        }
+        $aliquots = $sample->getNphAliquots();
+        foreach ($aliquots as $aliquot) {
+            $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
+            $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
+            $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
         }
         return $sampleData;
     }
