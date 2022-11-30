@@ -130,7 +130,7 @@
                     {{ form_widget(sampleFinalizeForm) }}
                     <p>
                         <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif
-                        %}">Mark as Finalized</button>
+                        %}" id="sample_finalize_btn">Mark as Finalized</button>
                         <button type="button" class="btn btn-default">Cancel</button>
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
@@ -141,4 +141,5 @@
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
+    {{ encore_entry_script_tags('nph-sample-finalize') }}
 {% endblock %}
