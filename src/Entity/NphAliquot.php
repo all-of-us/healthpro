@@ -76,7 +76,7 @@ class NphAliquot
     public function setNphSample(?NphSample $nphSample): self
     {
         $this->nphSample = $nphSample;
-
+        $nphSample->addNphAliquot($this);
         return $this;
     }
 

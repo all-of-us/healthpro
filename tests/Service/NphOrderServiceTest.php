@@ -226,4 +226,53 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame(10, strlen($sampleId));
         $this->assertNotEquals(0, $sampleId[0]);
     }
+
+    /**
+     * @dataProvider orderFinalizationDataProvider
+     */
+    public function testSaveOrderFinalization(
+        $timePoint,
+        $orderType,
+        $sampleCode,
+        $collectedTs,
+        $aliquots): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
+
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+
+        $finalizedFormData = [
+            "{$sampleCode}CollectedTs" => $collectedTs,
+            "{$sampleCode}Notes" => 'Test',
+        ];
+        foreach ($aliquots as $aliquotCode => $aliquot) {
+            $finalizedFormData[$aliquotCode][] = $aliquot[0];
+            $finalizedFormData["{$aliquotCode}AliquotTs"][] = $aliquot[1];
+            $finalizedFormData["{$aliquotCode}Volume"][] = floatval($aliquot[2]);
+        }
+        $this->service->saveOrderFinalization($finalizedFormData, $nphSample);
+        $this->assertSame($collectedTs, $nphSample->getCollectedTs());
+        $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
+    }
+
+    public function orderFinalizationDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2022-12-01');
+        $aliquotTs = new \DateTime('2022-12-02');
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, [
+                'URINESA1' => ['10001', $aliquotTs, 500],
+                'URINESA2' => ['10002', $aliquotTs, 5]
+            ]],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, [
+                'SALIVAA1' => ['10003', $aliquotTs, 4]
+            ]],
+            ['30min', 'blood', 'SST8P5', $collectedTs, [
+                'SST8P5A1' => ['10004', $aliquotTs, 500],
+                'SST8P5A2' => ['10005', $aliquotTs, 1000]
+            ]]
+        ];
+    }
 }
