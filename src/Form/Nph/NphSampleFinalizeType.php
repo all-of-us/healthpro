@@ -89,7 +89,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'sample' => null,
             'orderType' => null,
             'timeZone' => null,
-            'aliquots' => null
+            'aliquots' => null,
+            'disabled' => null
         ]);
     }
 }

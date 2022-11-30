@@ -129,7 +129,8 @@
                     <hr>
                     {{ form_widget(sampleFinalizeForm) }}
                     <p>
-                        <button type="submit" class="btn btn-primary">Mark as Finalized</button>
+                        <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif
+                        %}">Mark as Finalized</button>
                         <button type="button" class="btn btn-default">Cancel</button>
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
