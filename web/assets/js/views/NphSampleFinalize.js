@@ -4,7 +4,7 @@ $(document).ready(function () {
         return confirm(confirmMessage);
     });
 
-    $('.add-another-collection-widget').click(function (e) {
+    $('.add-aliquot-widget').click(function (e) {
         let list = $($(this).attr('data-list-selector'));
         let aliquotId = list.data('aliquot-id');
         let aliquotUnits = list.data('aliquot-units');
@@ -27,9 +27,13 @@ $(document).ready(function () {
             '<td>' + newTsWidget + '</td>' +
             '<td>' + newVolumeWidget + '</td>' +
             '<td>' + aliquotUnits + '</td>' +
-            '<td><i class="fa fa-eraser" role="button"></i> <i class="fa fa-trash" role="button"></i></td>'
+            '<td><i class="fa fa-eraser" role="button"></i> <i class="fa fa-trash delete-aliquot-widget" role="button"></i></td>'
         );
 
         $('.aliquots-row-' + aliquotId).last().after(newElem);
+    });
+
+    $(document).on("click", ".delete-aliquot-widget" , function() {
+        $(this).closest('tr').remove();
     });
 });
