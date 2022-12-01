@@ -68,6 +68,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]
                 ],
                 'required' => false,
+                'allow_add' => true,
                 'data' => $tsData,
             ]);
 
