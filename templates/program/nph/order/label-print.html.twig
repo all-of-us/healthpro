@@ -37,22 +37,22 @@
                 </tr>
                 {% set lastOrderID = '' %}
                 {% for timepointName,timepoint in orderSummary %}
-                    {% for orderid, orderInfo in timepoint %}
-                        {% if orderid != lastOrderID %}
+                    {% for orderId, orderInfo in timepoint %}
+                        {% if orderId != lastOrderID %}
                             {% set printOrderTD = true %}
                         {% else %}
                             {% set printOrderTD = false %}
                         {% endif %}
-                        {% for samplecode,sampleInfo in orderInfo %}
+                        {% for sampleCode,sampleInfo in orderInfo %}
                              <tr>
                                  {% if printOrderTD %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderid}) }}">{{ orderid }}</a></td>
-                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.TimepointDisplayName }}</td>
-                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.SampleTypeDisplayName }}</td>
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderId}) }}">{{ orderId }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.timepointDisplayName }}</td>
+                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.sampleTypeDisplayName }}</td>
                                     {% set printOrderTD = false %}
                                  {% endif %}
-                                 <td>{{ sampleInfo.SampleName }}</td>
-                                 <td>{{ sampleInfo.SampleID }}</td>
+                                 <td>{{ sampleInfo.sampleName }}</td>
+                                 <td>{{ sampleInfo.sampleId }}</td>
                              </tr>
                          {% endfor %}
                     {% endfor %}

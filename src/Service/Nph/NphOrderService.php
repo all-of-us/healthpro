@@ -363,14 +363,14 @@ class NphOrderService
                 [$order->getTimepoint()]
                 [$order->getOrderId()]
                 [$sample->getSampleCode()] = [
-                    'SampleID' => $sample->getSampleID(),
-                    'SampleName' => $sampleName,
-                    'OrderID' => $order->getOrderId(),
-                    'CreateDate' => $order->getCreatedTs()->format('Y-M-D'),
-                    'SampleType' => $module->getSampleType($sample->getSampleCode()),
-                    'SampleCollectionVolume' => $sampleCollectionVolume,
-                    'TimepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
-                    'SampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode()))
+                    'sampleId' => $sample->getSampleId(),
+                    'sampleName' => $sampleName,
+                    'orderId' => $order->getOrderId(),
+                    'createDate' => $order->getCreatedTs()->format('Y-M-D'),
+                    'sampleType' => $module->getSampleType($sample->getSampleCode()),
+                    'sampleCollectionVolume' => $sampleCollectionVolume,
+                    'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
+                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode()))
                 ];
             }
         }

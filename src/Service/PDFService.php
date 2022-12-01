@@ -48,19 +48,19 @@ class PDFService
     public function batchPDF(array $OrderSummary, Participant $participant, string $module, string $visit): string
     {
         foreach ($OrderSummary as $timePointOrder) {
-            foreach ($timePointOrder as $orderID => $sampleInfo) {
+            foreach ($timePointOrder as $orderId => $sampleInfo) {
                 foreach ($sampleInfo as $sampleCode => $sample) {
                     try {
                         $this->renderPDF(
                             $participant->firstName . ' ' . $participant->lastName,
-                            $orderID,
+                            $orderId,
                             $participant->dob,
-                            $sample['SampleID'],
+                            $sample['sampleId'],
                             $module,
-                            $sample['TimepointDisplayName'],
+                            $sample['timepointDisplayName'],
                             $sampleCode,
                             $visit,
-                            $sample['SampleCollectionVolume']
+                            $sample['sampleCollectionVolume']
                         );
                     } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
                         return "Unable to render PDF";
