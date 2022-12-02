@@ -2,38 +2,35 @@
 
 namespace App\Tests\Service;
 
-use App\Helper\Participant;
+use App\Entity\NphOrder;
+use App\Entity\NphSample;
+use App\Service\Nph\NphOrderService;
 use App\Service\PDFService;
+use App\Service\SiteService;
 use App\Tests\testSetup;
+use Doctrine\ORM\EntityManagerInterface;
 
 class PDFServiceTest extends ServiceTestCase
 {
 
-    protected function getOrderData(): array
+    protected $service;
+    protected $testSetup;
+    protected NphOrderService $nphOrderService;
+
+    public function setUp(): void
     {
-        return [
-            'minus15min' => [
-                    '6505378640' => [
-                        'SST8P5' => [
-                            'SampleID' => '9292338307',
-                            'SampleName' => '8.5 mL SST',
-                            'OrderID' => '6505378640',
-                            'SampleCollectionVolume' => '8.5 mL',
-                            'TimepointDisplayName' => '-15 min',
-                        ]
-                    ]
-                ]
-        ];
+        $this->service = static::getContainer()->get(PDFService::class);
+        $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
+        $this->nphOrderService = static::getContainer()->get(NphOrderService::class);
     }
 
     public function testBatchPDF(): void
     {
-        $module = '1';
-        $visit = 'LMT';
         $pdfService = static::getContainer()->get(PDFService::class);
-        $participant = testSetup::generateParticipant('P000001', 'John', 'Doe', new \DateTime('2000-01-01'));
-        $orderSummary = $this->getOrderData();
-        $pdf = $pdfService->batchPDF($orderSummary, $participant, $module, $visit);
+        $participant = $this->testSetup->generateParticipant();
+        $nphOrder = $this->testSetup->generateNphOrder($participant);
+        $orderSummary = $this->nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participant->id, $nphOrder->getModule(), $nphOrder->getVisitType());
+        $pdf = $pdfService->batchPDF($orderSummary['order'], $participant, $nphOrder->getModule(), $nphOrder->getVisitType());
         $this->assertIsString($pdf);
         $this->assertStringContainsString('%PDF', $pdf);
     }
