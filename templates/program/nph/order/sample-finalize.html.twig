@@ -129,17 +129,21 @@
                                         <td>
                                             {{ aliquot['units'] }}
                                         </td>
-                                        <td>
-                                            <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
-                                        </td>
+                                        {% if sample.finalizedTs is empty %}
+                                            <td>
+                                                <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
-                                <tr>
-                                    <td>
-                                        <a type="button" class="add-aliquot-widget"
-                                           data-list-selector="#aliquots_fields_list_{{ aliquotCode }}">+ Add Line</a>
-                                    </td>
-                                </tr>
+                                {% if sample.finalizedTs is empty %}
+                                    <tr>
+                                        <td>
+                                            <a type="button" class="add-aliquot-widget"
+                                               data-list-selector="#aliquots_fields_list_{{ aliquotCode }}">+ Add Line</a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
