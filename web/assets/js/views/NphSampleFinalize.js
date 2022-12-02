@@ -8,18 +8,15 @@ $(document).ready(function () {
         let list = $($(this).attr('data-list-selector'));
         let aliquotId = list.data('aliquot-id');
         let aliquotUnits = list.data('aliquot-units');
+        let counter = list.data('widget-counter');
 
-        // Try to find the counter of the list or use the length of the list
-        let counter = list.data('widget-counter') || list.children().length;
-
-        // grab the prototype template and replace the "__name__" used in the id and name of the prototype
+        // Grab the prototype template and replace the "__name__" used in the id and name of the prototype
         let newCodeWidget = list.data('code-prototype').replace(/__name__/g, counter);
         let newTsWidget = list.data('ts-prototype').replace(/__name__/g, counter);
         let newVolumeWidget = list.data('volume-prototype').replace(/__name__/g, counter);
 
-        // Increase the counter
+        // Increment and update widget counter
         counter++;
-        // And store it, the length cannot be used if deleting widgets is allowed
         list.data('widget-counter', counter);
 
         let newElem = $(list.attr('data-widget-tags')).html(

@@ -198,7 +198,8 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'aliquots' => $nphOrderService->getAliquots($sampleCode)
+            'aliquots' => $nphOrderService->getAliquots($sampleCode),
+            'sampleData' => $sampleData
         ]);
     }
 }
