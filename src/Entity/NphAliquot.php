@@ -39,7 +39,17 @@ class NphAliquot
     /**
      * @ORM\Column(type="string", length=100)
      */
-    private $type;
+    private $aliquotCode;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $volume;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $units;
 
     public function getId(): ?int
     {
@@ -66,7 +76,7 @@ class NphAliquot
     public function setNphSample(?NphSample $nphSample): self
     {
         $this->nphSample = $nphSample;
-
+        $nphSample->addNphAliquot($this);
         return $this;
     }
 
@@ -82,14 +92,38 @@ class NphAliquot
         return $this;
     }
 
-    public function getType(): ?string
+    public function getAliquotCode(): ?string
     {
-        return $this->type;
+        return $this->aliquotCode;
     }
 
-    public function setType(string $type): self
+    public function setAliquotCode(string $aliquotCode): self
     {
-        $this->type = $type;
+        $this->aliquotCode = $aliquotCode;
+
+        return $this;
+    }
+
+    public function getVolume(): ?float
+    {
+        return $this->volume;
+    }
+
+    public function setVolume(?float $volume): self
+    {
+        $this->volume = $volume;
+
+        return $this;
+    }
+
+    public function getUnits(): ?string
+    {
+        return $this->units;
+    }
+
+    public function setUnits(?string $units): self
+    {
+        $this->units = $units;
 
         return $this;
     }

@@ -7,7 +7,7 @@ $(document).ready(function () {
         });
     }
 
-    $('.order-collected-ts').pmiDateTimePicker();
+    $('.order-ts').pmiDateTimePicker();
 
     $('.toggle-help-image').on('click', function (e){
         displayHelpModal(e);

@@ -65,6 +65,7 @@ Encore
     .addEntry('deceased-report-review', './web/assets/js/views/DeceasedReportReview.js')
     .addEntry('nph-order-create', './web/assets/js/views/NphOrderCreate.js')
     .addEntry('nph-order', './web/assets/js/views/NphOrder.js')
+    .addEntry('nph-sample-finalize', './web/assets/js/views/NphSampleFinalize.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

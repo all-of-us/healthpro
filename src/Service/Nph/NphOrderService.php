@@ -3,6 +3,7 @@
 namespace App\Service\Nph;
 
 use App\Audit\Log;
+use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
@@ -11,6 +12,7 @@ use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTime;
+use Doctrine\ORM\PersistentCollection;
 
 class NphOrderService
 {
@@ -42,7 +44,7 @@ class NphOrderService
         $this->loggerService = $loggerService;
     }
 
-    public function loadModules($module, $visit, $participantId): void
+    public function loadModules(string $module, string $visit, string $participantId): void
     {
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $this->moduleObj = new $moduleClass($visit);
@@ -60,27 +62,32 @@ class NphOrderService
         return $this->moduleObj->getTimePointSamples();
     }
 
-    public function getTimePoints()
+    public function getTimePoints(): array
     {
         return $this->moduleObj->getTimePoints();
     }
 
-    public function getSamples()
+    public function getSamples(): array
     {
         return $this->moduleObj->getSamples();
     }
 
-    public function getSamplesByType($type): array
+    public function getSamplesByType(string $type): array
     {
         return $this->moduleObj->getSamplesByType($type);
     }
 
-    public function getSampleType($sample): string
+    public function getSampleType(string $sampleCode): string
     {
-        return $this->moduleObj->getSampleType($sample);
+        return $this->moduleObj->getSampleType($sampleCode);
     }
 
-    public function getSamplesWithLabels($samplesObj): array
+    public function getAliquots(string $sampleCode): ?array
+    {
+        return $this->moduleObj->getAliquots($sampleCode);
+    }
+
+    public function getSamplesWithLabels(PersistentCollection $samplesObj): array
     {
         $samples = $this->getSamples();
         $sampleLabels = [];
@@ -180,7 +187,7 @@ class NphOrderService
         return $id;
     }
 
-    public function createOrdersAndSamples($formData): void
+    public function createOrdersAndSamples(array $formData): void
     {
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
@@ -212,7 +219,7 @@ class NphOrderService
         }
     }
 
-    public function createOrder($timePoint, $orderType, $orderId = null): NphOrder
+    public function createOrder(string $timePoint, string $orderType, string $orderId = null): NphOrder
     {
         if ($orderId === null) {
             $orderId = $this->generateOrderId();
@@ -233,7 +240,7 @@ class NphOrderService
         return $nphOrder;
     }
 
-    public function createSample($sample, $nphOrder, $sampleId = null): NphSample
+    public function createSample(string $sample, NphOrder $nphOrder, string $sampleId = null): NphSample
     {
         if ($sampleId === null) {
             $sampleId = $this->generateSampleId();
@@ -248,7 +255,7 @@ class NphOrderService
         return $nphSample;
     }
 
-    private function createOrderWithSamples($timePoint, $orderType, $samples): void
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType);
         foreach ($samples as $sample) {
@@ -256,7 +263,7 @@ class NphOrderService
         }
     }
 
-    public function saveOrderCollection($formData, $order)
+    public function saveOrderCollection(array $formData, NphOrder $order): NphOrder
     {
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
@@ -282,7 +289,7 @@ class NphOrderService
         return $order;
     }
 
-    public function getExistingOrderCollectionData($order): array
+    public function getExistingOrderCollectionData(NphOrder $order): array
     {
         $orderCollectionData = [];
         foreach ($order->getNphSamples() as $nphSample) {
@@ -318,7 +325,7 @@ class NphOrderService
         return $orderCollectionData;
     }
 
-    public function jsonEncodeMetadata($formData, $metaDataTypes): ?string
+    public function jsonEncodeMetadata(array $formData, array $metaDataTypes): ?string
     {
         $metadata = [];
         foreach ($metaDataTypes as $metaDataType) {
@@ -371,5 +378,66 @@ class NphOrderService
             }
         }
         return $returnArray;
+    }
+
+    public function saveOrderFinalization(array $formData, NphSample $sample): NphSample
+    {
+        $sampleCode = $sample->getSampleCode();
+        $aliquots = $this->getAliquots($sampleCode);
+        foreach ($aliquots as $aliquotCode => $aliquot) {
+            foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                if ($aliquotId) {
+                    $nphAliquot = new NphAliquot();
+                    $nphAliquot->setNphSample($sample);
+                    $nphAliquot->setAliquotId($aliquotId);
+                    $nphAliquot->setAliquotCode($aliquotCode);
+                    $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                    $nphAliquot->setUnits($aliquot['units']);
+                    $this->em->persist($nphAliquot);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                }
+            }
+        }
+        $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
+        $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
+        $sample->setFinalizedUser($this->user);
+        $sample->setFinalizedSite($this->site);
+        $sample->setFinalizedTs(new DateTime());
+        if ($sample->getNphOrder()->getOrderType() === 'urine') {
+            $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
+                'urineClarity']));
+        }
+        $this->em->persist($sample);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
+        return $sample;
+    }
+
+    public function getExistingSampleData(NphSample $sample): array
+    {
+        $sampleData = [];
+        $sampleCode = $sample->getSampleCode();
+        $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
+        $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
+        if ($sample->getNphOrder()->getOrderType() === 'urine') {
+            if ($sample->getSampleMetaData()) {
+                $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
+                if (!empty($sampleMetadata['urineColor'])) {
+                    $sampleData['urineColor'] = $sampleMetadata['urineColor'];
+                }
+                if (!empty($sampleMetadata['urineClarity'])) {
+                    $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
+                }
+            }
+        }
+        $aliquots = $sample->getNphAliquots();
+        foreach ($aliquots as $aliquot) {
+            $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
+            $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
+            $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
+        }
+        return $sampleData;
     }
 }
