@@ -113,8 +113,9 @@
                                         {{ aliquot['container'] }}
                                     </td>
                                 </tr>
-                                {% set aliquotCount = max(aliquot['expectedAliquots'],
-                                    sampleData[aliquotCode]|length) %}
+                                {% set sampleDataCount = sampleData[aliquotCode] is defined ?
+                                    sampleData[aliquotCode]|length : 0 %}
+                                {% set aliquotCount = max(aliquot['expectedAliquots'], sampleDataCount) %}
                                 {% for i in range(0, aliquotCount - 1) %}
                                     <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
                                         <td>

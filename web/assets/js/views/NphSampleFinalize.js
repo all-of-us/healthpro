@@ -21,13 +21,15 @@ $(document).ready(function () {
 
         let newElem = $(list.attr('data-widget-tags')).html(
             '<td>' + newCodeWidget + '</td>' +
-            '<td>' + newTsWidget + '</td>' +
+            '<td style="position: relative">' + newTsWidget + '</td>' +
             '<td>' + newVolumeWidget + '</td>' +
             '<td>' + aliquotUnits + '</td>' +
             '<td><i class="fa fa-eraser clear-aliquot-widget" role="button"></i> <i class="fa fa-trash delete-aliquot-widget" role="button"></i></td>'
         );
 
         $('.aliquots-row-' + aliquotId).last().after(newElem);
+
+        $('.order-ts').pmiDateTimePicker();
     });
 
     $(document).on("click", ".delete-aliquot-widget" , function() {
