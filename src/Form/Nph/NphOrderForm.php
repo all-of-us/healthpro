@@ -4,6 +4,7 @@ namespace App\Form\Nph;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints;
 
 class NphOrderForm extends AbstractType
@@ -38,7 +39,7 @@ class NphOrderForm extends AbstractType
         'I tend to have normal formed stool - Type 3 and 4' => 'normal'
     ];
 
-    protected function addCollectedSampleFields($builder, $sample, $sampleLabel): void
+    protected function addCollectedSampleFields(FormBuilderInterface $builder, string $sample, string $sampleLabel): void
     {
         $builder->add($sample, Type\CheckboxType::class, [
             'label' => $sampleLabel,
@@ -46,7 +47,7 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addCollectedTimeAndNoteFields($builder, $options, $sample): void
+    protected function addCollectedTimeAndNoteFields(FormBuilderInterface $builder, array $options, string $sample): void
     {
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
@@ -75,7 +76,7 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addUrineMetadataFields($builder): void
+    protected function addUrineMetadataFields(FormBuilderInterface  $builder): void
     {
         $builder->add('urineColor', Type\ChoiceType::class, [
             'label' => 'Urine Color',
@@ -94,7 +95,7 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addStoolMetadataFields($builder): void
+    protected function addStoolMetadataFields(FormBuilderInterface $builder): void
     {
         $builder->add('bowelType', Type\ChoiceType::class, [
             'label' => 'Describe the bowel movement for this collection',
