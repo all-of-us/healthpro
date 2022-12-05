@@ -56,8 +56,7 @@ class NphOrderController extends BaseController
             $formData = $oderForm->getData();
             $nphOrderService->createOrdersAndSamples($formData);
             $this->addFlash('success', 'Orders Created');
-            // TODO: Redirect to generate orders & print labels page
-            return $this->redirectToRoute('nph_generate_oder', ['participantId' => $participantId, 'module' => $module,
+            return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
                 'visit' => $visit]);
         }
         return $this->render('program/nph/order/generate-orders.html.twig', [
@@ -206,5 +205,23 @@ class NphOrderController extends BaseController
             'aliquots' => $nphOrderService->getAliquots($sampleCode),
             'sampleData' => $sampleData
         ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint", name="nph_order_label_print")
+     */
+    public function orderSummary($participantId, $module, $visit, ParticipantSummaryService $participantSummaryService, NphOrderService $nphOrderService): Response
+    {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        $nphOrderService->loadModules($module, $visit, $participantId);
+        $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit);
+        return $this->render(
+            'program/nph/order/label-print.html.twig',
+            ['participant' => $participant,
+             'orderSummary' => $orderInfo['order'],
+                'module' => $module,
+                'visit' => $visit,
+                'sampleCount' => $orderInfo['sampleCount']]
+        );
     }
 }

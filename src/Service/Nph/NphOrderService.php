@@ -340,43 +340,52 @@ class NphOrderService
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
         $orderInfo = $OrderRepository->findBy(['participantId' => $participantid]);
-        $returnArray = array();
-        foreach ($orderInfo as $order) {
-            $samples = $order->getNphSamples()->toArray();
-            foreach ($samples as $sample) {
-                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
-                $module = new $moduleClass($order->getVisitType());
-                $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
-                $returnArray[$order->getModule()]
-                [$order->getVisitType()]
-                [$order->getTimepoint()]
-                [$sample->getSampleCode()] = ['SampleID' => $sample->getSampleID(),
-                                              'SampleName' => $sampleName,
-                                              'OrderID' => $order->getOrderId()];
-            }
-        }
-        return $returnArray;
+        return $this->generateOrderSummaryArray($orderInfo);
     }
 
     public function getParticipantOrderSummaryByModuleAndVisit(string $participantid, string $module, string $visit): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
         $orderInfo = $OrderRepository->findBy(['participantId' => $participantid, 'visitType' => $visit, 'module' => $module]);
-        $returnArray = array();
-        foreach ($orderInfo as $order) {
+        $orderSummary = $this->generateOrderSummaryArray($orderInfo);
+        $orderSummary['order'] = $orderSummary['order'][$module][$visit];
+        return $orderSummary;
+    }
+
+    private function generateOrderSummaryArray(array $nphOrder): array
+    {
+        $sampleCount = 0;
+        $orderSummary = array();
+        foreach ($nphOrder as $order) {
             $samples = $order->getNphSamples()->toArray();
             foreach ($samples as $sample) {
+                $sampleCount++;
                 $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
                 $module = new $moduleClass($order->getVisitType());
                 $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
+                $timePointsDisplay = $module->getTimePoints();
                 $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
-                $returnArray[$order->getTimepoint()][$sample->getSampleCode()] =
-                    ['SampleID' => $sample->getSampleID(),
-                    'SampleName' => $sampleName,
-                    'OrderID' => $order->getOrderId(),
-                    'SampleCollectionVolume' => $sampleCollectionVolume];
+                $orderSummary[$order->getModule()]
+                [$order->getVisitType()]
+                [$order->getTimepoint()]
+                [$module->getSampleType($sample->getSampleCode())]
+                [$sample->getSampleCode()] = [
+                    'sampleId' => $sample->getSampleID(),
+                    'sampleName' => $sampleName,
+                    'orderId' => $order->getOrderId(),
+                    'healthProOrderId' => $order->getId(),
+                    'createDate' => $order->getCreatedTs()->format('Y-M-D'),
+                    'sampleStatus' => $sample->getStatus(),
+                    'sampleType' => $module->getSampleType($sample->getSampleCode()),
+                    'sampleCollectionVolume' => $sampleCollectionVolume,
+                    'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
+                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode()))
+                ];
             }
         }
+        $returnArray = array();
+        $returnArray['order'] = $orderSummary;
+        $returnArray['sampleCount'] = $sampleCount;
         return $returnArray;
     }
 
