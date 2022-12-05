@@ -102,8 +102,11 @@ class NphOrderController extends BaseController
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
+            $formData = $oderCollectForm->getData();
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
             if ($oderCollectForm->isValid()) {
-                $formData = $oderCollectForm->getData();
                 if ($nphOrderService->saveOrderCollection($formData, $order)) {
                     $this->addFlash('success', 'Order collection saved');
                 } else {

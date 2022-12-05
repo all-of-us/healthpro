@@ -36,6 +36,7 @@
                         </td>
                         <td>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                             {% if index == order.nphSamples|length - 1 %}
                                 <small class="text-warning">
                                     Comments entered in this field are transmitted to the Biobank via reconciliation reporting.
@@ -46,8 +47,12 @@
                         </td>
                     </tr>
                 {% endfor %}
+                <tr>
+                    <td colspan="3">{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
+                </tr>
                 </tbody>
             </table>
+            <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
             {% if order.orderType == 'urine' %}
                 <h4>
                     Color and Clarity
@@ -63,6 +68,7 @@
                 <div class="form-group">
                     {{ form_label(orderCollectForm['urineClarity']) }}
                     {{ form_widget(orderCollectForm['urineClarity']) }}
+                    {{ form_errors(orderCollectForm['urineClarity']) }}
                 </div>
             {% endif %}
             {% if order.orderType == 'stool' %}

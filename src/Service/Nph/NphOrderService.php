@@ -263,6 +263,16 @@ class NphOrderService
         }
     }
 
+    public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
+    {
+        foreach ($order->getNphSamples() as $nphSample) {
+            if ($formData[$nphSample->getSampleCode()] === true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function saveOrderCollection(array $formData, NphOrder $order): NphOrder
     {
         foreach ($order->getNphSamples() as $nphSample) {

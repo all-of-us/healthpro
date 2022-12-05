@@ -35,6 +35,12 @@ class NphOrderCollect extends NphOrderForm
         if ($orderType === 'stool') {
             $this->addStoolMetadataFields($builder);
         }
+
+        // Placeholder field for displaying select at least one sample error message
+        $builder->add('samplesCheckAll', Type\CheckboxType::class, [
+            'required' => false
+        ]);
+
         return $builder->getForm();
     }
 
