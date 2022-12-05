@@ -345,10 +345,10 @@ class NphOrderService
         return $orderSummary;
     }
 
-    private function generateOrderSummaryArray($nphOrder): array
+    private function generateOrderSummaryArray(array $nphOrder): array
     {
-        $returnArray = array();
         $sampleCount = 0;
+        $orderSummary = array();
         foreach ($nphOrder as $order) {
             $samples = $order->getNphSamples()->toArray();
             foreach ($samples as $sample) {
@@ -358,15 +358,17 @@ class NphOrderService
                 $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
                 $timePointsDisplay = $module->getTimePoints();
                 $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
-                $returnArray['order'][$order->getModule()]
+                $orderSummary[$order->getModule()]
                 [$order->getVisitType()]
                 [$order->getTimepoint()]
-                [$order->getOrderId()]
+                [$module->getSampleType($sample->getSampleCode())]
                 [$sample->getSampleCode()] = [
-                    'sampleId' => $sample->getSampleId(),
+                    'sampleId' => $sample->getSampleID(),
                     'sampleName' => $sampleName,
                     'orderId' => $order->getOrderId(),
+                    'healthProOrderId' => $order->getId(),
                     'createDate' => $order->getCreatedTs()->format('Y-M-D'),
+                    'sampleStatus' => $sample->getStatus(),
                     'sampleType' => $module->getSampleType($sample->getSampleCode()),
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
@@ -374,6 +376,8 @@ class NphOrderService
                 ];
             }
         }
+        $returnArray = array();
+        $returnArray['order'] = $orderSummary;
         $returnArray['sampleCount'] = $sampleCount;
         return $returnArray;
     }

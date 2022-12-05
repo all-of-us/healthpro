@@ -8,6 +8,7 @@ use App\Entity\NphSite;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Helper\Participant;
+use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class testSetup
@@ -43,10 +44,8 @@ class testSetup
 
     }
 
-    public function generateNPHOrder(Participant $participant): NphOrder
+    public function generateNPHOrder(Participant $participant, User $user, SiteService $site): NphOrder
     {
-        $user = $this->generateUser();
-        $siteId = $this->generateSite('hpo')->getGoogleGroup();
         $nphOrder = new NphOrder();
         $nphOrder->setModule(1);
         $nphOrder->setVisitType('LMT');
@@ -54,7 +53,7 @@ class testSetup
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId($participant->id);
         $nphOrder->setUser($user);
-        $nphOrder->setSite($siteId);
+        $nphOrder->setSite($site->getSiteId());
         $nphOrder->setCreatedTs(new \DateTime());
         $nphOrder->setOrderType('urine');
         $this->em->persist($nphOrder);
@@ -67,41 +66,5 @@ class testSetup
         $this->em->persist($nphSample);
         $this->em->flush();
         return $nphOrder;
-    }
-
-    public function generateUser(): User
-    {
-        $user = new User();
-        $user->setEmail('test@example.com');
-        $user->setGoogleId('12345');
-        $this->em->persist($user);
-        $this->em->flush();
-        return $user;
-    }
-
-
-    public function generateSite($type = 'hpo'): Site
-    {
-        $id = uniqid();
-        $orgId = 'TEST_ORG_' . $id;
-        $siteId = 'test-' . $id;
-        if ($type === 'nph') {
-            $site = new NphSite();
-            $site->setStatus(true)
-                ->setName('Test Site ' . $id)
-                ->setOrganizationId($orgId)
-                ->setGoogleGroup($siteId);
-        } else {
-            $site = new Site();
-            $site->setStatus(true)
-                ->setName('Test Site ' . $id)
-                ->setOrganizationId($orgId)
-                ->setSiteId($siteId)
-                ->setGoogleGroup($siteId)
-                ->setWorkqueueDownload('');
-        }
-        $this->em->persist($site);
-        $this->em->flush();
-        return $site;
     }
 }

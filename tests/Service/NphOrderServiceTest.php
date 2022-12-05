@@ -7,6 +7,7 @@ use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\SiteService;
 use App\Service\UserService;
+use App\Tests\testSetup;
 use Doctrine\ORM\EntityManagerInterface;
 
 class NphOrderServiceTest extends ServiceTestCase
@@ -14,6 +15,7 @@ class NphOrderServiceTest extends ServiceTestCase
     protected $service;
     protected $em;
     protected $module1Data;
+    protected testSetup $testSetup;
 
     public function setUp(): void
     {
@@ -28,6 +30,7 @@ class NphOrderServiceTest extends ServiceTestCase
             static::getContainer()->get(SiteService::class),
             $this->createMock(LoggerService::class)
         );
+        $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
@@ -161,8 +164,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $sampleCode,
         $collectedTs,
         $notes,
-        $metaData = []): void
-    {
+        $metaData = []
+    ): void {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008');
         if ($orderType === 'stool') {
@@ -181,15 +184,17 @@ class NphOrderServiceTest extends ServiceTestCase
             foreach ($metaData as $type => $data) {
                 $collectionFormData[$type] = $data;
             }
-         }
+        }
         $this->service->saveOrderCollection($collectionFormData, $nphOrder);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($notes, $nphSample->getCollectedNotes());
         $this->assertSame($collectionFormData, $this->service->getExistingOrderCollectionData($nphOrder));
 
         if ($metaData) {
-            $this->assertSame(json_encode($metaData), $this->service->jsonEncodeMetadata($collectionFormData,
-                array_keys($metaData)));
+            $this->assertSame(json_encode($metaData), $this->service->jsonEncodeMetadata(
+                $collectionFormData,
+                array_keys($metaData)
+            ));
         }
     }
 
@@ -225,5 +230,30 @@ class NphOrderServiceTest extends ServiceTestCase
         $sampleId = $this->service->generateSampleId();
         $this->assertSame(10, strlen($sampleId));
         $this->assertNotEquals(0, $sampleId[0]);
+    }
+
+    public function testGetParticipantOrderSummary(): void
+    {
+        $orderSummary = $this->service->getParticipantOrderSummary('P0000000001');
+        $this->assertSame(array('order' => array(), 'sampleCount' => 0), $orderSummary);
+        $participant = $this->testSetup->generateParticipant();
+        $nphOrder = $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
+        $orderSummary = $this->service->getParticipantOrderSummary($participant->id);
+        $this->assertIsArray($orderSummary);
+        $this->assertArrayHasKey('order', $orderSummary);
+        $this->assertSame(count($orderSummary['order']), 1);
+        $this->assertArrayHasKey('sampleName', $orderSummary['order']['1']['LMT']['preLMT']['urine']['URINES']);
+
+    }
+
+    public function testGetParticipantOrderSummaryByVisitAndModule(): void
+    {
+        $participant = $this->testSetup->generateParticipant();
+        $nphOrder = $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
+        $orderSummary = $this->service->getParticipantOrderSummaryByModuleAndVisit($participant->id, '1', 'LMT');
+        $this->assertIsArray($orderSummary);
+        $this->assertArrayHasKey('order', $orderSummary);
+        $this->assertSame(count($orderSummary['order']), 1);
+        $this->assertArrayHasKey('sampleName', $orderSummary['order']['preLMT']['urine']['URINES']);
     }
 }
