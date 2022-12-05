@@ -26,15 +26,18 @@
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
                     <tr>
-                        <td>
+                        <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+                        class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
                         </td>
-                        <td style="position: relative">
+                        <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+                            class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                         </td>
-                        <td>
+                        <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                            class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                             {% if index == order.nphSamples|length - 1 %}
@@ -48,7 +51,8 @@
                     </tr>
                 {% endfor %}
                 <tr>
-                    <td colspan="3">{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
+                    <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
+                        class="has-error"{% endif %}>{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
                 </tr>
                 </tbody>
             </table>
