@@ -43,7 +43,8 @@ class NphOrderForm extends AbstractType
         FormBuilderInterface $builder,
         array $options,
         string $sample,
-        string $formType = 'finalize'): void
+        string $formType = 'finalize'
+    ): void
     {
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         $constraints = [
