@@ -44,8 +44,7 @@ class NphOrderForm extends AbstractType
         array $options,
         string $sample,
         string $formType = 'finalize'
-    ): void
-    {
+    ): void {
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         $constraints = [
             new Constraints\Type('datetime'),
@@ -81,7 +80,7 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addUrineMetadataFields(FormBuilderInterface  $builder): void
+    protected function addUrineMetadataFields(FormBuilderInterface $builder): void
     {
         $builder->add('urineColor', Type\ChoiceType::class, [
             'label' => 'Urine Color',
