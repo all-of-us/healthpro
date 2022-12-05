@@ -249,7 +249,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetParticipantOrderSummaryByVisitAndModule(): void
     {
         $participant = $this->testSetup->generateParticipant();
-        $nphOrder = $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
+        $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
         $orderSummary = $this->service->getParticipantOrderSummaryByModuleAndVisit($participant->id, '1', 'LMT');
         $this->assertIsArray($orderSummary);
         $this->assertArrayHasKey('order', $orderSummary);
