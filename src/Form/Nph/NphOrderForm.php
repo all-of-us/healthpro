@@ -39,17 +39,27 @@ class NphOrderForm extends AbstractType
         'I tend to have normal formed stool - Type 3 and 4' => 'normal'
     ];
 
-    protected function addCollectedSampleFields(FormBuilderInterface $builder, string $sample, string $sampleLabel): void
-    {
-        $builder->add($sample, Type\CheckboxType::class, [
-            'label' => $sampleLabel,
-            'required' => false
-        ]);
-    }
-
-    protected function addCollectedTimeAndNoteFields(FormBuilderInterface $builder, array $options, string $sample): void
+    protected function addCollectedTimeAndNoteFields(
+        FormBuilderInterface $builder,
+        array $options,
+        string $sample,
+        string $formType = 'finalize'): void
     {
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
+        $constraints = [
+            new Constraints\Type('datetime'),
+            new Constraints\LessThanOrEqual([
+                'value' => $constraintDateTime,
+                'message' => 'Date cannot be in the future'
+            ])
+        ];
+        if ($formType === 'collect') {
+            $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
+                if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
+                    $context->buildViolation('Collection time required')->addViolation();
+                }
+            });
+        }
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
             'required' => false,
             'label' => 'Collection Time',
@@ -58,13 +68,7 @@ class NphOrderForm extends AbstractType
             'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => $options['timeZone'],
-            'constraints' => [
-                new Constraints\Type('datetime'),
-                new Constraints\LessThanOrEqual([
-                    'value' => $constraintDateTime,
-                    'message' => 'Date cannot be in the future'
-                ])
-            ],
+            'constraints' => $constraints,
             'attr' => [
                 'class' => 'order-ts',
             ]

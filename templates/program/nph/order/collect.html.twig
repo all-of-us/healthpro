@@ -26,9 +26,13 @@
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
                     <tr>
-                        <td>{{ form_widget(orderCollectForm[nphSample.sampleCode]) }}</td>
+                        <td>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+                        </td>
                         <td style="position: relative">
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                         </td>
                         <td>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
@@ -54,6 +58,7 @@
                 <div class="form-group">
                     {{ form_label(orderCollectForm['urineColor']) }}
                     {{ form_widget(orderCollectForm['urineColor']) }}
+                    {{ form_errors(orderCollectForm['urineColor']) }}
                 </div>
                 <div class="form-group">
                     {{ form_label(orderCollectForm['urineClarity']) }}
