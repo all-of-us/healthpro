@@ -98,13 +98,26 @@
                         </thead>
                         <tbody>
                             {% for aliquotCode, aliquot in aliquots %}
-                                <tr>
+                                <tr id="aliquots_fields_list_{{ aliquotCode }}"
+                                    data-aliquot-id="{{ aliquotCode }}"
+                                    data-aliquot-units="{{ aliquot['units'] }}"
+                                    data-code-prototype="{{ form_widget(sampleFinalizeForm[aliquotCode].vars
+                                    .prototype)|e }}"
+                                    data-ts-prototype="{{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'].vars
+                                    .prototype)|e }}"
+                                    data-volume-prototype="{{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'].vars
+                                    .prototype)|e }}"
+                                    data-widget-tags='<tr class="aliquots-row-{{ aliquotCode }}"></tr>'
+                                    data-widget-counter="{{ sampleFinalizeForm[aliquotCode]|length }}">
                                     <td colspan="4">
                                         {{ aliquot['container'] }}
                                     </td>
                                 </tr>
-                                {% for i in range(0, aliquot['expectedAliquots']-1) %}
-                                    <tr>
+                                {% set sampleDataCount = sampleData[aliquotCode] is defined ?
+                                    sampleData[aliquotCode]|length : 0 %}
+                                {% set aliquotCount = max(aliquot['expectedAliquots'], sampleDataCount) %}
+                                {% for i in range(0, aliquotCount - 1) %}
+                                    <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
                                         <td>
                                             {{ form_widget(sampleFinalizeForm[aliquotCode][i]) }}
                                         </td>
@@ -117,12 +130,21 @@
                                         <td>
                                             {{ aliquot['units'] }}
                                         </td>
-                                        <td>
-                                            <i class="fa fa-eraser" role="button"></i>
-                                            <i class="fa fa-trash" role="button"></i>
-                                        </td>
+                                        {% if sample.finalizedTs is empty %}
+                                            <td>
+                                                <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
+                                {% if sample.finalizedTs is empty %}
+                                    <tr>
+                                        <td>
+                                            <a type="button" class="add-aliquot-widget"
+                                               data-list-selector="#aliquots_fields_list_{{ aliquotCode }}">+ Add Line</a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
