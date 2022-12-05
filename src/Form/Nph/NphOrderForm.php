@@ -80,7 +80,7 @@ class NphOrderForm extends AbstractType
     {
         $builder->add('urineColor', Type\ChoiceType::class, [
             'label' => 'Urine Color',
-            'required' => false,
+            'required' => true,
             'choices' => NphOrderCollect::$urineColors,
             'multiple' => false,
             'placeholder' => 'Select Urine Color'
@@ -88,7 +88,7 @@ class NphOrderForm extends AbstractType
 
         $builder->add('urineClarity', Type\ChoiceType::class, [
             'label' => 'Urine Clarity',
-            'required' => false,
+            'required' => true,
             'choices' => NphOrderCollect::$urineClarity,
             'multiple' => false,
             'placeholder' => 'Select Urine Clarity'
@@ -99,7 +99,7 @@ class NphOrderForm extends AbstractType
     {
         $builder->add('bowelType', Type\ChoiceType::class, [
             'label' => 'Describe the bowel movement for this collection',
-            'required' => false,
+            'required' => true,
             'choices' => self::$bowelMovements,
             'multiple' => false,
             'placeholder' => 'Select bowel movement type'
@@ -107,7 +107,7 @@ class NphOrderForm extends AbstractType
 
         $builder->add('bowelQuality', Type\ChoiceType::class, [
             'label' => 'Describe the typical quality of your bowel movements',
-            'required' => false,
+            'required' => true,
             'choices' => self::$bowelMovementQuality,
             'multiple' => false,
             'placeholder' => 'Select bowel movement quality'
