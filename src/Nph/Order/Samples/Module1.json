@@ -9,7 +9,23 @@
       "specimen": "Serum SST",
       "type": "blood",
       "identifier": "SST8.5",
-      "collectionVolume": "8.5 mL"
+      "collectionVolume": "8.5 mL",
+      "aliquots": {
+        "SST8P5A1": {
+          "identifier": "SSTS1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 500,
+          "units": "μL"
+        },
+        "SST8P5A2": {
+          "identifier": "SSTS1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 3,
+          "expectedVolume": 1000,
+          "units": "μL"
+        }
+      }
     },
     "PST8": {
       "label": "8 mL PST",
@@ -18,7 +34,23 @@
       "specimen": "Plasma PST",
       "type": "blood",
       "identifier": "PST8",
-      "collectionVolume": "8 mL"
+      "collectionVolume": "8 mL",
+      "aliquots": {
+        "PST8A1": {
+          "identifier": "LHPSTP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 500,
+          "units": "μL"
+        },
+        "PST8A2": {
+          "identifier": "LHPSTP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 3,
+          "expectedVolume": 1000,
+          "units": "μL"
+        }
+      }
     },
     "EDTA10": {
       "label": "10 mL EDTA",
@@ -27,7 +59,23 @@
       "specimen": "Whole Blood EDTA",
       "type": "blood",
       "identifier": "EDTA10",
-      "collectionVolume": "10 mL"
+      "collectionVolume": "10 mL",
+      "aliquots": {
+        "EDTA10A1": {
+          "identifier": "EDPAP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 500,
+          "units": "μL"
+        },
+        "EDTA10A2": {
+          "identifier": "EDPAP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 4,
+          "expectedVolume": 1000,
+          "units": "μL"
+        }
+      }
     },
     "P800": {
       "label": "2 mL P800",
@@ -36,7 +84,16 @@
       "specimen": "Whole Blood EDTA",
       "type": "blood",
       "identifier": "P800",
-      "collectionVolume": "2 mL"
+      "collectionVolume": "2 mL",
+      "aliquots": {
+        "P800A1": {
+          "identifier": "P800P1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 2,
+          "expectedVolume": 500,
+          "units": "μL"
+        }
+      }
     },
     "URINES": {
       "label": "Spot Urine",
@@ -45,7 +102,23 @@
       "specimen": "Urine",
       "type": "urine",
       "identifier": "UrineS",
-      "collectionVolume": "100 mL"
+      "collectionVolume": "100 mL",
+      "aliquots": {
+        "URINESA1": {
+          "identifier": "RU1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 7,
+          "expectedVolume": 500,
+          "units": "μL"
+        },
+        "URINESA2": {
+          "identifier": "RU2",
+          "container": "6mL Urine Aliquot tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 5,
+          "units": "mL"
+        }
+      }
     },
     "SALIVA": {
       "label": "Saliva",
@@ -54,7 +127,16 @@
       "specimen": "Saliva",
       "type": "saliva",
       "identifier": "Saliva",
-      "collectionVolume": "50 mL"
+      "collectionVolume": "50 mL",
+      "aliquots": {
+        "SALIVAA1": {
+          "identifier": "SA1",
+          "container": "5mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 4,
+          "units": "mL"
+        }
+      }
     },
     "HAIR": {
       "label": "Hair",
@@ -62,7 +144,16 @@
       "temperature": "Refrigerated",
       "specimen": "Hair",
       "type": "hair",
-      "identifier": "Hair"
+      "identifier": "Hair",
+      "aliquots": {
+        "HAIRA1": {
+          "identifier": "HA1",
+          "container": "Plastic Storage Bag",
+          "expectedAliquots": 1,
+          "expectedVolume": null,
+          "units": null
+        }
+      }
     },
     "NAIL": {
       "label": "Nail",
@@ -79,7 +170,16 @@
       "temperature": "Refrigerated",
       "specimen": "Nail",
       "type": "nail",
-      "identifier": "Nail-B"
+      "identifier": "Nail-B",
+      "aliquots": {
+        "NAILBA1": {
+          "identifier": "NA1",
+          "container": "5mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": null,
+          "units": null
+        }
+      }
     },
     "NAILL": {
       "label": "Other Toenails",
@@ -87,7 +187,16 @@
       "temperature": "Refrigerated",
       "specimen": "Nail",
       "type": "nail",
-      "identifier": "Nail-L"
+      "identifier": "Nail-L",
+      "aliquots": {
+        "NAILLA1": {
+          "identifier": "NA2",
+          "container": "5mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": null,
+          "units": null
+        }
+      }
     },
     "STOOL": {
       "label": "Stool",

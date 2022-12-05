@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\NphOrder;
-use App\Form\Nph\NphOrderCollectType;
+use App\Entity\NphSample;
+use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
+use App\Form\Nph\NphSampleFinalizeType;
+use App\Form\Nph\NphSampleLookupType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
@@ -92,7 +95,7 @@ class NphOrderController extends BaseController
         $sampleLabels = $nphOrderService->getSamplesWithLabels($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
-            NphOrderCollectType::class,
+            NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
         );
@@ -111,6 +114,96 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
+        ]);
+    }
+
+    /**
+     * @Route("/samples/aliquot", name="nph_samples_aliquot")
+     */
+    public function sampleAliquotLookupAction(Request $request): Response
+    {
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleIdForm->handleRequest($request);
+
+        if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
+            $id = $sampleIdForm->get('sampleId')->getData();
+
+            $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+                'sampleId' => $id
+            ]);
+            if ($sample) {
+                return $this->redirectToRoute('nph_sample_finalize', [
+                    'participantId' => $sample->getNphOrder()->getParticipantId(),
+                    'orderId' => $sample->getNphOrder()->getId(),
+                    'sampleId' => $sample->getId()
+                ]);
+            }
+            $this->addFlash('error', 'Sample ID not found');
+        }
+
+        return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
+            'sampleIdForm' => $sampleIdForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/finalize", name="nph_sample_finalize")
+     */
+    public function sampleFinalizeAction(
+        $participantId,
+        $orderId,
+        $sampleId,
+        NphOrderService $nphOrderService,
+        ParticipantSummaryService $participantSummaryService,
+        Request $request
+    ): Response {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'nphOrder' => $order, 'id' => $sampleId
+        ]);
+        if (empty($sample)) {
+            throw $this->createNotFoundException('Sample not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleCode = $sample->getSampleCode();
+        $sampleData = $nphOrderService->getExistingSampleData($sample);
+        $sampleFinalizeForm = $this->createForm(
+            NphSampleFinalizeType::class,
+            $sampleData,
+            ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => (bool)$sample->getFinalizedTs()]
+        );
+        $sampleFinalizeForm->handleRequest($request);
+        if ($sampleFinalizeForm->isSubmitted() && $sampleFinalizeForm->isValid()) {
+            $formData = $sampleFinalizeForm->getData();
+            if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                $this->addFlash('success', 'Order finalized');
+                return $this->redirectToRoute('nph_sample_finalize', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId,
+                    'sampleId' => $sampleId
+                ]);
+            } else {
+                $this->addFlash('error', 'Failed finalizing order');
+            }
+        }
+        return $this->render('program/nph/order/sample-finalize.html.twig', [
+            'sampleIdForm' => $sampleIdForm->createView(),
+            'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
+            'sample' => $sample,
+            'participant' => $participant,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
+            'aliquots' => $nphOrderService->getAliquots($sampleCode),
+            'sampleData' => $sampleData
         ]);
     }
 

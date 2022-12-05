@@ -28,7 +28,7 @@
                     <tr>
                         <td>{{ form_widget(orderCollectForm[nphSample.sampleCode]) }}</td>
                         <td style="position: relative">
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~'CollectedTs']) }}
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                         </td>
                         <td>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
