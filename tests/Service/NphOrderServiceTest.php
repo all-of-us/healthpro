@@ -237,7 +237,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $orderSummary = $this->service->getParticipantOrderSummary('P0000000001');
         $this->assertSame(array('order' => array(), 'sampleCount' => 0), $orderSummary);
         $participant = $this->testSetup->generateParticipant();
-        $nphOrder = $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
+        $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
         $orderSummary = $this->service->getParticipantOrderSummary($participant->id);
         $this->assertIsArray($orderSummary);
         $this->assertArrayHasKey('order', $orderSummary);
