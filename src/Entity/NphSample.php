@@ -260,6 +260,16 @@ class NphSample
         return $this;
     }
 
+    public function getStatus(): string
+    {
+        if ($this->collectedTs === null) {
+            return 'Created';
+        } elseif ($this->finalizedTs === null) {
+            return 'Collected';
+        }
+        return 'Finalized';
+    }
+
     /**
      * @return Collection|NphAliquot[]
      */
