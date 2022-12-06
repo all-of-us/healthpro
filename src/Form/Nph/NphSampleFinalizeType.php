@@ -40,7 +40,8 @@ class NphSampleFinalizeType extends NphOrderForm
                 'entry_options' => [
                     'constraints' => new Constraints\Type('string'),
                     'attr' => [
-                        'placeholder' => 'Scan Aliquot Barcode'
+                        'placeholder' => 'Scan Aliquot Barcode',
+                        'class' => 'aliquot-barcode'
                     ],
                 ],
                 'label' => $aliquot['container'],

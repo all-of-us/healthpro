@@ -190,18 +190,26 @@ class NphOrderController extends BaseController
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => (bool)$sample->getFinalizedTs()]
         );
         $sampleFinalizeForm->handleRequest($request);
-        if ($sampleFinalizeForm->isSubmitted() && $sampleFinalizeForm->isValid()) {
+        if ($sampleFinalizeForm->isSubmitted()) {
             $formData = $sampleFinalizeForm->getData();
-            if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
-                $this->addFlash('success', 'Order finalized');
-                return $this->redirectToRoute('nph_sample_finalize', [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId,
-                    'sampleId' => $sampleId
-                ]);
-            } else {
-                $this->addFlash('error', 'Failed finalizing order');
+            if ($nphOrderService->hasAtLeastOneAliquotSample($formData, $sampleCode) === false) {
+                $sampleFinalizeForm->addError(new FormError('Please select at least one sample'));
             }
+            if ($sampleFinalizeForm->isValid()) {
+                if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                    $this->addFlash('success', 'Order finalized');
+                    return $this->redirectToRoute('nph_sample_finalize', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId,
+                        'sampleId' => $sampleId
+                    ]);
+                } else {
+                    $this->addFlash('error', 'Failed finalizing order');
+                }
+            } else {
+                $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
+            }
+
         }
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),

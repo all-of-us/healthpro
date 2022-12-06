@@ -399,6 +399,19 @@ class NphOrderService
         return $returnArray;
     }
 
+    public function hasAtLeastOneAliquotSample(array $formData, string $sampleCode): bool
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        foreach ($aliquots as $aliquotCode => $aliquot) {
+            foreach ($formData[$aliquotCode] as $aliquotId) {
+                if ($aliquotId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public function saveOrderFinalization(array $formData, NphSample $sample): NphSample
     {
         $sampleCode = $sample->getSampleCode();

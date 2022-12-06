@@ -61,6 +61,7 @@
                 </div>
                 <div class="panel-body">
                     {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+                    {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group">
                         {{ form_label(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
@@ -149,7 +150,11 @@
                         </tbody>
                     </table>
                     <hr>
-                    {{ form_widget(sampleFinalizeForm) }}
+                    <div class="form-group">
+                        {{ form_label(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
+                        {{ form_widget(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
+                        {{ form_errors(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
+                    </div>
                     <p>
                         <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif
                         %}" id="sample_finalize_btn">Mark as Finalized</button>
