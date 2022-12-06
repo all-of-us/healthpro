@@ -21,7 +21,7 @@ class NphProgramSummaryService
         $moduleSummary = [];
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $visits = $moduleClass::getVisitTypes();
-        foreach ($visits as $visit => $_) {
+        foreach (array_keys($visits) as $visit) {
             $module = new $moduleClass($visit);
             $moduleSummary[$visit] = $module->getTimePointSamples();
             foreach ($moduleSummary[$visit] as $timePoint => $timePointSamples) {
