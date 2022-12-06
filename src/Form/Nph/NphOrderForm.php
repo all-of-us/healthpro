@@ -39,17 +39,27 @@ class NphOrderForm extends AbstractType
         'I tend to have normal formed stool - Type 3 and 4' => 'normal'
     ];
 
-    protected function addCollectedSampleFields(FormBuilderInterface $builder, string $sample, string $sampleLabel): void
-    {
-        $builder->add($sample, Type\CheckboxType::class, [
-            'label' => $sampleLabel,
-            'required' => false
-        ]);
-    }
-
-    protected function addCollectedTimeAndNoteFields(FormBuilderInterface $builder, array $options, string $sample): void
-    {
+    protected function addCollectedTimeAndNoteFields(
+        FormBuilderInterface $builder,
+        array $options,
+        string $sample,
+        string $formType = 'finalize'
+    ): void {
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
+        $constraints = [
+            new Constraints\Type('datetime'),
+            new Constraints\LessThanOrEqual([
+                'value' => $constraintDateTime,
+                'message' => 'Date cannot be in the future'
+            ])
+        ];
+        if ($formType === 'collect') {
+            $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
+                if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
+                    $context->buildViolation('Collection time required')->addViolation();
+                }
+            });
+        }
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
             'required' => false,
             'label' => 'Collection Time',
@@ -58,13 +68,7 @@ class NphOrderForm extends AbstractType
             'html5' => false,
             'model_timezone' => 'UTC',
             'view_timezone' => $options['timeZone'],
-            'constraints' => [
-                new Constraints\Type('datetime'),
-                new Constraints\LessThanOrEqual([
-                    'value' => $constraintDateTime,
-                    'message' => 'Date cannot be in the future'
-                ])
-            ],
+            'constraints' => $constraints,
             'attr' => [
                 'class' => 'order-ts',
             ]
@@ -76,11 +80,11 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addUrineMetadataFields(FormBuilderInterface  $builder): void
+    protected function addUrineMetadataFields(FormBuilderInterface $builder): void
     {
         $builder->add('urineColor', Type\ChoiceType::class, [
             'label' => 'Urine Color',
-            'required' => false,
+            'required' => true,
             'choices' => NphOrderCollect::$urineColors,
             'multiple' => false,
             'placeholder' => 'Select Urine Color'
@@ -88,7 +92,7 @@ class NphOrderForm extends AbstractType
 
         $builder->add('urineClarity', Type\ChoiceType::class, [
             'label' => 'Urine Clarity',
-            'required' => false,
+            'required' => true,
             'choices' => NphOrderCollect::$urineClarity,
             'multiple' => false,
             'placeholder' => 'Select Urine Clarity'
@@ -99,7 +103,7 @@ class NphOrderForm extends AbstractType
     {
         $builder->add('bowelType', Type\ChoiceType::class, [
             'label' => 'Describe the bowel movement for this collection',
-            'required' => false,
+            'required' => true,
             'choices' => self::$bowelMovements,
             'multiple' => false,
             'placeholder' => 'Select bowel movement type'
@@ -107,7 +111,7 @@ class NphOrderForm extends AbstractType
 
         $builder->add('bowelQuality', Type\ChoiceType::class, [
             'label' => 'Describe the typical quality of your bowel movements',
-            'required' => false,
+            'required' => true,
             'choices' => self::$bowelMovementQuality,
             'multiple' => false,
             'placeholder' => 'Select bowel movement quality'

@@ -12,6 +12,7 @@ use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -100,12 +101,19 @@ class NphOrderController extends BaseController
             ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
         );
         $oderCollectForm->handleRequest($request);
-        if ($oderCollectForm->isSubmitted() && $oderCollectForm->isValid()) {
+        if ($oderCollectForm->isSubmitted()) {
             $formData = $oderCollectForm->getData();
-            if ($nphOrderService->saveOrderCollection($formData, $order)) {
-                $this->addFlash('success', 'Order collection saved');
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
+            if ($oderCollectForm->isValid()) {
+                if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                    $this->addFlash('success', 'Order collection saved');
+                } else {
+                    $this->addFlash('error', 'Order collection failed');
+                }
             } else {
-                $this->addFlash('error', 'Order collection failed');
+                $oderCollectForm->addError(new FormError('Please correct the errors below'));
             }
         }
         return $this->render('program/nph/order/collect.html.twig', [

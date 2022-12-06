@@ -156,6 +156,43 @@ class NphOrderServiceTest extends ServiceTestCase
     }
 
     /**
+     * @dataProvider orderCollectionFormDataProvider
+     */
+    public function testIsAtLeastOneSampleChecked(
+        $timePoint,
+        $orderType,
+        $sampleCodes,
+        $formData,
+        $isAtLeastOneSampleChecked
+    ): void {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        if ($orderType === 'stool') {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
+            foreach ($sampleCodes as $key => $sampleCode) {
+                $this->service->createSample($sampleCode, $nphOrder, "T000000000{$key}");
+            }
+        } else {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType);
+            foreach ($sampleCodes as $sampleCode) {
+                $this->service->createSample($sampleCode, $nphOrder);
+            }
+        }
+        $this->assertSame($this->service->isAtLeastOneSampleChecked($formData, $nphOrder), $isAtLeastOneSampleChecked);
+    }
+
+    public function orderCollectionFormDataProvider(): array
+    {
+        return [
+            ['preLMT', 'urine', ['URINES'], ['URINES' => true], true],
+            ['preLMT', 'saliva', ['SALIVA'], ['SALIVA' => true], true],
+            ['preLMT', 'stool', ['ST1', 'ST2'], ['ST1' => false, 'ST2' => true], true],
+            ['30min', 'blood', ['SST8P5', 'PST8'], ['SST8P5' => false, 'PST8' => false], false],
+            ['postLMT', 'saliva', ['SALIVA'], ['SALIVA' => false], false],
+        ];
+    }
+
+    /**
      * @dataProvider orderCollectionDataProvider
      */
     public function testSaveOrderCollection(

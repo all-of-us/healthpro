@@ -26,12 +26,20 @@
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
                     <tr>
-                        <td>{{ form_widget(orderCollectForm[nphSample.sampleCode]) }}</td>
-                        <td style="position: relative">
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                        <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+                        class="has-error"{% endif %}>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
                         </td>
-                        <td>
+                        <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+                            class="has-error"{% endif %}>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                        </td>
+                        <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                            class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                             {% if index == order.nphSamples|length - 1 %}
                                 <small class="text-warning">
                                     Comments entered in this field are transmitted to the Biobank via reconciliation reporting.
@@ -42,8 +50,13 @@
                         </td>
                     </tr>
                 {% endfor %}
+                <tr>
+                    <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
+                        class="has-error"{% endif %}>{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
+                </tr>
                 </tbody>
             </table>
+            <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
             {% if order.orderType == 'urine' %}
                 <h4>
                     Color and Clarity
@@ -54,10 +67,12 @@
                 <div class="form-group">
                     {{ form_label(orderCollectForm['urineColor']) }}
                     {{ form_widget(orderCollectForm['urineColor']) }}
+                    {{ form_errors(orderCollectForm['urineColor']) }}
                 </div>
                 <div class="form-group">
                     {{ form_label(orderCollectForm['urineClarity']) }}
                     {{ form_widget(orderCollectForm['urineClarity']) }}
+                    {{ form_errors(orderCollectForm['urineClarity']) }}
                 </div>
             {% endif %}
             {% if order.orderType == 'stool' %}
