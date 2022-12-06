@@ -21,21 +21,16 @@ class NphProgramSummaryService
         $moduleSummary = [];
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $visits = $moduleClass::getVisitTypes();
-        foreach ($visits as $visit => $visitName) {
+        foreach ($visits as $visit) {
             $module = new $moduleClass($visit);
             $moduleSummary[$visit] = $module->getTimePointSamples();
             foreach ($moduleSummary[$visit] as $timePoint => $timePointSamples) {
                 foreach ($timePointSamples as $sampleCode => $sample) {
-                    try {
-                        unset($moduleSummary[$visit][$timePoint][$sampleCode]);
-                        if (!array_key_exists($module->getSampleType($sampleCode), $moduleSummary[$visit][$timePoint])) {
-                            $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)] = [];
-                        }
-                        $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)][$sampleCode] = $sample;
-                    } catch (\Exception $e) {
-                        $test = $e->getMessage();
-                        throw $e;
+                    unset($moduleSummary[$visit][$timePoint][$sampleCode]);
+                    if (!array_key_exists($module->getSampleType($sampleCode), $moduleSummary[$visit][$timePoint])) {
+                        $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)] = [];
                     }
+                    $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)][$sampleCode] = $sample;
                 }
                 $moduleSummary[$visit][$timePoint] = ['timePointInfo' => $moduleSummary[$visit][$timePoint], 'timePointDisplayName' => $module->getTimePoints()[$timePoint]];
             }
@@ -63,7 +58,7 @@ class NphProgramSummaryService
                     foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
                         $numberSamples = 0;
                         $expectedSamples = 0;
-                        foreach ($sample as $sampleCode => $sampleName) {
+                        foreach ($sample as $sampleCode) {
                             if ($sampleCode === 'STOOL' || $sampleCode === 'NAIL') {
                                 continue;
                             }
