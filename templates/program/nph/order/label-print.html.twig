@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello NphParticipantSummaryController!{% endblock %}
+{% block title %}NPH Print Label{% endblock %}
 
 {% block body %}
     <div class="page-header">
@@ -46,7 +46,7 @@
                         {% for sampleCode,sampleInfo in orderInfo %}
                              <tr>
                                  {% if printOrderTD %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderId}) }}">{{ orderId }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.orderId}) }}">{{ sampleInfo.orderId }}</a></td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.timepointDisplayName }}</td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.sampleTypeDisplayName }}</td>
                                     {% set printOrderTD = false %}
@@ -79,7 +79,7 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="window.history.back();">close</button>
+    <a class="btn btn-primary" role="button" href="{{ path('nph_participant_summary', {participantid: participant.id}) }}">close</a>
 {% endblock %}
 
 {% block pagejs %}

@@ -68,7 +68,7 @@ class NphProgramSummaryService
                                 continue;
                             }
                             $expectedSamples++;
-                            if (isset($orderSummary[$module][$visit][$timePoint][$sampleType][$sampleCode]['SampleID'])) {
+                            if (isset($orderSummary[$module][$visit][$timePoint][$sampleType][$sampleCode]['sampleId'])) {
                                 $numberSamples++;
                             }
                             $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];

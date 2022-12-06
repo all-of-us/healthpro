@@ -92,7 +92,7 @@
                                         {% if loop.first %}
                                             <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
                                         {% endif %}
-                                        {% set SampleGroupStatus = sampleInfo|column('SampleStatus') %}
+                                        {% set SampleGroupStatus = sampleInfo|column('sampleStatus') %}
                                         {% if 'Collected' in SampleGroupStatus %}
                                             {% set SampleGroupCollectionStatus = 'Collected' %}
                                             {% if 'Created' in SampleGroupStatus %}
@@ -103,13 +103,13 @@
                                         {% endif %}
                                         {% for sampleCode, sample in sampleInfo %}
                                             {% set SampleGroupStatus = null %}
-                                            {% if sample is iterable and sample|length > 0 and sample['SampleID'] is not null and loop.first %}
+                                            {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and loop.first %}
                                                 <div class="well well-sm row">
-                                                    <div class="col-sm-2">{{ sample['CreateDate'] }}</div>
+                                                    <div class="col-sm-2">{{ sample['createDate'] }}</div>
                                                     <div class="col-sm-3"><a
-                                                            href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample['HealthProOrderID']}) }}">Order
-                                                            ID: {{ sample['OrderID'] }}</a></div>
-                                                    <div class="col-sm-2">{{ sample['SampleTypeDisplayName'] }}</div>
+                                                            href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample['healthProOrderId']}) }}">Order
+                                                            ID: {{ sample['orderId'] }}</a></div>
+                                                    <div class="col-sm-2">{{ sample['sampleTypeDisplayName'] }}</div>
                                                     <div class="col-sm-2">{{ SampleGroupCollectionStatus ?? 'Created' }}</div>
                                                     <div class="col-sm-3">({{ sampleInfo['numberSamples'] }}
                                                         /{{ sampleInfo['expectedSamples'] }} Samples Created)
