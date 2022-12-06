@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} NPH Participant Summary {% endblock %}
+
+{% block body %}
+    <div class="page-header row">
+        <h2 class="col-sm-2">{{ participant.lastName }}, {{ participant.firstName }}</h2>
+        <span class="label label-warning font-size-small col-sm-1" style="display: block">NPH Module 1</span>
+    </div>
+    <div class="page-header row">
+        <div class="row">
+            <div class="col-md-2">
+                <div>ParticipantID</div>
+                <div>{{ participant.id }}</div>
+            </div>
+            <div class="col-md-2">
+                <div>Biobank ID</div>
+                <div>Bio123456789</div>
+            </div>
+            <div class="col-md-2">
+                <div>Site</div>
+                <div>{{ siteInfo.siteId }}</div>
+            </div>
+            <div class="col-md-2">
+                <div>Module informed consent status</div>
+            </div>
+            <div class="col-md-4 -align-right">
+                <div>
+                    <svg id="participantBarcode" data-id="{{ participant.id }}"></svg>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div>DOB</div>
+                <div>{{ participant.dob ? participant.dob|date('n/j/Y') }}</div>
+            </div>
+            <div class="col-md-2">
+                <div>Gender Identity</div>
+                <div>{{ participant.genderIdentity }}</div>
+            </div>
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-2">
+                <div>Module Eligibility Evaluation Status</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12" role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            {% for moduleNumber, module in programSummaryAndOrderInfo %}
+                {% if loop.first %}
+                    {% set tabActive = 'active' %}
+                {% else %}
+                    {% set tabActive = '' %}
+                {% endif %}
+                <li role="presentation" class="{{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
+                        Module {{ moduleNumber }}</a></li>
+            {% endfor %}
+        </ul>
+        <button class="btn btn-primary pull-right" style="position: relative">Refresh</button>
+    </div>
+    <div class="col-sm-3">
+        <ul class="nav nav-pills">
+            <li role="presentation" class="active"><a>Sample Collection</a></li>
+            <li role="presentation"><a>Participant Overview</a></li>
+            <li role="presentation"><a>Participant Activities</a></li>
+        </ul>
+    </div>
+    <div class="col-sm-9">
+        {% for moduleNumber, module in programSummaryAndOrderInfo %}
+            {% if loop.first %}
+                {% set modulePanelDisplay = '' %}
+            {% else %}
+                {% set modulePanelDisplay = 'hidden' %}
+            {% endif %}
+            <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
+                <h4 class="col-md-12">NPH Module {{ moduleNumber }} Sample Collection</h4>
+                {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
+                    <div>
+                        <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#Visit{{ VisitCode }}"
+                             role="button">Visit {{ VisitCode }}<span class="caret"
+                                                                      style="float: right; margin: 9px 0;"></span></div>
+                        <div style="margin-bottom: 20px" id="Visit{{ VisitCode }}" class="collapse">
+                            <a class="btn btn-primary" role="button"
+                               href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
+                            </a>
+                            {% for timepointCode, timepoint in visit %}
+                                {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                    {% if sampleInfo['numberSamples'] > 0 %}
+                                        {% if loop.first %}
+                                            <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+                                        {% endif %}
+                                        {% set SampleGroupStatus = sampleInfo|column('SampleStatus') %}
+                                        {% if 'Collected' in SampleGroupStatus %}
+                                            {% set SampleGroupCollectionStatus = 'Collected' %}
+                                            {% if 'Created' in SampleGroupStatus %}
+                                                {% set SampleGroupCollectionStatus = 'Partially Collected' %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% set SampleGroupCollectionStatus = 'Created' %}
+                                        {% endif %}
+                                        {% for sampleCode, sample in sampleInfo %}
+                                            {% set SampleGroupStatus = null %}
+                                            {% if sample is iterable and sample|length > 0 and sample['SampleID'] is not null and loop.first %}
+                                                <div class="well well-sm row">
+                                                    <div class="col-sm-2">{{ sample['CreateDate'] }}</div>
+                                                    <div class="col-sm-3"><a
+                                                            href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample['HealthProOrderID']}) }}">Order
+                                                            ID: {{ sample['OrderID'] }}</a></div>
+                                                    <div class="col-sm-2">{{ sample['SampleTypeDisplayName'] }}</div>
+                                                    <div class="col-sm-2">{{ SampleGroupCollectionStatus ?? 'Created' }}</div>
+                                                    <div class="col-sm-3">({{ sampleInfo['numberSamples'] }}
+                                                        /{{ sampleInfo['expectedSamples'] }} Samples Created)
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-participant-summary') }}
+{% endblock %}

@@ -48,4 +48,9 @@ class Module3 extends Samples
         }
         parent::__construct($this->module, $visit);
     }
+
+    public static function getVisitTypes(): array
+    {
+        return self::$visitTypes;
+    }
 }
