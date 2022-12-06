@@ -191,7 +191,7 @@ class NphOrderController extends BaseController
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
-            $formData = $sampleFinalizeForm->getData();
+            $formData = $sampleData = $sampleFinalizeForm->getData();
             if ($nphOrderService->hasAtLeastOneAliquotSample($formData, $sampleCode) === false) {
                 $sampleFinalizeForm->addError(new FormError('Please select at least one sample'));
             }
@@ -209,7 +209,6 @@ class NphOrderController extends BaseController
             } else {
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
             }
-
         }
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),

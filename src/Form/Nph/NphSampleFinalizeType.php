@@ -47,6 +47,7 @@ class NphSampleFinalizeType extends NphOrderForm
                 'label' => $aliquot['container'],
                 'required' => false,
                 'allow_add' => true,
+                'allow_delete' => true,
                 'data' => $idData,
             ]);
 
@@ -72,6 +73,7 @@ class NphSampleFinalizeType extends NphOrderForm
                 ],
                 'required' => false,
                 'allow_add' => true,
+                'allow_delete' => true,
                 'data' => $tsData,
             ]);
 
@@ -80,6 +82,7 @@ class NphSampleFinalizeType extends NphOrderForm
                 'label' => 'Volume',
                 'required' => false,
                 'allow_add' => true,
+                'allow_delete' => true,
                 'data' => $volumeData,
             ]);
         }
