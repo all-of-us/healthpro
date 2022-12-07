@@ -13,6 +13,7 @@ use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,20 +29,20 @@ class AccessManagementController extends BaseController
     private $googleGroupsService;
     private $loggerService;
     private $contextTemplate;
-    private $session;
+    private $requestStack;
 
     public function __construct(
         GoogleGroupsService $googleGroupsService,
         LoggerService $loggerService,
         EntityManagerInterface $em,
         ContextTemplateService $contextTemplate,
-        SessionInterface $session
+        RequestStack $requestStack
     ) {
         parent::__construct($em);
         $this->googleGroupsService = $googleGroupsService;
         $this->loggerService = $loggerService;
         $this->contextTemplate = $contextTemplate;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -65,9 +66,9 @@ class AccessManagementController extends BaseController
      */
     public function userGroup($groupId): Response
     {
-        if ($this->session->get('program') === 'hpo') {
+        if ($this->requestStack->getSession()->get('program') === 'hpo') {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
-        } elseif ($this->session->get('program') === 'nph') {
+        } elseif ($this->requestStack->getSession()->get('program') === 'nph') {
             $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
         }
         if (empty($group)) {
@@ -91,9 +92,9 @@ class AccessManagementController extends BaseController
      */
     public function member($groupId, Request $request)
     {
-        if ($this->session->get('program') === 'hpo') {
+        if ($this->requestStack->getSession()->get('program') === 'hpo') {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
-        } elseif ($this->session->get('program') === 'nph') {
+        } elseif ($this->requestStack->getSession()->get('program') === 'nph') {
             $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
         }
         if (empty($group)) {
@@ -145,9 +146,9 @@ class AccessManagementController extends BaseController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        if ($this->session->get('program') === 'hpo') {
+        if ($this->requestStack->getSession()->get('program') === 'hpo') {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
-        } elseif ($this->session->get('program') === 'nph') {
+        } elseif ($this->requestStack->getSession()->get('program') === 'nph') {
             $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
         }
         if (empty($group)) {
