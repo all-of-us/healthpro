@@ -403,9 +403,11 @@ class NphOrderService
     {
         $aliquots = $this->getAliquots($sampleCode);
         foreach ($aliquots as $aliquotCode => $aliquot) {
-            foreach ($formData[$aliquotCode] as $aliquotId) {
-                if ($aliquotId) {
-                    return true;
+            if (isset($formData[$aliquotCode])) {
+                foreach ($formData[$aliquotCode] as $aliquotId) {
+                    if ($aliquotId) {
+                        return true;
+                    }
                 }
             }
         }
