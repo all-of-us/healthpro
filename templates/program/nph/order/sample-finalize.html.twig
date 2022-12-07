@@ -121,15 +121,18 @@
                                 {% for i in range(0, aliquotCount - 1) %}
                                     {% if sampleFinalizeForm[aliquotCode][i] is defined %}
                                     <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
-                                        <td>
+                                        <td {% if not sampleFinalizeForm[aliquotCode][i].vars.valid %}
+                                            class="has-error"{% endif %}>
                                             {{ form_widget(sampleFinalizeForm[aliquotCode][i]) }}
                                             {{ form_errors(sampleFinalizeForm[aliquotCode][i]) }}
                                         </td>
-                                        <td style="position: relative;">
+                                        <td {% if not sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
+                                                class="has-error"{% endif %} style="position: relative;">
                                             {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
                                             {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
                                         </td>
-                                        <td>
+                                        <td {% if not sampleFinalizeForm[aliquotCode ~ 'Volume'][i].vars.valid %}
+                                            class="has-error"{% endif %}>
                                             {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
                                             {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
                                         </td>
