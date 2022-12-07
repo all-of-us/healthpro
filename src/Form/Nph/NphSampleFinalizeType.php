@@ -39,6 +39,10 @@ class NphSampleFinalizeType extends NphOrderForm
                 'entry_options' => [
                     'constraints' => [
                         new Constraints\Type('string'),
+                        new Constraints\Regex([
+                            'pattern' => '/^[a-zA-Z0-9]{10}$/',
+                            'message' => 'Aliquot barcode must be a string of 10 digits'
+                        ]),
                         new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
                             $formData = $context->getRoot()->getData();
                             $key = intval($context->getObject()->getName());
