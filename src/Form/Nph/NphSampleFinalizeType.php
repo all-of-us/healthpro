@@ -120,6 +120,11 @@ class NphSampleFinalizeType extends NphOrderForm
             ]);
         }
 
+        // Placeholder field for displaying enter at least one aliquot message
+        $builder->add('aliquotError', Type\CheckboxType::class, [
+            'required' => false
+        ]);
+
         return $builder->getForm();
     }
 

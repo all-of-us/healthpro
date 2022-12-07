@@ -158,8 +158,13 @@
                                     </tr>
                                 {% endif %}
                             {% endfor %}
+                            <tr>
+                                <td colspan="4" {% if not sampleFinalizeForm['aliquotError'].vars.valid %}
+                                    class="has-error"{% endif %}>{{ form_errors(sampleFinalizeForm['aliquotError']) }}</td>
+                            </tr>
                         </tbody>
                     </table>
+                    <div style="display: none">{{ form_widget(sampleFinalizeForm['aliquotError']) }}</div>
                     <hr>
                     <div class="form-group">
                         {{ form_label(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
