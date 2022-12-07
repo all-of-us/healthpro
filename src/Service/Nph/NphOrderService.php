@@ -402,7 +402,7 @@ class NphOrderService
     public function hasAtLeastOneAliquotSample(array $formData, string $sampleCode): bool
     {
         $aliquots = $this->getAliquots($sampleCode);
-        foreach ($aliquots as $aliquotCode => $aliquot) {
+        foreach (array_keys($aliquots) as $aliquotCode) {
             if (isset($formData[$aliquotCode])) {
                 foreach ($formData[$aliquotCode] as $aliquotId) {
                     if ($aliquotId) {
