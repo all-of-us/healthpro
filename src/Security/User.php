@@ -354,10 +354,10 @@ class User implements UserInterface
         }
     }
 
-    public function getSiteFromId($siteId)
+    public function getSiteFromId(string $siteId, string $siteType = 'sites')
     {
         $site = null;
-        foreach ($this->sites as $s) {
+        foreach ($this->$siteType as $s) {
             if ($s->id === $siteId) {
                 $site = $s;
                 break;
@@ -416,7 +416,7 @@ class User implements UserInterface
         return $readOnlyGroup;
     }
 
-    public function getGroup($email)
+    public function getGroup(string $email, string $siteType = 'sites')
     {
         $group = $this->getSite($email);
         if ($group) {
@@ -425,9 +425,9 @@ class User implements UserInterface
         return $this->getReadOnlyGroup($email);
     }
 
-    public function getGroupFromId($groupId)
+    public function getGroupFromId(string $groupId, string $siteType = 'sites')
     {
-        $group = $this->getSiteFromId($groupId);
+        $group = $this->getSiteFromId($groupId, $siteType);
         if ($group) {
             return $group;
         }

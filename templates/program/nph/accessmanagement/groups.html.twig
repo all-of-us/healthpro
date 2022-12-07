@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+        <li class="active">HealthPro Groups</li>
+    </ol>
+    <div class="page-header">
+        <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
+    </div>
+    <br/>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>HealthPro Groups</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for group in app.session.get('managegroupsnph') %}
+            {% set groupInfo = app.user.site(group, 'nphSites') %}
+            <tr>
+                <td>
+                    <h4><a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ groupInfo.name }}</a></h4>
+                    <a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ group }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                order: [[0, 'asc']],
+                pageLength: 25
+            });
+        });
+    </script>
+{% endblock %}
