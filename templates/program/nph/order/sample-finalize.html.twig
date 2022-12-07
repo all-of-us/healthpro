@@ -123,12 +123,15 @@
                                     <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
                                         <td>
                                             {{ form_widget(sampleFinalizeForm[aliquotCode][i]) }}
+                                            {{ form_errors(sampleFinalizeForm[aliquotCode][i]) }}
                                         </td>
                                         <td style="position: relative;">
                                             {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
+                                            {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
                                         </td>
                                         <td>
                                             {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
+                                            {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
                                         </td>
                                         <td>
                                             {{ aliquot['units'] }}

@@ -38,7 +38,17 @@ class NphSampleFinalizeType extends NphOrderForm
             $builder->add("{$aliquotCode}", Type\CollectionType::class, [
                 'entry_type' => Type\TextType::class,
                 'entry_options' => [
-                    'constraints' => new Constraints\Type('string'),
+                    'constraints' => [
+                        new Constraints\Type('string'),
+                        new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
+                            $formData = $context->getRoot()->getData();
+                            $key = intval($context->getObject()->getName());
+                            if (($formData["{$aliquotCode}AliquotTs"][$key] ||
+                                $formData["{$aliquotCode}Volume"][$key]) && empty($value)) {
+                                $context->buildViolation('Barcode is required')->addViolation();
+                            }
+                        })
+                    ],
                     'attr' => [
                         'placeholder' => 'Scan Aliquot Barcode',
                         'class' => 'aliquot-barcode'
@@ -65,7 +75,15 @@ class NphSampleFinalizeType extends NphOrderForm
                         new Constraints\LessThanOrEqual([
                             'value' => new \DateTime('+5 minutes'),
                             'message' => 'Timestamp cannot be in the future'
-                        ])
+                        ]),
+                        new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
+                            $formData = $context->getRoot()->getData();
+                            $key = intval($context->getObject()->getName());
+                            if (($formData[$aliquotCode][$key] || $formData["{$aliquotCode}Volume"][$key])
+                                && empty($value)) {
+                                $context->buildViolation('Time is required')->addViolation();
+                            }
+                        })
                     ],
                     'attr' => [
                         'class' => 'order-ts',
@@ -80,6 +98,18 @@ class NphSampleFinalizeType extends NphOrderForm
             $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                 'entry_type' => Type\TextType::class,
                 'label' => 'Volume',
+                'entry_options' => [
+                    'constraints' => [
+                        new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
+                            $formData = $context->getRoot()->getData();
+                            $key = intval($context->getObject()->getName());
+                            if (($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
+                                && empty($value)) {
+                                $context->buildViolation('Volume is required')->addViolation();
+                            }
+                        })
+                    ]
+                ],
                 'required' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
