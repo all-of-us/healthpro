@@ -28,8 +28,7 @@ class NphSampleFinalizeType extends NphOrderForm
 
         foreach ($options['aliquots'] as $aliquotCode => $aliquot) {
             $idData = $tsData = $volumeData = [];
-            $formDataCount = isset($formData[$aliquotCode]) ? count($formData[$aliquotCode]) : 0;
-            $aliquotCount = max($aliquot['expectedAliquots'], $formDataCount);
+            $aliquotCount = isset($formData[$aliquotCode]) ? count($formData[$aliquotCode]) : $aliquot['expectedAliquots'];
             for ($i = 0; $i < $aliquotCount; $i++) {
                 $idData[] = $formData[$aliquotCode][$i] ?? null;
                 $tsData[] = $formData["{$aliquotCode}AliquotTs"][$i] ?? null;
