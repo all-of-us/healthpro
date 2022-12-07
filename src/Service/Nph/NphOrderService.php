@@ -101,7 +101,6 @@ class NphOrderService
     {
         $ordersData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
-            $this->user,
             $this->participantId,
             $this->visit
         );
@@ -127,7 +126,6 @@ class NphOrderService
     {
         $samplesData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
-            $this->user,
             $this->participantId,
             $this->visit
         );

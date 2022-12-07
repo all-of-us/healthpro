@@ -40,7 +40,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $this->em->persist($nphSample);
         $this->em->flush();
 
-        $orders = $this->repo->getOrdersByVisitType($user, 'P000000001', 'LMT');
+        $orders = $this->repo->getOrdersByVisitType('P000000001', 'LMT');
         $this->assertSame($nphOrder, $orders[0]);
     }
 }
