@@ -19,4 +19,9 @@ class Module1 extends Samples
             throw new \Exception('Visit Type not supported');
         }
     }
+
+    public static function getVisitTypes(): array
+    {
+        return self::$visitTypes;
+    }
 }
