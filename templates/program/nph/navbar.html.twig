@@ -50,22 +50,18 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% for key, roleNav in roleNavs|filter((roleNav, key) =>
-                                is_granted(roleNav.role) and
-                                not (key == 'biobank')
-                                ) %}
-                                {# Scripps and biobank roles point to the same route, so only display one if user has both roles #}
+                            {% if is_granted('ROLE_NPH_ADMIN') %}
                                 <li>
-                                    <a href="{{ path(roleNav.path) }}">
+                                    <a href="{{ path('nph_admin_home') }}">
                                         <i class="fas fa-arrow-circle-right"></i>
-                                        {% if key == currentRoleNav %}
-                                            <strong>{{ roleNav.title }}</strong>
+                                        {% if currentRoleNav == 'admin' %}
+                                            <strong>Admin</strong>
                                         {% else %}
-                                            {{ roleNav.title }}
+                                            Admin
                                         {% endif %}
                                     </a>
                                 </li>
-                            {% endfor %}
+                            {% endif %}
                         </ul>
                     </li>
                 </ul>
