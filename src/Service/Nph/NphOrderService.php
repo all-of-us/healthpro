@@ -101,7 +101,6 @@ class NphOrderService
     {
         $ordersData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
-            $this->user,
             $this->participantId,
             $this->visit
         );
@@ -127,7 +126,6 @@ class NphOrderService
     {
         $samplesData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
-            $this->user,
             $this->participantId,
             $this->visit
         );
@@ -397,6 +395,21 @@ class NphOrderService
         $returnArray['order'] = $orderSummary;
         $returnArray['sampleCount'] = $sampleCount;
         return $returnArray;
+    }
+
+    public function hasAtLeastOneAliquotSample(array $formData, string $sampleCode): bool
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        foreach (array_keys($aliquots) as $aliquotCode) {
+            if (isset($formData[$aliquotCode])) {
+                foreach ($formData[$aliquotCode] as $aliquotId) {
+                    if ($aliquotId) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public function saveOrderFinalization(array $formData, NphSample $sample): NphSample

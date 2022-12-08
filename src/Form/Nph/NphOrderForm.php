@@ -61,7 +61,7 @@ class NphOrderForm extends AbstractType
             });
         }
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-            'required' => false,
+            'required' => $formType === 'finalize',
             'label' => 'Collection Time',
             'widget' => 'single_text',
             'format' => 'M/d/yyyy h:mm a',

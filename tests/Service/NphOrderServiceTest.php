@@ -270,6 +270,28 @@ class NphOrderServiceTest extends ServiceTestCase
     }
 
     /**
+     * @dataProvider orderFinalizationFormDataProvider
+     */
+    public function testHasAtLeastOneAliquotSample($sampleCode, $formData, $isAtLeastOneSampleChecked): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->assertSame($this->service->hasAtLeastOneAliquotSample($formData, $sampleCode), $isAtLeastOneSampleChecked);
+    }
+
+    public function orderFinalizationFormDataProvider(): array
+    {
+        return [
+            ['URINES', ['URINESA1' => ['1234567890'], ['URINESA2' => []]], true],
+            ['URINES', ['URINESA1' => []], false],
+            ['PST8', ['PST8A1' => ['1234567890']], true],
+            ['PST8', ['PST8A1' => []], false],
+            ['SALIVA', ['SALIVAA1' => ['1234567890']], true],
+            ['SALIVA', [], false]
+        ];
+    }
+
+    /**
      * @dataProvider orderFinalizationDataProvider
      */
     public function testSaveOrderFinalization(
