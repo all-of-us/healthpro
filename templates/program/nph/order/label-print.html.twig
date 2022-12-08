@@ -46,7 +46,7 @@
                         {% for sampleCode,sampleInfo in orderInfo %}
                              <tr>
                                  {% if printOrderTD %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.orderId}) }}">{{ sampleInfo.orderId }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.healthProOrderId}) }}">{{ sampleInfo.orderId }}</a></td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.timepointDisplayName }}</td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.sampleTypeDisplayName }}</td>
                                     {% set printOrderTD = false %}
