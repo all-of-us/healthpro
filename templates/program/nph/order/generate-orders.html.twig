@@ -41,7 +41,8 @@
                         <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
                     </div>
                     <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
-                        {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds) }}
+                        {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
+                            participant.id) }}
                     </div>
                 </div>
             {% endfor %}

@@ -148,7 +148,7 @@ class NphOrderServiceTest extends ServiceTestCase
                 $sampleCode = $timePointSample[2];
                 if ($nphOrder->getTimepoint() === $timePoint) {
                     if ($nphOrder->getOrderType() === $sampleType) {
-                        $this->assertSame($nphOrder->getOrderId(), $samplesWithOrderIds[$timePoint][$sampleCode]);
+                        $this->assertSame($nphOrder->getOrderId(), $samplesWithOrderIds[$timePoint][$sampleCode]['orderId']);
                     }
                 }
             }

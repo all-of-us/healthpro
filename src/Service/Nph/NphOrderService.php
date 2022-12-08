@@ -132,7 +132,10 @@ class NphOrderService
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
-                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $order->getOrderId();
+                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = [
+                    'id' => $order->getId(),
+                    'orderId' => $order->getOrderId()
+                ];
             }
         }
         return $samplesData;
