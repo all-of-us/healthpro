@@ -18,15 +18,15 @@ class NphParticipantSummaryController extends AbstractController
      * @Route("/{participantid}", name="nph_participant_summary")
      */
     public function index(
-        $participantid,
-        ParticipantSummaryService $ParticipantSummaryService,
+        $participantId,
+        ParticipantSummaryService $participantSummaryService,
         NphOrderService $nphOrderService,
         NphProgramSummaryService $nphProgramSummaryService
     ): Response {
-        $participant = $ParticipantSummaryService->getParticipantById($participantid);
-        $NPHOrderInfo = $nphOrderService->getParticipantOrderSummary($participantid);
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participantId);
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
-        $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($NPHOrderInfo['order'], $nphProgramSummary);
+        $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo['order'], $nphProgramSummary);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined

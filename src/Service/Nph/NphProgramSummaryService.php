@@ -58,7 +58,7 @@ class NphProgramSummaryService
                     foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
                         $numberSamples = 0;
                         $expectedSamples = 0;
-                        foreach ($sample as $sampleCode) {
+                        foreach (array_keys($sample) as $sampleCode) {
                             if ($sampleCode === 'STOOL' || $sampleCode === 'NAIL') {
                                 continue;
                             }
