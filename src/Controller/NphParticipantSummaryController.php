@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class NphParticipantSummaryController extends AbstractController
 {
     /**
-     * @Route("/{participantid}", name="nph_participant_summary")
+     * @Route("/{participantId}", name="nph_participant_summary")
      */
     public function index(
         $participantId,
