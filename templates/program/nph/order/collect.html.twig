@@ -62,24 +62,28 @@
             </table>
             <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
             {% if order.orderType == 'urine' %}
+                <hr>
                 <h4>
                     Color and Clarity
                     <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
-                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-                    </span>
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
                 </h4>
-                <div class="form-group">
-                    {{ form_label(orderCollectForm['urineColor']) }}
-                    {{ form_widget(orderCollectForm['urineColor']) }}
-                    {{ form_errors(orderCollectForm['urineColor']) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(orderCollectForm['urineClarity']) }}
-                    {{ form_widget(orderCollectForm['urineClarity']) }}
-                    {{ form_errors(orderCollectForm['urineClarity']) }}
+                <div class="row">
+                    <div class="form-group col-sm-3">
+                        {{ form_label(orderCollectForm['urineColor']) }}
+                        {{ form_widget(orderCollectForm['urineColor']) }}
+                        {{ form_errors(orderCollectForm['urineColor']) }}
+                    </div>
+                    <div class="form-group col-sm-3">
+                        {{ form_label(orderCollectForm['urineClarity']) }}
+                        {{ form_widget(orderCollectForm['urineClarity']) }}
+                        {{ form_errors(orderCollectForm['urineClarity']) }}
+                    </div>
                 </div>
             {% endif %}
             {% if order.orderType == 'stool' %}
+                <hr>
                 <h4>
                     Bristol Stool Chart Questions
                     <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
