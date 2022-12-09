@@ -93,8 +93,9 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                <button type="submit" class="btn btn-primary" id="order_next_btn">Save and Close</button>
-                <a class="btn btn-default" href="#">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
+                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                   class="btn btn-default">Cancel</a>
             </div>
             {{ form_end(orderCollectForm) }}
         </div>
