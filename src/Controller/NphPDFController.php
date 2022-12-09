@@ -13,11 +13,11 @@ class NphPDFController extends AbstractController
 {
     //TODO: Refactor to work off shyams NPHOrderService->getExistingOrdersData
     /**
-     * @Route("/nph/participant/{participantid}/render_pdf/module/{module}/visit/{visit}", name="nph_render_pdf")
+     * @Route("/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}", name="nph_render_pdf")
      */
-    public function render_pdf($participantid, $module, $visit, PDFService $PDF, NphOrderService $nphOrderService, ParticipantSummaryService $participantSummaryService): Response
+    public function render_pdf($participantId, $module, $visit, PDFService $PDF, NphOrderService $nphOrderService, ParticipantSummaryService $participantSummaryService): Response
     {
-        $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantid, $module, $visit)['order'], $participantSummaryService->getParticipantById($participantid), $module, $visit);
+        $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit)['order'], $participantSummaryService->getParticipantById($participantId), $module, $visit);
         return new Response($OrderPDF, Response::HTTP_OK, ['content-type' => 'application/pdf']);
     }
 }
