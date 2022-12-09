@@ -38,9 +38,11 @@
             {% for timePoint, orderSamples in timePointSamples %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
+                        <input type="checkbox" class="timepointCheckAll" data-timepoint="{{ timePoint }}">
+                        {{ form_label(orderForm[timePoint]) }}
                     </div>
-                    <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
+                    <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
+                         data-timepoint="{{ timePoint }}">
                         {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
                             participant.id, module, visit) }}
                     </div>
