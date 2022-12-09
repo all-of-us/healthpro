@@ -13,10 +13,10 @@
     Order ID: <strong>{{ order.orderId }}</strong>
 </p>
 <div class="row" id="order_info" data-order-id="{{ order.orderId }}">
-    <div class="col-sm-6">
+    <div class="col-sm-7">
         {% include 'program/nph/order/partials/participant-dl.html.twig' %}
     </div>
-    <div class="col-sm-6 text-center">
+    <div class="col-sm-5 text-center">
         <strong class="text-primary">
             Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }} | {{ order
             .orderType|capitalize }}
