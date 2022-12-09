@@ -86,4 +86,8 @@ $(document).ready(function () {
             $('#order_create_form').submit();
         }
     });
+
+    $('#checkAll').on('change', function () {
+        $('#order_create_form input:checkbox:enabled').prop('checked', $(this).prop('checked'));
+    });
 });
