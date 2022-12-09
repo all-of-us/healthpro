@@ -55,7 +55,7 @@ class PDFService
                         $participantFullName = $participant->firstName . ' ' . $participant->lastName;
                         if (strlen($participantFullName) > 20) {
                             $participantFullName = substr(
-                                $participant->firstName[0] . ' ' . $participant->lastName,
+                                $participant->firstName[0] . '. ' . $participant->lastName,
                                 0,
                                 20
                             );
@@ -69,7 +69,7 @@ class PDFService
                             continue;
                         }
                         $this->renderPDF(
-                            $participant->firstName . ' ' . $participant->lastName,
+                            $participantFullName,
                             $sampleType,
                             $participant->dob,
                             $sampleId,
