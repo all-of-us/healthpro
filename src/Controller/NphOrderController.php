@@ -93,12 +93,12 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Order not found.');
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
-        $sampleLabels = $nphOrderService->getSamplesWithLabels($order->getNphSamples());
+        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
             $orderCollectionData,
-            ['samples' => $sampleLabels, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
+            ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()->getTimezone()]
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {

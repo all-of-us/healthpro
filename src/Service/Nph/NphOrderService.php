@@ -97,6 +97,19 @@ class NphOrderService
         return $sampleLabels;
     }
 
+    public function getSamplesWithLabelsAndIds(PersistentCollection $samplesObj): array
+    {
+        $samples = $this->getSamples();
+        $sampleLabels = [];
+        foreach ($samplesObj as $sampleObj) {
+            $sampleLabels[$sampleObj->getSampleCode()] = [
+                'label' => $samples[$sampleObj->getSampleCode()],
+                'id' => $sampleObj->getSampleId()
+            ];
+        }
+        return $sampleLabels;
+    }
+
     public function getExistingOrdersData(): array
     {
         $ordersData = [];
