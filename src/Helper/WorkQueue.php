@@ -260,24 +260,6 @@ class WorkQueue
             'group' => 'consent',
             'default' => true
         ],
-        'EtMConsent' => [
-            'name' => 'Exploring the Mind Consent',
-            'csvNames' => [
-                'EtM Consent Status',
-                'EtM Consent Date'
-            ],
-            'rdrField' => 'consentForEtM',
-            'sortField' => 'consentForEtMAuthored',
-            'rdrDateField' => 'consentForEtMAuthored',
-            'method' => 'displayConsentStatus',
-            'params' => 4,
-            'displayTime' => true,
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'pdfPath' => 'consentForEtMRORFilePath',
-            'group' => 'consent',
-            'default' => true
-        ],
         'primaryLanguage' => [
             'name' => 'Language of Primary Consent',
             'rdrField' => 'primaryLanguage',
@@ -343,6 +325,25 @@ class WorkQueue
             'toggleColumn' => true,
             'visible' => false,
             'group' => 'consent'
+        ],
+        'EtMConsent' => [
+            'name' => 'Exploring the Mind Consent',
+            'csvNames' => [
+                'EtM Consent Status',
+                'EtM Consent Date'
+            ],
+            'rdrField' => 'consentForEtM',
+            'sortField' => 'consentForEtMAuthored',
+            'rdrDateField' => 'consentForEtMAuthored',
+            'method' => 'displayConsentStatus',
+            'params' => 4,
+            'displayTime' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForEtMRORFilePath',
+            'visible' => false,
+            'group' => 'consent',
+            'default' => true
         ],
         'retentionEligibleStatus' => [
             'name' => 'Retention Eligible',
@@ -1241,11 +1242,11 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
-        'EtMConsent',
         'primaryLanguage',
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
+        'EtMConsent',
         'retentionEligibleStatus',
         'retentionType',
         'isEhrDataAvailable',
@@ -1336,10 +1337,10 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
-        'EtMConsent',
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
+        'EtMConsent',
         'consentCohort',
         'primaryLanguage'
     ];
@@ -1355,12 +1356,12 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
-        'EtMConsent',
         'dvEhrStatus',
         'caborConsent',
         'fitbit',
         'appleHealthKit',
         'appleEHR',
+        'EtMConsent',
         'consentCohort',
         'primaryLanguage',
         'firstPrimaryConsent',
@@ -1393,7 +1394,6 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
-        'EtMConsent',
         'primaryLanguage',
         'dvEhrStatus',
         'caborConsent',
@@ -1467,7 +1467,8 @@ class WorkQueue
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
-        'LifeFunctioning'
+        'LifeFunctioning',
+        'EtMConsent',
     ];
 
     public static $sortColumns = [
@@ -1493,6 +1494,7 @@ class WorkQueue
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
+        'consentForEtMAuthored',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -1577,6 +1579,7 @@ class WorkQueue
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
+        'consentForEtMAuthored',
         'consentCohort',
         'primaryLanguage'
     ];
@@ -2214,7 +2217,6 @@ class WorkQueue
             'questionnaireOnDnaProgram',
             'ehrConsent',
             'gRoRConsent',
-            'EtMConsent',
             'primaryLanguage',
             'ppiStatus',
             'ppiSurveys',
@@ -2255,7 +2257,6 @@ class WorkQueue
             'ehrConsent',
             'ehrConsentExpireStatus',
             'gRoRConsent',
-            'EtMConsent',
             'primaryLanguage',
             'isEhrDataAvailable',
             'latestEhrReceiptTime'
