@@ -14,7 +14,7 @@
             <div class="form-group row">
                 <div class="col-sm-6">
                     <label>Scan or manually check all successfully collected samples:</label>
-                    <input type="text" class="form-control" placeholder="Scan collection device">
+                    <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device">
                 </div>
             </div>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
-                    <tr>
+                    <tr class="row-samples">
                         <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
                         class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}

@@ -26,4 +26,14 @@ $(document).ready(function () {
         this.$('#helpModal .modal-body').html(html);
         this.$('#helpModal').modal();
     };
+
+    $('#scan_barcode').keyup(function () {
+        let barcode = $(this).val();
+        $('.row-samples').each(function () {
+            let sampleId = $(this).find('input:checkbox').data('sample-id').toString();
+            if (barcode === sampleId) {
+                $(this).find('input:checkbox').prop('checked', true);
+            }
+        });
+    });
 });
