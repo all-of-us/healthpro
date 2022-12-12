@@ -97,6 +97,34 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
     }
 
+    /**
+     * @dataProvider sampleLabelsAndIdsDataProvider
+     */
+    public function testGetSamplesWithLabelsAndIds($timePoint, $orderType, $sampleCode, $sampleLabel, $sampleId): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $this->service->createSample($sampleCode, $nphOrder, $sampleId);
+        $expectedSampleLabelAndIds[$sampleCode] = [
+            'label' => $sampleLabel,
+            'id' => $sampleId
+        ];
+        $this->assertSame($expectedSampleLabelAndIds, $this->service->getSamplesWithLabelsAndIds($nphOrder->getNphSamples()));
+    }
+
+    public function sampleLabelsAndIdsDataProvider(): array
+    {
+        return [
+            ['preLMT', 'urine', 'URINES', 'Spot Urine', '1000000001'],
+            ['preLMT', 'saliva', 'SALIVA', 'Saliva', '1000000002'],
+            ['preLMT', 'nail', 'NAILB', 'Big Toenails', '1000000003'],
+            ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1', '1000000004'],
+            ['30min', 'blood', 'SST8P5', '8.5 mL SST', '1000000005'],
+            ['30min', 'blood', 'PST8', '8 mL PST', '1000000006'],
+        ];
+    }
+
     public function testCreateOrder()
     {
         // Module 1
