@@ -74,12 +74,15 @@ class User implements UserInterface
         foreach ($this->groups as $group) {
             if (strpos($group->getEmail(), $sitePrefix) === 0) {
                 $id = preg_replace('/@.*$/', '', $group->getEmail());
-                $id = str_replace($sitePrefix, '', $id);
-                $sites[] = (object)[
-                    'email' => $group->getEmail(),
-                    'name' => $group->getName(),
-                    'id' => $id
-                ];
+                // Prevent admin group from being added to the sites list as it has the same site prefix.
+                if ($id !== self::NPH_ADMIN_GROUP) {
+                    $id = str_replace($sitePrefix, '', $id);
+                    $sites[] = (object)[
+                        'email' => $group->getEmail(),
+                        'name' => $group->getName(),
+                        'id' => $id
+                    ];
+                }
             }
         }
         return $sites;
