@@ -36,8 +36,20 @@
             </div>
             <br>
             <div class="row">
+                {% set cycleCount = 0 %}
             {% for timePoint, orderSamples in timePointSamples %}
-                <div class="col-sm-3">
+                {% if timePoint == 'preLMT' %}
+                    <div class="col-sm-3">
+                    {% set containsLMT = true %}
+                {% elseif loop.first and timePoint != 'preLMT' %}
+                    <div class="col-sm-3">
+                    {% set containsLMT = false %}
+                {% elseif cycleCount == 0 and containsLMT %}
+                    <div class="col-sm-12">
+                    <div class="col-sm-4">
+                {% else %}
+                    <div class="col-sm-4">
+                {% endif %}
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <input type="checkbox" class="timepointCheckAll" data-timepoint="{{ timePoint }}">
@@ -49,7 +61,19 @@
                                 participant.id, module, visit) }}
                         </div>
                     </div>
-                </div>
+                {% if timePoint == 'preLMT' %}
+                    </div>
+                    <div class="col-md-9">
+                {% elseif cycleCount == 2 %}
+                    </div>
+                    </div>
+                    {% set cycleCount = 0 %}
+                {% elseif loop.last %}
+                    </div>
+                {% else %}
+                    </div>
+                    {% set cycleCount = cycleCount + 1 %}
+                {% endif %}
             {% endfor %}
             </div>
             {{ form_rest(orderForm) }}
