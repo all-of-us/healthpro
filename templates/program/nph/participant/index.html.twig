@@ -4,46 +4,21 @@
 
 {% block body %}
     <div class="page-header row">
-        <h2 class="col-sm-2">{{ participant.lastName }}, {{ participant.firstName }}</h2>
-        <span class="label label-warning font-size-small col-sm-1" style="display: block">NPH Module 1</span>
+        <h2>
+            {{ participant.lastName }}, {{ participant.firstName }}
+            <span class="label label-warning" style="font-size: small">NPH Module 1</span>
+        </h2>
     </div>
     <div class="page-header row">
-        <div class="row">
-            <div class="col-md-2">
-                <div>ParticipantID</div>
-                <div>{{ participant.id }}</div>
-            </div>
-            <div class="col-md-2">
-                <div>Biobank ID</div>
-                <div>Bio123456789</div>
-            </div>
-            <div class="col-md-2">
-                <div>Site</div>
-                <div>{{ siteInfo.siteId }}</div>
-            </div>
-            <div class="col-md-2">
-                <div>Module informed consent status</div>
-            </div>
-            <div class="col-md-4 -align-right">
-                <div>
-                    <svg id="participantBarcode" data-id="{{ participant.id }}"></svg>
-                </div>
-            </div>
+        <div class="col-md-5">
+            {% include 'program/nph/order/partials/participant-details.html.twig' %}
         </div>
-        <div class="row">
-            <div class="col-md-2">
-                <div>DOB</div>
-                <div>{{ participant.dob ? participant.dob|date('n/j/Y') }}</div>
-            </div>
-            <div class="col-md-2">
-                <div>Gender Identity</div>
-                <div>{{ participant.genderIdentity }}</div>
-            </div>
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-2">
-                <div>Module Eligibility Evaluation Status</div>
-            </div>
+        <div class="col-md-4">
+            <p><i class="fas fa-file-contract fa-lg"></i> Module 1 informed consent</p>
+            <p><i class="fas fa-clipboard-check fa-lg"></i> Module 1 Eligibility Evaluation</p>
+        </div>
+        <div class="col-md-3">
+            <svg id="participantBarcode" data-id="{{ participant.id }}"></svg>
         </div>
     </div>
     <div class="col-md-12" role="tabpanel">

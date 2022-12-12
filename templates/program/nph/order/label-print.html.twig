@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            {% include 'program/nph/order/partials/participant-dl.html.twig' %}
+            {% include 'program/nph/order/partials/participant-details-with-name.html.twig' %}
         </div>
         <div class="col-sm-6">
             <div class="alert well-sm bg-warning-new">Module | NPH Module {{ module }}</div>
@@ -46,7 +46,7 @@
                         {% for sampleCode,sampleInfo in orderInfo %}
                              <tr>
                                  {% if printOrderTD %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.orderId}) }}">{{ sampleInfo.orderId }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.healthProOrderId}) }}">{{ sampleInfo.orderId }}</a></td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.timepointDisplayName }}</td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.sampleTypeDisplayName }}</td>
                                     {% set printOrderTD = false %}
@@ -79,7 +79,8 @@
             </div>
         </div>
     </div>
-    <a class="btn btn-primary" role="button" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">close</a>
+    <a class="btn btn-primary" role="button"
+       href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Close</a>
 {% endblock %}
 
 {% block pagejs %}
