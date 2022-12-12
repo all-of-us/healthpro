@@ -260,6 +260,24 @@ class WorkQueue
             'group' => 'consent',
             'default' => true
         ],
+        'EtMConsent' => [
+            'name' => 'Exploring the Mind Consent',
+            'csvNames' => [
+                'EtM Consent Status',
+                'EtM Consent Date'
+            ],
+            'rdrField' => 'consentForEtM',
+            'sortField' => 'consentForEtMAuthored',
+            'rdrDateField' => 'consentForEtMAuthored',
+            'method' => 'displayConsentStatus',
+            'params' => 4,
+            'displayTime' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForEtMRORFilePath',
+            'group' => 'consent',
+            'default' => true
+        ],
         'primaryLanguage' => [
             'name' => 'Language of Primary Consent',
             'rdrField' => 'primaryLanguage',
@@ -1223,6 +1241,7 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
+        'EtMConsent',
         'primaryLanguage',
         'dvEhrStatus',
         'caborConsent',
@@ -1317,6 +1336,7 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
+        'EtMConsent',
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
@@ -1335,6 +1355,7 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
+        'EtMConsent',
         'dvEhrStatus',
         'caborConsent',
         'fitbit',
@@ -1372,6 +1393,7 @@ class WorkQueue
         'ehrConsent',
         'ehrConsentExpireStatus',
         'gRoRConsent',
+        'EtMConsent',
         'primaryLanguage',
         'dvEhrStatus',
         'caborConsent',
@@ -1882,6 +1904,15 @@ class WorkQueue
                 ],
                 'dateField' => 'consentForGenomicsRORAuthored'
             ],
+            'EtMConsent' => [
+                'label' => 'Exploring The Mind Consent',
+                'options' => [
+                    'View All' => '',
+                    'Consented Yes' => 'SUBMITTED',
+                    'Consent Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForEtMAuthored'
+            ],
             'consentForDvElectronicHealthRecordsSharing' => [
                 'label' => 'DV-Only EHR Sharing',
                 'options' => [
@@ -2183,6 +2214,7 @@ class WorkQueue
             'questionnaireOnDnaProgram',
             'ehrConsent',
             'gRoRConsent',
+            'EtMConsent',
             'primaryLanguage',
             'ppiStatus',
             'ppiSurveys',
@@ -2209,6 +2241,7 @@ class WorkQueue
             'ehrConsent',
             'ehrConsentExpireStatus',
             'gRoRConsent',
+            'EtMConsent',
             'primaryLanguage',
         ],
         'status' => [
@@ -2222,6 +2255,7 @@ class WorkQueue
             'ehrConsent',
             'ehrConsentExpireStatus',
             'gRoRConsent',
+            'EtMConsent',
             'primaryLanguage',
             'isEhrDataAvailable',
             'latestEhrReceiptTime'
