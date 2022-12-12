@@ -28,12 +28,12 @@ class PDFService
      * @throws RuntimeError
      * @throws LoaderError
      */
-    private function renderPDF(string $name, string $orderID, \DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
+    private function renderPDF(string $name, string $sampleType, \DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
     {
         $this->mpdf->WriteHTML(
             $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
                     'PatientName' => $name,
-                    'OrderID' => $orderID,
+                    'sampleType' => $sampleType,
                     'dob' => $DOB->format('Y-m-d'),
                     'SpecimenID' => $specimenID,
                     'ModuleNum' => $moduleNum,
@@ -47,15 +47,32 @@ class PDFService
 
     public function batchPDF(array $OrderSummary, Participant $participant, string $module, string $visit): string
     {
+        $stoolPrinted = false;
         foreach ($OrderSummary as $timePointOrder) {
-            foreach ($timePointOrder as $orderId => $sampleInfo) {
+            foreach ($timePointOrder as $sampleType => $sampleInfo) {
                 foreach ($sampleInfo as $sampleCode => $sample) {
                     try {
+                        $participantFullName = $participant->firstName . ' ' . $participant->lastName;
+                        if (strlen($participantFullName) > 20) {
+                            $participantFullName = substr(
+                                $participant->firstName[0] . '. ' . $participant->lastName,
+                                0,
+                                20
+                            );
+                        }
+                        $sampleId = $sample['sampleId'];
+                        if ($sampleType === "stool" && $stoolPrinted === false) {
+                            $sampleCode = "ST KIT";
+                            $sampleId = $sample['orderId'];
+                            $stoolPrinted = true;
+                        } elseif ($sampleType === "stool" && $stoolPrinted === true) {
+                            continue;
+                        }
                         $this->renderPDF(
-                            $participant->firstName . ' ' . $participant->lastName,
-                            $orderId,
+                            $participantFullName,
+                            $sampleType,
                             $participant->dob,
-                            $sample['sampleId'],
+                            $sampleId,
                             $module,
                             $sample['timepointDisplayName'],
                             $sampleCode,
