@@ -432,19 +432,21 @@ class NphOrderService
     {
         $sampleCode = $sample->getSampleCode();
         $aliquots = $this->getAliquots($sampleCode);
-        foreach ($aliquots as $aliquotCode => $aliquot) {
-            foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                if ($aliquotId) {
-                    $nphAliquot = new NphAliquot();
-                    $nphAliquot->setNphSample($sample);
-                    $nphAliquot->setAliquotId($aliquotId);
-                    $nphAliquot->setAliquotCode($aliquotCode);
-                    $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
-                    $nphAliquot->setUnits($aliquot['units']);
-                    $this->em->persist($nphAliquot);
-                    $this->em->flush();
-                    $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+        if (!empty($aliquots)) {
+            foreach ($aliquots as $aliquotCode => $aliquot) {
+                foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                    if ($aliquotId) {
+                        $nphAliquot = new NphAliquot();
+                        $nphAliquot->setNphSample($sample);
+                        $nphAliquot->setAliquotId($aliquotId);
+                        $nphAliquot->setAliquotCode($aliquotCode);
+                        $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                        $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                        $nphAliquot->setUnits($aliquot['units']);
+                        $this->em->persist($nphAliquot);
+                        $this->em->flush();
+                        $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                    }
                 }
             }
         }
@@ -459,6 +461,13 @@ class NphOrderService
         }
         $this->em->persist($sample);
         $this->em->flush();
+
+        if ($sample->getNphOrder()->getOrderType() === 'stool') {
+            $order = $sample->getNphOrder();
+            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
+            $this->em->persist($order);
+            $this->em->flush();
+        }
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
         return $sample;
     }

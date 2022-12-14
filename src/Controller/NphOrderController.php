@@ -192,7 +192,8 @@ class NphOrderController extends BaseController
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
             $formData = $sampleData = $sampleFinalizeForm->getData();
-            if ($nphOrderService->hasAtLeastOneAliquotSample($formData, $sampleCode) === false) {
+            if (!empty($nphOrderService->getAliquots($sampleCode)) &&
+                $nphOrderService->hasAtLeastOneAliquotSample($formData, $sampleCode) === false) {
                 $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter at least one aliquot'));
             }
             if ($sampleFinalizeForm->isValid()) {
