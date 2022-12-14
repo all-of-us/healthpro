@@ -17,21 +17,33 @@
             {{ form_end(sampleIdForm) }}
             <div class="well bg-white">
                 <div class="text-center">
-                    <p><strong>Aliquot Instructions for {{ samples[sampleCode]}}</strong></p>
-                    <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
-                    {% for aliquot in aliquots %}
-                        <p>
-                            {{ aliquot.container }}: {{ aliquot.expectedAliquots }} Volume: {{ aliquot
-                            .expectedVolume }} {{ aliquot.units }}
-                        </p>
-                    {% endfor %}
+                    {% if aliquots is not empty %}
+                        <p><strong>Aliquot Instructions for {{ samples[sampleCode]}}</strong></p>
+                        <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
+                        {% for aliquot in aliquots %}
+                            <p>
+                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }} Volume: {{ aliquot
+                                .expectedVolume }} {{ aliquot.units }}
+                            </p>
+                        {% endfor %}
+                    {% else %}
+                        <p><strong>Instructions for Stool Kit</strong></p>
+                    {% endif %}
                 </div>
             </div>
         </div>
         <div class="col-sm-7">
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
-                    <div class="pull-right">
+                    <div class="col-sm-4">
+                        <strong>Name</strong> {{ participant.lastName }}, {{ participant.firstName }} {{ participant
+                        .middleName }} <br>
+                        <strong>Participant ID</strong> {{ participant.id }} <br>
+                        <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
+                        <strong>Site</strong> {{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }} <br>
+                        <strong>DOB</strong> {{ participant.dob ? participant.dob|date('n/j/Y') : '--' }} <br>
+                    </div>
+                    <div class="col-sm-8">
                         <strong class="text-primary">
                             Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
                             | {{ samples[sampleCode]}}
@@ -41,21 +53,6 @@
                             <dd>{{ sample.nphOrder.orderId }}</dd>
                             <dt>Sample ID</dt>
                             <dd>{{ sample.sampleId }}</dd>
-                        </dl>
-                    </div>
-                    <div class="pull-left">
-                        <dl class="dl-horizontal">
-                            <dt>Name</dt>
-                            <dd>{{ participant.lastName }}
-                                , {{ participant.firstName }} {{ participant.middleName }}</dd>
-                            <dt>Participant ID</dt>
-                            <dd>{{ participant.id }}</dd>
-                            <dt>Biobank ID</dt>
-                            <dd>{{ participant.biobankId }}</dd>
-                            <dt>Site</dt>
-                            <dd>{{ participant.site }}</dd>
-                            <dt>DOB</dt>
-                            <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
                         </dl>
                     </div>
                 </div>
@@ -104,7 +101,7 @@
                         <hr>
                     {% endif %}
                     <label>Aliquot</label>
-                    {% if aliquots is not empty%}
+                    {% if aliquots is not empty %}
                         <table class="table table-samples">
                             <thead>
                             <tr>

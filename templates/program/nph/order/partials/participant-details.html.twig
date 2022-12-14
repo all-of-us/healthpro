@@ -9,7 +9,7 @@
     </div>
     <div class="col-md-4">
         <div><strong>Site</strong></div>
-        <div>{{ participant.site|default('--') }}</div>
+        <div>{{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }}</div>
     </div>
 </div>
 <br>
