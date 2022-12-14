@@ -59,7 +59,7 @@ class Samples
     {
         $samplesInfo = $this->getSamplesInformation();
         foreach ($samplesInfo as $sampleCode => $sample) {
-            if ($sampleIdentifier === $sampleCode) {
+            if ($sampleIdentifier === $sampleCode && isset($sample['aliquots'])) {
                 return $sample['aliquots'];
             }
         }
