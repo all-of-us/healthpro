@@ -329,8 +329,8 @@ class WorkQueue
         'EtMConsent' => [
             'name' => 'Exploring the Mind Consent',
             'csvNames' => [
-                'EtM Consent Status',
-                'EtM Consent Date'
+                'Exploring the Mind Consent Status',
+                'Exploring the Mind Consent Date'
             ],
             'rdrField' => 'consentForEtM',
             'sortField' => 'consentForEtMAuthored',
@@ -1340,9 +1340,9 @@ class WorkQueue
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
+        'EtMConsent',
         'consentCohort',
-        'primaryLanguage',
-        'EtMConsent'
+        'primaryLanguage'
     ];
 
     public static $consentExportColumns = [
@@ -1361,13 +1361,13 @@ class WorkQueue
         'fitbit',
         'appleHealthKit',
         'appleEHR',
+        'EtMConsent',
         'consentCohort',
         'primaryLanguage',
         'firstPrimaryConsent',
         'firstEhrConsent',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored',
-        'EtMConsent'
+        'reconsentForElectronicHealthRecordsAuthored'
     ];
 
     public static $exportColumns = [
@@ -1457,6 +1457,7 @@ class WorkQueue
         'fitbit',
         'appleHealthKit',
         'appleEHR',
+        'EtMConsent',
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
@@ -1467,8 +1468,7 @@ class WorkQueue
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
-        'LifeFunctioning',
-        'EtMConsent'
+        'LifeFunctioning'
     ];
 
     public static $sortColumns = [

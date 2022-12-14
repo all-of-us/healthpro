@@ -179,7 +179,9 @@
                                             {% for type, label in digitalHealthSharingTypes %}
                                                 <dd>{{ label }} {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}</dd>
                                             {% endfor %}
-                                        </dl>
+                                            </dl>
+                                            <dt>Exploring the Mind Consent</dt>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'EtMConsent', '', true) }}</dd>
                                     </div>
                                 </div>
 
