@@ -377,7 +377,6 @@ class WorkQueueTest extends TestCase
         $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'],
             WorkQueue::$filterDateFieldLabels);
         $advancedFilters = WorkQueue::$consentAdvanceFilters;
-        $workQueueConsentOptionPairs = WorkQueue::getFilterLabelOptionPairs($advancedFilters);
         $this->assertSame($filterLabelOptionPairs, WorkQueue::getFilterLabelOptionPairs($advancedFilters));
     }
 
