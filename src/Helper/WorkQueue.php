@@ -1361,13 +1361,13 @@ class WorkQueue
         'fitbit',
         'appleHealthKit',
         'appleEHR',
-        'EtMConsent',
         'consentCohort',
         'primaryLanguage',
         'firstPrimaryConsent',
         'firstEhrConsent',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored',
+        'EtMConsent'
     ];
 
     public static $exportColumns = [

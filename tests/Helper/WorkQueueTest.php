@@ -36,14 +36,14 @@ class WorkQueueTest extends TestCase
             'Apple HealthKit Consent Date',
             'Apple EHR Consent',
             'Apple EHR Consent Date',
-            'Exploring the Mind Consent Status',
-            'Exploring the Mind Consent Date',
             'Consent Cohort',
             'Language of Primary Consent',
             'Date of First Primary Consent',
             'Date of First EHR Consent',
             'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent'
+            'Date of EHR Re-Consent',
+            'Exploring the Mind Consent Status',
+            'Exploring the Mind Consent Date'
         ], $exportHeaders);
     }
 
