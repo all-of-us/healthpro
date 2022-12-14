@@ -489,6 +489,18 @@ class NphOrderService
                 }
             }
         }
+        if ($sample->getNphOrder()->getOrderType() === 'stool') {
+            $order = $sample->getNphOrder();
+            if ($order->getMetadata()) {
+                $orderMetadata = json_decode($order->getMetadata(), true);
+                if (!empty($orderMetadata['bowelType'])) {
+                    $sampleData['bowelType'] = $orderMetadata['bowelType'];
+                }
+                if (!empty($orderMetadata['bowelQuality'])) {
+                    $sampleData['bowelQuality'] = $orderMetadata['bowelQuality'];
+                }
+            }
+        }
         $aliquots = $sample->getNphAliquots();
         foreach ($aliquots as $aliquot) {
             $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
