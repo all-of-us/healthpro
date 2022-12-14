@@ -66,9 +66,9 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentPanelStatus(participant, field, showConsentPDFs = '', displayCheck = 0) %}
+{% macro displayConsentPanelStatus(participant, field, showConsentPDFs = '') %}
     {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
-    {% if attribute(participant, field) in consentValues and not displayCheck %}
+    {% if attribute(participant, field) in consentValues %}
         {% set time = attribute(participant, field ~ 'Authored') %}
         {{ time ? _self.displayConsent(time, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) : '--' }}
     {% else %}
