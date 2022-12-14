@@ -1912,6 +1912,7 @@ class WorkQueue
                 'options' => [
                     'View All' => '',
                     'Consented Yes' => 'SUBMITTED',
+                    'Refused Consent' => 'SUBMITTED_NO_CONSENT',
                     'Consent Not Completed' => 'UNSET'
                 ],
                 'dateField' => 'consentForEtMAuthored'
