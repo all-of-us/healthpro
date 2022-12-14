@@ -1340,9 +1340,9 @@ class WorkQueue
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
-        'EtMConsent',
         'consentCohort',
-        'primaryLanguage'
+        'primaryLanguage',
+        'EtMConsent'
     ];
 
     public static $consentExportColumns = [
@@ -1361,13 +1361,13 @@ class WorkQueue
         'fitbit',
         'appleHealthKit',
         'appleEHR',
-        'EtMConsent',
         'consentCohort',
         'primaryLanguage',
         'firstPrimaryConsent',
         'firstEhrConsent',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored',
+        'EtMConsent'
     ];
 
     public static $exportColumns = [
@@ -1468,7 +1468,7 @@ class WorkQueue
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
         'LifeFunctioning',
-        'EtMConsent',
+        'EtMConsent'
     ];
 
     public static $sortColumns = [
