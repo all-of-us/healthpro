@@ -174,6 +174,9 @@ class WorkQueueService
         if (!empty($params['isEhrDataAvailable'])) {
             $rdrParams['isEhrDataAvailable'] = $params['isEhrDataAvailable'] === 'yes' ? 1 : 0;
         }
+        if (!empty($params['EtMConsent'])) {
+            $rdrParams['consentForEtM'] = $params['EtMConsent'];
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
