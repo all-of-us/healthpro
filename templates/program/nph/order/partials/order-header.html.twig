@@ -11,16 +11,9 @@
 </div>
 <p class="lead">
     Order ID: <strong>{{ order.orderId }}</strong>
+    <a href="{{ path('nph_order_modify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}"
+       class="btn btn-sm btn-danger">
+        Cancel Order
+    </a>
 </p>
-<div class="row" id="order_info" data-order-id="{{ order.orderId }}">
-    <div class="col-sm-7">
-        {% include 'program/nph/order/partials/participant-details.html.twig' %}
-    </div>
-    <div class="col-sm-5 text-center">
-        <strong class="text-primary">
-            Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }} | {{ order
-            .orderType|capitalize }}
-        </strong>
-        <div><svg id="order-barcode"></svg></div>
-    </div>
-</div>
+{% include 'program/nph/order/partials/order-participant-details-barcode.html.twig' %}

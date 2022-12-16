@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphOrderCollect;
+use App\Form\Nph\NphOrderModifyType;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
@@ -239,5 +240,54 @@ class NphOrderController extends BaseController
                 'visit' => $visit,
                 'sampleCount' => $orderInfo['sampleCount']]
         );
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/modify/{type}", name="nph_order_modify")
+     */
+    public function orderModifyAction(
+        $participantId,
+        string $orderId,
+        string $type,
+        NphOrderService $nphOrderService,
+        ParticipantSummaryService $participantSummaryService,
+        Request $request
+    ): Response {
+        if (!in_array($type, [NphOrder::ORDER_CANCEL, NphOrder::ORDER_RESTORE, NphOrder::ORDER_UNLOCK])) {
+            throw $this->createNotFoundException();
+        }
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderModifyForm = $this->createForm(NphOrderModifyType::class, null, ['type' => $type]);
+        $nphOrderModifyForm->handleRequest($request);
+        if ($nphOrderModifyForm->isSubmitted()) {
+            $orderModifyData = $nphOrderModifyForm->getData();
+            if ($orderModifyData['reason'] === 'OTHER' && empty($orderModifyData['otherText'])) {
+                $nphOrderModifyForm['otherText']->addError(new FormError('Please enter a reason'));
+            }
+            if ($type === NphOrder::ORDER_CANCEL && strtolower($orderModifyData['confirm']) !== NphOrder::ORDER_CANCEL) {
+                $nphOrderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
+            }
+            if ($nphOrderModifyForm->isValid()) {
+                //Save
+            } else {
+                $this->addFlash('error', 'Please correct the errors below');
+            }
+        }
+        return $this->render('program/nph/order/order-modify.html.twig', [
+            'participant' => $participant,
+            'order' => $order,
+            'orderModifyForm' => $nphOrderModifyForm->createView(),
+            'type' => $type,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
+        ]);
     }
 }

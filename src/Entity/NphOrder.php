@@ -15,6 +15,17 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphOrder
 {
+    public const ORDER_CANCEL = 'cancel';
+    public const ORDER_RESTORE = 'restore';
+    public const ORDER_UNLOCK = 'unlock';
+
+    public static $cancelReasons = [
+        'Order created in error' => 'ORDER_CANCEL_ERROR',
+        'Order created for wrong participant' => 'ORDER_CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'ORDER_CANCEL_LABEL_ERROR',
+        'Other' => 'OTHER'
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

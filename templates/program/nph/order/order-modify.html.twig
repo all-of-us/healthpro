@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% block title %}Order - Cancel - {% endblock %}
+{% block body %}
+    <h2 class="text-danger">
+        <i class="fa fa-medkit" aria-hidden="true"></i>
+        {{ type|capitalize }} Biobank Order
+        <small>
+            <a href="{{ path('participant', { id: participant.id }) }}">
+                {{ participant.lastName }}, {{ participant.firstName }}
+            </a>
+        </small>
+    </h2>
+    <hr>
+
+    {% include 'program/nph/order/partials/order-participant-details-barcode.html.twig' %}
+
+    <div class="alert bg-light well-sm">
+        {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
+    </div>
+    <table class="table table-samples">
+        <thead>
+        <tr>
+            <th>Sample</th>
+            <th>Collected</th>
+            <th>Aliquoted and Finalized</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for index, nphSample in order.nphSamples %}
+            <tr class="row-samples">
+                <td>{{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
+                <td>
+                    {% if nphSample.collectedTs is not empty %}
+                        {{ nphSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        {{ nphSample.collectedUser.email }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if nphSample.finalizedTs is not empty %}
+                        {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        {{ nphSample.finalizedUser.email }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_start(orderModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(orderModifyForm) }}
+            {{ form_rest(orderModifyForm) }}
+            <p>
+                <button type="submit" name="reportable" class="btn btn-danger">{{ type|capitalize }}
+                    Order
+                </button>
+                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                   class="btn btn-default">Exit</a>
+            </p>
+            {{ form_end(orderModifyForm) }}
+        </div>
+    </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order') }}
+{% endblock %}
