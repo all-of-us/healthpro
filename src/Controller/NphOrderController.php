@@ -276,7 +276,12 @@ class NphOrderController extends BaseController
                 $nphOrderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
             }
             if ($nphOrderModifyForm->isValid()) {
-                //Save
+                $nphOrderService->saveOrderModification($orderModifyData, $type, $order);
+                $this->addFlash('success', "Order cancelled");
+                return $this->redirectToRoute('nph_order_collect', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId
+                ]);
             } else {
                 $this->addFlash('error', 'Please correct the errors below');
             }

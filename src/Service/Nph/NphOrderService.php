@@ -525,4 +525,17 @@ class NphOrderService
         }
         return $sampleData;
     }
+
+    public function saveOrderModification(array $formData, string $type, NphOrder $order): NphOrder
+    {
+        $order->setCancelledTs(new \DateTime());
+        $order->setCancelledSite($this->site);
+        $order->setCancelledUser($this->user);
+        $order->setModifyReason($formData['reason']);
+        $order->setModifyType($type);
+        $this->em->persist($order);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+        return $order;
+    }
 }
