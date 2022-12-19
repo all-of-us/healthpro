@@ -45,6 +45,44 @@
         {% endfor %}
         </tbody>
     </table>
+    {% if order.orderType == 'urine' %}
+        <hr>
+        <h4>
+            Color and Clarity
+            <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                <span class="sr-only">Help</span>
+            </span>
+        </h4>
+        <div class="row">
+            <div class="form-group col-sm-3">
+                <label>Urine Color:</label>
+                {{ samplesMetadata ? samplesMetadata['urineColor'] : '-' }}
+            </div>
+            <div class="form-group col-sm-3">
+                <label>Urine Clarity:</label>
+                {{ samplesMetadata ? samplesMetadata['urineClarity'] : '-' }}
+            </div>
+        </div>
+    {% endif %}
+    {% if order.orderType == 'stool' %}
+        <hr>
+        <h4>
+            Bristol Stool Chart Questions
+            <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
+                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                <span class="sr-only">Help</span>
+            </span>
+        </h4>
+        <div class="form-group">
+            <label>Bowel Type:</label>
+            {{ samplesMetadata ? samplesMetadata['bowelType'] : '-' }}
+        </div>
+        <div class="form-group">
+            <label>Bowel Quality:</label>
+            {{ samplesMetadata ? samplesMetadata['bowelQuality'] : '-' }}
+        </div>
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
             {{ form_start(orderModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}

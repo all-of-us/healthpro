@@ -7,6 +7,7 @@ use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
+use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -358,6 +359,21 @@ class NphOrderService
             }
         }
         return !empty($metadata) ? json_encode($metadata) : null;
+    }
+
+    public function getSamplesMetadata(NphOrder $order): array
+    {
+        $metadata = [];
+        if ($order->getOrderType() === 'stool') {
+            $metadata = json_decode($order->getMetadata(), true);
+            $metadata['bowelType'] = array_search($metadata['bowelType'], NphOrderForm::$bowelMovements);
+            $metadata['bowelQuality'] = array_search($metadata['bowelQuality'], NphOrderForm::$bowelMovementQuality);
+        } elseif ($order->getOrderType() === 'urine') {
+            $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
+            $metadata['urineColor'] = array_search($metadata['urineColor'], NphOrderForm::$urineColors);
+            $metadata['urineClarity'] = array_search($metadata['urineClarity'], NphOrderForm::$urineClarity);
+        }
+        return $metadata;
     }
 
     public function getParticipantOrderSummary(string $participantid): array
