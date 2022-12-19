@@ -104,6 +104,16 @@ class NphOrder
      */
     private $metadata;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $modifyReason;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $modifyType;
+
     public function __construct()
     {
         $this->nphSamples = new ArrayCollection();
@@ -296,6 +306,30 @@ class NphOrder
     public function setMetadata(?string $metadata): self
     {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    public function getModifyReason(): ?string
+    {
+        return $this->modifyReason;
+    }
+
+    public function setModifyReason(?string $modifyReason): self
+    {
+        $this->modifyReason = $modifyReason;
+
+        return $this;
+    }
+
+    public function getModifyType(): ?string
+    {
+        return $this->modifyType;
+    }
+
+    public function setModifyType(?string $modifyType): self
+    {
+        $this->modifyType = $modifyType;
 
         return $this;
     }
