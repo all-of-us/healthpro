@@ -13,14 +13,14 @@
       "aliquots": {
         "SST8P5A1": {
           "identifier": "SSTS1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 500μL",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
         "SST8P5A2": {
           "identifier": "SSTS1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 1000μL",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
           "units": "μL"
@@ -38,14 +38,14 @@
       "aliquots": {
         "PST8A1": {
           "identifier": "LHPSTP1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 500μL",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
         "PST8A2": {
           "identifier": "LHPSTP1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 1000μL",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
           "units": "μL"
@@ -63,14 +63,14 @@
       "aliquots": {
         "EDTA10A1": {
           "identifier": "EDPAP1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 500μL",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
         "EDTA10A2": {
           "identifier": "EDPAP1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 1000μL",
           "expectedAliquots": 4,
           "expectedVolume": 1000,
           "units": "μL"

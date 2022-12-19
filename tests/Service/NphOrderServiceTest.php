@@ -392,4 +392,33 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame(count($orderSummary['order']), 1);
         $this->assertArrayHasKey('sampleName', $orderSummary['order']['preLMT']['urine']['URINES']);
     }
+
+    public function testGetSamplesWithStatus(): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $this->service->createOrdersAndSamples($this->module1Data['formData']);
+
+        $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
+            'participantId' => 'P0000000010', 'visitType' => 'LMT'
+        ]);
+        $samplesWithStatus = $this->service->getSamplesWithStatus();
+        $timePointSamples = [
+            ['preLMT', 'saliva', 'SALIVA'],
+            ['preLMT', 'urine', 'URINES'],
+            ['preLMT', 'nail', 'NAILB'],
+            ['30min', 'blood', 'SST8P5'],
+        ];
+        foreach ($nphOrders as $nphOrder) {
+            foreach ($timePointSamples as $timePointSample) {
+                list($timePoint, $sampleType, $sampleCode) = $timePointSample;
+                if ($nphOrder->getTimepoint() === $timePoint) {
+                    if ($nphOrder->getOrderType() === $sampleType) {
+
+                        $this->assertSame($nphOrder->getNphSamples()[0]->getStatus(), $samplesWithStatus[$timePoint][$sampleCode]);
+                    }
+                }
+            }
+        }
+    }
 }

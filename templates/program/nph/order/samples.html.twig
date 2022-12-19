@@ -1,11 +1,11 @@
-{% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit) %}
+{% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit, samplesStatus) %}
     {% set formField = orderForm[timePoint] %}
     {% for sample in formField.children %}
         {% if sample.vars.value in nailSamples %}
             <div class="sub-samples nail-sub-samples">
                 {{ form_widget(sample) }}
                 {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
-                    {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit) }}
+                    {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
             </div>
         {% elseif sample.vars.value == 'STOOL' %}
@@ -16,7 +16,7 @@
             {% for stoolSample in stoolSamples %}
                 {{ form_label(orderForm[stoolSample]) }}
                 {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                    {{ _self.displayOrderId(samplesOrderIds[timePoint][stoolSample], participantId, module, visit) }}
+                    {{ _self.displayOrderId(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
                 {{ form_widget(orderForm[stoolSample]) }}
                 <br>
@@ -24,21 +24,23 @@
         {% else %}
             {{ form_widget(sample) }}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
-                {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit) }}
+                {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
             {% endif %}
         {% endif %}
     {% endfor %}
 {% endmacro %}
 
-{% macro displayOrderId(order, participantId, module, visit) %}
+{% macro displayOrderId(order, participantId, module, visit, sampleStatus) %}
     <div>
         Order ID:
         <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': order['id']}) }}">
             {{ order['orderId'] }}
         </a>
-        <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit}) }}"
-           class="btn btn-primary btn-xs">
-            Reprint Labels
-        </a>
+        {% if sampleStatus == 'Created' %}
+            <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit}) }}"
+               class="btn btn-primary btn-xs">
+                Reprint Labels
+            </a>
+        {% endif %}
     </div>
 {% endmacro %}
