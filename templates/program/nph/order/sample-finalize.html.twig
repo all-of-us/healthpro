@@ -203,8 +203,10 @@
                         {{ form_errors(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                     </div>
                     <p>
-                        <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif
-                        %}" id="sample_finalize_btn">Mark as Finalized</button>
+                        <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif %}"
+                                id="sample_finalize_btn" {% if order.disabled %} disabled="disabled" {% endif %}>
+                            Mark as Finalized
+                        </button>
                         <button type="button" class="btn btn-default">Cancel</button>
                     </p>
                     {{ form_end(sampleFinalizeForm) }}

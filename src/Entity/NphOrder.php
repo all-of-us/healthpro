@@ -333,4 +333,9 @@ class NphOrder
 
         return $this;
     }
+
+    public function isDisabled(): bool
+    {
+        return $this->modifyType === 'cancel';
+    }
 }
