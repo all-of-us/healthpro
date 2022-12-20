@@ -528,9 +528,9 @@ class NphOrderService
 
     public function saveOrderModification(array $formData, string $type, NphOrder $order): NphOrder
     {
-        $order->setCancelledTs(new \DateTime());
-        $order->setCancelledSite($this->site);
-        $order->setCancelledUser($this->user);
+        $order->setModifiedTs(new \DateTime());
+        $order->setModifiedSite($this->site);
+        $order->setModifiedUser($this->user);
         $order->setModifyReason($formData['reason']);
         $order->setModifyType($type);
         $this->em->persist($order);

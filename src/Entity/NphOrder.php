@@ -77,17 +77,17 @@ class NphOrder
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $cancelledTs;
+    private $modifiedTs;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class)
      */
-    private $cancelledUser;
+    private $modifiedUser;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $cancelledSite;
+    private $modifiedSite;
 
     /**
      * @ORM\OneToMany(targetEntity=NphSample::class, mappedBy="nphOrder")
@@ -220,38 +220,38 @@ class NphOrder
         return $this;
     }
 
-    public function getCancelledTs(): ?\DateTimeInterface
+    public function getModifiedTs(): ?\DateTimeInterface
     {
-        return $this->cancelledTs;
+        return $this->modifiedTs;
     }
 
-    public function setCancelledTs(?\DateTimeInterface $cancelledTs): self
+    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
     {
-        $this->cancelledTs = $cancelledTs;
+        $this->modifiedTs = $modifiedTs;
 
         return $this;
     }
 
-    public function getCancelledUser(): ?User
+    public function getModifiedUser(): ?User
     {
-        return $this->cancelledUser;
+        return $this->modifiedUser;
     }
 
-    public function setCancelledUser(?User $cancelledUser): self
+    public function setModifiedUser(?User $modifiedUser): self
     {
-        $this->cancelledUser = $cancelledUser;
+        $this->modifiedUser = $modifiedUser;
 
         return $this;
     }
 
-    public function getCancelledSite(): ?string
+    public function getModifiedSite(): ?string
     {
-        return $this->cancelledSite;
+        return $this->modifiedSite;
     }
 
-    public function setCancelledSite(?string $cancelledSite): self
+    public function setModifiedSite(?string $modifiedSite): self
     {
-        $this->cancelledSite = $cancelledSite;
+        $this->modifiedSite = $modifiedSite;
 
         return $this;
     }
