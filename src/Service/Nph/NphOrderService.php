@@ -528,6 +528,9 @@ class NphOrderService
 
     public function saveOrderModification(array $formData, string $type, NphOrder $order): NphOrder
     {
+        if ($formData['reason'] === 'OTHER') {
+            $formData['reason'] = $formData['otherText'];
+        }
         $order->setModifiedTs(new \DateTime());
         $order->setModifiedSite($this->site);
         $order->setModifiedUser($this->user);
