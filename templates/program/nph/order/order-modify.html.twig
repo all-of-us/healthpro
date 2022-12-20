@@ -31,12 +31,14 @@
                 <td>{{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
                 <td>
                     {% if nphSample.collectedTs is not empty %}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {{ nphSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {{ nphSample.collectedUser.email }}
                     {% endif %}
                 </td>
                 <td>
                     {% if nphSample.finalizedTs is not empty %}
+                        <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {{ nphSample.finalizedUser.email }}
                     {% endif %}

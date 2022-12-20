@@ -366,14 +366,19 @@ class NphOrderService
         $metadata = [];
         if ($order->getOrderType() === 'stool') {
             $metadata = json_decode($order->getMetadata(), true);
-            $metadata['bowelType'] = array_search($metadata['bowelType'], NphOrderForm::$bowelMovements);
-            $metadata['bowelQuality'] = array_search($metadata['bowelQuality'], NphOrderForm::$bowelMovementQuality);
+            $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
+            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);;
         } elseif ($order->getOrderType() === 'urine') {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
-            $metadata['urineColor'] = array_search($metadata['urineColor'], NphOrderForm::$urineColors);
-            $metadata['urineClarity'] = array_search($metadata['urineClarity'], NphOrderForm::$urineClarity);
+            $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
+            $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
         }
         return $metadata;
+    }
+
+    private function mapMetadata($metadata, $type, $values): string
+    {
+        return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
     }
 
     public function getParticipantOrderSummary(string $participantid): array
