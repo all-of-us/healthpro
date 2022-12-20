@@ -30,7 +30,12 @@ class NphOrderModifyType extends AbstractType
             'label' => false,
             'required' => false,
             'constraints' => [
-                new Constraints\Type('string')
+                new Constraints\Type('string'),
+                new Constraints\Callback(function ($value, $context) {
+                    if (empty($value) && $context->getRoot()['reason']->getData() === 'OTHER') {
+                        $context->buildViolation('Please enter a reason')->addViolation();
+                    }
+                })
             ]
         ]);
         if ($options['type'] == NphOrder::ORDER_CANCEL) {
@@ -39,7 +44,12 @@ class NphOrderModifyType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new Constraints\NotBlank(),
-                    new Constraints\Type('string')
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (strtolower($value) !== NphOrder::ORDER_CANCEL) {
+                            $context->buildViolation('Please type the word "CANCEL" to confirm')->addViolation();
+                        }
+                    })
                 ],
                 'attr' => [
                     'placeholder' => 'Type the word "CANCEL" to confirm',

@@ -269,12 +269,6 @@ class NphOrderController extends BaseController
         $nphOrderModifyForm->handleRequest($request);
         if ($nphOrderModifyForm->isSubmitted()) {
             $orderModifyData = $nphOrderModifyForm->getData();
-            if ($orderModifyData['reason'] === 'OTHER' && empty($orderModifyData['otherText'])) {
-                $nphOrderModifyForm['otherText']->addError(new FormError('Please enter a reason'));
-            }
-            if ($type === NphOrder::ORDER_CANCEL && strtolower($orderModifyData['confirm']) !== NphOrder::ORDER_CANCEL) {
-                $nphOrderModifyForm['confirm']->addError(new FormError('Please type the word "CANCEL" to confirm'));
-            }
             if ($nphOrderModifyForm->isValid()) {
                 $nphOrderService->saveOrderModification($orderModifyData, $type, $order);
                 $this->addFlash('success', "Order cancelled");
@@ -283,7 +277,7 @@ class NphOrderController extends BaseController
                     'orderId' => $orderId
                 ]);
             } else {
-                $this->addFlash('error', 'Please correct the errors below');
+                $nphOrderModifyForm->addError(new FormError('Please correct the errors below'));
             }
         }
         return $this->render('program/nph/order/order-modify.html.twig', [
