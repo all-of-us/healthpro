@@ -33,6 +33,16 @@
             </div>
         </div>
         <div class="col-sm-7">
+            {% if order.modifyType == 'cancel' %}
+                <div class="alert alert-danger well-sm">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    <strong>
+                        Order Cancelled by {{ order.modifiedUser.email|default('Unknown') }}
+                        at {{ siteInfo.siteDisplayName(order.modifiedSite) }}
+                        on {{ order.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
+                    </strong>
+                </div>
+            {% endif %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="col-sm-4">
@@ -193,8 +203,10 @@
                         {{ form_errors(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                     </div>
                     <p>
-                        <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif
-                        %}" id="sample_finalize_btn">Mark as Finalized</button>
+                        <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif %}"
+                                id="sample_finalize_btn" {% if order.disabled %} disabled="disabled" {% endif %}>
+                            Mark as Finalized
+                        </button>
                         <button type="button" class="btn btn-default">Cancel</button>
                     </p>
                     {{ form_end(sampleFinalizeForm) }}

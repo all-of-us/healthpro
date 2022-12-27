@@ -67,6 +67,7 @@ Encore
     .addEntry('nph-order', './web/assets/js/views/NphOrder.js')
     .addEntry('nph-participant-summary', './web/assets/js/views/NphParticipantSummary.js')
     .addEntry('nph-sample-finalize', './web/assets/js/views/NphSampleFinalize.js')
+    .addEntry('nph-order-modify', './web/assets/js/views/NphOrderModify.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

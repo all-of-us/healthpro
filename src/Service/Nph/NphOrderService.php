@@ -7,6 +7,7 @@ use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
+use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -360,6 +361,27 @@ class NphOrderService
         return !empty($metadata) ? json_encode($metadata) : null;
     }
 
+    public function getSamplesMetadata(NphOrder $order): array
+    {
+        $metadata = [];
+        if ($order->getOrderType() === 'stool') {
+            $metadata = json_decode($order->getMetadata(), true);
+            $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
+            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
+            ;
+        } elseif ($order->getOrderType() === 'urine') {
+            $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
+            $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
+            $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
+        }
+        return $metadata;
+    }
+
+    private function mapMetadata($metadata, $type, $values): string
+    {
+        return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
+    }
+
     public function getParticipantOrderSummary(string $participantid): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
@@ -508,5 +530,21 @@ class NphOrderService
             $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
         }
         return $sampleData;
+    }
+
+    public function saveOrderModification(array $formData, string $type, NphOrder $order): NphOrder
+    {
+        if ($formData['reason'] === 'OTHER') {
+            $formData['reason'] = $formData['otherText'];
+        }
+        $order->setModifiedTs(new \DateTime());
+        $order->setModifiedSite($this->site);
+        $order->setModifiedUser($this->user);
+        $order->setModifyReason($formData['reason']);
+        $order->setModifyType($type);
+        $this->em->persist($order);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+        return $order;
     }
 }
