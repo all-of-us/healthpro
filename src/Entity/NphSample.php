@@ -15,6 +15,17 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphSample
 {
+    public const SAMPLE_CANCEL = 'cancel';
+    public const SAMPLE_RESTORE = 'restore';
+    public const SAMPLE_UNLOCK = 'unlock';
+
+    public static $cancelReasons = [
+        'Sample created in error' => 'SAMPLE_CANCEL_ERROR',
+        'Sample created for wrong participant' => 'SAMPLE_CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'SAMPLE_CANCEL_LABEL_ERROR',
+        'Other' => 'OTHER'
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
