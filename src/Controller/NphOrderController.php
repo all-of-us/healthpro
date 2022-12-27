@@ -9,6 +9,7 @@ use App\Form\Nph\NphOrderModifyType;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
+use App\Form\Nph\NphSampleModifyType;
 use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
@@ -214,6 +215,20 @@ class NphOrderController extends BaseController
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
+
+        if ($request->query->has('modifyType')) {
+            $modifyType = $request->query->get('modifyType');
+            $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, ['type' => $modifyType]);
+            $nphSampleModifyForm->handleRequest($request);
+            if ($nphSampleModifyForm->isSubmitted()) {
+                $sampleModifyData = $nphSampleModifyForm->getData();
+                if ($nphSampleModifyForm->isValid()) {
+                    // Save sample cancel
+                } else {
+                    $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
+        }
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
@@ -222,7 +237,9 @@ class NphOrderController extends BaseController
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'aliquots' => $nphOrderService->getAliquots($sampleCode),
-            'sampleData' => $sampleData
+            'sampleData' => $sampleData,
+            'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
+            'modifyType' => $modifyType ?? ''
         ]);
     }
 

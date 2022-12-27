@@ -54,6 +54,15 @@
                                 </small>
                             {% endif %}
                         </td>
+                        {% if nphSample.finalizedTs is not empty %}
+                            <td>
+                                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                                    order.id, sampleId: nphSample.id, modifyType: 'cancel'}) }}"
+                                   class="btn btn-danger btn-xs">
+                                    Cancel Sample
+                                </a>
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 <tr>
