@@ -15,7 +15,7 @@
             {{ form_rest(sampleModifyForm) }}
             <p>
                 <button type="submit" name="reportable" class="btn btn-danger">{{ modifyType|capitalize }}
-                    Order
+                    Sample
                 </button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
@@ -236,4 +236,5 @@
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
     {{ encore_entry_script_tags('nph-sample-finalize') }}
+    {{ encore_entry_script_tags('nph-order-modify') }}
 {% endblock %}

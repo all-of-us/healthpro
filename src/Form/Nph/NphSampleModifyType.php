@@ -24,7 +24,8 @@ class NphSampleModifyType extends AbstractType
             'multiple' => false,
             'constraints' => new Constraints\NotBlank([
                 'message' => "Please select {$options['type']} reason"
-            ])
+            ]),
+            'attr' => ['class' => 'modify-reason']
         ]);
         $builder->add('otherText', Type\TextareaType::class, [
             'label' => false,
@@ -36,7 +37,8 @@ class NphSampleModifyType extends AbstractType
                         $context->buildViolation('Please enter a reason')->addViolation();
                     }
                 })
-            ]
+            ],
+            'attr' => ['class' => 'modify-other-text']
         ]);
         if ($options['type'] == NphSample::SAMPLE_CANCEL) {
             $builder->add('confirm', Type\TextType::class, [
