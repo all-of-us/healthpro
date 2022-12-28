@@ -108,7 +108,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->service->createSample($sampleCode, $nphOrder, $sampleId);
         $expectedSampleLabelAndIds[$sampleCode] = [
             'label' => $sampleLabel,
-            'id' => $sampleId
+            'id' => $sampleId,
+            'disabled' => false
         ];
         $this->assertSame($expectedSampleLabelAndIds, $this->service->getSamplesWithLabelsAndIds($nphOrder->getNphSamples()));
     }
