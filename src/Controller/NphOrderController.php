@@ -223,7 +223,12 @@ class NphOrderController extends BaseController
             if ($nphSampleModifyForm->isSubmitted()) {
                 $sampleModifyData = $nphSampleModifyForm->getData();
                 if ($nphSampleModifyForm->isValid()) {
-                    // Save sample cancel
+                    $nphOrderService->saveSampleModification($sampleModifyData, $modifyType, $sample);
+                    $this->addFlash('success', "Sample cancelled");
+                    return $this->redirectToRoute('nph_order_collect', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
                 } else {
                     $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
                 }

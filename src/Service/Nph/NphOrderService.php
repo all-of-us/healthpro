@@ -547,4 +547,20 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
         return $order;
     }
+
+    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
+    {
+        if ($formData['reason'] === 'OTHER') {
+            $formData['reason'] = $formData['otherText'];
+        }
+        $sample->setModifiedTs(new \DateTime());
+        $sample->setModifiedSite($this->site);
+        $sample->setModifiedUser($this->user);
+        $sample->setModifyReason($formData['reason']);
+        $sample->setModifyType($type);
+        $this->em->persist($sample);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
+        return $sample;
+    }
 }
