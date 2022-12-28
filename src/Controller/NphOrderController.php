@@ -218,6 +218,9 @@ class NphOrderController extends BaseController
 
         if ($request->query->has('modifyType')) {
             $modifyType = $request->query->get('modifyType');
+            if ($modifyType === $sample->getModifyType()) {
+                throw $this->createNotFoundException();
+            }
             $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, ['type' => $modifyType]);
             $nphSampleModifyForm->handleRequest($request);
             if ($nphSampleModifyForm->isSubmitted()) {

@@ -54,7 +54,7 @@
                                 </small>
                             {% endif %}
                         </td>
-                        {% if nphSample.finalizedTs is not empty %}
+                        {% if nphSample.modifyType != 'cancel' %}
                             <td>
                                 <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
                                     order.id, sampleId: nphSample.id, modifyType: 'cancel'}) }}"

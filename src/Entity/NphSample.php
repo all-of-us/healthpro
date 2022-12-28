@@ -400,4 +400,10 @@ class NphSample
     {
         return $this->finalizedTs || $this->modifyType === self::SAMPLE_CANCEL;
     }
+
+    public function getModifyReasonDisplayText(): string
+    {
+        $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
 }
