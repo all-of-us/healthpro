@@ -336,6 +336,6 @@ class NphOrder
 
     public function isDisabled(): bool
     {
-        return $this->modifyType === 'cancel';
+        return $this->modifyType === self::ORDER_CANCEL;
     }
 }

@@ -26,9 +26,10 @@ class NphOrderCollect extends NphOrderForm
                 ],
                 'attr' => [
                     'data-sample-id' => $sample['id'],
-                ]
+                ],
+                'disabled' => $sample['disabled']
             ]);
-            $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, 'collect');
+            $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, $sample['disabled'], 'collect');
         }
 
         if ($orderType === 'urine') {

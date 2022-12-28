@@ -395,4 +395,9 @@ class NphSample
 
         return $this;
     }
+
+    public function isDisabled(): bool
+    {
+        return $this->finalizedTs || $this->modifyType === self::SAMPLE_CANCEL;
+    }
 }

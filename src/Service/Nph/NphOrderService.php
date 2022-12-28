@@ -105,7 +105,8 @@ class NphOrderService
         foreach ($samplesObj as $sampleObj) {
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
-                'id' => $sampleObj->getSampleId()
+                'id' => $sampleObj->getSampleId(),
+                'disabled' => $sampleObj->isDisabled()
             ];
         }
         return $sampleLabels;
