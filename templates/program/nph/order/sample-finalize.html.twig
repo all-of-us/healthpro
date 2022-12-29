@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
 {% block body %}
     {% set order = sample.nphOrder %}
@@ -6,16 +7,7 @@
     <div class="page-header">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
-    {% if sample.modifyType == 'cancel' %}
-        <div class="alert alert-danger well-sm">
-            <strong>
-                Cancelled by {{ sample.modifiedUser.email|default('Unknown') }}
-                at {{ siteInfo.siteDisplayName(sample.modifiedSite) }}
-                on {{ sample.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
-            </strong>
-            <p><strong>Reason:</strong> {{ sample.modifyReasonDisplayText }}</p>
-        </div>
-    {% endif %}
+    {{ macros.displayModifyBannerMessage(sample) }}
     {% if sampleModifyForm is not empty %}
         <div>
             <h3 class="text-danger">Cancel Sample</h3>

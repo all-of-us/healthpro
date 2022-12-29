@@ -1,0 +1,12 @@
+{% macro displayModifyBannerMessage(obj) %}
+    {% if obj.modifyType == 'cancel' %}
+    <div class="alert alert-danger well-sm">
+        <i class="fa fa-info-circle" aria-hidden="true"></i>
+        <strong>
+            Cancelled by {{ obj.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(obj
+            .modifiedSite) }} on {{ obj.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
+        </strong>
+        <p><strong>Reason:</strong> {{ obj.modifyReasonDisplayText }}</p>
+    </div>
+    {% endif %}
+{% endmacro %}
