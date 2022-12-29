@@ -546,6 +546,11 @@ class NphOrderService
         $this->em->persist($order);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+        foreach ($order->getNphSamples() as $sample) {
+            if ($sample->getModifyType() !== NphSample::SAMPLE_CANCEL) {
+                $this->saveSampleModification($formData, $type, $sample);
+            }
+        }
         return $order;
     }
 
