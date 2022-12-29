@@ -341,8 +341,10 @@ class NphOrder
 
     public function getModifyReasonDisplayText(): string
     {
-        $reasonDisplayText = array_search($this->getModifyReason(), array_merge(self::$cancelReasons,
-            NphSample::$cancelReasons));
+        $reasonDisplayText = array_search($this->getModifyReason(), array_merge(
+            self::$cancelReasons,
+            NphSample::$cancelReasons
+        ));
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }

@@ -41,6 +41,9 @@
                             class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+                            {% if nphSample.modifyType == 'cancel' %}
+                                <p class="text-danger"><i class="fa fa-close"></i> Cancelled</p>
+                            {% endif %}
                         </td>
                         <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
                             class="has-error"{% endif %}>
