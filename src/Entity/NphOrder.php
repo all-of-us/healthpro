@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 class NphOrder
 {
     public const ORDER_CANCEL = 'cancel';
+    public const ORDER_SAMPLE_CANCEL = 'sample_cancel';
     public const ORDER_RESTORE = 'restore';
     public const ORDER_UNLOCK = 'unlock';
 
@@ -341,10 +342,7 @@ class NphOrder
 
     public function getModifyReasonDisplayText(): string
     {
-        $reasonDisplayText = array_search($this->getModifyReason(), array_merge(
-            self::$cancelReasons,
-            NphSample::$cancelReasons
-        ));
+        $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }

@@ -127,9 +127,11 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                <button type="submit" class="btn btn-primary" id="order_next_btn"
-                        {% if order.disabled %} disabled="disabled" {% endif %}>Save
-                </button>
+                {% if order.modifyType != 'sample_cancel' %}
+                    <button type="submit" class="btn btn-primary" id="order_next_btn"
+                            {% if order.disabled %} disabled="disabled" {% endif %}>Save
+                    </button>
+                {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Cancel</a>
             </div>

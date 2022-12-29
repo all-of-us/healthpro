@@ -12,7 +12,7 @@
 </div>
 {% if order.modifyType == 'cancel' %}
     {{ macros.displayModifyBannerMessage(order) }}
-{% else %}
+{% elseif order.modifyType != 'sample_cancel' %}
     <p class="lead">
         Order ID: <strong>{{ order.orderId }}</strong>
         <a href="{{ path('nph_order_modify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}"
