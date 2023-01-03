@@ -64,16 +64,23 @@
                             {% endif %}
                         </td>
                         <td>
+                            <p>
+                                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                                    order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
+                                    View
+                                </a>
+                            </p>
                             {% if nphSample.modifyType != 'cancel' %}
                                 <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
                                     order.id, sampleId: nphSample.id, modifyType: 'cancel'}) }}"
                                    class="btn btn-danger btn-xs">
                                     Cancel Sample
                                 </a>
-                            {% else %}
+                            {% elseif nphSample.modifyType != 'restore'  %}
                                 <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
-                                    order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
-                                    View
+                                    order.id, sampleId: nphSample.id, modifyType: 'restore'}) }}"
+                                   class="btn btn-success btn-xs">
+                                    Restore
                                 </a>
                             {% endif %}
                         </td>
