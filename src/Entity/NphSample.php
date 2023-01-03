@@ -26,6 +26,18 @@ class NphSample
         'Other' => 'OTHER'
     ];
 
+    public static $restoreReasons = [
+        'Sample cancelled for wrong participant' => 'SAMPLE_RESTORE_WRONG_PARTICIPANT',
+        'Sample can be amended instead of cancelled' => 'SAMPLE_RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
+    public static $modifySuccessText = [
+        'cancel' => 'cancelled',
+        'restore' => 'restored',
+        'unlock' => 'unlocked'
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
