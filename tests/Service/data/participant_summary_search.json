@@ -161,7 +161,8 @@
                     "dateGiven": "{'date': '2022-07-22 00:00:00.000000', 'timezone_type': 3, 'timezone': 'UTC'}",
                     "occurrence": "one_time",
                     "incentiveType": "cash",
-                    "amount": "25"
+                    "amount": "25",
+                    "cancelled": false
                 }
             ],
             "reconsentForStudyEnrollmentAuthored": "2022-08-03T20:00:00",
@@ -303,7 +304,8 @@
                     "dateGiven": "2022-07-23T00:00:00Z",
                     "occurrence": "one_time",
                     "incentiveType": "cash",
-                    "amount": "25"
+                    "amount": "25",
+                    "cancelled": false
                 }
             ]
         }

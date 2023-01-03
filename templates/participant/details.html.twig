@@ -155,7 +155,7 @@
                                             <dt>Language of Primary Consent</dt>
                                             <dd>{{ participant.primaryLanguage|default('--') }}</dd>
                                             <dt>Primary Consent</dt>
-                                            <dd>{{ macros.displayFirstConsentPanelStatus(participant, 'reconsentForStudyEnrollmentAuthored', 'reconsentForStudyEnrollementFilePath', 'consentForStudyEnrollment', showConsentPDFs) }}</dd>
+                                            <dd>{{ macros.displayFirstConsentPanelStatus(participant, 'reconsentForStudyEnrollmentAuthored', 'reconsentForStudyEnrollmentFilePath', 'consentForStudyEnrollment', showConsentPDFs) }}</dd>
                                             <dt>Program Update</dt>
                                             <dd>{{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}</dd>
                                             <dt>EHR Consent</dt>
@@ -179,7 +179,9 @@
                                             {% for type, label in digitalHealthSharingTypes %}
                                                 <dd>{{ label }} {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}</dd>
                                             {% endfor %}
-                                        </dl>
+                                            </dl>
+                                            <dt>Exploring the Mind Consent</dt>
+                                            <dd>{{ macros.displayConsentPanelStatus(participant, 'consentForEtM') }}</dd>
                                     </div>
                                 </div>
 

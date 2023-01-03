@@ -173,7 +173,7 @@ class WorkQueue
             'rdrDateField' => 'consentForStudyEnrollmentAuthored',
             'consentMethod' => 'displayHistoricalConsentStatus',
             'reconsentField' => 'reconsentForStudyEnrollmentAuthored',
-            'reconsentPdfPath' => 'reconsentForStudyEnrollementFilePath',
+            'reconsentPdfPath' => 'reconsentForStudyEnrollmentFilePath',
             'displayTime' => true,
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
@@ -325,6 +325,25 @@ class WorkQueue
             'toggleColumn' => true,
             'visible' => false,
             'group' => 'consent'
+        ],
+        'EtMConsent' => [
+            'name' => 'Exploring the Mind Consent',
+            'csvNames' => [
+                'Exploring the Mind Consent Status',
+                'Exploring the Mind Consent Date'
+            ],
+            'rdrField' => 'consentForEtM',
+            'sortField' => 'consentForEtMAuthored',
+            'rdrDateField' => 'consentForEtMAuthored',
+            'method' => 'displayConsentStatus',
+            'params' => 4,
+            'displayTime' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'pdfPath' => 'consentForEtMRORFilePath',
+            'visible' => false,
+            'group' => 'consent',
+            'default' => true
         ],
         'retentionEligibleStatus' => [
             'name' => 'Retention Eligible',
@@ -1227,6 +1246,7 @@ class WorkQueue
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
+        'EtMConsent',
         'retentionEligibleStatus',
         'retentionType',
         'isEhrDataAvailable',
@@ -1320,6 +1340,7 @@ class WorkQueue
         'dvEhrStatus',
         'caborConsent',
         'digitalHealthSharingStatus',
+        'EtMConsent',
         'consentCohort',
         'primaryLanguage'
     ];
@@ -1345,7 +1366,8 @@ class WorkQueue
         'firstPrimaryConsent',
         'firstEhrConsent',
         'reconsentForStudyEnrollmentAuthored',
-        'reconsentForElectronicHealthRecordsAuthored'
+        'reconsentForElectronicHealthRecordsAuthored',
+        'EtMConsent'
     ];
 
     public static $exportColumns = [
@@ -1435,6 +1457,7 @@ class WorkQueue
         'fitbit',
         'appleHealthKit',
         'appleEHR',
+        'EtMConsent',
         'PersonalAndFamilyHealthHistory',
         'SocialDeterminantsOfHealth',
         'CopeVaccineMinute3',
@@ -1471,6 +1494,7 @@ class WorkQueue
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
+        'consentForEtMAuthored',
         'retentionEligibleTime',
         'retentionType',
         'isEhrDataAvailable',
@@ -1555,6 +1579,7 @@ class WorkQueue
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
         'digitalHealthSharingStatus',
+        'consentForEtMAuthored',
         'consentCohort',
         'primaryLanguage'
     ];
@@ -1881,6 +1906,16 @@ class WorkQueue
                     'Consent Not Completed' => 'UNSET'
                 ],
                 'dateField' => 'consentForGenomicsRORAuthored'
+            ],
+            'EtMConsent' => [
+                'label' => 'Exploring The Mind Consent',
+                'options' => [
+                    'View All' => '',
+                    'Consented Yes' => 'SUBMITTED',
+                    'Refused Consent' => 'SUBMITTED_NO_CONSENT',
+                    'Consent Not Completed' => 'UNSET'
+                ],
+                'dateField' => 'consentForEtMAuthored'
             ],
             'consentForDvElectronicHealthRecordsSharing' => [
                 'label' => 'DV-Only EHR Sharing',
@@ -2209,6 +2244,7 @@ class WorkQueue
             'ehrConsent',
             'ehrConsentExpireStatus',
             'gRoRConsent',
+            'EtMConsent',
             'primaryLanguage',
         ],
         'status' => [
@@ -2799,10 +2835,17 @@ class WorkQueue
     {
         if ($participantIncentives && is_array($participantIncentives)) {
             $count = count($participantIncentives);
-            $incentive = $participantIncentives[$count - 1];
-            $incentiveDate = date_parse($incentive->dateGiven);
-            return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
-                $incentiveDate['year'];
+            for ($i = $count - 1; $i >= 0; $i--) {
+                if ($participantIncentives[$i]->cancelled === false) {
+                    $incentive = $participantIncentives[$i];
+                    break;
+                }
+            }
+            if (!empty($incentive)) {
+                $incentiveDate = date_parse($incentive->dateGiven);
+                return $incentiveDate['month'] . '/' . $incentiveDate['day'] . '/' .
+                    $incentiveDate['year'];
+            }
         }
         return '';
     }

@@ -40,7 +40,6 @@ class Participant
     public $siteSuffix;
     public $enrollmentSiteSuffix;
     public $participantIncentiveDateGiven;
-    public $isAIAN;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -247,10 +246,6 @@ class Participant
         // Set most recent participant incentive date given
         if (isset($participant->participantIncentives)) {
             $this->participantIncentiveDateGiven = $this->getParticipantIncentiveDateGiven($participant->participantIncentives);
-        }
-
-        if (isset($participant->race)) {
-            $this->isAIAN = $participant->race === "AMERICAN_INDIAN_OR_ALASKA_NATIVE";
         }
     }
 
