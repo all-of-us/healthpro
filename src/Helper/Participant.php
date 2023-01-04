@@ -249,7 +249,7 @@ class Participant
             $this->participantIncentiveDateGiven = $this->getParticipantIncentiveDateGiven($participant->participantIncentives);
         }
 
-        if (isset($participant->isaian)) {
+        if (isset($participant->aian)) {
             $this->isAIAN = $participant->aian;
         }
     }
