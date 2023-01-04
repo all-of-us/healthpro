@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
-{% block title %}Order - Cancel - {% endblock %}
+{% block title %}Sample - Modify - {% endblock %}
 {% block body %}
     <h2 class="text-danger">
         <i class="fa fa-medkit" aria-hidden="true"></i>
-        {{ type|capitalize }} Biobank Order
+        {{ type|capitalize }} Samples
         <small>
             <a href="{{ path('participant', { id: participant.id }) }}">
                 {{ participant.lastName }}, {{ participant.firstName }}
@@ -17,9 +17,15 @@
     <div class="alert bg-light well-sm">
         {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
     </div>
+    {% if type == 'cancel' %}
+        <p class="text-danger">Select all samples to be cancelled</p>
+    {% else %}
+        <p class="text-success">Select all samples to be restored</p>
+    {% endif %}
     <table class="table table-samples">
         <thead>
         <tr>
+            <th>Cancel</th>
             <th>Sample</th>
             <th>Collected</th>
             <th>Aliquoted and Finalized</th>
@@ -28,6 +34,7 @@
         <tbody>
         {% for index, nphSample in order.nphSamples %}
             <tr class="row-samples">
+                <td></td>
                 <td>{{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
                 <td>
                     {% if nphSample.collectedTs is not empty %}
@@ -87,9 +94,9 @@
     {% endif %}
     <div class="row">
         <div class="col-sm-12">
-            {{ form_start(orderModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-            {{ form_errors(orderModifyForm) }}
-            {{ form_rest(orderModifyForm) }}
+            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(sampleModifyForm) }}
+            {{ form_rest(sampleModifyForm) }}
             <p>
                 <button type="submit" name="reportable" class="btn btn-danger">{{ type|capitalize }}
                     Order
@@ -97,7 +104,7 @@
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
             </p>
-            {{ form_end(orderModifyForm) }}
+            {{ form_end(sampleModifyForm) }}
         </div>
     </div>
 {% endblock %}

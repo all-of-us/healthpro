@@ -15,8 +15,7 @@
             <div class="form-group row">
                 <div class="col-sm-6">
                     <label>Scan or manually check all successfully collected samples:</label>
-                    <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device"
-                            {% if order.disabled %} disabled="disabled" {% endif %}>
+                    <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device">
                 </div>
             </div>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
@@ -27,6 +26,12 @@
                     <th>Sample</th>
                     <th>Collection Time</th>
                     <th>Notes</th>
+                    <th>
+                        <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                            type: 'cancel' }) }}" class="btn btn-xs btn-danger">
+                            Cancel
+                        </a>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -70,19 +75,6 @@
                                     View
                                 </a>
                             </p>
-                            {% if nphSample.modifyType != 'cancel' %}
-                                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
-                                    order.id, sampleId: nphSample.id, modifyType: 'cancel'}) }}"
-                                   class="btn btn-danger btn-xs">
-                                    Cancel Sample
-                                </a>
-                            {% elseif nphSample.modifyType != 'restore'  %}
-                                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
-                                    order.id, sampleId: nphSample.id, modifyType: 'restore'}) }}"
-                                   class="btn btn-success btn-xs">
-                                    Restore
-                                </a>
-                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -134,11 +126,7 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                {% if order.modifyType != 'sample_cancel' %}
-                    <button type="submit" class="btn btn-primary" id="order_next_btn"
-                            {% if order.disabled %} disabled="disabled" {% endif %}>Save
-                    </button>
-                {% endif %}
+                <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Cancel</a>
             </div>

@@ -40,7 +40,7 @@ class NphSampleModifyType extends AbstractType
             ],
             'attr' => ['class' => 'modify-other-text']
         ]);
-        if ($options['type'] == NphSample::SAMPLE_CANCEL) {
+        if ($options['type'] == NphSample::CANCEL) {
             $builder->add('confirm', Type\TextType::class, [
                 'label' => 'Confirm',
                 'required' => true,
@@ -48,7 +48,7 @@ class NphSampleModifyType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if (strtolower($value) !== NphSample::SAMPLE_CANCEL) {
+                        if (strtolower($value) !== NphSample::CANCEL) {
                             $context->buildViolation('Please type the word "CANCEL" to confirm')->addViolation();
                         }
                     })

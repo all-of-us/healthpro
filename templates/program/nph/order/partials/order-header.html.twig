@@ -10,15 +10,4 @@
         </small>
     </h2>
 </div>
-{% if order.modifyType == 'cancel' %}
-    {{ macros.displayModifyBannerMessage(order) }}
-{% elseif order.modifyType != 'sample_cancel' %}
-    <p class="lead">
-        Order ID: <strong>{{ order.orderId }}</strong>
-        <a href="{{ path('nph_order_modify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}"
-           class="btn btn-sm btn-danger">
-            Cancel Order
-        </a>
-    </p>
-{% endif %}
 {% include 'program/nph/order/partials/order-participant-details-barcode.html.twig' %}
