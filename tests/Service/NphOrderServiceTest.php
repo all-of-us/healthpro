@@ -420,6 +420,7 @@ class NphOrderServiceTest extends ServiceTestCase
                 }
             }
         }
+    }
     /**
      * @dataProvider samplesMetadataDataProvider
      */
