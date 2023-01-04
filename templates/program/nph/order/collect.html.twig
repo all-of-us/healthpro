@@ -13,7 +13,8 @@
             <div class="form-group row">
                 <div class="col-sm-6">
                     <label>Scan or manually check all successfully collected samples:</label>
-                    <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device">
+                    <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device"
+                            {% if order.disabled %} disabled="disabled" {% endif %}>
                 </div>
             </div>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
@@ -30,7 +31,7 @@
                 {% for index, nphSample in order.nphSamples %}
                     <tr class="row-samples">
                         <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
-                        class="has-error"{% endif %}>
+                            class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
                         </td>
@@ -45,9 +46,10 @@
                             {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                             {% if index == order.nphSamples|length - 1 %}
                                 <small class="text-warning">
-                                    Comments entered in this field are transmitted to the Biobank via reconciliation reporting.
+                                    Comments entered in this field are transmitted to the Biobank via reconciliation
+                                    reporting.
                                     <br>
-                                    Do  not enter any participant identifying information here.
+                                    Do not enter any participant identifying information here.
                                 </small>
                             {% endif %}
                         </td>
@@ -101,7 +103,9 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
+                <button type="submit" class="btn btn-primary" id="order_next_btn"
+                        {% if order.disabled %} disabled="disabled" {% endif %}>Save
+                </button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Cancel</a>
             </div>

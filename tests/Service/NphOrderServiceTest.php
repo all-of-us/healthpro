@@ -420,5 +420,63 @@ class NphOrderServiceTest extends ServiceTestCase
                 }
             }
         }
+    /**
+     * @dataProvider samplesMetadataDataProvider
+     */
+    public function testGetSamplesMetadata(
+        $timePoint,
+        $orderType,
+        $sampleCode,
+        $collectedTs,
+        $notes,
+        $metaData,
+        $expectedMetaData
+    ): void {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        if ($orderType === 'stool') {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
+            $this->service->createSample($sampleCode, $nphOrder, 'T0000000001');
+        } else {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType);
+            $this->service->createSample($sampleCode, $nphOrder);
+        }
+        $collectionFormData = [
+            $sampleCode => true,
+            "{$sampleCode}CollectedTs" => $collectedTs,
+            "{$sampleCode}Notes" => $notes,
+        ];
+        if ($orderType === 'urine' || $orderType === 'stool') {
+            foreach ($metaData as $type => $data) {
+                $collectionFormData[$type] = $data;
+            }
+        }
+        $this->service->saveOrderCollection($collectionFormData, $nphOrder);
+        $this->assertSame($this->service->getSamplesMetadata($nphOrder), $expectedMetaData);
+    }
+
+    public function samplesMetadataDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2022-11-18');
+        $urineMetaData = [
+            'urineColor' => 1,
+            'urineClarity' => 'clean'
+        ];
+        $stoolMetaData = [
+            'bowelType' => 'difficult',
+            'bowelQuality' => 'normal'
+        ];
+        $expectedUrineMetaData = [
+            'urineColor' => 'Color 1',
+            'urineClarity' => 'Clean'
+        ];
+        $expectedStoolMetaData = [
+            'bowelType' => 'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2',
+            'bowelQuality' => 'I tend to have normal formed stool - Type 3 and 4'
+        ];
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData, $expectedUrineMetaData],
+            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', $stoolMetaData, $expectedStoolMetaData]
+        ];
     }
 }
