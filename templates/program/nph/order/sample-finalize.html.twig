@@ -7,28 +7,6 @@
     <div class="page-header">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
-    {% if sampleModifyForm is not empty %}
-        <div>
-            <h3 class="{% if modifyType == 'cancel' %} text-danger {% elseif modifyType == 'restore' %} text-success {% endif %}">
-                {{ modifyType|capitalize }} Sample
-            </h3>
-            {% if modifyType == 'cancel' %}
-                <p class="text-danger">Note: Cancelling a sample will cancel all aliquots associated with this sample</p>
-            {% endif %}
-            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-            {{ form_errors(sampleModifyForm) }}
-            {{ form_rest(sampleModifyForm) }}
-            <p>
-                <button type="submit" class="btn {% if modifyType == 'cancel' %} btn-danger {% elseif modifyType == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
-                    {{ modifyType|capitalize }} Sample
-                </button>
-                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
-            </p>
-            {{ form_end(sampleModifyForm) }}
-            <hr>
-        </div>
-    {% endif %}
     {{ macros.displayModifyBannerMessage(sample) }}
     <div class="row">
         <div class="col-sm-5">
@@ -218,7 +196,7 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary {% if sample.finalizedTs %} disabled {% endif %}"
-                                id="sample_finalize_btn" {% if order.disabled %} disabled="disabled" {% endif %}>
+                                id="sample_finalize_btn">
                             Mark as Finalized
                         </button>
                         <button type="button" class="btn btn-default">Cancel</button>
@@ -232,5 +210,4 @@
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
     {{ encore_entry_script_tags('nph-sample-finalize') }}
-    {{ encore_entry_script_tags('nph-order-modify') }}
 {% endblock %}
