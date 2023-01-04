@@ -31,7 +31,7 @@ class HFHRepairService
             } catch (\Exception $exception) {
                 $this->em->getConnection()->rollBack();
                 $this->logger->error($exception->getMessage());
-                exit();
+                return;
             }
             if ($count === 100) {
                 $this->em->flush();
