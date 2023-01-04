@@ -546,7 +546,7 @@ class NphOrderService
         }
         return $samplesData;
     }
-  
+
     public function saveOrderModification(array $formData, string $type, NphOrder $order): NphOrder
     {
         if ($formData['reason'] === 'OTHER') {
