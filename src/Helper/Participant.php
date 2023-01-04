@@ -250,7 +250,7 @@ class Participant
         }
 
         if (isset($participant->isaian)) {
-            $this->isAIAN = $participant->isaian;
+            $this->isAIAN = $participant->aian;
         }
     }
 
