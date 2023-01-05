@@ -77,12 +77,12 @@
                             {% endif %}
                         </td>
                         <td>
-                            <p>
+                            {% if nphSample.finalizedTs is not empty %}
                                 <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
                                     order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
                                     View
                                 </a>
-                            </p>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
