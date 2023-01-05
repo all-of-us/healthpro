@@ -342,4 +342,15 @@ class NphOrder
         }
         return false;
     }
+
+    public function canModify($type): bool
+    {
+        if ($type === NphSample::CANCEL) {
+            return $this->canCancel();
+        }
+        if ($type === NphSample::RESTORE) {
+            return $this->canRestore();
+        }
+        return false;
+    }
 }

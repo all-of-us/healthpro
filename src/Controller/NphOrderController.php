@@ -265,7 +265,7 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        if ($type === $order->getModifyType()) {
+        if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
