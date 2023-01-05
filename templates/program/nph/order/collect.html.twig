@@ -27,10 +27,18 @@
                     <th>Collection Time</th>
                     <th>Notes</th>
                     <th>
-                        <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
-                            type: 'cancel' }) }}" class="btn btn-xs btn-danger">
-                            Cancel
-                        </a>
+                        {% if order.canCancel %}
+                            <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                                type: 'cancel' }) }}" class="btn btn-xs btn-danger">
+                                Cancel
+                            </a>
+                        {% endif %}
+                        {% if order.canRestore %}
+                            <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                                type: 'restore' }) }}" class="btn btn-xs btn-success">
+                                Restore
+                            </a>
+                        {% endif %}
                     </th>
                 </tr>
                 </thead>

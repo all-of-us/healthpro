@@ -323,9 +323,23 @@ class NphOrder
         return $this;
     }
 
-    public function getModifyReasonDisplayText(): string
+    public function canCancel(): bool
     {
-        $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
-        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() !== NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function canRestore(): bool
+    {
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() === NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
     }
 }

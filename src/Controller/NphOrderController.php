@@ -269,9 +269,8 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException();
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
-        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
-            'type' => $type, 'samples' => $sampleLabelsIds
+            'type' => $type, 'samples' => $order->getNphSamples()
         ]);
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {

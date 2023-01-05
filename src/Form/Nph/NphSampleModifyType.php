@@ -14,14 +14,17 @@ class NphSampleModifyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $samples = $options['samples'];
-        foreach ($samples as $sampleCode => $sample) {
-            $builder->add($sampleCode, Type\CheckboxType::class, [
+        foreach ($samples as $sample) {
+            $disabled = false;
+            if ($options['type'] === NphSample::CANCEL) {
+                $disabled = $sample->getModifyType() === NphSample::CANCEL;
+            } elseif ($options['type'] === NphSample::RESTORE) {
+                $disabled = $sample->getModifyType() !== NphSample::CANCEL;
+            }
+            $builder->add($sample->getSampleCode(), Type\CheckboxType::class, [
                 'label' => false,
                 'required' => false,
-                'attr' => [
-                    'data-sample-id' => $sample['id'],
-                ],
-                'disabled' => $sample['disabled']
+                'disabled' => $disabled
             ]);
         }
 
