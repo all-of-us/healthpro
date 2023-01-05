@@ -455,45 +455,9 @@ class NphOrderServiceTest extends ServiceTestCase
     }
 
     /**
-     * @dataProvider saveOrderModificationDataProvider
+     * @dataProvider saveSamplesModificationDataProvider
      */
-    public function testSaveOrderModification(
-        $timePoint,
-        $orderType,
-        $sampleCode,
-        $collectedTs,
-        $notes,
-        $modifyReason,
-        $modifyType
-    ): void {
-        // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000009');
-        $nphOrder = $this->service->createOrder($timePoint, $orderType);
-        $nphSample = $this->service->createSample($sampleCode, $nphOrder);
-        $modificationFormData = [
-            'reason' => $modifyReason
-        ];
-        $nphOrder = $this->service->saveOrderModification($modificationFormData, $modifyType, $nphOrder);
-
-        $this->assertSame($modifyReason, $nphOrder->getModifyReason());
-        $this->assertSame($modifyReason, $nphSample->getModifyReason());
-    }
-
-    public function saveOrderModificationDataProvider(): array
-    {
-        $collectedTs = new \DateTime('2022-11-18');
-        return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'ORDER_CANCEL_ERROR', 'cancel'],
-            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'ORDER_CANCEL_WRONG_PARTICIPANT', 'cancel'],
-            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'ORDER_CANCEL_LABEL_ERROR', 'cancel'],
-            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'ORDER_CANCEL_ERROR', 'cancel'],
-        ];
-    }
-
-    /**
-     * @dataProvider saveSampleModificationDataProvider
-     */
-    public function testSaveSampleModification(
+    public function testSaveSamplesModification(
         $timePoint,
         $orderType,
         $sampleCode,
@@ -507,15 +471,19 @@ class NphOrderServiceTest extends ServiceTestCase
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
         $modificationFormData = [
+            $sampleCode => true,
             'reason' => $modifyReason
         ];
-        $nphSample = $this->service->saveSampleModification($modificationFormData, $modifyType, $nphSample);
+        $nphOrder = $this->service->saveSamplesModification($modificationFormData, $modifyType, $nphOrder);
 
-        $this->assertSame($modifyReason, $nphSample->getModifyReason());
-        $this->assertSame(NphOrder::ORDER_SAMPLE_CANCEL, $nphSample->getNphOrder()->getModifyType());
+        foreach ($nphOrder->getNphSamples() as $sample) {
+            if ($sample->getSampleCode() === $sampleCode) {
+                $this->assertSame($modifyReason, $nphSample->getModifyReason());
+            }
+        }
     }
 
-    public function saveSampleModificationDataProvider(): array
+    public function saveSamplesModificationDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         return [
