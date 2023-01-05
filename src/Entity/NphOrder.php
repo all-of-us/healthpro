@@ -64,21 +64,6 @@ class NphOrder
     private $createdTs;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $modifiedTs;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     */
-    private $modifiedUser;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $modifiedSite;
-
-    /**
      * @ORM\OneToMany(targetEntity=NphSample::class, mappedBy="nphOrder")
      */
     private $nphSamples;
@@ -92,16 +77,6 @@ class NphOrder
      * @ORM\Column(type="text", nullable=true)
      */
     private $metadata;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $modifyReason;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $modifyType;
 
     public function __construct()
     {
@@ -209,42 +184,6 @@ class NphOrder
         return $this;
     }
 
-    public function getModifiedTs(): ?\DateTimeInterface
-    {
-        return $this->modifiedTs;
-    }
-
-    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
-    {
-        $this->modifiedTs = $modifiedTs;
-
-        return $this;
-    }
-
-    public function getModifiedUser(): ?User
-    {
-        return $this->modifiedUser;
-    }
-
-    public function setModifiedUser(?User $modifiedUser): self
-    {
-        $this->modifiedUser = $modifiedUser;
-
-        return $this;
-    }
-
-    public function getModifiedSite(): ?string
-    {
-        return $this->modifiedSite;
-    }
-
-    public function setModifiedSite(?string $modifiedSite): self
-    {
-        $this->modifiedSite = $modifiedSite;
-
-        return $this;
-    }
-
     /**
      * @return Collection|NphSample[]
      */
@@ -295,30 +234,6 @@ class NphOrder
     public function setMetadata(?string $metadata): self
     {
         $this->metadata = $metadata;
-
-        return $this;
-    }
-
-    public function getModifyReason(): ?string
-    {
-        return $this->modifyReason;
-    }
-
-    public function setModifyReason(?string $modifyReason): self
-    {
-        $this->modifyReason = $modifyReason;
-
-        return $this;
-    }
-
-    public function getModifyType(): ?string
-    {
-        return $this->modifyType;
-    }
-
-    public function setModifyType(?string $modifyType): self
-    {
-        $this->modifyType = $modifyType;
 
         return $this;
     }
