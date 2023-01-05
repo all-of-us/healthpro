@@ -22,6 +22,7 @@
     {% else %}
         <p class="text-success">Select all samples to be restored</p>
     {% endif %}
+    {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     <table class="table table-samples">
         <thead>
         <tr>
@@ -34,7 +35,9 @@
         <tbody>
         {% for index, nphSample in order.nphSamples %}
             <tr class="row-samples">
-                <td></td>
+                <td>
+                    {{ form_widget(sampleModifyForm[nphSample.sampleCode]) }}
+                </td>
                 <td>{{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
                 <td>
                     {% if nphSample.collectedTs is not empty %}
@@ -94,19 +97,16 @@
     {% endif %}
     <div class="row">
         <div class="col-sm-12">
-            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
-                <button type="submit" name="reportable" class="btn btn-danger">{{ type|capitalize }}
-                    Order
-                </button>
+                <button type="submit" name="reportable" class="btn btn-danger">{{ type|capitalize }}</button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
             </p>
-            {{ form_end(sampleModifyForm) }}
         </div>
     </div>
+    {{ form_end(sampleModifyForm) }}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order-modify') }}

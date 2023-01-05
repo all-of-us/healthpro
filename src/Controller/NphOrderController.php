@@ -269,12 +269,15 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException();
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
-        $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, ['type' => $type]);
+        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+        $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
+            'type' => $type, 'samples' => $sampleLabelsIds
+        ]);
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {
-            $orderModifyData = $nphSampleModifyForm->getData();
+            $samplesModifyData = $nphSampleModifyForm->getData();
             if ($nphSampleModifyForm->isValid()) {
-                $nphOrderService->saveOrderModification($orderModifyData, $type, $order);
+                $nphOrderService->saveSamplesModification($samplesModifyData, $type, $order);
                 $this->addFlash('success', "Order cancelled");
                 return $this->redirectToRoute('nph_order_collect', [
                     'participantId' => $participantId,

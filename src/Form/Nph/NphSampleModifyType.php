@@ -13,9 +13,20 @@ class NphSampleModifyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $samples = $options['samples'];
+        foreach ($samples as $sampleCode => $sample) {
+            $builder->add($sampleCode, Type\CheckboxType::class, [
+                'label' => false,
+                'required' => false,
+                'attr' => [
+                    'data-sample-id' => $sample['id'],
+                ],
+                'disabled' => $sample['disabled']
+            ]);
+        }
+
         $reasonType = $options['type'] . 'Reasons';
         $reasons = NphSample::$$reasonType;
-
         $builder->add('reason', Type\ChoiceType::class, [
             'label' => 'Reason',
             'required' => true,
@@ -64,7 +75,8 @@ class NphSampleModifyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'type' => null
+            'type' => null,
+            'samples' => null,
         ]);
     }
 }

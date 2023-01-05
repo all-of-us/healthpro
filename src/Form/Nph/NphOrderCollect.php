@@ -15,7 +15,7 @@ class NphOrderCollect extends NphOrderForm
         $orderType = $options['orderType'];
         foreach ($samples as $sampleCode => $sample) {
             $builder->add($sampleCode, Type\CheckboxType::class, [
-                'label' => $sample['label'],
+                'label' => $sample['label'] . ' (' . $sample['id'] . ')',
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) use ($sampleCode) {
