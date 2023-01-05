@@ -278,7 +278,8 @@ class NphOrderController extends BaseController
             $samplesModifyData = $nphSampleModifyForm->getData();
             if ($nphSampleModifyForm->isValid()) {
                 $nphOrderService->saveSamplesModification($samplesModifyData, $type, $order);
-                $this->addFlash('success', "Order cancelled");
+                $modifySuccessText = NphSample::$modifySuccessText[$type];
+                $this->addFlash('success', "Samples {$modifySuccessText}");
                 return $this->redirectToRoute('nph_order_collect', [
                     'participantId' => $participantId,
                     'orderId' => $orderId

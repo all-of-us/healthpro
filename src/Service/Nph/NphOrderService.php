@@ -539,7 +539,7 @@ class NphOrderService
             $formData['reason'] = $formData['otherText'];
         }
         foreach ($order->getNphSamples() as $sample) {
-            if ($formData[$sample->getSampleCode()] === true) {
+            if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
                 $this->saveSampleModificationsData($sample, $type, $formData['reason']);
             }
         }
