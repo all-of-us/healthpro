@@ -15,6 +15,17 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphSample
 {
+    public const SAMPLE_CANCEL = 'cancel';
+    public const SAMPLE_RESTORE = 'restore';
+    public const SAMPLE_UNLOCK = 'unlock';
+
+    public static $cancelReasons = [
+        'Sample created in error' => 'SAMPLE_CANCEL_ERROR',
+        'Sample created for wrong participant' => 'SAMPLE_CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'SAMPLE_CANCEL_LABEL_ERROR',
+        'Other' => 'OTHER'
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -92,6 +103,31 @@ class NphSample
      * @ORM\OneToMany(targetEntity=NphAliquot::class, mappedBy="nphSample")
      */
     private $nphAliquots;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     */
+    private $modifiedUser;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $modifiedSite;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $modifiedTs;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $modifyReason;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $modifyType;
 
     public function __construct()
     {
@@ -298,5 +334,79 @@ class NphSample
         }
 
         return $this;
+    }
+
+    public function getModifiedUser(): ?User
+    {
+        return $this->modifiedUser;
+    }
+
+    public function setModifiedUser(?User $modifiedUser): self
+    {
+        $this->modifiedUser = $modifiedUser;
+
+        return $this;
+    }
+
+    public function getModifiedSite(): ?string
+    {
+        return $this->modifiedSite;
+    }
+
+    public function setModifiedSite(?string $modifiedSite): self
+    {
+        $this->modifiedSite = $modifiedSite;
+
+        return $this;
+    }
+
+    public function getModifiedTs(): ?\DateTimeInterface
+    {
+        return $this->modifiedTs;
+    }
+
+    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
+    {
+        $this->modifiedTs = $modifiedTs;
+
+        return $this;
+    }
+
+    public function getModifyReason(): ?string
+    {
+        return $this->modifyReason;
+    }
+
+    public function setModifyReason(?string $modifyReason): self
+    {
+        $this->modifyReason = $modifyReason;
+
+        return $this;
+    }
+
+    public function getModifyType(): ?string
+    {
+        return $this->modifyType;
+    }
+
+    public function setModifyType(?string $modifyType): self
+    {
+        $this->modifyType = $modifyType;
+
+        return $this;
+    }
+
+    public function isDisabled(): bool
+    {
+        return $this->finalizedTs || $this->modifyType === self::SAMPLE_CANCEL;
+    }
+
+    public function getModifyReasonDisplayText(): string
+    {
+        $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
+        if (empty($reasonDisplayText)) {
+            $reasonDisplayText = array_search($this->getModifyReason(), NphOrder::$cancelReasons);
+        }
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }

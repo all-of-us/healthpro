@@ -1,15 +1,15 @@
 $(document).ready(function () {
     let showHideOtherField = function () {
-        if ($("#nph_order_modify_reason option:selected").val() === 'OTHER') {
-            $('#nph_order_modify_otherText').show();
+        if ($(".modify-reason option:selected").val() === 'OTHER') {
+            $('.modify-other-text').show();
         } else {
-            $('#nph_order_modify_otherText').hide();
+            $('.modify-other-text').hide();
         }
     }
 
     showHideOtherField();
 
-    $('#nph_order_modify_reason').on('change', function () {
+    $('.modify-reason').on('change', function () {
         showHideOtherField();
     });
 });

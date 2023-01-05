@@ -7,14 +7,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use App\Entity\NphOrder;
+use App\Entity\NphSample;
 
-class NphOrderModifyType extends AbstractType
+class NphSampleModifyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $reasonType = $options['type'] . 'Reasons';
-        $reasons = NphOrder::$$reasonType;
+        $reasons = NphSample::$$reasonType;
 
         $builder->add('reason', Type\ChoiceType::class, [
             'label' => 'Reason',
@@ -40,7 +40,7 @@ class NphOrderModifyType extends AbstractType
             ],
             'attr' => ['class' => 'modify-other-text']
         ]);
-        if ($options['type'] == NphOrder::ORDER_CANCEL) {
+        if ($options['type'] == NphSample::SAMPLE_CANCEL) {
             $builder->add('confirm', Type\TextType::class, [
                 'label' => 'Confirm',
                 'required' => true,
@@ -48,7 +48,7 @@ class NphOrderModifyType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if (strtolower($value) !== NphOrder::ORDER_CANCEL) {
+                        if (strtolower($value) !== NphSample::SAMPLE_CANCEL) {
                             $context->buildViolation('Please type the word "CANCEL" to confirm')->addViolation();
                         }
                     })

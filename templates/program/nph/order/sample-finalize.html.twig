@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
 {% block body %}
     {% set order = sample.nphOrder %}
@@ -6,6 +7,25 @@
     <div class="page-header">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
+    {{ macros.displayModifyBannerMessage(sample) }}
+    {% if sampleModifyForm is not empty %}
+        <div>
+            <h3 class="text-danger">Cancel Sample</h3>
+            <p class="text-danger">Note: Cancelling a sample will cancel all aliquots associated with this sample</p>
+            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(sampleModifyForm) }}
+            {{ form_rest(sampleModifyForm) }}
+            <p>
+                <button type="submit" name="reportable" class="btn btn-danger">{{ modifyType|capitalize }}
+                    Sample
+                </button>
+                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                   class="btn btn-default">Exit</a>
+            </p>
+            {{ form_end(sampleModifyForm) }}
+            <hr>
+        </div>
+    {% endif %}
     <div class="row">
         <div class="col-sm-5">
             {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
@@ -33,16 +53,6 @@
             </div>
         </div>
         <div class="col-sm-7">
-            {% if order.modifyType == 'cancel' %}
-                <div class="alert alert-danger well-sm">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    <strong>
-                        Order Cancelled by {{ order.modifiedUser.email|default('Unknown') }}
-                        at {{ siteInfo.siteDisplayName(order.modifiedSite) }}
-                        on {{ order.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
-                    </strong>
-                </div>
-            {% endif %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="col-sm-4">
@@ -219,4 +229,5 @@
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
     {{ encore_entry_script_tags('nph-sample-finalize') }}
+    {{ encore_entry_script_tags('nph-order-modify') }}
 {% endblock %}

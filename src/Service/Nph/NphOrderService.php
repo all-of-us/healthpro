@@ -105,7 +105,8 @@ class NphOrderService
         foreach ($samplesObj as $sampleObj) {
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
-                'id' => $sampleObj->getSampleId()
+                'id' => $sampleObj->getSampleId(),
+                'disabled' => $sampleObj->isDisabled()
             ];
         }
         return $sampleLabels;
@@ -560,6 +561,45 @@ class NphOrderService
         $this->em->persist($order);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+        foreach ($order->getNphSamples() as $sample) {
+            if ($sample->getModifyType() !== NphSample::SAMPLE_CANCEL) {
+                $this->saveSampleModificationsData($sample, $type, $formData['reason']);
+            }
+        }
         return $order;
+    }
+
+    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
+    {
+        if ($formData['reason'] === 'OTHER') {
+            $formData['reason'] = $formData['otherText'];
+        }
+        $sample = $this->saveSampleModificationsData($sample, $type, $formData['reason']);
+        // If all samples are cancelled mark the order as cancelled
+        $order = $sample->getNphOrder();
+        $samples = $this->em->getRepository(NphSample::class)->findBy([
+            'nphOrder' => $order,
+            'modifyType' => null
+        ]);
+        if (empty($samples)) {
+            $order->setModifyType(NphOrder::ORDER_SAMPLE_CANCEL);
+            $this->em->persist($order);
+            $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+        }
+        return $sample;
+    }
+
+    private function saveSampleModificationsData(NphSample $sample, string $type, string $reason): NphSample
+    {
+        $sample->setModifiedTs(new \DateTime());
+        $sample->setModifiedSite($this->site);
+        $sample->setModifiedUser($this->user);
+        $sample->setModifyReason($reason);
+        $sample->setModifyType($type);
+        $this->em->persist($sample);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
+        return $sample;
     }
 }

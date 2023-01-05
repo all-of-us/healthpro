@@ -1,3 +1,4 @@
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 <div class="page-header">
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
@@ -10,14 +11,8 @@
     </h2>
 </div>
 {% if order.modifyType == 'cancel' %}
-    <div class="alert alert-danger well-sm">
-        <i class="fa fa-info-circle" aria-hidden="true"></i>
-        <strong>
-            Cancelled by {{ order.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(order
-            .modifiedSite) }} on {{ order.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
-        </strong>
-    </div>
-{% else %}
+    {{ macros.displayModifyBannerMessage(order) }}
+{% elseif order.modifyType != 'sample_cancel' %}
     <p class="lead">
         Order ID: <strong>{{ order.orderId }}</strong>
         <a href="{{ path('nph_order_modify', { participantId: participant.id, orderId: order.id, type: 'cancel' }) }}"
