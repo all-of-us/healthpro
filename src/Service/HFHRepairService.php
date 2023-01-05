@@ -59,8 +59,6 @@ class HFHRepairService
             throw new \Exception("Multiple orders found for participant $participantId at site $currentSite");
         }
         $order[0]->setFinalizedSite($repairSite);
-        $order[0]->setCollectedSite($repairSite);
-        $order[0]->setProcessedSite($repairSite);
         $this->em->persist($order[0]);
     }
 }
