@@ -2,10 +2,9 @@
 {% block title %}Sample - Modify - {% endblock %}
 {% block body %}
     <h2 class="text-danger">
-        <i class="fa fa-medkit" aria-hidden="true"></i>
-        {{ type|capitalize }} Samples
+        <i class="fa fa-medkit" aria-hidden="true"></i> {{ type|capitalize }} Samples
         <small>
-            <a href="{{ path('participant', { id: participant.id }) }}">
+            <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">
                 {{ participant.lastName }}, {{ participant.firstName }}
             </a>
         </small>
@@ -38,7 +37,7 @@
                 <td>
                     {{ form_widget(sampleModifyForm[nphSample.sampleCode]) }}
                 </td>
-                <td>{{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
+                <td>({{ index + 1 }}) {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
                 <td>
                     {% if nphSample.collectedTs is not empty %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>

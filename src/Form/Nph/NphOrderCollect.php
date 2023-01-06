@@ -13,9 +13,11 @@ class NphOrderCollect extends NphOrderForm
     {
         $samples = $options['samples'];
         $orderType = $options['orderType'];
+        $sampleIndex = 1;
         foreach ($samples as $sampleCode => $sample) {
+            $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
             $builder->add($sampleCode, Type\CheckboxType::class, [
-                'label' => $sample['label'] . ' (' . $sample['id'] . ')',
+                'label' => $sampleLabel,
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) use ($sampleCode) {
@@ -30,6 +32,7 @@ class NphOrderCollect extends NphOrderForm
                 'disabled' => $sample['disabled']
             ]);
             $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, $sample['disabled'], 'collect');
+            $sampleIndex++;
         }
 
         if ($orderType === 'urine') {
