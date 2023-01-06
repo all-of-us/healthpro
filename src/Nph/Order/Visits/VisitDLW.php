@@ -8,20 +8,20 @@ class VisitDLW extends TimePoints
 {
     protected $timePoints = [
         'day0PreDoseA' => 'Day 0 Pre Dose A',
-        'day0PreDoseB' => 'Day 0 Pre Dose B',
-        'day0PostDoseA' => 'Day 0 Post Dose A',
-        'day0PostDoseB' => 'Day 0 Post Dose B',
+        'day1PreDoseB' => 'Day 1 Pre Dose B',
+        'day1PostDoseC' => 'Day 1 Post Dose C',
+        'day1PostDoseD' => 'Day 1 Post Dose D',
         'day6E' => 'Day 6 E',
         'day7F' => 'Day 7 F',
         'day13G' => 'Day 13 G',
-        'day14F' => 'Day 14 F'
+        'day14F' => 'Day 14 H'
     ];
 
     protected $timePointSampleTypes = [
         'day0PreDoseA' => ['urineDlw'],
-        'day0PreDoseB' => ['urineDlw'],
-        'day0PostDoseA' => ['urineDlw'],
-        'day0PostDoseB' => ['urineDlw'],
+        'day1PreDoseB' => ['urineDlw'],
+        'day1PostDoseC' => ['urineDlw'],
+        'day1PostDoseD' => ['urineDlw'],
         'day6E' => ['urineDlw'],
         'day7F' => ['urineDlw'],
         'day13G' => ['urineDlw'],
