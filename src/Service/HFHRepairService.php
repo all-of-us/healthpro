@@ -53,8 +53,8 @@ class HFHRepairService
     private function repairParticipantSite($participantId, $currentSite, $repairSite)
     {
         $repairSite = strtolower($repairSite);
-        $repairSite = strtolower('hpo-site-', '', $repairSite);
-        $currentSite = lower($currentSite);
+        $repairSite = str_replace('hpo-site-', '', $repairSite);
+        $currentSite = strtolower($currentSite);
         $currentSite = str_replace('hpo-site-', '', $currentSite);
         $evaluation = $this->em->getRepository(Measurement::class)->findBy(['ParticipantId' => $participantId, 'finalizedSite' => $currentSite]);
         $order = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
