@@ -423,7 +423,6 @@ class NphOrderService
                     'healthProOrderId' => $order->getId(),
                     'createDate' => $order->getCreatedTs()->format('Y-M-D'),
                     'sampleStatus' => $sample->getStatus(),
-                    'sampleType' => $module->getSampleType($sample->getSampleCode()),
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
                     'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode()))
@@ -531,6 +530,22 @@ class NphOrderService
             $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
         }
         return $sampleData;
+    }
+
+    public function getSamplesWithStatus(): array
+    {
+        $samplesData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->participantId,
+            $this->visit
+        );
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $sample->getStatus();
+            }
+        }
+        return $samplesData;
     }
 
     public function saveSamplesModification(array $formData, string $type, NphOrder $order): NphOrder

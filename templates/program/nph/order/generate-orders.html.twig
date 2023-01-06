@@ -44,7 +44,7 @@
                     <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
                          data-timepoint="{{ timePoint }}">
                         {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
-                            participant.id, module, visit) }}
+                            participant.id, module, visit, samplesStatus) }}
                     </div>
                 </div>
             {% endfor %}
