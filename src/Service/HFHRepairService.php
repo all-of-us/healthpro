@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Measurement;
 use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -51,12 +52,24 @@ class HFHRepairService
 
     private function repairParticipantSite($participantId, $currentSite, $repairSite)
     {
+        $repairSite = strtolower($repairSite);
+        $repairSite = strtolower('hpo-site-', '', $repairSite);
+        $currentSite = lower($currentSite);
+        $currentSite = str_replace('hpo-site-', '', $currentSite);
+        $evaluation = $this->em->getRepository(Measurement::class)->findBy(['ParticipantId' => $participantId, 'finalizedSite' => $currentSite]);
         $order = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
         if (count($order) == 0) {
             throw new \Exception("No order found for participant $participantId at site $currentSite");
         }
         if (count($order) > 1) {
             throw new \Exception("Multiple orders found for participant $participantId at site $currentSite");
+        }
+        if (count($order) == 0) {
+            throw new \Exception("No measurements found for participant $participantId at site $currentSite");
+        }
+        foreach ($evaluation as $measurement) {
+            $measurement->setFinalizedSite($repairSite);
+            $this->em->persist($measurement);
         }
         $order[0]->setFinalizedSite($repairSite);
         $this->em->persist($order[0]);
