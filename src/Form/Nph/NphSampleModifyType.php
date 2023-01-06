@@ -73,6 +73,11 @@ class NphSampleModifyType extends AbstractType
                 ]
             ]);
         }
+
+        // Placeholder field for displaying select at least one sample error message
+        $builder->add('samplesCheckAll', Type\CheckboxType::class, [
+            'required' => false
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)

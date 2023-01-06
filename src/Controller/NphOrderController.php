@@ -275,6 +275,9 @@ class NphOrderController extends BaseController
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {
             $samplesModifyData = $nphSampleModifyForm->getData();
+            if ($nphOrderService->isAtLeastOneSampleChecked($samplesModifyData, $order) === false) {
+                $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
             if ($nphSampleModifyForm->isValid()) {
                 $nphOrderService->saveSamplesModification($samplesModifyData, $type, $order);
                 $modifySuccessText = NphSample::$modifySuccessText[$type];

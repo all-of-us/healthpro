@@ -282,7 +282,7 @@ class NphOrderService
     public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
     {
         foreach ($order->getNphSamples() as $nphSample) {
-            if ($formData[$nphSample->getSampleCode()] === true) {
+            if (isset($formData[$nphSample->getSampleCode()]) && $formData[$nphSample->getSampleCode()] === true) {
                 return true;
             }
         }
