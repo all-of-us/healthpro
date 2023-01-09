@@ -456,18 +456,20 @@ class NphOrderService
         $aliquots = $this->getAliquots($sampleCode);
         if (!empty($aliquots)) {
             foreach ($aliquots as $aliquotCode => $aliquot) {
-                foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                    if ($aliquotId) {
-                        $nphAliquot = new NphAliquot();
-                        $nphAliquot->setNphSample($sample);
-                        $nphAliquot->setAliquotId($aliquotId);
-                        $nphAliquot->setAliquotCode($aliquotCode);
-                        $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                        $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
-                        $nphAliquot->setUnits($aliquot['units']);
-                        $this->em->persist($nphAliquot);
-                        $this->em->flush();
-                        $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                if (isset($formData[$aliquotCode])) {
+                    foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                        if ($aliquotId) {
+                            $nphAliquot = new NphAliquot();
+                            $nphAliquot->setNphSample($sample);
+                            $nphAliquot->setAliquotId($aliquotId);
+                            $nphAliquot->setAliquotCode($aliquotCode);
+                            $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                            $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            $nphAliquot->setUnits($aliquot['units']);
+                            $this->em->persist($nphAliquot);
+                            $this->em->flush();
+                            $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                        }
                     }
                 }
             }
