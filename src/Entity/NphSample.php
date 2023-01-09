@@ -18,6 +18,7 @@ class NphSample
     public const CANCEL = 'cancel';
     public const RESTORE = 'restore';
     public const UNLOCK = 'unlock';
+    public const EDITED = 'edited';
 
     public static $cancelReasons = [
         'Created in error' => 'CANCEL_ERROR',
@@ -332,6 +333,15 @@ class NphSample
         return $this->nphAliquots;
     }
 
+    public function getNphAliquotIds(): array
+    {
+        $aliquotIds = [];
+        foreach ($this->nphAliquots as $aliquot) {
+            $aliquotIds[] = $aliquot->getAliquotId();
+        }
+        return $aliquotIds;
+    }
+
     public function addNphAliquot(NphAliquot $nphAliquot): self
     {
         if (!$this->nphAliquots->contains($nphAliquot)) {
@@ -416,7 +426,7 @@ class NphSample
 
     public function isDisabled(): bool
     {
-        return $this->finalizedTs || $this->modifyType === self::CANCEL;
+        return ($this->finalizedTs || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
     }
 
     public function getModifyReasonDisplayText(): string

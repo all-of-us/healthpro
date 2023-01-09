@@ -481,6 +481,9 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
+        if ($sample->getModifyType() === NphSample::UNLOCK) {
+            $sample->setModifyType(NphSample::EDITED);
+        }
         $this->em->persist($sample);
         $this->em->flush();
 
