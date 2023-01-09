@@ -78,10 +78,19 @@
                         </td>
                         <td>
                             {% if nphSample.finalizedTs is not empty %}
-                                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
-                                    order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
-                                    View
-                                </a>
+                                <p>
+                                    <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                                        order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
+                                        View
+                                    </a>
+                                </p>
+                                {% if nphSample.modifyType != 'cancel' %}
+                                    <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                                        order.id, sampleId: nphSample.id, modifyType: 'unlock'}) }}" class="btn
+                                        btn-warning btn-xs">
+                                        Edit
+                                    </a>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>

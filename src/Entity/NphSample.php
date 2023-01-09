@@ -32,6 +32,12 @@ class NphSample
         'Other' => 'OTHER'
     ];
 
+    public static $unlockReasons = [
+        'Change collection information' => 'CHANGE_COLLECTION_INFORMATION',
+        'Change, add, or remove aliquot' => 'CHANGE_ADD_REMOVE_ALIQUOT',
+        'Other' => 'OTHER'
+    ];
+
     public static $modifySuccessText = [
         'cancel' => 'cancelled',
         'restore' => 'restored',
@@ -417,5 +423,15 @@ class NphSample
     {
         $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
+
+    public function canUnlock(): bool
+    {
+        if (!empty($this->finalizedTs) &&
+            $this->getModifyType() !== NphSample::CANCEL &&
+            $this->getModifyType() !== NphSample::UNLOCK) {
+            return true;
+        }
+        return false;
     }
 }
