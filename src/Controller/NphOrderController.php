@@ -228,7 +228,7 @@ class NphOrderController extends BaseController
             if ($nphSampleModifyForm->isSubmitted()) {
                 $sampleModifyData = $nphSampleModifyForm->getData();
                 if ($nphSampleModifyForm->isValid()) {
-                    $nphOrderService->saveSamplesModification($sampleModifyData, $modifyType, $sample);
+                    $nphOrderService->saveSampleModification($sampleModifyData, NphSample::UNLOCK, $sample);
                     $successText = $sample::$modifySuccessText;
                     $this->addFlash('success', "Sample {$successText[$modifyType]}");
                     return $this->redirectToRoute('nph_sample_finalize', [

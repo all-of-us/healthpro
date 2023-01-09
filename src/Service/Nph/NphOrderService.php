@@ -550,23 +550,29 @@ class NphOrderService
 
     public function saveSamplesModification(array $formData, string $type, NphOrder $order): NphOrder
     {
-        if ($formData['reason'] === 'OTHER') {
-            $formData['reason'] = $formData['otherText'];
-        }
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
-                $this->saveSampleModificationsData($sample, $type, $formData['reason']);
+                $this->saveSampleModificationsData($sample, $type, $formData);
             }
         }
         return $order;
     }
 
-    private function saveSampleModificationsData(NphSample $sample, string $type, string $reason): void
+    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
     {
+        $this->saveSampleModificationsData($sample, $type, $formData);
+        return $sample;
+    }
+
+    private function saveSampleModificationsData(NphSample $sample, string $type, array $formData): void
+    {
+        if ($formData['reason'] === 'OTHER') {
+            $formData['reason'] = $formData['otherText'];
+        }
         $sample->setModifiedTs(new \DateTime());
         $sample->setModifiedSite($this->site);
         $sample->setModifiedUser($this->user);
-        $sample->setModifyReason($reason);
+        $sample->setModifyReason($formData['reason']);
         $sample->setModifyType($type);
         $this->em->persist($sample);
         $this->em->flush();
