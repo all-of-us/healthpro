@@ -19,7 +19,7 @@ class HFHRepairService
         $this->logger = $logger;
     }
 
-    public function repairHFHParticipants()
+    public function repairHFHParticipants($repairLimit = 100): void
     {
         $this->em->getConnection()->beginTransaction();
         $fhandle = fopen('src/Cache/HFSitePairing.csv', 'r');
@@ -34,7 +34,7 @@ class HFHRepairService
                 $this->logger->error($exception->getMessage());
                 return;
             }
-            if ($count === 100) {
+            if ($count === $repairLimit) {
                 $this->em->flush();
                 $this->em->clear();
                 $this->em->getConnection()->commit();
@@ -56,22 +56,19 @@ class HFHRepairService
         $repairSite = str_replace('hpo-site-', '', $repairSite);
         $currentSite = strtolower($currentSite);
         $currentSite = str_replace('hpo-site-', '', $currentSite);
-        $evaluation = $this->em->getRepository(Measurement::class)->findBy(['ParticipantId' => $participantId, 'finalizedSite' => $currentSite]);
+        $evaluation = $this->em->getRepository(Measurement::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
         $order = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
-        if (count($order) == 0) {
+        if (count($evaluation) == 0) {
             throw new \Exception("No order found for participant $participantId at site $currentSite");
-        }
-        if (count($order) > 1) {
-            throw new \Exception("Multiple orders found for participant $participantId at site $currentSite");
         }
         if (count($order) == 0) {
             throw new \Exception("No measurements found for participant $participantId at site $currentSite");
         }
+        foreach ($order as $order) {
+            $order->setFinalizedSite($repairSite);
+        }
         foreach ($evaluation as $measurement) {
             $measurement->setFinalizedSite($repairSite);
-            $this->em->persist($measurement);
         }
-        $order[0]->setFinalizedSite($repairSite);
-        $this->em->persist($order[0]);
     }
 }
