@@ -84,7 +84,7 @@
                                         View
                                     </a>
                                 </p>
-                                {% if nphSample.modifyType != 'cancel' %}
+                                {% if nphSample.canUnlock %}
                                     <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
                                         order.id, sampleId: nphSample.id, modifyType: 'unlock'}) }}" class="btn
                                         btn-warning btn-xs">
