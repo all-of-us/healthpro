@@ -15,15 +15,27 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphSample
 {
-    public const SAMPLE_CANCEL = 'cancel';
-    public const SAMPLE_RESTORE = 'restore';
-    public const SAMPLE_UNLOCK = 'unlock';
+    public const CANCEL = 'cancel';
+    public const RESTORE = 'restore';
+    public const UNLOCK = 'unlock';
 
     public static $cancelReasons = [
-        'Sample created in error' => 'SAMPLE_CANCEL_ERROR',
-        'Sample created for wrong participant' => 'SAMPLE_CANCEL_WRONG_PARTICIPANT',
-        'Labeling error identified after finalization' => 'SAMPLE_CANCEL_LABEL_ERROR',
+        'Created in error' => 'CANCEL_ERROR',
+        'Created for wrong participant' => 'CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'CANCEL_LABEL_ERROR',
         'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Cancelled for wrong participant' => 'RESTORE_WRONG_PARTICIPANT',
+        'Can be amended instead of cancelled' => 'RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
+    public static $modifySuccessText = [
+        'cancel' => 'cancelled',
+        'restore' => 'restored',
+        'unlock' => 'unlocked'
     ];
 
     /**
@@ -398,15 +410,12 @@ class NphSample
 
     public function isDisabled(): bool
     {
-        return $this->finalizedTs || $this->modifyType === self::SAMPLE_CANCEL;
+        return $this->finalizedTs || $this->modifyType === self::CANCEL;
     }
 
     public function getModifyReasonDisplayText(): string
     {
         $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
-        if (empty($reasonDisplayText)) {
-            $reasonDisplayText = array_search($this->getModifyReason(), NphOrder::$cancelReasons);
-        }
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 }

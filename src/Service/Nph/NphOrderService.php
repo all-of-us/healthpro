@@ -282,7 +282,7 @@ class NphOrderService
     public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
     {
         foreach ($order->getNphSamples() as $nphSample) {
-            if ($formData[$nphSample->getSampleCode()] === true) {
+            if (isset($formData[$nphSample->getSampleCode()]) && $formData[$nphSample->getSampleCode()] === true) {
                 return true;
             }
         }
@@ -548,49 +548,20 @@ class NphOrderService
         return $samplesData;
     }
 
-    public function saveOrderModification(array $formData, string $type, NphOrder $order): NphOrder
+    public function saveSamplesModification(array $formData, string $type, NphOrder $order): NphOrder
     {
         if ($formData['reason'] === 'OTHER') {
             $formData['reason'] = $formData['otherText'];
         }
-        $order->setModifiedTs(new \DateTime());
-        $order->setModifiedSite($this->site);
-        $order->setModifiedUser($this->user);
-        $order->setModifyReason($formData['reason']);
-        $order->setModifyType($type);
-        $this->em->persist($order);
-        $this->em->flush();
-        $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
         foreach ($order->getNphSamples() as $sample) {
-            if ($sample->getModifyType() !== NphSample::SAMPLE_CANCEL) {
+            if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
                 $this->saveSampleModificationsData($sample, $type, $formData['reason']);
             }
         }
         return $order;
     }
 
-    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
-    {
-        if ($formData['reason'] === 'OTHER') {
-            $formData['reason'] = $formData['otherText'];
-        }
-        $sample = $this->saveSampleModificationsData($sample, $type, $formData['reason']);
-        // If all samples are cancelled mark the order as cancelled
-        $order = $sample->getNphOrder();
-        $samples = $this->em->getRepository(NphSample::class)->findBy([
-            'nphOrder' => $order,
-            'modifyType' => null
-        ]);
-        if (empty($samples)) {
-            $order->setModifyType(NphOrder::ORDER_SAMPLE_CANCEL);
-            $this->em->persist($order);
-            $this->em->flush();
-            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
-        }
-        return $sample;
-    }
-
-    private function saveSampleModificationsData(NphSample $sample, string $type, string $reason): NphSample
+    private function saveSampleModificationsData(NphSample $sample, string $type, string $reason): void
     {
         $sample->setModifiedTs(new \DateTime());
         $sample->setModifiedSite($this->site);
@@ -600,6 +571,5 @@ class NphOrderService
         $this->em->persist($sample);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
-        return $sample;
     }
 }

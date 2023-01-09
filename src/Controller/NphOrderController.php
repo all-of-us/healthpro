@@ -5,12 +5,10 @@ namespace App\Controller;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphOrderCollect;
-use App\Form\Nph\NphOrderModifyType;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
-use App\Nph\Order\Samples;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -102,7 +100,7 @@ class NphOrderController extends BaseController
             NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                $this->getSecurityUser()->getTimezone(), 'disabled' => $order->isDisabled()]
+                $this->getSecurityUser()->getTimezone()]
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
@@ -191,8 +189,8 @@ class NphOrderController extends BaseController
             NphSampleFinalizeType::class,
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
-                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => $order->isDisabled()
-                || (bool)$sample->isDisabled()]
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => (bool)$sample->isDisabled()
+            ]
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
@@ -216,28 +214,6 @@ class NphOrderController extends BaseController
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
             }
         }
-
-        if ($request->query->has('modifyType')) {
-            $modifyType = $request->query->get('modifyType');
-            if ($modifyType === $sample->getModifyType()) {
-                throw $this->createNotFoundException();
-            }
-            $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, ['type' => $modifyType]);
-            $nphSampleModifyForm->handleRequest($request);
-            if ($nphSampleModifyForm->isSubmitted()) {
-                $sampleModifyData = $nphSampleModifyForm->getData();
-                if ($nphSampleModifyForm->isValid()) {
-                    $nphOrderService->saveSampleModification($sampleModifyData, $modifyType, $sample);
-                    $this->addFlash('success', "Sample cancelled");
-                    return $this->redirectToRoute('nph_order_collect', [
-                        'participantId' => $participantId,
-                        'orderId' => $orderId
-                    ]);
-                } else {
-                    $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
-                }
-            }
-        }
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
@@ -246,9 +222,7 @@ class NphOrderController extends BaseController
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'aliquots' => $nphOrderService->getAliquots($sampleCode),
-            'sampleData' => $sampleData,
-            'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
-            'modifyType' => $modifyType ?? ''
+            'sampleData' => $sampleData
         ]);
     }
 
@@ -271,9 +245,9 @@ class NphOrderController extends BaseController
     }
 
     /**
-     * @Route("/participant/{participantId}/order/{orderId}/modify/{type}", name="nph_order_modify")
+     * @Route("/participant/{participantId}/order/{orderId}/samples/modify/{type}", name="nph_samples_modify")
      */
-    public function orderModifyAction(
+    public function sampleModifyAction(
         $participantId,
         string $orderId,
         string $type,
@@ -281,7 +255,7 @@ class NphOrderController extends BaseController
         ParticipantSummaryService $participantSummaryService,
         Request $request
     ): Response {
-        if (!in_array($type, [NphOrder::ORDER_CANCEL, NphOrder::ORDER_RESTORE, NphOrder::ORDER_UNLOCK])) {
+        if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK])) {
             throw $this->createNotFoundException();
         }
         $participant = $participantSummaryService->getParticipantById($participantId);
@@ -292,29 +266,35 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        if ($type === $order->getModifyType()) {
+        if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
-        $nphOrderModifyForm = $this->createForm(NphOrderModifyType::class, null, ['type' => $type]);
-        $nphOrderModifyForm->handleRequest($request);
-        if ($nphOrderModifyForm->isSubmitted()) {
-            $orderModifyData = $nphOrderModifyForm->getData();
-            if ($nphOrderModifyForm->isValid()) {
-                $nphOrderService->saveOrderModification($orderModifyData, $type, $order);
-                $this->addFlash('success', "Order cancelled");
+        $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
+            'type' => $type, 'samples' => $order->getNphSamples()
+        ]);
+        $nphSampleModifyForm->handleRequest($request);
+        if ($nphSampleModifyForm->isSubmitted()) {
+            $samplesModifyData = $nphSampleModifyForm->getData();
+            if ($nphOrderService->isAtLeastOneSampleChecked($samplesModifyData, $order) === false) {
+                $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
+            if ($nphSampleModifyForm->isValid()) {
+                $nphOrderService->saveSamplesModification($samplesModifyData, $type, $order);
+                $modifySuccessText = NphSample::$modifySuccessText[$type];
+                $this->addFlash('success', "Samples {$modifySuccessText}");
                 return $this->redirectToRoute('nph_order_collect', [
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
             } else {
-                $nphOrderModifyForm->addError(new FormError('Please correct the errors below'));
+                $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
             }
         }
-        return $this->render('program/nph/order/order-modify.html.twig', [
+        return $this->render('program/nph/order/sample-modify.html.twig', [
             'participant' => $participant,
             'order' => $order,
-            'orderModifyForm' => $nphOrderModifyForm->createView(),
+            'sampleModifyForm' => $nphSampleModifyForm->createView(),
             'type' => $type,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
