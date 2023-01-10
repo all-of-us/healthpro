@@ -583,4 +583,22 @@ class NphOrderService
         $this->em->flush();
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
+
+    public function checkDuplicateAliquotId(array $formData, string $sampleCode): array
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        foreach (array_keys($aliquots) as $aliquotCode) {
+            if (isset($formData[$aliquotCode])) {
+                foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                    if ($this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' => $aliquotId])) {
+                        return [
+                            'key' => $key,
+                            'aliquotCode' => $aliquotCode
+                        ];
+                    }
+                }
+            }
+        }
+        return [];
+    }
 }
