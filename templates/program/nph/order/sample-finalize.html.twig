@@ -127,11 +127,14 @@
                         <table class="table table-samples">
                             <thead>
                             <tr>
-                                <td class="col-md-5">Matrix Aliquot Tube/Aliquot Container</td>
+                                <td class="col-md-4">Matrix Aliquot Tube/Aliquot Container</td>
                                 <td class="col-md-3">Aliquot Time</td>
                                 <td class="col-md-2">Volume</td>
                                 <td class="col-md-1"></td>
-                                <td class="col-md-1"></td>
+                                {% if sample.modifyType == 'unlock' %}
+                                    <td class="col-md-1">Remove</td>
+                                    <td class="col-md-1">Restore</td>
+                                {% endif %}
                             </tr>
                             </thead>
                             <tbody>
@@ -156,8 +159,8 @@
                                         sampleData[aliquotCode]|length : aliquot['expectedAliquots'] %}
                                     {% for i in range(0, aliquotCount - 1) %}
                                         {% if sampleFinalizeForm[aliquotCode][i] is defined %}
-                                            {% set disabled = sampleFinalizeForm[aliquotCode][i].vars.data in
-                                                sample.nphAliquotIds ? true: false %}
+                                            {% set aliquotId = sampleFinalizeForm[aliquotCode][i].vars.data %}
+                                            {% set disabled = aliquotId in sample.nphAliquotIds ? true: false %}
                                             <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
                                                 <td {% if not sampleFinalizeForm[aliquotCode][i].vars.valid %}
                                                     class="has-error"{% endif %}>
@@ -178,15 +181,18 @@
                                                     {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
                                                 </td>
                                                 <td>
-                                                    <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
                                                     {{ aliquot['units'] }}
-                                                </td>
-                                                {% if sample.finalizedTs is empty %}
-                                                    <td>
+                                                    {% if aliquotId not in sample.nphAliquotIds  %}
                                                         <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
-                                                        {% if i != 0 %}
-                                                            <i class="fa fa-trash delete-aliquot-widget" role="button"></i>
-                                                        {% endif %}
+                                                    {% endif %}
+                                                </td>
+                                                {% if sample.modifyType == 'unlock' and aliquotId in sample
+                                                    .nphAliquotIds  %}
+                                                    <td>
+                                                        {{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotId]) }}
+                                                    </td>
+                                                    <td>
+                                                        {{ form_widget(sampleFinalizeForm['restore_' ~ aliquotId]) }}
                                                     </td>
                                                 {% endif %}
                                             </tr>

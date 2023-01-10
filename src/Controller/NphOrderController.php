@@ -189,7 +189,8 @@ class NphOrderController extends BaseController
             NphSampleFinalizeType::class,
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
-                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => $sample->isDisabled()
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
+                $sample->isDisabled(), 'finalizedAliquots' => $sample->getNphAliquots()
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
