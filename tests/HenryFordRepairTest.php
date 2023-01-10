@@ -22,12 +22,6 @@ class HenryFordRepairTest extends KernelTestCase
         $this->HFHRepairService = static::getContainer()->get(HFHRepairService::class);
     }
 
-    public function getParticipantData()
-    {
-        $fhandle = fopen('src/Cache/HFSitePairing.csv', 'r');
-        $headers = fgetcsv($fhandle);
-    }
-
     protected function getUser()
     {
         $user = new User();
