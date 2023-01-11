@@ -20,7 +20,7 @@ class HFHRepairService
         $this->loggerService = $logger;
     }
 
-    public function repairHFHParticipants($repairLimit = 100): void
+    public function repairHFHParticipants(int $repairLimit = 100): void
     {
         $this->em->getConnection()->beginTransaction();
         $fhandle = fopen('src/Cache/HFSitePairing.csv', 'r');
@@ -50,7 +50,7 @@ class HFHRepairService
         }
     }
 
-    private function repairParticipantSite($participantId, $currentSite, $repairSite)
+    private function repairParticipantSite(string $participantId, string $currentSite, string $repairSite): void
     {
         $repairSite = strtolower($repairSite);
         $repairSite = str_replace('hpo-site-', '', $repairSite);
