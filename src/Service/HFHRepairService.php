@@ -12,12 +12,12 @@ use Symfony\Component\Console\Command\Command;
 class HFHRepairService
 {
     private EntityManagerInterface $em;
-    private LoggerInterface $logger;
+    private LoggerService $loggerService;
 
-    public function __construct(EntityManagerInterface $em, LoggerInterface $logger)
+    public function __construct(EntityManagerInterface $em, LoggerService $logger)
     {
         $this->em = $em;
-        $this->logger = $logger;
+        $this->loggerService = $logger;
     }
 
     public function repairHFHParticipants($repairLimit = 100): void
@@ -32,7 +32,7 @@ class HFHRepairService
                 $this->repairParticipantSite($row[0], $row[3], $row[4]);
             } catch (\Exception $exception) {
                 $this->em->getConnection()->rollBack();
-                $this->logger->error($exception->getMessage());
+                $this->loggerService->error($exception->getMessage());
                 return;
             }
             if ($count === $repairLimit) {
@@ -48,7 +48,6 @@ class HFHRepairService
                 break;
             }
         }
-        $this->logger->info('100 records processed');
     }
 
     private function repairParticipantSite($participantId, $currentSite, $repairSite)
@@ -66,11 +65,11 @@ class HFHRepairService
             throw new \Exception("No measurements found for participant $participantId at site $currentSite");
         }
         foreach ($orders as $order) {
-            $this->logger->log(Log::ORDER_EDIT, $order->getId());
+            $this->loggerService->log(Log::ORDER_EDIT, $order->getId());
             $order->setFinalizedSite($repairSite);
         }
         foreach ($evaluation as $measurement) {
-            $this->logger->log(Log::EVALUATION_EDIT, $measurement->getId());
+            $this->loggerService->log(Log::EVALUATION_EDIT, $measurement->getId());
             $measurement->setFinalizedSite($repairSite);
         }
     }

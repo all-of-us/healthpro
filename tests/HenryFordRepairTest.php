@@ -8,7 +8,6 @@ use App\Entity\User;
 use App\Service\HFHRepairService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use function Webmozart\Assert\Tests\StaticAnalysis\null;
 
 class HenryFordRepairTest extends KernelTestCase
 {
