@@ -37,8 +37,16 @@
             <tr class="row-samples">
                 <td>
                     {{ form_widget(sampleModifyForm[nphSample.sampleCode]) }}
+                    {{ dump(sampleModifyForm[nphSample.sampleCode].vars.disabled) }}
                 </td>
-                <td>({{ index + 1 }}) {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})</td>
+                <td>
+                    ({{ index + 1 }}) {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
+                    {% if nphSample.modifyType == 'cancel' %}
+                        <span class="text-danger">Cancelled</span>
+                    {% else %}
+                        <span class="text-success">Active</span>
+                    {% endif %}
+                </td>
                 <td>
                     {% if nphSample.collectedTs is not empty %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>

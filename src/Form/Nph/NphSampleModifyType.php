@@ -13,18 +13,25 @@ class NphSampleModifyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $samples = $options['samples'];
-        foreach ($samples as $sample) {
-            $disabled = false;
-            if ($options['type'] === NphSample::CANCEL) {
-                $disabled = $sample->getModifyType() === NphSample::CANCEL;
-            } elseif ($options['type'] === NphSample::RESTORE) {
-                $disabled = $sample->getModifyType() !== NphSample::CANCEL;
+        if ($options['type'] != NphSample::UNLOCK) {
+            $samples = $options['samples'];
+            foreach ($samples as $sample) {
+                $disabled = false;
+                if ($options['type'] === NphSample::CANCEL) {
+                    $disabled = $sample->getModifyType() === NphSample::CANCEL;
+                } elseif ($options['type'] === NphSample::RESTORE) {
+                    $disabled = $sample->getModifyType() !== NphSample::CANCEL;
+                }
+                $builder->add($sample->getSampleCode(), Type\CheckboxType::class, [
+                    'label' => false,
+                    'required' => false,
+                    'disabled' => $disabled
+                ]);
             }
-            $builder->add($sample->getSampleCode(), Type\CheckboxType::class, [
-                'label' => false,
-                'required' => false,
-                'disabled' => $disabled
+
+            // Placeholder field for displaying select at least one sample error message
+            $builder->add('samplesCheckAll', Type\CheckboxType::class, [
+                'required' => false
             ]);
         }
 
@@ -73,11 +80,6 @@ class NphSampleModifyType extends AbstractType
                 ]
             ]);
         }
-
-        // Placeholder field for displaying select at least one sample error message
-        $builder->add('samplesCheckAll', Type\CheckboxType::class, [
-            'required' => false
-        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
