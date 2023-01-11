@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
@@ -57,17 +58,19 @@ class HFHRepairService
         $currentSite = strtolower($currentSite);
         $currentSite = str_replace('hpo-site-', '', $currentSite);
         $evaluation = $this->em->getRepository(Measurement::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
-        $order = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
+        $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
         if (count($evaluation) == 0) {
             throw new \Exception("No order found for participant $participantId at site $currentSite");
         }
-        if (count($order) == 0) {
+        if (count($orders) == 0) {
             throw new \Exception("No measurements found for participant $participantId at site $currentSite");
         }
-        foreach ($order as $order) {
+        foreach ($orders as $order) {
+            $this->logger->log(Log::ORDER_EDIT, $order->getId());
             $order->setFinalizedSite($repairSite);
         }
         foreach ($evaluation as $measurement) {
+            $this->logger->log(Log::EVALUATION_EDIT, $measurement->getId());
             $measurement->setFinalizedSite($repairSite);
         }
     }
