@@ -452,6 +452,7 @@ class NphOrderService
 
     public function saveOrderFinalization(array $formData, NphSample $sample): NphSample
     {
+        $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();
         $aliquots = $this->getAliquots($sampleCode);
         if (!empty($aliquots)) {
@@ -483,7 +484,7 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
-        if ($sample->getModifyType() === NphSample::UNLOCK) {
+        if ($sampleModifyType === NphSample::UNLOCK) {
             $sample->setModifyType(NphSample::EDITED);
         }
         $this->em->persist($sample);
@@ -495,6 +496,20 @@ class NphOrderService
             $this->em->persist($order);
             $this->em->flush();
         }
+
+        if ($sampleModifyType === NphSample::UNLOCK) {
+            foreach ($sample->getNphAliquots() as $aliquot) {
+                if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
+                    $aliquot->setStatus(NphSample::CANCEL);
+                }
+                if (!empty($formData["restore_{$aliquot->getAliquotId()}"])) {
+                    $aliquot->setStatus(NphSample::RESTORE);
+                }
+                $this->em->persist($aliquot);
+                $this->em->flush();
+            }
+        }
+
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
         return $sample;
     }
