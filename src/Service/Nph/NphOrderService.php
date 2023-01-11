@@ -528,11 +528,13 @@ class NphOrderService
                 }
             }
         }
-        $aliquots = $sample->getNphAliquots();
-        foreach ($aliquots as $aliquot) {
-            $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
-            $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
-            $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
+        if ($sample->getModifyType() !== NphSample::UNLOCK) {
+            $aliquots = $sample->getNphAliquots();
+            foreach ($aliquots as $aliquot) {
+                $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
+                $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
+                $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
+            }
         }
         return $sampleData;
     }

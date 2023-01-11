@@ -123,18 +123,21 @@ class NphSampleFinalizeType extends NphOrderForm
             }
         }
 
-        $finalizedAliquots = $options['finalizedAliquots'];
-        foreach ($finalizedAliquots as $finalizedAliquot) {
-            $builder->add('cancel_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
-                'label' => false,
-                'required' => false,
-                'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL
-            ]);
-            $builder->add('restore_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
-                'label' => false,
-                'required' => false,
-                'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
-            ]);
+        $nphSample = $options['nphSample'];
+        if ($nphSample->getModifyType() === NphSample::UNLOCK) {
+            $finalizedAliquots = $nphSample->getNphAliquots();
+            foreach ($finalizedAliquots as $finalizedAliquot) {
+                $builder->add('cancel_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
+                    'label' => false,
+                    'required' => false,
+                    'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL
+                ]);
+                $builder->add('restore_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
+                    'label' => false,
+                    'required' => false,
+                    'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                ]);
+            }
         }
 
         // Placeholder field for displaying enter at least one aliquot message
@@ -152,8 +155,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'orderType' => null,
             'timeZone' => null,
             'aliquots' => null,
-            'finalizedAliquots' => null,
-            'disabled' => null
+            'disabled' => null,
+            'nphSample' => null
         ]);
     }
 }
