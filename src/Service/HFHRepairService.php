@@ -32,7 +32,7 @@ class HFHRepairService
                 $this->repairParticipantSite($row[0], $row[3], $row[4]);
             } catch (\Exception $exception) {
                 $this->em->getConnection()->rollBack();
-                $this->loggerService->error($exception->getMessage());
+                $this->loggerService->log(Log::PROBLEM_NOTIFIY, $exception->getMessage());
                 return;
             }
             if ($count === $repairLimit) {
