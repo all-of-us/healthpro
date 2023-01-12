@@ -1,5 +1,5 @@
 .navbar, .navbar .navbar-toggle {
-    background-color: #719500;
+    background-color: #459500;
 }
 
 .navbar .navbar-toggle:focus, .navbar .navbar-toggle:hover {
@@ -16,3 +16,28 @@
         color: #FFFFFF;
     }
 }
+.nav-tabs > li.participant-module.active > a {
+    background-color: #235389;
+    color: #FFFFFF;
+}
+.nav-pills.nav > li.participant-activity.active > a {
+    background-color: #667584;
+    color: #FFFFFF;
+}
+.nph-module-badge.nph-module-1 {
+    background-color: #5D01A5;
+}
+.nph-module-badge.nph-module-2 {
+    background-color: #FF8813;
+}
+.nph-module-badge.nph-module-3 {
+    background-color: #C0143C;
+}
+.well-sm.well.visit-dropdown {
+    background-color: #D7DBDE;
+}
+.nph-visit.nph-visit-badge {
+    background-color: #667584;
+}
+
+
