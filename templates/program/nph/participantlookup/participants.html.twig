@@ -5,6 +5,15 @@
         <h2><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</h2>
     </div>
     <div class="row">
+        <div class="col-sm-6">
+            <h3><i class="fa fa-search" aria-hidden="true"></i> Search</h3>
+            {{ form_start(searchForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(searchForm) }}
+            <p>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </p>
+            {{ form_end(searchForm) }}
+        </div>
 
         <div class="col-sm-6">
             <hr class="visible-xs"/>
@@ -15,6 +24,25 @@
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
             {{ form_end(idForm) }}
+
+            <hr/>
+            <h3><i class="fa fa-envelope" aria-hidden="true"></i> Find by Email</h3>
+            {{ form_start(emailForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(emailForm) }}
+            <p>
+                <button type="submit" class="btn btn-primary">Go</button>
+            </p>
+            {{ form_end(emailForm) }}
+
+
+            <hr/>
+            <h3><i class="fa fa-phone" aria-hidden="true"></i> Find by Phone</h3>
+            {{ form_start(phoneForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(phoneForm) }}
+            <p>
+                <button type="submit" class="btn btn-primary btn-phone">Go</button>
+            </p>
+            {{ form_end(phoneForm) }}
         </div>
     </div>
 {% endblock %}

@@ -2,6 +2,9 @@
 
 namespace App\Service\Nph;
 
+use App\Drc\Exception\FailedRequestException;
+use App\Drc\Exception\InvalidResponseException;
+use App\Helper\Participant;
 use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -47,21 +50,7 @@ class NphParticipantSummaryService
         }
         if (!$participant) {
             try {
-                $query = '
-                  query {
-                    participant (nphId: 10001000000001) {
-                      totalCount
-                      resultCount
-                      edges {
-                          node {
-                            firstName
-                            lastName
-                          }
-                      }
-                    }
-                  }
-                ';
-                $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
+                $response = $this->api->GQLPost('rdr/v1/nph_participant', $this->getParticipantByIdQuery($participantId));
                 $participant = json_decode($response->getBody()->getContents());
             } catch (\Exception $e) {
                 error_log($e->getMessage());
@@ -76,8 +65,81 @@ class NphParticipantSummaryService
             }
         }
         if ($participant) {
-            return $participant;
+            return new Participant($participant);
         }
         return false;
     }
+
+    /**
+     * @throws FailedRequestException
+     * @throws InvalidResponseException
+     */
+    public function search($params): ?array
+    {
+        $query = $this->getSearchQuery($params);
+        try {
+            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
+        } catch (\Exception $e) {
+            throw new FailedRequestException();
+        }
+
+        $contents = $response->getBody()->getContents();
+        $responseObject = json_decode($contents);
+
+        if (!is_object($responseObject)) {
+            throw new InvalidResponseException();
+        }
+        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+            return [];
+        }
+        $results = [];
+        foreach ($responseObject->entry as $participant) {
+            if (isset($participant->resource) && is_object($participant->resource)) {
+                if ($result = new Participant($participant->resource)) {
+                    $results[] = $result;
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    private function getParticipantByIdQuery(string $participantId): string
+    {
+        //TODO
+        return ' 
+            query {
+                participant (nphId: 10001000000001) {
+                    totalCount
+                    resultCount
+                    edges {
+                        node {
+                            firstName
+                            lastName
+                        }
+                    }
+                }
+              }
+        ';
+    }
+
+    private function getSearchQuery(array $params): string
+    {
+        //TODO
+        return ' 
+            query {
+                participant (firstName: test) {
+                    totalCount
+                    resultCount
+                    edges {
+                        node {
+                            firstName
+                            lastName
+                        }
+                    }
+                }
+              }
+        ';
+    }
+
 }
