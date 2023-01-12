@@ -50,7 +50,8 @@ class NphParticipantSummaryService
         }
         if (!$participant) {
             try {
-                $response = $this->api->GQLPost('rdr/v1/nph_participant', $this->getParticipantByIdQuery($participantId));
+                $query = $this->getParticipantByIdQuery($participantId);
+                $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
                 $participant = json_decode($response->getBody()->getContents());
             } catch (\Exception $e) {
                 error_log($e->getMessage());
@@ -107,9 +108,9 @@ class NphParticipantSummaryService
     private function getParticipantByIdQuery(string $participantId): string
     {
         //TODO
-        return ' 
+        return " 
             query {
-                participant (nphId: 10001000000001) {
+                participant (nphId: {$participantId}) {
                     totalCount
                     resultCount
                     edges {
@@ -120,7 +121,7 @@ class NphParticipantSummaryService
                     }
                 }
               }
-        ';
+        ";
     }
 
     private function getSearchQuery(array $params): string

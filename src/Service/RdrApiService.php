@@ -67,9 +67,14 @@ class RdrApiService
         return $this->getClient($path)->request('PATCH', $this->endpoint . $path, $params);
     }
 
-    public function GQLPost(string $path, string $body, array $params = []): ResponseInterface
+    public function GQLPost(string $path, string $query): ResponseInterface
     {
-        $params['body'] = $body;
+        $params = [
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'body' => $query
+        ];
         return $this->getClient($path)->request('POST', $this->endpoint . $path, $params);
     }
 
