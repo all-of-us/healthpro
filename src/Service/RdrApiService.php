@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Google\Client as GoogleClient;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use App\Cache\DatastoreAdapter;
 use App\HttpClient;
@@ -64,6 +65,12 @@ class RdrApiService
     {
         $params['json'] = $body;
         return $this->getClient($path)->request('PATCH', $this->endpoint . $path, $params);
+    }
+
+    public function GQLPost($path, $body, $params = []): ResponseInterface
+    {
+        $params['body'] = $body;
+        return $this->getClient($path)->request('POST', $this->endpoint . $path, $params);
     }
 
     /* Private Methods */
