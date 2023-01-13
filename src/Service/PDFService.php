@@ -28,7 +28,16 @@ class PDFService
      * @throws RuntimeError
      * @throws LoaderError
      */
-    private function renderPDF(string $name, string $sampleType, \DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
+    private function renderPDF(
+        string $name,
+        string $sampleType,
+        \DateTime $DOB,
+        string $specimenID,
+        string $moduleNum,
+        string $timePoint,
+        string $sampleCode,
+        string $VisitType,
+        string $collectionVolume): void
     {
         $this->mpdf->WriteHTML(
             $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
