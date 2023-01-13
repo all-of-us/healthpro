@@ -9,6 +9,7 @@ use App\Entity\NphSample;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
+use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +22,7 @@ class NphOrderService
     private $userService;
     private $siteService;
     private $loggerService;
+    private $rdrApiService;
 
     private $module;
     private $visit;
@@ -37,12 +39,14 @@ class NphOrderService
         EntityManagerInterface $em,
         UserService $userService,
         SiteService $siteService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        RdrApiService $rdrApiService
     ) {
         $this->em = $em;
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
+        $this->rdrApiService = $rdrApiService;
     }
 
     public function loadModules(string $module, string $visit, string $participantId): void
@@ -106,7 +110,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool) $sampleObj->getFinalizedTs()
+                'disabled' => (bool)$sampleObj->getFinalizedTs()
             ];
         }
         return $sampleLabels;
@@ -368,8 +372,7 @@ class NphOrderService
         if ($order->getOrderType() === 'stool') {
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
-            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
-            ;
+            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);;
         } elseif ($order->getOrderType() === 'urine') {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
@@ -617,5 +620,118 @@ class NphOrderService
             }
         }
         return [];
+    }
+
+    public function sendToRdr(NphOrder $order, NphSample $sample): bool
+    {
+        if ($sample->getModifyType() === NphSample::UNLOCK) {
+            // TODO
+        } else {
+            $orderRdrObject = $this->getRdrObject($order, $sample);
+            dd($orderRdrObject);
+            $rdrId = $this->createRdrOrder($order->getParticipantId(), $orderRdrObject);
+            if (!empty($rdrId)) {
+                // Save RDR id
+                $order->setRdrId($rdrId);
+                $this->em->persist($order);
+                $this->em->flush();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function createRdrOrder(string $participantId, \stdClass $orderObject): ?string
+    {
+        try {
+            $response = $this->rdrApiService->post("rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder",
+                $orderObject);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function getRdrObject(NphOrder $order, NphSample $sample): \stdClass
+    {
+        $obj = new \StdClass();
+        $obj->subject = 'Patient/' . $order->getParticipantId();
+        $identifiers = [
+            [
+                'system' => 'https://www.pmi-ops.org/order-id',
+                'value' => $order->getOrderId()
+            ],
+            [
+                'system' => 'https://www.pmi-ops.org/sample-id',
+                'value' => $sample->getSampleId()
+            ],
+            [
+                'system' => 'https://www.pmi-ops.org/client-id',
+                'value' => ''
+            ],
+        ];
+        $createdSite = $this->getSiteWithPrefix($order->getSite());
+        $collectedSite = $this->getSiteWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
+        $finalizedSite = $this->getSiteWithPrefix($sample->getFinalizedSite());
+        $obj->createdInfo = $this->getUserSiteData($order->getUser()->getEmail(), $createdSite);
+        $obj->collectedInfo = $this->getUserSiteData($sample->getCollectedUser() ? $sample->getCollectedUser()
+            ->getEmail() : $sample->getFinalizedUser()->getEmail(), $collectedSite);
+        $obj->finalizedInfo = $this->getUserSiteData($sample->getFinalizedUser()->getEmail(), $finalizedSite);
+        $obj->identifier = $identifiers;
+        $createdTs = clone $order->getCreatedTs();
+        $createdTs->setTimezone(new \DateTimeZone('UTC'));
+        $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
+        $obj->module = $order->getModule();
+        $obj->visitType = $order->getVisitType();
+        $obj->timepoint = $order->getTimepoint();
+        $obj->sample = $this->getSampleObj($sample);
+        $notes = [];
+        foreach (['collected', 'finalized'] as $step) {
+            if ($sample->{'get' . ucfirst($step) . 'Notes'}()) {
+                $notes[$step] = $sample->{'get' . ucfirst($step) . 'Notes'}();
+            }
+        }
+        if (!empty($notes)) {
+            $obj->notes = $notes;
+        }
+        return $obj;
+    }
+
+    public function getUserSiteData(string $user, string $site): array
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
+    }
+
+    private function getSampleObj(NphSample $sample): array
+    {
+        $collectedTs = clone $sample->getCollectedTs();
+        $collectedTs->setTimezone(new \DateTimeZone('UTC'));
+        $finalizedTs = clone $sample->getCollectedTs();
+        $finalizedTs->setTimezone(new \DateTimeZone('UTC'));
+        return [
+            'test' => $sample->getSampleCode(),
+            'description' => "",
+            'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
+            'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
+        ];
+    }
+
+    private function getSiteWithPrefix(string $site): string
+    {
+        return \App\Security\User::SITE_NPH_PREFIX . $site;
     }
 }

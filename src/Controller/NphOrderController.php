@@ -9,10 +9,13 @@ use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
+use App\Service\EnvironmentService;
 use App\Service\Nph\NphOrderService;
 use App\Service\ParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Util\Json;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -207,7 +210,10 @@ class NphOrderController extends BaseController
                 }
             }
             if ($sampleFinalizeForm->isValid()) {
-                if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                if ($sample = $nphOrderService->saveOrderFinalization($formData, $sample)) {
+                    if ($nphOrderService->sendToRdr($order, $sample)) {
+                        //TODO
+                    }
                     $this->addFlash('success', 'Order finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,
@@ -336,5 +342,34 @@ class NphOrderController extends BaseController
             'samples' => $nphOrderService->getSamples(),
             'samplesMetadata' => $nphOrderService->getSamplesMetadata($order)
         ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/json-response", name="nph_order_json")
+     * For debugging generated JSON representation - only allowed for admins or in local dev
+     */
+    public function nphOrderJsonAction(
+        string $participantId,
+        string $orderId,
+        string $sampleId,
+        ParticipantSummaryService $participantSummaryService,
+        NphOrderService $nphOrderService,
+        EnvironmentService $env): Response
+    {
+        $participant = $participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+            throw $this->createAccessDeniedException();
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'nphOrder' => $order, 'id' => $sampleId
+        ]);
+        $object = $nphOrderService->getRdrObject($order, $sample);
+        $response = new JsonResponse($object);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
     }
 }
