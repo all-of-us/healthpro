@@ -52,7 +52,8 @@ class NphParticipantSummaryService
             try {
                 $query = $this->getParticipantByIdQuery($participantId);
                 $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
-                $participant = json_decode($response->getBody()->getContents());
+                $result = json_decode($response->getBody()->getContents());
+                $participant = $result->participant->edges;
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 return false;
