@@ -39,5 +39,11 @@
 .nph-visit.nph-visit-badge {
     background-color: #667584;
 }
+.navbar .dropdown-menu-role {
+    right: 0;
+    left: -15px;
+    font-size: 17px;
+    min-width: 280px
+}
 
 
