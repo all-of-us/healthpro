@@ -447,9 +447,9 @@ class NphSample
 
     public function getRdrSampleObj(string $description): array
     {
-        $collectedTs = clone $this->getCollectedTs();
+        $collectedTs = $this->getCollectedTs();
         $collectedTs->setTimezone(new \DateTimeZone('UTC'));
-        $finalizedTs = clone $this->getCollectedTs();
+        $finalizedTs = $this->getFinalizedTs();
         $finalizedTs->setTimezone(new \DateTimeZone('UTC'));
         return [
             'test' => $this->getSampleCode(),
@@ -463,7 +463,7 @@ class NphSample
     {
         $aliquotObj = [];
         foreach ($this->getNphAliquots() as $aliquot) {
-            $collectedTs = clone $aliquot->getAliquotTs();
+            $collectedTs = $aliquot->getAliquotTs();
             $collectedTs->setTimezone(new \DateTimeZone('UTC'));
             $aliquotObj[] = [
                 'id' => $aliquot->getAliquotId(),

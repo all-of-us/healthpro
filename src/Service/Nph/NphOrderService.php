@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSite;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
@@ -668,6 +669,7 @@ class NphOrderService
     {
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $order->getParticipantId();
+        $nphSite = $this->em->getRepository(NphSite::class)->findOneBy(['googleGroup' => $sample->getFinalizedSite()]);
         $identifiers = [
             [
                 'system' => 'https://www.pmi-ops.org/order-id',
@@ -679,18 +681,18 @@ class NphOrderService
             ],
             [
                 'system' => 'https://www.pmi-ops.org/client-id',
-                'value' => ''
+                'value' => $nphSite->getMayolinkAccount()
             ],
         ];
-        $createdSite = Site::getNphSiteIdWithPrefix($order->getSite());
-        $collectedSite = Site::getNphSiteIdWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
-        $finalizedSite = Site::getNphSiteIdWithPrefix($sample->getFinalizedSite());
+        $createdSite = NphSite::getSiteIdWithPrefix($order->getSite());
+        $collectedSite = NphSite::getSiteIdWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
+        $finalizedSite = NphSite::getSiteIdWithPrefix($sample->getFinalizedSite());
         $obj->createdInfo = $this->getUserSiteData($order->getUser()->getEmail(), $createdSite);
         $obj->collectedInfo = $this->getUserSiteData($sample->getCollectedUser() ? $sample->getCollectedUser()
             ->getEmail() : $sample->getFinalizedUser()->getEmail(), $collectedSite);
         $obj->finalizedInfo = $this->getUserSiteData($sample->getFinalizedUser()->getEmail(), $finalizedSite);
         $obj->identifier = $identifiers;
-        $createdTs = clone $order->getCreatedTs();
+        $createdTs = $order->getCreatedTs();
         $createdTs->setTimezone(new \DateTimeZone('UTC'));
         $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
         $obj->module = $order->getModule();
@@ -713,7 +715,7 @@ class NphOrderService
         return $obj;
     }
 
-    public function getUserSiteData(string $user, string $site): array
+    private function getUserSiteData(string $user, string $site): array
     {
         return [
             'author' => [
