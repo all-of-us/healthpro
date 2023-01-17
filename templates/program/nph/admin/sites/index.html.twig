@@ -29,6 +29,7 @@
                 <th>Google Group</th>
                 <th>Awardee</th>
                 <th>Organization</th>
+                <th>MayoLINK Account</th>
                 <th>Type</th>
                 <th>Site Type</th>
                 <th>Email</th>
@@ -44,6 +45,7 @@
                     <td>{{ site.googleGroup }}</td>
                     <td>{{ site.awardeeId }}</td>
                     <td>{{ site.organizationId }}</td>
+                    <td>{{ site.mayolinkAccount }}</td>
                     <td>{{ site.type }}</td>
                     <td>{{ site.siteType }}</td>
                     <td>{{ site.email|length > 30 ? site.email|slice(0, 30) ~ '...' : site.email }}</td>

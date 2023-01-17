@@ -68,6 +68,11 @@ class NphSite
      */
     private $email;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $mayolinkAccount;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -189,6 +194,18 @@ class NphSite
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getMayolinkAccount(): ?string
+    {
+        return $this->mayolinkAccount;
+    }
+
+    public function setMayolinkAccount(?string $mayolinkAccount): self
+    {
+        $this->mayolinkAccount = $mayolinkAccount;
 
         return $this;
     }

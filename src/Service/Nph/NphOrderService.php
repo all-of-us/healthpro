@@ -415,6 +415,7 @@ class NphOrderService
                 $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
                 $timePointsDisplay = $module->getTimePoints();
                 $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
+                $visitTypes = $module->getVisitTypes();
                 $orderSummary[$order->getModule()]
                 [$order->getVisitType()]
                 [$order->getTimepoint()]
@@ -428,7 +429,9 @@ class NphOrderService
                     'sampleStatus' => $sample->getStatus(),
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
-                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode()))
+                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
+                    'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
+                    'visitDisplayName' => $visitTypes[$order->getVisitType()],
                 ];
             }
         }

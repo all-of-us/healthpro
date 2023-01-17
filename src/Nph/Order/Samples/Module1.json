@@ -27,26 +27,26 @@
         }
       }
     },
-    "PST8": {
-      "label": "8 mL PST",
+    "LIHP1": {
+      "label": "6 mL Lithium Heparin",
       "color": "Green and gray",
       "temperature": "Refrigerated",
-      "specimen": "Plasma PST",
+      "specimen": "Plasma",
       "type": "blood",
-      "identifier": "PST8",
-      "collectionVolume": "8 mL",
+      "identifier": "LiH6",
+      "collectionVolume": "6 mL",
       "aliquots": {
-        "PST8A1": {
-          "identifier": "LHPSTP1",
-          "container": "1.4mL Matrix tube 500μL",
+        "LIHP1A1": {
+          "identifier": "LiHP1",
+          "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
-        "PST8A2": {
-          "identifier": "LHPSTP1",
-          "container": "1.4mL Matrix tube 1000μL",
-          "expectedAliquots": 3,
+        "LIHP1A2": {
+          "identifier": "LiHP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 2,
           "expectedVolume": 1000,
           "units": "μL"
         }
