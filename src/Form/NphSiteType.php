@@ -66,6 +66,12 @@ class NphSiteType extends AbstractType
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $options['isDisabled'],
             ])
+            ->add('mayolink_account', Type\TextType::class, [
+                'label' => 'MayoLINK Account',
+                'required' => false,
+                'constraints' => new Constraints\Type('string'),
+                'disabled' => $options['isDisabled'],
+            ])
             ->add('type', Type\TextType::class, [
                 'label' => 'Type (e.g. HPO, DV)',
                 'required' => false,

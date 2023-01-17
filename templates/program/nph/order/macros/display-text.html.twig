@@ -20,3 +20,11 @@
     {{ obj.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(obj.modifiedSite) }} on
     {{ obj.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
 {% endmacro %}
+
+{% macro displayAliquotStatus(status) %}
+    {% if status == 'cancel' %}
+        <span class="text-danger">Removed</span>
+    {% else %}
+        <span class="text-success">Active</span>
+    {% endif %}
+{% endmacro %}

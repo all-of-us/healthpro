@@ -6,7 +6,7 @@
     <div class="page-header row">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
-            <span class="label label-warning" style="font-size: small">NPH Module 1</span>
+            <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module 1</span>
         </h2>
     </div>
     <div class="page-header row">
@@ -29,7 +29,7 @@
                 {% else %}
                     {% set tabActive = '' %}
                 {% endif %}
-                <li role="presentation" class="{{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
+                <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
                         Module {{ moduleNumber }}</a></li>
             {% endfor %}
         </ul>
@@ -37,9 +37,7 @@
     </div>
     <div class="col-sm-3">
         <ul class="nav nav-pills">
-            <li role="presentation" class="active"><a>Sample Collection</a></li>
-            <li role="presentation"><a>Participant Overview</a></li>
-            <li role="presentation"><a>Participant Activities</a></li>
+            <li role="presentation" class="participant-activity active"><a>Sample Collection</a></li>
         </ul>
     </div>
     <div class="col-sm-9">
@@ -53,10 +51,10 @@
                 <h4 class="col-md-12">NPH Module {{ moduleNumber }} Sample Collection</h4>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                     <div>
-                        <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#Visit{{ VisitCode }}"
+                        <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                              role="button">Visit {{ VisitCode }}<span class="caret"
                                                                       style="float: right; margin: 9px 0;"></span></div>
-                        <div style="margin-bottom: 20px" id="Visit{{ VisitCode }}" class="collapse">
+                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse">
                             <a class="btn btn-primary" role="button"
                                href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                 <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels

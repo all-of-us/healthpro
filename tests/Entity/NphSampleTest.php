@@ -56,4 +56,40 @@ class NphSampleTest extends NphTestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider aliquotDataProvider
+     */
+    public function testGetNphAliquotsStatus($aliquotData)
+    {
+        $sample = $this->createOrderAndSample();
+        $aliquotData['nphSample'] = $sample;
+        $aliquotData = array_merge($this->getAliquotData(), $aliquotData);
+        $this->createNphAliquot($aliquotData);
+        $expectedStatus = [
+            $aliquotData['aliquotId'] => $aliquotData['status']
+        ];
+        $this->assertSame($expectedStatus, $sample->getNphAliquotsStatus());
+    }
+
+    public function aliquotDataProvider(): array
+    {
+        return [
+            [
+                [
+                    'status' => 'cancel',
+                ]
+            ],
+            [
+                [
+                    'status' => 'restore',
+                ]
+            ],
+            [
+                [
+                    'status' => null,
+                ]
+            ]
+        ];
+    }
 }

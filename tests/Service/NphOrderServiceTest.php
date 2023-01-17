@@ -93,7 +93,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'nail', 'NAILB', 'Big Toenails'],
             ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1'],
             ['30min', 'blood', 'SST8P5', '8.5 mL SST'],
-            ['30min', 'blood', 'PST8', '8 mL PST'],
+            ['30min', 'blood', 'LIHP1', '6 mL Lithium Heparin'],
         ];
     }
 
@@ -122,7 +122,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'nail', 'NAILB', 'Big Toenails', '1000000003'],
             ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1', '1000000004'],
             ['30min', 'blood', 'SST8P5', '8.5 mL SST', '1000000005'],
-            ['30min', 'blood', 'PST8', '8 mL PST', '1000000006'],
+            ['30min', 'blood', 'LIHP1', '6 mL Lithium Heparin', '1000000006'],
         ];
     }
 
@@ -313,8 +313,8 @@ class NphOrderServiceTest extends ServiceTestCase
         return [
             ['URINES', ['URINESA1' => ['1234567890'], ['URINESA2' => []]], true],
             ['URINES', ['URINESA1' => []], false],
-            ['PST8', ['PST8A1' => ['1234567890']], true],
-            ['PST8', ['PST8A1' => []], false],
+            ['LIHP1', ['LIHP1A1' => ['1234567890']], true],
+            ['LIHP1', ['LIHP1A1' => []], false],
             ['SALIVA', ['SALIVAA1' => ['1234567890']], true],
             ['SALIVA', [], false]
         ];
@@ -328,7 +328,9 @@ class NphOrderServiceTest extends ServiceTestCase
         $orderType,
         $sampleCode,
         $collectedTs,
-        $aliquots): void
+        $aliquots,
+        $aliquotId,
+        $duplicate): void
     {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008');
@@ -348,6 +350,13 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->service->saveOrderFinalization($finalizedFormData, $nphSample);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
+
+        $finalizedFormData = [];
+        foreach ($aliquots as $aliquotCode => $aliquot) {
+            $finalizedFormData[$aliquotCode][] = $aliquotId;
+        }
+        $this->assertSame($duplicate, (bool) $this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
+
     }
 
     public function orderFinalizationDataProvider(): array
@@ -358,14 +367,14 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'urine', 'URINES', $collectedTs, [
                 'URINESA1' => ['10001', $aliquotTs, 500],
                 'URINESA2' => ['10002', $aliquotTs, 5]
-            ]],
+            ], '10001', true],
             ['preLMT', 'saliva', 'SALIVA', $collectedTs, [
                 'SALIVAA1' => ['10003', $aliquotTs, 4]
-            ]],
+            ], '10008', false],
             ['30min', 'blood', 'SST8P5', $collectedTs, [
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
-            ]]
+            ], '10005', true]
         ];
     }
 
