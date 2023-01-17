@@ -359,6 +359,21 @@ class NphOrderServiceTest extends ServiceTestCase
         }
         $this->assertSame($duplicate, (bool) $this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
 
+        // Test RDR Object
+        $rdrObject = $this->service->getRdrObject($nphOrder, $nphSample);
+        $this->assertEquals('Patient/P0000000008', $rdrObject->subject);
+        // Assert module info
+        $this->assertEquals(1, $rdrObject->module);
+        $this->assertEquals('LMT', $rdrObject->visitType);
+        $this->assertEquals($timePoint, $rdrObject->timepoint);
+        // Assert identifiers orderId and sampleId
+        $this->assertEquals($nphOrder->getOrderId(), $rdrObject->identifier[0]['value']);
+        $this->assertEquals($nphSample->getSampleId(), $rdrObject->identifier[1]['value']);
+        // Assert createdInfo
+        $this->assertEquals('test-nph-user1@example.com', $rdrObject->createdInfo['author']['value']);
+        $this->assertEquals('nph-site-test', $rdrObject->createdInfo['site']['value']);
+        // Assert sample code
+        $this->assertEquals($sampleCode, $rdrObject->sample['test']);
     }
 
     public function orderFinalizationDataProvider(): array

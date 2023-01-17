@@ -489,7 +489,7 @@ class NphOrderService
             $sample->setCollectedUser($this->user);
         }
         if (empty($sample->getCollectedSite())) {
-            $sample->setCollectedSite($this->user);
+            $sample->setCollectedSite($this->site);
         }
         $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
         $sample->setFinalizedUser($this->user);
@@ -676,6 +676,7 @@ class NphOrderService
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $order->getParticipantId();
         $nphSite = $this->em->getRepository(NphSite::class)->findOneBy(['googleGroup' => $sample->getFinalizedSite()]);
+        $clientId = !empty($nphSite) ? $nphSite->getMayolinkAccount() : null;
         $identifiers = [
             [
                 'system' => 'https://www.pmi-ops.org/order-id',
@@ -687,7 +688,7 @@ class NphOrderService
             ],
             [
                 'system' => 'https://www.pmi-ops.org/client-id',
-                'value' => $nphSite->getMayolinkAccount()
+                'value' => $clientId
             ],
         ];
         $createdSite = NphSite::getSiteIdWithPrefix($order->getSite());
