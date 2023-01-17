@@ -354,7 +354,8 @@ class NphOrderController extends BaseController
         string $sampleId,
         ParticipantSummaryService $participantSummaryService,
         NphOrderService $nphOrderService,
-        EnvironmentService $env): Response
+        EnvironmentService $env
+    ): Response
     {
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {

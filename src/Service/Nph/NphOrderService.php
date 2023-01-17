@@ -373,7 +373,8 @@ class NphOrderService
         if ($order->getOrderType() === 'stool') {
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
-            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);;
+            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
+            ;
         } elseif ($order->getOrderType() === 'urine') {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
@@ -648,8 +649,10 @@ class NphOrderService
     public function createRdrOrder(string $participantId, \stdClass $orderObject): ?string
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder",
-                $orderObject);
+            $response = $this->rdrApiService->post(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder",
+                $orderObject
+            );
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result->id;
