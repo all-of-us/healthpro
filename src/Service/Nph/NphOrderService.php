@@ -485,6 +485,12 @@ class NphOrderService
             }
         }
         $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
+        if (empty($sample->getCollectedUser())) {
+            $sample->setCollectedUser($this->user);
+        }
+        if (empty($sample->getCollectedSite())) {
+            $sample->setCollectedSite($this->user);
+        }
         $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
         $sample->setFinalizedUser($this->user);
         $sample->setFinalizedSite($this->site);
