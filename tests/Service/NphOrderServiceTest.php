@@ -5,6 +5,7 @@ namespace App\Tests\Service;
 use App\Entity\NphOrder;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
+use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use App\Tests\testSetup;
@@ -28,7 +29,8 @@ class NphOrderServiceTest extends ServiceTestCase
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
-            $this->createMock(LoggerService::class)
+            $this->createMock(LoggerService::class),
+            $this->createMock(RdrApiService::class)
         );
         $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
         $this->em = static::$container->get(EntityManagerInterface::class);
