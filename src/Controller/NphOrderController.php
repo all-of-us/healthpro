@@ -367,6 +367,7 @@ class NphOrderController extends BaseController
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
         ]);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
         $object = $nphOrderService->getRdrObject($order, $sample);
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);

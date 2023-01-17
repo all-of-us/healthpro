@@ -368,4 +368,9 @@ class Site
 
         return $this;
     }
+
+    public static function getNphSiteIdWithPrefix(string $site): string
+    {
+        return \App\Security\User::SITE_NPH_PREFIX . $site;
+    }
 }

@@ -444,4 +444,35 @@ class NphSample
         }
         return false;
     }
+
+    public function getRdrSampleObj(string $description): array
+    {
+        $collectedTs = clone $this->getCollectedTs();
+        $collectedTs->setTimezone(new \DateTimeZone('UTC'));
+        $finalizedTs = clone $this->getCollectedTs();
+        $finalizedTs->setTimezone(new \DateTimeZone('UTC'));
+        return [
+            'test' => $this->getSampleCode(),
+            'description' => $description,
+            'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
+            'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
+        ];
+    }
+
+    public function getRdrAliquotsSampleObj(array $aliquotsInfo): array
+    {
+        $aliquotObj = [];
+        foreach ($this->getNphAliquots() as $aliquot) {
+            $collectedTs = clone $aliquot->getAliquotTs();
+            $collectedTs->setTimezone(new \DateTimeZone('UTC'));
+            $aliquotObj[] = [
+                'id' => $aliquot->getAliquotId(),
+                'identifier' => $aliquotsInfo[$aliquot->getAliquotCode()]['identifier'],
+                'container' => $aliquotsInfo[$aliquot->getAliquotCode()]['container'],
+                'volume' => $aliquot->getVolume(),
+                'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z')
+            ];
+        }
+        return $aliquotObj;
+    }
 }

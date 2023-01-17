@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\Site;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
@@ -678,9 +679,9 @@ class NphOrderService
                 'value' => ''
             ],
         ];
-        $createdSite = $this->getSiteWithPrefix($order->getSite());
-        $collectedSite = $this->getSiteWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
-        $finalizedSite = $this->getSiteWithPrefix($sample->getFinalizedSite());
+        $createdSite = Site::getNphSiteIdWithPrefix($order->getSite());
+        $collectedSite = Site::getNphSiteIdWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
+        $finalizedSite = Site::getNphSiteIdWithPrefix($sample->getFinalizedSite());
         $obj->createdInfo = $this->getUserSiteData($order->getUser()->getEmail(), $createdSite);
         $obj->collectedInfo = $this->getUserSiteData($sample->getCollectedUser() ? $sample->getCollectedUser()
             ->getEmail() : $sample->getFinalizedUser()->getEmail(), $collectedSite);
@@ -692,7 +693,11 @@ class NphOrderService
         $obj->module = $order->getModule();
         $obj->visitType = $order->getVisitType();
         $obj->timepoint = $order->getTimepoint();
-        $obj->sample = $this->getSampleObj($sample);
+        $sampleInfo = $this->getSamples();
+        $sampleDescription = $sampleInfo[$sample->getSampleCode()];
+        $obj->sample = $sample->getRdrSampleObj($sampleDescription);
+        $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
+        $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
         $notes = [];
         foreach (['collected', 'finalized'] as $step) {
             if ($sample->{'get' . ucfirst($step) . 'Notes'}()) {
@@ -717,24 +722,5 @@ class NphOrderService
                 'value' => $site
             ]
         ];
-    }
-
-    private function getSampleObj(NphSample $sample): array
-    {
-        $collectedTs = clone $sample->getCollectedTs();
-        $collectedTs->setTimezone(new \DateTimeZone('UTC'));
-        $finalizedTs = clone $sample->getCollectedTs();
-        $finalizedTs->setTimezone(new \DateTimeZone('UTC'));
-        return [
-            'test' => $sample->getSampleCode(),
-            'description' => "",
-            'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
-            'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
-        ];
-    }
-
-    private function getSiteWithPrefix(string $site): string
-    {
-        return \App\Security\User::SITE_NPH_PREFIX . $site;
     }
 }
