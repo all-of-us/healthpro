@@ -6,7 +6,7 @@
     <div class="page-header row">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
-            <span class="label label-warning" style="font-size: small">NPH Module 1</span>
+            <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module 1</span>
         </h2>
     </div>
     <div class="page-header row">
@@ -29,7 +29,7 @@
                 {% else %}
                     {% set tabActive = '' %}
                 {% endif %}
-                <li role="presentation" class="{{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
+                <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
                         Module {{ moduleNumber }}</a></li>
             {% endfor %}
         </ul>
@@ -37,9 +37,7 @@
     </div>
     <div class="col-sm-3">
         <ul class="nav nav-pills">
-            <li role="presentation" class="active"><a>Sample Collection</a></li>
-            <li role="presentation"><a>Participant Overview</a></li>
-            <li role="presentation"><a>Participant Activities</a></li>
+            <li role="presentation" class="participant-activity active"><a>Sample Collection</a></li>
         </ul>
     </div>
     <div class="col-sm-9">

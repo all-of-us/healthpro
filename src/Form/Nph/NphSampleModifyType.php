@@ -13,9 +13,30 @@ class NphSampleModifyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        if ($options['type'] != NphSample::UNLOCK) {
+            $samples = $options['samples'];
+            foreach ($samples as $sample) {
+                $disabled = false;
+                if ($options['type'] === NphSample::CANCEL) {
+                    $disabled = $sample->getModifyType() === NphSample::CANCEL;
+                } elseif ($options['type'] === NphSample::RESTORE) {
+                    $disabled = $sample->getModifyType() !== NphSample::CANCEL;
+                }
+                $builder->add($sample->getSampleCode(), Type\CheckboxType::class, [
+                    'label' => false,
+                    'required' => false,
+                    'disabled' => $disabled
+                ]);
+            }
+
+            // Placeholder field for displaying select at least one sample error message
+            $builder->add('samplesCheckAll', Type\CheckboxType::class, [
+                'required' => false
+            ]);
+        }
+
         $reasonType = $options['type'] . 'Reasons';
         $reasons = NphSample::$$reasonType;
-
         $builder->add('reason', Type\ChoiceType::class, [
             'label' => 'Reason',
             'required' => true,
@@ -40,7 +61,7 @@ class NphSampleModifyType extends AbstractType
             ],
             'attr' => ['class' => 'modify-other-text']
         ]);
-        if ($options['type'] == NphSample::SAMPLE_CANCEL) {
+        if ($options['type'] == NphSample::CANCEL) {
             $builder->add('confirm', Type\TextType::class, [
                 'label' => 'Confirm',
                 'required' => true,
@@ -48,7 +69,7 @@ class NphSampleModifyType extends AbstractType
                     new Constraints\NotBlank(),
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if (strtolower($value) !== NphSample::SAMPLE_CANCEL) {
+                        if (strtolower($value) !== NphSample::CANCEL) {
                             $context->buildViolation('Please type the word "CANCEL" to confirm')->addViolation();
                         }
                     })
@@ -64,7 +85,8 @@ class NphSampleModifyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'type' => null
+            'type' => null,
+            'samples' => null,
         ]);
     }
 }

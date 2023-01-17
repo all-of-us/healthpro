@@ -15,18 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphOrder
 {
-    public const ORDER_CANCEL = 'cancel';
-    public const ORDER_SAMPLE_CANCEL = 'sample_cancel';
-    public const ORDER_RESTORE = 'restore';
-    public const ORDER_UNLOCK = 'unlock';
-
-    public static $cancelReasons = [
-        'Order created in error' => 'ORDER_CANCEL_ERROR',
-        'Order created for wrong participant' => 'ORDER_CANCEL_WRONG_PARTICIPANT',
-        'Labeling error identified after finalization' => 'ORDER_CANCEL_LABEL_ERROR',
-        'Other' => 'OTHER'
-    ];
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -76,21 +64,6 @@ class NphOrder
     private $createdTs;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $modifiedTs;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     */
-    private $modifiedUser;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $modifiedSite;
-
-    /**
      * @ORM\OneToMany(targetEntity=NphSample::class, mappedBy="nphOrder")
      */
     private $nphSamples;
@@ -104,16 +77,6 @@ class NphOrder
      * @ORM\Column(type="text", nullable=true)
      */
     private $metadata;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $modifyReason;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $modifyType;
 
     public function __construct()
     {
@@ -221,42 +184,6 @@ class NphOrder
         return $this;
     }
 
-    public function getModifiedTs(): ?\DateTimeInterface
-    {
-        return $this->modifiedTs;
-    }
-
-    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
-    {
-        $this->modifiedTs = $modifiedTs;
-
-        return $this;
-    }
-
-    public function getModifiedUser(): ?User
-    {
-        return $this->modifiedUser;
-    }
-
-    public function setModifiedUser(?User $modifiedUser): self
-    {
-        $this->modifiedUser = $modifiedUser;
-
-        return $this;
-    }
-
-    public function getModifiedSite(): ?string
-    {
-        return $this->modifiedSite;
-    }
-
-    public function setModifiedSite(?string $modifiedSite): self
-    {
-        $this->modifiedSite = $modifiedSite;
-
-        return $this;
-    }
-
     /**
      * @return Collection|NphSample[]
      */
@@ -311,38 +238,34 @@ class NphOrder
         return $this;
     }
 
-    public function getModifyReason(): ?string
+    public function canCancel(): bool
     {
-        return $this->modifyReason;
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() !== NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public function setModifyReason(?string $modifyReason): self
+    public function canRestore(): bool
     {
-        $this->modifyReason = $modifyReason;
-
-        return $this;
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() === NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public function getModifyType(): ?string
+    public function canModify($type): bool
     {
-        return $this->modifyType;
-    }
-
-    public function setModifyType(?string $modifyType): self
-    {
-        $this->modifyType = $modifyType;
-
-        return $this;
-    }
-
-    public function isDisabled(): bool
-    {
-        return $this->modifyType === self::ORDER_CANCEL;
-    }
-
-    public function getModifyReasonDisplayText(): string
-    {
-        $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
-        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+        if ($type === NphSample::CANCEL) {
+            return $this->canCancel();
+        }
+        if ($type === NphSample::RESTORE) {
+            return $this->canRestore();
+        }
+        return false;
     }
 }

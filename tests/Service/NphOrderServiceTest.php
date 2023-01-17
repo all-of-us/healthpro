@@ -483,9 +483,9 @@ class NphOrderServiceTest extends ServiceTestCase
     }
 
     /**
-     * @dataProvider saveOrderModificationDataProvider
+     * @dataProvider saveSamplesModificationDataProvider
      */
-    public function testSaveOrderModification(
+    public function testSaveSamplesModification(
         $timePoint,
         $orderType,
         $sampleCode,
@@ -495,26 +495,30 @@ class NphOrderServiceTest extends ServiceTestCase
         $modifyType
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000009');
+        $this->service->loadModules(1, 'LMT', 'P0000000010');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
         $modificationFormData = [
+            $sampleCode => true,
             'reason' => $modifyReason
         ];
-        $nphOrder = $this->service->saveOrderModification($modificationFormData, $modifyType, $nphOrder);
+        $nphOrder = $this->service->saveSamplesModification($modificationFormData, $modifyType, $nphOrder);
 
-        $this->assertSame($modifyReason, $nphOrder->getModifyReason());
-        $this->assertSame($modifyReason, $nphSample->getModifyReason());
+        foreach ($nphOrder->getNphSamples() as $sample) {
+            if ($sample->getSampleCode() === $sampleCode) {
+                $this->assertSame($modifyReason, $nphSample->getModifyReason());
+            }
+        }
     }
 
-    public function saveOrderModificationDataProvider(): array
+    public function saveSamplesModificationDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'ORDER_CANCEL_ERROR', 'cancel'],
-            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'ORDER_CANCEL_WRONG_PARTICIPANT', 'cancel'],
-            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'ORDER_CANCEL_LABEL_ERROR', 'cancel'],
-            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'ORDER_CANCEL_ERROR', 'cancel'],
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'SAMPLE_CANCEL_ERROR', 'cancel'],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'SAMPLE_CANCEL_WRONG_PARTICIPANT', 'cancel'],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'SAMPLE_CANCEL_LABEL_ERROR', 'cancel'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'SAMPLE_CANCEL_ERROR', 'cancel'],
         ];
     }
 
@@ -534,23 +538,28 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->service->loadModules(1, 'LMT', 'P0000000010');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+
+        $finalizedFormData = [
+            "{$sampleCode}CollectedTs" => $collectedTs,
+            "{$sampleCode}Notes" => 'Test',
+        ];
+        $this->service->saveOrderFinalization($finalizedFormData, $nphSample);
+
         $modificationFormData = [
             'reason' => $modifyReason
         ];
         $nphSample = $this->service->saveSampleModification($modificationFormData, $modifyType, $nphSample);
-
         $this->assertSame($modifyReason, $nphSample->getModifyReason());
-        $this->assertSame(NphOrder::ORDER_SAMPLE_CANCEL, $nphSample->getNphOrder()->getModifyType());
     }
 
     public function saveSampleModificationDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'SAMPLE_CANCEL_ERROR', 'cancel'],
-            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'SAMPLE_CANCEL_WRONG_PARTICIPANT', 'cancel'],
-            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'SAMPLE_CANCEL_LABEL_ERROR', 'cancel'],
-            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'SAMPLE_CANCEL_ERROR', 'cancel'],
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'CHANGE_COLLECTION_INFORMATION', 'unlock'],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'CHANGE_ADD_REMOVE_ALIQUOT', 'unlock'],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'CHANGE_COLLECTION_INFORMATION', 'unlock'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'CHANGE_ADD_REMOVE_ALIQUOT', 'unlock'],
         ];
     }
 }
