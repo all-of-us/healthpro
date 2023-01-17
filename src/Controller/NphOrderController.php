@@ -189,15 +189,22 @@ class NphOrderController extends BaseController
             NphSampleFinalizeType::class,
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
-                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => $sample->isDisabled()
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
+                $sample->isDisabled(), 'nphSample' => $sample
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
             $formData = $sampleData = $sampleFinalizeForm->getData();
-            if (!empty($nphOrderService->getAliquots($sampleCode)) &&
-                $nphOrderService->hasAtLeastOneAliquotSample($formData, $sampleCode) === false) {
-                $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter at least one aliquot'));
+            if (!empty($nphOrderService->getAliquots($sampleCode))) {
+                if ($sample->getModifyType() !== NphSample::UNLOCK && $nphOrderService->hasAtLeastOneAliquotSample(
+                    $formData,
+                    $sampleCode
+                ) === false) {
+                    $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter at least one aliquot'));
+                } elseif ($duplicate = $nphOrderService->checkDuplicateAliquotId($formData, $sampleCode)) {
+                    $sampleFinalizeForm[$duplicate['aliquotCode']][$duplicate['key']]->addError(new FormError('Aliquot ID already exists'));
+                }
             }
             if ($sampleFinalizeForm->isValid()) {
                 if ($nphOrderService->saveOrderFinalization($formData, $sample)) {

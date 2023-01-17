@@ -2,6 +2,7 @@
 
 namespace App\Form\Nph;
 
+use App\Entity\NphSample;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,8 +42,8 @@ class NphSampleFinalizeType extends NphOrderForm
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
-                                'pattern' => '/^[a-zA-Z0-9]{10}$/',
-                                'message' => 'Aliquot barcode must be a string of 10 digits'
+                                'pattern' => '/^[a-zA-Z0-9]{11}$/',
+                                'message' => 'Aliquot barcode must be a string of 11 digits'
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
                                 $formData = $context->getRoot()->getData();
@@ -122,6 +123,23 @@ class NphSampleFinalizeType extends NphOrderForm
             }
         }
 
+        $nphSample = $options['nphSample'];
+        if ($nphSample->getModifyType() === NphSample::UNLOCK) {
+            $finalizedAliquots = $nphSample->getNphAliquots();
+            foreach ($finalizedAliquots as $finalizedAliquot) {
+                $builder->add('cancel_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
+                    'label' => false,
+                    'required' => false,
+                    'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL
+                ]);
+                $builder->add('restore_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
+                    'label' => false,
+                    'required' => false,
+                    'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                ]);
+            }
+        }
+
         // Placeholder field for displaying enter at least one aliquot message
         $builder->add('aliquotError', Type\CheckboxType::class, [
             'required' => false
@@ -137,7 +155,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'orderType' => null,
             'timeZone' => null,
             'aliquots' => null,
-            'disabled' => null
+            'disabled' => null,
+            'nphSample' => null
         ]);
     }
 }

@@ -333,13 +333,13 @@ class NphSample
         return $this->nphAliquots;
     }
 
-    public function getNphAliquotIds(): array
+    public function getNphAliquotsStatus(): array
     {
-        $aliquotIds = [];
+        $aliquotsStatus = [];
         foreach ($this->nphAliquots as $aliquot) {
-            $aliquotIds[] = $aliquot->getAliquotId();
+            $aliquotsStatus[$aliquot->getAliquotId()] = $aliquot->getStatus();
         }
-        return $aliquotIds;
+        return $aliquotsStatus;
     }
 
     public function addNphAliquot(NphAliquot $nphAliquot): self
