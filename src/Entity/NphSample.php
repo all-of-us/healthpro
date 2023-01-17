@@ -15,6 +15,36 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphSample
 {
+    public const CANCEL = 'cancel';
+    public const RESTORE = 'restore';
+    public const UNLOCK = 'unlock';
+    public const EDITED = 'edited';
+
+    public static $cancelReasons = [
+        'Created in error' => 'CANCEL_ERROR',
+        'Created for wrong participant' => 'CANCEL_WRONG_PARTICIPANT',
+        'Labeling error identified after finalization' => 'CANCEL_LABEL_ERROR',
+        'Other' => 'OTHER'
+    ];
+
+    public static $restoreReasons = [
+        'Cancelled for wrong participant' => 'RESTORE_WRONG_PARTICIPANT',
+        'Can be amended instead of cancelled' => 'RESTORE_AMEND',
+        'Other' => 'OTHER'
+    ];
+
+    public static $unlockReasons = [
+        'Change collection information' => 'CHANGE_COLLECTION_INFORMATION',
+        'Change, add, or remove aliquot' => 'CHANGE_ADD_REMOVE_ALIQUOT',
+        'Other' => 'OTHER'
+    ];
+
+    public static $modifySuccessText = [
+        'cancel' => 'cancelled',
+        'restore' => 'restored',
+        'unlock' => 'unlocked'
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -92,6 +122,31 @@ class NphSample
      * @ORM\OneToMany(targetEntity=NphAliquot::class, mappedBy="nphSample")
      */
     private $nphAliquots;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     */
+    private $modifiedUser;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $modifiedSite;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $modifiedTs;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $modifyReason;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $modifyType;
 
     public function __construct()
     {
@@ -278,6 +333,15 @@ class NphSample
         return $this->nphAliquots;
     }
 
+    public function getNphAliquotIds(): array
+    {
+        $aliquotIds = [];
+        foreach ($this->nphAliquots as $aliquot) {
+            $aliquotIds[] = $aliquot->getAliquotId();
+        }
+        return $aliquotIds;
+    }
+
     public function addNphAliquot(NphAliquot $nphAliquot): self
     {
         if (!$this->nphAliquots->contains($nphAliquot)) {
@@ -298,5 +362,86 @@ class NphSample
         }
 
         return $this;
+    }
+
+    public function getModifiedUser(): ?User
+    {
+        return $this->modifiedUser;
+    }
+
+    public function setModifiedUser(?User $modifiedUser): self
+    {
+        $this->modifiedUser = $modifiedUser;
+
+        return $this;
+    }
+
+    public function getModifiedSite(): ?string
+    {
+        return $this->modifiedSite;
+    }
+
+    public function setModifiedSite(?string $modifiedSite): self
+    {
+        $this->modifiedSite = $modifiedSite;
+
+        return $this;
+    }
+
+    public function getModifiedTs(): ?\DateTimeInterface
+    {
+        return $this->modifiedTs;
+    }
+
+    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
+    {
+        $this->modifiedTs = $modifiedTs;
+
+        return $this;
+    }
+
+    public function getModifyReason(): ?string
+    {
+        return $this->modifyReason;
+    }
+
+    public function setModifyReason(?string $modifyReason): self
+    {
+        $this->modifyReason = $modifyReason;
+
+        return $this;
+    }
+
+    public function getModifyType(): ?string
+    {
+        return $this->modifyType;
+    }
+
+    public function setModifyType(?string $modifyType): self
+    {
+        $this->modifyType = $modifyType;
+
+        return $this;
+    }
+
+    public function isDisabled(): bool
+    {
+        return ($this->finalizedTs || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
+    }
+
+    public function getModifyReasonDisplayText(): string
+    {
+        $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
+        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+    }
+
+    public function canUnlock(): bool
+    {
+        if (!empty($this->finalizedTs) &&
+            $this->getModifyType() !== NphSample::CANCEL &&
+            $this->getModifyType() !== NphSample::UNLOCK) {
+            return true;
+        }
+        return false;
     }
 }

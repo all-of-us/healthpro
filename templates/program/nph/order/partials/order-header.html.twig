@@ -1,3 +1,4 @@
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 <div class="page-header">
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
@@ -9,18 +10,4 @@
         </small>
     </h2>
 </div>
-<p class="lead">
-    Order ID: <strong>{{ order.orderId }}</strong>
-</p>
-<div class="row" id="order_info" data-order-id="{{ order.orderId }}">
-    <div class="col-sm-7">
-        {% include 'program/nph/order/partials/participant-details.html.twig' %}
-    </div>
-    <div class="col-sm-5 text-center">
-        <strong class="text-primary">
-            Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }} | {{ order
-            .orderType|capitalize }}
-        </strong>
-        <div><svg id="order-barcode"></svg></div>
-    </div>
-</div>
+{% include 'program/nph/order/partials/order-participant-details-barcode.html.twig' %}

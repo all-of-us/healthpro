@@ -1,0 +1,22 @@
+{% macro displayModifyBannerMessage(obj) %}
+    {% if obj.modifyType == 'cancel' %}
+        <div class="alert alert-danger well-sm">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>
+                Cancelled by {{ _self.displayModifiedInfo(obj) }}
+            </strong>
+            <p><strong>Reason:</strong> {{ obj.modifyReasonDisplayText }}</p>
+        </div>
+    {% elseif obj.modifyType == 'unlock' %}
+        <div class="alert alert-warning well-sm">
+            <strong>
+                Unlocked for editing by {{ _self.displayModifiedInfo(obj) }}
+            </strong>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro displayModifiedInfo(obj) %}
+    {{ obj.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(obj.modifiedSite) }} on
+    {{ obj.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
+{% endmacro %}

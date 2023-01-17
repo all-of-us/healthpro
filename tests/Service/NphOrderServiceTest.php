@@ -97,6 +97,35 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
     }
 
+    /**
+     * @dataProvider sampleLabelsAndIdsDataProvider
+     */
+    public function testGetSamplesWithLabelsAndIds($timePoint, $orderType, $sampleCode, $sampleLabel, $sampleId): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $this->service->createSample($sampleCode, $nphOrder, $sampleId);
+        $expectedSampleLabelAndIds[$sampleCode] = [
+            'label' => $sampleLabel,
+            'id' => $sampleId,
+            'disabled' => false
+        ];
+        $this->assertSame($expectedSampleLabelAndIds, $this->service->getSamplesWithLabelsAndIds($nphOrder->getNphSamples()));
+    }
+
+    public function sampleLabelsAndIdsDataProvider(): array
+    {
+        return [
+            ['preLMT', 'urine', 'URINES', 'Spot Urine', '1000000001'],
+            ['preLMT', 'saliva', 'SALIVA', 'Saliva', '1000000002'],
+            ['preLMT', 'nail', 'NAILB', 'Big Toenails', '1000000003'],
+            ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1', '1000000004'],
+            ['30min', 'blood', 'SST8P5', '8.5 mL SST', '1000000005'],
+            ['30min', 'blood', 'PST8', '8 mL PST', '1000000006'],
+        ];
+    }
+
     public function testCreateOrder()
     {
         // Module 1
@@ -363,5 +392,174 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertArrayHasKey('order', $orderSummary);
         $this->assertSame(count($orderSummary['order']), 1);
         $this->assertArrayHasKey('sampleName', $orderSummary['order']['preLMT']['urine']['URINES']);
+    }
+
+    public function testGetSamplesWithStatus(): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $this->service->createOrdersAndSamples($this->module1Data['formData']);
+
+        $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
+            'participantId' => 'P0000000010', 'visitType' => 'LMT'
+        ]);
+        $samplesWithStatus = $this->service->getSamplesWithStatus();
+        $timePointSamples = [
+            ['preLMT', 'saliva', 'SALIVA'],
+            ['preLMT', 'urine', 'URINES'],
+            ['preLMT', 'nail', 'NAILB'],
+            ['30min', 'blood', 'SST8P5'],
+        ];
+        foreach ($nphOrders as $nphOrder) {
+            foreach ($timePointSamples as $timePointSample) {
+                list($timePoint, $sampleType, $sampleCode) = $timePointSample;
+                if ($nphOrder->getTimepoint() === $timePoint) {
+                    if ($nphOrder->getOrderType() === $sampleType) {
+
+                        $this->assertSame($nphOrder->getNphSamples()[0]->getStatus(), $samplesWithStatus[$timePoint][$sampleCode]);
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * @dataProvider samplesMetadataDataProvider
+     */
+    public function testGetSamplesMetadata(
+        $timePoint,
+        $orderType,
+        $sampleCode,
+        $collectedTs,
+        $notes,
+        $metaData,
+        $expectedMetaData
+    ): void {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        if ($orderType === 'stool') {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
+            $this->service->createSample($sampleCode, $nphOrder, 'T0000000001');
+        } else {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType);
+            $this->service->createSample($sampleCode, $nphOrder);
+        }
+        $collectionFormData = [
+            $sampleCode => true,
+            "{$sampleCode}CollectedTs" => $collectedTs,
+            "{$sampleCode}Notes" => $notes,
+        ];
+        if ($orderType === 'urine' || $orderType === 'stool') {
+            foreach ($metaData as $type => $data) {
+                $collectionFormData[$type] = $data;
+            }
+        }
+        $this->service->saveOrderCollection($collectionFormData, $nphOrder);
+        $this->assertSame($this->service->getSamplesMetadata($nphOrder), $expectedMetaData);
+    }
+
+    public function samplesMetadataDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2022-11-18');
+        $urineMetaData = [
+            'urineColor' => 1,
+            'urineClarity' => 'clean'
+        ];
+        $stoolMetaData = [
+            'bowelType' => 'difficult',
+            'bowelQuality' => 'normal'
+        ];
+        $expectedUrineMetaData = [
+            'urineColor' => 'Color 1',
+            'urineClarity' => 'Clean'
+        ];
+        $expectedStoolMetaData = [
+            'bowelType' => 'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2',
+            'bowelQuality' => 'I tend to have normal formed stool - Type 3 and 4'
+        ];
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData, $expectedUrineMetaData],
+            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', $stoolMetaData, $expectedStoolMetaData]
+        ];
+    }
+
+    /**
+     * @dataProvider saveSamplesModificationDataProvider
+     */
+    public function testSaveSamplesModification(
+        $timePoint,
+        $orderType,
+        $sampleCode,
+        $collectedTs,
+        $notes,
+        $modifyReason,
+        $modifyType
+    ): void {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+        $modificationFormData = [
+            $sampleCode => true,
+            'reason' => $modifyReason
+        ];
+        $nphOrder = $this->service->saveSamplesModification($modificationFormData, $modifyType, $nphOrder);
+
+        foreach ($nphOrder->getNphSamples() as $sample) {
+            if ($sample->getSampleCode() === $sampleCode) {
+                $this->assertSame($modifyReason, $nphSample->getModifyReason());
+            }
+        }
+    }
+
+    public function saveSamplesModificationDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2022-11-18');
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'SAMPLE_CANCEL_ERROR', 'cancel'],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'SAMPLE_CANCEL_WRONG_PARTICIPANT', 'cancel'],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'SAMPLE_CANCEL_LABEL_ERROR', 'cancel'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'SAMPLE_CANCEL_ERROR', 'cancel'],
+        ];
+    }
+
+    /**
+     * @dataProvider saveSampleModificationDataProvider
+     */
+    public function testSaveSampleModification(
+        $timePoint,
+        $orderType,
+        $sampleCode,
+        $collectedTs,
+        $notes,
+        $modifyReason,
+        $modifyType
+    ): void {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $nphSample = $this->service->createSample($sampleCode, $nphOrder);
+
+        $finalizedFormData = [
+            "{$sampleCode}CollectedTs" => $collectedTs,
+            "{$sampleCode}Notes" => 'Test',
+        ];
+        $this->service->saveOrderFinalization($finalizedFormData, $nphSample);
+
+        $modificationFormData = [
+            'reason' => $modifyReason
+        ];
+        $nphSample = $this->service->saveSampleModification($modificationFormData, $modifyType, $nphSample);
+        $this->assertSame($modifyReason, $nphSample->getModifyReason());
+    }
+
+    public function saveSampleModificationDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2022-11-18');
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 'CHANGE_COLLECTION_INFORMATION', 'unlock'],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 'CHANGE_ADD_REMOVE_ALIQUOT', 'unlock'],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'CHANGE_COLLECTION_INFORMATION', 'unlock'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'CHANGE_ADD_REMOVE_ALIQUOT', 'unlock'],
+        ];
     }
 }

@@ -64,21 +64,6 @@ class NphOrder
     private $createdTs;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $cancelledTs;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     */
-    private $cancelledUser;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $cancelledSite;
-
-    /**
      * @ORM\OneToMany(targetEntity=NphSample::class, mappedBy="nphOrder")
      */
     private $nphSamples;
@@ -199,42 +184,6 @@ class NphOrder
         return $this;
     }
 
-    public function getCancelledTs(): ?\DateTimeInterface
-    {
-        return $this->cancelledTs;
-    }
-
-    public function setCancelledTs(?\DateTimeInterface $cancelledTs): self
-    {
-        $this->cancelledTs = $cancelledTs;
-
-        return $this;
-    }
-
-    public function getCancelledUser(): ?User
-    {
-        return $this->cancelledUser;
-    }
-
-    public function setCancelledUser(?User $cancelledUser): self
-    {
-        $this->cancelledUser = $cancelledUser;
-
-        return $this;
-    }
-
-    public function getCancelledSite(): ?string
-    {
-        return $this->cancelledSite;
-    }
-
-    public function setCancelledSite(?string $cancelledSite): self
-    {
-        $this->cancelledSite = $cancelledSite;
-
-        return $this;
-    }
-
     /**
      * @return Collection|NphSample[]
      */
@@ -287,5 +236,36 @@ class NphOrder
         $this->metadata = $metadata;
 
         return $this;
+    }
+
+    public function canCancel(): bool
+    {
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() !== NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function canRestore(): bool
+    {
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() === NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function canModify($type): bool
+    {
+        if ($type === NphSample::CANCEL) {
+            return $this->canCancel();
+        }
+        if ($type === NphSample::RESTORE) {
+            return $this->canRestore();
+        }
+        return false;
     }
 }

@@ -24,7 +24,7 @@ $(document).ready(function () {
             '<td style="position: relative">' + newTsWidget + '</td>' +
             '<td>' + newVolumeWidget + '</td>' +
             '<td>' + aliquotUnits + '</td>' +
-            '<td><i class="fa fa-eraser clear-aliquot-widget" role="button"></i> <i class="fa fa-trash delete-aliquot-widget" role="button"></i></td>'
+            '<td><i class="fa fa-eraser clear-aliquot-widget" role="button"></i></td>'
         );
 
         $('.aliquots-row-' + aliquotId).last().after(newElem);

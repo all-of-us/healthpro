@@ -7,6 +7,7 @@ use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
+use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -93,6 +94,20 @@ class NphOrderService
         $sampleLabels = [];
         foreach ($samplesObj as $sampleObj) {
             $sampleLabels[$sampleObj->getSampleCode()] = $samples[$sampleObj->getSampleCode()];
+        }
+        return $sampleLabels;
+    }
+
+    public function getSamplesWithLabelsAndIds(PersistentCollection $samplesObj): array
+    {
+        $samples = $this->getSamples();
+        $sampleLabels = [];
+        foreach ($samplesObj as $sampleObj) {
+            $sampleLabels[$sampleObj->getSampleCode()] = [
+                'label' => $samples[$sampleObj->getSampleCode()],
+                'id' => $sampleObj->getSampleId(),
+                'disabled' => $sampleObj->isDisabled()
+            ];
         }
         return $sampleLabels;
     }
@@ -267,7 +282,7 @@ class NphOrderService
     public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
     {
         foreach ($order->getNphSamples() as $nphSample) {
-            if ($formData[$nphSample->getSampleCode()] === true) {
+            if (isset($formData[$nphSample->getSampleCode()]) && $formData[$nphSample->getSampleCode()] === true) {
                 return true;
             }
         }
@@ -347,6 +362,27 @@ class NphOrderService
         return !empty($metadata) ? json_encode($metadata) : null;
     }
 
+    public function getSamplesMetadata(NphOrder $order): array
+    {
+        $metadata = [];
+        if ($order->getOrderType() === 'stool') {
+            $metadata = json_decode($order->getMetadata(), true);
+            $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
+            $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
+            ;
+        } elseif ($order->getOrderType() === 'urine') {
+            $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
+            $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
+            $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
+        }
+        return $metadata;
+    }
+
+    private function mapMetadata($metadata, $type, $values): string
+    {
+        return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
+    }
+
     public function getParticipantOrderSummary(string $participantid): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
@@ -387,7 +423,6 @@ class NphOrderService
                     'healthProOrderId' => $order->getId(),
                     'createDate' => $order->getCreatedTs()->format('Y-M-D'),
                     'sampleStatus' => $sample->getStatus(),
-                    'sampleType' => $module->getSampleType($sample->getSampleCode()),
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
                     'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode()))
@@ -419,19 +454,23 @@ class NphOrderService
     {
         $sampleCode = $sample->getSampleCode();
         $aliquots = $this->getAliquots($sampleCode);
-        foreach ($aliquots as $aliquotCode => $aliquot) {
-            foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                if ($aliquotId) {
-                    $nphAliquot = new NphAliquot();
-                    $nphAliquot->setNphSample($sample);
-                    $nphAliquot->setAliquotId($aliquotId);
-                    $nphAliquot->setAliquotCode($aliquotCode);
-                    $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
-                    $nphAliquot->setUnits($aliquot['units']);
-                    $this->em->persist($nphAliquot);
-                    $this->em->flush();
-                    $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+        if (!empty($aliquots)) {
+            foreach ($aliquots as $aliquotCode => $aliquot) {
+                if (isset($formData[$aliquotCode])) {
+                    foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                        if ($aliquotId) {
+                            $nphAliquot = new NphAliquot();
+                            $nphAliquot->setNphSample($sample);
+                            $nphAliquot->setAliquotId($aliquotId);
+                            $nphAliquot->setAliquotCode($aliquotCode);
+                            $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                            $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            $nphAliquot->setUnits($aliquot['units']);
+                            $this->em->persist($nphAliquot);
+                            $this->em->flush();
+                            $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                        }
+                    }
                 }
             }
         }
@@ -444,8 +483,18 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
+        if ($sample->getModifyType() === NphSample::UNLOCK) {
+            $sample->setModifyType(NphSample::EDITED);
+        }
         $this->em->persist($sample);
         $this->em->flush();
+
+        if ($sample->getNphOrder()->getOrderType() === 'stool') {
+            $order = $sample->getNphOrder();
+            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
+            $this->em->persist($order);
+            $this->em->flush();
+        }
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
         return $sample;
     }
@@ -467,6 +516,18 @@ class NphOrderService
                 }
             }
         }
+        if ($sample->getNphOrder()->getOrderType() === 'stool') {
+            $order = $sample->getNphOrder();
+            if ($order->getMetadata()) {
+                $orderMetadata = json_decode($order->getMetadata(), true);
+                if (!empty($orderMetadata['bowelType'])) {
+                    $sampleData['bowelType'] = $orderMetadata['bowelType'];
+                }
+                if (!empty($orderMetadata['bowelQuality'])) {
+                    $sampleData['bowelQuality'] = $orderMetadata['bowelQuality'];
+                }
+            }
+        }
         $aliquots = $sample->getNphAliquots();
         foreach ($aliquots as $aliquot) {
             $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
@@ -474,5 +535,52 @@ class NphOrderService
             $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
         }
         return $sampleData;
+    }
+
+    public function getSamplesWithStatus(): array
+    {
+        $samplesData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->participantId,
+            $this->visit
+        );
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $sample->getStatus();
+            }
+        }
+        return $samplesData;
+    }
+
+    public function saveSamplesModification(array $formData, string $type, NphOrder $order): NphOrder
+    {
+        foreach ($order->getNphSamples() as $sample) {
+            if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
+                $this->saveSampleModificationsData($sample, $type, $formData);
+            }
+        }
+        return $order;
+    }
+
+    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
+    {
+        $this->saveSampleModificationsData($sample, $type, $formData);
+        return $sample;
+    }
+
+    private function saveSampleModificationsData(NphSample $sample, string $type, array $formData): void
+    {
+        if ($formData['reason'] === 'OTHER') {
+            $formData['reason'] = $formData['otherText'];
+        }
+        $sample->setModifiedTs(new \DateTime());
+        $sample->setModifiedSite($this->site);
+        $sample->setModifiedUser($this->user);
+        $sample->setModifyReason($formData['reason']);
+        $sample->setModifyType($type);
+        $this->em->persist($sample);
+        $this->em->flush();
+        $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 }

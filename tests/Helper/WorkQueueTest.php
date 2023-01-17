@@ -41,7 +41,9 @@ class WorkQueueTest extends TestCase
             'Date of First Primary Consent',
             'Date of First EHR Consent',
             'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent'
+            'Date of EHR Re-Consent',
+            'Exploring the Mind Consent Status',
+            'Exploring the Mind Consent Date'
         ], $exportHeaders);
     }
 
@@ -184,6 +186,7 @@ class WorkQueueTest extends TestCase
                 'questionnaireOnDnaProgram' => 'Program Update',
                 'consentForElectronicHealthRecords' => 'EHR Consent Status',
                 'consentForGenomicsROR' => 'gRoR Consent Status',
+                'EtMConsent' => 'Exploring The Mind Consent',
                 'consentForDvElectronicHealthRecordsSharing' => 'DV-Only EHR Sharing',
                 'consentForCABoR' => 'CABoR Consent',
                 'consentCohort' => 'Consent Cohort',
@@ -253,6 +256,13 @@ class WorkQueueTest extends TestCase
                             'SUBMITTED' => 'Consented Yes',
                             'SUBMITTED_NO_CONSENT' => 'Refused Consent',
                             'SUBMITTED_NOT_SURE' => 'Responded Not Sure',
+                            'UNSET' => 'Consent Not Completed',
+                        ],
+                    'EtMConsent' =>
+                        [
+                            '' => 'View All',
+                            'SUBMITTED' => 'Consented Yes',
+                            'SUBMITTED_NO_CONSENT' => 'Refused Consent',
                             'UNSET' => 'Consent Not Completed',
                         ],
                     'consentForDvElectronicHealthRecordsSharing' =>
