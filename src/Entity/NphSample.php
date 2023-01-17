@@ -465,13 +465,17 @@ class NphSample
         foreach ($this->getNphAliquots() as $aliquot) {
             $collectedTs = $aliquot->getAliquotTs();
             $collectedTs->setTimezone(new \DateTimeZone('UTC'));
-            $aliquotObj[] = [
+            $aliquotsData = [
                 'id' => $aliquot->getAliquotId(),
                 'identifier' => $aliquotsInfo[$aliquot->getAliquotCode()]['identifier'],
                 'container' => $aliquotsInfo[$aliquot->getAliquotCode()]['container'],
                 'volume' => $aliquot->getVolume(),
                 'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z')
             ];
+            if ($aliquot->getStatus()) {
+                $aliquotsData['status'] = $aliquot->getStatus();
+            }
+            $aliquotObj[] = $aliquotsData;
         }
         return $aliquotObj;
     }
