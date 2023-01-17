@@ -10,11 +10,11 @@ class Module2 extends Samples
 
     private static $visitTypes = [
         'OrangeDiet' => 'Orange Diet',
-        'OrangeLMT' => 'Orange LMT',
+        'OrangeLMT' => 'Orange DSMT',
         'BlueDiet' => 'Blue Diet',
-        'BlueLMT' => 'Blue LMT',
+        'BlueLMT' => 'Blue DSMT',
         'PurpleDiet' => 'Purple Diet',
-        'PurpleLMT' => 'Purple LMT'
+        'PurpleLMT' => 'Purple DSMT'
     ];
 
     private static $visitTypeMapper = [

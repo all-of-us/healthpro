@@ -85,4 +85,10 @@ class Samples
         }
         return "";
     }
+
+    public function getSampleIdentifierFromCode(string $sampleCode): string
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        return $samplesInfo[$sampleCode]['identifier'];
+    }
 }
