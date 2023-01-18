@@ -9,12 +9,12 @@
             <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module 1</span>
         </h2>
     </div>
-    <div class="page-header row">
+    <div class="page-header row participant-information">
         <div class="col-md-5">
             {% include 'program/nph/order/partials/participant-details.html.twig' %}
         </div>
         <div class="col-md-4">
-            <p><i class="fas fa-file-contract fa-lg"></i> Module 1 informed consent</p>
+            <p><i class="fas fa-file-contract fa-lg"></i> Module 1 Informed Consent</p>
             <p><i class="fas fa-clipboard-check fa-lg"></i> Module 1 Eligibility Evaluation</p>
         </div>
         <div class="col-md-3">
@@ -32,15 +32,16 @@
                 <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
                         Module {{ moduleNumber }}</a></li>
             {% endfor %}
+            <li class="pull-right"><button class="btn btn-primary pull-right" style="position: relative"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button></li>
+
         </ul>
-        <button class="btn btn-primary pull-right" style="position: relative">Refresh</button>
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-2 participant-activity-div">
         <ul class="nav nav-pills">
-            <li role="presentation" class="participant-activity active"><a>Sample Collection</a></li>
+            <li role="presentation" class="participant-activity active" ><a>Sample Collection</a></li>
         </ul>
     </div>
-    <div class="col-sm-9">
+    <div class="col-sm-10 participant-modules">
         {% for moduleNumber, module in programSummaryAndOrderInfo %}
             {% if loop.first %}
                 {% set modulePanelDisplay = '' %}
@@ -48,7 +49,7 @@
                 {% set modulePanelDisplay = 'hidden' %}
             {% endif %}
             <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
-                <h4 class="col-md-12">NPH Module {{ moduleNumber }} Sample Collection</h4>
+                <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Sample Collection</h4>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                     <div>
                         <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"

@@ -48,5 +48,17 @@
 .timepoint-panel {
     min-height: 220px;
 }
-
+.participant-activity-div {
+    margin-top: 20px;
+}
+.participant-modules {
+    margin-top: 10px;
+    border-left: 1px solid #eeeeee
+}
+.participant-information {
+    padding-bottom: 20px;
+}
+.participant-module-header {
+    padding-left: 0;
+}
 
