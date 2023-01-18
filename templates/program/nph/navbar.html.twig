@@ -67,9 +67,9 @@
                     </li>
                 </ul>
             {% else %}
-                <a class="navbar-brand" href="{# TODO: Path to NPH Home #}">
+                <a class="navbar-brand" href="{{ path('home') }}">
                     <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
-                    HealthPro
+                    NPH
                     {% if isTraining %}
                         <div class="navbar-brand-subtitle">training</div>
                     {% endif %}
