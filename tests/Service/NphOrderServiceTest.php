@@ -93,7 +93,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'nail', 'NAILB', 'Big Toenails'],
             ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1'],
             ['30min', 'blood', 'SST8P5', '8.5 mL SST'],
-            ['30min', 'blood', 'PST8', '8 mL PST'],
+            ['30min', 'blood', 'LIHP1', '6 mL Lithium Heparin'],
         ];
     }
 
@@ -122,7 +122,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'nail', 'NAILB', 'Big Toenails', '1000000003'],
             ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1', '1000000004'],
             ['30min', 'blood', 'SST8P5', '8.5 mL SST', '1000000005'],
-            ['30min', 'blood', 'PST8', '8 mL PST', '1000000006'],
+            ['30min', 'blood', 'LIHP1', '6 mL Lithium Heparin', '1000000006'],
         ];
     }
 
@@ -313,8 +313,8 @@ class NphOrderServiceTest extends ServiceTestCase
         return [
             ['URINES', ['URINESA1' => ['1234567890'], ['URINESA2' => []]], true],
             ['URINES', ['URINESA1' => []], false],
-            ['PST8', ['PST8A1' => ['1234567890']], true],
-            ['PST8', ['PST8A1' => []], false],
+            ['LIHP1', ['LIHP1A1' => ['1234567890']], true],
+            ['LIHP1', ['LIHP1A1' => []], false],
             ['SALIVA', ['SALIVAA1' => ['1234567890']], true],
             ['SALIVA', [], false]
         ];

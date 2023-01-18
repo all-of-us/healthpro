@@ -62,8 +62,9 @@ class PDFService
                         }
                         $sampleId = $sample['sampleId'];
                         if ($sampleType === "stool" && $stoolPrinted === false) {
-                            $sampleCode = "ST KIT";
+                            $sample['identifier'] = "ST-KIT";
                             $sampleId = $sample['orderId'];
+                            $sampleId = str_replace("KIT", "", $sampleId);
                             $stoolPrinted = true;
                         } elseif ($sampleType === "stool" && $stoolPrinted === true) {
                             continue;
@@ -75,8 +76,8 @@ class PDFService
                             $sampleId,
                             $module,
                             $sample['timepointDisplayName'],
-                            $sampleCode,
-                            $visit,
+                            $sample['identifier'],
+                            $sample['visitDisplayName'],
                             $sample['sampleCollectionVolume']
                         );
                     } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {

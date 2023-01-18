@@ -4,7 +4,7 @@
         <h2>Welcome!</h2>
     </div>
     <div class="row home-menu row-equal-height">
-        {% if is_granted('ROLE_USER') and app.session.get('site') %}
+        {% if is_granted('ROLE_NPH_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('nph_participants') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-user" aria-hidden="true"></i>

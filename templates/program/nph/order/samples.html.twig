@@ -3,44 +3,45 @@
     {% for sample in formField.children %}
         {% if sample.vars.value in nailSamples %}
             <div class="sub-samples nail-sub-samples">
-                {{ form_widget(sample) }}
+                <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
                 {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
-                    {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
+                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
             </div>
         {% elseif sample.vars.value == 'STOOL' %}
-            {{ form_widget(sample) }}
+            <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
             {{ form_label(orderForm.stoolKit) }}
             {{ form_widget(orderForm.stoolKit) }}
             <br>
             {% for stoolSample in stoolSamples %}
                 {{ form_label(orderForm[stoolSample]) }}
                 {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                    {{ _self.displayOrderId(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
+                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
                 {{ form_widget(orderForm[stoolSample]) }}
                 <br>
             {% endfor %}
         {% else %}
-            {{ form_widget(sample) }}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
-                {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
+                <div class="checkbox">
+                    <label for="{{ sample.vars.id }}">{{ form_widget(sample) }} <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">{{ sample.vars.label }}</a>
+                    </label>
+                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
+                </div>
+            {% else %}
+                <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
             {% endif %}
         {% endif %}
     {% endfor %}
 {% endmacro %}
 
-{% macro displayOrderId(order, participantId, module, visit, sampleStatus) %}
-    <div>
-        Order ID:
-        <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': order['id']}) }}">
-            {{ order['orderId'] }}
-        </a>
+{% macro displayReprintButton(order, participantId, module, visit, sampleStatus) %}
         {% if sampleStatus == 'Created' %}
             <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit}) }}"
-               class="btn btn-primary btn-xs">
+               class="btn btn-primary btn-xs right">
                 Reprint Labels
             </a>
         {% endif %}
-    </div>
 {% endmacro %}
+
+

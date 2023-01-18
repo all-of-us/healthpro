@@ -36,7 +36,8 @@ class DefaultController extends BaseController
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
         }
-        if ($this->isGranted('ROLE_USER') || ($this->isGranted('ROLE_AWARDEE') && $this->isGranted('ROLE_DV_ADMIN'))) {
+        if (($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER')) || ($this->isGranted('ROLE_AWARDEE') &&
+                $this->isGranted('ROLE_DV_ADMIN'))) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
         } elseif ($this->isGranted('ROLE_AWARDEE')) {
             return $this->redirectToRoute('workqueue_index');
