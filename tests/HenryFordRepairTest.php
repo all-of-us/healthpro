@@ -117,7 +117,6 @@ class HenryFordRepairTest extends KernelTestCase
         $this->em->flush();
         $this->addTestParticipantToCSV($csvFile);
         $this->HFHRepairService->repairHFHParticipants(1,$csvFile);
-        $CSVArrayAfterRepair = file_get_contents($csvFile);
         $testMeasurement = $this->em->find(Measurement::class, $testMeasurement->getId());
         $testOrder = $this->em->find(Order::class, $testOrder->getId());
         $this->assertSame('henryforddearbornuopo', $testOrder->getFinalizedSite());
