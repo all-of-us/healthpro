@@ -45,5 +45,8 @@
     font-size: 17px;
     min-width: 280px
 }
+.timepoint-panel {
+    min-height: 220px;
+}
 
 
