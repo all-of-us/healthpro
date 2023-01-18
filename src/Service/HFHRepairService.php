@@ -22,14 +22,9 @@ class HFHRepairService
         $this->env = $env;
     }
 
-    public function repairHFHParticipants(int $repairLimit = 100): void
+    public function repairHFHParticipants(int $repairLimit = 100, string $csvFile = "src/Cache/HFSitePairing.csv"): void
     {
         $this->em->getConnection()->beginTransaction();
-        if ($this->env->isProd()) {
-            $csvFile = 'src/Cache/HFSitePairing.csv';
-        } else {
-            $csvFile = 'src/Cache/HFSitePairingDev.csv';
-        }
         $fhandle = fopen($csvFile, 'r');
         $headers = fgetcsv($fhandle);
         $count = 0;

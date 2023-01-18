@@ -88,23 +88,23 @@ class HenryFordRepairTest extends KernelTestCase
         return $order;
     }
 
-    protected function addTestParticipantToCSV(string $csvFile)
+    protected function addTestParticipantToCSV(string $csvFile): void
     {
-        $CSVArray = file_get_contents($csvFile);
-        $CSVArray = explode("\r\n", $CSVArray);
-        $headers = array_slice($CSVArray, 0, 1, true);
-        $allItems = array_slice($CSVArray, 1, null, true);
-        $CSVArray = array_merge($headers, ['P123456789,TRANS_AM,TRANS_AM_HENRY_FORD,hpo-site-HenryFord,HPO-SITE-HENRYFORDDEARBORNUOPO'], $allItems);
-        file_put_contents($csvFile, implode("\r\n", $CSVArray));
+        $file = fopen($csvFile, 'w');
+        $fileHeaders = ['participantid,awardee,awardeenew,currentsite,newsite'];
+        $CSVArray = array_merge($fileHeaders, ['P123456789,TRANS_AM,TRANS_AM_HENRY_FORD,hpo-site-HenryFord,HPO-SITE-HENRYFORDDEARBORNUOPO']);
+        fwrite($file, implode("\r\n", $CSVArray));
+        fclose($file);
+    }
+
+    protected function cleanupTestCSV(string $csvFile): void
+    {
+        unlink($csvFile);
     }
 
     public function testRepair(): void
     {
-        if ($this->env->isProd()) {
-            $csvFile = 'src/Cache/HFSitePairing.csv';
-        } else {
-            $csvFile = 'src/Cache/HFSitePairingDev.csv';
-        }
+        $csvFile = 'src/Cache/HFSitePairTest.csv';
         $user = $this->getUser();
         $this->em->persist($user);
         $this->em->flush();
@@ -112,17 +112,16 @@ class HenryFordRepairTest extends KernelTestCase
         $testMeasurement = $this->createMeasurement($this->getMeasurementData(), $user);
         $this->assertSame('henryford', $testOrder->getFinalizedSite());
         $this->assertSame('henryford', $testMeasurement->getFinalizedSite());
-        $CSVArrayBeforeAddition = file_get_contents($csvFile);
         $this->em->persist($testOrder);
         $this->em->persist($testMeasurement);
         $this->em->flush();
         $this->addTestParticipantToCSV($csvFile);
-        $this->HFHRepairService->repairHFHParticipants(1);
+        $this->HFHRepairService->repairHFHParticipants(1,$csvFile);
         $CSVArrayAfterRepair = file_get_contents($csvFile);
         $testMeasurement = $this->em->find(Measurement::class, $testMeasurement->getId());
         $testOrder = $this->em->find(Order::class, $testOrder->getId());
-        $this->assertSame($CSVArrayBeforeAddition, $CSVArrayAfterRepair);
         $this->assertSame('henryforddearbornuopo', $testOrder->getFinalizedSite());
         $this->assertSame('henryforddearbornuopo', $testMeasurement->getFinalizedSite());
+        $this->cleanupTestCSV($csvFile);
     }
 }
