@@ -5,7 +5,7 @@
             <div class="sub-samples nail-sub-samples">
                 <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
                 {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
-                    {{ _self.displayOrderId(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
+                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
             </div>
         {% elseif sample.vars.value == 'STOOL' %}
@@ -16,7 +16,7 @@
             {% for stoolSample in stoolSamples %}
                 {{ form_label(orderForm[stoolSample]) }}
                 {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                    {{ _self.displayOrderId(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
+                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
                 {{ form_widget(orderForm[stoolSample]) }}
                 <br>
