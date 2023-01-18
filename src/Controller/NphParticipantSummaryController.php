@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\Nph\NphOrderService;
+use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
 use App\Service\ParticipantSummaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,11 +20,11 @@ class NphParticipantSummaryController extends AbstractController
      */
     public function index(
         $participantId,
-        ParticipantSummaryService $participantSummaryService,
+        NphParticipantSummaryService $nphParticipantSummaryService,
         NphOrderService $nphOrderService,
         NphProgramSummaryService $nphProgramSummaryService
     ): Response {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphParticipantSummaryService->getParticipantById($participantId);
         $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participantId);
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
         $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo['order'], $nphProgramSummary);

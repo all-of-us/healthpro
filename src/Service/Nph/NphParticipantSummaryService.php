@@ -4,7 +4,7 @@ namespace App\Service\Nph;
 
 use App\Drc\Exception\FailedRequestException;
 use App\Drc\Exception\InvalidResponseException;
-use App\Helper\Participant;
+use App\Helper\NphParticipant;
 use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -14,11 +14,9 @@ class NphParticipantSummaryService
     public const CACHE_TIME = 300;
     public const DS_CLEAN_UP_LIMIT = 500;
 
-    protected $api;
-    protected $nextToken;
-    protected $total;
-    protected $params;
-    protected $em;
+    protected RdrApiService $api;
+    protected ParameterBagInterface $params;
+    protected EntityManagerInterface $em;
 
     public function __construct(RdrApiService $api, ParameterBagInterface $params, EntityManagerInterface $em)
     {
@@ -53,7 +51,8 @@ class NphParticipantSummaryService
                 $query = $this->getParticipantByIdQuery($participantId);
                 $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
                 $result = json_decode($response->getBody()->getContents());
-                $participant = $result->participant->edges;
+                $edges = $result->participant->edges;
+                $participant = !empty($edges) ? $edges[0]->node : null;
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 return false;
@@ -67,7 +66,7 @@ class NphParticipantSummaryService
             }
         }
         if ($participant) {
-            return new Participant($participant);
+            return new NphParticipant($participant);
         }
         return false;
     }
@@ -97,7 +96,7 @@ class NphParticipantSummaryService
         $results = [];
         foreach ($responseObject->entry as $participant) {
             if (isset($participant->resource) && is_object($participant->resource)) {
-                if ($result = new Participant($participant->resource)) {
+                if ($result = new NphParticipant($participant->resource)) {
                     $results[] = $result;
                 }
             }
@@ -118,6 +117,10 @@ class NphParticipantSummaryService
                         node {
                             firstName
                             lastName
+                            participantNphId
+                            DOB
+                            biobankId
+                            nphPairedSite
                         }
                     }
                 }
