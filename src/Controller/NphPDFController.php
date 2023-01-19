@@ -22,8 +22,7 @@ class NphPDFController extends AbstractController
         PDFService $PDF,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService
-    ): Response
-    {
+    ): Response {
         $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit)['order'], $nphParticipantSummaryService->getParticipantById($participantId), $module, $visit);
         return new Response($OrderPDF, Response::HTTP_OK, ['content-type' => 'application/pdf']);
     }
