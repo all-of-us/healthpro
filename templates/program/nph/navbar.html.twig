@@ -11,8 +11,7 @@
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
                         <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/> NPH
-                            <span class="caret"></span>
+                            <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-role navbar-program">
                             {% if siteInfo.canSwitchProgram %}
@@ -29,7 +28,7 @@
                 <ul class="nav navbar-nav navbar-nav-role">
                     <li class="dropdown">
                         <a class="navbar-brand dropdown-toggle" href="{# TODO: Path to NPH Home #}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            Healthpro
+                            NPH
                             {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
                                 <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
                             {% endif %}
