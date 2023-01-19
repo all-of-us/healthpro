@@ -2,6 +2,14 @@
 
 namespace App\Helper;
 
+/**
+ * Define magic properties to fix phpstan errors
+ * @property string $email
+ * @property string $lastName
+ * @property string $firstName
+ * @property string $phoneNumber
+ */
+
 class NphParticipant
 {
     public $id;
