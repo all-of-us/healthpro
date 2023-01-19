@@ -79,7 +79,3 @@ cron:
   url: /cron/delete-unconfirmed-id-verifications-import-data
   schedule: every day 04:00
   timezone: America/Chicago
-- description: 'Repair Henry Ford Participants'
-  url: /cron/repair-hfh-participants
-  schedule: 'every 10 mins'
-  timezone: America/Chicago
