@@ -6,7 +6,7 @@
     <div class="row home-menu row-equal-height">
         {% if is_granted('ROLE_NPH_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4">
-                <a href="{# TODO: NPH-Participant Lookup #}" class="btn btn-lg btn-default btn-block">
+                <a href="{{ path('nph_participants') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-user" aria-hidden="true"></i>
                     Participant Lookup
                     <div class="description">Search for participants by first name, last name, and date of birth, PID, email, or phone number.</div>

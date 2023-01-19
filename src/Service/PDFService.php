@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Helper\Participant;
+use App\Helper\NphParticipant;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
 use Mpdf\Output\Destination;
@@ -28,13 +28,14 @@ class PDFService
      * @throws RuntimeError
      * @throws LoaderError
      */
-    private function renderPDF(string $name, string $sampleType, \DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
+    private function renderPDF(string $name, string $sampleType, ?\DateTime $DOB, string $specimenID, string
+    $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
     {
         $this->mpdf->WriteHTML(
             $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
                     'PatientName' => $name,
                     'sampleType' => $sampleType,
-                    'dob' => $DOB->format('Y-m-d'),
+                    'dob' => $DOB ? $DOB->format('Y-m-d') : null,
                     'SpecimenID' => $specimenID,
                     'ModuleNum' => $moduleNum,
                     'TimePoint' => $timePoint,
@@ -45,7 +46,7 @@ class PDFService
         );
     }
 
-    public function batchPDF(array $OrderSummary, Participant $participant, string $module, string $visit): string
+    public function batchPDF(array $OrderSummary, NphParticipant $participant, string $module, string $visit): string
     {
         $stoolPrinted = false;
         foreach ($OrderSummary as $timePointOrder) {

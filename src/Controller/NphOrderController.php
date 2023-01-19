@@ -10,7 +10,7 @@ use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
 use App\Service\Nph\NphOrderService;
-use App\Service\ParticipantSummaryService;
+use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,10 +35,10 @@ class NphOrderController extends BaseController
         $module,
         $visit,
         NphOrderService $nphOrderService,
-        ParticipantSummaryService $participantSummaryService,
+        NphParticipantSummaryService $nphParticipantSummaryService,
         Request $request
     ): Response {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphParticipantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -82,10 +82,10 @@ class NphOrderController extends BaseController
         $participantId,
         $orderId,
         NphOrderService $nphOrderService,
-        ParticipantSummaryService $participantSummaryService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
     ): Response {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -164,10 +164,10 @@ class NphOrderController extends BaseController
         $orderId,
         $sampleId,
         NphOrderService $nphOrderService,
-        ParticipantSummaryService $participantSummaryService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
     ): Response {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -265,9 +265,10 @@ class NphOrderController extends BaseController
     /**
      * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint", name="nph_order_label_print")
      */
-    public function orderSummary($participantId, $module, $visit, ParticipantSummaryService $participantSummaryService, NphOrderService $nphOrderService): Response
+    public function orderSummary($participantId, $module, $visit, NphParticipantSummaryService
+    $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         $nphOrderService->loadModules($module, $visit, $participantId);
         $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit);
         return $this->render(
@@ -288,13 +289,13 @@ class NphOrderController extends BaseController
         string $orderId,
         string $type,
         NphOrderService $nphOrderService,
-        ParticipantSummaryService $participantSummaryService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
     ): Response {
         if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK])) {
             throw $this->createNotFoundException();
         }
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
