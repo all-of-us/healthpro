@@ -77,39 +77,50 @@ class HelpController extends BaseController
     {
         return $this->render('help/sop.html.twig', [
             'documentGroups' => $helpService::$documentGroups,
-            'path' => $helpService->getStoragePath()
+            'path' => $helpService->getStoragePath(),
+            'supportedLanguages' => $helpService::$SupportedLanguages
         ]);
     }
 
     /**
-     * @Route("/sop/{id}", name="help_sopView")
+     * @Route("/sop/{id}/{language}", name="help_sopView")
      */
 
-    public function sopViewAction($id, HelpService $helpService)
+    public function sopViewAction($id, $language, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);
         if (!$document) {
             throw $this->createNotFoundException('Page Not Found!');
         }
+
+
         return $this->render('help/sop-pdf.html.twig', [
             'sop' => $id,
             'title' => trim(str_replace($id, '', $document['title'])),
             'document' => $document,
+            'language' => $language,
             'path' => $helpService->getStoragePath()
         ]);
     }
 
     /**
-     * @Route("/sop/file/{id}", name="help_sopFile")
+     * @Route("/sop/file/{id}/{language}", name="help_sopFile")
      */
 
-    public function sopFileAction($id, HelpService $helpService)
+    public function sopFileAction($id, $language, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);
         if (!$document) {
             throw $this->createNotFoundException('Page Not Found!');
         }
-        $url = $helpService->getStoragePath() . '/' . rawurlencode($document['filename']);
+        if ($language !== 'en') {
+            $pattern = '/(.*)(\.pdf)/';
+            $replacement = "\${1}($language)\${2}";
+            $documentFile = preg_replace($pattern, $replacement, $document['filename']);
+        } else {
+            $documentFile = $document['filename'];
+        }
+        $url = $helpService->getStoragePath() . '/' . rawurlencode($documentFile);
         try {
             $client = new HttpClient();
             $response = $client->get($url, ['stream' => true]);

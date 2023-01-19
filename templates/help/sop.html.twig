@@ -10,16 +10,38 @@
         <h2><i class="fa fa-file-text-o" aria-hidden="true"></i> All of Us℠ Research Program SOPs</h2>
     </div>
     {% for group in documentGroups %}
-        <h3><em>All of Us</em> {{ group.title }}</h3>
-        <ul>
-            {% for id, document in group.documents %}
-                {% if document.download is defined and document.download %}
-                    <li><a href="{{ path('help_sopRedirect', { id: id }) }}">{{ document.title }}</a> <i class="fa fa-download" aria-hidden="true"></i></li>
-                {% else %}
-                    <li><a href="{{ path('help_sopView', { id: id }) }}">{{ document.title }}</a></li>
-                {% endif %}
+        {% if loop.first %}
+            <div class="row">
+                <h3 class="col-md-6">
+                    English
+                </h3>
+                <h3 class="col-md-6">
+                    Spanish
+                </h3>
+            </div>
+        {% endif %}
+        <div class="row">
+            {% for language in supportedLanguages %}
+                <div class="col-md-6">
+                    <h3><em>All of Us</em> {{ group.title }}</h3>
+                    <ul>
+                        {% for id, document in group.documents %}
+                            {% if language in document.languages %}
+                                {% if document.download is defined and document.download %}
+                                    <li>
+                                        <a href="{{ path('help_sopRedirect', { id: id, language: language }) }}">{{ document.title }}</a>
+                                        <i class="fa fa-download" aria-hidden="true"></i></li>
+                                {% else %}
+                                    <li>
+                                        <a href="{{ path('help_sopView', { id: id, language: language }) }}">{{ document.title }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% endfor %}
     {% include 'help/footer.html.twig' %}
 {% endblock %}
