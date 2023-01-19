@@ -4,10 +4,8 @@ namespace App\Tests;
 
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
-use App\Entity\NphSite;
-use App\Entity\Site;
 use App\Entity\User;
-use App\Helper\Participant;
+use App\Helper\NphParticipant;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -20,7 +18,8 @@ class testSetup
         $this->em = $em;
     }
 
-    public function generateParticipant(string $id = null, string $firstName = null, string $lastName = null, \DateTime $dateOfBirth = null): Participant
+    public function generateParticipant(string $id = null, string $firstName = null, string $lastName = null,
+        \DateTime $dateOfBirth = null): NphParticipant
     {
         if ($id === null) {
             $id = "P0000001";
@@ -34,9 +33,9 @@ class testSetup
         if ($dateOfBirth === null) {
             $dateOfBirth = new \DateTime('2000-01-01');
         }
-        $participant = new Participant((object)[
-            'participantId' => $id,
-            'dateOfBirth' => $dateOfBirth->format('y-m-d'),
+        $participant = new NphParticipant((object)[
+            'participantNphId' => $id,
+            'DOB' => $dateOfBirth->format('y-m-d'),
             'firstName' => $firstName,
             'lastName' => $lastName
         ]);
@@ -44,7 +43,7 @@ class testSetup
 
     }
 
-    public function generateNPHOrder(Participant $participant, User $user, SiteService $site): NphOrder
+    public function generateNPHOrder(NphParticipant $participant, User $user, SiteService $site): NphOrder
     {
         $nphOrder = new NphOrder();
         $nphOrder->setModule(1);
