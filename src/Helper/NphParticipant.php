@@ -7,9 +7,10 @@ class NphParticipant
     public $id;
     public $cacheTime;
     public $rdrData;
+    public $dob;
 
 
-    public function __construct($rdrParticipant = null)
+    public function __construct(?\stdClass $rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
             if (!empty($rdrParticipant->cacheTime)) {
@@ -21,7 +22,7 @@ class NphParticipant
         }
     }
 
-    private function parseRdrParticipant($participant)
+    private function parseRdrParticipant(\stdClass $participant)
     {
         if (!is_object($participant)) {
             return;
@@ -33,7 +34,7 @@ class NphParticipant
         // Set dob to DateTime object
         if (isset($participant->DOB)) {
             try {
-                $this->dob = new \DateTime($participant->dateOfBirth);
+                $this->dob = new \DateTime($participant->DOB);
             } catch (\Exception $e) {
                 $this->dob = null;
             }
@@ -43,7 +44,7 @@ class NphParticipant
     /**
      * Magic methods for RDR data
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         if (isset($this->rdrData->{$key})) {
             return $this->rdrData->{$key};
@@ -51,7 +52,7 @@ class NphParticipant
         return null;
     }
 
-    public function __isset($key)
+    public function __isset(string $key)
     {
         return true;
     }
