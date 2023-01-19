@@ -81,6 +81,7 @@ class NphParticipantSummaryService
         try {
             $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
         } catch (\Exception $e) {
+            error_log($e->getMessage());
             throw new FailedRequestException();
         }
 
