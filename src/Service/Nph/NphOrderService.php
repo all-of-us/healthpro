@@ -589,6 +589,8 @@ class NphOrderService
     {
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
+                $orderObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                $this->cancelRestoreOrder($order->getOrderId(), $order->getParticipantId(), $type, $orderObject);
                 $this->saveSampleModificationsData($sample, $type, $formData);
             }
         }
@@ -734,5 +736,41 @@ class NphOrderService
                 'value' => $site
             ]
         ];
+    }
+
+    public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
+    {
+        $obj = new \StdClass();
+        $statusType = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->amendedReason = $reason;
+        $user = $this->user->getEmail();
+        $site = NphSite::getSiteIdWithPrefix($this->site);
+        $obj->{$statusType . 'Info'} = $this->getUserSiteData($user, $site);
+        return $obj;
+    }
+
+    public function cancelRestoreOrder(
+        string $orderId,
+        string $participantId,
+        string $type,
+        \stdClass $orderObject
+    ): bool
+    {
+        try {
+            $response = $this->rdrApiService->patch(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
+                $orderObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === NphSample::CANCEL ? 'CANCELLED' : 'RESTORED';
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
     }
 }

@@ -54,6 +54,7 @@ class NphParticipantSummaryService
                 $edges = $result->participant->edges;
                 $participant = !empty($edges) ? $edges[0]->node : null;
             } catch (\Exception $e) {
+                throw $e;
                 error_log($e->getMessage());
                 return false;
             }
