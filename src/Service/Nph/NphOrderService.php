@@ -640,12 +640,11 @@ class NphOrderService
             // TODO
         } else {
             $orderRdrObject = $this->getRdrObject($order, $sample);
-            dd($orderRdrObject);
             $rdrId = $this->createRdrOrder($order->getParticipantId(), $orderRdrObject);
             if (!empty($rdrId)) {
                 // Save RDR id
-                $order->setRdrId($rdrId);
-                $this->em->persist($order);
+                $sample->setRdrId($rdrId);
+                $this->em->persist($sample);
                 $this->em->flush();
                 return true;
             }
@@ -665,6 +664,7 @@ class NphOrderService
                 return $result->id;
             }
         } catch (\Exception $e) {
+            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }

@@ -353,12 +353,12 @@ class NphOrderController extends BaseController
         string $participantId,
         string $orderId,
         string $sampleId,
-        ParticipantSummaryService $participantSummaryService,
+        NphParticipantSummaryService $nphParticipantSummaryService,
         NphOrderService $nphOrderService,
         EnvironmentService $env
     ): Response
     {
-        $participant = $participantSummaryService->getParticipantById($participantId);
+        $participant = $nphParticipantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -370,6 +370,8 @@ class NphOrderController extends BaseController
             'nphOrder' => $order, 'id' => $sampleId
         ]);
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        // TODO remove after testing the order api
+        $nphOrderService->sendToRdr($order, $sample);
         $object = $nphOrderService->getRdrObject($order, $sample);
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
