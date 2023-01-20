@@ -22,7 +22,7 @@ class HFHRepairService
         $this->env = $env;
     }
 
-    public function repairHFHParticipants(int $repairLimit = 100, string $csvFile = "src/Cache/HFSitePairing.csv"): void
+    public function repairHFHParticipants(int $repairLimit = 100, string $csvFile = "../src/Cache/HFSitePairing.csv"): void
     {
         $this->em->getConnection()->beginTransaction();
         $fhandle = fopen($csvFile, 'r');
@@ -38,18 +38,18 @@ class HFHRepairService
                 return;
             }
             if ($count === $repairLimit) {
-                $this->em->flush();
-                $this->em->clear();
-                $this->em->getConnection()->commit();
-                fclose($fhandle);
-                $CSVArray = file_get_contents($csvFile);
-                $CSVArray = explode("\r\n", $CSVArray);
-                $CSVArray = array_slice($CSVArray, 1 + $count);
-                $CSVArray = array_merge([implode(',', $headers)], $CSVArray);
-                file_put_contents($csvFile, implode("\r\n", $CSVArray));
                 break;
             }
         }
+        $this->em->flush();
+        $this->em->clear();
+        $this->em->getConnection()->commit();
+        fclose($fhandle);
+        $CSVArray = file_get_contents($csvFile);
+        $CSVArray = explode("\r\n", $CSVArray);
+        $CSVArray = array_slice($CSVArray, 1 + $count);
+        $CSVArray = array_merge([implode(',', $headers)], $CSVArray);
+        file_put_contents($csvFile, implode("\r\n", $CSVArray));
     }
 
     private function repairParticipantSite(string $participantId, string $currentSite, string $repairSite): void
