@@ -9,7 +9,7 @@ $(document).ready(function () {
             return el.$element.closest(".form-group");
         },
         errorsWrapper: '<div class="deceased-report-review-errors help-block"></div>',
-        errorTemplate: '<div></div>',
+        errorTemplate: "<div></div>",
         trigger: "keyup change"
     });
 
@@ -19,40 +19,38 @@ $(document).ready(function () {
     var denialReasonOtherDescription = $('textarea[name="deceased_report_review[denialReasonOtherDescription]"]');
 
     // Set initial state of form on load
-    if (reportStatusChecked.length == 0
-        || reportStatusChecked.val() == 'final'
-    ) {
-        $('.denial_reason').addClass('collapse');
-        $('.denial_reason_other').addClass('collapse');
-    } else if (reportMechanismChecked.val() == 'OTHER') {
-        $('.denial_reason_other').removeClass('collapse');
+    if (reportStatusChecked.length == 0 || reportStatusChecked.val() == "final") {
+        $(".denial_reason").addClass("collapse");
+        $(".denial_reason_other").addClass("collapse");
+    } else if (reportMechanismChecked.val() == "OTHER") {
+        $(".denial_reason_other").removeClass("collapse");
     }
 
     // Handle onChange event for Report Mechanism
-    $(reportStatus).on('change', function (e) {
+    $(reportStatus).on("change", function (e) {
         switch ($(e.target).val()) {
-            case 'cancelled':
-                $('.denial_reason').removeClass('collapse');
-                denialReason.attr('required', true);
+            case "cancelled":
+                $(".denial_reason").removeClass("collapse");
+                denialReason.attr("required", true);
                 break;
             default:
-                $('.denial_reason').addClass('collapse');
-                $('.denial_reason_other').addClass('collapse');
-                denialReason.attr('required', false);
-                denialReasonOtherDescription.attr('required', false);
+                $(".denial_reason").addClass("collapse");
+                $(".denial_reason_other").addClass("collapse");
+                denialReason.attr("required", false);
+                denialReasonOtherDescription.attr("required", false);
         }
     });
 
     // Handle onChange event for Denial Reason
-    $(denialReason).on('change', function (e) {
+    $(denialReason).on("change", function (e) {
         switch ($(e.target).val()) {
-            case 'OTHER':
-                $('.denial_reason_other').removeClass('collapse');
-                denialReasonOtherDescription.attr('required', true);
+            case "OTHER":
+                $(".denial_reason_other").removeClass("collapse");
+                denialReasonOtherDescription.attr("required", true);
                 break;
             default:
-                $('.denial_reason_other').addClass('collapse');
-                denialReasonOtherDescription.attr('required', false);
+                $(".denial_reason_other").addClass("collapse");
+                denialReasonOtherDescription.attr("required", false);
         }
     });
 });
