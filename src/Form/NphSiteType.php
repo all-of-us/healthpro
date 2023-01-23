@@ -19,10 +19,6 @@ class NphSiteType extends AbstractType
         'status' => [
             'Active'=> 1,
             'Inactive' => 0
-        ],
-        'centrifuge_type' => [
-            'Fixed Angle' => self::FIXED_ANGLE,
-            'Swinging Bucket' => self::SWINGING_BUCKET
         ]
     ];
 
@@ -73,13 +69,7 @@ class NphSiteType extends AbstractType
                 'disabled' => $options['isDisabled'],
             ])
             ->add('type', Type\TextType::class, [
-                'label' => 'Type (e.g. HPO, DV)',
-                'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
-            ])
-            ->add('site_type', Type\TextType::class, [
-                'label' => 'Site Type',
+                'label' => 'Type (e.g. HPO)',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
                 'disabled' => $options['isDisabled'],
@@ -110,13 +100,6 @@ class NphSiteType extends AbstractType
                     })
                 ],
                 'disabled' => $options['isDisabled'] && $options['isProd'],
-            ])
-            ->add('centrifuge_type', Type\ChoiceType::class, [
-                'label' => 'Centrifuge type',
-                'required' => false,
-                'choices' => self::$siteChoices['centrifuge_type'],
-                'multiple' => false,
-                'placeholder' => '-- Select centrifuge type --'
             ]);
     }
 

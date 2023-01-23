@@ -49,16 +49,6 @@ class NphSite
     private $type;
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
-    private $siteType;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $centrifugeType;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $deleted = false;
@@ -146,30 +136,6 @@ class NphSite
     public function setType(?string $type): self
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getSiteType(): ?string
-    {
-        return $this->siteType;
-    }
-
-    public function setSiteType(?string $siteType): self
-    {
-        $this->siteType = $siteType;
-
-        return $this;
-    }
-
-    public function getCentrifugeType(): ?string
-    {
-        return $this->centrifugeType;
-    }
-
-    public function setCentrifugeType(?string $centrifugeType): self
-    {
-        $this->centrifugeType = $centrifugeType;
 
         return $this;
     }
