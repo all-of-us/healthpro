@@ -499,6 +499,7 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
+        //TODO remove when the rdr api is integrated
         if ($sampleModifyType === NphSample::UNLOCK) {
             $sample->setModifyType(NphSample::EDITED);
         }
@@ -639,10 +640,15 @@ class NphOrderService
 
     public function sendToRdr(NphOrder $order, NphSample $sample): bool
     {
+        $sampleRdrObject = $this->getRdrObject($order, $sample);
         if ($sample->getModifyType() === NphSample::UNLOCK) {
-            // TODO
+            if ($this->editRdrSample($order->getParticipantId(), $sample->getSampleId(), $sampleRdrObject)) {
+                $sample->setModifyType(NphSample::EDITED);
+                $this->em->persist($sample);
+                $this->em->flush();
+                return true;
+            }
         } else {
-            $sampleRdrObject = $this->getRdrObject($order, $sample);
             $rdrId = $this->createRdrSample($order->getParticipantId(), $sampleRdrObject);
             if (!empty($rdrId)) {
                 // Save RDR id
@@ -668,6 +674,24 @@ class NphOrderService
             }
         } catch (\Exception $e) {
             throw $e;
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function editRdrSample(string $participantId, string $orderId, \stdClass $sampleObject): bool
+    {
+        try {
+            $response = $this->rdrApiService->put(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
+                $sampleObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->status) && $result->status === 'AMENDED') {
+                return true;
+            }
+        } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
             return false;
         }
