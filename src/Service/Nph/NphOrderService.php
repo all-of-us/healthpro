@@ -591,7 +591,12 @@ class NphOrderService
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
                 $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
-                if ($this->cancelRestoreSample($sample->getRdrId(), $order->getParticipantId(), $type, $sampleObject)) {
+                if ($sample->getRdrId()) {
+                    if ($this->cancelRestoreSample($sample->getRdrId(), $order->getParticipantId(), $type,
+                        $sampleObject)) {
+                        $this->saveSampleModificationsData($sample, $type, $formData);
+                    }
+                } else {
                     $this->saveSampleModificationsData($sample, $type, $formData);
                 }
             }
@@ -780,8 +785,7 @@ class NphOrderService
         string $participantId,
         string $type,
         \stdClass $sampleObject
-    ): bool
-    {
+    ): bool {
         try {
             $response = $this->rdrApiService->patch(
                 "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
