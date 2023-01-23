@@ -54,8 +54,6 @@ class NphAdminController extends BaseController
         NphSiteRepository $nphSiteRepository,
         LoggerService $loggerService,
         Request $request,
-        ParameterBagInterface $params,
-        EnvironmentService $env,
         $id = null
     ) {
         if ($id) {

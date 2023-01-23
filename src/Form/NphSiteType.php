@@ -65,7 +65,8 @@ class NphSiteType extends AbstractType
             ->add('type', Type\TextType::class, [
                 'label' => 'Type (e.g. HPO)',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => new Constraints\Type('string'),
+                'empty_data' => 'HPO'
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
