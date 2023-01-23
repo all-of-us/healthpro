@@ -12,16 +12,12 @@ use Symfony\Component\Validator\Validation;
 
 class NphSiteType extends AbstractType
 {
-    public const FIXED_ANGLE = 'fixed_angle';
-    public const SWINGING_BUCKET = 'swinging_bucket';
-
     public static $siteChoices = [
         'status' => [
             'Active'=> 1,
             'Inactive' => 0
         ]
     ];
-
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

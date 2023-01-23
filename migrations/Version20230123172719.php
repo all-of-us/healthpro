@@ -19,6 +19,7 @@ final class Version20230123172719 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE nph_sites DROP site_type, DROP centrifuge_type');
+        $this->addSql('ALTER TABLE nph_sites ADD CONSTRAINT unique_google_group UNIQUE (google_group)');
     }
 
     public function down(Schema $schema): void
@@ -26,5 +27,6 @@ final class Version20230123172719 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE nph_sites ADD site_type VARCHAR(100) DEFAULT NULL, ADD centrifuge_type VARCHAR(50) DEFAULT NULL');
+        $this->addSql('ALTER TABLE nph_sites DROP CONSTRAINT unique_google_group');
     }
 }
