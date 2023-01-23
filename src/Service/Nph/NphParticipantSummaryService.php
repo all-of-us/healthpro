@@ -112,7 +112,7 @@ class NphParticipantSummaryService
         //TODO
         return " 
             query {
-                participant (nphId: {$participantId}) {
+                participant (nphId: \"{$participantId}\") {
                     totalCount
                     resultCount
                     edges {
