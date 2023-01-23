@@ -32,14 +32,12 @@ class NphSiteType extends AbstractType
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
-                ],
-                'disabled' => $options['isDisabled'],
+                ]
             ])
             ->add('status', Type\ChoiceType::class, [
                 'label' => 'Status',
                 'required' => true,
-                'choices' => self::$siteChoices['status'],
-                'disabled' => $options['isDisabled']
+                'choices' => self::$siteChoices['status']
             ])
             ->add('google_group', Type\TextType::class, [
                 'label' => 'Google Group',
@@ -47,32 +45,27 @@ class NphSiteType extends AbstractType
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
-                ],
-                'disabled' => $options['isDisabled'],
+                ]
             ])
             ->add('organization_id', Type\TextType::class, [
                 'label' => 'Organization',
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('awardee_id', Type\TextType::class, [
                 'label' => 'Awardee',
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('mayolink_account', Type\TextType::class, [
                 'label' => 'MayoLINK Account',
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('type', Type\TextType::class, [
                 'label' => 'Type (e.g. HPO)',
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
@@ -98,17 +91,14 @@ class NphSiteType extends AbstractType
                             }
                         }
                     })
-                ],
-                'disabled' => $options['isDisabled'] && $options['isProd'],
+                ]
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => NphSite::class,
-            'isDisabled' => false,
-            'isProd' => false
+            'data_class' => NphSite::class
         ]);
     }
 }
