@@ -421,8 +421,13 @@ class NphOrderService
         return $orderSummary;
     }
 
-    public function getParticipantOrderSummaryByModuleVisitAndSampleGroup(string $participantid, string $module, string $visit,
-    string $sampleGroup): array {
+    public function getParticipantOrderSummaryByModuleVisitAndSampleGroup(
+        string $participantid,
+        string $module,
+        string $visit,
+        string $sampleGroup
+    ): array
+    {
         $orderInfo = $this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($participantid, $sampleGroup);
         $orderSummary = $this->generateOrderSummaryArray($orderInfo);
         $orderSummary['order'] = $orderSummary['order'][$module][$visit];

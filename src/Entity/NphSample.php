@@ -450,11 +450,13 @@ class NphSample
         return false;
     }
 
-    public function getSampleGroup(): ?int {
+    public function getSampleGroup(): ?int
+    {
         return $this->sampleGroup;
     }
 
-    public function setSampleGroup($sampleGroup): void {
+    public function setSampleGroup($sampleGroup): void
+    {
         $this->sampleGroup = $sampleGroup;
     }
 }
