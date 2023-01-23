@@ -37,6 +37,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $nphSample->setNphOrder($nphOrder);
         $nphSample->setSampleId('100000002');
         $nphSample->setSampleCode('URINES');
+        $nphSample->setSampleGroup('100000008');
         $this->em->persist($nphSample);
         $this->em->flush();
 

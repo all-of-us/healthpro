@@ -62,6 +62,7 @@ class testSetup
         $nphSample->setNphOrder($nphOrder);
         $nphSample->setSampleId('100000002');
         $nphSample->setSampleCode('URINES');
+        $nphSample->setSampleGroup('1000000001');
         $this->em->persist($nphSample);
         $this->em->flush();
         return $nphOrder;
