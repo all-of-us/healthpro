@@ -589,9 +589,10 @@ class NphOrderService
     {
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
-                $orderObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
-                $this->cancelRestoreOrder($order->getOrderId(), $order->getParticipantId(), $type, $orderObject);
-                $this->saveSampleModificationsData($sample, $type, $formData);
+                $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                if ($this->cancelRestoreSample($sample->getRdrId(), $order->getParticipantId(), $type, $sampleObject)) {
+                    $this->saveSampleModificationsData($sample, $type, $formData);
+                }
             }
         }
         return $order;
@@ -641,8 +642,8 @@ class NphOrderService
         if ($sample->getModifyType() === NphSample::UNLOCK) {
             // TODO
         } else {
-            $orderRdrObject = $this->getRdrObject($order, $sample);
-            $rdrId = $this->createRdrOrder($order->getParticipantId(), $orderRdrObject);
+            $sampleRdrObject = $this->getRdrObject($order, $sample);
+            $rdrId = $this->createRdrSample($order->getParticipantId(), $sampleRdrObject);
             if (!empty($rdrId)) {
                 // Save RDR id
                 $sample->setRdrId($rdrId);
@@ -654,12 +655,12 @@ class NphOrderService
         return false;
     }
 
-    public function createRdrOrder(string $participantId, \stdClass $orderObject): ?string
+    public function createRdrSample(string $participantId, \stdClass $sampleObject): ?string
     {
         try {
             $response = $this->rdrApiService->post(
                 "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder",
-                $orderObject
+                $sampleObject
             );
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
@@ -750,17 +751,17 @@ class NphOrderService
         return $obj;
     }
 
-    public function cancelRestoreOrder(
+    public function cancelRestoreSample(
         string $orderId,
         string $participantId,
         string $type,
-        \stdClass $orderObject
+        \stdClass $sampleObject
     ): bool
     {
         try {
             $response = $this->rdrApiService->patch(
                 "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
-                $orderObject
+                $sampleObject
             );
             $result = json_decode($response->getBody()->getContents());
             $rdrStatus = $type === NphSample::CANCEL ? 'CANCELLED' : 'RESTORED';
