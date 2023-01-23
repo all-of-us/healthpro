@@ -30,4 +30,16 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getOrdersBySampleGroup($participantId, $sampleGroup) {
+        return $this->createQueryBuilder('no')
+            ->leftJoin('no.nphSamples', 'ns')
+            ->where('no.participantId = :participantId')
+            ->andWhere('ns.sampleGroup = :sampleGroup')
+            ->setParameter('participantId', $participantId)
+            ->setParameter('sampleGroup', $sampleGroup)
+            ->orderBy('no.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

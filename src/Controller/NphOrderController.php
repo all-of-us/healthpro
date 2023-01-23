@@ -55,10 +55,10 @@ class NphOrderController extends BaseController
         $oderForm->handleRequest($request);
         if ($oderForm->isSubmitted() && $oderForm->isValid()) {
             $formData = $oderForm->getData();
-            $nphOrderService->createOrdersAndSamples($formData);
+            $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
             $this->addFlash('success', 'Orders Created');
             return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
-                'visit' => $visit]);
+                'visit' => $visit, 'sampleGroup' => $sampleGroup]);
         }
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
@@ -71,7 +71,7 @@ class NphOrderController extends BaseController
             'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
             'nailSamples' => $nphOrderService->getSamplesByType('nail'),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
-            'samplesStatus' => $nphOrderService->getSamplesWithStatus()
+            'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
         ]);
     }
 
@@ -263,21 +263,22 @@ class NphOrderController extends BaseController
     }
 
     /**
-     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint", name="nph_order_label_print")
+     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint/{sampleGroup}", name="nph_order_label_print")
      */
-    public function orderSummary($participantId, $module, $visit, NphParticipantSummaryService
+    public function orderSummary($participantId, $module, $visit, $sampleGroup, NphParticipantSummaryService
     $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         $nphOrderService->loadModules($module, $visit, $participantId);
-        $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit);
+        $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleVisitAndSampleGroup($participantId, $module, $visit, $sampleGroup);
         return $this->render(
             'program/nph/order/label-print.html.twig',
             ['participant' => $participant,
              'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
-                'sampleCount' => $orderInfo['sampleCount']]
+                'sampleCount' => $orderInfo['sampleCount'],
+                'sampleGroup' => $sampleGroup]
         );
     }
 

@@ -78,7 +78,8 @@ class NphOrderServiceTest extends ServiceTestCase
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000003');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
-        $this->service->createSample($sampleCode, $nphOrder);
+        $sampleGroup = $this->service->generateSampleGroup();
+        $this->service->createSample($sampleCode, $nphOrder, $sampleGroup);
         $expectedSampleLabels = [
             $sampleCode => $sampleLabel
         ];

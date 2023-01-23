@@ -268,4 +268,14 @@ class NphOrder
         }
         return false;
     }
+
+    public function getSampleGroupBySampleCode($sampleCode): string {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getSampleCode() === $sampleCode) {
+                return $nphSample->getSampleGroup();
+            }
+        }
+        return '';
+    }
+
 }

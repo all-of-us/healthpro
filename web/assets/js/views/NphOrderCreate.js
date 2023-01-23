@@ -26,7 +26,7 @@ $(document).ready(function () {
                         if (sample === 'nail') {
                             let nailSubSamples = [];
                             $('.nail-sub-samples').find('input:checkbox').each(function () {
-                                if ($(this).prop('checked') === true) {
+                                if ($(this).prop('checked') === true && $(this).prop('disabled') === false) {
                                     nailSubSamples.push(samples[$(this).val()]);
                                     samplesCount++;
                                 }
@@ -58,7 +58,7 @@ $(document).ready(function () {
             } else {
                 let bloodSamples = [];
                 $(this).find('input:checkbox').each(function () {
-                    if ($(this).prop('checked') === true) {
+                    if ($(this).prop('checked') === true && $(this).prop('disabled') === false) {
                         bloodSamples.push(samples[$(this).val()]);
                         samplesCount++;
                     }

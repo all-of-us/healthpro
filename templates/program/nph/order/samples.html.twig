@@ -37,7 +37,7 @@
 
 {% macro displayReprintButton(order, participantId, module, visit, sampleStatus) %}
         {% if sampleStatus == 'Created' %}
-            <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit}) }}"
+            <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit, 'sampleGroup': order.sampleGroup}) }}"
                class="btn btn-primary btn-xs right">
                 Reprint Labels
             </a>

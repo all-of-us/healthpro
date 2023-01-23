@@ -62,7 +62,7 @@
         <div class="col-sm-6" style="height: 600px">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                        <a class="pull-right" href="{{ path('nph_render_pdf', {'participantId': participant.id,'module': module,'visit': visit}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                        <a class="pull-right" href="{{ path('nph_render_pdf_sample_group', {'participantId': participant.id,'module': module,'visit': visit, 'sampleGroup': sampleGroup}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
                     <h3 class="panel-title">Labels</h3>
                 </div>
                 <div class="panel-body">
@@ -74,7 +74,7 @@
                             </a>
                         </p>
                     </div>
-                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('nph_render_pdf', {'participantId': participant.id,'module': module,'visit': visit}) }}"></iframe>
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('nph_render_pdf_sample_group', {'participantId': participant.id,'module': module,'visit': visit, 'sampleGroup': sampleGroup}) }}"></iframe>
                 </div>
             </div>
         </div>
