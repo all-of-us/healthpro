@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
+use App\Service\HFHRepairService;
 use App\Service\IdVerificationImportService;
 use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
@@ -233,6 +234,15 @@ class CronController extends BaseController
     public function deleteUnconfimedIdVerificationsImportDataAction(IdVerificationImportService $idVerificationImportService)
     {
         $idVerificationImportService->deleteUnconfirmedImportData();
+        return $this->json(['success' => true]);
+    }
+
+    /**
+     * @Route("/repair-hfh-participants", name="cron_repair_hfh_participants")
+     */
+    public function repairHfhParticipantsAction(HFHRepairService $HFHRepairService)
+    {
+        $HFHRepairService->repairHFHParticipants();
         return $this->json(['success' => true]);
     }
 }
