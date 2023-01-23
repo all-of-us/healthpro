@@ -592,8 +592,12 @@ class NphOrderService
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
                 $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
                 if ($sample->getRdrId()) {
-                    if ($this->cancelRestoreSample($sample->getRdrId(), $order->getParticipantId(), $type,
-                        $sampleObject)) {
+                    if ($this->cancelRestoreSample(
+                        $sample->getRdrId(),
+                        $order->getParticipantId(),
+                        $type,
+                        $sampleObject
+                    )) {
                         $this->saveSampleModificationsData($sample, $type, $formData);
                     }
                 } else {
