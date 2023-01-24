@@ -500,11 +500,11 @@ class NphOrderService
                 'urineClarity']));
         }
         //TODO remove when the rdr api is integrated
-        if ($sampleModifyType === NphSample::UNLOCK) {
-            $sample->setModifyType(NphSample::EDITED);
-        }
-        $this->em->persist($sample);
-        $this->em->flush();
+//        if ($sampleModifyType === NphSample::UNLOCK) {
+//            $sample->setModifyType(NphSample::EDITED);
+//        }
+//        $this->em->persist($sample);
+//        $this->em->flush();
 
         if ($sample->getNphOrder()->getOrderType() === 'stool') {
             $order = $sample->getNphOrder();
@@ -649,15 +649,16 @@ class NphOrderService
 
     public function sendToRdr(NphOrder $order, NphSample $sample): bool
     {
-        $sampleRdrObject = $this->getRdrObject($order, $sample);
         if ($sample->getModifyType() === NphSample::UNLOCK) {
-            if ($this->editRdrSample($order->getParticipantId(), $sample->getSampleId(), $sampleRdrObject)) {
+            $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend');
+            if ($this->editRdrSample($order->getParticipantId(), $sample->getRdrId(), $sampleRdrObject)) {
                 $sample->setModifyType(NphSample::EDITED);
                 $this->em->persist($sample);
                 $this->em->flush();
                 return true;
             }
         } else {
+            $sampleRdrObject = $this->getRdrObject($order, $sample);
             $rdrId = $this->createRdrSample($order->getParticipantId(), $sampleRdrObject);
             if (!empty($rdrId)) {
                 // Save RDR id
@@ -697,17 +698,21 @@ class NphOrderService
                 $sampleObject
             );
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->status) && $result->status === 'AMENDED') {
+//            if (is_object($result) && isset($result->status) && $result->status === 'AMENDED') {
+//                return true;
+//            }
+            if (is_object($result)) {
                 return true;
             }
         } catch (\Exception $e) {
+            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }
         return false;
     }
 
-    public function getRdrObject(NphOrder $order, NphSample $sample): \stdClass
+    public function getRdrObject(NphOrder $order, NphSample $sample, string $type = 'create'): \stdClass
     {
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $order->getParticipantId();
@@ -755,6 +760,11 @@ class NphOrderService
         if (!empty($notes)) {
             $obj->notes = $notes;
         }
+        if ($type === 'amend') {
+            $obj->amendedReason = $sample->getModifyReason();
+            $obj->amendedInfo = $this->getUserSiteData($sample->getModifiedUser()->getEmail(),
+                NphSite::getSiteIdWithPrefix($sample->getModifiedSite()));
+        }
         return $obj;
     }
 
@@ -775,7 +785,7 @@ class NphOrderService
     public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
     {
         $obj = new \StdClass();
-        $statusType = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
+        $statusType = $type === NphSample::CANCEL ? 'canceled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
         $user = $this->user->getEmail();
@@ -801,6 +811,7 @@ class NphOrderService
                 return true;
             }
         } catch (\Exception $e) {
+            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }
