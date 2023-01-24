@@ -790,7 +790,7 @@ class NphOrderService
     public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
     {
         $obj = new \StdClass();
-        $statusType = $type === NphSample::CANCEL ? 'canceled' : 'restored';
+        $statusType = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
         $user = $this->user->getEmail();
@@ -811,12 +811,11 @@ class NphOrderService
                 $sampleObject
             );
             $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === NphSample::CANCEL ? 'CANCELLED' : 'RESTORED';
+            $rdrStatus = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
             if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
                 return true;
             }
         } catch (\Exception $e) {
-            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }

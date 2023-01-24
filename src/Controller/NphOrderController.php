@@ -374,8 +374,6 @@ class NphOrderController extends BaseController
             'nphOrder' => $order, 'id' => $sampleId
         ]);
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
-        // TODO remove after testing the order api
-        $nphOrderService->sendToRdr($order, $sample);
         $object = $nphOrderService->getRdrObject($order, $sample);
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
