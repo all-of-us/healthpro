@@ -30,6 +30,7 @@ class NphOrderService
     private $visit;
     private $moduleObj;
     private $participantId;
+    private $biobankId;
     private $user;
     private $site;
 
@@ -51,7 +52,7 @@ class NphOrderService
         $this->rdrApiService = $rdrApiService;
     }
 
-    public function loadModules(string $module, string $visit, string $participantId): void
+    public function loadModules(string $module, string $visit, string $participantId, string $biobankId): void
     {
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $this->moduleObj = new $moduleClass($visit);
@@ -59,6 +60,7 @@ class NphOrderService
         $this->module = $module;
         $this->visit = $visit;
         $this->participantId = $participantId;
+        $this->biobankId = $biobankId;
 
         $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
         $this->site = $this->siteService->getSiteId();
@@ -252,6 +254,7 @@ class NphOrderService
         $nphOrder->setTimepoint($timePoint);
         $nphOrder->setOrderId($orderId);
         $nphOrder->setParticipantId($this->participantId);
+        $nphOrder->setBiobankId($this->biobankId);
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
         $nphOrder->setCreatedTs(new DateTime());

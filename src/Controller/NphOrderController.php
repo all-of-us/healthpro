@@ -45,7 +45,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $nphOrderService->loadModules($module, $visit, $participantId);
+        $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $ordersData = $nphOrderService->getExistingOrdersData();
@@ -96,7 +96,7 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
@@ -184,7 +184,8 @@ class NphOrderController extends BaseController
         if (empty($sample)) {
             throw $this->createNotFoundException('Sample not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId,
+            $participant->biobankId);
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
@@ -275,7 +276,7 @@ class NphOrderController extends BaseController
     $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
-        $nphOrderService->loadModules($module, $visit, $participantId);
+        $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit);
         return $this->render(
             'program/nph/order/label-print.html.twig',
@@ -312,7 +313,7 @@ class NphOrderController extends BaseController
         if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
             'type' => $type, 'samples' => $order->getNphSamples()
         ]);
@@ -368,7 +369,7 @@ class NphOrderController extends BaseController
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
         ]);
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         // TODO remove after testing the order api
         $nphOrderService->sendToRdr($order, $sample);
         $object = $nphOrderService->getRdrObject($order, $sample);

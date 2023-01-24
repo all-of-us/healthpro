@@ -41,7 +41,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testLoadModules(): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000001');
+        $this->service->loadModules(1, 'LMT', 'P0000000001', 'T10000000');
         $this->assertSame($this->module1Data['timePointSamples'], $this->service->getTimePointSamples());
         $this->assertSame($this->module1Data['timePoints'], $this->service->getTimePoints());
         $this->assertSame($this->module1Data['samples'], $this->service->getSamples());
@@ -57,7 +57,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetSampleType($sampleType, $sampleCode): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000002');
+        $this->service->loadModules(1, 'LMT', 'P0000000002', 'T10000000');
         $this->assertSame($sampleType, $this->service->getSampleType($sampleCode));
     }
 
@@ -78,7 +78,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetSamplesWithLabels($timePoint, $orderType, $sampleCode, $sampleLabel): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $this->service->loadModules(1, 'LMT', 'P0000000003', 'T10000000');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $this->service->createSample($sampleCode, $nphOrder);
         $expectedSampleLabels = [
@@ -105,7 +105,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetSamplesWithLabelsAndIds($timePoint, $orderType, $sampleCode, $sampleLabel, $sampleId): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $this->service->loadModules(1, 'LMT', 'P0000000003', 'T10000000');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $this->service->createSample($sampleCode, $nphOrder, $sampleId);
         $expectedSampleLabelAndIds[$sampleCode] = [
@@ -131,7 +131,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testCreateOrder()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000004');
+        $this->service->loadModules(1, 'LMT', 'P0000000004', 'T10000000');
         $nphOrder = $this->service->createOrder('preLMT', 'saliva');
         $this->assertSame('LMT', $nphOrder->getVisitType());
         $this->assertSame('preLMT', $nphOrder->getTimepoint());
@@ -141,7 +141,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testCreateSample()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000005');
+        $this->service->loadModules(1, 'LMT', 'P0000000005', 'T10000000');
         $nphOrder = $this->service->createOrder('preLMT', 'saliva');
         $nphSample = $this->service->createSample('SALIVA', $nphOrder);
 
@@ -151,7 +151,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testCreateOrdersAndSamples()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000006');
+        $this->service->loadModules(1, 'LMT', 'P0000000006', 'T10000000');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
         $this->assertSame($this->module1Data['formData'], $this->service->getExistingOrdersData());
     }
@@ -159,7 +159,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetSamplesWithOrderIds()
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000007');
+        $this->service->loadModules(1, 'LMT', 'P0000000007', 'T10000000');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
 
         $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
@@ -197,7 +197,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $isAtLeastOneSampleChecked
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
         if ($orderType === 'stool') {
             $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
             foreach ($sampleCodes as $key => $sampleCode) {
@@ -235,7 +235,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $metaData = []
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
         if ($orderType === 'stool') {
             $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
             $nphSample = $this->service->createSample($sampleCode, $nphOrder, 'T0000000001');
@@ -289,7 +289,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGenerateOrderAndSampleIds(): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
 
         $orderId = $this->service->generateOrderId();
         $this->assertSame(10, strlen($orderId));
@@ -306,7 +306,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testHasAtLeastOneAliquotSample($sampleCode, $formData, $isAtLeastOneSampleChecked): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
         $this->assertSame($this->service->hasAtLeastOneAliquotSample($formData, $sampleCode), $isAtLeastOneSampleChecked);
     }
 
@@ -335,7 +335,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $duplicate): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
 
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
@@ -423,7 +423,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function testGetSamplesWithStatus(): void
     {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $this->service->loadModules(1, 'LMT', 'P0000000010', 'T10000000');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
 
         $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
@@ -461,7 +461,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $expectedMetaData
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008');
+        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
         if ($orderType === 'stool') {
             $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
             $this->service->createSample($sampleCode, $nphOrder, 'T0000000001');
@@ -521,7 +521,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $modifyType
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $this->service->loadModules(1, 'LMT', 'P0000000010', 'T10000000');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
         $modificationFormData = [
@@ -561,7 +561,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $modifyType
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000010');
+        $this->service->loadModules(1, 'LMT', 'P0000000010', 'T10000000');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $nphSample = $this->service->createSample($sampleCode, $nphOrder);
 
