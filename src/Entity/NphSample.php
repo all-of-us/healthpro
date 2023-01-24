@@ -231,12 +231,12 @@ class NphSample
         return $this;
     }
 
-    public function getCollectedTs(): ?\DateTimeInterface
+    public function getCollectedTs(): ?\DateTime
     {
         return $this->collectedTs;
     }
 
-    public function setCollectedTs(?\DateTimeInterface $collectedTs): self
+    public function setCollectedTs(?\DateTime $collectedTs): self
     {
         $this->collectedTs = $collectedTs;
 
@@ -279,12 +279,12 @@ class NphSample
         return $this;
     }
 
-    public function getFinalizedTs(): ?\DateTimeInterface
+    public function getFinalizedTs(): ?\DateTime
     {
         return $this->finalizedTs;
     }
 
-    public function setFinalizedTs(?\DateTimeInterface $finalizedTs): self
+    public function setFinalizedTs(?\DateTime $finalizedTs): self
     {
         $this->finalizedTs = $finalizedTs;
 
@@ -388,12 +388,12 @@ class NphSample
         return $this;
     }
 
-    public function getModifiedTs(): ?\DateTimeInterface
+    public function getModifiedTs(): ?\DateTime
     {
         return $this->modifiedTs;
     }
 
-    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
+    public function setModifiedTs(?\DateTime $modifiedTs): self
     {
         $this->modifiedTs = $modifiedTs;
 

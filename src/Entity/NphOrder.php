@@ -177,12 +177,12 @@ class NphOrder
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): ?\DateTime
     {
         return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $createdTs): self
+    public function setCreatedTs(\DateTime $createdTs): self
     {
         $this->createdTs = $createdTs;
 
