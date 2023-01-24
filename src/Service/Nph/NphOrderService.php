@@ -765,8 +765,10 @@ class NphOrderService
         }
         if ($type === 'amend') {
             $obj->amendedReason = $sample->getModifyReason();
-            $obj->amendedInfo = $this->getUserSiteData($sample->getModifiedUser()->getEmail(),
-                NphSite::getSiteIdWithPrefix($sample->getModifiedSite()));
+            $obj->amendedInfo = $this->getUserSiteData(
+                $sample->getModifiedUser()->getEmail(),
+                NphSite::getSiteIdWithPrefix($sample->getModifiedSite())
+            );
         }
         return $obj;
     }

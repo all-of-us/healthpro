@@ -51,6 +51,7 @@ class testSetup
         $nphOrder->setTimepoint('preLMT');
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId($participant->id);
+        $nphOrder->setBiobankId('T0000000001');
         $nphOrder->setUser($user);
         $nphOrder->setSite($site->getSiteId());
         $nphOrder->setCreatedTs(new \DateTime());

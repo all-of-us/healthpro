@@ -184,8 +184,12 @@ class NphOrderController extends BaseController
         if (empty($sample)) {
             throw $this->createNotFoundException('Sample not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId,
-            $participant->biobankId);
+        $nphOrderService->loadModules(
+            $order->getModule(),
+            $order->getVisitType(),
+            $participantId,
+            $participant->biobankId
+        );
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);

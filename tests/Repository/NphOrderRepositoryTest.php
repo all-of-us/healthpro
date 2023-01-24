@@ -26,6 +26,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $nphOrder->setTimepoint('preLMT');
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId('P000000001');
+        $nphOrder->setBiobankId('T0000000001');
         $nphOrder->setUser($user);
         $nphOrder->setSite($siteId);
         $nphOrder->setCreatedTs(new \DateTime());
