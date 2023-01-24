@@ -88,39 +88,36 @@ class HenryFordRepairTest extends KernelTestCase
         return $order;
     }
 
-    protected function addTestParticipantToCSV(string $csvFile): void
+    protected function addTestParticipantToDatabase(): void
     {
-        $file = fopen($csvFile, 'w');
-        $fileHeaders = ['participantid,awardee,awardeenew,currentsite,newsite'];
-        $CSVArray = array_merge($fileHeaders, ['P123456789,TRANS_AM,TRANS_AM_HENRY_FORD,hpo-site-HenryFord,HPO-SITE-HENRYFORDDEARBORNUOPO']);
-        fwrite($file, implode("\r\n", $CSVArray));
-        fclose($file);
-    }
-
-    protected function cleanupTestCSV(string $csvFile): void
-    {
-        unlink($csvFile);
+        $conn = $this->em->getConnection();
+        $sql = "INSERT INTO henry_ford_repair
+                    (participant_id, awardee_id, organization_id, current_pairing_site, repair_site)
+                VALUES
+                    ('P123456789', 'TRANS_AM', 'TRANS_AM_HENRY_FORD', 'hpo-site-HenryFord', 'HPO-SITE-HENRYFORDDEARBORNUOPO')";
+        $conn->executeQuery($sql);
     }
 
     public function testRepair(): void
     {
-        $csvFile = 'src/Cache/HFSitePairTest.csv';
+        $conn = $this->em->getConnection();
         $user = $this->getUser();
         $this->em->persist($user);
         $this->em->flush();
         $testOrder = $this->createOrder($this->getOrderData());
         $testMeasurement = $this->createMeasurement($this->getMeasurementData(), $user);
+        $this->addTestParticipantToDatabase();
+        $this->assertCount(1, $conn->fetchAll("SELECT * FROM henry_ford_repair WHERE participant_id = 'P123456789'"));
         $this->assertSame('henryford', $testOrder->getFinalizedSite());
         $this->assertSame('henryford', $testMeasurement->getFinalizedSite());
         $this->em->persist($testOrder);
         $this->em->persist($testMeasurement);
         $this->em->flush();
-        $this->addTestParticipantToCSV($csvFile);
-        $this->HFHRepairService->repairHFHParticipants(1,$csvFile);
+        $this->HFHRepairService->repairHFHParticipants(1, "P123456789");
         $testMeasurement = $this->em->find(Measurement::class, $testMeasurement->getId());
         $testOrder = $this->em->find(Order::class, $testOrder->getId());
         $this->assertSame('henryforddearbornuopo', $testOrder->getFinalizedSite());
         $this->assertSame('henryforddearbornuopo', $testMeasurement->getFinalizedSite());
-        $this->cleanupTestCSV($csvFile);
+        $this->assertCount(0, $conn->fetchAll("SELECT * FROM henry_ford_repair WHERE participant_id = 'P123456789'"));
     }
 }
