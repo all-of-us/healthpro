@@ -60,6 +60,7 @@
                                href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                 <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
                             </a>
+                            {% set displayedOrderIDS = [] %}
                             {% for timepointCode, timepoint in visit %}
                                 {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
                                     {% if sampleInfo['numberSamples'] > 0 %}
@@ -77,7 +78,8 @@
                                         {% endif %}
                                         {% for sampleCode, sample in sampleInfo %}
                                             {% set SampleGroupStatus = null %}
-                                            {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and sampleInfo['numberSamples'] > 0 %}
+                                            {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and sampleInfo['numberSamples'] > 0 and sample['healthProOrderId'] not in displayedOrderIDS %}
+                                                {% set displayedOrderIDS = displayedOrderIDS|merge([sample['healthProOrderId']]) %}
                                                 <div class="well well-sm row">
                                                     <div class="col-sm-2">{{ sample['createDate'] }}</div>
                                                     <div class="col-sm-3"><a
