@@ -469,6 +469,7 @@ class NphSample
                 'id' => $aliquot->getAliquotId(),
                 'identifier' => $aliquotsInfo[$aliquot->getAliquotCode()]['identifier'],
                 'container' => $aliquotsInfo[$aliquot->getAliquotCode()]['container'],
+                'description' => $aliquotsInfo[$aliquot->getAliquotCode()]['description'],
                 'volume' => $aliquot->getVolume(),
                 'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z')
             ];
