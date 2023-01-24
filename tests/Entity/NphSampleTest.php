@@ -92,4 +92,38 @@ class NphSampleTest extends NphTestCase
             ]
         ];
     }
+
+    public function testGetRdrSampleObj()
+    {
+        $sample = $this->createOrderAndSample();
+        $aliquotData['nphSample'] = $sample;
+        $aliquotData = array_merge($this->getAliquotData(), $aliquotData);
+        $this->createNphAliquot($aliquotData);
+        $expectedSampleObj = [
+            'test' => 'SST8P5',
+            'description' => 'Test Description',
+            'collected' => '2023-01-08T08:00:00Z',
+            'finalized' => '2023-01-08T08:00:00Z'
+        ];
+        $this->assertSame($expectedSampleObj, $sample->getRdrSampleObj('Test Description'));
+
+        $aliquotInfo = [
+            'SST8P5A1' => [
+                'identifier' => 'SSTS1',
+                'container' => '1.4mL Matrix tube 1000μL',
+                'description' => '1.4mL Matrix tube'
+            ]
+        ];
+        $expectedAliquotSampleObj = [
+            [
+                'id' => '11111111111',
+                'identifier' => 'SSTS1',
+                'container' => '1.4mL Matrix tube 1000μL',
+                'description' => '1.4mL Matrix tube',
+                'volume' => 500.0,
+                'collected' => '2023-01-08T08:00:00Z'
+            ]
+        ];
+        $this->assertSame($expectedAliquotSampleObj, $sample->getRdrAliquotsSampleObj($aliquotInfo));
+    }
 }

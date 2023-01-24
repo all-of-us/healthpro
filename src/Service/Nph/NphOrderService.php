@@ -502,13 +502,6 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
-        //TODO remove when the rdr api is integrated
-//        if ($sampleModifyType === NphSample::UNLOCK) {
-//            $sample->setModifyType(NphSample::EDITED);
-//        }
-//        $this->em->persist($sample);
-//        $this->em->flush();
-
         if ($sample->getNphOrder()->getOrderType() === 'stool') {
             $order = $sample->getNphOrder();
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
@@ -701,14 +694,10 @@ class NphOrderService
                 $sampleObject
             );
             $result = json_decode($response->getBody()->getContents());
-//            if (is_object($result) && isset($result->status) && $result->status === 'AMENDED') {
-//                return true;
-//            }
             if (is_object($result)) {
                 return true;
             }
         } catch (\Exception $e) {
-            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }
