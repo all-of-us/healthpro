@@ -23,7 +23,18 @@ class NphPDFController extends AbstractController
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService
     ): Response {
-        $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participantId, $module, $visit)['order'], $nphParticipantSummaryService->getParticipantById($participantId), $module, $visit);
+        $OrderPDF = $PDF->batchPDF(
+            $nphOrderService->getParticipantOrderSummaryByModuleAndVisit(
+                $participantId,
+                $module,
+                $visit
+            )['order'],
+            $nphParticipantSummaryService->getParticipantById(
+                $participantId
+            ),
+            $module,
+            $visit
+        );
         return new Response($OrderPDF, Response::HTTP_OK, ['content-type' => 'application/pdf']);
     }
 
@@ -39,7 +50,19 @@ class NphPDFController extends AbstractController
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService
     ): Response {
-        $OrderPDF = $PDF->batchPDF($nphOrderService->getParticipantOrderSummaryByModuleVisitAndSampleGroup($participantId, $module, $visit, $sampleGroup)['order'], $nphParticipantSummaryService->getParticipantById($participantId), $module, $visit);
+        $OrderPDF = $PDF->batchPDF(
+            $nphOrderService->getParticipantOrderSummaryByModuleVisitAndSampleGroup(
+                $participantId,
+                $module,
+                $visit,
+                $sampleGroup
+            )['order'],
+            $nphParticipantSummaryService->getParticipantById(
+                $participantId
+            ),
+            $module,
+            $visit
+        );
         return new Response($OrderPDF, Response::HTTP_OK, ['content-type' => 'application/pdf']);
     }
 }

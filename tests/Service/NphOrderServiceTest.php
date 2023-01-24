@@ -331,7 +331,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $collectedTs,
         $aliquots,
         $aliquotId,
-        $duplicate): void
+        $duplicate
+    ): void
     {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008');
@@ -357,7 +358,6 @@ class NphOrderServiceTest extends ServiceTestCase
             $finalizedFormData[$aliquotCode][] = $aliquotId;
         }
         $this->assertSame($duplicate, (bool) $this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
-
     }
 
     public function orderFinalizationDataProvider(): array
@@ -390,7 +390,6 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertArrayHasKey('order', $orderSummary);
         $this->assertSame(count($orderSummary['order']), 1);
         $this->assertArrayHasKey('sampleName', $orderSummary['order']['1']['LMT']['preLMT']['urine']['URINES']);
-
     }
 
     public function testGetParticipantOrderSummaryByVisitAndModule(): void
@@ -425,7 +424,6 @@ class NphOrderServiceTest extends ServiceTestCase
                 list($timePoint, $sampleType, $sampleCode) = $timePointSample;
                 if ($nphOrder->getTimepoint() === $timePoint) {
                     if ($nphOrder->getOrderType() === $sampleType) {
-
                         $this->assertSame($nphOrder->getNphSamples()[0]->getStatus(), $samplesWithStatus[$timePoint][$sampleCode]);
                     }
                 }
@@ -571,5 +569,20 @@ class NphOrderServiceTest extends ServiceTestCase
             ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 'CHANGE_COLLECTION_INFORMATION', 'unlock'],
             ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 'CHANGE_ADD_REMOVE_ALIQUOT', 'unlock'],
         ];
+    }
+
+    /**
+     * @dataProvider sampleLabelsAndIdsDataProvider
+     */
+    public function testGetParticipantOrderSummaryByModuleVisitAndSampleGroup($timePoint, $orderType, $sampleCode, $sampleLabel, $sampleId, $sampleGroup): void
+    {
+        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $nphOrder = $this->service->createOrder($timePoint, $orderType);
+        $this->service->createSample($sampleCode, $nphOrder, $sampleGroup, $sampleId);
+        $orderSummary = $this->service->getParticipantOrderSummaryByModuleVisitAndSampleGroup('P0000000003', 1, 'LMT', $sampleGroup);
+        $this->service->getSamples();
+        $this->assertCount($orderSummary['sampleCount'], $orderSummary['order']);
+        $this->assertSame(1, $orderSummary['sampleCount']);
+        $this->assertIsArray($orderSummary);
     }
 }

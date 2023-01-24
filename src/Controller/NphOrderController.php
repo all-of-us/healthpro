@@ -71,7 +71,7 @@ class NphOrderController extends BaseController
             'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
             'nailSamples' => $nphOrderService->getSamplesByType('nail'),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
-            'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
+            'samplesStatus' => $nphOrderService->getSamplesWithStatus()
         ]);
     }
 

@@ -31,7 +31,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getOrdersBySampleGroup($participantId, $sampleGroup)
+    public function getOrdersBySampleGroup(string $participantId, string $sampleGroup): array
     {
         return $this->createQueryBuilder('no')
             ->leftJoin('no.nphSamples', 'ns')

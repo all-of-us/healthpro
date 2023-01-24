@@ -421,6 +421,7 @@ class NphOrderService
         return $orderSummary;
     }
 
+    //TODO: Update these summary methods to return some sort of data object instead of arrays.
     public function getParticipantOrderSummaryByModuleVisitAndSampleGroup(
         string $participantid,
         string $module,
