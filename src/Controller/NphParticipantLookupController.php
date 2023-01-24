@@ -49,10 +49,10 @@ class NphParticipantLookupController extends BaseController
                 $searchResults = $this->nphParticipantSummaryService->search($searchParameters);
                 if (count($searchResults) == 1) {
                     return $this->redirectToRoute('nph_participant_summary', [
-                        'id' => $searchResults[0]->id
+                        'participantId' => $searchResults[0]->id
                     ]);
                 }
-                return $this->render('participantlookup/participants-list.html.twig', [
+                return $this->render('program/nph/participantlookup/participants-list.html.twig', [
                     'participants' => $searchResults
                 ]);
             } catch (ParticipantSearchExceptionInterface $e) {
@@ -64,31 +64,20 @@ class NphParticipantLookupController extends BaseController
         $phoneForm->handleRequest($request);
 
         if ($phoneForm->isSubmitted() && $phoneForm->isValid()) {
-            $searchFields = ['loginPhone', 'phone'];
-            $searchResults = [];
-
-            foreach ($searchFields as $field) {
-                try {
-                    $results = $this->nphParticipantSummaryService->search([$field => $phoneForm['phone']->getData()]);
-                    if (!empty($results)) {
-                        foreach ($results as $result) {
-                            // Check for duplicates
-                            if (isset($searchResults[$result->id])) {
-                                continue;
-                            }
-                            // Set search field type
-                            $result->searchField = $field;
-                            $searchResults[$result->id] = $result;
-                        }
-                    }
-                } catch (ParticipantSearchExceptionInterface $e) {
-                    $phoneForm->addError(new FormError($e->getMessage()));
+            $searchParameters = $phoneForm->getData();
+            try {
+                $searchResults = $this->nphParticipantSummaryService->search($searchParameters);
+                if (count($searchResults) == 1) {
+                    return $this->redirectToRoute('nph_participant_summary', [
+                        'participantId' => $searchResults[0]->id
+                    ]);
                 }
+                return $this->render('program/nph/participantlookup/participants-list.html.twig', [
+                    'participants' => $searchResults
+                ]);
+            } catch (ParticipantSearchExceptionInterface $e) {
+                $emailForm->addError(new FormError($e->getMessage()));
             }
-            return $this->render('program/nph/participantlookup/participants-list.html.twig', [
-                'participants' => $searchResults,
-                'searchType' => 'phone'
-            ]);
         }
 
         $searchForm = $this->createForm(ParticipantLookupSearchType::class, null);
@@ -98,7 +87,7 @@ class NphParticipantLookupController extends BaseController
             $searchParameters = $searchForm->getData();
             try {
                 $searchResults = $this->nphParticipantSummaryService->search($searchParameters);
-                return $this->render('participantlookup/participants-list.html.twig', [
+                return $this->render('program/nph/participantlookup/participants-list.html.twig', [
                     'participants' => $searchResults
                 ]);
             } catch (ParticipantSearchExceptionInterface $e) {
