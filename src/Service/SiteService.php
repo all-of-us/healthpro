@@ -3,8 +3,10 @@
 namespace App\Service;
 
 use App\Entity\Awardee;
+use App\Entity\NphSite;
 use App\Entity\Organization;
 use App\Entity\Site;
+use App\Entity\User;
 use App\Form\SiteType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -23,6 +25,7 @@ class SiteService
     private $env;
     private $tokenStorage;
     protected $siteNameMapper = [];
+    protected $nphSiteNameMapper = [];
     protected $organizationNameMapper = [];
     protected $awardeeNameMapper = [];
 
@@ -38,7 +41,8 @@ class SiteService
 
     public function isTestSite(): bool
     {
-        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) && $this->requestStack->getSession()->get('siteAwardeeId') === 'TEST';
+        return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) &&
+            $this->requestStack->getSession()->get('siteEntity')->getAwardeeId() === 'TEST';
     }
 
 
@@ -96,13 +100,13 @@ class SiteService
 
     public function getSiteAwardee()
     {
-        return $this->requestStack->getSession()->get('siteOrganization');
+        return $this->requestStack->getSession()->get('siteEntity')->getOrganization();
     }
 
 
     public function getSiteOrganization()
     {
-        return $this->requestStack->getSession()->get('siteOrganizationId');
+        return $this->requestStack->getSession()->get('siteEntity')->getOrganizationId();
     }
 
     public function getSuperUserAwardees()
@@ -209,6 +213,14 @@ class SiteService
 
     public function isValidSite($email)
     {
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+            return $this->isValidHpoSite($email);
+        }
+        return $this->isValidNphSite($email);
+    }
+
+    public function isValidHpoSite($email)
+    {
         $user = $this->userService->getUser();
         if (!$user || !$user->belongsToSite($email)) {
             return false;
@@ -230,7 +242,24 @@ class SiteService
         return true;
     }
 
-    public function switchSite($email)
+    public function isValidNphSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if (!$user || !$user->belongsToSite($email, 'nphSites')) {
+            return false;
+        }
+        return true;
+    }
+
+    public function switchSite($email): bool
+    {
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+            return $this->switchHpoSite($email);
+        }
+        return $this->switchNphSite($email);
+    }
+
+    public function switchHpoSite($email): bool
     {
         $user = $this->userService->getUser();
         if ($user && $user->belongsToSite($email)) {
@@ -251,6 +280,20 @@ class SiteService
         }
     }
 
+    public function switchNphSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if ($user && $user->belongsToSite($email, 'nphSites')) {
+            $this->requestStack->getSession()->set('site', $user->getSite($email, 'nphSites'));
+            $this->requestStack->getSession()->remove('awardee');
+            $this->setNewRoles($user);
+            $this->saveSiteMetaDataInSession();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     protected function setNewRoles($user)
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
@@ -264,27 +307,17 @@ class SiteService
     {
         $site = $this->getSiteEntity();
         if (!empty($site)) {
-            $this->requestStack->getSession()->set('siteOrganization', $site->getOrganization());
-            $this->requestStack->getSession()->set('siteOrganizationId', $site->getOrganizationId());
+            $this->requestStack->getSession()->set('siteEntity', $site);
             $this->requestStack->getSession()->set('siteOrganizationDisplayName', $this->getOrganizationDisplayName($site->getOrganizationId()));
-            $this->requestStack->getSession()->set('siteAwardee', $site->getAwardee());
-            $this->requestStack->getSession()->set('siteAwardeeId', $site->getAwardeeId());
             $this->requestStack->getSession()->set('siteAwardeeDisplayName', $this->getAwardeeDisplayName($site->getAwardeeId()));
-            $this->requestStack->getSession()->set('currentSiteDisplayName', $site->getName());
             $this->requestStack->getSession()->set('siteType', $this->getSiteType());
             $this->requestStack->getSession()->set('orderType', $this->getOrderType());
-            $this->requestStack->getSession()->set('siteState', $site->getState());
         } else {
-            $this->requestStack->getSession()->remove('siteOrganization');
-            $this->requestStack->getSession()->remove('siteOrganizationId');
+            $this->requestStack->getSession()->remove('siteEntity');
             $this->requestStack->getSession()->remove('siteOrganizationDisplayName');
-            $this->requestStack->getSession()->remove('siteAwardee');
-            $this->requestStack->getSession()->remove('siteAwardeeId');
             $this->requestStack->getSession()->remove('siteAwardeeDisplayName');
-            $this->requestStack->getSession()->remove('currentSiteDisplayName');
             $this->requestStack->getSession()->remove('siteType');
             $this->requestStack->getSession()->remove('orderType');
-            $this->requestStack->getSession()->remove('siteState');
         }
     }
 
@@ -294,8 +327,12 @@ class SiteService
         if (!$googleGroup) {
             return null;
         }
-        $site = $this->em->getRepository(Site::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
-        return !empty($site) ? $site[0] : null;
+        //TODO: Use nph site class if the progam is nph
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+            $site = $this->em->getRepository(Site::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
+            return !empty($site) ? $site[0] : null;
+        }
+        return null;
     }
 
     public function getOrderType()
@@ -313,11 +350,62 @@ class SiteService
 
     public function displayCaborConsent(): bool
     {
-        return $this->requestStack->getSession()->get('siteState') === self::CABOR_STATE ? true : false;
+        return $this->requestStack->getSession()->get('siteEntity')->getState() === self::CABOR_STATE ? true : false;
     }
 
     public function getSiteWithPrefix($siteId): string
     {
         return \App\Security\User::SITE_PREFIX . $siteId;
+    }
+
+    public function canSwitchProgram(): bool
+    {
+        if ($this->userService->getUser()) {
+            $roles = $this->userService->getUser()->getRoles();
+            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
+        }
+        return false;
+    }
+
+    public function autoSwitchSite(): bool
+    {
+        $program = $this->requestStack->getSession()->get('program');
+        $user = $this->userService->getUser();
+        $sites = $program === User::PROGRAM_HPO ? $user->getSites() : $user->getNphSites();
+        $autoSwitch = false;
+        if ($program === User::PROGRAM_HPO) {
+            if (count($sites) === 1 && empty($user->getAwardees()) && $this->isValidSite($sites[0]->email)) {
+                $this->switchSite($sites[0]->email);
+                $autoSwitch = true;
+            } elseif (count($user->getAwardees()) === 1 && empty($sites)) {
+                $this->switchSite($user->getAwardees()[0]->email);
+                $autoSwitch = true;
+            }
+        } else {
+            if (count($sites) === 1 && $this->isValidSite($sites[0]->email)) {
+                $this->switchSite($sites[0]->email);
+                $autoSwitch = true;
+            }
+        }
+        return $autoSwitch;
+    }
+
+    public function getNphSiteDisplayName(string $siteSuffix, bool $defaultToSiteSuffix = true): ?string
+    {
+        $siteName = $defaultToSiteSuffix ? $siteSuffix : null;
+        if (!empty($siteSuffix)) {
+            if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
+                $siteName = $this->nphSiteNameMapper[$siteSuffix];
+            } else {
+                $site = $this->em->getRepository(NphSite::class)->findOneBy([
+                    'deleted' => 0,
+                    'googleGroup' => $siteSuffix
+                ]);
+                if (!empty($site)) {
+                    $siteName = $this->nphSiteNameMapper[$siteSuffix] = $site->getName();
+                }
+            }
+        }
+        return $siteName;
     }
 }

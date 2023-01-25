@@ -70,14 +70,14 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            {{ form_start(orderModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
-            {{ form_errors(orderModifyForm) }}
-            {{ form_rest(orderModifyForm) }}
+            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_errors(sampleModifyForm) }}
+            {{ form_rest(sampleModifyForm) }}
             <p>
                 <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Order</button>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
-            {{ form_end(orderModifyForm) }}
+            {{ form_end(sampleModifyForm) }}
         </div>
     </div>
 {% endblock %}

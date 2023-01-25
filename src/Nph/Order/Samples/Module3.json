@@ -1,0 +1,104 @@
+{
+  "version": "1",
+  "notes": "Module 1 samples",
+  "samplesInformation": {
+    "1SST4": {
+      "label": "4 mL SST",
+      "color": "Red and gray",
+      "temperature": "Refrigerated",
+      "specimen": "Serum SST",
+      "type": "blood",
+      "identifier": "SST4"
+    },
+    "LIHP1": {
+      "label": "4 mL Lithium Heparin",
+      "color": "Green and gray",
+      "temperature": "Refrigerated",
+      "specimen": "Plasma PST",
+      "type": "blood",
+      "collectionVolume": "4 mL",
+      "identifier": "LiH4"
+    },
+    "1ED4": {
+      "label": "4 mL EDTA",
+      "color": "Lavender",
+      "temperature": "Refrigerated",
+      "specimen": "Whole Blood EDTA",
+      "type": "blood",
+      "identifier": "EDTA4"
+    },
+    "1P8T2": {
+      "label": "2 mL P800",
+      "color": "Lavender",
+      "temperature": "Refrigerated",
+      "specimen": "Whole Blood EDTA",
+      "type": "blood",
+      "identifier": "P800"
+    },
+    "urine": {
+      "label": "Spot Urine",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Urine",
+      "type": "urine",
+      "identifier": "UrineS"
+    },
+    "saliva": {
+      "label": "Saliva",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Saliva",
+      "type": "saliva",
+      "identifier": "Saliva"
+    },
+    "urineDlw": {
+      "label": "Urine DLW",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Urine DLW",
+      "type": "urineDlw",
+      "identifier": "UrineDLW"
+    },
+    "STOOL": {
+      "label": "Stool",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "placeholder": true,
+      "identifier": "Stool"
+    },
+    "ST1": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST1"
+    },
+    "ST2": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST2"
+    },
+    "ST3": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST3"
+    },
+    "ST4": {
+      "label": "DNA/RNA Shield Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST4"
+    }
+  }
+}

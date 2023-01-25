@@ -1,0 +1,117 @@
+{
+  "version": "1",
+  "notes": "Module 2 samples",
+  "samplesInformation": {
+    "SST8P5": {
+      "label": "8.5 mL SST",
+      "color": "Red and gray",
+      "temperature": "Refrigerated",
+      "specimen": "Serum SST",
+      "type": "blood",
+      "identifier": "SST8.5",
+      "collectionVolume": "8.5 mL"
+    },
+    "LIHP1": {
+      "label": "6 mL Lithium Heparin",
+      "color": "Green and gray",
+      "temperature": "Refrigerated",
+      "specimen": "Plasma",
+      "type": "blood",
+      "identifier": "LiH6",
+      "collectionVolume": "6 mL",
+      "aliquots": {
+        "LIHP1A1": {
+          "identifier": "LiHP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 500,
+          "units": "μL"
+        },
+        "LIHP1A2": {
+          "identifier": "LiHP1",
+          "container": "1.4mL Matrix tube",
+          "expectedAliquots": 2,
+          "expectedVolume": 1000,
+          "units": "μL"
+        }
+      }
+    },
+    "EDTA10": {
+      "label": "10 mL EDTA",
+      "color": "Lavender",
+      "temperature": "Refrigerated",
+      "specimen": "Whole Blood EDTA",
+      "type": "blood",
+      "identifier": "EDTA10",
+      "collectionVolume": "10 mL"
+    },
+    "P800": {
+      "label": "2 mL P800",
+      "color": "Lavender",
+      "temperature": "Refrigerated",
+      "specimen": "Whole Blood EDTA",
+      "type": "blood",
+      "identifier": "P800",
+      "collectionVolume": "2 mL"
+    },
+    "URINES": {
+      "label": "Spot Urine",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Urine",
+      "type": "urine",
+      "identifier": "UrineS",
+      "collectionVolume": "100 mL"
+    },
+    "SALIVA": {
+      "label": "Saliva",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Saliva",
+      "type": "saliva",
+      "identifier": "Saliva",
+      "collectionVolume": "50 mL"
+    },
+    "STOOL": {
+      "label": "Stool",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "placeholder": true,
+      "identifier": "Stool"
+    },
+    "ST1": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST1"
+    },
+    "ST2": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST2"
+    },
+    "ST3": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST3"
+    },
+    "ST4": {
+      "label": "DNA/RNA Shield Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST4"
+    }
+  }
+}

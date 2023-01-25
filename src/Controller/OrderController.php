@@ -677,7 +677,7 @@ class OrderController extends BaseController
             'samplesInfo' => $this->orderService->getCustomSamplesInfo(),
             'orders' => $orders,
             'orderId' => $orderId,
-            'orderModifyForm' => $orderModifyForm->createView(),
+            'sampleModifyForm' => $orderModifyForm->createView(),
             'type' => $type
         ]);
     }

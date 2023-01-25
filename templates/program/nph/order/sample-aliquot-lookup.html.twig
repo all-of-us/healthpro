@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block title %}Sample Aliquot Lookup - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-md-5">
+            {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+            {{ form_widget(sampleIdForm) }}
+            <p>
+                <button type="submit" class="btn btn-primary">Go</button>
+            </p>
+            {{ form_end(sampleIdForm) }}
+        </div>
+    </div>
+{% endblock %}
