@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Awardee;
+use App\Entity\NphSite;
 use App\Entity\Organization;
 use App\Entity\Site;
 use App\Entity\User;
@@ -24,6 +25,7 @@ class SiteService
     private $env;
     private $tokenStorage;
     protected $siteNameMapper = [];
+    protected $nphSiteNameMapper = [];
     protected $organizationNameMapper = [];
     protected $awardeeNameMapper = [];
 
@@ -386,5 +388,24 @@ class SiteService
             }
         }
         return $autoSwitch;
+    }
+
+    public function getNphSiteDisplayName(string $siteSuffix, bool $defaultToSiteSuffix = true): ?string
+    {
+        $siteName = $defaultToSiteSuffix ? $siteSuffix : null;
+        if (!empty($siteSuffix)) {
+            if (array_key_exists($siteSuffix, $this->siteNameMapper)) {
+                $siteName = $this->nphSiteNameMapper[$siteSuffix];
+            } else {
+                $site = $this->em->getRepository(NphSite::class)->findOneBy([
+                    'deleted' => 0,
+                    'googleGroup' => $siteSuffix
+                ]);
+                if (!empty($site)) {
+                    $siteName = $this->nphSiteNameMapper[$siteSuffix] = $site->getName();
+                }
+            }
+        }
+        return $siteName;
     }
 }

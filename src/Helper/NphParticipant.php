@@ -16,6 +16,7 @@ class NphParticipant
     public $cacheTime;
     public $rdrData;
     public $dob;
+    public $nphPairedSiteSuffix;
 
 
     public function __construct(?\stdClass $rdrParticipant = null)
@@ -47,6 +48,15 @@ class NphParticipant
                 $this->dob = null;
             }
         }
+        // Get NPH site suffix
+        if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
+            $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
+        }
+    }
+
+    private function getSiteSuffix($site)
+    {
+        return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
     }
 
     /**

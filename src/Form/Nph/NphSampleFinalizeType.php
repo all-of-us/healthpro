@@ -119,6 +119,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $volumeData,
+                    'disabled' => $aliquot['expectedVolume'] === null
                 ]);
             }
         }

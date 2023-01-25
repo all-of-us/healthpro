@@ -45,7 +45,7 @@
                         {% for aliquot in aliquots %}
                             <p>
                                 {{ aliquot.container }}: {{ aliquot.expectedAliquots }} Volume: {{ aliquot
-                                .expectedVolume }} {{ aliquot.units }}
+                                .expectedVolume|default('--') }} {{ aliquot.units }}
                             </p>
                         {% endfor %}
                     {% else %}
@@ -57,15 +57,15 @@
         <div class="col-sm-7">
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
                         <strong>Name</strong> {{ participant.lastName }}, {{ participant.firstName }} {{ participant
                         .middleName }} <br>
                         <strong>Participant ID</strong> {{ participant.id }} <br>
                         <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
-                        <strong>Site</strong> {{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }} <br>
+                        <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
                         <strong>DOB</strong> {{ participant.dob ? participant.dob|date('n/j/Y') : '--' }} <br>
                     </div>
-                    <div class="col-sm-8">
+                    <div class="col-sm-7">
                         <strong class="text-primary">
                             Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
                             | {{ samples[sampleCode]}}

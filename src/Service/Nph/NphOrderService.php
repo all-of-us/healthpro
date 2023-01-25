@@ -258,7 +258,9 @@ class NphOrderService
             // TODO: dynamically load stool visit type
             $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
-                $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
+                if (!empty($formData[$stoolSample])) {
+                    $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
+                }
             }
         }
         return $sampleGroup;
@@ -513,7 +515,9 @@ class NphOrderService
                             $nphAliquot->setAliquotId($aliquotId);
                             $nphAliquot->setAliquotCode($aliquotCode);
                             $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                            $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            if (!empty($formData["{$aliquotCode}Volume"][$key])) {
+                                $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            }
                             $nphAliquot->setUnits($aliquot['units']);
                             $this->em->persist($nphAliquot);
                             $this->em->flush();
@@ -778,7 +782,9 @@ class NphOrderService
         $sampleDescription = $sampleInfo[$sample->getSampleCode()];
         $obj->sample = $sample->getRdrSampleObj($sampleDescription);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
+        if ($aliquotsInfo) {
+            $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
+        }
         $notes = [];
         foreach (['collected', 'finalized'] as $step) {
             if ($sample->{'get' . ucfirst($step) . 'Notes'}()) {
