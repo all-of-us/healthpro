@@ -45,7 +45,7 @@
                         {% for aliquot in aliquots %}
                             <p>
                                 {{ aliquot.container }}: {{ aliquot.expectedAliquots }} Volume: {{ aliquot
-                                .expectedVolume }} {{ aliquot.units }}
+                                .expectedVolume|default('--') }} {{ aliquot.units }}
                             </p>
                         {% endfor %}
                     {% else %}
