@@ -85,21 +85,16 @@ class NphParticipantSummaryService
             throw new FailedRequestException();
         }
 
-        $contents = $response->getBody()->getContents();
-        $responseObject = json_decode($contents);
+        $result = json_decode($response->getBody()->getContents());
+        $edges = $result->participant->edges;
 
-        if (!is_object($responseObject)) {
-            throw new InvalidResponseException();
-        }
-        if (!isset($responseObject->entry) || !is_array($responseObject->entry)) {
+        if (empty($edges)) {
             return [];
         }
         $results = [];
-        foreach ($responseObject->entry as $participant) {
-            if (isset($participant->resource) && is_object($participant->resource)) {
-                if ($result = new NphParticipant($participant->resource)) {
-                    $results[] = $result;
-                }
+        foreach ($edges as $edge) {
+            if ($result = new NphParticipant($edge->node)) {
+                $results[] = $result;
             }
         }
 
@@ -108,10 +103,9 @@ class NphParticipantSummaryService
 
     private function getParticipantByIdQuery(string $participantId): string
     {
-        //TODO
         return " 
             query {
-                participant (nphId: {$participantId}) {
+                participant (nphId: \"{$participantId}\") {
                     totalCount
                     resultCount
                     edges {
@@ -129,22 +123,42 @@ class NphParticipantSummaryService
         ";
     }
 
+
     private function getSearchQuery(array $params): string
     {
-        //TODO
-        return ' 
+        $searchParams = [];
+        foreach ($params as $field => $value) {
+            if ($field === 'dob') {
+                $date = new \DateTime($params['dob']);
+                $field = 'dateOfBirth';
+                $value = $date->format('Y-m-d');
+            }
+            if ($field === 'email') {
+                $value = strtolower($value);
+            }
+            if ($field === 'phone') {
+                $field = 'phoneNumber';
+            }
+            $searchParams[] = "{$field}: \"{$value}\"";
+        }
+        $searchParams = implode(',', $searchParams);
+        return " 
             query {
-                participant (firstName: test) {
+                participant ({$searchParams}) {
                     totalCount
                     resultCount
                     edges {
                         node {
                             firstName
                             lastName
+                            participantNphId
+                            DOB
+                            biobankId
+                            nphPairedSite
                         }
                     }
                 }
               }
-        ';
+        ";
     }
 }

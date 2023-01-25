@@ -6,9 +6,12 @@ use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSite;
+use App\Entity\Site;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
+use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,11 +24,13 @@ class NphOrderService
     private $userService;
     private $siteService;
     private $loggerService;
+    private $rdrApiService;
 
     private $module;
     private $visit;
     private $moduleObj;
     private $participantId;
+    private $biobankId;
     private $user;
     private $site;
 
@@ -37,15 +42,17 @@ class NphOrderService
         EntityManagerInterface $em,
         UserService $userService,
         SiteService $siteService,
-        LoggerService $loggerService
+        LoggerService $loggerService,
+        RdrApiService $rdrApiService
     ) {
         $this->em = $em;
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
+        $this->rdrApiService = $rdrApiService;
     }
 
-    public function loadModules(string $module, string $visit, string $participantId): void
+    public function loadModules(string $module, string $visit, string $participantId, string $biobankId): void
     {
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $this->moduleObj = new $moduleClass($visit);
@@ -53,6 +60,7 @@ class NphOrderService
         $this->module = $module;
         $this->visit = $visit;
         $this->participantId = $participantId;
+        $this->biobankId = $biobankId;
 
         $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
         $this->site = $this->siteService->getSiteId();
@@ -106,7 +114,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool) $sampleObj->getFinalizedTs()
+                'disabled' => (bool)$sampleObj->getFinalizedTs()
             ];
         }
         return $sampleLabels;
@@ -246,6 +254,7 @@ class NphOrderService
         $nphOrder->setTimepoint($timePoint);
         $nphOrder->setOrderId($orderId);
         $nphOrder->setParticipantId($this->participantId);
+        $nphOrder->setBiobankId($this->biobankId);
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
         $nphOrder->setCreatedTs(new DateTime());
@@ -479,6 +488,12 @@ class NphOrderService
             }
         }
         $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
+        if (empty($sample->getCollectedUser())) {
+            $sample->setCollectedUser($this->user);
+        }
+        if (empty($sample->getCollectedSite())) {
+            $sample->setCollectedSite($this->site);
+        }
         $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
         $sample->setFinalizedUser($this->user);
         $sample->setFinalizedSite($this->site);
@@ -487,12 +502,6 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
-        if ($sampleModifyType === NphSample::UNLOCK) {
-            $sample->setModifyType(NphSample::EDITED);
-        }
-        $this->em->persist($sample);
-        $this->em->flush();
-
         if ($sample->getNphOrder()->getOrderType() === 'stool') {
             $order = $sample->getNphOrder();
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
@@ -577,7 +586,19 @@ class NphOrderService
     {
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
-                $this->saveSampleModificationsData($sample, $type, $formData);
+                $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                if ($sample->getRdrId()) {
+                    if ($this->cancelRestoreSample(
+                        $sample->getRdrId(),
+                        $order->getParticipantId(),
+                        $type,
+                        $sampleObject
+                    )) {
+                        $this->saveSampleModificationsData($sample, $type, $formData);
+                    }
+                } else {
+                    $this->saveSampleModificationsData($sample, $type, $formData);
+                }
             }
         }
         return $order;
@@ -620,5 +641,173 @@ class NphOrderService
             }
         }
         return [];
+    }
+
+    public function sendToRdr(NphOrder $order, NphSample $sample): bool
+    {
+        if ($sample->getModifyType() === NphSample::UNLOCK) {
+            $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend');
+            if ($this->editRdrSample($order->getParticipantId(), $sample->getRdrId(), $sampleRdrObject)) {
+                $sample->setModifyType(NphSample::EDITED);
+                $this->em->persist($sample);
+                $this->em->flush();
+                return true;
+            }
+        } else {
+            $sampleRdrObject = $this->getRdrObject($order, $sample);
+            $rdrId = $this->createRdrSample($order->getParticipantId(), $sampleRdrObject);
+            if (!empty($rdrId)) {
+                // Save RDR id
+                $sample->setRdrId($rdrId);
+                $this->em->persist($sample);
+                $this->em->flush();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function createRdrSample(string $participantId, \stdClass $sampleObject): ?string
+    {
+        try {
+            $response = $this->rdrApiService->post(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder",
+                $sampleObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->id)) {
+                return $result->id;
+            }
+        } catch (\Exception $e) {
+            throw $e;
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function editRdrSample(string $participantId, string $orderId, \stdClass $sampleObject): bool
+    {
+        try {
+            $response = $this->rdrApiService->put(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
+                $sampleObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function getRdrObject(NphOrder $order, NphSample $sample, string $type = 'create'): \stdClass
+    {
+        $obj = new \StdClass();
+        $obj->subject = 'Patient/' . $order->getParticipantId();
+        $nphSite = $this->em->getRepository(NphSite::class)->findOneBy(['googleGroup' => $sample->getFinalizedSite()]);
+        $clientId = !empty($nphSite) ? $nphSite->getMayolinkAccount() : null;
+        $identifiers = [
+            [
+                'system' => 'https://www.pmi-ops.org/order-id',
+                'value' => $order->getOrderId()
+            ],
+            [
+                'system' => 'https://www.pmi-ops.org/sample-id',
+                'value' => $sample->getSampleId()
+            ],
+            [
+                'system' => 'https://www.pmi-ops.org/client-id',
+                'value' => $clientId
+            ],
+        ];
+        $createdSite = NphSite::getSiteIdWithPrefix($order->getSite());
+        $collectedSite = NphSite::getSiteIdWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
+        $finalizedSite = NphSite::getSiteIdWithPrefix($sample->getFinalizedSite());
+        $obj->createdInfo = $this->getUserSiteData($order->getUser()->getEmail(), $createdSite);
+        $obj->collectedInfo = $this->getUserSiteData($sample->getCollectedUser() ? $sample->getCollectedUser()
+            ->getEmail() : $sample->getFinalizedUser()->getEmail(), $collectedSite);
+        $obj->finalizedInfo = $this->getUserSiteData($sample->getFinalizedUser()->getEmail(), $finalizedSite);
+        $obj->identifier = $identifiers;
+        $createdTs = $order->getCreatedTs();
+        $createdTs->setTimezone(new \DateTimeZone('UTC'));
+        $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
+        $obj->module = $order->getModule();
+        $obj->visitType = $order->getVisitType();
+        $obj->timepoint = $order->getTimepoint();
+        $sampleInfo = $this->getSamples();
+        $sampleDescription = $sampleInfo[$sample->getSampleCode()];
+        $obj->sample = $sample->getRdrSampleObj($sampleDescription);
+        $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
+        $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
+        $notes = [];
+        foreach (['collected', 'finalized'] as $step) {
+            if ($sample->{'get' . ucfirst($step) . 'Notes'}()) {
+                $notes[$step] = $sample->{'get' . ucfirst($step) . 'Notes'}();
+            }
+        }
+        if (!empty($notes)) {
+            $obj->notes = $notes;
+        }
+        if ($type === 'amend') {
+            $obj->amendedReason = $sample->getModifyReason();
+            $obj->amendedInfo = $this->getUserSiteData(
+                $sample->getModifiedUser()->getEmail(),
+                NphSite::getSiteIdWithPrefix($sample->getModifiedSite())
+            );
+        }
+        return $obj;
+    }
+
+    private function getUserSiteData(string $user, string $site): array
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
+    }
+
+    public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
+    {
+        $obj = new \StdClass();
+        $statusType = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->amendedReason = $reason;
+        $user = $this->user->getEmail();
+        $site = NphSite::getSiteIdWithPrefix($this->site);
+        $obj->{$statusType . 'Info'} = $this->getUserSiteData($user, $site);
+        return $obj;
+    }
+
+    public function cancelRestoreSample(
+        string $orderId,
+        string $participantId,
+        string $type,
+        \stdClass $sampleObject
+    ): bool {
+        try {
+            $response = $this->rdrApiService->patch(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
+                $sampleObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
     }
 }

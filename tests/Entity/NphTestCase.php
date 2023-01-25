@@ -74,10 +74,12 @@ class NphTestCase extends KernelTestCase
 
     protected function getSampleData(): array
     {
+        $ts = new \DateTime('2023-01-08 08:00:00');
         return [
             'sampleId' => '1000000000',
             'sampleCode' => 'SST8P5',
-            'finalizedTs' => new \DateTime('2023-01-08 08:00:00')
+            'collectedTs' => $ts,
+            'finalizedTs' => $ts
         ];
     }
 
@@ -87,7 +89,8 @@ class NphTestCase extends KernelTestCase
             'aliquotId' => '11111111111',
             'aliquotCode' => 'SST8P5A1',
             'volume' => 500,
-            'units' => 'μL'
+            'units' => 'μL',
+            'aliquotTs' => new \DateTime('2023-01-08 08:00:00')
         ];
     }
 

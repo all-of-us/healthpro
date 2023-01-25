@@ -25,19 +25,19 @@
             {% for participant in participants %}
                 <tr>
                     <td>
-                        <a href="{{ path('nph_participant_summary', { participantId: participant.participantId }) }}">{{ participant.lastName }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">{{ participant.lastName }}</a>
                     </td>
                     <td>
-                        <a href="{{ path('nph_participant_summary', { participantId: participant.participantId }) }}">{{ participant.firstName }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">{{ participant.firstName }}</a>
                     </td>
                     <td>
-                        <a href="{{ path('nph_participant_summary', { participantId: participant.participantId }) }}">{{ participant.middleName }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">{{ participant.middleName }}</a>
                     </td>
                     <td>
-                        <a href="{{ path('nph_participant_summary', { participantId: participant.participantId }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">{{ participant.dob ? participant.dob|date('n/j/Y') }}</a>
                     </td>
                     <td>
-                        <a href="{{ path('nph_participant_summary', { participantId: participant.participantId }) }}">{{ participant.zipCode }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">{{ participant.zipCode }}</a>
                     </td>
                     <td>
                         {% if participant.awardee %}
