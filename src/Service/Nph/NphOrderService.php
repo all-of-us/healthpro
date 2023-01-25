@@ -258,7 +258,9 @@ class NphOrderService
             // TODO: dynamically load stool visit type
             $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
-                $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
+                if (!empty($formData[$stoolSample])) {
+                    $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
+                }
             }
         }
         return $sampleGroup;
