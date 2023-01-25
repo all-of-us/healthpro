@@ -51,7 +51,7 @@ class PDFService
         $stoolPrinted = false;
         foreach ($OrderSummary as $timePointOrder) {
             foreach ($timePointOrder as $sampleType => $sampleInfo) {
-                foreach ($sampleInfo as $sampleCode => $sample) {
+                foreach ($sampleInfo as $sample) {
                     try {
                         $participantFullName = $participant->firstName . ' ' . $participant->lastName;
                         if (strlen($participantFullName) > 20) {
