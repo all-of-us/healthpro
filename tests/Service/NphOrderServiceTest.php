@@ -594,7 +594,7 @@ class NphOrderServiceTest extends ServiceTestCase
      */
     public function testGetParticipantOrderSummaryByModuleVisitAndSampleGroup($timePoint, $orderType, $sampleCode, $sampleLabel, $sampleId, $sampleGroup): void
     {
-        $this->service->loadModules(1, 'LMT', 'P0000000003');
+        $this->service->loadModules(1, 'LMT', 'P0000000003', 'T10000000');
         $nphOrder = $this->service->createOrder($timePoint, $orderType);
         $this->service->createSample($sampleCode, $nphOrder, $sampleGroup, $sampleId);
         $orderSummary = $this->service->getParticipantOrderSummaryByModuleVisitAndSampleGroup('P0000000003', 1, 'LMT', $sampleGroup);
