@@ -148,6 +148,11 @@ class NphSample
      */
     private $modifyType;
 
+    /**
+     * @ORM\Column(type="integer", nullable=false)
+     */
+    private $sampleGroup;
+
     public function __construct()
     {
         $this->nphAliquots = new ArrayCollection();
@@ -479,5 +484,15 @@ class NphSample
             $aliquotObj[] = $aliquotsData;
         }
         return $aliquotObj;
+    }
+
+    public function getSampleGroup(): ?int
+    {
+        return $this->sampleGroup;
+    }
+
+    public function setSampleGroup($sampleGroup): void
+    {
+        $this->sampleGroup = $sampleGroup;
     }
 }

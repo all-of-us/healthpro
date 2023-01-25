@@ -157,7 +157,8 @@ class NphOrderService
             foreach ($samples as $sample) {
                 $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = [
                     'id' => $order->getId(),
-                    'orderId' => $order->getOrderId()
+                    'orderId' => $order->getOrderId(),
+                    'sampleGroup' => $order->getSampleGroupBySampleCode($sample->getSampleCode()),
                 ];
             }
         }
@@ -200,6 +201,24 @@ class NphOrderService
         return $id;
     }
 
+    public function generateSampleGroup(): string
+    {
+        $attempts = 0;
+        $nphSampleRepository = $this->em->getRepository(NphSample::class);
+        while (++$attempts <= 20) {
+            $id = $this->getNumericId();
+            if ($nphSampleRepository->findOneBy(['sampleGroup' => $id])) {
+                $id = null;
+            } else {
+                break;
+            }
+        }
+        if (empty($id)) {
+            throw new \Exception('Failed to generate unique sample group');
+        }
+        return $id;
+    }
+
     private function getNumericId(): string
     {
         $length = 10;
@@ -211,8 +230,9 @@ class NphOrderService
         return $id;
     }
 
-    public function createOrdersAndSamples(array $formData): void
+    public function createOrdersAndSamples(array $formData): string
     {
+        $sampleGroup = $this->generateSampleGroup();
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
                 if (in_array($timePoint, self::$nonBloodTimePoints)) {
@@ -222,14 +242,14 @@ class NphOrderService
                             $nailSamples[] = $sample;
                         } elseif (!in_array($sample, self::$placeholderSamples)) {
                             $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
-                            $this->createSample($sample, $nphOrder);
+                            $this->createSample($sample, $nphOrder, $sampleGroup);
                         }
                     }
                     if (!empty($nailSamples)) {
-                        $this->createOrderWithSamples($timePoint, 'nail', $nailSamples);
+                        $this->createOrderWithSamples($timePoint, 'nail', $nailSamples, $sampleGroup);
                     }
                 } else {
-                    $this->createOrderWithSamples($timePoint, 'blood', $samples);
+                    $this->createOrderWithSamples($timePoint, 'blood', $samples, $sampleGroup);
                 }
             }
         }
@@ -238,9 +258,10 @@ class NphOrderService
             // TODO: dynamically load stool visit type
             $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
-                $this->createSample($stoolSample, $nphOrder, $formData[$stoolSample]);
+                $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
             }
         }
+        return $sampleGroup;
     }
 
     public function createOrder(string $timePoint, string $orderType, string $orderId = null): NphOrder
@@ -265,12 +286,13 @@ class NphOrderService
         return $nphOrder;
     }
 
-    public function createSample(string $sample, NphOrder $nphOrder, string $sampleId = null): NphSample
+    public function createSample(string $sample, NphOrder $nphOrder, string $sampleGroup, string $sampleId = null): NphSample
     {
         if ($sampleId === null) {
             $sampleId = $this->generateSampleId();
         }
         $nphSample = new NphSample();
+        $nphSample->setSampleGroup($sampleGroup);
         $nphSample->setNphOrder($nphOrder);
         $nphSample->setSampleId($sampleId);
         $nphSample->setSampleCode($sample);
@@ -280,11 +302,11 @@ class NphOrderService
         return $nphSample;
     }
 
-    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples): void
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType);
         foreach ($samples as $sample) {
-            $this->createSample($sample, $nphOrder);
+            $this->createSample($sample, $nphOrder, $sampleGroup);
         }
     }
 
@@ -408,6 +430,19 @@ class NphOrderService
         return $orderSummary;
     }
 
+    //TODO: Update these summary methods to return some sort of data object instead of arrays.
+    public function getParticipantOrderSummaryByModuleVisitAndSampleGroup(
+        string $participantid,
+        string $module,
+        string $visit,
+        string $sampleGroup
+    ): array {
+        $orderInfo = $this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($participantid, $sampleGroup);
+        $orderSummary = $this->generateOrderSummaryArray($orderInfo);
+        $orderSummary['order'] = $orderSummary['order'][$module][$visit];
+        return $orderSummary;
+    }
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
@@ -438,6 +473,7 @@ class NphOrderService
                     'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
                     'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
                     'visitDisplayName' => $visitTypes[$order->getVisitType()],
+                    'sampleGroup' => $sample->getSampleGroup(),
                 ];
             }
         }

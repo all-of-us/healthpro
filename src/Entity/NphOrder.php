@@ -285,4 +285,14 @@ class NphOrder
 
         return $this;
     }
+
+    public function getSampleGroupBySampleCode(string $sampleCode): ?string
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getSampleCode() === $sampleCode) {
+                return $nphSample->getSampleGroup();
+            }
+        }
+        throw new \ErrorException("Sample group not found for SampleCode $sampleCode with SampleId $this->id");
+    }
 }
