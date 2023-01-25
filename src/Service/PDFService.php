@@ -18,7 +18,15 @@ class PDFService
 
     public function __construct(Environment $twig)
     {
-        $this->mpdf = new Mpdf(['orientation' => 'L', 'format' => [60.96, 101.6], 'margin_left' => 5, 'margin_right' => 5, 'margin_top' => 5, 'margin_bottom' => 2]);
+        $this->mpdf = new Mpdf([
+            'orientation' => 'L',
+            'format' => [60.96, 101.6],
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_top' => 5,
+            'margin_bottom' => 2,
+            'tempDir' => '/tmp'
+        ]);
         $this->twig = $twig;
     }
 
