@@ -85,12 +85,12 @@ class NphAliquot
         return $this;
     }
 
-    public function getAliquotTs(): ?\DateTimeInterface
+    public function getAliquotTs(): ?\DateTime
     {
         return $this->aliquotTs;
     }
 
-    public function setAliquotTs(\DateTimeInterface $aliquotTs): self
+    public function setAliquotTs(\DateTime $aliquotTs): self
     {
         $this->aliquotTs = $aliquotTs;
 

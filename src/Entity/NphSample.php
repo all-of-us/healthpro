@@ -236,12 +236,12 @@ class NphSample
         return $this;
     }
 
-    public function getCollectedTs(): ?\DateTimeInterface
+    public function getCollectedTs(): ?\DateTime
     {
         return $this->collectedTs;
     }
 
-    public function setCollectedTs(?\DateTimeInterface $collectedTs): self
+    public function setCollectedTs(?\DateTime $collectedTs): self
     {
         $this->collectedTs = $collectedTs;
 
@@ -284,12 +284,12 @@ class NphSample
         return $this;
     }
 
-    public function getFinalizedTs(): ?\DateTimeInterface
+    public function getFinalizedTs(): ?\DateTime
     {
         return $this->finalizedTs;
     }
 
-    public function setFinalizedTs(?\DateTimeInterface $finalizedTs): self
+    public function setFinalizedTs(?\DateTime $finalizedTs): self
     {
         $this->finalizedTs = $finalizedTs;
 
@@ -393,12 +393,12 @@ class NphSample
         return $this;
     }
 
-    public function getModifiedTs(): ?\DateTimeInterface
+    public function getModifiedTs(): ?\DateTime
     {
         return $this->modifiedTs;
     }
 
-    public function setModifiedTs(?\DateTimeInterface $modifiedTs): self
+    public function setModifiedTs(?\DateTime $modifiedTs): self
     {
         $this->modifiedTs = $modifiedTs;
 
@@ -448,6 +448,42 @@ class NphSample
             return true;
         }
         return false;
+    }
+
+    public function getRdrSampleObj(string $description): array
+    {
+        $collectedTs = $this->getCollectedTs();
+        $collectedTs->setTimezone(new \DateTimeZone('UTC'));
+        $finalizedTs = $this->getFinalizedTs();
+        $finalizedTs->setTimezone(new \DateTimeZone('UTC'));
+        return [
+            'test' => $this->getSampleCode(),
+            'description' => $description,
+            'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
+            'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
+        ];
+    }
+
+    public function getRdrAliquotsSampleObj(array $aliquotsInfo): array
+    {
+        $aliquotObj = [];
+        foreach ($this->getNphAliquots() as $aliquot) {
+            $collectedTs = $aliquot->getAliquotTs();
+            $collectedTs->setTimezone(new \DateTimeZone('UTC'));
+            $aliquotsData = [
+                'id' => $aliquot->getAliquotId(),
+                'identifier' => $aliquotsInfo[$aliquot->getAliquotCode()]['identifier'],
+                'container' => $aliquotsInfo[$aliquot->getAliquotCode()]['container'],
+                'description' => $aliquotsInfo[$aliquot->getAliquotCode()]['description'],
+                'volume' => $aliquot->getVolume(),
+                'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z')
+            ];
+            if ($aliquot->getStatus()) {
+                $aliquotsData['status'] = $aliquot->getStatus();
+            }
+            $aliquotObj[] = $aliquotsData;
+        }
+        return $aliquotObj;
     }
 
     public function getSampleGroup(): ?int

@@ -9,10 +9,13 @@ use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
+use App\Service\EnvironmentService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Util\Json;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,7 +45,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $nphOrderService->loadModules($module, $visit, $participantId);
+        $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $ordersData = $nphOrderService->getExistingOrdersData();
@@ -93,7 +96,7 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
@@ -181,7 +184,12 @@ class NphOrderController extends BaseController
         if (empty($sample)) {
             throw $this->createNotFoundException('Sample not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules(
+            $order->getModule(),
+            $order->getVisitType(),
+            $participantId,
+            $participant->biobankId
+        );
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
@@ -207,7 +215,10 @@ class NphOrderController extends BaseController
                 }
             }
             if ($sampleFinalizeForm->isValid()) {
-                if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                if ($sample = $nphOrderService->saveOrderFinalization($formData, $sample)) {
+                    if ($nphOrderService->sendToRdr($order, $sample)) {
+                        //TODO
+                    }
                     $this->addFlash('success', 'Order finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,
@@ -269,7 +280,7 @@ class NphOrderController extends BaseController
     $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
-        $nphOrderService->loadModules($module, $visit, $participantId);
+        $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleVisitAndSampleGroup($participantId, $module, $visit, $sampleGroup);
         return $this->render(
             'program/nph/order/label-print.html.twig',
@@ -307,7 +318,7 @@ class NphOrderController extends BaseController
         if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
             'type' => $type, 'samples' => $order->getNphSamples()
         ]);
@@ -338,5 +349,35 @@ class NphOrderController extends BaseController
             'samples' => $nphOrderService->getSamples(),
             'samplesMetadata' => $nphOrderService->getSamplesMetadata($order)
         ]);
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/json-response", name="nph_order_json")
+     * For debugging generated JSON representation - only allowed for admins or in local dev
+     */
+    public function nphOrderJsonAction(
+        string $participantId,
+        string $orderId,
+        string $sampleId,
+        NphParticipantSummaryService $nphParticipantSummaryService,
+        NphOrderService $nphOrderService,
+        EnvironmentService $env
+    ): Response {
+        $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+            throw $this->createAccessDeniedException();
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'nphOrder' => $order, 'id' => $sampleId
+        ]);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $object = $nphOrderService->getRdrObject($order, $sample);
+        $response = new JsonResponse($object);
+        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
+        return $response;
     }
 }

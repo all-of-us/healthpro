@@ -78,6 +78,11 @@ class NphOrder
      */
     private $metadata;
 
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $biobankId;
+
     public function __construct()
     {
         $this->nphSamples = new ArrayCollection();
@@ -172,12 +177,12 @@ class NphOrder
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): ?\DateTime
     {
         return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $createdTs): self
+    public function setCreatedTs(\DateTime $createdTs): self
     {
         $this->createdTs = $createdTs;
 
@@ -267,6 +272,18 @@ class NphOrder
             return $this->canRestore();
         }
         return false;
+    }
+
+    public function getBiobankId(): ?string
+    {
+        return $this->biobankId;
+    }
+
+    public function setBiobankId(string $biobankId): self
+    {
+        $this->biobankId = $biobankId;
+
+        return $this;
     }
 
     public function getSampleGroupBySampleCode(string $sampleCode): ?string

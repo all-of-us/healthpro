@@ -5,6 +5,7 @@ namespace App\Tests\Service;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphProgramSummaryService;
+use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use App\Tests\testSetup;
@@ -35,7 +36,8 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
-            $this->createMock(LoggerService::class)
+            $this->createMock(LoggerService::class),
+            $this->createMock(RdrApiService::class)
         );
     }
 
