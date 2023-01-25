@@ -742,7 +742,9 @@ class NphOrderService
         $sampleDescription = $sampleInfo[$sample->getSampleCode()];
         $obj->sample = $sample->getRdrSampleObj($sampleDescription);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
+        if ($aliquotsInfo) {
+            $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
+        }
         $notes = [];
         foreach (['collected', 'finalized'] as $step) {
             if ($sample->{'get' . ucfirst($step) . 'Notes'}()) {
