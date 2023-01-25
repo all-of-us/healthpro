@@ -71,7 +71,7 @@ class HFHRepairService
         $evaluation = $this->em->getRepository(Measurement::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId, 'finalizedSite' => $currentSite]);
         if (count($orders) == 0) {
-            throw new \Exception("No order found for participant $participantId at site $currentSite");
+            $this->loggerService->log(Log::PROBLEM_NOTIFIY, "No order found for participant $participantId with finalized site $currentSite");
         }
         foreach ($orders as $order) {
             $this->loggerService->log(Log::ORDER_EDIT, $order->getId());
