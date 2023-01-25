@@ -14,8 +14,6 @@
             {% include 'program/nph/order/partials/participant-details.html.twig' %}
         </div>
         <div class="col-md-4">
-            <p><i class="fas fa-file-contract fa-lg"></i> Module 1 Informed Consent</p>
-            <p><i class="fas fa-clipboard-check fa-lg"></i> Module 1 Eligibility Evaluation</p>
         </div>
         <div class="col-md-3">
             <svg id="participantBarcode" data-id="{{ participant.id }}"></svg>
@@ -23,7 +21,7 @@
     </div>
     <div class="col-md-12" role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 2 %}
                 {% if loop.first %}
                     {% set tabActive = 'active' %}
                 {% else %}
