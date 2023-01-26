@@ -40,6 +40,7 @@
         "tabWidth":4,
         "trailingComma": "none",
         "printWidth": 120,
-        "semi": true
+        "semi": true,
+        "endOfLine": "auto"
     }
 }
