@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\NphSite;
 use App\Entity\Site;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,13 +12,18 @@ class SiteServiceTest extends ServiceTestCase
     protected $service;
     protected $id;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->service = static::$container->get(SiteService::class);
+    }
+
     public function testCaborConsentDisplay(): void
     {
         $this->id = uniqid();
         $caborSite = 'hpo-site-test' . SiteService::CABOR_STATE . $this->id;
         $nonCaborSite = 'hpo-site-testTN' . $this->id;
         $this->login('test@example.com', [$caborSite, $nonCaborSite]);
-        $this->service = static::$container->get(SiteService::class);
 
         $this->createSite(SiteService::CABOR_STATE);
         $this->service->switchSite($caborSite . '@' . self::GROUP_DOMAIN);
@@ -41,6 +47,25 @@ class SiteServiceTest extends ServiceTestCase
             ->setGoogleGroup($siteId)
             ->setWorkqueueDownload('')
             ->setState($state);
+        $em->persist($site);
+        $em->flush();
+    }
+
+    public function testGetNphSiteDisplayName(): void
+    {
+        $this->id = uniqid();
+        $this->createNphSite();
+        $this->assertSame('Test Site ' . $this->id, $this->service->getNphSiteDisplayName('test' . $this->id));
+    }
+
+    private function createNphSite(): void
+    {
+        $em = static::$container->get(EntityManagerInterface::class);
+        $googleGroup = 'test' . $this->id;
+        $site = new NphSite();
+        $site->setStatus(true)
+            ->setName('Test Site ' . $this->id)
+            ->setGoogleGroup($googleGroup);
         $em->persist($site);
         $em->flush();
     }

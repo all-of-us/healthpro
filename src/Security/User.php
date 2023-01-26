@@ -7,8 +7,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     public const SITE_PREFIX = 'hpo-site-';
+    public const SITE_NPH_PREFIX = 'nph-site-';
     public const AWARDEE_PREFIX = 'awardee-';
     public const ADMIN_GROUP = 'site-admin';
+    public const NPH_ADMIN_GROUP = 'nph-site-admin';
     public const TWOFACTOR_GROUP = 'mfa_exception';
     public const TWOFACTOR_PREFIX = 'x-site-';
     public const ADMIN_DV = 'dv-admin';
@@ -22,8 +24,10 @@ class User implements UserInterface
     private $googleUser;
     private $groups;
     private $sites;
+    private $nphSites;
     private $awardees;
     private $adminAccess;
+    private $nphAdminAccess;
     private $info;
     private $timezone;
     private $lastLogin;
@@ -41,9 +45,11 @@ class User implements UserInterface
         $this->info = $info;
         $this->timezone = is_null($timezone) && isset($info['timezone']) ? $info['timezone'] : $timezone;
         $this->sessionInfo = $sessionInfo;
-        $this->sites = $this->computeSites();
+        $this->sites = $this->computeSites('hpo');
+        $this->nphSites = $this->computeSites('nph');
         $this->awardees = $this->computeAwardees();
-        $this->adminAccess = $this->computeAdminAccess();
+        $this->adminAccess = $this->computeAdminAccess('hpo');
+        $this->nphAdminAccess = $this->computeAdminAccess('nph');
         $this->adminDvAccess = $this->computeAdminDvAccess();
         $this->biobankAccess = $this->computeBiobankAccess();
         $this->scrippsAccess = $this->computeScrippsAccess();
@@ -60,19 +66,23 @@ class User implements UserInterface
         return $this->info;
     }
 
-    private function computeSites()
+    private function computeSites($siteType)
     {
         $sites = [];
+        $sitePrefix = $siteType === 'hpo' ? self::SITE_PREFIX : self::SITE_NPH_PREFIX;
         // site membership is determined by the user's groups
         foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::SITE_PREFIX) === 0) {
+            if (strpos($group->getEmail(), $sitePrefix) === 0) {
                 $id = preg_replace('/@.*$/', '', $group->getEmail());
-                $id = str_replace(self::SITE_PREFIX, '', $id);
-                $sites[] = (object)[
-                    'email' => $group->getEmail(),
-                    'name' => $group->getName(),
-                    'id' => $id
-                ];
+                // Prevent admin group from being added to the sites list as it has the same site prefix.
+                if ($id !== self::NPH_ADMIN_GROUP) {
+                    $id = str_replace($sitePrefix, '', $id);
+                    $sites[] = (object)[
+                        'email' => $group->getEmail(),
+                        'name' => $group->getName(),
+                        'id' => $id
+                    ];
+                }
             }
         }
         return $sites;
@@ -100,11 +110,12 @@ class User implements UserInterface
         return $awardees;
     }
 
-    private function computeAdminAccess()
+    private function computeAdminAccess($type)
     {
         $hasAccess = false;
+        $groupPrefix = $type === 'hpo' ? self::ADMIN_GROUP : self::NPH_ADMIN_GROUP;
         foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::ADMIN_GROUP . '@') === 0) {
+            if (strpos($group->getEmail(), $groupPrefix . '@') === 0) {
                 $hasAccess = true;
             }
         }
@@ -182,15 +193,20 @@ class User implements UserInterface
         return $this->sites;
     }
 
+    public function getNphSites(): array
+    {
+        return $this->nphSites;
+    }
+
     public function getAwardees()
     {
         return $this->awardees;
     }
 
-    public function getSite($email)
+    public function getSite($email, $siteType = 'sites')
     {
         $site = null;
-        foreach ($this->sites as $s) {
+        foreach ($this->{$siteType} as $s) {
             if ($s->email === $email) {
                 $site = $s;
                 break;
@@ -211,10 +227,10 @@ class User implements UserInterface
         return $awardee;
     }
 
-    public function belongsToSite($email)
+    public function belongsToSite($email, $siteType = 'sites')
     {
         $belongs = false;
-        foreach ($this->sites as $site) {
+        foreach ($this->{$siteType} as $site) {
             if ($site->email === $email) {
                 $belongs = true;
                 break;
@@ -246,11 +262,17 @@ class User implements UserInterface
         if (count($this->sites) > 0) {
             $roles[] = 'ROLE_USER';
         }
+        if (count($this->nphSites) > 0) {
+            $roles[] = 'ROLE_NPH_USER';
+        }
         if (count($this->awardees) > 0) {
             $roles[] = 'ROLE_AWARDEE';
         }
         if ($this->adminAccess) {
             $roles[] = 'ROLE_ADMIN';
+        }
+        if ($this->nphAdminAccess) {
+            $roles[] = 'ROLE_NPH_ADMIN';
         }
         if ($this->adminDvAccess) {
             $roles[] = 'ROLE_DV_ADMIN';

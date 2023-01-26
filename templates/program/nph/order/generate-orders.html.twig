@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+{% import 'program/nph/order/samples.html.twig' as samples %}
+{% block title %} Generate Orders - {% endblock %}
+{% form_theme orderForm 'form/simple_checkbox.html.twig' %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            Generate Order and Print Labels
+        </h2>
+    </div>
+
+    {% include 'program/nph/order/partials/generate-orders-header.html.twig' %}
+
+    {% if samplesOrderIds is not empty %}
+        <div class="alert alert-warning">
+            <p><strong>Existing order found within this visit.</strong></p>
+            If you need to create a new order while a previous order exists, please cancel the existing order first.
+        </div>
+    {% endif %}
+
+    <div class="row" id="order_create"
+         data-samples="{{ samples|json_encode() }}"
+         data-time-points="{{ timePoints|json_encode() }}"
+         data-nail-samples="{{ nailSamples|json_encode() }}"
+         data-stool-samples="{{ stoolSamples|json_encode() }}">
+        <div class="col-sm-12">
+            {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
+                'order_create_form' } }) }}
+            {{ form_errors(orderForm) }}
+            <div>
+                <label>Select the sample and timepoints:</label>
+                <span class="well-sm bg-primary">
+                    <input type="checkbox" id="checkAll">
+                    Check All Timepoints and Samples
+                </span>
+            </div>
+            <br>
+            <div class="row">
+            {% for timePoint, orderSamples in timePointSamples %}
+                <div class="col-sm-4">
+                    <div class="panel panel-default timepoint-panel">
+                        <div class="panel-heading">
+                            <input type="checkbox" class="timepointCheckAll" data-timepoint="{{ timePoint }}">
+                            {{ form_label(orderForm[timePoint]) }}
+                        </div>
+                        <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
+                             data-timepoint="{{ timePoint }}">
+                            {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
+                                participant.id, module, visit, samplesStatus) }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            {{ form_rest(orderForm) }}
+                <div class="row">
+                    <a class="btn btn-default" href="#">Cancel</a>
+                    <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
+                </div>
+            {{ form_end(orderForm) }}
+            <br>
+        </div>
+    </div>
+
+    <div class="row" id="order_review" style="display: none">
+        <div class="col-sm-12">
+            <div>
+                <label>Review Timepoints/Samples</label>
+                <span class="alert well-sm bg-secondary pull-right text-white">
+                    Total # of Samples
+                    <span class="badge badge-light" id="samples_count">0</span>
+                </span>
+            </div>
+            <table class="table table-bordered" id="order_review_table">
+                <thead>
+                    <tr>
+                        <th>Timepoint</th>
+                        <th>Samples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-default" id="order_review_back_btn">Back</button>
+            <button type="button" class="btn btn-primary" id="order_generate_btn">
+                Generate Orders and Print Labels
+            </button>
+        </div>
+    </div>
+    <br>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order-create') }}
+{% endblock %}
