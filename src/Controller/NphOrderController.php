@@ -269,7 +269,7 @@ class NphOrderController extends BaseController
         $sampleRetryForm = $this->createForm(NphSampleRdrRetryType::class);
         $sampleRetryForm->handleRequest($request);
         if ($sampleRetryForm->isSubmitted()) {
-            if ($sample->hasRdrError() === false) {
+            if ($sample->hasRdrError() === false && $sample->hasEditedRdrError() === false) {
                 throw $this->createAccessDeniedException();
             }
             if ($nphOrderService->sendToRdr($order, $sample)) {

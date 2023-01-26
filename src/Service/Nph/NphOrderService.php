@@ -688,13 +688,18 @@ class NphOrderService
 
     public function sendToRdr(NphOrder $order, NphSample $sample): bool
     {
-        if ($sample->getModifyType() === NphSample::UNLOCK) {
+        if ($sample->getModifyType() === NphSample::UNLOCK || $sample->getModifyType() === NphSample::EDITED_RDR_ERROR) {
             $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend');
             if ($this->editRdrSample($order->getParticipantId(), $sample->getRdrId(), $sampleRdrObject)) {
                 $sample->setModifyType(NphSample::EDITED);
                 $this->em->persist($sample);
                 $this->em->flush();
                 return true;
+            } else {
+                $sample->setModifyType(NphSample::EDITED_RDR_ERROR);
+                $this->em->persist($sample);
+                $this->em->flush();
+                return false;
             }
         } else {
             $sampleRdrObject = $this->getRdrObject($order, $sample);
