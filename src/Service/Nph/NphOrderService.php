@@ -581,6 +581,7 @@ class NphOrderService
 
         } catch (\Exception $e) {
             $connection->rollback();
+            $this->em->refresh($sample);
         }
         return $status;
     }
