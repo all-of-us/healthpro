@@ -18,12 +18,14 @@
         <tbody>
         {% for group in app.session.get('managegroupsnph') %}
             {% set groupInfo = app.user.site(group, 'nphSites') %}
+            {% if groupInfo is not null %}
             <tr>
                 <td>
                     <h4><a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ groupInfo.name }}</a></h4>
                     <a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ group }}</a>
                 </td>
             </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>
