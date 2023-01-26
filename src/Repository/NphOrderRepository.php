@@ -43,4 +43,16 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getRecentOrdersBySite($siteId): array
+    {
+        return $this->createQueryBuilder('no')
+            ->where('no.createdTs >= :createdTs')
+            ->andWhere('no.site = :site')
+            ->setParameters(['site' => $siteId,  'createdTs' => (new \DateTime('-1 day'))->format('Y-m-d H:i:s')])
+            ->orderBy('no.createdTs', 'DESC')
+            ->addOrderBy('no.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
