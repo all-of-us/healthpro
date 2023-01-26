@@ -6,7 +6,7 @@
     background-color: #9ed101;
 }
 .navbar .navbar-nav>.open>a, .navbar .navbar-nav>.open>a:focus, .navbar .navbar-nav>.open>a:hover {
-    background-color: #526801;
+    background-color: #2C5F00;
 }
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
     color: #FFFFFF;
@@ -38,6 +38,9 @@
 }
 .nph-visit.nph-visit-badge {
     background-color: #667584;
+}
+.nph-samples-badge{
+    background-color: #235389;
 }
 .navbar .dropdown-menu-role {
     right: 0;
