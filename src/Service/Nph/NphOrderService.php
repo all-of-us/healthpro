@@ -501,13 +501,13 @@ class NphOrderService
         return false;
     }
 
-    public function saveOrderFinalization(array $formData, NphSample $sample): bool
+    public function saveSampleFinalization(array $formData, NphSample $sample): bool
     {
         $status = false;
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
-            $this->saveOrderFinalizationData($formData, $sample);
+            $this->saveSampleFinalizationData($formData, $sample);
             // Send sample to RDR, throw exception if failed.
             if ($this->sendToRdr($sample)) {
                 $status = true;
@@ -522,7 +522,7 @@ class NphOrderService
         return $status;
     }
 
-    public function saveOrderFinalizationData(array $formData, NphSample $sample): void
+    public function saveSampleFinalizationData(array $formData, NphSample $sample): void
     {
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();

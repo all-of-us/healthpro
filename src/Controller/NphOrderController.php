@@ -219,7 +219,7 @@ class NphOrderController extends BaseController
                 }
             }
             if ($sampleFinalizeForm->isValid()) {
-                if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                if ($nphOrderService->saveSampleFinalization($formData, $sample)) {
                     $this->addFlash('success', 'Sample finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,

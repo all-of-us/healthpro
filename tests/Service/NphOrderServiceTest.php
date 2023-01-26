@@ -326,7 +326,7 @@ class NphOrderServiceTest extends ServiceTestCase
     /**
      * @dataProvider orderFinalizationDataProvider
      */
-    public function testSaveOrderFinalizationData(
+    public function testSaveSampleFinalizationData(
         $timePoint,
         $orderType,
         $sampleCode,
@@ -351,7 +351,7 @@ class NphOrderServiceTest extends ServiceTestCase
             $finalizedFormData["{$aliquotCode}AliquotTs"][] = $aliquot[1];
             $finalizedFormData["{$aliquotCode}Volume"][] = floatval($aliquot[2]);
         }
-        $this->service->saveOrderFinalizationData($finalizedFormData, $nphSample);
+        $this->service->saveSampleFinalizationData($finalizedFormData, $nphSample);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
 
@@ -569,7 +569,7 @@ class NphOrderServiceTest extends ServiceTestCase
             "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => 'Test',
         ];
-        $this->service->saveOrderFinalizationData($finalizedFormData, $nphSample);
+        $this->service->saveSampleFinalizationData($finalizedFormData, $nphSample);
 
         $modificationFormData = [
             'reason' => $modifyReason
