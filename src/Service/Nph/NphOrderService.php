@@ -542,6 +542,8 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
+        $this->em->persist($sample);
+        $this->em->flush();
         if ($sample->getNphOrder()->getOrderType() === 'stool') {
             $order = $sample->getNphOrder();
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
@@ -549,6 +551,7 @@ class NphOrderService
             $this->em->flush();
         }
 
+        // Aliquot status is only set while editing a sample
         if ($sampleModifyType === NphSample::UNLOCK) {
             foreach ($sample->getNphAliquots() as $aliquot) {
                 if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
@@ -719,7 +722,6 @@ class NphOrderService
                 return $result->id;
             }
         } catch (\Exception $e) {
-            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }

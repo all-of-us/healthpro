@@ -9,6 +9,7 @@ use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
+use App\Form\Nph\NphSampleRdrRetryType;
 use App\Service\EnvironmentService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -203,6 +204,9 @@ class NphOrderController extends BaseController
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
+            if ($sample->isDisabled()) {
+                throw $this->createAccessDeniedException();
+            }
             $formData = $sampleData = $sampleFinalizeForm->getData();
             if (!empty($nphOrderService->getAliquots($sampleCode))) {
                 if ($sample->getModifyType() !== NphSample::UNLOCK && $nphOrderService->hasAtLeastOneAliquotSample(
@@ -217,9 +221,10 @@ class NphOrderController extends BaseController
             if ($sampleFinalizeForm->isValid()) {
                 if ($sample = $nphOrderService->saveOrderFinalization($formData, $sample)) {
                     if ($nphOrderService->sendToRdr($order, $sample)) {
-                        //TODO
+                        $this->addFlash('success', 'Order finalized');
+                    } else {
+                        $this->addFlash('error', 'Failed to finalize the sample. Please try again.');
                     }
-                    $this->addFlash('success', 'Order finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,
                         'orderId' => $orderId,
@@ -259,6 +264,21 @@ class NphOrderController extends BaseController
                 }
             }
         }
+
+        // Retry sending to RDR
+        $sampleRetryForm = $this->createForm(NphSampleRdrRetryType::class);
+        $sampleRetryForm->handleRequest($request);
+        if ($sampleRetryForm->isSubmitted()) {
+            if ($sample->hasRdrError() === false) {
+                throw $this->createAccessDeniedException();
+            }
+            if ($nphOrderService->sendToRdr($order, $sample)) {
+                $this->addFlash('success', 'Order finalized');
+            } else {
+                $this->addFlash('error', 'Failed to finalize the sample. Please try again.');
+            }
+        }
+
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
@@ -269,7 +289,8 @@ class NphOrderController extends BaseController
             'aliquots' => $nphOrderService->getAliquots($sampleCode),
             'sampleData' => $sampleData,
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
-            'modifyType' => $modifyType ?? ''
+            'modifyType' => $modifyType ?? '',
+            'sampleRetryForm' => $sampleRetryForm->createView()
         ]);
     }
 

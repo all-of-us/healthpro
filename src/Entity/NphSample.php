@@ -434,6 +434,11 @@ class NphSample
         return ($this->finalizedTs || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
     }
 
+    public function hasRdrError(): bool
+    {
+        return $this->finalizedTs && empty($this->rdrId);
+    }
+
     public function getModifyReasonDisplayText(): string
     {
         $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
