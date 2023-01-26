@@ -9,14 +9,16 @@ use App\Repository\NphOrderRepository;
 class NphOrderRepositoryTest extends RepositoryTestCase
 {
     private $repo;
+    private $nphOrder;
 
     public function setup(): void
     {
         parent::setUp();
         $this->repo = static::$container->get(NphOrderRepository::class);
+        $this->nphOrder = $this->createTestOrder();
     }
 
-    public function testGetOrdersByVisitType(): void
+    private function createTestOrder(): NphOrder
     {
         $user = $this->getUser();
         $siteId = $this->getSite()->getGoogleGroup();
@@ -26,6 +28,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $nphOrder->setTimepoint('preLMT');
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId('P000000001');
+        $nphOrder->setBiobankId('T0000000001');
         $nphOrder->setUser($user);
         $nphOrder->setSite($siteId);
         $nphOrder->setCreatedTs(new \DateTime());
@@ -37,10 +40,29 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $nphSample->setNphOrder($nphOrder);
         $nphSample->setSampleId('100000002');
         $nphSample->setSampleCode('URINES');
+        $nphSample->setSampleGroup('100000008');
         $this->em->persist($nphSample);
         $this->em->flush();
+        $nphSample2 = new NphSample();
+        $nphSample2->setNphOrder($nphOrder);
+        $nphSample2->setSampleId('100000003');
+        $nphSample2->setSampleCode('URINES');
+        $nphSample2->setSampleGroup('100000008');
+        $this->em->persist($nphSample2);
+        $this->em->flush();
+        return $nphOrder;
+    }
 
-        $orders = $this->repo->getOrdersByVisitType($user, 'P000000001', 'LMT');
-        $this->assertSame($nphOrder, $orders[0]);
+
+    public function testGetOrdersByVisitType(): void
+    {
+        $orders = $this->repo->getOrdersByVisitType('P000000001', 'LMT');
+        $this->assertSame($this->nphOrder, $orders[0]);
+    }
+
+    public function testGetOrdersBySampleGroup(): void
+    {
+        $orders = $this->repo->getOrdersBySampleGroup('P000000001', '100000008');
+        $this->assertSame($this->nphOrder, $orders[0]);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Problem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type as Type;
 use Symfony\Component\Validator\Constraints as Constraints;
@@ -21,9 +20,16 @@ class ParticipantLookupIdType extends AbstractType
                     new Constraints\Type('string')
                 ],
                 'attr' => [
-                    'placeholder' => 'P000000000'
+                    'placeholder' => $options['placeholder'] ?? 'P000000000'
                 ]
             ])
         ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'placeholder' => null
+        ]);
     }
 }

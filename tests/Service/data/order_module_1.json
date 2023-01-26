@@ -1,6 +1,6 @@
 {
   "timePoints": {
-    "preLMT": "Pre LMT",
+    "preLMT": "Pre DSMT",
     "minus15min": "-15 Min",
     "minus5min": "-5 Min",
     "15min": "15 Min",
@@ -9,11 +9,11 @@
     "90min": "90 Min",
     "120min": "120 Min",
     "240min": "240 Min",
-    "postLMT": "Post LMT"
+    "postLMT": "Post DSMT"
   },
   "samples": {
     "SST8P5": "8.5 mL SST",
-    "PST8": "8 mL PST",
+    "LIHP1": "6 mL Lithium Heparin",
     "EDTA10": "10 mL EDTA",
     "P800": "2 mL P800",
     "URINES": "Spot Urine",
@@ -44,55 +44,54 @@
     },
     "minus15min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "minus5min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "15min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "30min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "60min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "90min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "120min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "240min": {
       "SST8P5": "8.5 mL SST",
-      "PST8": "8 mL PST",
+      "LIHP1": "6 mL Lithium Heparin",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "postLMT": {
-      "URINES": "Spot Urine",
-      "SALIVA": "Saliva"
+      "URINES": "Spot Urine"
     }
   },
   "nailSamples": [
@@ -107,7 +106,7 @@
   ],
   "bloodSamples": [
     "SST8P5",
-    "PST8",
+    "LIHP1",
     "EDTA10",
     "P800"
   ],
@@ -121,19 +120,18 @@
     ],
     "30min": [
       "SST8P5",
-      "PST8",
+      "LIHP1",
       "EDTA10",
       "P800"
     ],
     "240min": [
       "SST8P5",
-      "PST8",
+      "LIHP1",
       "EDTA10",
       "P800"
     ],
     "postLMT": [
-      "URINES",
-      "SALIVA"
+      "URINES"
     ],
     "stoolKit": "KIT-000000001",
     "ST1": "T0000000001",

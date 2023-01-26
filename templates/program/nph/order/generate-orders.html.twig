@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 {% import 'program/nph/order/samples.html.twig' as samples %}
 {% block title %} Generate Orders - {% endblock %}
+{% form_theme orderForm 'form/simple_checkbox.html.twig' %}
 {% block body %}
     <div class="page-header">
         <h2>
@@ -30,24 +31,33 @@
             <div>
                 <label>Select the sample and timepoints:</label>
                 <span class="well-sm bg-primary">
-                    <input type="checkbox">
+                    <input type="checkbox" id="checkAll">
                     Check All Timepoints and Samples
                 </span>
             </div>
             <br>
+            <div class="row">
             {% for timePoint, orderSamples in timePointSamples %}
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <input type="checkbox"> {{ form_label(orderForm[timePoint]) }}
-                    </div>
-                    <div class="panel-body timepoint-samples" data-timepoint="{{ timePoint }}">
-                        {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds) }}
+                <div class="col-sm-4">
+                    <div class="panel panel-default timepoint-panel">
+                        <div class="panel-heading">
+                            <input type="checkbox" class="timepointCheckAll" data-timepoint="{{ timePoint }}">
+                            {{ form_label(orderForm[timePoint]) }}
+                        </div>
+                        <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
+                             data-timepoint="{{ timePoint }}">
+                            {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
+                                participant.id, module, visit, samplesStatus) }}
+                        </div>
                     </div>
                 </div>
             {% endfor %}
+            </div>
             {{ form_rest(orderForm) }}
-            <a class="btn btn-default" href="#">Cancel</a>
-            <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
+                <div class="row">
+                    <a class="btn btn-default" href="#">Cancel</a>
+                    <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
+                </div>
             {{ form_end(orderForm) }}
             <br>
         </div>

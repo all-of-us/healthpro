@@ -13,25 +13,34 @@ class HelpService
         $this->params = $params;
     }
 
+    public static $SupportedLanguages = [
+        'en',
+        'es'
+    ];
+
     public static $documentGroups = [
         [
             'title' => 'Physical Measurements for DVs and HPOs',
             'documents' => [
                 'SOP-012' => [
                     'title' => 'SOP-012 Blood Pressure Measurement',
-                    'filename' => 'SOP-012 Blood Pressure Measurement.pdf'
+                    'filename' => 'SOP-012 Blood Pressure Measurement.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-013' => [
                     'title' => 'SOP-013 Heart Rate Measurement',
-                    'filename' => 'SOP-013 Heart Rate Measurement.pdf'
+                    'filename' => 'SOP-013 Heart Rate Measurement.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-014' => [
                     'title' => 'SOP-014 Height and Weight Measurement',
-                    'filename' => 'SOP-014 Height and Weight Measurement.pdf'
+                    'filename' => 'SOP-014 Height and Weight Measurement.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-015' => [
                     'title' => 'SOP-015 Waist-Hip Circumference Measurement',
-                    'filename' => 'SOP-015 Waist-Hip Circumference Measurement.pdf'
+                    'filename' => 'SOP-015 Waist-Hip Circumference Measurement.pdf',
+                    'languages' => ['es', 'en']
                 ]
             ]
         ],
@@ -40,43 +49,53 @@ class HelpService
             'documents' => [
                 'SOP-001' => [
                     'title' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Label and Test Requisition',
-                    'filename' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf'
+                    'filename' => 'SOP-001 HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-003' => [
                     'title' => 'SOP-003 HPO Blood Specimens Collection and Processing',
-                    'filename' => 'SOP-003 HPO Blood Specimens Collection and Processing.pdf'
+                    'filename' => 'SOP-003 HPO Blood Specimens Collection and Processing.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-005' => [
                     'title' => 'SOP-005 HPO Urine Specimen Collection',
-                    'filename' => 'SOP-005 HPO Urine Specimen Collection.pdf'
+                    'filename' => 'SOP-005 HPO Urine Specimen Collection.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-007' => [
                     'title' => 'SOP-007 HPO Saliva Oragene Collection',
-                    'filename' => 'SOP-007 HPO Saliva Oragene Collection.pdf'
+                    'filename' => 'SOP-007 HPO Saliva Oragene Collection.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-009' => [
                     'title' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up',
-                    'filename' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up.pdf'
+                    'filename' => 'SOP-009 HPO Preparing Biobank Orders for Courier Pick-up.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-010' => [
                     'title' => 'SOP-010 HPO Ordering Supplies from MML',
-                    'filename' => 'SOP-010 HPO Ordering Supplies from MML.pdf'
+                    'filename' => 'SOP-010 HPO Ordering Supplies from MML.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-018' => [
                     'title' => 'SOP-018 HPO Specimen Rejection Criteria',
-                    'filename' => 'SOP-018 HPO Specimen Rejection Criteria.pdf'
+                    'filename' => 'SOP-018 HPO Specimen Rejection Criteria.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-020' => [
                     'title' => 'SOP-020 HPO Biobank Order Downtime Procedure',
-                    'filename' => 'SOP-020 HPO Biobank Order Downtime Procedure.pdf'
+                    'filename' => 'SOP-020 HPO Biobank Order Downtime Procedure.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-022' => [
                     'title' => 'SOP-022 HPO Cancelling, Editing, & Restoring Biobank Orders',
-                    'filename' => 'SOP-022 HPO Cancelling, Editing, & Restoring Biobank Orders.pdf'
+                    'filename' => 'SOP-022 HPO Cancelling, Editing, & Restoring Biobank Orders.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-026' => [
                     'title' => 'SOP-026 HPO Biobank Order Review',
-                    'filename' => 'SOP-026 HPO Biobank Order Review.pdf'
+                    'filename' => 'SOP-026 HPO Biobank Order Review.pdf',
+                    'languages' => ['es', 'en']
                 ]
             ]
         ],
@@ -85,35 +104,43 @@ class HelpService
             'documents' => [
                 'SOP-002' => [
                     'title' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order',
-                    'filename' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf'
+                    'filename' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-004' => [
                     'title' => 'SOP-004 DV Blood Specimens Collection and Processing',
-                    'filename' => 'SOP-004 DV Blood Specimens Collection and Processing.pdf'
+                    'filename' => 'SOP-004 DV Blood Specimens Collection and Processing.pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-006' => [
                     'title' => 'SOP-006 DV Urine Specimen Collection',
-                    'filename' => 'SOP-006 DV Urine Specimen Collection.pdf'
+                    'filename' => 'SOP-006 DV Urine Specimen Collection.pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-011' => [
                     'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
-                    'filename' => 'SOP-011 DV Packaging and Shipping PMI Specimens.pdf'
+                    'filename' => 'SOP-011 DV Packaging and Shipping PMI Specimens.pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-019' => [
                     'title' => 'SOP-019 DV Specimen Rejection Criteria',
-                    'filename' => 'SOP-019 DV Specimen Rejection Criteria.pdf'
+                    'filename' => 'SOP-019 DV Specimen Rejection Criteria.pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-021' => [
                     'title' => 'SOP-021 DV Biobank Order Downtime Procedure',
-                    'filename' => 'SOP-021 DV Biobank Order Downtime Procedure.pdf'
+                    'filename' => 'SOP-021 DV Biobank Order Downtime Procedure.pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-023' => [
                     'title' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders',
-                    'filename' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders .pdf'
+                    'filename' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders .pdf',
+                    'languages' => ['en']
                 ],
                 'SOP-025' => [
                     'title' => 'SOP-025 DV Biobank Order Review',
-                    'filename' => 'SOP-025 DV Biobank Order Review.pdf'
+                    'filename' => 'SOP-025 DV Biobank Order Review.pdf',
+                    'languages' => ['en']
                 ]
             ]
         ],
@@ -122,23 +149,33 @@ class HelpService
             'documents' => [
                 'HPRO SOP-001' => [
                     'title' => 'HPRO SOP-001 Report of Death in HealthPro',
-                    'filename' => 'HPRO SOP-001 Report of Death in HealthPro.pdf'
+                    'filename' => 'HPRO SOP-001 Report of Death in HealthPro.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'HPRO SOP-002' => [
                     'title' => 'HPRO SOP-002 HealthPro Incentive Tracking Feature',
-                    'filename' => 'HPRO SOP-002 HealthPro Incentive Tracking Feature.pdf'
+                    'filename' => 'HPRO SOP-002 HealthPro Incentive Tracking Feature.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'HPRO SOP-003' => [
                     'title' => 'HPRO SOP-003 On-Site ID Verification Feature',
-                    'filename' => 'HPRO SOP-003 On-Site ID Verification Feature.pdf'
+                    'filename' => 'HPRO SOP-003 On-Site ID Verification Feature.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'HPRO SOP-004' => [
                     'title' => 'HPRO SOP-004 Patient Status Flag',
-                    'filename' => 'HPRO SOP-004 Patient Status Flag.pdf'
+                    'filename' => 'HPRO SOP-004 Patient Status Flag.pdf',
+                    'languages' => ['es', 'en']
                 ],
                 'HPRO SOP-005' => [
                     'title' => 'HPRO SOP-005 HealthPro Imports Feature',
-                    'filename' => 'HPRO SOP-005 HealthPro Imports Feature.pdf'
+                    'filename' => 'HPRO SOP-005 HealthPro Imports Feature.pdf',
+                    'languages' => ['es', 'en']
+                ],
+                'HPRO SOP-006' => [
+                    'title' => 'HPRO SOP-006 On-Site Details Reporting',
+                    'filename' => 'HPRO SOP-006 On-Site Details Reporting.pdf',
+                    'languages' => ['es', 'en']
                 ]
             ]
         ]

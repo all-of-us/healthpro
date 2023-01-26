@@ -43,6 +43,7 @@ class NphOrderForm extends AbstractType
         FormBuilderInterface $builder,
         array $options,
         string $sample,
+        bool $disabled = false,
         string $formType = 'finalize'
     ): void {
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
@@ -61,7 +62,7 @@ class NphOrderForm extends AbstractType
             });
         }
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-            'required' => false,
+            'required' => $formType === 'finalize',
             'label' => 'Collection Time',
             'widget' => 'single_text',
             'format' => 'M/d/yyyy h:mm a',
@@ -71,12 +72,14 @@ class NphOrderForm extends AbstractType
             'constraints' => $constraints,
             'attr' => [
                 'class' => 'order-ts',
-            ]
+            ],
+            'disabled' => $disabled
         ]);
         $builder->add("{$sample}Notes", Type\TextareaType::class, [
             'label' => 'Notes',
             'required' => false,
-            'constraints' => new Constraints\Type('string')
+            'constraints' => new Constraints\Type('string'),
+            'disabled' => $disabled
         ]);
     }
 

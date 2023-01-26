@@ -13,40 +13,44 @@
       "aliquots": {
         "SST8P5A1": {
           "identifier": "SSTS1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 500μL",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
         "SST8P5A2": {
           "identifier": "SSTS1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 1000μL",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
           "units": "μL"
         }
       }
     },
-    "PST8": {
-      "label": "8 mL PST",
+    "LIHP1": {
+      "label": "6 mL Lithium Heparin",
       "color": "Green and gray",
       "temperature": "Refrigerated",
-      "specimen": "Plasma PST",
+      "specimen": "Plasma",
       "type": "blood",
-      "identifier": "PST8",
-      "collectionVolume": "8 mL",
+      "identifier": "LiH6",
+      "collectionVolume": "6 mL",
       "aliquots": {
-        "PST8A1": {
-          "identifier": "LHPSTP1",
+        "LIHP1A1": {
+          "identifier": "LiHP1",
           "container": "1.4mL Matrix tube",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
-        "PST8A2": {
-          "identifier": "LHPSTP1",
+        "LIHP1A2": {
+          "identifier": "LiHP1",
           "container": "1.4mL Matrix tube",
-          "expectedAliquots": 3,
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 2,
           "expectedVolume": 1000,
           "units": "μL"
         }
@@ -63,14 +67,16 @@
       "aliquots": {
         "EDTA10A1": {
           "identifier": "EDPAP1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 500μL",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
         "EDTA10A2": {
           "identifier": "EDPAP1",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube 1000μL",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 4,
           "expectedVolume": 1000,
           "units": "μL"
@@ -89,6 +95,7 @@
         "P800A1": {
           "identifier": "P800P1",
           "container": "1.4mL Matrix tube",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 500,
           "units": "μL"
@@ -107,6 +114,7 @@
         "URINESA1": {
           "identifier": "RU1",
           "container": "1.4mL Matrix tube",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 7,
           "expectedVolume": 500,
           "units": "μL"
@@ -114,6 +122,7 @@
         "URINESA2": {
           "identifier": "RU2",
           "container": "6mL Urine Aliquot tube",
+          "description": "6mL Urine Aliquot tube",
           "expectedAliquots": 1,
           "expectedVolume": 5,
           "units": "mL"
@@ -132,6 +141,7 @@
         "SALIVAA1": {
           "identifier": "SA1",
           "container": "5mL Matrix tube",
+          "description": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 4,
           "units": "mL"
@@ -149,6 +159,7 @@
         "HAIRA1": {
           "identifier": "HA1",
           "container": "Plastic Storage Bag",
+          "description": "Plastic Storage Bag",
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null
@@ -175,6 +186,7 @@
         "NAILBA1": {
           "identifier": "NA1",
           "container": "5mL Matrix tube",
+          "description": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null
@@ -192,6 +204,7 @@
         "NAILLA1": {
           "identifier": "NA2",
           "container": "5mL Matrix tube",
+          "description": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null

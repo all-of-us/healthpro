@@ -1,5 +1,5 @@
 .navbar, .navbar .navbar-toggle {
-    background-color: #719500;
+    background-color: #459500;
 }
 
 .navbar .navbar-toggle:focus, .navbar .navbar-toggle:hover {
@@ -8,3 +8,57 @@
 .navbar .navbar-nav>.open>a, .navbar .navbar-nav>.open>a:focus, .navbar .navbar-nav>.open>a:hover {
     background-color: #526801;
 }
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
+    color: #FFFFFF;
+}
+@media(max-width:767px) {
+    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+        color: #FFFFFF;
+    }
+}
+.nav-tabs > li.participant-module.active > a {
+    background-color: #235389;
+    color: #FFFFFF;
+}
+.nav-pills.nav > li.participant-activity.active > a {
+    background-color: #667584;
+    color: #FFFFFF;
+}
+.nph-module-badge.nph-module-1 {
+    background-color: #5D01A5;
+}
+.nph-module-badge.nph-module-2 {
+    background-color: #FF8813;
+}
+.nph-module-badge.nph-module-3 {
+    background-color: #C0143C;
+}
+.well-sm.well.visit-dropdown {
+    background-color: #D7DBDE;
+}
+.nph-visit.nph-visit-badge {
+    background-color: #667584;
+}
+.navbar .dropdown-menu-role {
+    right: 0;
+    left: -15px;
+    font-size: 17px;
+    min-width: 280px
+}
+.timepoint-panel {
+    min-height: 220px;
+}
+.participant-activity-div {
+    margin-top: 20px;
+}
+.participant-modules {
+    margin-top: 10px;
+    border-left: 1px solid #eeeeee
+}
+.participant-information {
+    padding-bottom: 20px;
+}
+.participant-module-header {
+    padding-left: 0;
+}
+

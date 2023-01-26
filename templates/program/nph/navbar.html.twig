@@ -11,7 +11,7 @@
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
                         <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH Logo"/>
+                            <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-role navbar-program">
                             {% if siteInfo.canSwitchProgram %}
@@ -28,7 +28,7 @@
                 <ul class="nav navbar-nav navbar-nav-role">
                     <li class="dropdown">
                         <a class="navbar-brand dropdown-toggle" href="{# TODO: Path to NPH Home #}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            Nutrition for Precision Health
+                            NPH
                             {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
                                 <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
                             {% endif %}
@@ -50,29 +50,25 @@
                                     </a>
                                 </li>
                             {% endif %}
-                            {% for key, roleNav in roleNavs|filter((roleNav, key) =>
-                                is_granted(roleNav.role) and
-                                not (key == 'biobank')
-                                ) %}
-                                {# Scripps and biobank roles point to the same route, so only display one if user has both roles #}
+                            {% if is_granted('ROLE_NPH_ADMIN') %}
                                 <li>
-                                    <a href="{{ path(roleNav.path) }}">
+                                    <a href="{{ path('nph_admin_home') }}">
                                         <i class="fas fa-arrow-circle-right"></i>
-                                        {% if key == currentRoleNav %}
-                                            <strong>{{ roleNav.title }}</strong>
+                                        {% if currentRoleNav == 'admin' %}
+                                            <strong>Admin</strong>
                                         {% else %}
-                                            {{ roleNav.title }}
+                                            Admin
                                         {% endif %}
                                     </a>
                                 </li>
-                            {% endfor %}
+                            {% endif %}
                         </ul>
                     </li>
                 </ul>
             {% else %}
-                <a class="navbar-brand" href="{# TODO: Path to NPH Home #}">
-                    <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH Logo"/>
-                    HealthPro
+                <a class="navbar-brand" href="{{ path('home') }}">
+                    <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
+                    NPH
                     {% if isTraining %}
                         <div class="navbar-brand-subtitle">training</div>
                     {% endif %}
@@ -86,7 +82,7 @@
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lookup <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{# TODO: Path to NPH Participant Lookup #}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
+                                <li><a href="{{ path('nph_participants') }}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
                                 <li><a href="{# TODO: Path to NPH Order Lookup #}"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Order Lookup</a></li>
                             </ul>
                         </li>
@@ -129,31 +125,6 @@
                         {% endif %}
                     {% endif %}
 
-                    {% if app.request.get('_route') != 'site_select' %}
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-bell" aria-hidden="true"></i>
-                                {% if notifications_count > 0 %}
-                                    <span class="badge badge-notify" id="notifications_count">{{ notifications_count }}</span>
-                                {% endif %}
-                            </a>
-                            {% include '/partials/notifications-dropdown.html.twig' %}
-                        </li>
-                    {% endif %}
-
-                    <li class="dropdown">
-                        <a href="{# TODO: Path to NPH Help #}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{# TODO: Path to NPH Training #}"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
-                            <li><a href="{# TODO: Path to NPH FAQ #}"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</a></li>
-                            <li><a href="{# TODO: Path to NPH SOP's #}"><i class="fa fa-file-text-o" aria-hidden="true"></i> NPH SOPs</a></li>
-                            <li><a href="{{ confluenceResources.ops_data_api }}" target="_blank"><i class="fa fa-files-o" aria-hidden="true"></i> OpsData API Resources</a></li>
-                            <li><a href="{{ confluenceResources.data_dictionaries }}" target="_blank"><i class="fa fa-table" aria-hidden="true"></i> HealthPro Data Dictionaries</a></li>
-                            <li><a href="{{ confluenceResources.release_notes }}" target="_blank"><i class="fa fa-sticky-note" aria-hidden="true"></i> HealthPro Release Notes</a></li>
-                            <li><a href="{{ feedback_url }}" target="_blank"><i class="fa fa-comment-dots" aria-hidden="true"></i> Submit Feedback</a></li>
-                            <li><a href="{{ report_technical_issue_url }}" target="_blank"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Report Technical Issue</a></li>
-                        </ul>
-                    </li>
                     <li class="dropdown">
                         <a href="{# TODO: NPH Settings #}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">

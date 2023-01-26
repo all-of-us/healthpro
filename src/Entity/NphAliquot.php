@@ -51,6 +51,11 @@ class NphAliquot
      */
     private $units;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $status;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -80,12 +85,12 @@ class NphAliquot
         return $this;
     }
 
-    public function getAliquotTs(): ?\DateTimeInterface
+    public function getAliquotTs(): ?\DateTime
     {
         return $this->aliquotTs;
     }
 
-    public function setAliquotTs(\DateTimeInterface $aliquotTs): self
+    public function setAliquotTs(\DateTime $aliquotTs): self
     {
         $this->aliquotTs = $aliquotTs;
 
@@ -124,6 +129,18 @@ class NphAliquot
     public function setUnits(?string $units): self
     {
         $this->units = $units;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

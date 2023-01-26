@@ -54,11 +54,8 @@ class NphAdminController extends BaseController
         NphSiteRepository $nphSiteRepository,
         LoggerService $loggerService,
         Request $request,
-        ParameterBagInterface $params,
-        EnvironmentService $env,
         $id = null
     ) {
-        $syncEnabled = $params->has('nph_sites_use_rdr') ? $params->get('nph_sites_use_rdr') : false;
         if ($id) {
             $site = $nphSiteRepository->find($id);
             if (!$site) {
@@ -72,17 +69,12 @@ class NphAdminController extends BaseController
                 return $this->redirectToRoute('nph_admin_sites');
             }
         } else {
-            if ($syncEnabled) {
-                // can't create new sites if syncing from rdr
-                throw $this->createNotFoundException('Sites cannot be created when the RDR Awardee API is enabled.');
-            }
             $site = null;
         }
-        $disabled = $syncEnabled ? true : false;
-        $form = $this->createForm(NphSiteType::class, $site, ['isDisabled' => $disabled, 'isProd' => $env->isProd()]);
+        $form = $this->createForm(NphSiteType::class, $site);
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
-            if ($form->isValid() && !$syncEnabled) {
+            if ($form->isValid()) {
                 if ($site) {
                     $duplicateGoogleGroup = $nphSiteRepository->getDuplicateGoogleGroup($form['google_group']->getData(), $id);
                 } else {
@@ -112,7 +104,6 @@ class NphAdminController extends BaseController
                 }
             }
         }
-        $form = $this->createForm(NphSiteType::class, $site, ['isDisabled' => false, 'isProd' => $env->isProd()]);
         return $this->render('program/nph/admin/sites/edit.html.twig', [
             'site' => $site,
             'siteForm' => $form->createView()

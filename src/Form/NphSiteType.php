@@ -12,20 +12,12 @@ use Symfony\Component\Validator\Validation;
 
 class NphSiteType extends AbstractType
 {
-    public const FIXED_ANGLE = 'fixed_angle';
-    public const SWINGING_BUCKET = 'swinging_bucket';
-
     public static $siteChoices = [
         'status' => [
             'Active'=> 1,
             'Inactive' => 0
-        ],
-        'centrifuge_type' => [
-            'Fixed Angle' => self::FIXED_ANGLE,
-            'Swinging Bucket' => self::SWINGING_BUCKET
         ]
     ];
-
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -36,14 +28,12 @@ class NphSiteType extends AbstractType
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
-                ],
-                'disabled' => $options['isDisabled'],
+                ]
             ])
             ->add('status', Type\ChoiceType::class, [
                 'label' => 'Status',
                 'required' => true,
-                'choices' => self::$siteChoices['status'],
-                'disabled' => $options['isDisabled']
+                'choices' => self::$siteChoices['status']
             ])
             ->add('google_group', Type\TextType::class, [
                 'label' => 'Google Group',
@@ -51,32 +41,28 @@ class NphSiteType extends AbstractType
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
-                ],
-                'disabled' => $options['isDisabled'],
+                ]
             ])
             ->add('organization_id', Type\TextType::class, [
                 'label' => 'Organization',
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('awardee_id', Type\TextType::class, [
                 'label' => 'Awardee',
                 'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'constraints' => new Constraints\Type('string')
+            ])
+            ->add('mayolink_account', Type\TextType::class, [
+                'label' => 'MayoLINK Account',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
             ])
             ->add('type', Type\TextType::class, [
-                'label' => 'Type (e.g. HPO, DV)',
+                'label' => 'Type (e.g. HPO)',
                 'required' => false,
                 'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
-            ])
-            ->add('site_type', Type\TextType::class, [
-                'label' => 'Site Type',
-                'required' => false,
-                'constraints' => new Constraints\Type('string'),
-                'disabled' => $options['isDisabled'],
+                'empty_data' => 'HPO'
             ])
             ->add('email', Type\TextType::class, [
                 'label' => 'Email address(es)',
@@ -102,24 +88,14 @@ class NphSiteType extends AbstractType
                             }
                         }
                     })
-                ],
-                'disabled' => $options['isDisabled'] && $options['isProd'],
-            ])
-            ->add('centrifuge_type', Type\ChoiceType::class, [
-                'label' => 'Centrifuge type',
-                'required' => false,
-                'choices' => self::$siteChoices['centrifuge_type'],
-                'multiple' => false,
-                'placeholder' => '-- Select centrifuge type --'
+                ]
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => NphSite::class,
-            'isDisabled' => false,
-            'isProd' => false
+            'data_class' => NphSite::class
         ]);
     }
 }

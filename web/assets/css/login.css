@@ -29,7 +29,7 @@ body {
 #login-action {
     min-height: 250px;
     margin-top: 5rem;
-    margin-bottom: 10rem;
+    margin-bottom: 1rem;
 }
 #login-action img {
     max-width: 250px;
@@ -58,7 +58,12 @@ body {
     top: 75px;
 }
 #login-carousel > div {
-    min-height: 155px;
+    min-height: 110px;
+}
+
+.carousel {
+    margin-left: 7rem;
+    margin-right: 7rem;
 }
 @media (max-width: 970px){
     #login-logo {

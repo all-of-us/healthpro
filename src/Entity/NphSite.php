@@ -49,16 +49,6 @@ class NphSite
     private $type;
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
-    private $siteType;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $centrifugeType;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $deleted = false;
@@ -67,6 +57,11 @@ class NphSite
      * @ORM\Column(type="string", length=512, nullable=true)
      */
     private $email;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $mayolinkAccount;
 
     public function getId(): ?int
     {
@@ -145,30 +140,6 @@ class NphSite
         return $this;
     }
 
-    public function getSiteType(): ?string
-    {
-        return $this->siteType;
-    }
-
-    public function setSiteType(?string $siteType): self
-    {
-        $this->siteType = $siteType;
-
-        return $this;
-    }
-
-    public function getCentrifugeType(): ?string
-    {
-        return $this->centrifugeType;
-    }
-
-    public function setCentrifugeType(?string $centrifugeType): self
-    {
-        $this->centrifugeType = $centrifugeType;
-
-        return $this;
-    }
-
     public function getDeleted(): ?bool
     {
         return $this->deleted;
@@ -191,5 +162,22 @@ class NphSite
         $this->email = $email;
 
         return $this;
+    }
+
+    public function getMayolinkAccount(): ?string
+    {
+        return $this->mayolinkAccount;
+    }
+
+    public function setMayolinkAccount(?string $mayolinkAccount): self
+    {
+        $this->mayolinkAccount = $mayolinkAccount;
+
+        return $this;
+    }
+
+    public static function getSiteIdWithPrefix(string $site): string
+    {
+        return \App\Security\User::SITE_NPH_PREFIX . $site;
     }
 }

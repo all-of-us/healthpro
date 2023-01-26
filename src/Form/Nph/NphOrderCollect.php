@@ -13,19 +13,26 @@ class NphOrderCollect extends NphOrderForm
     {
         $samples = $options['samples'];
         $orderType = $options['orderType'];
-        foreach ($samples as $sample => $sampleLabel) {
-            $builder->add($sample, Type\CheckboxType::class, [
+        $sampleIndex = 1;
+        foreach ($samples as $sampleCode => $sample) {
+            $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
+            $builder->add($sampleCode, Type\CheckboxType::class, [
                 'label' => $sampleLabel,
                 'required' => false,
                 'constraints' => [
-                    new Constraints\Callback(function ($value, $context) use ($sample) {
-                        if ($value === false && !empty($context->getRoot()["{$sample}CollectedTs"]->getData())) {
+                    new Constraints\Callback(function ($value, $context) use ($sampleCode) {
+                        if ($value === false && !empty($context->getRoot()["{$sampleCode}CollectedTs"]->getData())) {
                             $context->buildViolation('Collected sample required')->addViolation();
                         }
                     })
-                ]
+                ],
+                'attr' => [
+                    'data-sample-id' => $sample['id'],
+                ],
+                'disabled' => $sample['disabled']
             ]);
-            $this->addCollectedTimeAndNoteFields($builder, $options, $sample, 'collect');
+            $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, $sample['disabled'], 'collect');
+            $sampleIndex++;
         }
 
         if ($orderType === 'urine') {

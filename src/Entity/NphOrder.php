@@ -64,21 +64,6 @@ class NphOrder
     private $createdTs;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $cancelledTs;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     */
-    private $cancelledUser;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $cancelledSite;
-
-    /**
      * @ORM\OneToMany(targetEntity=NphSample::class, mappedBy="nphOrder")
      */
     private $nphSamples;
@@ -92,6 +77,11 @@ class NphOrder
      * @ORM\Column(type="text", nullable=true)
      */
     private $metadata;
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $biobankId;
 
     public function __construct()
     {
@@ -187,50 +177,14 @@ class NphOrder
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): ?\DateTime
     {
         return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $createdTs): self
+    public function setCreatedTs(\DateTime $createdTs): self
     {
         $this->createdTs = $createdTs;
-
-        return $this;
-    }
-
-    public function getCancelledTs(): ?\DateTimeInterface
-    {
-        return $this->cancelledTs;
-    }
-
-    public function setCancelledTs(?\DateTimeInterface $cancelledTs): self
-    {
-        $this->cancelledTs = $cancelledTs;
-
-        return $this;
-    }
-
-    public function getCancelledUser(): ?User
-    {
-        return $this->cancelledUser;
-    }
-
-    public function setCancelledUser(?User $cancelledUser): self
-    {
-        $this->cancelledUser = $cancelledUser;
-
-        return $this;
-    }
-
-    public function getCancelledSite(): ?string
-    {
-        return $this->cancelledSite;
-    }
-
-    public function setCancelledSite(?string $cancelledSite): self
-    {
-        $this->cancelledSite = $cancelledSite;
 
         return $this;
     }
@@ -287,5 +241,58 @@ class NphOrder
         $this->metadata = $metadata;
 
         return $this;
+    }
+
+    public function canCancel(): bool
+    {
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() !== NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function canRestore(): bool
+    {
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() === NphSample::CANCEL) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function canModify($type): bool
+    {
+        if ($type === NphSample::CANCEL) {
+            return $this->canCancel();
+        }
+        if ($type === NphSample::RESTORE) {
+            return $this->canRestore();
+        }
+        return false;
+    }
+
+    public function getBiobankId(): ?string
+    {
+        return $this->biobankId;
+    }
+
+    public function setBiobankId(string $biobankId): self
+    {
+        $this->biobankId = $biobankId;
+
+        return $this;
+    }
+
+    public function getSampleGroupBySampleCode(string $sampleCode): ?string
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getSampleCode() === $sampleCode) {
+                return $nphSample->getSampleGroup();
+            }
+        }
+        throw new \ErrorException("Sample group not found for SampleCode $sampleCode with SampleId $this->id");
     }
 }

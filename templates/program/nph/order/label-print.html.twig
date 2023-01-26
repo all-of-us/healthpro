@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello NphParticipantSummaryController!{% endblock %}
+{% block title %}NPH Print Label{% endblock %}
 
 {% block body %}
     <div class="page-header">
@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            {% include 'program/nph/order/partials/participant-dl.html.twig' %}
+            {% include 'program/nph/order/partials/participant-details-with-name.html.twig' %}
         </div>
         <div class="col-sm-6">
             <div class="alert well-sm bg-warning-new">Module | NPH Module {{ module }}</div>
@@ -46,7 +46,7 @@
                         {% for sampleCode,sampleInfo in orderInfo %}
                              <tr>
                                  {% if printOrderTD %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderId}) }}">{{ orderId }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.healthProOrderId}) }}">{{ sampleInfo.orderId }}</a></td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.timepointDisplayName }}</td>
                                     <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.sampleTypeDisplayName }}</td>
                                     {% set printOrderTD = false %}
@@ -62,7 +62,7 @@
         <div class="col-sm-6" style="height: 600px">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                        <a class="pull-right" href="{{ path('nph_render_pdf', {'participantid': participant.id,'module': module,'visit': visit}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                        <a class="pull-right" href="{{ path('nph_render_pdf_sample_group', {'participantId': participant.id,'module': module,'visit': visit, 'sampleGroup': sampleGroup}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
                     <h3 class="panel-title">Labels</h3>
                 </div>
                 <div class="panel-body">
@@ -74,12 +74,13 @@
                             </a>
                         </p>
                     </div>
-                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('nph_render_pdf', {'participantid': participant.id,'module': module,'visit': visit}) }}"></iframe>
+                    <iframe name="labels" class="pdf pdf-labels" src="{{ path('nph_render_pdf_sample_group', {'participantId': participant.id,'module': module,'visit': visit, 'sampleGroup': sampleGroup}) }}"></iframe>
                 </div>
             </div>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="window.history.back();">close</button>
+    <a class="btn btn-primary" role="button"
+       href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Close</a>
 {% endblock %}
 
 {% block pagejs %}

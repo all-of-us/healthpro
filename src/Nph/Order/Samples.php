@@ -59,7 +59,7 @@ class Samples
     {
         $samplesInfo = $this->getSamplesInformation();
         foreach ($samplesInfo as $sampleCode => $sample) {
-            if ($sampleIdentifier === $sampleCode) {
+            if ($sampleIdentifier === $sampleCode && isset($sample['aliquots'])) {
                 return $sample['aliquots'];
             }
         }
@@ -84,5 +84,11 @@ class Samples
             return $samplesInfo[$sampleCode]['collectionVolume'];
         }
         return "";
+    }
+
+    public function getSampleIdentifierFromCode(string $sampleCode): string
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        return $samplesInfo[$sampleCode]['identifier'];
     }
 }
