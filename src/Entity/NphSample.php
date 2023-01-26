@@ -19,7 +19,6 @@ class NphSample
     public const RESTORE = 'restore';
     public const UNLOCK = 'unlock';
     public const EDITED = 'edited';
-    public const EDITED_RDR_ERROR = 'edited_rdr_error';
 
     public static $cancelReasons = [
         'Created in error' => 'CANCEL_ERROR',
@@ -433,16 +432,6 @@ class NphSample
     public function isDisabled(): bool
     {
         return ($this->finalizedTs || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
-    }
-
-    public function hasRdrError(): bool
-    {
-        return $this->finalizedTs && empty($this->rdrId);
-    }
-
-    public function hasEditedRdrError(): bool
-    {
-        return $this->modifyType === self::EDITED_RDR_ERROR;
     }
 
     public function getModifyReasonDisplayText(): string

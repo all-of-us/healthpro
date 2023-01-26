@@ -7,18 +7,6 @@
     <div class="page-header">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
-    {% if sample.hasRdrError or sample.hasEditedRdrError %}
-        <div class="row alert alert-danger custom-alert">
-            <div class="col-md-10">
-                Sample information {{ sample.hasRdrError ? 'saved' : 'amended'}} but failed to finalize the sample. Please try again.
-            </div>
-            <div class="col-md-2">
-                {{ form_start(sampleRetryForm) }}
-                {{ form_errors(sampleRetryForm) }}
-                {{ form_end(sampleRetryForm) }}
-            </div>
-        </div>
-    {% endif %}
     {{ macros.displayModifyBannerMessage(sample) }}
     {% if sampleModifyForm is not empty %}
         <div>

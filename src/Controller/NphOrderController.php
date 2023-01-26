@@ -219,19 +219,15 @@ class NphOrderController extends BaseController
                 }
             }
             if ($sampleFinalizeForm->isValid()) {
-                if ($sample = $nphOrderService->saveOrderFinalization($formData, $sample)) {
-                    if ($nphOrderService->sendToRdr($order, $sample)) {
-                        $this->addFlash('success', 'Order finalized');
-                    } else {
-                        $this->addFlash('error', 'Failed to finalize the sample. Please try again.');
-                    }
+                if ($nphOrderService->saveOrderFinalization($formData, $sample)) {
+                    $this->addFlash('success', 'Sample finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,
                         'orderId' => $orderId,
                         'sampleId' => $sampleId
                     ]);
                 } else {
-                    $this->addFlash('error', 'Failed finalizing order');
+                    $this->addFlash('error', 'Failed finalizing sample. Please try again.');
                 }
             } else {
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
@@ -265,20 +261,6 @@ class NphOrderController extends BaseController
             }
         }
 
-        // Retry sending to RDR
-        $sampleRetryForm = $this->createForm(NphSampleRdrRetryType::class);
-        $sampleRetryForm->handleRequest($request);
-        if ($sampleRetryForm->isSubmitted()) {
-            if ($sample->hasRdrError() === false && $sample->hasEditedRdrError() === false) {
-                throw $this->createAccessDeniedException();
-            }
-            if ($nphOrderService->sendToRdr($order, $sample)) {
-                $this->addFlash('success', 'Order finalized');
-            } else {
-                $this->addFlash('error', 'Failed to finalize the sample. Please try again.');
-            }
-        }
-
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
@@ -289,8 +271,7 @@ class NphOrderController extends BaseController
             'aliquots' => $nphOrderService->getAliquots($sampleCode),
             'sampleData' => $sampleData,
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
-            'modifyType' => $modifyType ?? '',
-            'sampleRetryForm' => $sampleRetryForm->createView()
+            'modifyType' => $modifyType ?? ''
         ]);
     }
 
