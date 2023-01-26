@@ -507,83 +507,86 @@ class NphOrderService
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
-            $sampleModifyType = $sample->getModifyType();
-            $sampleCode = $sample->getSampleCode();
-            $aliquots = $this->getAliquots($sampleCode);
-            if (!empty($aliquots)) {
-                foreach ($aliquots as $aliquotCode => $aliquot) {
-                    if (isset($formData[$aliquotCode])) {
-                        foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                            if ($aliquotId) {
-                                $nphAliquot = new NphAliquot();
-                                $nphAliquot->setNphSample($sample);
-                                $nphAliquot->setAliquotId($aliquotId);
-                                $nphAliquot->setAliquotCode($aliquotCode);
-                                $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                                if (!empty($formData["{$aliquotCode}Volume"][$key])) {
-                                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
-                                }
-                                $nphAliquot->setUnits($aliquot['units']);
-                                $this->em->persist($nphAliquot);
-                                $this->em->flush();
-                                $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
-                            }
-                        }
-                    }
-                }
-            }
-            $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
-            if (empty($sample->getCollectedUser())) {
-                $sample->setCollectedUser($this->user);
-            }
-            if (empty($sample->getCollectedSite())) {
-                $sample->setCollectedSite($this->site);
-            }
-            $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
-            $sample->setFinalizedUser($this->user);
-            $sample->setFinalizedSite($this->site);
-            $sample->setFinalizedTs(new DateTime());
-            if ($sample->getNphOrder()->getOrderType() === 'urine') {
-                $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
-                    'urineClarity']));
-            }
-            $this->em->persist($sample);
-            $this->em->flush();
-            $order = $sample->getNphOrder();
-            if ($sample->getNphOrder()->getOrderType() === 'stool') {
-                $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
-                $this->em->persist($order);
-                $this->em->flush();
-            }
-
-            // Aliquot status is only set while editing a sample
-            if ($sampleModifyType === NphSample::UNLOCK) {
-                foreach ($sample->getNphAliquots() as $aliquot) {
-                    if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
-                        $aliquot->setStatus(NphSample::CANCEL);
-                    }
-                    if (!empty($formData["restore_{$aliquot->getAliquotId()}"])) {
-                        $aliquot->setStatus(NphSample::RESTORE);
-                    }
-                    $this->em->persist($aliquot);
-                    $this->em->flush();
-                }
-            }
-            $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
-
+            $this->saveOrderFinalizationData($formData, $sample);
             // Send sample to RDR, throw exception if failed.
-            if ($this->sendToRdr($order, $sample)) {
+            if ($this->sendToRdr($sample)) {
                 $status = true;
                 $connection->commit();
             } else {
                 throw new Exception('Failed sending to RDR');
             }
-
         } catch (\Exception $e) {
             $connection->rollback();
             $this->em->refresh($sample);
         }
         return $status;
+    }
+
+    public function saveOrderFinalizationData(array $formData, NphSample $sample): void
+    {
+        $sampleModifyType = $sample->getModifyType();
+        $sampleCode = $sample->getSampleCode();
+        $aliquots = $this->getAliquots($sampleCode);
+        if (!empty($aliquots)) {
+            foreach ($aliquots as $aliquotCode => $aliquot) {
+                if (isset($formData[$aliquotCode])) {
+                    foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                        if ($aliquotId) {
+                            $nphAliquot = new NphAliquot();
+                            $nphAliquot->setNphSample($sample);
+                            $nphAliquot->setAliquotId($aliquotId);
+                            $nphAliquot->setAliquotCode($aliquotCode);
+                            $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                            if (!empty($formData["{$aliquotCode}Volume"][$key])) {
+                                $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            }
+                            $nphAliquot->setUnits($aliquot['units']);
+                            $this->em->persist($nphAliquot);
+                            $this->em->flush();
+                            $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                        }
+                    }
+                }
+            }
+        }
+        $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
+        if (empty($sample->getCollectedUser())) {
+            $sample->setCollectedUser($this->user);
+        }
+        if (empty($sample->getCollectedSite())) {
+            $sample->setCollectedSite($this->site);
+        }
+        $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
+        $sample->setFinalizedUser($this->user);
+        $sample->setFinalizedSite($this->site);
+        $sample->setFinalizedTs(new DateTime());
+        if ($sample->getNphOrder()->getOrderType() === 'urine') {
+            $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
+                'urineClarity']));
+        }
+        $this->em->persist($sample);
+        $this->em->flush();
+        $order = $sample->getNphOrder();
+        if ($sample->getNphOrder()->getOrderType() === 'stool') {
+            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
+            $this->em->persist($order);
+            $this->em->flush();
+        }
+
+        // Aliquot status is only set while editing a sample
+        if ($sampleModifyType === NphSample::UNLOCK) {
+            foreach ($sample->getNphAliquots() as $aliquot) {
+                if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
+                    $aliquot->setStatus(NphSample::CANCEL);
+                }
+                if (!empty($formData["restore_{$aliquot->getAliquotId()}"])) {
+                    $aliquot->setStatus(NphSample::RESTORE);
+                }
+                $this->em->persist($aliquot);
+                $this->em->flush();
+            }
+        }
+        $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
     public function getExistingSampleData(NphSample $sample): array
@@ -703,8 +706,9 @@ class NphOrderService
         return [];
     }
 
-    public function sendToRdr(NphOrder $order, NphSample $sample): bool
+    public function sendToRdr(NphSample $sample): bool
     {
+        $order = $sample->getNphOrder();
         if ($sample->getModifyType() === NphSample::UNLOCK) {
             $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend');
             if ($this->editRdrSample($order->getParticipantId(), $sample->getRdrId(), $sampleRdrObject)) {
