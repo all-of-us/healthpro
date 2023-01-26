@@ -331,13 +331,21 @@ class NphOrderController extends BaseController
                 $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($nphSampleModifyForm->isValid()) {
-                $nphOrderService->saveSamplesModification($samplesModifyData, $type, $order);
-                $modifySuccessText = NphSample::$modifySuccessText[$type];
-                $this->addFlash('success', "Samples {$modifySuccessText}");
-                return $this->redirectToRoute('nph_order_collect', [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+                if ($nphOrderService->saveSamplesModification($samplesModifyData, $type, $order)) {
+                    $modifySuccessText = NphSample::$modifySuccessText[$type];
+                    $this->addFlash('success', "Samples {$modifySuccessText}");
+                    return $this->redirectToRoute('nph_order_collect', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
+                } else {
+                    $this->addFlash('error', "Failed to {$type} one or more samples. Please try again.");
+                    return $this->redirectToRoute('nph_samples_modify', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId,
+                        'type' => $type
+                    ]);
+                }
             } else {
                 $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
             }

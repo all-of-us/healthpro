@@ -645,8 +645,9 @@ class NphOrderService
         return $samplesData;
     }
 
-    public function saveSamplesModification(array $formData, string $type, NphOrder $order): NphOrder
+    public function saveSamplesModification(array $formData, string $type, NphOrder $order): bool
     {
+        $status = true;
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
                 $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
@@ -658,13 +659,15 @@ class NphOrderService
                         $sampleObject
                     )) {
                         $this->saveSampleModificationsData($sample, $type, $formData);
+                    } else {
+                        $status = false;
                     }
                 } else {
                     $this->saveSampleModificationsData($sample, $type, $formData);
                 }
             }
         }
-        return $order;
+        return $status;
     }
 
     public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample

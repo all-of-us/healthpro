@@ -528,7 +528,7 @@ class NphOrderServiceTest extends ServiceTestCase
             $sampleCode => true,
             'reason' => $modifyReason
         ];
-        $nphOrder = $this->service->saveSamplesModification($modificationFormData, $modifyType, $nphOrder);
+        $this->service->saveSamplesModification($modificationFormData, $modifyType, $nphOrder);
 
         foreach ($nphOrder->getNphSamples() as $sample) {
             if ($sample->getSampleCode() === $sampleCode) {
