@@ -17,6 +17,11 @@ class Samples
         return $this->visitObj->getTimePoints();
     }
 
+    public function getRdrTimePoints(): array
+    {
+        return $this->visitObj->getRdrTimePoints();
+    }
+
     public function getTimePointSamples(): array
     {
         return $this->visitObj->getTimePointSamples();

@@ -8,11 +8,18 @@ class TimePoints
 
     protected $timePoints;
 
+    protected $rdrTimePoints;
+
     protected $timePointSampleTypes;
 
     public function getTimePoints(): array
     {
         return $this->timePoints;
+    }
+
+    public function getRdrTimePoints(): array
+    {
+        return $this->rdrTimePoints;
     }
 
     public function getTimePointSamples(): array

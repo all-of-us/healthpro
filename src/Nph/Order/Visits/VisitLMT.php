@@ -15,9 +15,13 @@ class VisitLMT extends TimePoints
         '60min' => '60 min',
         '90min' => '90 min',
         '120min' => '120 min',
-        '180min' => '180 min',
         '240min' => '240 min',
         'postLMT' => 'Post LMT'
+    ];
+
+    protected $rdrTimePoints = [
+        'minus15min' => 'Minus 15 min',
+        'minus5min' => 'Minus 5 min',
     ];
 
     protected $timePointSampleTypes = [
