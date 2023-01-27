@@ -65,4 +65,10 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $orders = $this->repo->getOrdersBySampleGroup('P000000001', '100000008');
         $this->assertSame($this->nphOrder, $orders[0]);
     }
+
+    public function testGetRecentOrdersBySite(): void
+    {
+        $orders = $this->repo->getRecentOrdersBySite($this->nphOrder->getSite());
+        $this->assertSame([$this->nphOrder], $orders);
+    }
 }
