@@ -43,12 +43,12 @@
 {% endmacro %}
 
 {% macro displayReprintButton(order, participantId, module, visit, sampleStatus) %}
-        {% if sampleStatus == 'Created' %}
-            <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit, 'sampleGroup': order.sampleGroup}) }}"
-               class="btn btn-primary btn-xs right">
-                Reprint Labels
-            </a>
-        {% endif %}
+    {% if sampleStatus == 'Created' %}
+        <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit, 'sampleGroup': order.sampleGroup}) }}"
+           class="btn btn-primary btn-xs right">
+            Reprint Labels
+        </a>
+    {% endif %}
 {% endmacro %}
 
 {% macro displaySampleLink(participantId, sample, samplesOrderIds, timePoint) %}
