@@ -163,11 +163,13 @@ class NphOrderService
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
-                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = [
-                    'id' => $order->getId(),
-                    'orderId' => $order->getOrderId(),
-                    'sampleGroup' => $order->getSampleGroupBySampleCode($sample->getSampleCode()),
-                ];
+                if ($sample->getModifyType() !== NphSample::CANCEL) {
+                    $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = [
+                        'id' => $order->getId(),
+                        'orderId' => $order->getOrderId(),
+                        'sampleGroup' => $order->getSampleGroupBySampleCode($sample->getSampleCode()),
+                    ];
+                }
             }
         }
         return $samplesData;
