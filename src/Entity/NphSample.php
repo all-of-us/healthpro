@@ -476,7 +476,8 @@ class NphSample
                 'container' => $aliquotsInfo[$aliquot->getAliquotCode()]['container'],
                 'description' => $aliquotsInfo[$aliquot->getAliquotCode()]['description'],
                 'volume' => $aliquot->getVolume(),
-                'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z')
+                'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
+                'units' => $aliquot->getUnits()
             ];
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();

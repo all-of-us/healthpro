@@ -333,7 +333,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $collectedTs,
         $aliquots,
         $aliquotId,
-        $duplicate
+        $duplicate,
+        $expectedRdrTimePoint
     ): void
     {
         // Module 1
@@ -367,7 +368,7 @@ class NphOrderServiceTest extends ServiceTestCase
         // Assert module info
         $this->assertEquals(1, $rdrObject->module);
         $this->assertEquals('LMT', $rdrObject->visitType);
-        $this->assertEquals($timePoint, $rdrObject->timepoint);
+        $this->assertEquals($expectedRdrTimePoint, $rdrObject->timepoint);
         // Assert identifiers orderId and sampleId
         $this->assertEquals($nphOrder->getOrderId(), $rdrObject->identifier[0]['value']);
         $this->assertEquals($nphSample->getSampleId(), $rdrObject->identifier[1]['value']);
@@ -386,14 +387,14 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'urine', 'URINES', $collectedTs, [
                 'URINESA1' => ['10001', $aliquotTs, 500],
                 'URINESA2' => ['10002', $aliquotTs, 5]
-            ], '10001', true],
+            ], '10001', true, 'Pre LMT'],
             ['preLMT', 'saliva', 'SALIVA', $collectedTs, [
                 'SALIVAA1' => ['10003', $aliquotTs, 4]
-            ], '10008', false],
+            ], '10008', false, 'Pre LMT'],
             ['30min', 'blood', 'SST8P5', $collectedTs, [
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
-            ], '10005', true]
+            ], '10005', true, '30 min']
         ];
     }
 

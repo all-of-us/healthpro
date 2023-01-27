@@ -77,6 +77,11 @@ class NphOrderService
         return $this->moduleObj->getTimePoints();
     }
 
+    public function getRdrTimePoints(): array
+    {
+        return $this->moduleObj->getRdrTimePoints();
+    }
+
     public function getSamples(): array
     {
         return $this->moduleObj->getSamples();
@@ -803,7 +808,13 @@ class NphOrderService
         $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
         $obj->module = $order->getModule();
         $obj->visitType = $order->getVisitType();
-        $obj->timepoint = $order->getTimepoint();
+        // Handle RDR specific timepoint needs
+        if ($this->getRdrTimePoints() && isset($this->getRdrTimePoints()[$order->getTimepoint()])) {
+            $rdrTimePoint = $this->getRdrTimePoints()[$order->getTimepoint()];
+        } else {
+            $rdrTimePoint = $this->getTimePoints()[$order->getTimepoint()];
+        }
+        $obj->timepoint = $rdrTimePoint;
         $sampleInfo = $this->getSamples();
         $sampleDescription = $sampleInfo[$sample->getSampleCode()];
         $obj->sample = $sample->getRdrSampleObj($sampleDescription);
