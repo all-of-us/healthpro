@@ -24,7 +24,9 @@
         {% else %}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                 <div class="checkbox">
-                    <label for="{{ sample.vars.id }}">{{ form_widget(sample) }} <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">{{ sample.vars.label }}</a>
+                    <label for="{{ sample.vars.id }}">
+                        {{ form_widget(sample) }}
+                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint) }}
                     </label>
                     {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 </div>
@@ -42,6 +44,12 @@
                 Reprint Labels
             </a>
         {% endif %}
+{% endmacro %}
+
+{% macro displaySampleLink(participantId, sample, samplesOrderIds, timePoint) %}
+    <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">
+        {{ sample.vars.label }}
+    </a>
 {% endmacro %}
 
 
