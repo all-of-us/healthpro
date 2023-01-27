@@ -1,175 +1,177 @@
 $(document).ready(function () {
     // Ignore non order check pages.
-    if (!$('#safety-checks').length) {
+    if (!$("#safety-checks").length) {
         return;
     }
 
     var isChecked = function (fieldName) {
-        return $('input:radio[name='+fieldName+']').is(':checked');
+        return $("input:radio[name=" + fieldName + "]").is(":checked");
     };
 
     var hideFields = function (fields) {
         for (var i = 0; i < fields.length; i++) {
-            $('#' + fields[i]).hide();
-            $('#' + fields[i]).find('input:radio, input:checkbox').prop('checked', false);
-            if (fields[i] === 'order-info-text') {
-                $('#order-info-text').find('span').hide();
+            $("#" + fields[i]).hide();
+            $("#" + fields[i])
+                .find("input:radio, input:checkbox")
+                .prop("checked", false);
+            if (fields[i] === "order-info-text") {
+                $("#order-info-text").find("span").hide();
             }
         }
     };
 
     var showFields = function (fields) {
         for (var i = 0; i < fields.length; i++) {
-            $('#' + fields[i]).show();
+            $("#" + fields[i]).show();
         }
     };
 
     var allowCollection = function (type) {
-        if (type === 'urine') {
-            $('input[name=show-blood-tubes]').val('no');
-            $('input[name=show-saliva-tubes]').val('no');
-        } else if (type === 'saliva') {
-            $('input[name=show-blood-tubes]').val('no');
-            $('input[name=show-saliva-tubes]').val('yes');
+        if (type === "urine") {
+            $("input[name=show-blood-tubes]").val("no");
+            $("input[name=show-saliva-tubes]").val("no");
+        } else if (type === "saliva") {
+            $("input[name=show-blood-tubes]").val("no");
+            $("input[name=show-saliva-tubes]").val("yes");
         } else {
-            $('input[name=show-blood-tubes]').val('yes');
-            $('input[name=show-saliva-tubes]').val('yes');
+            $("input[name=show-blood-tubes]").val("yes");
+            $("input[name=show-saliva-tubes]").val("yes");
         }
     };
 
     var handleSyncopeQuestion = function () {
-        showFields(['syncope-qn']);
-        if (!isChecked('syncope')) {
-            hideFields(['syncope-sub-qn']);
+        showFields(["syncope-qn"]);
+        if (!isChecked("syncope")) {
+            hideFields(["syncope-sub-qn"]);
             return;
         }
-        var syncope = $('input:radio[name=syncope]:checked').val();
-        if (syncope === 'yes') {
-            showFields(['syncope-sub-qn', 'order-info-text', 'info-text-5']);
-            if (!isChecked('syncope_sub')) {
+        var syncope = $("input:radio[name=syncope]:checked").val();
+        if (syncope === "yes") {
+            showFields(["syncope-sub-qn", "order-info-text", "info-text-5"]);
+            if (!isChecked("syncope_sub")) {
                 return;
             }
-            var syncopeSubQn = $('input:radio[name=syncope_sub]:checked').val();
-            if (syncopeSubQn === 'yes') {
-                allowCollection('all');
+            var syncopeSubQn = $("input:radio[name=syncope_sub]:checked").val();
+            if (syncopeSubQn === "yes") {
+                allowCollection("all");
             } else {
-                allowCollection('saliva');
+                allowCollection("saliva");
             }
-            showFields(['continue']);
+            showFields(["continue"]);
         } else {
-            hideFields(['syncope-sub-qn']);
-            showFields(['continue']);
-            allowCollection('all');
+            hideFields(["syncope-sub-qn"]);
+            showFields(["continue"]);
+            allowCollection("all");
         }
     };
 
     var handleStep5 = function (donate) {
         // #5 Show Question 5
-        if (!isChecked('ppc_qn')) {
-            hideFields(['syncope-qn', 'syncope-sub-qn']);
+        if (!isChecked("ppc_qn")) {
+            hideFields(["syncope-qn", "syncope-sub-qn"]);
         }
-        showFields(['ppc-qn']);
-        hideFields(['continue', 'order-info-text']);
-        var ppc = $('input:radio[name=ppc_qn]:checked').val();
-        if (ppc === 'yes') {
-            if (donate === 'no') {
+        showFields(["ppc-qn"]);
+        hideFields(["continue", "order-info-text"]);
+        var ppc = $("input:radio[name=ppc_qn]:checked").val();
+        if (ppc === "yes") {
+            if (donate === "no") {
                 // #5 Answer syncope question and continue
                 handleSyncopeQuestion();
             } else {
                 // #5 Display info text 1 and continue
-                showFields(['order-info-text', 'info-text-1', 'continue']);
-                hideFields(['syncope-qn', 'info-text-5']);
-                allowCollection('saliva');
+                showFields(["order-info-text", "info-text-1", "continue"]);
+                hideFields(["syncope-qn", "info-text-5"]);
+                allowCollection("saliva");
             }
-        } else if (ppc === 'no') {
+        } else if (ppc === "no") {
             // #5 Display info text 3 and continue
-            hideFields(['order-info-text', 'syncope-qn', 'info-text-5']);
-            showFields(['continue', 'order-info-text', 'info-text-3']);
-            allowCollection('saliva');
+            hideFields(["order-info-text", "syncope-qn", "info-text-5"]);
+            showFields(["continue", "order-info-text", "info-text-3"]);
+            allowCollection("saliva");
         }
     };
 
     var applyBranchingLogic = function () {
         // Continue only when both Q1 and Q2 are checked
-        if (!isChecked('donate') || !isChecked('transfusion')) {
+        if (!isChecked("donate") || !isChecked("transfusion")) {
             return;
         }
 
         // Hide fields on initialization
-        var hideFieldNames = ['order-info-text', 'continue'];
-        if (!isChecked('rbc_qn')) {
-            hideFieldNames.push('rbc-qn');
+        var hideFieldNames = ["order-info-text", "continue"];
+        if (!isChecked("rbc_qn")) {
+            hideFieldNames.push("rbc-qn");
         }
-        if (!isChecked('ppc_qn')) {
-            hideFieldNames.push('ppc-qn');
+        if (!isChecked("ppc_qn")) {
+            hideFieldNames.push("ppc-qn");
         }
         hideFields(hideFieldNames);
 
-        var donate = $('input:radio[name=donate]:checked').val();
-        var transfusion = $('input:radio[name=transfusion]:checked').val();
-        if (transfusion === 'yes') {
-            var isTransfusionWBChecked = $('input:checkbox[name=transfusion_wb]').is(':checked');
-            var isTransfusionRBCChecked = $('input:checkbox[name=transfusion_rbc]').is(':checked');
-            var isTransfusionPPCChecked = $('input:checkbox[name=transfusion_ppc]').is(':checked');
+        var donate = $("input:radio[name=donate]:checked").val();
+        var transfusion = $("input:radio[name=transfusion]:checked").val();
+        if (transfusion === "yes") {
+            var isTransfusionWBChecked = $("input:checkbox[name=transfusion_wb]").is(":checked");
+            var isTransfusionRBCChecked = $("input:checkbox[name=transfusion_rbc]").is(":checked");
+            var isTransfusionPPCChecked = $("input:checkbox[name=transfusion_ppc]").is(":checked");
             // #3 Show Question 3
-            showFields(['transfusion-qn']);
-            hideFields(['continue']);
+            showFields(["transfusion-qn"]);
+            hideFields(["continue"]);
             if (isTransfusionWBChecked) {
                 // #3 Display info text 4 and continue
-                hideFields(['rbc-qn', 'ppc-qn', 'order-info-text', 'syncope-qn']);
-                showFields(['continue', 'order-info-text', 'info-text-4']);
-                allowCollection('urine');
+                hideFields(["rbc-qn", "ppc-qn", "order-info-text", "syncope-qn"]);
+                showFields(["continue", "order-info-text", "info-text-4"]);
+                allowCollection("urine");
             } else if (isTransfusionRBCChecked) {
                 // #4 Show Question 4
-                showFields(['rbc-qn']);
-                hideFields(['continue', 'order-info-text']);
-                if (!isChecked('rbc_qn')) {
-                    hideFields(['syncope-qn', 'syncope-sub-qn']);
+                showFields(["rbc-qn"]);
+                hideFields(["continue", "order-info-text"]);
+                if (!isChecked("rbc_qn")) {
+                    hideFields(["syncope-qn", "syncope-sub-qn"]);
                 }
-                var rbc = $('input:radio[name=rbc_qn]:checked').val();
-                if (rbc === 'yes') {
+                var rbc = $("input:radio[name=rbc_qn]:checked").val();
+                if (rbc === "yes") {
                     if (!isTransfusionPPCChecked) {
-                        hideFields(['order-info-text', 'ppc-qn']);
-                        if (donate === 'no') {
+                        hideFields(["order-info-text", "ppc-qn"]);
+                        if (donate === "no") {
                             // #4 Answer syncope question and continue
                             handleSyncopeQuestion();
                         } else {
                             // #4 Display info text 1 and continue
-                            showFields(['order-info-text', 'info-text-1', 'continue']);
-                            hideFields(['syncope-qn', 'info-text-5']);
-                            allowCollection('saliva');
+                            showFields(["order-info-text", "info-text-1", "continue"]);
+                            hideFields(["syncope-qn", "info-text-5"]);
+                            allowCollection("saliva");
                         }
                     } else {
                         // #5 Handle step 5
                         handleStep5(donate);
                     }
-                } else if (rbc === 'no') {
+                } else if (rbc === "no") {
                     // #4 Display info text 2 and continue
-                    hideFields(['ppc-qn', 'order-info-text', 'syncope-qn']);
-                    showFields(['continue', 'order-info-text', 'info-text-2']);
-                    allowCollection('saliva');
+                    hideFields(["ppc-qn", "order-info-text", "syncope-qn"]);
+                    showFields(["continue", "order-info-text", "info-text-2"]);
+                    allowCollection("saliva");
                 } else {
                     // Hide PPC question if RBC question is not checked
-                    hideFields(['ppc-qn']);
+                    hideFields(["ppc-qn"]);
                 }
             } else if (isTransfusionPPCChecked) {
                 // #5 Handle step 5
-                hideFields(['rbc-qn']);
+                hideFields(["rbc-qn"]);
                 handleStep5(donate);
             } else {
                 // Hide both RBC and PPC questions if no transfusion type is checked
-                hideFields(['rbc-qn', 'ppc-qn', 'syncope-qn']);
+                hideFields(["rbc-qn", "ppc-qn", "syncope-qn"]);
             }
         } else {
-            hideFields(['transfusion-qn', 'rbc-qn', 'ppc-qn', 'order-info-text']);
-            if (donate === 'no') {
+            hideFields(["transfusion-qn", "rbc-qn", "ppc-qn", "order-info-text"]);
+            if (donate === "no") {
                 // #3 Answer syncope question and continue
                 handleSyncopeQuestion();
             } else {
                 // #3 Display info text 1 and continue
-                hideFields(['syncope-qn', 'syncope-sub-qn', 'info-text-5']);
-                showFields(['order-info-text', 'info-text-1', 'continue']);
-                allowCollection('saliva');
+                hideFields(["syncope-qn", "syncope-sub-qn", "info-text-5"]);
+                showFields(["order-info-text", "info-text-1", "continue"]);
+                allowCollection("saliva");
             }
         }
     };
@@ -177,7 +179,7 @@ $(document).ready(function () {
     // Display current branching logic state for browser back clicks
     applyBranchingLogic();
 
-    $('input[type=radio], input[type=checkbox]').on('change', function () {
+    $("input[type=radio], input[type=checkbox]").on("change", function () {
         applyBranchingLogic();
     });
 });
