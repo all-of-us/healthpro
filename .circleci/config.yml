@@ -70,6 +70,9 @@ jobs:
     # PHPStan
     - run: ./ci/phpstan.sh
 
+    # CS Fixer
+    - run: npx prettier --check ./web/assets/js
+
     # Teardown
     - store_test_results:
         path: /tmp/circleci-test-results

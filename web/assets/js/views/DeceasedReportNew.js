@@ -9,12 +9,12 @@ $(document).ready(function () {
             return el.$element.closest(".form-group");
         },
         errorsWrapper: '<div class="deceased-report-errors help-block"></div>',
-        errorTemplate: '<div></div>',
+        errorTemplate: "<div></div>",
         trigger: "keyup change"
     });
 
-    $('#deceased_report_dateOfDeath').pmiDateTimePicker({
-        format: 'MM/DD/YYYY',
+    $("#deceased_report_dateOfDeath").pmiDateTimePicker({
+        format: "MM/DD/YYYY",
         maxDate: new Date().setHours(23, 59, 59, 999),
         useCurrent: false
     });
@@ -26,39 +26,37 @@ $(document).ready(function () {
     var reportMechanismOtherDescription = $('textarea[name="deceased_report[reportMechanismOtherDescription]"]');
 
     // Set initial state of form on load
-    if (reportMechanismChecked.length == 0
-        || reportMechanismChecked.val() == 'EHR'
-    ) {
-        $('.next_of_kin_details').addClass('collapse');
-        $('.other_details').addClass('collapse');
-    } else if (reportMechanismChecked.val() == 'OTHER') {
-        $('.next_of_kin_details').addClass('collapse');
-        $('.other_details').removeClass('collapse');
+    if (reportMechanismChecked.length == 0 || reportMechanismChecked.val() == "EHR") {
+        $(".next_of_kin_details").addClass("collapse");
+        $(".other_details").addClass("collapse");
+    } else if (reportMechanismChecked.val() == "OTHER") {
+        $(".next_of_kin_details").addClass("collapse");
+        $(".other_details").removeClass("collapse");
     }
 
     // Handle onChange event for Report Mechanism
-    $(reportMechanism).on('change', function (e) {
+    $(reportMechanism).on("change", function (e) {
         switch ($(e.target).val()) {
-            case 'EHR':
-                $('.next_of_kin_details').addClass('collapse');
-                $('.other_details').addClass('collapse');
-                nextOfKinName.attr('required', false);
-                nextOfKinRelationship.attr('required', false);
-                reportMechanismOtherDescription.attr('required', false);
+            case "EHR":
+                $(".next_of_kin_details").addClass("collapse");
+                $(".other_details").addClass("collapse");
+                nextOfKinName.attr("required", false);
+                nextOfKinRelationship.attr("required", false);
+                reportMechanismOtherDescription.attr("required", false);
                 break;
-            case 'OTHER':
-                $('.next_of_kin_details').addClass('collapse');
-                $('.other_details').removeClass('collapse');
-                nextOfKinName.attr('required', false);
-                nextOfKinRelationship.attr('required', false);
-                reportMechanismOtherDescription.attr('required', true);
+            case "OTHER":
+                $(".next_of_kin_details").addClass("collapse");
+                $(".other_details").removeClass("collapse");
+                nextOfKinName.attr("required", false);
+                nextOfKinRelationship.attr("required", false);
+                reportMechanismOtherDescription.attr("required", true);
                 break;
             default:
-                $('.next_of_kin_details').removeClass('collapse');
-                $('.other_details').addClass('collapse');
-                nextOfKinName.attr('required', true);
-                nextOfKinRelationship.attr('required', true);
-                reportMechanismOtherDescription.attr('required', false);
+                $(".next_of_kin_details").removeClass("collapse");
+                $(".other_details").addClass("collapse");
+                nextOfKinName.attr("required", true);
+                nextOfKinRelationship.attr("required", true);
+                reportMechanismOtherDescription.attr("required", false);
         }
     });
 });

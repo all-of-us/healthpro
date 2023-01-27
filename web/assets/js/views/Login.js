@@ -1,9 +1,8 @@
-require('bootstrap');
-require('../../css/login.css');
+require("bootstrap");
+require("../../css/login.css");
 
 $(document).ready(function () {
-    $('.carousel').carousel({
-        interval: 5000,
+    $(".carousel").carousel({
+        interval: 5000
     });
 });
-

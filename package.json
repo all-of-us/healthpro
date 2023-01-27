@@ -27,12 +27,20 @@
         "underscore": "^1.13.1"
     },
     "devDependencies": {
-        "@symfony/webpack-encore": "^4.1.1"
+        "@symfony/webpack-encore": "^4.1.1",
+        "prettier": "^2.8.3"
     },
     "scripts": {
         "dev-server": "encore dev-server",
         "dev": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production"
+    },
+    "prettier": {
+        "tabWidth":4,
+        "trailingComma": "none",
+        "printWidth": 120,
+        "semi": true,
+        "endOfLine": "auto"
     }
 }
