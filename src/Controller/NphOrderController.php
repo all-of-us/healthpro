@@ -9,6 +9,7 @@ use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
+use App\Form\Nph\NphSampleRdrRetryType;
 use App\Service\EnvironmentService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -203,6 +204,9 @@ class NphOrderController extends BaseController
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
+            if ($sample->isDisabled()) {
+                throw $this->createAccessDeniedException();
+            }
             $formData = $sampleData = $sampleFinalizeForm->getData();
             if (!empty($nphOrderService->getAliquots($sampleCode))) {
                 if ($sample->getModifyType() !== NphSample::UNLOCK && $nphOrderService->hasAtLeastOneAliquotSample(
@@ -215,18 +219,15 @@ class NphOrderController extends BaseController
                 }
             }
             if ($sampleFinalizeForm->isValid()) {
-                if ($sample = $nphOrderService->saveOrderFinalization($formData, $sample)) {
-                    if ($nphOrderService->sendToRdr($order, $sample)) {
-                        //TODO
-                    }
-                    $this->addFlash('success', 'Order finalized');
+                if ($nphOrderService->saveSampleFinalization($formData, $sample)) {
+                    $this->addFlash('success', 'Sample finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,
                         'orderId' => $orderId,
                         'sampleId' => $sampleId
                     ]);
                 } else {
-                    $this->addFlash('error', 'Failed finalizing order');
+                    $this->addFlash('error', 'Failed finalizing sample. Please try again.');
                 }
             } else {
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
@@ -259,6 +260,7 @@ class NphOrderController extends BaseController
                 }
             }
         }
+
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
@@ -329,13 +331,21 @@ class NphOrderController extends BaseController
                 $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($nphSampleModifyForm->isValid()) {
-                $nphOrderService->saveSamplesModification($samplesModifyData, $type, $order);
-                $modifySuccessText = NphSample::$modifySuccessText[$type];
-                $this->addFlash('success', "Samples {$modifySuccessText}");
-                return $this->redirectToRoute('nph_order_collect', [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+                if ($nphOrderService->saveSamplesModification($samplesModifyData, $type, $order)) {
+                    $modifySuccessText = NphSample::$modifySuccessText[$type];
+                    $this->addFlash('success', "Samples {$modifySuccessText}");
+                    return $this->redirectToRoute('nph_order_collect', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
+                } else {
+                    $this->addFlash('error', "Failed to {$type} one or more samples. Please try again.");
+                    return $this->redirectToRoute('nph_samples_modify', [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId,
+                        'type' => $type
+                    ]);
+                }
             } else {
                 $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
             }

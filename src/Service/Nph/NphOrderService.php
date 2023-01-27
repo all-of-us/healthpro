@@ -2,6 +2,7 @@
 
 namespace App\Service\Nph;
 
+use _PHPStan_70b6e53dc\Nette\Neon\Exception;
 use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
@@ -500,7 +501,28 @@ class NphOrderService
         return false;
     }
 
-    public function saveOrderFinalization(array $formData, NphSample $sample): NphSample
+    public function saveSampleFinalization(array $formData, NphSample $sample): bool
+    {
+        $status = false;
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $this->saveSampleFinalizationData($formData, $sample);
+            // Send sample to RDR, throw exception if failed.
+            if ($this->sendToRdr($sample)) {
+                $status = true;
+                $connection->commit();
+            } else {
+                throw new Exception('Failed sending to RDR');
+            }
+        } catch (\Exception $e) {
+            $connection->rollback();
+            $this->em->refresh($sample);
+        }
+        return $status;
+    }
+
+    public function saveSampleFinalizationData(array $formData, NphSample $sample): void
     {
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();
@@ -542,13 +564,16 @@ class NphOrderService
             $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
                 'urineClarity']));
         }
+        $this->em->persist($sample);
+        $this->em->flush();
+        $order = $sample->getNphOrder();
         if ($sample->getNphOrder()->getOrderType() === 'stool') {
-            $order = $sample->getNphOrder();
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
             $this->em->persist($order);
             $this->em->flush();
         }
 
+        // Aliquot status is only set while editing a sample
         if ($sampleModifyType === NphSample::UNLOCK) {
             foreach ($sample->getNphAliquots() as $aliquot) {
                 if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
@@ -561,9 +586,7 @@ class NphOrderService
                 $this->em->flush();
             }
         }
-
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
-        return $sample;
     }
 
     public function getExistingSampleData(NphSample $sample): array
@@ -622,8 +645,9 @@ class NphOrderService
         return $samplesData;
     }
 
-    public function saveSamplesModification(array $formData, string $type, NphOrder $order): NphOrder
+    public function saveSamplesModification(array $formData, string $type, NphOrder $order): bool
     {
+        $status = true;
         foreach ($order->getNphSamples() as $sample) {
             if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
                 $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
@@ -635,13 +659,15 @@ class NphOrderService
                         $sampleObject
                     )) {
                         $this->saveSampleModificationsData($sample, $type, $formData);
+                    } else {
+                        $status = false;
                     }
                 } else {
                     $this->saveSampleModificationsData($sample, $type, $formData);
                 }
             }
         }
-        return $order;
+        return $status;
     }
 
     public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
@@ -683,8 +709,9 @@ class NphOrderService
         return [];
     }
 
-    public function sendToRdr(NphOrder $order, NphSample $sample): bool
+    public function sendToRdr(NphSample $sample): bool
     {
+        $order = $sample->getNphOrder();
         if ($sample->getModifyType() === NphSample::UNLOCK) {
             $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend');
             if ($this->editRdrSample($order->getParticipantId(), $sample->getRdrId(), $sampleRdrObject)) {
@@ -719,7 +746,6 @@ class NphOrderService
                 return $result->id;
             }
         } catch (\Exception $e) {
-            throw $e;
             $this->rdrApiService->logException($e);
             return false;
         }
