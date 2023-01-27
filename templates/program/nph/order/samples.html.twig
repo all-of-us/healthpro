@@ -3,7 +3,12 @@
     {% for sample in formField.children %}
         {% if sample.vars.value in nailSamples %}
             <div class="sub-samples nail-sub-samples">
-                <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
+                <div class="checkbox">
+                    <label for="{{ sample.vars.id }}">
+                        {{ form_widget(sample) }}
+                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint) }}
+                    </label>
+                </div>
                 {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                     {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
@@ -47,9 +52,13 @@
 {% endmacro %}
 
 {% macro displaySampleLink(participantId, sample, samplesOrderIds, timePoint) %}
-    <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">
+    {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
+        <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">
+            {{ sample.vars.label }}
+        </a>
+    {% else %}
         {{ sample.vars.label }}
-    </a>
+    {% endif %}
 {% endmacro %}
 
 
