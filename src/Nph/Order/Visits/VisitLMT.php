@@ -7,16 +7,17 @@ use App\Nph\Order\TimePoints;
 class VisitLMT extends TimePoints
 {
     protected $timePoints = [
-        'preLMT' => 'Pre DSMT',
-        'minus15min' => '-15 Min',
-        'minus5min' => '-5 Min',
-        '15min' => '15 Min',
-        '30min' => '30 Min',
-        '60min' => '60 Min',
-        '90min' => '90 Min',
-        '120min' => '120 Min',
-        '240min' => '240 Min',
-        'postLMT' => 'Post DSMT'
+        'preLMT' => 'Pre LMT',
+        'minus15min' => '-15 min',
+        'minus5min' => '-5 min',
+        '15min' => '15 min',
+        '30min' => '30 min',
+        '60min' => '60 min',
+        '90min' => '90 min',
+        '120min' => '120 min',
+        '180min' => '180 min',
+        '240min' => '240 min',
+        'postLMT' => 'Post LMT'
     ];
 
     protected $timePointSampleTypes = [
