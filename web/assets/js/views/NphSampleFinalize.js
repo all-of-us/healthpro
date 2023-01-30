@@ -48,4 +48,13 @@ $(document).ready(function () {
     $(document).on("click", ".clear-aliquot-widget", function () {
         $(this).closest("tr").find("input").val("");
     });
+
+    $(".aliquot-barcode").keyup(function () {
+        let barcode = $(this).val();
+        if (barcode.length === 11) {
+            let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
+            aliquotTsSelector.focus();
+            aliquotTsSelector.blur();
+        }
+    });
 });

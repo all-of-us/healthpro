@@ -33,8 +33,6 @@ $(document).ready(function () {
             let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
             if (barcode === sampleId) {
                 $(this).find("input:checkbox").prop("checked", true);
-                $(this).find("input:text").focus();
-                $(this).find("input:text").blur();
             }
         });
     });
