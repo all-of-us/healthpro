@@ -496,4 +496,14 @@ class NphSample
     {
         $this->sampleGroup = $sampleGroup;
     }
+
+    public function allowAddNewAliquots(): bool
+    {
+        $order = $this->getNphOrder();
+        if (($order->getOrderType() === 'blood' || $this->getModifyType() === self::UNLOCK) && $this->isDisabled()
+            === false) {
+            return true;
+        }
+        return false;
+    }
 }
