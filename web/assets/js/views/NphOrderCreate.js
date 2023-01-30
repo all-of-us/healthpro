@@ -21,7 +21,7 @@ $(document).ready(function () {
                 $(this)
                     .find("input:checkbox")
                     .each(function () {
-                        if ($(this).prop("checked") === true) {
+                        if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                             let sample = $(this).val();
                             if (sample === "nail") {
                                 let nailSubSamples = [];

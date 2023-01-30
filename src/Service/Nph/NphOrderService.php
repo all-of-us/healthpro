@@ -137,14 +137,16 @@ class NphOrderService
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
-                if (in_array($sample->getSampleCode(), $this->getSamplesByType('stool'))) {
-                    if ($addStoolKit) {
-                        $ordersData['stoolKit'] = $order->getOrderId();
-                        $addStoolKit = false;
+                if ($sample->getModifyType() !== NphSample::CANCEL) {
+                    if (in_array($sample->getSampleCode(), $this->getSamplesByType('stool'))) {
+                        if ($addStoolKit) {
+                            $ordersData['stoolKit'] = $order->getOrderId();
+                            $addStoolKit = false;
+                        }
+                        $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
+                    } else {
+                        $ordersData[$order->getTimepoint()][] = $sample->getSampleCode();
                     }
-                    $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
-                } else {
-                    $ordersData[$order->getTimepoint()][] = $sample->getSampleCode();
                 }
             }
         }
@@ -161,11 +163,13 @@ class NphOrderService
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
-                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = [
-                    'id' => $order->getId(),
-                    'orderId' => $order->getOrderId(),
-                    'sampleGroup' => $order->getSampleGroupBySampleCode($sample->getSampleCode()),
-                ];
+                if ($sample->getModifyType() !== NphSample::CANCEL) {
+                    $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = [
+                        'id' => $order->getId(),
+                        'orderId' => $order->getOrderId(),
+                        'sampleGroup' => $order->getSampleGroupBySampleCode($sample->getSampleCode()),
+                    ];
+                }
             }
         }
         return $samplesData;

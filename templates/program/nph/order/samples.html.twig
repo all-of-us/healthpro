@@ -3,7 +3,12 @@
     {% for sample in formField.children %}
         {% if sample.vars.value in nailSamples %}
             <div class="sub-samples nail-sub-samples">
-                <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
+                <div class="checkbox">
+                    <label for="{{ sample.vars.id }}">
+                        {{ form_widget(sample) }}
+                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint) }}
+                    </label>
+                </div>
                 {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                     {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 {% endif %}
@@ -24,7 +29,9 @@
         {% else %}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                 <div class="checkbox">
-                    <label for="{{ sample.vars.id }}">{{ form_widget(sample) }} <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">{{ sample.vars.label }}</a>
+                    <label for="{{ sample.vars.id }}">
+                        {{ form_widget(sample) }}
+                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint) }}
                     </label>
                     {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 </div>
@@ -36,12 +43,22 @@
 {% endmacro %}
 
 {% macro displayReprintButton(order, participantId, module, visit, sampleStatus) %}
-        {% if sampleStatus == 'Created' %}
-            <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit, 'sampleGroup': order.sampleGroup}) }}"
-               class="btn btn-primary btn-xs right">
-                Reprint Labels
-            </a>
-        {% endif %}
+    {% if sampleStatus == 'Created' %}
+        <a href="{{ path('nph_order_label_print', {'participantId': participantId, 'module': module, 'visit': visit, 'sampleGroup': order.sampleGroup}) }}"
+           class="btn btn-primary btn-xs right">
+            Reprint Labels
+        </a>
+    {% endif %}
+{% endmacro %}
+
+{% macro displaySampleLink(participantId, sample, samplesOrderIds, timePoint) %}
+    {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
+        <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">
+            {{ sample.vars.label }}
+        </a>
+    {% else %}
+        {{ sample.vars.label }}
+    {% endif %}
 {% endmacro %}
 
 
