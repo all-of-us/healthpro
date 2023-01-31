@@ -78,7 +78,7 @@
                         <h4 class="modal-title" id="siteModalLabel">Current site</h4>
                     </div>
                     <div class="modal-body">
-                        {% set sites = app.session.get('program') == 'hpo' ? app.user.sites : app.user.nphSites %}
+                        {% set sites = isCurrentProgramHpo() ? app.user.sites : app.user.nphSites %}
                         {% if sites|length == 0 and app.user.awardees|length == 0 %}
                             <span class="text-danger">You do not belong to any HPO sites!</span>
                         {% else %}
@@ -86,7 +86,7 @@
                                 {% for site in sites %}
                                     <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
                                 {% endfor %}
-                                {% if app.session.get('program') == 'hpo' %}
+                                {% if isCurrentProgramHpo() %}
                                     {% for awardee in app.user.awardees %}
                                         <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
                                     {% endfor %}

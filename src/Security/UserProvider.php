@@ -7,6 +7,7 @@ use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
 use App\Security\User;
+use Hoa\Math\Context;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -47,6 +48,7 @@ class UserProvider implements UserProviderInterface
             $groups = $this->requestStack->getSession()->get('googlegroups');
         } else {
             $manageGroups = [];
+            $manageGroupsNPH = [];
             if ($this->env->isLocal() && (($this->params->has('gaBypass') && $this->params->get('gaBypass')) || $this->env->values['isUnitTest'])) {
                 $groups = $this->mockGoogleGroups->getGroups($googleUser->getEmail());
             } else {
@@ -57,6 +59,12 @@ class UserProvider implements UserProviderInterface
                             $role = $this->googleGroups->getRole($googleUser->getEmail(), $group->getEmail());
                             if (in_array($role, ['OWNER', 'MANAGER'])) {
                                 $manageGroups[] = $group->getEmail();
+                            }
+                        }
+                        if (strpos($group->getEmail(), User::SITE_NPH_PREFIX) === 0 || strpos($group->getEmail(), User::READ_ONLY_GROUP) === 0) {
+                            $role = $this->googleGroups->getRole($googleUser->getEmail(), $group->getEmail());
+                            if (in_array($role, ['OWNER', 'MANAGER'])) {
+                                $manageGroupsNPH[] = $group->getEmail();
                             }
                         }
                     }
@@ -72,6 +80,7 @@ class UserProvider implements UserProviderInterface
             }
             $this->requestStack->getSession()->set('googlegroups', $groups);
             $this->requestStack->getSession()->set('managegroups', $manageGroups);
+            $this->requestStack->getSession()->set('managegroupsnph', $manageGroupsNPH);
         }
         $userInfo = $this->userService->getUserInfo($googleUser);
         $sessionInfo = [
