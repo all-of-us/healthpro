@@ -2,6 +2,9 @@
 
 namespace App\Helper;
 
+use DateTime;
+use DateTimeZone;
+
 class WorkQueue
 {
     public const LIMIT_EXPORT = 10000;
@@ -2345,8 +2348,8 @@ class WorkQueue
         if (!empty($string)) {
             try {
                 if ($timezone) {
-                    $date = new \DateTime($string);
-                    $date->setTimezone(new \DateTimeZone($timezone));
+                    $date = new DateTime($string);
+                    $date->setTimezone(new DateTimeZone($timezone));
                     if ($displayTime) {
                         return $link
                             ? sprintf('<a href="%s" target="_blank">', $link) . $date->format('n/j/Y g:i a') . '</a>'
@@ -2413,7 +2416,6 @@ class WorkQueue
                 return 1;
             case 'APPROVED':
                 return 2;
-                break;
             default:
                 return 0;
         }
@@ -2666,11 +2668,10 @@ class WorkQueue
         return $headers;
     }
 
-    public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone)
+    public static function getDigitalHealthSharingStatus($digitalHealthSharingStatus, $type, $userTimezone): string
     {
         if ($digitalHealthSharingStatus) {
             if (isset($digitalHealthSharingStatus->{$type}->status)) {
-                /** @phpstan-ignore-next-line */
                 $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
                 if ($digitalHealthSharingStatus->{$type}->status === 'YES') {
                     return self::HTML_SUCCESS . ' ' . self::dateFromString($authoredDate, $userTimezone);
@@ -2771,7 +2772,7 @@ class WorkQueue
 
     public static function isValidDate($date)
     {
-        $dt = \DateTime::createFromFormat("m/d/Y", $date);
+        $dt = DateTime::createFromFormat("m/d/Y", $date);
         return $dt !== false && !array_sum($dt::getLastErrors());
     }
 
