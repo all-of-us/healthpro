@@ -107,23 +107,33 @@ class NphSampleFinalizeType extends NphOrderForm
                     'data' => $tsData,
                 ]);
 
+                $volumeConstraints = [
+                    new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
+                        $formData = $context->getRoot()->getData();
+                        $key = intval($context->getObject()->getName());
+                        if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
+                            && empty($value)) {
+                            $context->buildViolation('Volume is required')->addViolation();
+                        }
+                        if ($aliquot['expectedVolume'] === null && !empty($value)) {
+                            $context->buildViolation('Volume should not be entered')->addViolation();
+                        }
+                    })
+                ];
+                if (isset($aliquot['minVolume']) && isset($aliquot['maxVolume'])) {
+                    $volumeConstraints[] = new Constraints\Range([
+                        'min' => $aliquot['minVolume'],
+                        'max' => $aliquot['maxVolume'],
+                        'minMessage' => 'Volume must be greater than 0.0',
+                        'maxMessage' => 'Please verify the volume is correct. If greater than expected volume, you may add an additional aliquot.'
+                    ]);
+                }
+
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
                     'entry_options' => [
-                        'constraints' => [
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
-                                $formData = $context->getRoot()->getData();
-                                $key = intval($context->getObject()->getName());
-                                if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
-                                    && empty($value)) {
-                                    $context->buildViolation('Volume is required')->addViolation();
-                                }
-                                if ($aliquot['expectedVolume'] === null && !empty($value)) {
-                                    $context->buildViolation('Volume should not be entered')->addViolation();
-                                }
-                            })
-                        ]
+                        'constraints' => $volumeConstraints
                     ],
                     'required' => false,
                     'allow_add' => true,

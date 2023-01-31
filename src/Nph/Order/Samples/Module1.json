@@ -18,7 +18,9 @@
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500
         },
         "SST8P5A2": {
           "identifier": "SSTS1",
@@ -27,7 +29,9 @@
           "expectedAliquots": 3,
           "expectedVolume": 1000,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000
         }
       }
     },
@@ -47,7 +51,9 @@
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500
         },
         "LIHP1A2": {
           "identifier": "LiHP1",
@@ -56,7 +62,9 @@
           "expectedAliquots": 2,
           "expectedVolume": 1000,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000
         }
       }
     },
@@ -76,7 +84,9 @@
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500
         },
         "EDTA10A2": {
           "identifier": "EDPAP1",
@@ -85,7 +95,9 @@
           "expectedAliquots": 4,
           "expectedVolume": 1000,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000
         }
       }
     },
@@ -105,7 +117,9 @@
           "expectedAliquots": 2,
           "expectedVolume": 500,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500
         }
       }
     },
@@ -123,9 +137,11 @@
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 7,
-          "expectedVolume": 500,
+          "expectedVolume": 1000,
           "units": "μL",
-          "barcodeLength" : 10
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000
         },
         "URINESA2": {
           "identifier": "RU2",
@@ -134,7 +150,9 @@
           "expectedAliquots": 1,
           "expectedVolume": 5,
           "units": "mL",
-          "barcodeLength" : 11
+          "barcodeLength" : 11,
+          "minVolume": 0,
+          "maxVolume": 5
         }
       }
     },
@@ -155,7 +173,9 @@
           "expectedVolume": 4,
           "units": "mL",
           "barcodeLength" : 10,
-          "barcodePrefix": "MC"
+          "barcodePrefix": "MC",
+          "minVolume": 0,
+          "maxVolume": 4
         }
       }
     },
