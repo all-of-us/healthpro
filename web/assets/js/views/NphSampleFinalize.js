@@ -49,6 +49,8 @@ $(document).ready(function () {
         $(this).closest("tr").find("input").val("");
     });
 
+    /*
+    // TODO: Disabling it for now as we need to implement this based on different aliquot barcode lengths
     $(".aliquot-barcode").keyup(function () {
         let barcode = $(this).val();
         if (barcode.length === 11) {
@@ -57,4 +59,5 @@ $(document).ready(function () {
             aliquotTsSelector.blur();
         }
     });
+    */
 });

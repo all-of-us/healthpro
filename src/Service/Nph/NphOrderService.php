@@ -2,7 +2,6 @@
 
 namespace App\Service\Nph;
 
-use _PHPStan_70b6e53dc\Nette\Neon\Exception;
 use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
@@ -522,7 +521,7 @@ class NphOrderService
                 $status = true;
                 $connection->commit();
             } else {
-                throw new Exception('Failed sending to RDR');
+                throw new \Exception('Failed sending to RDR');
             }
         } catch (\Exception $e) {
             $connection->rollback();
