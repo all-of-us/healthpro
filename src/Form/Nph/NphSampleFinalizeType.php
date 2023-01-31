@@ -45,11 +45,12 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'pattern' => '/^[a-zA-Z0-9]{11}$/',
                                 'message' => 'Aliquot barcode must be a string of 11 digits'
                             ]),
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
+                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
                                 $key = intval($context->getObject()->getName());
-                                if (($formData["{$aliquotCode}AliquotTs"][$key] ||
-                                        $formData["{$aliquotCode}Volume"][$key]) && empty($value)) {
+                                $condition = $aliquot['expectedVolume'] ? ($formData["{$aliquotCode}AliquotTs"][$key] ||
+                                    $formData["{$aliquotCode}Volume"][$key]) : $formData["{$aliquotCode}AliquotTs"][$key];
+                                if ($condition && empty($value)) {
                                     $context->buildViolation('Barcode is required')->addViolation();
                                 }
                             })
@@ -81,11 +82,12 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'value' => new \DateTime('+5 minutes'),
                                 'message' => 'Timestamp cannot be in the future'
                             ]),
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
+                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
                                 $key = intval($context->getObject()->getName());
-                                if (($formData[$aliquotCode][$key] || $formData["{$aliquotCode}Volume"][$key])
-                                    && empty($value)) {
+                                $condition = $aliquot['expectedVolume'] ? ($formData[$aliquotCode][$key] ||
+                                    $formData["{$aliquotCode}Volume"][$key]) : $formData[$aliquotCode][$key];
+                                if ($condition && empty($value)) {
                                     $context->buildViolation('Time is required')->addViolation();
                                 }
                             })
@@ -105,12 +107,15 @@ class NphSampleFinalizeType extends NphOrderForm
                     'label' => 'Volume',
                     'entry_options' => [
                         'constraints' => [
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode) {
+                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
                                 $key = intval($context->getObject()->getName());
-                                if (($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
+                                if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
                                     && empty($value)) {
                                     $context->buildViolation('Volume is required')->addViolation();
+                                }
+                                if ($aliquot['expectedVolume'] === null && !empty($value)) {
+                                    $context->buildViolation('Volume should not be entered')->addViolation();
                                 }
                             })
                         ]
@@ -119,7 +124,9 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $volumeData,
-                    'disabled' => $aliquot['expectedVolume'] === null
+                    'attr' => [
+                        'readonly' => $aliquot['expectedVolume'] === null
+                    ],
                 ]);
             }
         }
