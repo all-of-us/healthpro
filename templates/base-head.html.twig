@@ -3,7 +3,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {{ encore_entry_link_tags('app') }}
-<link rel="stylesheet" href="{{ asset('css/'~app.session.get('program')|default('hpo')~'.css') }}?v={{ assetVer }}">
+<link rel="stylesheet" href="{{ asset('css/'~getCurrentProgram()~'.css') }}?v={{ assetVer }}">
 <!--[if IE]>
 <link rel="stylesheet" href="{{ asset('css/ie.css') }}?v={{ assetVer }}">
 <![endif]-->

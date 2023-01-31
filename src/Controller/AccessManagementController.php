@@ -66,9 +66,9 @@ class AccessManagementController extends BaseController
      */
     public function userGroup($groupId): Response
     {
-        if ($this->requestStack->getSession()->get('program') === 'hpo') {
+        if ($this->contextTemplate->isCurrentProgramHpo()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
-        } elseif ($this->requestStack->getSession()->get('program') === 'nph') {
+        } elseif ($this->contextTemplate->isCurrentProgramNph()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
         }
         if (empty($group)) {
@@ -92,9 +92,9 @@ class AccessManagementController extends BaseController
      */
     public function member($groupId, Request $request)
     {
-        if ($this->requestStack->getSession()->get('program') === 'hpo') {
+        if ($this->contextTemplate->isCurrentProgramHpo()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
-        } elseif ($this->requestStack->getSession()->get('program') === 'nph') {
+        } elseif ($this->contextTemplate->isCurrentProgramNph()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
         }
         if (empty($group)) {
@@ -146,9 +146,9 @@ class AccessManagementController extends BaseController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        if ($this->requestStack->getSession()->get('program') === 'hpo') {
+        if ($this->contextTemplate->isCurrentProgramHpo()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
-        } elseif ($this->requestStack->getSession()->get('program') === 'nph') {
+        } elseif ($this->contextTemplate->isCurrentProgramNph()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
         }
         if (empty($group)) {
