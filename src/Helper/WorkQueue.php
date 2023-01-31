@@ -2672,7 +2672,6 @@ class WorkQueue
     {
         if ($digitalHealthSharingStatus) {
             if (isset($digitalHealthSharingStatus->{$type}->status)) {
-                /** @phpstan-ignore-next-line */
                 $authoredDate = $digitalHealthSharingStatus->{$type}->history[0]->authoredTime ?? '';
                 if ($digitalHealthSharingStatus->{$type}->status === 'YES') {
                     return self::HTML_SUCCESS . ' ' . self::dateFromString($authoredDate, $userTimezone);
