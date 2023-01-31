@@ -134,7 +134,7 @@
                         {% endif %}
                     {% endif %}
 
-                    {% if app.request.get('_route') != 'site_select' %}
+                    {% if app.session.get('program') is not null %}
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-bell" aria-hidden="true"></i>
@@ -144,8 +144,6 @@
                             </a>
                             {% include '/partials/notifications-dropdown.html.twig' %}
                         </li>
-                    {% endif %}
-
                     <li class="dropdown">
                         <a href="{{ path('help_home') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help <span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -159,6 +157,7 @@
                             <li><a href="{{ report_technical_issue_url }}" target="_blank"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Report Technical Issue</a></li>
                         </ul>
                     </li>
+                    {% endif %}
                     <li class="dropdown">
                         <a href="{{ path('settings') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
