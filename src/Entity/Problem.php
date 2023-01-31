@@ -118,14 +118,14 @@ class Problem
     private $finalizedTs;
 
     /**
-     * @var ?DateTimeInterface
+     * @var DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
     private $createdTs;
 
     /**
-     * @var ?DateTimeInterface
+     * @var DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */

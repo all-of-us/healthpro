@@ -52,7 +52,7 @@ class ProblemComment
     private $comment;
 
     /**
-     * @var ?DateTimeInterface
+     * @var DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
