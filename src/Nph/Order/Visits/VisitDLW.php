@@ -9,8 +9,8 @@ class VisitDLW extends TimePoints
     protected $timePoints = [
         'day0PreDoseA' => 'Day 0 Pre Dose A',
         'day1PreDoseB' => 'Day 1 Pre Dose B',
-        'day1PostDoseC' => 'Day 1 Post Dose C',
-        'day1PostDoseD' => 'Day 1 Post Dose D',
+        'day1PostDoseC' => 'Day 1 Post Dose C (4 hrs)',
+        'day1PostDoseD' => 'Day 1 Post Dose D (4 hrs)',
         'day6E' => 'Day 6 E',
         'day7F' => 'Day 7 F',
         'day13G' => 'Day 13 G',
