@@ -34,7 +34,7 @@
                 </a>
             </div>
         {% endif %}
-        {% if (is_granted('ROLE_USER') and app.session.get('site') and app.session.get('siteOrganization')) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees) %}
+        {% if (is_granted('ROLE_USER') and app.session.get('site') and app.session.get('siteEntity') and app.session.get('siteEntity').organization) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees) %}
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('workqueue_index') }}" class="btn btn-lg btn-default btn-block">
                     <i class="fa fa-table" aria-hidden="true"></i>
