@@ -36,14 +36,19 @@ class NphSampleFinalizeType extends NphOrderForm
                     $tsData[] = $formData["{$aliquotCode}AliquotTs"][$i] ?? null;
                     $volumeData[] = $formData["{$aliquotCode}Volume"][$i] ?? null;
                 }
+                $barcodePattern = '';
+                if (!empty($aliquot['barcodePrefix'])) {
+                    $barcodePattern = $aliquot['barcodePrefix'];
+                }
+                $barcodePattern = "{$barcodePattern}[0-9]{{$aliquot['barcodeLength']}}";
                 $builder->add("{$aliquotCode}", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'entry_options' => [
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
-                                'pattern' => '/^[a-zA-Z0-9]{11}$/',
-                                'message' => 'Aliquot barcode must be a string of 11 digits'
+                                'pattern' => "/^{$barcodePattern}$/",
+                                'message' => 'Please enter a valid aliquot barcode.'
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();

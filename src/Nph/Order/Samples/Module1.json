@@ -17,7 +17,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         },
         "SST8P5A2": {
           "identifier": "SSTS1",
@@ -25,7 +26,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 1000,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         }
       }
     },
@@ -44,7 +46,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         },
         "LIHP1A2": {
           "identifier": "LiHP1",
@@ -52,7 +55,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 1000,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         }
       }
     },
@@ -71,7 +75,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         },
         "EDTA10A2": {
           "identifier": "EDPAP1",
@@ -79,7 +84,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 4,
           "expectedVolume": 1000,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         }
       }
     },
@@ -98,7 +104,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 500,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         }
       }
     },
@@ -117,7 +124,8 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 7,
           "expectedVolume": 500,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10
         },
         "URINESA2": {
           "identifier": "RU2",
@@ -125,7 +133,8 @@
           "description": "6mL Urine Aliquot tube",
           "expectedAliquots": 1,
           "expectedVolume": 5,
-          "units": "mL"
+          "units": "mL",
+          "barcodeLength" : 11
         }
       }
     },
@@ -144,7 +153,9 @@
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 4,
-          "units": "mL"
+          "units": "mL",
+          "barcodeLength" : 10,
+          "barcodePrefix": "MC"
         }
       }
     },
@@ -162,7 +173,8 @@
           "description": "Plastic Storage Bag",
           "expectedAliquots": 1,
           "expectedVolume": null,
-          "units": null
+          "units": null,
+          "barcodeLength" : 11
         }
       }
     },
@@ -189,7 +201,9 @@
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": null,
-          "units": null
+          "units": null,
+          "barcodeLength" : 10,
+          "barcodePrefix": "MC"
         }
       }
     },
@@ -207,7 +221,9 @@
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": null,
-          "units": null
+          "units": null,
+          "barcodeLength" : 10,
+          "barcodePrefix": "MC"
         }
       }
     },
