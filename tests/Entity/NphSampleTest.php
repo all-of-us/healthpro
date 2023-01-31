@@ -127,4 +127,43 @@ class NphSampleTest extends NphTestCase
         ];
         $this->assertSame($expectedAliquotSampleObj, $sample->getRdrAliquotsSampleObj($aliquotInfo));
     }
+
+    /**
+     * @dataProvider addNewAliquotsDataProvider
+     */
+    public function testAllowAddNewAliquots($orderType, $canAddNewAliquots)
+    {
+        $orderData['orderType'] = $orderType;
+        $orderData = array_merge($this->getOrderData(), $orderData);
+        $nphOrder = $this->createNphOrder($orderData);
+        $sampleData = [
+            'nphOrder' => $nphOrder,
+            'finalizedTs' => null
+        ];
+        $sampleData = array_merge($this->getSampleData(), $sampleData);
+        $nphSample = $this->createNphSample($sampleData);
+        $this->assertSame($canAddNewAliquots, $nphSample->allowAddNewAliquots());
+    }
+
+    public function addNewAliquotsDataProvider(): array
+    {
+        return [
+            [
+                'blood',
+                true
+            ],
+            [
+                'stool',
+                false
+            ],
+            [
+                'nail',
+                false
+            ],
+            [
+                'hair',
+                false
+            ]
+        ];
+    }
 }
