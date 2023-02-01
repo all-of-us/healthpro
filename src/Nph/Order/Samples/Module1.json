@@ -20,7 +20,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 500
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5
         },
         "SST8P5A2": {
           "identifier": "SSTS1",
@@ -31,7 +33,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 1000
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1
         }
       }
     },
@@ -53,7 +57,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 500
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5
         },
         "LIHP1A2": {
           "identifier": "LiHP1",
@@ -64,7 +70,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 1000
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1
         }
       }
     },
@@ -86,7 +94,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 500
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5
         },
         "EDTA10A2": {
           "identifier": "EDPAP1",
@@ -97,7 +107,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 1000
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1
         }
       }
     },
@@ -119,7 +131,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 500
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5
         }
       }
     },
@@ -141,7 +155,9 @@
           "units": "μL",
           "barcodeLength" : 10,
           "minVolume": 0,
-          "maxVolume": 1000
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1
         },
         "URINESA2": {
           "identifier": "RU2",
@@ -175,7 +191,9 @@
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
           "minVolume": 0,
-          "maxVolume": 4
+          "maxVolume": 4,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 4000
         }
       }
     },

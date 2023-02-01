@@ -142,9 +142,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $volumeData,
-                    'attr' => [
-                        'readonly' => $aliquot['expectedVolume'] === null
-                    ],
+                    'attr' => $this->getVolumeAttributes($aliquot)
                 ]);
             }
         }
@@ -184,5 +182,19 @@ class NphSampleFinalizeType extends NphOrderForm
             'disabled' => null,
             'nphSample' => null
         ]);
+    }
+
+    private function getVolumeAttributes(array $aliquot): array
+    {
+        $volumeAttributes = [
+            'readonly' => $aliquot['expectedVolume'] === null
+        ];
+        if (isset($aliquot['warningMinVolume'])) {
+            $volumeAttributes['warningMinVolume'] = $aliquot['warningMinVolume'];
+        }
+        if (isset($aliquot['warningMaxVolume'])) {
+            $volumeAttributes['warningMaxVolume'] = $aliquot['warningMaxVolume'];
+        }
+        return $volumeAttributes;
     }
 }
