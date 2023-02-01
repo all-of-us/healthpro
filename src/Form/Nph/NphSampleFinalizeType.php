@@ -112,7 +112,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         $formData = $context->getRoot()->getData();
                         $key = intval($context->getObject()->getName());
                         if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
-                            && empty($value)) {
+                            && $value === null) {
                             $context->buildViolation('Volume is required')->addViolation();
                         }
                         if ($aliquot['expectedVolume'] === null && !empty($value)) {
@@ -120,15 +120,18 @@ class NphSampleFinalizeType extends NphOrderForm
                         }
                     })
                 ];
-                if (isset($aliquot['minVolume']) && isset($aliquot['maxVolume'])) {
-                    $volumeConstraints[] = new Constraints\Range([
-                        'min' => $aliquot['minVolume'],
-                        'max' => $aliquot['maxVolume'],
-                        'minMessage' => 'Volume must be greater than 0.0',
-                        'maxMessage' => 'Please verify the volume is correct. If greater than expected volume, you may add an additional aliquot.'
+                if (isset($aliquot['minVolume'])) {
+                    $volumeConstraints[] = new Constraints\GreaterThan([
+                        'value' => $aliquot['minVolume'],
+                        'message' => 'Volume must be greater than 0'
                     ]);
                 }
-
+                if (isset($aliquot['maxVolume'])) {
+                    $volumeConstraints[] = new Constraints\LessThanOrEqual([
+                        'value' => $aliquot['maxVolume'],
+                        'message' => 'Please verify the volume is correct. If greater than expected volume, you may add an additional aliquot.'
+                    ]);
+                }
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
