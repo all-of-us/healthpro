@@ -55,7 +55,7 @@
             </div>
             {{ form_rest(orderForm) }}
                 <div class="row">
-                    <a class="btn btn-default" href="#">Cancel</a>
+                    <a class="btn btn-default" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
                     <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
                 </div>
             {{ form_end(orderForm) }}

@@ -888,4 +888,9 @@ class NphOrderService
         }
         return false;
     }
+
+    public function getVisitTypes(): array
+    {
+        return $this->moduleObj->getVisitTypes();
+    }
 }

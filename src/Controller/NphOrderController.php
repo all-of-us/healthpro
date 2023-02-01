@@ -70,6 +70,7 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
@@ -290,6 +291,7 @@ class NphOrderController extends BaseController
              'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
+                'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
                 'sampleCount' => $orderInfo['sampleCount'],
                 'sampleGroup' => $sampleGroup]
         );

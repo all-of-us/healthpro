@@ -34,6 +34,7 @@ class NphProgramSummaryService
                 }
                 $moduleSummary[$visit][$timePoint] = ['timePointInfo' => $moduleSummary[$visit][$timePoint], 'timePointDisplayName' => $module->getTimePoints()[$timePoint]];
             }
+            $moduleSummary[$visit] = ['visitInfo' => $moduleSummary[$visit], 'visitDisplayName' => $visits[$visit]];
         }
         return $moduleSummary;
     }
@@ -54,7 +55,7 @@ class NphProgramSummaryService
         $combinedSummary = [];
         foreach ($programSummary as $module => $moduleSummary) {
             foreach ($moduleSummary as $visit => $visitSummary) {
-                foreach ($visitSummary as $timePoint => $timePointSummary) {
+                foreach ($visitSummary['visitInfo'] as $timePoint => $timePointSummary) {
                     foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
                         $numberSamples = 0;
                         $expectedSamples = 0;
@@ -71,8 +72,9 @@ class NphProgramSummaryService
                         $combinedSummary[$module][$visit][$timePoint][$sampleType]['numberSamples'] = $numberSamples;
                         $combinedSummary[$module][$visit][$timePoint][$sampleType]['expectedSamples'] = $expectedSamples;
                     }
-                    $combinedSummary[$module][$visit][$timePoint] = ['timePointInfo' => $combinedSummary[$module][$visit][$timePoint], 'timePointDisplayName' => $programSummary[$module][$visit][$timePoint]['timePointDisplayName']];
+                    $combinedSummary[$module][$visit][$timePoint] = ['timePointInfo' => $combinedSummary[$module][$visit][$timePoint], 'timePointDisplayName' => $visitSummary['visitInfo'][$timePoint]['timePointDisplayName']];
                 }
+                $combinedSummary[$module][$visit] = ['visitInfo' => $combinedSummary[$module][$visit], 'visitDisplayName' => $visitSummary['visitDisplayName']];
             }
         }
         return $combinedSummary;
