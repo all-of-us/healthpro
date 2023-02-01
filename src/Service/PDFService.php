@@ -73,7 +73,7 @@ class PDFService
                         if ($sampleType === "stool" && $stoolPrinted === false) {
                             $sample['identifier'] = "ST-KIT";
                             $sampleId = $sample['orderId'];
-                            $sampleId = str_replace("KIT", "", $sampleId);
+                            $sampleId = preg_replace("/KIT-?/", "", $sampleId);
                             $stoolPrinted = true;
                         } elseif ($sampleType === "stool" && $stoolPrinted === true) {
                             continue;
