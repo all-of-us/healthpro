@@ -210,6 +210,9 @@
                                                     class="has-error"{% endif %}>
                                                     {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
                                                     {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
+                                                    <span class="text-warning aliquot-volume-warning" style="display: none">
+                                                        Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)'
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     {{ aliquot['units'] }}

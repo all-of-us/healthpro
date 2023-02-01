@@ -136,13 +136,16 @@ class NphSampleFinalizeType extends NphOrderForm
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
                     'entry_options' => [
-                        'constraints' => $volumeConstraints
+                        'constraints' => $volumeConstraints,
+                        'attr' => $this->getVolumeAttributes($aliquot)
                     ],
                     'required' => false,
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $volumeData,
-                    'attr' => $this->getVolumeAttributes($aliquot)
+                    'attr' => [
+                        'readonly' => $aliquot['expectedVolume'] === null
+                    ]
                 ]);
             }
         }
@@ -187,13 +190,13 @@ class NphSampleFinalizeType extends NphOrderForm
     private function getVolumeAttributes(array $aliquot): array
     {
         $volumeAttributes = [
-            'readonly' => $aliquot['expectedVolume'] === null
+            'class' => 'aliquot-volume'
         ];
         if (isset($aliquot['warningMinVolume'])) {
-            $volumeAttributes['warningMinVolume'] = $aliquot['warningMinVolume'];
+            $volumeAttributes['data-warning-min-volume'] = $aliquot['warningMinVolume'];
         }
         if (isset($aliquot['warningMaxVolume'])) {
-            $volumeAttributes['warningMaxVolume'] = $aliquot['warningMaxVolume'];
+            $volumeAttributes['data-warning-max-volume'] = $aliquot['warningMaxVolume'];
         }
         return $volumeAttributes;
     }
