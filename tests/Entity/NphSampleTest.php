@@ -122,7 +122,7 @@ class NphSampleTest extends NphTestCase
                 'description' => '1.4mL Matrix tube',
                 'volume' => 500.0,
                 'collected' => '2023-01-08T08:00:00Z',
-                'units' => 'μL'
+                'units' => 'uL'
             ]
         ];
         $this->assertSame($expectedAliquotSampleObj, $sample->getRdrAliquotsSampleObj($aliquotInfo));
