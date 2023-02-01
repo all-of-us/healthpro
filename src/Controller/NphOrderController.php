@@ -377,7 +377,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+        if (!$this->isGranted('ROLE_NPH_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();
         }
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
