@@ -51,12 +51,12 @@ $(document).ready(function () {
 
     $(".aliquot-volume").keyup(function () {
         let inputValue = $(this).val();
-        let minValue = $(this).data('warning-min-volume');
-        let maxValue = $(this).data('warning-max-volume');
+        let minValue = $(this).data("warning-min-volume");
+        let maxValue = $(this).data("warning-max-volume");
         if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
-            $(this).closest("tr").find('.aliquot-volume-warning').show();
+            $(this).closest("tr").find(".aliquot-volume-warning").show();
         } else {
-            $(this).closest("tr").find('.aliquot-volume-warning').hide();
+            $(this).closest("tr").find(".aliquot-volume-warning").hide();
         }
     });
 
