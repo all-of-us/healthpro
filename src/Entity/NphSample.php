@@ -20,6 +20,10 @@ class NphSample
     public const UNLOCK = 'unlock';
     public const EDITED = 'edited';
 
+    private const RDR_MICROLITER_UNITS = [
+        'μL' => 'uL'
+    ];
+
     public static $cancelReasons = [
         'Created in error' => 'CANCEL_ERROR',
         'Created for wrong participant' => 'CANCEL_WRONG_PARTICIPANT',
@@ -477,7 +481,7 @@ class NphSample
                 'description' => $aliquotsInfo[$aliquot->getAliquotCode()]['description'],
                 'volume' => $aliquot->getVolume(),
                 'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
-                'units' => $aliquot->getUnits()
+                'units' => self::RDR_MICROLITER_UNITS[$aliquot->getUnits()] ?? $aliquot->getUnits()
             ];
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();
