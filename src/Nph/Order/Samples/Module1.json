@@ -168,7 +168,9 @@
           "units": "mL",
           "barcodeLength" : 11,
           "minVolume": 0,
-          "maxVolume": 5
+          "maxVolume": 5,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 5000
         }
       }
     },
