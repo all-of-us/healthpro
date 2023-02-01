@@ -8,8 +8,8 @@ class VisitDSMT extends TimePoints
 {
     protected $timePoints = [
         'preDSMT' => 'Pre DSMT',
-        'minus15min' => 'Minus 15 Min',
-        'min5min' => 'Minus 5 Min',
+        'minus15min' => '-15 Min',
+        'min5min' => '-5 Min',
         '15min' => '15 Min',
         '30min' => '30 Min',
         '60min' => '60 Min',

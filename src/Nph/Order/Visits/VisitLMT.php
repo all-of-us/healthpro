@@ -8,8 +8,8 @@ class VisitLMT extends TimePoints
 {
     protected $timePoints = [
         'preLMT' => 'Pre LMT',
-        'minus15min' => 'Minus 15 Min',
-        'minus5min' => 'Minus 5 Min',
+        'minus15min' => '-15 Min',
+        'minus5min' => '-5 Min',
         '15min' => '15 Min',
         '30min' => '30 Min',
         '60min' => '60 Min',
