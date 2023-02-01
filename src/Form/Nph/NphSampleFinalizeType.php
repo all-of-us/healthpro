@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleFinalizeType extends NphOrderForm
 {
+    private const BARCODE_PREFIX_MC = 'MC';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $sample = $options['sample'];
@@ -48,7 +50,7 @@ class NphSampleFinalizeType extends NphOrderForm
                             new Constraints\Type('string'),
                             new Constraints\Regex([
                                 'pattern' => "/^{$barcodePattern}$/",
-                                'message' => 'Please enter a valid aliquot barcode.'
+                                'message' => $this->getBarcodeErrorMessage($aliquot)
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
@@ -199,5 +201,20 @@ class NphSampleFinalizeType extends NphOrderForm
             $volumeAttributes['data-warning-max-volume'] = $aliquot['warningMaxVolume'];
         }
         return $volumeAttributes;
+    }
+
+    private function getBarcodeErrorMessage(array $aliquot): string
+    {
+        switch ($aliquot['barcodeLength']) {
+            case 10:
+                if (isset($aliquot['barcodePrefix']) && $aliquot['barcodePrefix'] === self::BARCODE_PREFIX_MC) {
+                    return 'Please enter a valid aliquot barcode. Format should be MC1000000000 (MC + 10 digits).';
+                }
+                return 'Please enter a valid aliquot barcode. Format should be 1000000000 (10 digits).';
+            case 11:
+                return 'Please enter a valid aliquot barcode. Format should be 10000000000 (11 digits).';
+            default:
+                return 'Please enter a valid aliquot barcode.';
+        }
     }
 }
