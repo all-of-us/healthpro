@@ -16,6 +16,7 @@ use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Util\Json;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,7 +67,9 @@ class NphOrderController extends BaseController
                 }
             }
             if ($oderForm->isValid()) {
-                if ($oderForm->get('validate')->isClicked()) {
+                /** @var SubmitButton $validateButton */
+                $validateButton = $oderForm->get('validate');
+                if ($validateButton->isClicked()) {
                     $showPreview = true;
                 } else {
                     $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
