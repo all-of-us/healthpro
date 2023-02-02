@@ -6,7 +6,7 @@ $(document).ready(function () {
         $("#order_review_table tbody").append("<tr><td>" + timePoint + "</td><td>" + samples + "</td></tr>");
     };
 
-    let showPreview = orderCreateSelector.data('show-preview');
+    let showPreview = orderCreateSelector.data("show-preview");
     if (showPreview) {
         orderCreateSelector.hide();
         orderReviewSelector.show();
@@ -24,7 +24,7 @@ $(document).ready(function () {
                     .each(function () {
                         if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                             let sample = $(this).val();
-                            if (sample === "nail") {
+                            if (sample === "NAIL") {
                                 let nailSubSamples = [];
                                 $(".nail-sub-samples")
                                     .find("input:checkbox")
@@ -40,7 +40,7 @@ $(document).ready(function () {
                                         "Nail: " + nailSubSamples.join(", ") + ""
                                     );
                                 }
-                            } else if (sample === "stool") {
+                            } else if (sample === "STOOL") {
                                 let stoolKitSelector = $("#nph_order_stoolKit");
                                 if (stoolKitSelector.val()) {
                                     let stoolKitSamples = "";
