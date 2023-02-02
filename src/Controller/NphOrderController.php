@@ -57,12 +57,16 @@ class NphOrderController extends BaseController
                 $nphOrderService->getSamplesByType('stool')]
         );
         $oderForm->handleRequest($request);
-        if ($oderForm->isSubmitted() && $oderForm->isValid()) {
-            $formData = $oderForm->getData();
-            $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
-            $this->addFlash('success', 'Orders Created');
-            return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
-                'visit' => $visit, 'sampleGroup' => $sampleGroup]);
+        if ($oderForm->isSubmitted()) {
+            if ($oderForm->isValid()) {
+                $formData = $oderForm->getData();
+                $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
+                $this->addFlash('success', 'Orders Created');
+                return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
+                    'visit' => $visit, 'sampleGroup' => $sampleGroup]);
+            } else {
+                $oderForm->addError(new FormError('Please correct the errors below'));
+            }
         }
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),

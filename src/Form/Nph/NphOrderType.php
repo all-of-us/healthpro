@@ -21,7 +21,13 @@ class NphOrderType extends AbstractType
                     $builder->add('stoolKit', Type\TextType::class, [
                         'label' => 'Stool Kit ID',
                         'required' => false,
-                        'constraints' => new Constraints\Type('string'),
+                        'constraints' => [
+                            new Constraints\Type('string'),
+                            new Constraints\Regex([
+                                'pattern' => '/^KIT-[0-9]{8}$/',
+                                'message' => 'Please enter a valid KIT ID. Format should be KIT-10000000 (KIT-8 digits)'
+                            ])
+                        ],
                         'attr' => [
                             'placeholder' => 'Scan Kit ID',
                             'disabled' => !empty($ordersData['stoolKit'])
@@ -33,7 +39,13 @@ class NphOrderType extends AbstractType
                         'label' => $sample,
                         'required' => false,
                         'disabled' => !empty($ordersData[$sampleCode]),
-                        'constraints' => new Constraints\Type('string'),
+                        'constraints' => [
+                            new Constraints\Type('string'),
+                            new Constraints\Regex([
+                                'pattern' => '/^[0-9]{11}$/',
+                                'message' => 'Please enter a valid collection tube barcode.Format should be 10000000000 (11 digits).'
+                            ])
+                        ],
                         'attr' => [
                             'placeholder' => 'Scan Tube',
                             'disabled' => !empty($ordersData['stoolKit'])
