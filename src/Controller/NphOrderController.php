@@ -56,14 +56,24 @@ class NphOrderController extends BaseController
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
                 $nphOrderService->getSamplesByType('stool')]
         );
+        $showPreview = false;
         $oderForm->handleRequest($request);
         if ($oderForm->isSubmitted()) {
+            $formData = $oderForm->getData();
+            if ($validations = $nphOrderService->validateGenerateOrdersData($formData)) {
+                foreach ($validations as $validation) {
+                    $oderForm[$validation['field']]->addError(new FormError($validation['errorMessage']));
+                }
+            }
             if ($oderForm->isValid()) {
-                $formData = $oderForm->getData();
-                $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
-                $this->addFlash('success', 'Orders Created');
-                return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
-                    'visit' => $visit, 'sampleGroup' => $sampleGroup]);
+                if ($oderForm->get('validate')->isClicked()) {
+                    $showPreview = true;
+                } else {
+                    $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
+                    $this->addFlash('success', 'Orders Created');
+                    return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
+                        'visit' => $visit, 'sampleGroup' => $sampleGroup]);
+                }
             } else {
                 $oderForm->addError(new FormError('Please correct the errors below'));
             }
@@ -80,7 +90,8 @@ class NphOrderController extends BaseController
             'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
             'nailSamples' => $nphOrderService->getSamplesByType('nail'),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
-            'samplesStatus' => $nphOrderService->getSamplesWithStatus()
+            'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
+            'showPreview' => $showPreview
         ]);
     }
 

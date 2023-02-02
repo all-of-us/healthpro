@@ -69,6 +69,12 @@ class NphOrderType extends AbstractType
                     return $attr;
                 }
             ]);
+            $builder->add('validate', Type\SubmitType::class, [
+                'label' => 'Next',
+                'attr' => [
+                    'class' => 'btn btn-primary'
+                ]
+            ]);
         }
         return $builder->getForm();
     }

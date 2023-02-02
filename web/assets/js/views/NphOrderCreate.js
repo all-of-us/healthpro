@@ -6,7 +6,8 @@ $(document).ready(function () {
         $("#order_review_table tbody").append("<tr><td>" + timePoint + "</td><td>" + samples + "</td></tr>");
     };
 
-    $("#order_next_btn").on("click", function () {
+    let showPreview = orderCreateSelector.data('show-preview');
+    if (showPreview) {
         orderCreateSelector.hide();
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
@@ -81,7 +82,7 @@ $(document).ready(function () {
             }
         });
         $("#samples_count").html(samplesCount);
-    });
+    }
 
     $("#order_review_back_btn").on("click", function () {
         orderCreateSelector.show();

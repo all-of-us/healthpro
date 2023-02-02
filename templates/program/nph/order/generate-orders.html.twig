@@ -23,7 +23,8 @@
          data-samples="{{ samples|json_encode() }}"
          data-time-points="{{ timePoints|json_encode() }}"
          data-nail-samples="{{ nailSamples|json_encode() }}"
-         data-stool-samples="{{ stoolSamples|json_encode() }}">
+         data-stool-samples="{{ stoolSamples|json_encode() }}"
+         data-show-preview="{{ showPreview }}">
         <div class="col-sm-12">
             {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
                 'order_create_form' } }) }}
@@ -53,11 +54,12 @@
                 </div>
             {% endfor %}
             </div>
-            {{ form_rest(orderForm) }}
                 <div class="row">
                     <a class="btn btn-default" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
-                    <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>
+{#                    <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>#}
+                    {{ form_widget(orderForm.validate) }}
                 </div>
+            {{ form_rest(orderForm) }}
             {{ form_end(orderForm) }}
             <br>
         </div>

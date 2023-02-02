@@ -893,4 +893,23 @@ class NphOrderService
     {
         return $this->moduleObj->getVisitTypes();
     }
+
+    public function validateGenerateOrdersData(array $formData): array
+    {
+        // For stool kit samples
+        if (!empty($formData['stoolKit'])) {
+            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+                if (!empty($formData[$stoolSample])) {
+                    return [];
+                }
+            }
+            return [
+                [
+                    'field' => $this->getSamplesByType('stool')[0],
+                    'errorMessage' => 'Please enter at least one stool tube id'
+                ]
+            ];
+        }
+        return [];
+    }
 }
