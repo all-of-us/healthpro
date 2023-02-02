@@ -397,7 +397,7 @@ class NphOrderController extends BaseController
     }
 
     /**
-     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/revert", name="nph_sample_revert")
+     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/revert", name="nph_sample_revert", methods={"POST"})
      */
     public function sampleRevertAction(
         string $participantId,
