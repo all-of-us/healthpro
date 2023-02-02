@@ -128,18 +128,20 @@ class NphParticipantSummaryService
     {
         $searchParams = [];
         foreach ($params as $field => $value) {
-            if ($field === 'dob') {
-                $date = new \DateTime($params['dob']);
-                $field = 'dateOfBirth';
-                $value = $date->format('Y-m-d');
+            if (!empty($value)) {
+                if ($field === 'dob') {
+                    $date = new \DateTime($params['dob']);
+                    $field = 'dateOfBirth';
+                    $value = $date->format('Y-m-d');
+                }
+                if ($field === 'email') {
+                    $value = strtolower($value);
+                }
+                if ($field === 'phone') {
+                    $field = 'phoneNumber';
+                }
+                $searchParams[] = "{$field}: \"{$value}\"";
             }
-            if ($field === 'email') {
-                $value = strtolower($value);
-            }
-            if ($field === 'phone') {
-                $field = 'phoneNumber';
-            }
-            $searchParams[] = "{$field}: \"{$value}\"";
         }
         $searchParams = implode(',', $searchParams);
         return " 

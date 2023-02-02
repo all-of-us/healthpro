@@ -49,6 +49,17 @@ $(document).ready(function () {
         $(this).closest("tr").find("input").val("");
     });
 
+    $(".aliquot-volume").keyup(function () {
+        let inputValue = $(this).val();
+        let minValue = $(this).data("warning-min-volume");
+        let maxValue = $(this).data("warning-max-volume");
+        if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
+            $(this).closest("tr").find(".aliquot-volume-warning").show();
+        } else {
+            $(this).closest("tr").find(".aliquot-volume-warning").hide();
+        }
+    });
+
     /*
     // TODO: Disabling it for now as we need to implement this based on different aliquot barcode lengths
     $(".aliquot-barcode").keyup(function () {

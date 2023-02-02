@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleFinalizeType extends NphOrderForm
 {
+    private const BARCODE_PREFIX_MC = 'MC';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $sample = $options['sample'];
@@ -36,14 +38,19 @@ class NphSampleFinalizeType extends NphOrderForm
                     $tsData[] = $formData["{$aliquotCode}AliquotTs"][$i] ?? null;
                     $volumeData[] = $formData["{$aliquotCode}Volume"][$i] ?? null;
                 }
+                $barcodePattern = '';
+                if (!empty($aliquot['barcodePrefix'])) {
+                    $barcodePattern = $aliquot['barcodePrefix'];
+                }
+                $barcodePattern = "{$barcodePattern}[0-9]{{$aliquot['barcodeLength']}}";
                 $builder->add("{$aliquotCode}", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'entry_options' => [
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
-                                'pattern' => '/^[a-zA-Z0-9]{11}$/',
-                                'message' => 'Aliquot barcode must be a string of 11 digits'
+                                'pattern' => "/^{$barcodePattern}$/",
+                                'message' => $this->getBarcodeErrorMessage($aliquot)
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
@@ -102,23 +109,37 @@ class NphSampleFinalizeType extends NphOrderForm
                     'data' => $tsData,
                 ]);
 
+                $volumeConstraints = [
+                    new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
+                        $formData = $context->getRoot()->getData();
+                        $key = intval($context->getObject()->getName());
+                        if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
+                            && $value === null) {
+                            $context->buildViolation('Volume is required')->addViolation();
+                        }
+                        if ($aliquot['expectedVolume'] === null && !empty($value)) {
+                            $context->buildViolation('Volume should not be entered')->addViolation();
+                        }
+                    })
+                ];
+                if (isset($aliquot['minVolume'])) {
+                    $volumeConstraints[] = new Constraints\GreaterThan([
+                        'value' => $aliquot['minVolume'],
+                        'message' => 'Volume must be greater than 0'
+                    ]);
+                }
+                if (isset($aliquot['maxVolume'])) {
+                    $volumeConstraints[] = new Constraints\LessThanOrEqual([
+                        'value' => $aliquot['maxVolume'],
+                        'message' => 'Please verify the volume is correct. If greater than expected volume, you may add an additional aliquot.'
+                    ]);
+                }
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
                     'entry_options' => [
-                        'constraints' => [
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
-                                $formData = $context->getRoot()->getData();
-                                $key = intval($context->getObject()->getName());
-                                if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
-                                    && empty($value)) {
-                                    $context->buildViolation('Volume is required')->addViolation();
-                                }
-                                if ($aliquot['expectedVolume'] === null && !empty($value)) {
-                                    $context->buildViolation('Volume should not be entered')->addViolation();
-                                }
-                            })
-                        ]
+                        'constraints' => $volumeConstraints,
+                        'attr' => $this->getVolumeAttributes($aliquot)
                     ],
                     'required' => false,
                     'allow_add' => true,
@@ -126,7 +147,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'data' => $volumeData,
                     'attr' => [
                         'readonly' => $aliquot['expectedVolume'] === null
-                    ],
+                    ]
                 ]);
             }
         }
@@ -166,5 +187,34 @@ class NphSampleFinalizeType extends NphOrderForm
             'disabled' => null,
             'nphSample' => null
         ]);
+    }
+
+    private function getVolumeAttributes(array $aliquot): array
+    {
+        $volumeAttributes = [
+            'class' => 'aliquot-volume'
+        ];
+        if (isset($aliquot['warningMinVolume'])) {
+            $volumeAttributes['data-warning-min-volume'] = $aliquot['warningMinVolume'];
+        }
+        if (isset($aliquot['warningMaxVolume'])) {
+            $volumeAttributes['data-warning-max-volume'] = $aliquot['warningMaxVolume'];
+        }
+        return $volumeAttributes;
+    }
+
+    private function getBarcodeErrorMessage(array $aliquot): string
+    {
+        switch ($aliquot['barcodeLength']) {
+            case 10:
+                if (isset($aliquot['barcodePrefix']) && $aliquot['barcodePrefix'] === self::BARCODE_PREFIX_MC) {
+                    return 'Please enter a valid aliquot barcode. Format should be MC1000000000 (MC + 10 digits).';
+                }
+                return 'Please enter a valid aliquot barcode. Format should be 1000000000 (10 digits).';
+            case 11:
+                return 'Please enter a valid aliquot barcode. Format should be 10000000000 (11 digits).';
+            default:
+                return 'Please enter a valid aliquot barcode.';
+        }
     }
 }
