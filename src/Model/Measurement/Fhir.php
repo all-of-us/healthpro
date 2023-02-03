@@ -4,6 +4,8 @@ namespace App\Model\Measurement;
 
 use App\Entity\Measurement;
 use App\Helper\Util;
+use App\Security\User;
+use DateTimeZone;
 use stdClass;
 
 class Fhir
@@ -32,7 +34,7 @@ class Fhir
         // Convert DateTime object to UTC timestamp
         // (can't use 'c' ISO 8601 format because that results in +00:00 instead of Z)
         $date = clone $options['datetime'];
-        $date->setTimezone(new \DateTimeZone('UTC'));
+        $date->setTimezone(new DateTimeZone('UTC'));
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
         $this->parentRdr = $options['parent_rdr'];
         $this->createdUser = $options['created_user'];
@@ -119,7 +121,7 @@ class Fhir
             if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
                 continue;
             }
-            $index = $m[1] - 1;
+            $index = (int)$m[1] - 1;
             if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                 $metrics[$k] = 'blood-pressure-' . $m[1];
             } else {
@@ -206,11 +208,11 @@ class Fhir
                 'extension' => [
                     [
                         'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
-                        'valueString' => 'Location/' . \App\Security\User::SITE_PREFIX . $this->createdSite
+                        'valueString' => 'Location/' . User::SITE_PREFIX . $this->createdSite
                     ],
                     [
                         'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
-                        'valueString' => 'Location/' . \App\Security\User::SITE_PREFIX . $this->finalizedSite
+                        'valueString' => 'Location/' . User::SITE_PREFIX . $this->finalizedSite
                     ]
                 ],
             ]

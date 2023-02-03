@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-use App\Entity\Problem;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -51,7 +52,7 @@ class ProblemComment
     private $comment;
 
     /**
-     * @var \DateTime
+     * @var DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
@@ -65,7 +66,7 @@ class ProblemComment
 
     public function __construct()
     {
-        $this->createdTs = new \DateTime();
+        $this->createdTs = new DateTime();
     }
 
     public function getId(): ?int
@@ -121,12 +122,12 @@ class ProblemComment
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): ?DateTimeInterface
     {
         return $this->createdTs;
     }
 
-    public function setCreatedTs(\DateTimeInterface $createdTs): self
+    public function setCreatedTs(DateTimeInterface $createdTs): self
     {
         $this->createdTs = $createdTs;
 

@@ -755,9 +755,9 @@ class NphOrderService
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
-            return false;
+            return null;
         }
-        return false;
+        return null;
     }
 
     public function editRdrSample(string $participantId, string $orderId, \stdClass $sampleObject): bool
