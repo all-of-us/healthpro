@@ -32,9 +32,12 @@
             <div>
                 <label>Select the sample and timepoints:</label>
                 <span class="well-sm bg-primary">
-                    <input type="checkbox" id="checkAll">
+                    {{ form_widget(orderForm['checkAll']) }}
                     Check All Timepoints and Samples
                 </span>
+            </div>
+            <div {% if not orderForm['checkAll'].vars.valid %} class="has-error" {% endif %}>
+                {{ form_errors(orderForm['checkAll']) }}
             </div>
             <br>
             <div class="row">

@@ -15,6 +15,7 @@ class NphOrderType extends AbstractType
         $ordersData = $builder->getData();
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
+        $stoolSamples = $options['stoolSamples'];
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === 'ST1') {
@@ -65,17 +66,22 @@ class NphOrderType extends AbstractType
                     if (isset($ordersData[$timePoint]) && in_array($val, $ordersData[$timePoint])) {
                         $attr['disabled'] = true;
                         $attr['class'] = 'sample-disabled';
+                        $attr['checked'] = true;
                     }
                     return $attr;
                 }
             ]);
-            $builder->add('validate', Type\SubmitType::class, [
-                'label' => 'Next',
-                'attr' => [
-                    'class' => 'btn btn-primary'
-                ]
-            ]);
         }
+        $builder->add('validate', Type\SubmitType::class, [
+            'label' => 'Next',
+            'attr' => [
+                'class' => 'btn btn-primary'
+            ]
+        ]);
+        // Placeholder field for displaying select at least one sample message
+        $builder->add('checkAll', Type\CheckboxType::class, [
+            'required' => false
+        ]);
         return $builder->getForm();
     }
 

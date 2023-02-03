@@ -897,6 +897,22 @@ class NphOrderService
     public function validateGenerateOrdersData(array $formData): array
     {
         $formErrors = [];
+        $hasSample = false;
+        foreach (array_keys($this->getTimePoints()) as $timePoint) {
+            if (!empty($formData[$timePoint])) {
+                $hasSample = true;
+                break;
+            }
+        }
+        if (empty($formData['stoolKit'])) {
+            if ($hasSample === false) {
+                $formErrors[] = [
+                    'field' => 'checkAll',
+                    'message' => 'Please select or enter at least one sample'
+                ];
+                return $formErrors;
+            }
+        }
         if (!empty($formData['stoolKit'])) {
             $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
                 'orderId' => $formData['stoolKit']
@@ -925,7 +941,7 @@ class NphOrderService
             if ($hasStoolTube === false) {
                 $formErrors[] = [
                     'field' => $this->getSamplesByType('stool')[0],
-                    'message' => 'Please enter at least one stool tube id'
+                    'message' => 'Please enter at least one Stool Tube ID'
                 ];
             }
         }
