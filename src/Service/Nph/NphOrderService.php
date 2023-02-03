@@ -898,10 +898,28 @@ class NphOrderService
     {
         $formErrors = [];
         if (!empty($formData['stoolKit'])) {
+            $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $formData['stoolKit']
+            ]);
+            if ($nphOrder) {
+                $formErrors[] = [
+                    'field' => 'stoolKit',
+                    'message' => 'This Kit ID has already been used for another order'
+                ];
+            }
             $hasStoolTube = false;
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $hasStoolTube = true;
+                    $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
+                        'sampleId' => $formData[$stoolSample]
+                    ]);
+                    if ($nphSample) {
+                        $formErrors[] = [
+                            'field' => $stoolSample,
+                            'message' => 'This Tube ID has already been used for another sample'
+                        ];
+                    }
                 }
             }
             if ($hasStoolTube === false) {
@@ -909,16 +927,6 @@ class NphOrderService
                     'field' => $this->getSamplesByType('stool')[0],
                     'message' => 'Please enter at least one stool tube id'
                 ];
-            } else {
-                $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
-                    'orderId' => $formData['stoolKit']
-                ]);
-                if (!empty($nphOrder)) {
-                    $formErrors[] = [
-                        'field' => 'stoolKit',
-                        'message' => 'This Kit ID has already been used for another order'
-                    ];
-                }
             }
         }
         return $formErrors;
