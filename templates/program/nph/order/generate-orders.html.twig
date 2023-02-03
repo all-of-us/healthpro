@@ -19,7 +19,7 @@
         </div>
     {% endif %}
 
-    <div class="row" id="order_create"
+    <div class="row" id="order_create" {% if showPreview %} style="display: none" {% endif %}
          data-samples="{{ samples|json_encode() }}"
          data-time-points="{{ timePoints|json_encode() }}"
          data-nail-samples="{{ nailSamples|json_encode() }}"

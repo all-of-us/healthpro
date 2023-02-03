@@ -896,20 +896,31 @@ class NphOrderService
 
     public function validateGenerateOrdersData(array $formData): array
     {
-        // For stool kit samples
+        $formErrors = [];
         if (!empty($formData['stoolKit'])) {
+            $hasStoolTube = false;
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
-                    return [];
+                    $hasStoolTube = true;
                 }
             }
-            return [
-                [
+            if ($hasStoolTube === false) {
+                $formErrors[] = [
                     'field' => $this->getSamplesByType('stool')[0],
-                    'errorMessage' => 'Please enter at least one stool tube id'
-                ]
-            ];
+                    'message' => 'Please enter at least one stool tube id'
+                ];
+            } else {
+                $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
+                    'orderId' => $formData['stoolKit']
+                ]);
+                if (!empty($nphOrder)) {
+                    $formErrors[] = [
+                        'field' => 'stoolKit',
+                        'message' => 'This Kit ID has already been used for another order'
+                    ];
+                }
+            }
         }
-        return [];
+        return $formErrors;
     }
 }

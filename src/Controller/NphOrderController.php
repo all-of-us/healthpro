@@ -61,9 +61,9 @@ class NphOrderController extends BaseController
         $oderForm->handleRequest($request);
         if ($oderForm->isSubmitted()) {
             $formData = $oderForm->getData();
-            if ($validations = $nphOrderService->validateGenerateOrdersData($formData)) {
-                foreach ($validations as $validation) {
-                    $oderForm[$validation['field']]->addError(new FormError($validation['errorMessage']));
+            if ($formErrors = $nphOrderService->validateGenerateOrdersData($formData)) {
+                foreach ($formErrors as $formError) {
+                    $oderForm[$formError['field']]->addError(new FormError($formError['message']));
                 }
             }
             if ($oderForm->isValid()) {
