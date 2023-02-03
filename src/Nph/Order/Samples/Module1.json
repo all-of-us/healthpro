@@ -86,7 +86,7 @@
       "collectionVolume": "10 mL",
       "aliquots": {
         "EDTA10A1": {
-          "identifier": "EDPAP1",
+          "identifier": "EDTAP1",
           "container": "1.4mL Matrix tube 500μL",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
@@ -99,7 +99,7 @@
           "warningMaxVolume": 0.5
         },
         "EDTA10A2": {
-          "identifier": "EDPAP1",
+          "identifier": "EDTAP1",
           "container": "1.4mL Matrix tube 1000μL",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 4,
