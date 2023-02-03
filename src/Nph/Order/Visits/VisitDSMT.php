@@ -15,6 +15,7 @@ class VisitDSMT extends TimePoints
         '60min' => '60 Min',
         '90min' => '90 Min',
         '120min' => '120 Min',
+        '180min' => '180 Min',
         '240min' => '240 Min',
         'postDSMT' => 'Post DSMT'
     ];

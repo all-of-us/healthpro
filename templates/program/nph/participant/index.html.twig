@@ -51,7 +51,7 @@
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                     <div>
                         <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
-                             role="button">Visit {{ VisitCode }}<span class="caret"
+                             role="button">Visit {{ visit['visitDisplayName'] }}<span class="caret"
                                                                       style="float: right; margin: 9px 0;"></span></div>
                         <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse">
                             <a class="btn btn-primary" role="button"
@@ -59,7 +59,7 @@
                                 <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
                             </a>
                             {% set displayedOrderIDS = [] %}
-                            {% for timepointCode, timepoint in visit %}
+                            {% for timepointCode, timepoint in visit['visitInfo'] %}
                                 {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
                                     {% if sampleInfo['numberSamples'] > 0 %}
                                         {% if loop.first %}

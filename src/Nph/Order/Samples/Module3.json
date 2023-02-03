@@ -99,6 +99,14 @@
       "specimen": "Stool",
       "type": "stool",
       "identifier": "ST4"
+    },
+    "TU1": {
+      "label": "Timed Urine",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Timed Urine",
+      "type": "urine",
+      "identifier": "TU1"
     }
   }
 }

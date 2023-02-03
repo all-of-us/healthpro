@@ -825,15 +825,11 @@ class NphOrderService
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
         }
-        $notes = [];
-        foreach (['collected', 'finalized'] as $step) {
-            if ($sample->{'get' . ucfirst($step) . 'Notes'}()) {
-                $notes[$step] = $sample->{'get' . ucfirst($step) . 'Notes'}();
-            }
-        }
-        if (!empty($notes)) {
-            $obj->notes = $notes;
-        }
+        $notes = [
+            'collected' => $sample->getCollectedNotes(),
+            'finalized' => $sample->getFinalizedNotes()
+        ];
+        $obj->notes = $notes;
         if ($type === 'amend') {
             $obj->amendedReason = $sample->getModifyReason();
             $obj->amendedInfo = $this->getUserSiteData(
@@ -891,5 +887,10 @@ class NphOrderService
             return false;
         }
         return false;
+    }
+
+    public function getVisitTypes(): array
+    {
+        return $this->moduleObj->getVisitTypes();
     }
 }

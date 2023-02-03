@@ -70,6 +70,7 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
@@ -290,6 +291,7 @@ class NphOrderController extends BaseController
              'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
+                'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
                 'sampleCount' => $orderInfo['sampleCount'],
                 'sampleGroup' => $sampleGroup]
         );
@@ -377,7 +379,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
+        if (!$this->isGranted('ROLE_NPH_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();
         }
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);

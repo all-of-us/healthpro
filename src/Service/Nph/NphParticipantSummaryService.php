@@ -3,6 +3,7 @@
 namespace App\Service\Nph;
 
 use App\Drc\Exception\FailedRequestException;
+use App\Drc\Exception\InvalidDobException;
 use App\Drc\Exception\InvalidResponseException;
 use App\Helper\NphParticipant;
 use App\Service\RdrApiService;
@@ -86,6 +87,10 @@ class NphParticipantSummaryService
         }
 
         $result = json_decode($response->getBody()->getContents());
+        if (!is_object($result)) {
+            throw new InvalidResponseException();
+        }
+
         $edges = $result->participant->edges;
 
         if (empty($edges)) {
@@ -124,22 +129,36 @@ class NphParticipantSummaryService
     }
 
 
+    /**
+     * @throws InvalidDobException
+     */
     private function getSearchQuery(array $params): string
     {
         $searchParams = [];
         foreach ($params as $field => $value) {
-            if ($field === 'dob') {
-                $date = new \DateTime($params['dob']);
-                $field = 'dateOfBirth';
-                $value = $date->format('Y-m-d');
+            if (!empty($value)) {
+                if ($field === 'dob') {
+                    try {
+                        $date = new \DateTime($params['dob']);
+                        $field = 'dateOfBirth';
+                        $value = $date->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        throw new InvalidDobException();
+                    }
+                    if (strpos($params['dob'], $date->format('Y')) === false) {
+                        throw new InvalidDobException('Please enter a four digit year');
+                    } elseif ($date > new \DateTime('today')) {
+                        throw new InvalidDobException('Date of birth cannot be a future date');
+                    }
+                }
+                if ($field === 'email') {
+                    $value = strtolower($value);
+                }
+                if ($field === 'phone') {
+                    $field = 'phoneNumber';
+                }
+                $searchParams[] = "{$field}: \"{$value}\"";
             }
-            if ($field === 'email') {
-                $value = strtolower($value);
-            }
-            if ($field === 'phone') {
-                $field = 'phoneNumber';
-            }
-            $searchParams[] = "{$field}: \"{$value}\"";
         }
         $searchParams = implode(',', $searchParams);
         return " 

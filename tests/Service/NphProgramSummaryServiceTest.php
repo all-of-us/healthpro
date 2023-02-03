@@ -64,8 +64,8 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         $this->assertArrayHasKey('1', $programSummary);
         $this->assertArrayHasKey('2', $programSummary);
         $this->assertArrayHasKey('3', $programSummary);
-        $this->assertSame(array_keys($this->module1data['timePoints']), array_keys($programSummary['1']['LMT']));
-        foreach ($programSummary['1']['LMT'] as $timepoint => $timepointInfo) {
+        $this->assertSame(array_keys($this->module1data['timePoints']), array_keys($programSummary['1']['LMT']['visitInfo']));
+        foreach ($programSummary['1']['LMT']['visitInfo'] as $timepoint => $timepointInfo) {
             $this->assertSame($timepointInfo['timePointDisplayName'], $this->module1data['timePoints'][$timepoint]);
         }
     }
@@ -82,8 +82,8 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         $this->assertArrayHasKey('1', $combinedSummary);
         $this->assertArrayHasKey('2', $combinedSummary);
         $this->assertArrayHasKey('3', $combinedSummary);
-        $this->assertSame(array_keys($this->module1data['timePoints']), array_keys($combinedSummary['1']['LMT']));
-        foreach ($combinedSummary['1']['LMT'] as $timepoint => $timepointInfo) {
+        $this->assertSame(array_keys($this->module1data['timePoints']), array_keys($combinedSummary['1']['LMT']['visitInfo']));
+        foreach ($combinedSummary['1']['LMT']['visitInfo'] as $timepoint => $timepointInfo) {
             $this->assertSame($timepointInfo['timePointDisplayName'], $this->module1data['timePoints'][$timepoint]);
         }
     }
