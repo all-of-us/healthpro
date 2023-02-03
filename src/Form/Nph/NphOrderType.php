@@ -27,7 +27,21 @@ class NphOrderType extends AbstractType
                             new Constraints\Regex([
                                 'pattern' => '/^KIT-[0-9]{8}$/',
                                 'message' => 'Please enter a valid KIT ID. Format should be KIT-10000000 (KIT-8 digits)'
-                            ])
+                            ]),
+                            new Constraints\Callback(function ($value, $context) use ($stoolSamples) {
+                                $formData = $context->getRoot()->getData();
+                                if (empty($value)) {
+                                    $hasStoolTube = false;
+                                    foreach ($stoolSamples as $stoolSample) {
+                                        if (!empty($formData[$stoolSample])) {
+                                            $hasStoolTube = true;
+                                        }
+                                    }
+                                    if ($hasStoolTube) {
+                                        $context->buildViolation('Please enter Stool KIT ID')->addViolation();
+                                    }
+                                }
+                            })
                         ],
                         'attr' => [
                             'placeholder' => 'Scan Kit ID',
