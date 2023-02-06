@@ -912,8 +912,7 @@ class NphOrderService
                 ];
                 return $formErrors;
             }
-        }
-        if (!empty($formData['stoolKit'])) {
+        } else {
             $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
                 'orderId' => $formData['stoolKit']
             ]);
