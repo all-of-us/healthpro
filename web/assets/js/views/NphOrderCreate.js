@@ -6,7 +6,8 @@ $(document).ready(function () {
         $("#order_review_table tbody").append("<tr><td>" + timePoint + "</td><td>" + samples + "</td></tr>");
     };
 
-    $("#order_next_btn").on("click", function () {
+    let showPreview = orderCreateSelector.data("show-preview");
+    if (showPreview) {
         orderCreateSelector.hide();
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
@@ -23,7 +24,7 @@ $(document).ready(function () {
                     .each(function () {
                         if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                             let sample = $(this).val();
-                            if (sample === "nail") {
+                            if (sample === "NAIL") {
                                 let nailSubSamples = [];
                                 $(".nail-sub-samples")
                                     .find("input:checkbox")
@@ -39,7 +40,7 @@ $(document).ready(function () {
                                         "Nail: " + nailSubSamples.join(", ") + ""
                                     );
                                 }
-                            } else if (sample === "stool") {
+                            } else if (sample === "STOOL") {
                                 let stoolKitSelector = $("#nph_order_stoolKit");
                                 if (stoolKitSelector.val()) {
                                     let stoolKitSamples = "";
@@ -81,7 +82,7 @@ $(document).ready(function () {
             }
         });
         $("#samples_count").html(samplesCount);
-    });
+    }
 
     $("#order_review_back_btn").on("click", function () {
         orderCreateSelector.show();

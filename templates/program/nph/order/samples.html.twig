@@ -15,15 +15,21 @@
             </div>
         {% elseif sample.vars.value == 'STOOL' %}
             <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
-            {{ form_label(orderForm.stoolKit) }}
-            {{ form_widget(orderForm.stoolKit) }}
+            <div {% if not orderForm.stoolKit.vars.valid %} class="has-error" {% endif %}>
+                {{ form_label(orderForm.stoolKit) }}
+                {{ form_widget(orderForm.stoolKit) }}
+                {{ form_errors(orderForm.stoolKit) }}
+            </div>
             <br>
             {% for stoolSample in stoolSamples %}
-                {{ form_label(orderForm[stoolSample]) }}
-                {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
-                {% endif %}
-                {{ form_widget(orderForm[stoolSample]) }}
+                <div {% if not orderForm[stoolSample].vars.valid %} class="has-error" {% endif %}>
+                    {{ form_label(orderForm[stoolSample]) }}
+                    {% if samplesOrderIds[timePoint][stoolSample] is defined %}
+                        {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
+                    {% endif %}
+                    {{ form_widget(orderForm[stoolSample]) }}
+                    {{ form_errors(orderForm[stoolSample]) }}
+                </div>
                 <br>
             {% endfor %}
         {% else %}

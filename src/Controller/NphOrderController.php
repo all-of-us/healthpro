@@ -18,6 +18,7 @@ use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,13 +59,29 @@ class NphOrderController extends BaseController
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
                 $nphOrderService->getSamplesByType('stool')]
         );
+        $showPreview = false;
         $oderForm->handleRequest($request);
-        if ($oderForm->isSubmitted() && $oderForm->isValid()) {
+        if ($oderForm->isSubmitted()) {
             $formData = $oderForm->getData();
-            $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
-            $this->addFlash('success', 'Orders Created');
-            return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
-                'visit' => $visit, 'sampleGroup' => $sampleGroup]);
+            if ($formErrors = $nphOrderService->validateGenerateOrdersData($formData)) {
+                foreach ($formErrors as $formError) {
+                    $oderForm[$formError['field']]->addError(new FormError($formError['message']));
+                }
+            }
+            if ($oderForm->isValid()) {
+                /** @var SubmitButton $validateButton */
+                $validateButton = $oderForm->get('validate');
+                if ($validateButton->isClicked()) {
+                    $showPreview = true;
+                } else {
+                    $sampleGroup = $nphOrderService->createOrdersAndSamples($formData);
+                    $this->addFlash('success', 'Orders Created');
+                    return $this->redirectToRoute('nph_order_label_print', ['participantId' => $participantId, 'module' => $module,
+                        'visit' => $visit, 'sampleGroup' => $sampleGroup]);
+                }
+            } else {
+                $oderForm->addError(new FormError('Please correct the errors below'));
+            }
         }
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
@@ -78,7 +95,8 @@ class NphOrderController extends BaseController
             'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
             'nailSamples' => $nphOrderService->getSamplesByType('nail'),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
-            'samplesStatus' => $nphOrderService->getSamplesWithStatus()
+            'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
+            'showPreview' => $showPreview
         ]);
     }
 

@@ -604,4 +604,38 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame(1, $orderSummary['sampleCount']);
         $this->assertIsArray($orderSummary);
     }
+
+    /**
+     * @dataProvider validateGenerateOrdersDataProvider
+     */
+    public function testValidateGenerateOrdersData($formData, $expectedFormErrors): void
+    {
+        // Module 1
+        $this->service->loadModules(1, 'LMT', 'P0000000010', 'T10000000');
+        $nphOrder = $this->service->createOrder('preLMT', 'stool', 'KIT-00000001');
+        $this->service->createSample('ST1', $nphOrder, '1000000008', '00000000001');
+        $this->assertSame($expectedFormErrors, $this->service->validateGenerateOrdersData($formData));
+    }
+
+    public function validateGenerateOrdersDataProvider(): array
+    {
+        return [
+            [
+                ['stoolKit' => 'KIT-00000001', 'ST1' => '00000000002'],
+                [['field' => 'stoolKit', 'message' => 'This Kit ID has already been used for another order']]
+            ],
+            [
+                ['stoolKit' => 'KIT-00000002', 'ST1' => '00000000001'],
+                [['field' => 'ST1', 'message' => 'This Tube ID has already been used for another sample']]
+            ],
+            [
+                ['stoolKit' => 'KIT-00000003'],
+                [['field' => 'ST1', 'message' => 'Please enter at least one Stool Tube ID']]
+            ],
+            [
+                ['checkAll'],
+                [['field' => 'checkAll', 'message' => 'Please select or enter at least one sample']]
+            ]
+        ];
+    }
 }

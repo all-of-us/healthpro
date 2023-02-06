@@ -893,4 +893,57 @@ class NphOrderService
     {
         return $this->moduleObj->getVisitTypes();
     }
+
+    public function validateGenerateOrdersData(array $formData): array
+    {
+        $formErrors = [];
+        $hasSample = false;
+        foreach (array_keys($this->getTimePoints()) as $timePoint) {
+            if (!empty($formData[$timePoint])) {
+                $hasSample = true;
+                break;
+            }
+        }
+        if (empty($formData['stoolKit'])) {
+            if ($hasSample === false) {
+                $formErrors[] = [
+                    'field' => 'checkAll',
+                    'message' => 'Please select or enter at least one sample'
+                ];
+                return $formErrors;
+            }
+        } else {
+            $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $formData['stoolKit']
+            ]);
+            if ($nphOrder) {
+                $formErrors[] = [
+                    'field' => 'stoolKit',
+                    'message' => 'This Kit ID has already been used for another order'
+                ];
+            }
+            $hasStoolTube = false;
+            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+                if (!empty($formData[$stoolSample])) {
+                    $hasStoolTube = true;
+                    $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
+                        'sampleId' => $formData[$stoolSample]
+                    ]);
+                    if ($nphSample) {
+                        $formErrors[] = [
+                            'field' => $stoolSample,
+                            'message' => 'This Tube ID has already been used for another sample'
+                        ];
+                    }
+                }
+            }
+            if ($hasStoolTube === false) {
+                $formErrors[] = [
+                    'field' => $this->getSamplesByType('stool')[0],
+                    'message' => 'Please enter at least one Stool Tube ID'
+                ];
+            }
+        }
+        return $formErrors;
+    }
 }
