@@ -19,6 +19,7 @@ class NphSample
     public const RESTORE = 'restore';
     public const UNLOCK = 'unlock';
     public const EDITED = 'edited';
+    public const REVERT = 'revert';
 
     private const RDR_MICROLITER_UNITS = [
         'μL' => 'uL'

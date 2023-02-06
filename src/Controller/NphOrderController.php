@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphOrderCollect;
@@ -9,12 +10,13 @@ use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
-use App\Form\Nph\NphSampleRdrRetryType;
+use App\Form\Nph\NphSampleRevertType;
 use App\Service\EnvironmentService;
+use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Util\Json;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -272,7 +274,8 @@ class NphOrderController extends BaseController
             'aliquots' => $nphOrderService->getAliquots($sampleCode),
             'sampleData' => $sampleData,
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
-            'modifyType' => $modifyType ?? ''
+            'modifyType' => $modifyType ?? '',
+            'revertForm' => $this->createForm(NphSampleRevertType::class)->createView()
         ]);
     }
 
@@ -391,5 +394,58 @@ class NphOrderController extends BaseController
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
         return $response;
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/revert", name="nph_sample_revert", methods={"POST"})
+     */
+    public function sampleRevertAction(
+        string $participantId,
+        string $orderId,
+        string $sampleId,
+        Request $request,
+        NphParticipantSummaryService $nphParticipantSummaryService,
+        NphOrderService $nphOrderService,
+        LoggerService $loggerService
+    ): Response {
+        $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'id' => $sampleId
+        ]);
+        if (empty($sample)) {
+            throw $this->createNotFoundException('Sample not found.');
+        }
+        if ($sample->getModifyType() !== NphSample::UNLOCK) {
+            throw $this->createAccessDeniedException();
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        $nphOrderService->loadModules(
+            $order->getModule(),
+            $order->getVisitType(),
+            $participantId,
+            $participant->biobankId
+        );
+        $sampleRevertForm = $this->createForm(NphSampleRevertType::class, null);
+        $sampleRevertForm->handleRequest($request);
+        if ($sampleRevertForm->isSubmitted() && $sampleRevertForm->isValid()) {
+            try {
+                $sample->setModifyType(NphSample::REVERT);
+                $this->em->persist($sample);
+                $this->em->flush();
+                $loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
+                $this->addFlash('success', 'Sample reverted');
+            } catch (\Exception $e) {
+                $loggerService->log('error', $e->getMessage());
+                $this->addFlash('error', 'Sample revert failed. Please try again.');
+            }
+        }
+        return $this->redirectToRoute('nph_sample_finalize', [
+            'participantId' => $participantId,
+            'orderId' => $orderId,
+            'sampleId' => $sampleId
+        ]);
     }
 }
