@@ -140,6 +140,7 @@ class NphOrderService
                     if (in_array($sample->getSampleCode(), $this->getSamplesByType('stool'))) {
                         if ($addStoolKit) {
                             $ordersData['stoolKit'] = $order->getOrderId();
+                            $ordersData[$order->getTimepoint()][] = NphSample::SAMPLE_STOOL;
                             $addStoolKit = false;
                         }
                         $ordersData[$sample->getSampleCode()] = $sample->getSampleId();

@@ -20,6 +20,7 @@ class NphSample
     public const UNLOCK = 'unlock';
     public const EDITED = 'edited';
     public const REVERT = 'revert';
+    public const SAMPLE_STOOL = 'STOOL';
 
     private const RDR_MICROLITER_UNITS = [
         'μL' => 'uL'

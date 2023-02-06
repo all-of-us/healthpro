@@ -16,10 +16,11 @@ $(document).ready(function () {
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
         let stoolSamples = orderCreateSelector.data("stool-samples");
+        let prePostTimePoints = ['preLMT', 'postLMT'];
         let samplesCount = 0;
         $(".timepoint-samples").each(function () {
             let timePoint = $(this).data("timepoint");
-            if (timePoint === "preLMT" || timePoint === "postLMT") {
+            if (prePostTimePoints.includes(timePoint)) {
                 let nailSubSamples = [];
                 $(this)
                     .find("input:checkbox")
@@ -100,4 +101,20 @@ $(document).ready(function () {
         let timepointSamplesId = "timepoint_samples_" + $(this).data("timepoint");
         $("#" + timepointSamplesId + " input:checkbox:enabled").prop("checked", $(this).prop("checked"));
     });
+
+    let disableEnableStoolFields = function () {
+        let stoolCheckboxSel = $(".stool-checkbox");
+        if (!stoolCheckboxSel.prop("disabled")) {
+            let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
+            if (isStoolBoxChecked) {
+                $(".stool-text-fields input").prop('disabled', false);
+            } else {
+                $(".stool-text-fields input").prop('disabled', true).val('');
+            }
+        }
+    };
+
+    disableEnableStoolFields();
+
+    $(".stool-checkbox").on("change", disableEnableStoolFields);
 });
