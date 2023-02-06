@@ -116,5 +116,5 @@ $(document).ready(function () {
 
     disableEnableStoolFields();
 
-    $(".stool-checkbox").on("change", disableEnableStoolFields);
+    $(".stool-checkbox, #timepoint_preLMT, #nph_order_checkAll").on("change", disableEnableStoolFields);
 });

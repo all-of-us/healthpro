@@ -45,7 +45,7 @@
                 <div class="col-sm-4">
                     <div class="panel panel-default timepoint-panel">
                         <div class="panel-heading">
-                            <input type="checkbox" class="timepointCheckAll" data-timepoint="{{ timePoint }}">
+                            <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
                             {{ form_label(orderForm[timePoint]) }}
                         </div>
                         <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
