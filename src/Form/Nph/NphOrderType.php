@@ -96,12 +96,14 @@ class NphOrderType extends AbstractType
                 }
             ]);
         }
-        $builder->add('validate', Type\SubmitType::class, [
-            'label' => 'Next',
-            'attr' => [
-                'class' => 'btn btn-primary'
-            ]
-        ]);
+        if (!$options['hasAllSamplesBeenGenerated']) {
+            $builder->add('validate', Type\SubmitType::class, [
+                'label' => 'Next',
+                'attr' => [
+                    'class' => 'btn btn-primary'
+                ]
+            ]);
+        }
         // Placeholder field for displaying select at least one sample message
         $builder->add('checkAll', Type\CheckboxType::class, [
             'required' => false
@@ -114,7 +116,8 @@ class NphOrderType extends AbstractType
         $resolver->setDefaults([
             'timePointSamples' => null,
             'timePoints' => null,
-            'stoolSamples' => null
+            'stoolSamples' => null,
+            'hasAllSamplesBeenGenerated' => null
         ]);
     }
 }

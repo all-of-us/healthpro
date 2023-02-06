@@ -15,7 +15,6 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
@@ -53,11 +52,12 @@ class NphOrderController extends BaseController
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $ordersData = $nphOrderService->getExistingOrdersData();
+        $hasAllSamplesBeenGenerated = $nphOrderService->hasAllSamplesBeenGenerated();
         $oderForm = $this->createForm(
             NphOrderType::class,
             $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
-                $nphOrderService->getSamplesByType('stool')]
+                $nphOrderService->getSamplesByType('stool'), 'hasAllSamplesBeenGenerated' => $hasAllSamplesBeenGenerated]
         );
         $showPreview = false;
         $oderForm->handleRequest($request);
@@ -96,7 +96,8 @@ class NphOrderController extends BaseController
             'nailSamples' => $nphOrderService->getSamplesByType('nail'),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
             'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
-            'showPreview' => $showPreview
+            'showPreview' => $showPreview,
+            'hasAllSamplesBeenGenerated' => $hasAllSamplesBeenGenerated
         ]);
     }
 

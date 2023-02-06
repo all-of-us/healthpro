@@ -6,6 +6,8 @@ use App\Nph\Order\Samples;
 
 class Module1 extends Samples
 {
+    private const SAMPLES_TOTAL_COUNT = 43;
+
     private static $module = 1;
 
     private static $visitTypes = [
@@ -23,5 +25,10 @@ class Module1 extends Samples
     public static function getVisitTypes(): array
     {
         return self::$visitTypes;
+    }
+
+    public static function getSamplesTotalCount(): int
+    {
+        return self::SAMPLES_TOTAL_COUNT;
     }
 }

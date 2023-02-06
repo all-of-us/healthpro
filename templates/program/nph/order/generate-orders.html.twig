@@ -59,7 +59,9 @@
             </div>
                 <div class="row">
                     <a class="btn btn-default" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
-                    {{ form_widget(orderForm.validate) }}
+                    {% if orderForm.validate is defined %}
+                        {{ form_widget(orderForm.validate) }}
+                    {% endif %}
                 </div>
             {{ form_rest(orderForm) }}
             {{ form_end(orderForm) }}

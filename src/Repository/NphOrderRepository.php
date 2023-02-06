@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\NphOrder;
+use App\Entity\NphSample;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -54,5 +57,28 @@ class NphOrderRepository extends ServiceEntityRepository
             ->addOrderBy('no.id', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function getTotalSamplesCount(string $participantId, string $visitType, int $module): int
+    {
+        return $this->createQueryBuilder('no')
+            ->select('COUNT(ns)')
+            ->join('no.nphSamples', 'ns')
+            ->where('no.participantId = :participantId')
+            ->andWhere('no.visitType = :visitType')
+            ->andWhere('no.module = :module')
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType is NULL')
+            ->setParameters([
+                'participantId' => $participantId,
+                'visitType' => $visitType,
+                'module' => $module,
+                'modifyType' => 'cancel'
+            ])
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
