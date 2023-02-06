@@ -36,7 +36,7 @@ class NphOrderService
 
     private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
 
-    private static $placeholderSamples = ['NAIL', 'STOOL'];
+    private static $placeholderSamples = ['STOOL'];
 
     public function __construct(
         EntityManagerInterface $em,

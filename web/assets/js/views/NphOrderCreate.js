@@ -11,6 +11,7 @@ $(document).ready(function () {
         orderCreateSelector.hide();
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
+        const SAMPLE_STOOL = 'STOOL';
         let samples = orderCreateSelector.data("samples");
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
@@ -19,28 +20,13 @@ $(document).ready(function () {
         $(".timepoint-samples").each(function () {
             let timePoint = $(this).data("timepoint");
             if (timePoint === "preLMT" || timePoint === "postLMT") {
+                let nailSubSamples = [];
                 $(this)
                     .find("input:checkbox")
                     .each(function () {
                         if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                             let sample = $(this).val();
-                            if (sample === "NAIL") {
-                                let nailSubSamples = [];
-                                $(".nail-sub-samples")
-                                    .find("input:checkbox")
-                                    .each(function () {
-                                        if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
-                                            nailSubSamples.push(samples[$(this).val()]);
-                                            samplesCount++;
-                                        }
-                                    });
-                                if (nailSubSamples.length > 0) {
-                                    addTimePointSamples(
-                                        timePoints[timePoint],
-                                        "Nail: " + nailSubSamples.join(", ") + ""
-                                    );
-                                }
-                            } else if (sample === "STOOL") {
+                            if (sample === SAMPLE_STOOL) {
                                 let stoolKitSelector = $("#nph_order_stoolKit");
                                 if (stoolKitSelector.val()) {
                                     let stoolKitSamples = "";
@@ -59,12 +45,18 @@ $(document).ready(function () {
                                         );
                                     }
                                 }
-                            } else if (!nailSamples.includes(sample)) {
+                            } else if (nailSamples.includes(sample)) {
+                                nailSubSamples.push(samples[$(this).val()]);
+                                samplesCount++;
+                            } else {
                                 addTimePointSamples(timePoints[timePoint], samples[sample]);
                                 samplesCount++;
                             }
                         }
                     });
+                if (nailSubSamples.length > 0) {
+                    addTimePointSamples(timePoints[timePoint], "Nail: " + nailSubSamples.join(", ") + "");
+                }
             } else {
                 let bloodSamples = [];
                 $(this)
