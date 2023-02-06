@@ -100,7 +100,7 @@ $(document).ready(function () {
         }
     });
 
-    $("#checkAll").on("change", function () {
+    $("#nph_order_checkAll").on("change", function () {
         $("#order_create_form input:checkbox:enabled").prop("checked", $(this).prop("checked"));
     });
 

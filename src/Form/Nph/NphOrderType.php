@@ -10,15 +10,25 @@ use Symfony\Component\Validator\Constraints;
 
 class NphOrderType extends AbstractType
 {
+    private const STOOL_ST1 = 'ST1';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $ordersData = $builder->getData();
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
         $stoolSamples = $options['stoolSamples'];
+        $isStoolKitDisabled = !empty($ordersData['stoolKit']);
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
-                if ($sampleCode === 'ST1') {
+                if ($sampleCode === self::STOOL_ST1) {
+                    $stoolKitAttributes = [
+                        'placeholder' => 'Scan Kit ID',
+                        'disabled' => $isStoolKitDisabled,
+                    ];
+                    if ($isStoolKitDisabled) {
+                        $stoolKitAttributes['value'] = $ordersData['stoolKit'];
+                    }
                     $builder->add('stoolKit', Type\TextType::class, [
                         'label' => 'Stool Kit ID',
                         'required' => false,
@@ -43,17 +53,20 @@ class NphOrderType extends AbstractType
                                 }
                             })
                         ],
-                        'attr' => [
-                            'placeholder' => 'Scan Kit ID',
-                            'disabled' => !empty($ordersData['stoolKit'])
-                        ]
+                        'attr' => $stoolKitAttributes
                     ]);
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
+                    $stoolTubeAttributes = [
+                        'placeholder' => 'Scan Tube',
+                        'disabled' => $isStoolKitDisabled,
+                    ];
+                    if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
+                        $stoolTubeAttributes['value'] = $ordersData[$sampleCode];
+                    }
                     $builder->add($sampleCode, Type\TextType::class, [
                         'label' => $sample,
                         'required' => false,
-                        'disabled' => !empty($ordersData[$sampleCode]),
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
@@ -61,10 +74,7 @@ class NphOrderType extends AbstractType
                                 'message' => 'Please enter a valid collection tube barcode.Format should be 10000000000 (11 digits).'
                             ])
                         ],
-                        'attr' => [
-                            'placeholder' => 'Scan Tube',
-                            'disabled' => !empty($ordersData['stoolKit'])
-                        ]
+                        'attr' => $stoolTubeAttributes
                     ]);
                     unset($samples[$sampleCode]);
                 }
