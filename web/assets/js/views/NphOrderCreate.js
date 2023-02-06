@@ -11,12 +11,12 @@ $(document).ready(function () {
         orderCreateSelector.hide();
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
-        const SAMPLE_STOOL = 'STOOL';
+        const SAMPLE_STOOL = "STOOL";
         let samples = orderCreateSelector.data("samples");
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
         let stoolSamples = orderCreateSelector.data("stool-samples");
-        let prePostTimePoints = ['preLMT', 'postLMT'];
+        let prePostTimePoints = ["preLMT", "postLMT"];
         let samplesCount = 0;
         $(".timepoint-samples").each(function () {
             let timePoint = $(this).data("timepoint");
@@ -107,9 +107,9 @@ $(document).ready(function () {
         if (!stoolCheckboxSel.prop("disabled")) {
             let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
             if (isStoolBoxChecked) {
-                $(".stool-text-fields input").prop('disabled', false);
+                $(".stool-text-fields input").prop("disabled", false);
             } else {
-                $(".stool-text-fields input").prop('disabled', true).val('');
+                $(".stool-text-fields input").prop("disabled", true).val("");
             }
         }
     };
