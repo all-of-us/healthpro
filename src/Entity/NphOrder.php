@@ -295,4 +295,14 @@ class NphOrder
         }
         throw new \ErrorException("Sample group not found for SampleCode $sampleCode with SampleId $this->id");
     }
+
+    public function isDisabled(): bool
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if (empty($nphSample->getFinalizedTs())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
