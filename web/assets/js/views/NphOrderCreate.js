@@ -136,4 +136,13 @@ $(document).ready(function () {
             disabled: disabled
         });
     });
+
+    $("input:checkbox").on("change", function () {
+        let allSamplesChecked = $(".timepoint-samples :checkbox:not(:checked)").length === 0;
+        $("#nph_order_checkAll").prop("checked", allSamplesChecked);
+        $(".timepoint-samples").each(function () {
+            let timePointsChecked = $(this).find(":checkbox:not(:checked)").length === 0;
+            $(this).parent().find(".timepointCheckAll").prop("checked", timePointsChecked);
+        });
+    });
 });
