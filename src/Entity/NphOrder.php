@@ -308,4 +308,14 @@ class NphOrder
         }
         return true;
     }
+
+    public function disableMetadatatFields(): bool
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getFinalizedTs()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

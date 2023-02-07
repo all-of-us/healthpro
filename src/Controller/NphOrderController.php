@@ -124,7 +124,7 @@ class NphOrderController extends BaseController
             NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                $this->getSecurityUser()->getTimezone()]
+                $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->disableMetadatatFields()]
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
@@ -219,7 +219,7 @@ class NphOrderController extends BaseController
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
-                $sample->isDisabled(), 'nphSample' => $sample
+                $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' => $order->disableMetadatatFields()
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
