@@ -11,15 +11,12 @@
     {% if sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
-            {% if modifyType == 'cancel' %}
-                <p class="text-danger">Note: Cancelling a sample will cancel all aliquots associated with this sample</p>
-            {% endif %}
             {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
-                <button type="submit" class="btn {% if modifyType == 'cancel' %} btn-danger {% elseif modifyType == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
-                    {{ modifyType|capitalize }} Sample
+                <button type="submit" class="btn btn-primary">
+                    Unlock Sample
                 </button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
@@ -55,6 +52,15 @@
             </div>
         </div>
         <div class="col-sm-7">
+            {% if sample.finalizedTs is not empty %}
+                <div class="alert alert-success well-sm">
+                    <strong>
+                        Finalized
+                        by {{ sample.finalizedUser.email|default('Unknown') }}
+                        on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                    </strong>
+                </div>
+            {% endif %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="col-sm-5">
