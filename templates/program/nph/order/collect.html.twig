@@ -45,7 +45,7 @@
                 </thead>
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
-                    {% if nphSample.modifyType == 'cancel' %}
+                    {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
                         <tr>
                             <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
                         </tr>
@@ -106,7 +106,7 @@
                 </tbody>
             </table>
             <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
-            {% if order.orderType == 'urine' %}
+            {% if order.orderType == constant('TYPE_URINE', order) %}
                 <hr>
                 <h4>
                     Color and Clarity
@@ -127,7 +127,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if order.orderType == 'stool' %}
+            {% if order.orderType == constant('TYPE_STOOL', order) %}
                 <hr>
                 <h4>
                     Bristol Stool Chart Questions
@@ -151,7 +151,7 @@
                     <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
                 {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Cancel</a>
+                   class="btn btn-default">Exit</a>
             </div>
             {{ form_end(orderCollectForm) }}
         </div>
