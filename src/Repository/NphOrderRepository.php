@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\NphOrder;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -49,14 +50,14 @@ class NphOrderRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('no')
             ->where('no.createdTs >= :createdTs')
             ->andWhere('no.site = :site')
-            ->setParameters(['site' => $siteId,  'createdTs' => (new \DateTime('-1 day'))->format('Y-m-d H:i:s')])
+            ->setParameters(['site' => $siteId, 'createdTs' => (new DateTime('-1 day'))->format('Y-m-d H:i:s')])
             ->orderBy('no.createdTs', 'DESC')
             ->addOrderBy('no.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
-    public function getOrdersByDateRange(string $siteId, \DateTime $startDate, \DateTime $endDate): array
+    public function getOrdersByDateRange(string $siteId, DateTime $startDate, DateTime $endDate): array
     {
         return $this->createQueryBuilder('no')
             ->select('no.participantId, no.timepoint, group_concat(u.email) as email, no.id as hpoOrderId,
@@ -78,7 +79,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getSampleCollectionStatsByDate(string $siteId, \DateTime $startDate, \DateTime $endDate)
+    public function getSampleCollectionStatsByDate(string $siteId, DateTime $startDate, DateTime $endDate): array
     {
         return $this->createQueryBuilder('no')
             ->select('count(no.createdTs) as createdCount, count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
@@ -91,7 +92,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getUnfinalizedSampleCollectionStats(string $siteId)
+    public function getUnfinalizedSampleCollectionStats(string $siteId): array
     {
         return $this->createQueryBuilder('no')
             ->select('count(no.createdTs) as createdCount, count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
@@ -103,10 +104,11 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getUnfinalizedSamples(string $site)
+    public function getUnfinalizedSamples(string $site): array
     {
         return $this->createQueryBuilder('no')
-            ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType, no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
+            ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType,
+             no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->where('ns.finalizedTs IS NULL')
             ->andWhere('no.site = :site')
@@ -116,10 +118,11 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getRecentlyModifiedSamples(string $site, \DateTime $modifiedTs)
+    public function getRecentlyModifiedSamples(string $site, DateTime $modifiedTs): array
     {
         return $this->createQueryBuilder('no')
-            ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType, no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
+            ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType,
+             no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->where('ns.modifiedTs >= :modifiedTs')
             ->andWhere('no.site = :site')
@@ -128,5 +131,4 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
 }
