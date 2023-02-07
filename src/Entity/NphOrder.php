@@ -309,7 +309,7 @@ class NphOrder
         return true;
     }
 
-    public function disableMetadatatFields(): bool
+    public function isMetadataFieldDisabled(): bool
     {
         foreach ($this->nphSamples as $nphSample) {
             if ($nphSample->getFinalizedTs()) {
