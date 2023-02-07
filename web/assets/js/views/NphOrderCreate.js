@@ -118,9 +118,22 @@ $(document).ready(function () {
 
     $(".stool-checkbox, #timepoint_preLMT, #nph_order_checkAll").on("change", disableEnableStoolFields);
 
-    if ($(".timepoint-samples :checkbox:not(:checked)").length === 0) {
+    if (
+        $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length
+    ) {
         $("#nph_order_validate").hide();
-    } else {
-        $("#nph_order_validate").show();
+        $("#nph_order_checkAll").prop({
+            checked: true,
+            disabled: true
+        });
     }
+
+    $(".timepoint-samples").each(function () {
+        let checked = $(this).find(":checkbox:not(:checked)").length === 0;
+        let disabled = $(this).find("input:checkbox").length === $(this).find("input:checkbox:disabled:checked").length;
+        $(this).parent().find(".timepointCheckAll").prop({
+            checked: checked,
+            disabled: disabled
+        });
+    });
 });
