@@ -947,10 +947,4 @@ class NphOrderService
         }
         return $formErrors;
     }
-
-    public function hasAllSamplesBeenGenerated(): bool
-    {
-        return $this->em->getRepository(NphOrder::class)->getTotalSamplesCount($this->participantId,
-                $this->visit, $this->module) === $this->moduleObj->getSamplesTotalCount();
-    }
 }
