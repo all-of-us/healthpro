@@ -117,4 +117,10 @@ $(document).ready(function () {
     disableEnableStoolFields();
 
     $(".stool-checkbox, #timepoint_preLMT, #nph_order_checkAll").on("change", disableEnableStoolFields);
+
+    if ($(".timepoint-samples :checkbox:not(:checked)").length === 0) {
+        $("#nph_order_validate").hide();
+    } else {
+        $("#nph_order_validate").show();
+    }
 });
