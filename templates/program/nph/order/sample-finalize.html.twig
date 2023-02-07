@@ -222,7 +222,9 @@
                                                 </td>
                                                 <td>
                                                     {{ aliquot['units'] }}
-                                                    <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                                    {% if not sample.disabled %}
+                                                        <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                                    {% endif %}
                                                 </td>
                                             </tr>
                                         {% endif %}
