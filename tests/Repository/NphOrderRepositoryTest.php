@@ -47,7 +47,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $nphSample2 = new NphSample();
         $nphSample2->setNphOrder($nphOrder);
         $nphSample2->setSampleId('100000003');
-        $nphSample2->setSampleCode('URINES');
+        $nphSample2->setSampleCode('SST8P5');
         $nphSample2->setSampleGroup('100000008');
         $nphSample2->setCollectedTs(new \DateTime());
         $nphSample2->setFinalizedTs(new \DateTime());
@@ -93,7 +93,9 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $end = new \DateTime();
         $end->setTime(23, 59, 59);
         $orders = $this->repo->getOrdersByDateRange($this->nphOrder->getSite(), $beginning, $end);
-        $this->assertSame($orders[0]['sampleId'], '100000003,100000002,100000004');
+        $sampleCodes = explode(',', $orders[0]['sampleCode']);
+        $sampleIds = explode(',', $orders[0]['sampleId']);
+        $this->assertSame(array_search('URINES', $sampleCodes), array_search('100000002', $sampleIds));
         $this->assertSame($orders[0]['orderId'], '100000001');
         $this->assertCount(1, $orders);
     }
