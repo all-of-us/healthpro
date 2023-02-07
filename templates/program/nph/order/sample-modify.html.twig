@@ -51,6 +51,8 @@
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {{ nphSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {{ nphSample.collectedUser.email }}
+                    {% else %}
+                        <i class="fa fa-times text-danger"></i>
                     {% endif %}
                 </td>
                 <td>
