@@ -60,6 +60,10 @@ class NphOrderForm extends AbstractType
                     $context->buildViolation('Collection time required')->addViolation();
                 }
             });
+        } else {
+            $constraints[] = new Constraints\NotBlank([
+                'message' => 'Collection time is required'
+            ]);
         }
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
             'required' => $formType === 'finalize',
