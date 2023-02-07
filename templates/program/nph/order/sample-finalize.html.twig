@@ -262,7 +262,7 @@
                                 id="sample_finalize_btn">
                             Mark as Finalized
                         </button>
-                        <button type="button" class="btn btn-default">Cancel</button>
+                        <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
                     {% if sample.modifyType == 'unlock' %}
