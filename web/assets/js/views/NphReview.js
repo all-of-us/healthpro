@@ -10,10 +10,10 @@ $(document).ready(function () {
         if (participantIds.indexOf(td.data("participant-id")) === -1) {
             participantIds.push(td.data("participant-id"));
         }
-    })
+    });
 
     $(participantIds).each(function (index, element) {
-        const td = $(`.load-name[data-participant-id="${element}"]`)
+        const td = $(`.load-name[data-participant-id="${element}"]`);
         $.getJSON(nameLookupUrl + element, function (data) {
             td.empty();
             td.siblings(".load-biobankid").empty();
