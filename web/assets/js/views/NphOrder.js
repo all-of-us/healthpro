@@ -29,11 +29,17 @@ $(document).ready(function () {
 
     $("#scan_barcode").keyup(function () {
         let barcode = $(this).val();
-        $(".row-samples").each(function () {
-            let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
-            if (barcode === sampleId) {
-                $(this).find("input:checkbox").prop("checked", true);
-            }
-        });
+        if (barcode.length === 10) {
+            $(".row-samples").each(function () {
+                let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
+                if (barcode === sampleId) {
+                    $(this).find("input:checkbox").prop("checked", true);
+                    $('.sample-scan-error').hide();
+                    return false;
+                } else {
+                    $('.sample-scan-error').show();
+                }
+            });
+        }
     });
 });

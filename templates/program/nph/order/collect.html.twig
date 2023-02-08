@@ -17,6 +17,7 @@
                 <div class="col-sm-6">
                     <label>Scan or manually check all successfully collected samples:</label>
                     <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device">
+                    <span class="sample-scan-error text-danger" style="display: none">Sample not found</span>
                 </div>
             </div>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
