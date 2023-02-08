@@ -394,7 +394,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['30min', 'blood', 'SST8P5', $collectedTs, [
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
-            ], '10005', true, '30 Min']
+            ], '10005', true, '30 min']
         ];
     }
 
