@@ -60,7 +60,7 @@ $(document).ready(function () {
         }
     });
 
-    $(".aliquot-barcode").keyup(function () {
+    $(document).on("keyup", ".aliquot-barcode", function () {
         let barcode = $(this).val();
         let expectedBarcodeLength = $(this).data("barcode-length");
         let expectedBarcodePrefix = $(this).data("barcode-prefix");
