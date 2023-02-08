@@ -30,7 +30,7 @@ $(document).ready(function () {
     $("#scan_barcode").keyup(function () {
         let barcode = $(this).val();
         let sampleFound = false;
-        let sampleScanErrorSel = $('#sample_scan_error');
+        let sampleScanErrorSel = $("#sample_scan_error");
         if (barcode.length === 10) {
             $(".row-samples").each(function () {
                 let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
