@@ -1,37 +1,27 @@
 {% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit, samplesStatus) %}
     {% set formField = orderForm[timePoint] %}
     {% for sample in formField.children %}
-        {% if sample.vars.value in nailSamples %}
-            <div class="sub-samples nail-sub-samples">
-                <div class="checkbox">
-                    <label for="{{ sample.vars.id }}">
-                        {{ form_widget(sample) }}
-                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint) }}
-                    </label>
-                </div>
-                {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
-                    {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
-                {% endif %}
-            </div>
-        {% elseif sample.vars.value == 'STOOL' %}
-            <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample) }} {{ sample.vars.label }}</label></div>
-            <div {% if not orderForm.stoolKit.vars.valid %} class="has-error" {% endif %}>
-                {{ form_label(orderForm.stoolKit) }}
-                {{ form_widget(orderForm.stoolKit) }}
-                {{ form_errors(orderForm.stoolKit) }}
-            </div>
-            <br>
-            {% for stoolSample in stoolSamples %}
-                <div {% if not orderForm[stoolSample].vars.valid %} class="has-error" {% endif %}>
-                    {{ form_label(orderForm[stoolSample]) }}
-                    {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                        {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
-                    {% endif %}
-                    {{ form_widget(orderForm[stoolSample]) }}
-                    {{ form_errors(orderForm[stoolSample]) }}
+        {% if sample.vars.value == 'STOOL' %}
+            <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample, {'attr': {'class': 'stool-checkbox'}}) }} {{ sample.vars.label }}</label></div>
+            <div class="stool-text-fields">
+                <div {% if not orderForm.stoolKit.vars.valid %} class="has-error" {% endif %}>
+                    {{ form_label(orderForm.stoolKit) }}
+                    {{ form_widget(orderForm.stoolKit) }}
+                    {{ form_errors(orderForm.stoolKit) }}
                 </div>
                 <br>
-            {% endfor %}
+                {% for stoolSample in stoolSamples %}
+                    <div {% if not orderForm[stoolSample].vars.valid %} class="has-error" {% endif %}>
+                        {{ form_label(orderForm[stoolSample]) }}
+                        {% if samplesOrderIds[timePoint][stoolSample] is defined %}
+                            {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
+                        {% endif %}
+                        {{ form_widget(orderForm[stoolSample]) }}
+                        {{ form_errors(orderForm[stoolSample]) }}
+                    </div>
+                    <br>
+                {% endfor %}
+            </div>
         {% else %}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                 <div class="checkbox">

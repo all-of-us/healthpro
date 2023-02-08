@@ -218,15 +218,6 @@
         }
       }
     },
-    "NAIL": {
-      "label": "Nail",
-      "color": "White",
-      "temperature": "Refrigerated",
-      "specimen": "Nail",
-      "type": "nail",
-      "placeholder": true,
-      "identifier": "Nail"
-    },
     "NAILB": {
       "label": "Big Toenails",
       "color": "White",

@@ -29,11 +29,24 @@ $(document).ready(function () {
 
     $("#scan_barcode").keyup(function () {
         let barcode = $(this).val();
-        $(".row-samples").each(function () {
-            let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
-            if (barcode === sampleId) {
-                $(this).find("input:checkbox").prop("checked", true);
+        let sampleFound = false;
+        let sampleScanErrorSel = $("#sample_scan_error");
+        if (barcode.length === 10) {
+            $(".row-samples").each(function () {
+                let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
+                if (barcode === sampleId) {
+                    $(this).find("input:checkbox").prop("checked", true);
+                    sampleFound = true;
+                    return false;
+                }
+            });
+            if (sampleFound) {
+                sampleScanErrorSel.hide();
+            } else {
+                sampleScanErrorSel.show();
             }
-        });
+        } else {
+            sampleScanErrorSel.hide();
+        }
     });
 });

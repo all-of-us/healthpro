@@ -93,4 +93,72 @@ class NphOrderTest extends NphTestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider isDisabledAndMetadataDisabledDataProvider
+     */
+
+    public function testIsDisabledAndMetadataDisabled($samples, $isDisabled, $isMetadataFieldDisabled)
+    {
+        $orderData = $this->getOrderData();
+        $nphOrder = $this->createNphOrder($orderData);
+        foreach ($samples as $sample) {
+            $sample['nphOrder'] = $nphOrder;
+            $this->createNphSample($sample);
+        }
+        $this->assertSame($isDisabled, $nphOrder->isDisabled());
+        $this->assertSame($isMetadataFieldDisabled, $nphOrder->isMetadataFieldDisabled());
+    }
+
+    public function isDisabledAndMetadataDisabledDataProvider(): array
+    {
+        $finalizedTs = new \DateTime('2023-01-01 08:00:00');
+        return [
+            [
+                [
+                    [
+                        'sampleId' => '1000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                    [
+                        'sampleId' => '2000000000',
+                        'sampleCode' => 'ST2',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                ],
+                true,
+                true
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '3000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                    [
+                        'sampleId' => '4000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                false,
+                true
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '5000000000',
+                        'sampleCode' => 'ST1',
+                    ],
+                    [
+                        'sampleId' => '6000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                false,
+                false
+            ]
+        ];
+    }
 }

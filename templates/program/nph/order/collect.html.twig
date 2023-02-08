@@ -6,7 +6,9 @@
     <div class="alert bg-light well-sm">
         {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
         <div class="pull-right">
-            <a href="#">View Order Summary</a>
+            <a href="{{ path('nph_order_label_print', {'participantId': order.participantId, 'module': order.module, 'visit': order.visitType, 'sampleGroup': order.nphSamples[0].sampleGroup}) }}">
+                View Order Summary/Reprint Labels
+            </a>
         </div>
     </div>
     <div class="row">
@@ -15,6 +17,7 @@
                 <div class="col-sm-6">
                     <label>Scan or manually check all successfully collected samples:</label>
                     <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device">
+                    <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
                 </div>
             </div>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
@@ -43,7 +46,7 @@
                 </thead>
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
-                    {% if nphSample.modifyType == 'cancel' %}
+                    {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
                         <tr>
                             <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
                         </tr>
@@ -53,7 +56,9 @@
                             class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
-                            {% if nphSample.finalizedTs is not empty %}
+                            {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
+                                <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
+                            {% elseif nphSample.finalizedTs is not empty %}
                                 <p class="text-success"><i class="fa fa-check-circle"></i> Aliquoted and Finalized
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% endif %}
@@ -102,7 +107,7 @@
                 </tbody>
             </table>
             <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
-            {% if order.orderType == 'urine' %}
+            {% if order.orderType == constant('TYPE_URINE', order) %}
                 <hr>
                 <h4>
                     Color and Clarity
@@ -123,7 +128,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if order.orderType == 'stool' %}
+            {% if order.orderType == constant('TYPE_STOOL', order) %}
                 <hr>
                 <h4>
                     Bristol Stool Chart Questions
@@ -143,9 +148,11 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
+                {% if not order.isDisabled %}
+                    <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
+                {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Cancel</a>
+                   class="btn btn-default">Exit</a>
             </div>
             {{ form_end(orderCollectForm) }}
         </div>

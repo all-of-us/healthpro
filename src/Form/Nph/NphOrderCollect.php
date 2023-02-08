@@ -36,11 +36,11 @@ class NphOrderCollect extends NphOrderForm
         }
 
         if ($orderType === 'urine') {
-            $this->addUrineMetadataFields($builder);
+            $this->addUrineMetadataFields($builder, $options['disableMetadataFields']);
         }
 
         if ($orderType === 'stool') {
-            $this->addStoolMetadataFields($builder);
+            $this->addStoolMetadataFields($builder, $options['disableMetadataFields']);
         }
 
         // Placeholder field for displaying select at least one sample error message
@@ -56,7 +56,8 @@ class NphOrderCollect extends NphOrderForm
         $resolver->setDefaults([
             'samples' => null,
             'orderType' => null,
-            'timeZone' => null
+            'timeZone' => null,
+            'disableMetadataFields' => null
         ]);
     }
 }

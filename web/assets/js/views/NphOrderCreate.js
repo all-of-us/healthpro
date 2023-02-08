@@ -11,36 +11,23 @@ $(document).ready(function () {
         orderCreateSelector.hide();
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
+        const SAMPLE_STOOL = "STOOL";
         let samples = orderCreateSelector.data("samples");
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
         let stoolSamples = orderCreateSelector.data("stool-samples");
+        let prePostTimePoints = ["preLMT", "postLMT"];
         let samplesCount = 0;
         $(".timepoint-samples").each(function () {
             let timePoint = $(this).data("timepoint");
-            if (timePoint === "preLMT" || timePoint === "postLMT") {
+            if (prePostTimePoints.includes(timePoint)) {
+                let nailSubSamples = [];
                 $(this)
                     .find("input:checkbox")
                     .each(function () {
                         if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                             let sample = $(this).val();
-                            if (sample === "NAIL") {
-                                let nailSubSamples = [];
-                                $(".nail-sub-samples")
-                                    .find("input:checkbox")
-                                    .each(function () {
-                                        if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
-                                            nailSubSamples.push(samples[$(this).val()]);
-                                            samplesCount++;
-                                        }
-                                    });
-                                if (nailSubSamples.length > 0) {
-                                    addTimePointSamples(
-                                        timePoints[timePoint],
-                                        "Nail: " + nailSubSamples.join(", ") + ""
-                                    );
-                                }
-                            } else if (sample === "STOOL") {
+                            if (sample === SAMPLE_STOOL) {
                                 let stoolKitSelector = $("#nph_order_stoolKit");
                                 if (stoolKitSelector.val()) {
                                     let stoolKitSamples = "";
@@ -59,12 +46,18 @@ $(document).ready(function () {
                                         );
                                     }
                                 }
-                            } else if (!nailSamples.includes(sample)) {
+                            } else if (nailSamples.includes(sample)) {
+                                nailSubSamples.push(samples[$(this).val()]);
+                                samplesCount++;
+                            } else {
                                 addTimePointSamples(timePoints[timePoint], samples[sample]);
                                 samplesCount++;
                             }
                         }
                     });
+                if (nailSubSamples.length > 0) {
+                    addTimePointSamples(timePoints[timePoint], "Nail: " + nailSubSamples.join(", ") + "");
+                }
             } else {
                 let bloodSamples = [];
                 $(this)
@@ -107,5 +100,49 @@ $(document).ready(function () {
     $(".timepointCheckAll").on("change", function () {
         let timepointSamplesId = "timepoint_samples_" + $(this).data("timepoint");
         $("#" + timepointSamplesId + " input:checkbox:enabled").prop("checked", $(this).prop("checked"));
+    });
+
+    let disableEnableStoolFields = function () {
+        let stoolCheckboxSel = $(".stool-checkbox");
+        if (!stoolCheckboxSel.prop("disabled")) {
+            let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
+            if (isStoolBoxChecked) {
+                $(".stool-text-fields input").prop("disabled", false);
+            } else {
+                $(".stool-text-fields input").prop("disabled", true).val("");
+            }
+        }
+    };
+
+    disableEnableStoolFields();
+
+    $(".stool-checkbox, #timepoint_preLMT, #nph_order_checkAll").on("change", disableEnableStoolFields);
+
+    if (
+        $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length
+    ) {
+        $("#nph_order_validate").hide();
+        $("#nph_order_checkAll").prop({
+            checked: true,
+            disabled: true
+        });
+    }
+
+    $(".timepoint-samples").each(function () {
+        let checked = $(this).find(":checkbox:not(:checked)").length === 0;
+        let disabled = $(this).find("input:checkbox").length === $(this).find("input:checkbox:disabled:checked").length;
+        $(this).parent().find(".timepointCheckAll").prop({
+            checked: checked,
+            disabled: disabled
+        });
+    });
+
+    $("input:checkbox").on("change", function () {
+        let allSamplesChecked = $(".timepoint-samples :checkbox:not(:checked)").length === 0;
+        $("#nph_order_checkAll").prop("checked", allSamplesChecked);
+        $(".timepoint-samples").each(function () {
+            let timePointsChecked = $(this).find(":checkbox:not(:checked)").length === 0;
+            $(this).parent().find(".timepointCheckAll").prop("checked", timePointsChecked);
+        });
     });
 });

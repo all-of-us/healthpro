@@ -11,15 +11,12 @@
     {% if sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
-            {% if modifyType == 'cancel' %}
-                <p class="text-danger">Note: Cancelling a sample will cancel all aliquots associated with this sample</p>
-            {% endif %}
             {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
-                <button type="submit" class="btn {% if modifyType == 'cancel' %} btn-danger {% elseif modifyType == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
-                    {{ modifyType|capitalize }} Sample
+                <button type="submit" class="btn btn-primary">
+                    Unlock Sample
                 </button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
@@ -55,6 +52,15 @@
             </div>
         </div>
         <div class="col-sm-7">
+            {% if sample.finalizedTs is not empty %}
+                <div class="alert alert-success well-sm">
+                    <strong>
+                        Finalized
+                        by {{ sample.finalizedUser.email|default('Unknown') }}
+                        on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                    </strong>
+                </div>
+            {% endif %}
             <div class="panel panel-default">
                 <div class="panel-heading clearfix">
                     <div class="col-sm-5">
@@ -81,9 +87,11 @@
                 <div class="panel-body">
                     {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
-                    <div class="form-group">
+                    <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
+                            has-error"{% endif %}">
                         {{ form_label(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
+                        {{ form_errors(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                     </div>
                     <hr>
                     {% if order.orderType == 'urine' %}
@@ -216,7 +224,9 @@
                                                 </td>
                                                 <td>
                                                     {{ aliquot['units'] }}
-                                                    <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                                    {% if not sample.disabled %}
+                                                        <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                                    {% endif %}
                                                 </td>
                                             </tr>
                                         {% endif %}
@@ -251,10 +261,10 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary {% if sample.disabled %} disabled {% endif %}"
-                                id="sample_finalize_btn">
+                                id="sample_finalize_btn" formnovalidate>
                             Mark as Finalized
                         </button>
-                        <button type="button" class="btn btn-default">Cancel</button>
+                        <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
                     {% if sample.modifyType == 'unlock' %}

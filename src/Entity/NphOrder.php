@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphOrder
 {
+    public const TYPE_STOOL = 'stool';
+    public const TYPE_URINE = 'urine';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -294,5 +297,25 @@ class NphOrder
             }
         }
         throw new \ErrorException("Sample group not found for SampleCode $sampleCode with SampleId $this->id");
+    }
+
+    public function isDisabled(): bool
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if (empty($nphSample->getFinalizedTs())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function isMetadataFieldDisabled(): bool
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getFinalizedTs()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

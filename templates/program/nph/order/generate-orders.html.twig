@@ -45,7 +45,7 @@
                 <div class="col-sm-4">
                     <div class="panel panel-default timepoint-panel">
                         <div class="panel-heading">
-                            <input type="checkbox" class="timepointCheckAll" data-timepoint="{{ timePoint }}">
+                            <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
                             {{ form_label(orderForm[timePoint]) }}
                         </div>
                         <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
@@ -59,7 +59,6 @@
             </div>
                 <div class="row">
                     <a class="btn btn-default" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
-{#                    <button type="button" class="btn btn-primary" id="order_next_btn">Next</button>#}
                     {{ form_widget(orderForm.validate) }}
                 </div>
             {{ form_rest(orderForm) }}

@@ -20,7 +20,6 @@
     "URINES": "Spot Urine",
     "SALIVA": "Saliva",
     "HAIR": "Hair",
-    "NAIL": "Nail",
     "NAILB": "Big Toenails",
     "NAILL": "Other Toenails",
     "STOOL": "Stool",
@@ -34,7 +33,6 @@
       "URINES": "Spot Urine",
       "SALIVA": "Saliva",
       "HAIR": "Hair",
-      "NAIL": "Nail",
       "NAILB": "Big Toenails",
       "NAILL": "Other Toenails",
       "STOOL": "Stool",
@@ -123,7 +121,8 @@
       "SALIVA",
       "HAIR",
       "NAILB",
-      "NAILL"
+      "NAILL",
+      "STOOL"
     ],
     "30min": [
       "SST8P5",

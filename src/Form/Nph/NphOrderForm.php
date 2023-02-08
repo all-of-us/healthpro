@@ -57,9 +57,13 @@ class NphOrderForm extends AbstractType
         if ($formType === 'collect') {
             $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
                 if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
-                    $context->buildViolation('Collection time required')->addViolation();
+                    $context->buildViolation('Collection time is required')->addViolation();
                 }
             });
+        } else {
+            $constraints[] = new Constraints\NotBlank([
+                'message' => 'Collection time is required'
+            ]);
         }
         $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
             'required' => $formType === 'finalize',
@@ -83,14 +87,15 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addUrineMetadataFields(FormBuilderInterface $builder): void
+    protected function addUrineMetadataFields(FormBuilderInterface $builder, $disabled = false): void
     {
         $builder->add('urineColor', Type\ChoiceType::class, [
             'label' => 'Urine Color',
             'required' => true,
             'choices' => NphOrderCollect::$urineColors,
             'multiple' => false,
-            'placeholder' => 'Select Urine Color'
+            'placeholder' => 'Select Urine Color',
+            'disabled' => $disabled
         ]);
 
         $builder->add('urineClarity', Type\ChoiceType::class, [
@@ -98,18 +103,20 @@ class NphOrderForm extends AbstractType
             'required' => true,
             'choices' => NphOrderCollect::$urineClarity,
             'multiple' => false,
-            'placeholder' => 'Select Urine Clarity'
+            'placeholder' => 'Select Urine Clarity',
+            'disabled' => $disabled
         ]);
     }
 
-    protected function addStoolMetadataFields(FormBuilderInterface $builder): void
+    protected function addStoolMetadataFields(FormBuilderInterface $builder, $disabled = false): void
     {
         $builder->add('bowelType', Type\ChoiceType::class, [
             'label' => 'Describe the bowel movement for this collection',
             'required' => true,
             'choices' => self::$bowelMovements,
             'multiple' => false,
-            'placeholder' => 'Select bowel movement type'
+            'placeholder' => 'Select bowel movement type',
+            'disabled' => $disabled
         ]);
 
         $builder->add('bowelQuality', Type\ChoiceType::class, [
@@ -117,7 +124,8 @@ class NphOrderForm extends AbstractType
             'required' => true,
             'choices' => self::$bowelMovementQuality,
             'multiple' => false,
-            'placeholder' => 'Select bowel movement quality'
+            'placeholder' => 'Select bowel movement quality',
+            'disabled' => $disabled
         ]);
     }
 }

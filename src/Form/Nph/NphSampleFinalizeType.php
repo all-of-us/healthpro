@@ -20,11 +20,11 @@ class NphSampleFinalizeType extends NphOrderForm
         $this->addCollectedTimeAndNoteFields($builder, $options, $sample);
 
         if ($orderType === 'urine') {
-            $this->addUrineMetadataFields($builder);
+            $this->addUrineMetadataFields($builder, $options['disableMetadataFields']);
         }
 
         if ($orderType === 'stool') {
-            $this->addStoolMetadataFields($builder);
+            $this->addStoolMetadataFields($builder, $options['disableMetadataFields']);
         }
 
         $formData = $builder->getData();
@@ -185,7 +185,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'timeZone' => null,
             'aliquots' => null,
             'disabled' => null,
-            'nphSample' => null
+            'nphSample' => null,
+            'disableMetadataFields' => null
         ]);
     }
 
