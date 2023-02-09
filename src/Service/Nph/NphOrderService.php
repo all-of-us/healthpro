@@ -727,11 +727,7 @@ class NphOrderService
                 $totalAliquotCodes = array_merge($totalAliquotCodes, $formData[$aliquotCode]);
             }
         }
-        $totalAliquotCodes = array_filter($totalAliquotCodes, function ($value) {
-            return $value !== null;
-        });
-        $uniqueAliquotCodes = array_unique($totalAliquotCodes);
-        return count($totalAliquotCodes) > count($uniqueAliquotCodes);
+        return $this->hasDuplicateIds($totalAliquotCodes);
     }
 
     public function sendToRdr(NphSample $sample): bool
@@ -940,9 +936,11 @@ class NphOrderService
                 ];
             }
             $hasStoolTube = false;
+            $totalStoolTubes = [];
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $hasStoolTube = true;
+                    $totalStoolTubes[] = $formData[$stoolSample];
                     $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
                         'sampleId' => $formData[$stoolSample]
                     ]);
@@ -960,7 +958,22 @@ class NphOrderService
                     'message' => 'Please enter at least one Stool Tube ID'
                 ];
             }
+            if ($this->hasDuplicateIds($totalStoolTubes)) {
+                $formErrors[] = [
+                    'field' => 'checkAll',
+                    'message' => 'Please enter unique Stool Tube IDs'
+                ];
+            }
         }
         return $formErrors;
+    }
+
+    private function hasDuplicateIds(array $totalIds): bool
+    {
+        $totalIds = array_filter($totalIds, function ($value) {
+            return $value !== null;
+        });
+        $uniqueIds = array_unique($totalIds);
+        return count($totalIds) > count($uniqueIds);
     }
 }
