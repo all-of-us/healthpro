@@ -718,6 +718,22 @@ class NphOrderService
         return [];
     }
 
+    public function hasDuplicateAliquotsInForm(array $formData, string $sampleCode): bool
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        $totalAliquotCodes = [];
+        foreach (array_keys($aliquots) as $aliquotCode) {
+            if (isset($formData[$aliquotCode])) {
+                $totalAliquotCodes = array_merge($totalAliquotCodes, $formData[$aliquotCode]);
+            }
+        }
+        $totalAliquotCodes = array_filter($totalAliquotCodes, function ($value) {
+            return $value !== null;
+        });
+        $uniqueAliquotCodes = array_unique($totalAliquotCodes);
+        return count($totalAliquotCodes) > count($uniqueAliquotCodes);
+    }
+
     public function sendToRdr(NphSample $sample): bool
     {
         $order = $sample->getNphOrder();
