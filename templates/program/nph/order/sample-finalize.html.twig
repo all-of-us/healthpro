@@ -49,6 +49,14 @@
                         <p><strong>Instructions for Stool Kit</strong></p>
                     {% endif %}
                 </div>
+                <div>
+                    <div class="text-right">
+                        <a class="pull-right" href="{{ path('aliquot_instructions_file', { id: order.orderType }) }}" target="_blank">
+                            <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download
+                        </a>
+                    </div>
+                    <iframe class="pdf" name="pdf" src="{{ path('aliquot_instructions_file', { id: order.orderType  }) }}#view=FitH"></iframe>
+                </div>
             </div>
         </div>
         <div class="col-sm-7">
