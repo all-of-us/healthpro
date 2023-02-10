@@ -64,7 +64,9 @@ class NphSampleFinalizeType extends NphOrderForm
                         ],
                         'attr' => [
                             'placeholder' => 'Scan Aliquot Barcode',
-                            'class' => 'aliquot-barcode'
+                            'class' => 'aliquot-barcode',
+                            'data-barcode-length' => $aliquot['barcodeLength'],
+                            'data-barcode-prefix' => $aliquot['barcodePrefix'] ?? null
                         ],
                     ],
                     'label' => $aliquot['container'],

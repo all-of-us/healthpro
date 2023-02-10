@@ -60,15 +60,15 @@ $(document).ready(function () {
         }
     });
 
-    /*
-    // TODO: Disabling it for now as we need to implement this based on different aliquot barcode lengths
-    $(".aliquot-barcode").keyup(function () {
+    $(document).on("keyup", ".aliquot-barcode", function () {
         let barcode = $(this).val();
-        if (barcode.length === 11) {
+        let expectedBarcodeLength = $(this).data("barcode-length");
+        let expectedBarcodePrefix = $(this).data("barcode-prefix");
+        let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
+        if (regex.test(barcode)) {
             let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
             aliquotTsSelector.focus();
             aliquotTsSelector.blur();
         }
     });
-    */
 });
