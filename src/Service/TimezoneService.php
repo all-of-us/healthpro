@@ -11,7 +11,8 @@ class TimezoneService
         'America/Phoenix' => 'Mountain Time - Arizona',
         'America/Los_Angeles' => 'Pacific Time',
         'America/Anchorage' => 'Alaska Time',
-        'Pacific/Honolulu' => 'Hawaii Time'
+        'Pacific/Honolulu' => 'Hawaii Time',
+        'America/Puerto_Rico' => 'Atlantic Standard Time'
     ];
 
     /**
