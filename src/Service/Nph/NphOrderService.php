@@ -718,6 +718,18 @@ class NphOrderService
         return [];
     }
 
+    public function hasDuplicateAliquotsInForm(array $formData, string $sampleCode): bool
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        $totalAliquotCodes = [];
+        foreach (array_keys($aliquots) as $aliquotCode) {
+            if (isset($formData[$aliquotCode])) {
+                $totalAliquotCodes = array_merge($totalAliquotCodes, $formData[$aliquotCode]);
+            }
+        }
+        return $this->hasDuplicateIds($totalAliquotCodes);
+    }
+
     public function sendToRdr(NphSample $sample): bool
     {
         $order = $sample->getNphOrder();
@@ -924,9 +936,11 @@ class NphOrderService
                 ];
             }
             $hasStoolTube = false;
+            $totalStoolTubes = [];
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $hasStoolTube = true;
+                    $totalStoolTubes[] = $formData[$stoolSample];
                     $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
                         'sampleId' => $formData[$stoolSample]
                     ]);
@@ -944,7 +958,22 @@ class NphOrderService
                     'message' => 'Please enter at least one Stool Tube ID'
                 ];
             }
+            if ($this->hasDuplicateIds($totalStoolTubes)) {
+                $formErrors[] = [
+                    'field' => 'checkAll',
+                    'message' => 'Please enter unique Stool Tube IDs'
+                ];
+            }
         }
         return $formErrors;
+    }
+
+    private function hasDuplicateIds(array $totalIds): bool
+    {
+        $totalIds = array_filter($totalIds, function ($value) {
+            return $value !== null;
+        });
+        $uniqueIds = array_unique($totalIds);
+        return count($totalIds) > count($uniqueIds);
     }
 }

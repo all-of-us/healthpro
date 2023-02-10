@@ -334,6 +334,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $aliquots,
         $aliquotId,
         $duplicate,
+        $hasDuplicatesInform,
         $expectedRdrTimePoint
     ): void
     {
@@ -352,6 +353,7 @@ class NphOrderServiceTest extends ServiceTestCase
             $finalizedFormData["{$aliquotCode}AliquotTs"][] = $aliquot[1];
             $finalizedFormData["{$aliquotCode}Volume"][] = floatval($aliquot[2]);
         }
+        $this->assertSame($hasDuplicatesInform, $this->service->hasDuplicateAliquotsInForm($finalizedFormData, $sampleCode));
         $this->service->saveSampleFinalizationData($finalizedFormData, $nphSample);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
@@ -387,14 +389,14 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'urine', 'URINES', $collectedTs, [
                 'URINESA1' => ['10001', $aliquotTs, 500],
                 'URINESA2' => ['10002', $aliquotTs, 5]
-            ], '10001', true, 'Pre LMT'],
+            ], '10001', true, false, 'Pre LMT'],
             ['preLMT', 'saliva', 'SALIVA', $collectedTs, [
                 'SALIVAA1' => ['10003', $aliquotTs, 4]
-            ], '10008', false, 'Pre LMT'],
+            ], '10008', false, false, 'Pre LMT'],
             ['30min', 'blood', 'SST8P5', $collectedTs, [
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
-            ], '10005', true, '30 min']
+            ], '10005', true, false, '30 min'],
         ];
     }
 
@@ -635,7 +637,11 @@ class NphOrderServiceTest extends ServiceTestCase
             [
                 ['checkAll'],
                 [['field' => 'checkAll', 'message' => 'Please select or enter at least one sample']]
-            ]
+            ],
+            [
+                ['stoolKit' => 'KIT-00000004', 'ST1' => '00000000003', 'ST2' => '00000000003'],
+                [['field' => 'checkAll', 'message' => 'Please enter unique Stool Tube IDs']]
+            ],
         ];
     }
 }
