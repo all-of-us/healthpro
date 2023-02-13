@@ -331,12 +331,12 @@ class SiteService
         if (!$googleGroup) {
             return null;
         }
-        //TODO: Use nph site class if the progam is nph
-        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
+            $site = $this->em->getRepository(NphSite::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
+        } else {
             $site = $this->em->getRepository(Site::class)->findBy(['deleted' => 0, 'googleGroup' => $googleGroup]);
-            return !empty($site) ? $site[0] : null;
         }
-        return null;
+        return !empty($site) ? $site[0] : null;
     }
 
     public function getOrderType()
