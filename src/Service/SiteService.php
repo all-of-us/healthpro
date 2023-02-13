@@ -203,10 +203,14 @@ class SiteService
         return $siteName;
     }
 
-    public function getSiteIdWithPrefix()
+    public function getSiteIdWithPrefix(): ?string
     {
         if ($this->getSiteId()) {
-            return \App\Security\User::SITE_PREFIX . $this->getSiteId();
+            $prefix = \App\Security\User::SITE_PREFIX;
+            if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
+                $prefix = \App\Security\User::SITE_NPH_PREFIX;
+            }
+            return $prefix . $this->getSiteId();
         }
         return null;
     }
