@@ -51,7 +51,7 @@ class NphOrderLookupController extends AbstractController
                         'participant' => $participant
                     ]);
                 } else {
-                    $crossSiteErrorMessage = 'Lookup for this order id is not permitted because the participant is paired with another site';
+                    $crossSiteErrorMessage = 'Lookup for this order ID is not permitted because the participant is paired with another site';
 
                 }
             }

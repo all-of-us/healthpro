@@ -187,7 +187,7 @@ class NphOrderController extends BaseController
                         'sampleId' => $sample->getId()
                     ]);
                 } else {
-                    $crossSiteErrorMessage = 'Lookup for this sample id is not permitted because the participant is paired with another site';
+                    $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
                 }
             }
             $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
