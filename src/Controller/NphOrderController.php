@@ -160,7 +160,10 @@ class NphOrderController extends BaseController
     /**
      * @Route("/samples/aliquot", name="nph_samples_aliquot")
      */
-    public function sampleAliquotLookupAction(Request $request): Response
+    public function sampleAliquotLookupAction(
+        Request $request,
+        NphParticipantSummaryService $nphParticipantSummaryService
+    ): Response
     {
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleIdForm->handleRequest($request);
@@ -172,13 +175,22 @@ class NphOrderController extends BaseController
                 'sampleId' => $id
             ]);
             if ($sample) {
-                return $this->redirectToRoute('nph_sample_finalize', [
-                    'participantId' => $sample->getNphOrder()->getParticipantId(),
-                    'orderId' => $sample->getNphOrder()->getId(),
-                    'sampleId' => $sample->getId()
-                ]);
+                $participantId = $sample->getNphOrder()->getParticipantId();
+                $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+                if (!$participant) {
+                    throw $this->createNotFoundException('Participant not found.');
+                }
+                if($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
+                    return $this->redirectToRoute('nph_sample_finalize', [
+                        'participantId' => $sample->getNphOrder()->getParticipantId(),
+                        'orderId' => $sample->getNphOrder()->getId(),
+                        'sampleId' => $sample->getId()
+                    ]);
+                } else {
+                    $crossSiteErrorMessage = 'Lookup for this sample id is not permitted because the participant is paired with another site';
+                }
             }
-            $this->addFlash('error', 'Sample ID not found');
+            $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
