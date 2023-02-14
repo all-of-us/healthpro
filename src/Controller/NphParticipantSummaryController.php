@@ -37,10 +37,10 @@ class NphParticipantSummaryController extends AbstractController
         $agreeForm = $this->createForm(NphCrossSiteAgreeType::class, null);
         $agreeForm->handleRequest($request);
         if ($agreeForm->isSubmitted() && $agreeForm->isValid()) {
-            $session->set('agreeCrossOrg_' . $participantId, true);
+            $session->set('agreeCrossSite_' . $participantId, true);
             $loggerService->log(Log::NPH_CROSS_SITE_PARTICIPANT_AGREE, [
                 'participantId' => $participantId,
-                'site' => $participant->nphPairedSite
+                'site' => $participant->nphPairedSiteSuffix
             ]);
             return $this->redirectToRoute('nph_participant_summary', [
                 'participantId' => $participantId
@@ -49,17 +49,17 @@ class NphParticipantSummaryController extends AbstractController
         $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participantId);
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
         $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo['order'], $nphProgramSummary);
-        $isCrossSite = $participant->nphPairedSite !== $siteService->getSiteId();
-        $hasNoParticipantAccess = $isCrossSite && empty($session->get('agreeCrossOrg_' . $participantId));
+        $isCrossSite = $participant->nphPairedSiteSuffix !== $siteService->getSiteId();
+        $hasNoParticipantAccess = $isCrossSite && empty($session->get('agreeCrossSite_' . $participantId));
         if ($hasNoParticipantAccess) {
             $loggerService->log(Log::NPH_CROSS_SITE_PARTICIPANT_ATTEMPT, [
                 'participantId' => $participantId,
-                'organization' => $participant->nphPairedSite
+                'site' => $participant->nphPairedSiteSuffix
             ]);
         } elseif ($isCrossSite) {
             $loggerService->log(Log::NPH_CROSS_SITE_PARTICIPANT_VIEW, [
                 'participantId' => $participantId,
-                'organization' => $participant->nphPairedSite
+                'site' => $participant->nphPairedSiteSuffix
             ]);
         }
         return $this->render('program/nph/participant/index.html.twig', [
