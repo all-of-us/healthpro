@@ -12,7 +12,7 @@
         <div class="today-filter" align="center">
             {{ form_rest(todayFilterForm) }}
             <div class="form-group">
-                <a href="{{ path('review_today') }}" class="btn btn-default">Reset</a>
+                <a href="{{ path('nph_review_today') }}" class="btn btn-default">Reset</a>
             </div>
         </div>
         {{ form_end(todayFilterForm) }}
@@ -26,6 +26,8 @@
             <th rowspan="2">Participant ID</th>
             <th rowspan="2">Name</th>
             <th>Biobank ID</th>
+            <th>Module</th>
+            <th>Visit</th>
             <th>Timepoint</th>
             <th>Order ID</th>
             <th>Samples</th>
@@ -37,25 +39,38 @@
         </tr>
         </thead>
         <tbody>
+        {% set participantId = 0 %}
+        {% set lastModule = 0 %}
+        {% set lastVisit = '' %}
         {% for id, sample in samples %}
             {% set sampleLength = sample.sampleId|length %}
             {% set rowSpanLength = sampleLength + 1 %}
             {% set rowSpan = 'rowspan =' ~ rowSpanLength %}
-            <td {{ rowSpan }}>{{ sample.participantId }}</td>
-            {% if sample.participant is defined %}
-            <td {{ rowSpan }}>
-                <a href="{{ path('participant', { id: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
-            </td>
-            <td {{ rowSpan }}>{{ sample.participant.biobankId }}</td>
-            {% else %}
-                <td {{ rowSpan }} data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
-                    <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                    <span class="sr-only">Loading...</span>
+            {% set participantRowSpawn = 'rowspan =' ~ rowCounts[sample.participantId]['participantRow'] %}
+            {% set moduleRowSpan = 'rowspan =' ~ rowCounts[sample.participantId]['module'~sample.module] %}
+            {% if participantId != sample.participantId %}
+                <td {{ participantRowSpawn }}>{{ sample.participantId }}</td>
+                {% if sample.participant is defined %}
+                    <td {{ participantRowSpawn }}>
+                        <a href="{{ path('participant', { id: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
+                    </td>
+                    <td {{ participantRowSpawn }}>{{ sample.participant.biobankId }}</td>
+                {% else %}
+                    <td {{ participantRowSpawn }} data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                        <span class="sr-only">Loading...</span>
+                    </td>
+                    <td {{ participantRowSpawn }} data-participant-id="{{ sample.participantId }}"  class="load-biobankid">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                        <span class="sr-only">Loading...</span>
+                    </td>
+                {% endif %}
+            {% endif %}
+            {% if lastModule != sample.module or participantId != sample.participantId %}
+                <td {{ moduleRowSpan }}>
+                    {{ sample.module }}
                 </td>
-                <td {{ rowSpan }} data-participant-id="{{ sample.participantId }}"  class="load-biobankid">
-                    <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-                    <span class="sr-only">Loading...</span>
-                </td>
+                <td {{ moduleRowSpan }}>{{ sample.visitType }}</td>
             {% endif %}
             <td {{ rowSpan }}>{{ sample.timepoint }}</td>
             <td {{ rowSpan }}><a href="{{ path('nph_order_collect', {participantId: sample.participantId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a></td>
@@ -81,6 +96,8 @@
                     {% endif %}
                 </tr>
             {% endfor %}
+            {% set participantId = sample.participantId %}
+            {% set lastModule = sample.module %}
         {% else %}
             <tr>
                 <td colspan="99" align="center">No records found</td>

@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\NphFieldSort;
 use App\Entity\NphOrder;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -59,24 +61,27 @@ class NphOrderRepository extends ServiceEntityRepository
 
     public function getOrdersByDateRange(string $siteId, DateTime $startDate, DateTime $endDate): array
     {
-        return $this->createQueryBuilder('no')
-            ->select('no.participantId, no.timepoint, group_concat(u.email) as email, no.id as hpoOrderId,
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.timepoint, no.module, no.visitType, group_concat(u.email) as email, no.id as hpoOrderId,
              no.orderId, group_concat(IFNULL(ns.sampleCode, \'\')) as sampleCode, group_concat(IFNULL(ns.sampleId, \'\')) as sampleId,
               group_concat(IFNULL(no.createdTs, \'\')) as createdTs, group_concat(IFNULL(ns.collectedTs, \'\')) as collectedTs,
                group_concat(IFNULL(ns.finalizedTs, \'\')) as finalizedTs, count(no.createdTs) as createdCount,
-               count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
+               count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount, group_concat(nfs.sortOrder) as sortOrder')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
+            ->leftJoin(NphFieldSort::class, 'nfs', Join::WITH, 'nfs.fieldValue = no.timepoint')
             ->where('no.createdTs >= :startDate')
             ->andWhere('no.createdTs <= :endDate')
             ->andWhere('no.site = :site')
             ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
             ->orderBy('no.participantId', 'DESC')
-            ->addOrderBy('no.timepoint', 'DESC')
+            ->addorderBy('no.module', 'ASC')
+            ->addorderBy('no.visitType', 'DESC')
+            ->addOrderBy('nfs.sortOrder', 'asc')
             ->addOrderBy('no.orderId', 'DESC')
-            ->groupBy('no.participantId, no.timepoint, no.orderId')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('no.participantId, no.module, no.timepoint, no.orderId, nfs.sortOrder')
+            ->getQuery();
+        return $queryBuilder->getResult();
     }
 
     public function getSampleCollectionStatsByDate(string $siteId, DateTime $startDate, DateTime $endDate): array

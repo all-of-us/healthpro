@@ -61,13 +61,14 @@ class NphReviewController extends BaseController
                 $displayMessage = "Displaying results for {$startDate->format('m/d/Y')}";
                 if ($todayFilterForm->get('end_date')->getData()) {
                     $endDate = $todayFilterForm->get('end_date')->getData();
+                    $endDate->setTime(23, 59, 59);
                     // Check date range
                     if ($startDate->diff($endDate)->days >= self::DATE_RANGE_LIMIT) {
                         $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 30 days'));
                     }
                     $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
                 } else {
-                    $endDate = clone $startDate;
+                    $endDate = new DateTime('tomorrow', new DateTimeZone($this->getSecurityUser()->getTimeZone()));
                 }
             }
             if (!$todayFilterForm->isValid()) {
@@ -85,7 +86,16 @@ class NphReviewController extends BaseController
         $sampleCounts = $this->em->getRepository('App:NphOrder')->getSampleCollectionStatsByDate($site, $startDate, $endDate);
 
         $count = 0;
+        $rowCounts = [];
         foreach (array_keys($samples) as $key) {
+            if (!array_key_exists($samples[$key]['participantId'], $rowCounts)) {
+                $rowCounts[$samples[$key]['participantId']]['participantRow'] = 0;
+            }
+            if (!array_key_exists('module'.$samples[$key]['module'], $rowCounts[$samples[$key]['participantId']])) {
+                $rowCounts[$samples[$key]['participantId']]['module'.$samples[$key]['module']] = 0;
+            }
+            $rowCounts[$samples[$key]['participantId']]['participantRow'] += $samples[$key]['createdCount'] + 1;
+            $rowCounts[$samples[$key]['participantId']]['module'.$samples[$key]['module']] += $samples[$key]['createdCount'] + 1;
             if ($count <= 5) {
                 $samples[$key]['participant'] = $this->participantSummaryService->getParticipantById($samples[$key]['participantId']);
             }
@@ -107,6 +117,7 @@ class NphReviewController extends BaseController
             'collectedCount' => $sampleCounts[0]['collectedCount'],
             'finalizedCount' => $sampleCounts[0]['finalizedCount'],
             'createdCount' => $sampleCounts[0]['createdCount'],
+            'rowCounts' => $rowCounts
         ]);
     }
 
