@@ -63,7 +63,8 @@
         </ul>
     </div>
     <div class="col-sm-10 participant-modules">
-        {% for moduleNumber, module in programSummaryAndOrderInfo %}
+        {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo %}
             {% if loop.first %}
                 {% set modulePanelDisplay = '' %}
             {% else %}
@@ -122,6 +123,11 @@
                 {% endfor %}
             </div>
         {% endfor %}
+        {% else %}
+            <p class="alert alert-danger">
+                Biospecimen collections are not available because this participant is paired with another site.
+            </p>
+        {% endif %}
     </div>
     {% endif %}
 {% endblock %}
