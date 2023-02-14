@@ -6,6 +6,45 @@ class Samples
 {
     private $visitObj;
 
+    public static $aliquotDocuments = [
+        'blood' => [
+            'title' => 'HPRO Blood Aliquoting Instructions',
+            'filename' => 'HPRO Blood Aliquoting Instructions.pdf'
+        ],
+        'urine' => [
+            'title' => 'HPRO Spot Urine Aliquoting Instructions',
+            'filename' => 'HPRO Spot Urine Aliquoting Instructions.pdf'
+        ],
+        'urine24' => [
+            'title' => 'HPRO 24 Hour Urine Aliquoting Instructions',
+            'filename' => 'HPRO 24 Hour Urine Aliquoting Instructions.pdf'
+        ],
+        'urineDlw' => [
+            'title' => 'HPRO Doubly Labeled Water Urine Aliquoting Instructions',
+            'filename' => 'HPRO Doubly Labeled Water Urine Aliquoting Instructions.pdf'
+        ],
+        'hair' => [
+            'title' => 'HPRO Hair Aliquoting Instructions',
+            'filename' => 'HPRO Hair Aliquoting Instructions.pdf'
+        ],
+        'nail' => [
+            'title' => 'HPRO Nail Aliquoting Instructions',
+            'filename' => 'HPRO Nail Aliquoting Instructions.pdf'
+        ],
+        'stool' => [
+            'title' => 'HPRO Stool Instructions',
+            'filename' => 'HPRO Stool Instructions.pdf'
+        ],
+        'saliva' => [
+            'title' => 'HPRO Module 1&2 Saliva Aliquoting Instructions',
+            'filename' => 'HPRO Module 1&2 Saliva Aliquoting Instructions.pdf'
+        ],
+        'saliva3' => [
+            'title' => 'HPRO Module 3 Saliva Aliquoting Instructions',
+            'filename' => 'HPRO Module 3 Saliva Aliquoting Instructions.pdf'
+        ]
+    ];
+
     public function __construct($module, $visit)
     {
         $visitClass = 'App\Nph\Order\Visits\Visit' . $visit;

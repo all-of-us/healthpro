@@ -36,8 +36,20 @@
             {{ form_end(sampleIdForm) }}
             <div class="well bg-white">
                 <div class="text-center">
-                    {% if aliquots is not empty %}
+                    {% if aliquots %}
                         <p><strong>Aliquot Instructions for {{ samples[sampleCode]}}</strong></p>
+                    {% else %}
+                        <p><strong>Instructions for Stool Kit</strong></p>
+                    {% endif %}
+                    <div>
+                        <div class="text-right">
+                            <a class="pull-right" href="{{ path('aliquot_instructions_file', { id: order.orderType }) }}" target="_blank">
+                                <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download
+                            </a>
+                        </div>
+                        <iframe class="pdf" name="pdf" src="{{ path('aliquot_instructions_file', { id: order.orderType  }) }}#view=FitH"></iframe>
+                    </div>
+                    {% if aliquots %}
                         <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
                         {% for aliquot in aliquots %}
                             <p>
@@ -45,8 +57,6 @@
                                 .expectedVolume|default('--') }} {{ aliquot.units }}
                             </p>
                         {% endfor %}
-                    {% else %}
-                        <p><strong>Instructions for Stool Kit</strong></p>
                     {% endif %}
                 </div>
             </div>
