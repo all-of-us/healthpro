@@ -163,8 +163,7 @@ class NphOrderController extends BaseController
     public function sampleAliquotLookupAction(
         Request $request,
         NphParticipantSummaryService $nphParticipantSummaryService
-    ): Response
-    {
+    ): Response {
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleIdForm->handleRequest($request);
 
@@ -180,7 +179,7 @@ class NphOrderController extends BaseController
                 if (!$participant) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                if($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
+                if ($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $sample->getNphOrder()->getParticipantId(),
                         'orderId' => $sample->getNphOrder()->getId(),
