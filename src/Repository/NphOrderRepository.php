@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\NphFieldSort;
 use App\Entity\NphOrder;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -44,14 +47,92 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getRecentOrdersBySite($siteId): array
+    public function getRecentOrdersBySite(string $siteId): array
     {
         return $this->createQueryBuilder('no')
             ->where('no.createdTs >= :createdTs')
             ->andWhere('no.site = :site')
-            ->setParameters(['site' => $siteId,  'createdTs' => (new \DateTime('-1 day'))->format('Y-m-d H:i:s')])
+            ->setParameters(['site' => $siteId, 'createdTs' => (new DateTime('-1 day'))->format('Y-m-d H:i:s')])
             ->orderBy('no.createdTs', 'DESC')
             ->addOrderBy('no.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getOrdersByDateRange(string $siteId, DateTime $startDate, DateTime $endDate): array
+    {
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.timepoint, no.module, no.visitType, group_concat(u.email) as email, no.id as hpoOrderId,
+             no.orderId, group_concat(IFNULL(ns.sampleCode, \'\')) as sampleCode, group_concat(IFNULL(ns.sampleId, \'\')) as sampleId,
+              group_concat(IFNULL(no.createdTs, \'\')) as createdTs, group_concat(IFNULL(ns.collectedTs, \'\')) as collectedTs,
+               group_concat(IFNULL(ns.finalizedTs, \'\')) as finalizedTs, count(no.createdTs) as createdCount,
+               count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount, group_concat(nfs.sortOrder) as sortOrder')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->leftJoin(NphFieldSort::class, 'nfs', Join::WITH, 'nfs.fieldValue = no.timepoint')
+            ->where('no.createdTs >= :startDate')
+            ->andWhere('no.createdTs <= :endDate')
+            ->andWhere('no.site = :site')
+            ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
+            ->orderBy('no.participantId', 'DESC')
+            ->addorderBy('no.module', 'ASC')
+            ->addorderBy('no.visitType', 'DESC')
+            ->addOrderBy('nfs.sortOrder', 'asc')
+            ->addOrderBy('no.orderId', 'DESC')
+            ->groupBy('no.participantId, no.module, no.timepoint, no.orderId, nfs.sortOrder')
+            ->getQuery();
+        return $queryBuilder->getResult();
+    }
+
+    public function getSampleCollectionStatsByDate(string $siteId, DateTime $startDate, DateTime $endDate): array
+    {
+        return $this->createQueryBuilder('no')
+            ->select('count(no.createdTs) as createdCount, count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
+            ->join('no.nphSamples', 'ns')
+            ->where('no.createdTs >= :startDate')
+            ->andWhere('no.createdTs <= :endDate')
+            ->andWhere('no.site = :site')
+            ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getUnfinalizedSampleCollectionStats(string $siteId): array
+    {
+        return $this->createQueryBuilder('no')
+            ->select('count(no.createdTs) as createdCount, count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
+            ->join('no.nphSamples', 'ns')
+            ->where('no.site = :site')
+            ->andWhere('ns.finalizedTs IS NULL')
+            ->setParameter('site', $siteId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getUnfinalizedSamples(string $site): array
+    {
+        return $this->createQueryBuilder('no')
+            ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType,
+             no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->where('ns.finalizedTs IS NULL')
+            ->andWhere('no.site = :site')
+            ->setParameter('site', $site)
+            ->orderBy('no.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getRecentlyModifiedSamples(string $site, DateTime $modifiedTs): array
+    {
+        return $this->createQueryBuilder('no')
+            ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType,
+             no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->where('ns.modifiedTs >= :modifiedTs')
+            ->andWhere('no.site = :site')
+            ->setParameters(['site' => $site, 'modifiedTs' => $modifiedTs])
+            ->orderBy('no.id', 'ASC')
             ->getQuery()
             ->getResult();
     }

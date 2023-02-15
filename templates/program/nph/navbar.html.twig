@@ -89,7 +89,7 @@
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{# TODO: Path to NPH Participant Lookup #}"><i class="fa fa-list" aria-hidden="true"></i> Participant Review</a></li>
+                                <li><a href="{{ path('nph_review_today') }}"><i class="fa fa-list" aria-hidden="true"></i> Participant Review</a></li>
                             </ul>
                         </li>
                         {% if app.session.get('siteOrganization') %}
