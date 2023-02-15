@@ -935,11 +935,9 @@ class NphOrderService
                     'message' => 'This Kit ID has already been used for another order'
                 ];
             }
-            $hasStoolTube = false;
             $totalStoolTubes = [];
             foreach ($this->getSamplesByType('stool') as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
-                    $hasStoolTube = true;
                     $totalStoolTubes[] = $formData[$stoolSample];
                     $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
                         'sampleId' => $formData[$stoolSample]
@@ -951,12 +949,6 @@ class NphOrderService
                         ];
                     }
                 }
-            }
-            if ($hasStoolTube === false) {
-                $formErrors[] = [
-                    'field' => $this->getSamplesByType('stool')[0],
-                    'message' => 'Please enter at least one Stool Tube ID'
-                ];
             }
             if ($this->hasDuplicateIds($totalStoolTubes)) {
                 $formErrors[] = [

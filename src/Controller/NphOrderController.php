@@ -11,7 +11,10 @@ use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
+use App\HttpClient;
+use App\Nph\Order\Samples;
 use App\Service\EnvironmentService;
+use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -22,6 +25,7 @@ use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -493,6 +497,36 @@ class NphOrderController extends BaseController
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {
             throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
+        }
+    }
+
+    /**
+     * @Route("/aliquot/instructions/file/{id}", name="aliquot_instructions_file")
+     */
+
+    public function aliquotInstructions($id, HelpService $helpService)
+    {
+        $document = Samples::$aliquotDocuments[$id] ?? null;
+        if (!$document) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        $documentFile = $document['filename'];
+        $url = $helpService->getStoragePath() . '/' . rawurlencode($documentFile);
+        try {
+            $client = new HttpClient();
+            $response = $client->get($url, ['stream' => true]);
+            $responseBody = $response->getBody();
+            $streamedResponse = new StreamedResponse(function () use ($responseBody) {
+                while (!$responseBody->eof()) {
+                    echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
+                }
+            });
+            $streamedResponse->headers->set('Content-Type', 'application/pdf');
+            return $streamedResponse;
+        } catch (\Exception $e) {
+            error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
+            echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
+            exit;
         }
     }
 }

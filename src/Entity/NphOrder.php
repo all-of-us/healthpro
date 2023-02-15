@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class NphOrder
 {
+    public const TYPE_BLOOD = 'blood';
     public const TYPE_STOOL = 'stool';
     public const TYPE_URINE = 'urine';
 
