@@ -631,10 +631,6 @@ class NphOrderServiceTest extends ServiceTestCase
                 [['field' => 'ST1', 'message' => 'This Tube ID has already been used for another sample']]
             ],
             [
-                ['stoolKit' => 'KIT-00000003'],
-                [['field' => 'ST1', 'message' => 'Please enter at least one Stool Tube ID']]
-            ],
-            [
                 ['checkAll'],
                 [['field' => 'checkAll', 'message' => 'Please select or enter at least one sample']]
             ],

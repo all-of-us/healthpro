@@ -21,6 +21,7 @@ class NphSample
     public const EDITED = 'edited';
     public const REVERT = 'revert';
     public const SAMPLE_STOOL = 'STOOL';
+    public const PRE_LMT = 'preLMT';
 
     private const RDR_MICROLITER_UNITS = [
         'μL' => 'uL'

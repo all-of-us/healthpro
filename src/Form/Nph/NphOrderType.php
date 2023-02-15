@@ -2,6 +2,7 @@
 
 namespace App\Form\Nph;
 
+use App\Entity\NphSample;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -17,7 +18,6 @@ class NphOrderType extends AbstractType
         $ordersData = $builder->getData();
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
-        $stoolSamples = $options['stoolSamples'];
         $isStoolKitDisabled = !empty($ordersData['stoolKit']);
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
@@ -38,18 +38,10 @@ class NphOrderType extends AbstractType
                                 'pattern' => '/^KIT-[0-9]{8}$/',
                                 'message' => 'Please enter a valid KIT ID. Format should be KIT-10000000 (KIT-8 digits)'
                             ]),
-                            new Constraints\Callback(function ($value, $context) use ($stoolSamples) {
+                            new Constraints\Callback(function ($value, $context) {
                                 $formData = $context->getRoot()->getData();
-                                if (empty($value)) {
-                                    $hasStoolTube = false;
-                                    foreach ($stoolSamples as $stoolSample) {
-                                        if (!empty($formData[$stoolSample])) {
-                                            $hasStoolTube = true;
-                                        }
-                                    }
-                                    if ($hasStoolTube) {
-                                        $context->buildViolation('Please enter Stool KIT ID')->addViolation();
-                                    }
+                                if ($this->isStoolChecked($formData) && empty($value)) {
+                                    $context->buildViolation('Please enter Stool KIT ID')->addViolation();
                                 }
                             })
                         ],
@@ -72,7 +64,13 @@ class NphOrderType extends AbstractType
                             new Constraints\Regex([
                                 'pattern' => '/^[0-9]{11}$/',
                                 'message' => 'Please enter a valid collection tube barcode.Format should be 10000000000 (11 digits).'
-                            ])
+                            ]),
+                            new Constraints\Callback(function ($value, $context) {
+                                $formData = $context->getRoot()->getData();
+                                if ($this->isStoolChecked($formData) && empty($value)) {
+                                    $context->buildViolation('Please enter Stool Tube ID')->addViolation();
+                                }
+                            })
                         ],
                         'attr' => $stoolTubeAttributes
                     ]);
@@ -116,5 +114,21 @@ class NphOrderType extends AbstractType
             'timePoints' => null,
             'stoolSamples' => null
         ]);
+    }
+
+    private function isStoolChecked(array $formData): bool
+    {
+        foreach ($formData as $timePoint => $samples) {
+            if (!empty($samples) && is_array($samples)) {
+                if ($timePoint === NphSample::PRE_LMT) {
+                    foreach ($samples as $sample) {
+                        if ($sample === NphSample::SAMPLE_STOOL) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
