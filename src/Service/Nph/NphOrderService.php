@@ -478,7 +478,7 @@ class NphOrderService
                     'sampleName' => $sampleName,
                     'orderId' => $order->getOrderId(),
                     'healthProOrderId' => $order->getId(),
-                    'createDate' => $order->getCreatedTs()->format('Y-M-D'),
+                    'createDate' => $order->getCreatedTs()->format('m/d/Y'),
                     'sampleStatus' => $sample->getStatus(),
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],

@@ -53,7 +53,7 @@
                         <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                              role="button">Visit {{ visit['visitDisplayName'] }}<span class="caret"
                                                                       style="float: right; margin: 9px 0;"></span></div>
-                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse">
+                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
                             <a class="btn btn-primary" role="button"
                                href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                 <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
@@ -94,6 +94,9 @@
                                     {% endif %}
                                 {% endfor %}
                             {% endfor %}
+                            {% if displayedOrderIDS is empty %}
+                                <h4>No Orders Generated</h4>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
