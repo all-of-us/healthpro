@@ -2,6 +2,7 @@
 
 namespace App\Form\Nph;
 
+use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
@@ -19,11 +20,11 @@ class NphSampleFinalizeType extends NphOrderForm
 
         $this->addCollectedTimeAndNoteFields($builder, $options, $sample);
 
-        if ($orderType === 'urine') {
+        if ($orderType === NphOrder::TYPE_URINE) {
             $this->addUrineMetadataFields($builder, $options['disableMetadataFields']);
         }
 
-        if ($orderType === 'stool') {
+        if ($orderType === NphOrder::TYPE_STOOL) {
             $this->addStoolMetadataFields($builder, $options['disableMetadataFields']);
         }
 
@@ -131,9 +132,13 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]);
                 }
                 if (isset($aliquot['maxVolume'])) {
+                    $errorMessage = 'Please verify the volume is correct.';
+                    if ($orderType === NphOrder::TYPE_BLOOD) {
+                        $errorMessage .= ' If greater than expected volume, you may add an additional aliquot.';
+                    }
                     $volumeConstraints[] = new Constraints\LessThanOrEqual([
                         'value' => $aliquot['maxVolume'],
-                        'message' => 'Please verify the volume is correct. If greater than expected volume, you may add an additional aliquot.'
+                        'message' => $errorMessage
                     ]);
                 }
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
