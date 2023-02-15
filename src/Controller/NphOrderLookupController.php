@@ -41,13 +41,20 @@ class NphOrderLookupController extends AbstractController
 
             if ($order) {
                 $participant = $participantSummary->getParticipantById($order->getParticipantId());
-                return $this->redirectToRoute('nph_order_collect', [
-                    'participantId' => $order->getParticipantId(),
-                    'orderId' => $order->getId(),
-                    'participant' => $participant
-                ]);
+                if (!$participant) {
+                    throw $this->createNotFoundException('Participant not found.');
+                }
+                if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
+                    return $this->redirectToRoute('nph_order_collect', [
+                        'participantId' => $order->getParticipantId(),
+                        'orderId' => $order->getId(),
+                        'participant' => $participant
+                    ]);
+                } else {
+                    $crossSiteErrorMessage = 'Lookup for this order ID is not permitted because the participant is paired with another site';
+                }
             }
-            $this->addFlash('error', 'Order ID not found');
+            $this->addFlash('error', $crossSiteErrorMessage ?? 'Order ID not found');
         }
 
         $recentOrders = $this->em->getRepository(NphOrder::class)->getRecentOrdersBySite($siteService->getSiteId());

@@ -3,6 +3,29 @@
 {% block title %} NPH Participant Summary {% endblock %}
 
 {% block body %}
+    {% if hasNoParticipantAccess %}
+    <div class="row">
+        <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa" aria-hidden="true"></i>Warning</h3>
+                </div>
+                <div class="panel-body">
+                    The participant you have selected is paired with another enrollment site. Please verify that
+                    this is the correct participant. By continuing, you acknowledge that you have a valid need to
+                    access this record. Access to this record will be audited and is subject to review. Unauthorized
+                    access to records may result in loss of access to HealthPro.
+                </div>
+                <div class="modal-footer text-right">
+                    {{ form_start(agreeForm) }}
+                    {{ form_widget(agreeForm.Acknowledge) }}
+                    <a href="{{ path('nph_participants') }}" class="btn btn-default">Cancel</a>
+                    {{ form_end(agreeForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
     <div class="page-header row">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
@@ -40,7 +63,8 @@
         </ul>
     </div>
     <div class="col-sm-10 participant-modules">
-        {% for moduleNumber, module in programSummaryAndOrderInfo %}
+        {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo %}
             {% if loop.first %}
                 {% set modulePanelDisplay = '' %}
             {% else %}
@@ -99,7 +123,13 @@
                 {% endfor %}
             </div>
         {% endfor %}
+        {% else %}
+            <p class="alert alert-danger">
+                Biospecimen collections are not available because this participant is paired with another site.
+            </p>
+        {% endif %}
     </div>
+    {% endif %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-participant-summary') }}

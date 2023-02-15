@@ -18,6 +18,7 @@ use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
+use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
@@ -32,9 +33,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class NphOrderController extends BaseController
 {
-    public function __construct(EntityManagerInterface $em)
+    private $siteService;
+
+    public function __construct(EntityManagerInterface $em, SiteService $siteService)
     {
         parent::__construct($em);
+        $this->siteService = $siteService;
     }
 
     /**
@@ -52,6 +56,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
@@ -117,6 +122,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
@@ -158,8 +164,10 @@ class NphOrderController extends BaseController
     /**
      * @Route("/samples/aliquot", name="nph_samples_aliquot")
      */
-    public function sampleAliquotLookupAction(Request $request): Response
-    {
+    public function sampleAliquotLookupAction(
+        Request $request,
+        NphParticipantSummaryService $nphParticipantSummaryService
+    ): Response {
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleIdForm->handleRequest($request);
 
@@ -170,13 +178,22 @@ class NphOrderController extends BaseController
                 'sampleId' => $id
             ]);
             if ($sample) {
-                return $this->redirectToRoute('nph_sample_finalize', [
-                    'participantId' => $sample->getNphOrder()->getParticipantId(),
-                    'orderId' => $sample->getNphOrder()->getId(),
-                    'sampleId' => $sample->getId()
-                ]);
+                $participantId = $sample->getNphOrder()->getParticipantId();
+                $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+                if (!$participant) {
+                    throw $this->createNotFoundException('Participant not found.');
+                }
+                if ($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
+                    return $this->redirectToRoute('nph_sample_finalize', [
+                        'participantId' => $sample->getNphOrder()->getParticipantId(),
+                        'orderId' => $sample->getNphOrder()->getId(),
+                        'sampleId' => $sample->getId()
+                    ]);
+                } else {
+                    $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
+                }
             }
-            $this->addFlash('error', 'Sample ID not found');
+            $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
@@ -199,6 +216,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
@@ -309,6 +327,7 @@ class NphOrderController extends BaseController
     $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleVisitAndSampleGroup($participantId, $module, $visit, $sampleGroup);
         return $this->render(
@@ -341,6 +360,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
@@ -435,6 +455,7 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'id' => $sampleId
         ]);
@@ -470,6 +491,13 @@ class NphOrderController extends BaseController
             'orderId' => $orderId,
             'sampleId' => $sampleId
         ]);
+    }
+
+    private function checkCrossSiteParticipant(string $participantSiteId): void
+    {
+        if ($participantSiteId !== $this->siteService->getSiteId()) {
+            throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
+        }
     }
 
     /**
