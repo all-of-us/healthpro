@@ -56,7 +56,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
 
     public function testGetOrdersByVisitType(): void
     {
-        $orders = $this->repo->getOrdersByVisitType('P000000001', 'LMT');
+        $orders = $this->repo->getOrdersByVisitType('P000000001', 'LMT', 1);
         $this->assertSame($this->nphOrder, $orders[0]);
     }
 

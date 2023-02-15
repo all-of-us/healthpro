@@ -41,8 +41,11 @@
                         <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
                         {% for aliquot in aliquots %}
                             <p>
-                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }} Volume: {{ aliquot
-                                .expectedVolume|default('--') }} {{ aliquot.units }}
+                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }}
+                                {% if aliquot.expectedVolume %}
+                                <span style="padding: 1em"></span>
+                                Volume: {{ aliquot.expectedVolume|default('--') }} {{ aliquot.units }}
+                                {% endif %}
                             </p>
                         {% endfor %}
                     {% else %}
@@ -71,17 +74,13 @@
                         <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
                         <strong>DOB</strong> {{ participant.dob ? participant.dob|date('n/j/Y') : '--' }} <br>
                     </div>
-                    <div class="col-sm-7">
+                    <div class="col-sm-7 text-right">
                         <strong class="text-primary">
                             Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
                             | {{ samples[sampleCode]}}
-                        </strong>
-                        <dl class="dl-horizontal">
-                            <dt>Order ID</dt>
-                            <dd>{{ sample.nphOrder.orderId }}</dd>
-                            <dt>Sample ID</dt>
-                            <dd>{{ sample.sampleId }}</dd>
-                        </dl>
+                        </strong><br>
+                        <strong>Order ID</strong> {{ sample.nphOrder.orderId }}<br>
+                        <strong>Sample ID</strong> {{ sample.sampleId }}
                     </div>
                 </div>
                 <div class="panel-body">
@@ -135,9 +134,9 @@
                         <table class="table table-samples">
                             <thead>
                             <tr>
-                                <td class="col-md-4">Matrix Aliquot Tube/Aliquot Container</td>
-                                <td class="col-md-3">Aliquot Time</td>
-                                <td class="col-md-2">Volume</td>
+                                <td class="col-md-4 required aliquot-tube-td" id="aliquot-tube">Matrix Aliquot Tube/Aliquot Container</td>
+                                <td class="col-md-3 required">Aliquot Time</td>
+                                <td class="col-md-2 required">Volume</td>
                                 <td class="col-md-1"></td>
                                 {% if sample.modifyType == 'unlock' %}
                                     <td class="col-md-1">Remove</td>
@@ -159,8 +158,8 @@
                                         .prototype)|e }}"
                                         data-widget-tags='<tr class="aliquots-row-{{ aliquotCode }}"></tr>'
                                         data-widget-counter="{{ sampleFinalizeForm[aliquotCode]|length }}">
-                                        <td colspan="4">
-                                            {{ aliquot['container'] }}
+                                        <td colspan="4" class="font-it">
+                                            <em>{{ aliquot['container'] }}</em>
                                         </td>
                                     </tr>
                                     {% if sample.modifyType == 'unlock' %}
@@ -222,10 +221,10 @@
                                                         Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)'
                                                     </span>
                                                 </td>
-                                                <td>
-                                                    {{ aliquot['units'] }}
+                                                <td class="aliquot volume nopadleft" style="position: relative">
+                                                    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
                                                     {% if not sample.disabled %}
-                                                        <i class="fa fa-eraser clear-aliquot-widget" role="button"></i>
+                                                        <i style="position: absolute; bottom: 10px; left: 33px; font-size: 22px" class="fa fa-eraser text-danger clear-aliquot-widget" role="button"></i>
                                                     {% endif %}
                                                 </td>
                                             </tr>

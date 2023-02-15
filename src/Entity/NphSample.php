@@ -328,9 +328,19 @@ class NphSample
 
     public function getStatus(): string
     {
+        if ($this->modifyType === NphSample::CANCEL) {
+            return 'Canceled';
+        }
+
+        if ($this->modifyType === NphSample::UNLOCK) {
+            return 'Unlocked';
+        }
+
         if ($this->collectedTs === null) {
             return 'Created';
-        } elseif ($this->finalizedTs === null) {
+        }
+
+        if ($this->finalizedTs === null) {
             return 'Collected';
         }
         return 'Finalized';

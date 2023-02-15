@@ -96,7 +96,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'nail', 'NAILB', 'Big Toenails'],
             ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1'],
             ['30min', 'blood', 'SST8P5', '8.5 mL SST'],
-            ['30min', 'blood', 'LIHP1', '6 mL Lithium Heparin'],
+            ['30min', 'blood', 'LIHP1', '6 mL Li Hep'],
         ];
     }
 
@@ -125,7 +125,7 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'nail', 'NAILB', 'Big Toenails', '1000000003', '2000000001'],
             ['preLMT', 'stool', 'ST1', '95% Ethanol Tube 1', '1000000004', '2000000001'],
             ['30min', 'blood', 'SST8P5', '8.5 mL SST', '1000000005', '2000000001'],
-            ['30min', 'blood', 'LIHP1', '6 mL Lithium Heparin', '1000000006', '2000000001'],
+            ['30min', 'blood', 'LIHP1', '6 mL Li Hep', '1000000006', '2000000001'],
         ];
     }
 

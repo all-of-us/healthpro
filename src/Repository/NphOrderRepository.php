@@ -19,13 +19,15 @@ class NphOrderRepository extends ServiceEntityRepository
         parent::__construct($registry, NphOrder::class);
     }
 
-    public function getOrdersByVisitType($participantId, $visitType): array
+    public function getOrdersByVisitType($participantId, $visitType, $module): array
     {
         return $this->createQueryBuilder('no')
             ->where('no.participantId = :participantId')
             ->andWhere('no.visitType = :visitType')
+            ->andWhere('no.module = :module')
             ->setParameter('participantId', $participantId)
             ->setParameter('visitType', $visitType)
+            ->setParameter('module', $module)
             ->orderBy('no.id', 'ASC')
             ->getQuery()
             ->getResult();
