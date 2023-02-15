@@ -110,6 +110,8 @@ $(document).ready(function () {
                 $(".stool-text-fields input").prop("disabled", false);
             } else {
                 $(".stool-text-fields input").prop("disabled", true).val("");
+                $(".stool-text-fields .has-error").removeClass('has-error');
+                $(".stool-text-fields span.help-block ul li").remove();
             }
         }
     };
