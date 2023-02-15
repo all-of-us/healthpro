@@ -12,7 +12,7 @@
       "collectionVolume": "8.5 mL",
       "aliquots": {
         "SST8P5A1": {
-          "identifier": "SSTS1",
+          "identifier": "SSTS1-U",
           "container": "1.4mL Matrix tube 500μL",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
@@ -25,7 +25,7 @@
           "warningMaxVolume": 0.5
         },
         "SST8P5A2": {
-          "identifier": "SSTS1",
+          "identifier": "SSTS1-U",
           "container": "1.4mL Matrix tube 1000μL",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 3,
@@ -49,7 +49,7 @@
       "collectionVolume": "6 mL",
       "aliquots": {
         "LIHP1A1": {
-          "identifier": "LiHP1",
+          "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
@@ -62,7 +62,7 @@
           "warningMaxVolume": 0.5
         },
         "LIHP1A2": {
-          "identifier": "LiHP1",
+          "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 2,
@@ -86,7 +86,7 @@
       "collectionVolume": "10 mL",
       "aliquots": {
         "EDTA10A1": {
-          "identifier": "EDTAP1",
+          "identifier": "EDTAP1-U",
           "container": "1.4mL Matrix tube 500μL",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
@@ -99,7 +99,7 @@
           "warningMaxVolume": 0.5
         },
         "EDTA10A2": {
-          "identifier": "EDTAP1",
+          "identifier": "EDTAP1-U",
           "container": "1.4mL Matrix tube 1000μL",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 4,
@@ -123,7 +123,7 @@
       "collectionVolume": "2 mL",
       "aliquots": {
         "P800A1": {
-          "identifier": "P800P1",
+          "identifier": "P800P1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 2,
@@ -147,7 +147,7 @@
       "collectionVolume": "100 mL",
       "aliquots": {
         "URINESA1": {
-          "identifier": "RU1",
+          "identifier": "RU1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 7,
@@ -160,7 +160,7 @@
           "warningMaxVolume": 1
         },
         "URINESA2": {
-          "identifier": "RU2",
+          "identifier": "RU2-L",
           "container": "6mL Urine Aliquot tube",
           "description": "6mL Urine Aliquot tube",
           "expectedAliquots": 1,
@@ -184,7 +184,7 @@
       "collectionVolume": "50 mL",
       "aliquots": {
         "SALIVAA1": {
-          "identifier": "SA1",
+          "identifier": "SA1-U",
           "container": "5mL Matrix tube",
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
@@ -208,7 +208,7 @@
       "identifier": "Hair",
       "aliquots": {
         "HAIRA1": {
-          "identifier": "HA1",
+          "identifier": "HA1-L",
           "container": "Plastic Storage Bag",
           "description": "Plastic Storage Bag",
           "expectedAliquots": 1,
@@ -227,7 +227,7 @@
       "identifier": "Nail-B",
       "aliquots": {
         "NAILBA1": {
-          "identifier": "NA1",
+          "identifier": "NA1-U",
           "container": "5mL Matrix tube",
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
@@ -247,7 +247,7 @@
       "identifier": "Nail-L",
       "aliquots": {
         "NAILLA1": {
-          "identifier": "NA2",
+          "identifier": "NA2-U",
           "container": "5mL Matrix tube",
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
@@ -273,7 +273,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST1"
+      "identifier": "ST1-K"
     },
     "ST2": {
       "label": "95% Ethanol Tube 2",
@@ -281,7 +281,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST2"
+      "identifier": "ST2-K"
     },
     "ST3": {
       "label": "DNA/RNA Shield Tube 1",
@@ -289,7 +289,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST3"
+      "identifier": "ST3-K"
     },
     "ST4": {
       "label": "DNA/RNA Shield Tube 2",
@@ -297,7 +297,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST4"
+      "identifier": "ST4-K"
     }
   }
 }
