@@ -7,9 +7,6 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
 final class Version20230210142836 extends AbstractMigration
 {
     public function getDescription() : string
@@ -19,7 +16,6 @@ final class Version20230210142836 extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
         $this->addSql('CREATE TABLE nph_field_sort (id int auto_increment not null primary key, field_value varchar(100) not null, sort_order int not null)');
         $this->addSql("INSERT INTO nph_field_sort (field_value, sort_order)
