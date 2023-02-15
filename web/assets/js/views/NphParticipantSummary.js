@@ -6,14 +6,10 @@ $(document).ready(function () {
     });
 
     $(".nav-tabs > li").click(function (e) {
-        const oldModuleNumber = $(this).siblings(".active").data("modulenumber");
         $(this).addClass("active").siblings().removeClass("active");
-        const newModuleNumber = $(this).data("modulenumber");
-        $(`#ModuleGroup${newModuleNumber}`)
+        $("#ModuleGroup" + $(this).data("modulenumber"))
             .removeClass("hidden")
             .siblings()
             .addClass("hidden");
-        $('.label.nph-module-badge').removeClass(`nph-module-${oldModuleNumber}`)
-            .addClass(`nph-module-${newModuleNumber}`).text(`NPH Module ${newModuleNumber}`);
     });
 });
