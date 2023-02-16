@@ -26,13 +26,15 @@
     <table class="table table-samples">
         <thead>
         <tr>
-            <th>Cancel</th>
+            <th>
+                <input type="checkbox" id="modify_check_all"> Cancel
+            </th>
             <th>Sample</th>
             <th>Collected</th>
             <th>Aliquoted and Finalized</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="modify-samples">
         {% for index, nphSample in order.nphSamples %}
             <tr class="row-samples">
                 <td>
