@@ -180,7 +180,8 @@
                                                                    ('n/j/Y g:ia', app.user.timezone) }}" disabled></td>
                                                     <td><input type="text" class="form-control"
                                                                value="{{ nphAliquot.volume }}" disabled></td>
-                                                    <td>{{ nphAliquot.units }}</td>
+                                                    <td style="position: relative">
+                                                        <span style="position: absolute; bottom: 20px; left: 0;">{{ nphAliquot.units }}</span></td>
                                                     <td>{{ form_widget(sampleFinalizeForm['cancel_' ~ nphAliquot
                                                         .aliquotId]) }}</td>
                                                     <td>{{ form_widget(sampleFinalizeForm['restore_' ~ nphAliquot
