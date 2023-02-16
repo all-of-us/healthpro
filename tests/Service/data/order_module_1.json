@@ -14,7 +14,7 @@
   },
   "samples": {
     "SST8P5": "8.5 mL SST",
-    "LIHP1": "6 mL Lithium Heparin",
+    "LIHP1": "6 mL Li Hep",
     "EDTA10": "10 mL EDTA",
     "P800": "2 mL P800",
     "URINES": "Spot Urine",
@@ -43,55 +43,55 @@
     },
     "minus15min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "minus5min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "15min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "30min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "60min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "90min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "120min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "180min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
     "240min": {
       "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Lithium Heparin",
+      "LIHP1": "6 mL Li Hep",
       "EDTA10": "10 mL EDTA",
       "P800": "2 mL P800"
     },
