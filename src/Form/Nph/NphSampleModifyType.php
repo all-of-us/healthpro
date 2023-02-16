@@ -25,7 +25,10 @@ class NphSampleModifyType extends AbstractType
                 $builder->add($sample->getSampleCode(), Type\CheckboxType::class, [
                     'label' => false,
                     'required' => false,
-                    'disabled' => $disabled
+                    'disabled' => $disabled,
+                    'attr' => [
+                        'checked' => $disabled
+                    ]
                 ]);
             }
 

@@ -44,7 +44,7 @@
     </div>
     <div class="col-md-12" role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 2 %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 4 %}
                 {% if loop.first %}
                     {% set tabActive = 'active' %}
                 {% else %}
@@ -77,7 +77,7 @@
                         <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                              role="button">Visit {{ visit['visitDisplayName'] }}<span class="caret"
                                                                       style="float: right; margin: 9px 0;"></span></div>
-                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse">
+                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
                             <a class="btn btn-primary" role="button"
                                href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                 <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
@@ -90,14 +90,26 @@
                                             <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
                                         {% endif %}
                                         {% set SampleGroupStatus = sampleInfo|column('sampleStatus') %}
-                                        {% if 'Collected' in SampleGroupStatus %}
+                                        {% if 'Unlocked' in SampleGroupStatus %}
+                                            {% set SampleGroupCollectionStatus = 'Unlocked' %}
+                                        {% elseif 'Canceled' in SampleGroupStatus %}
+                                            {% set SampleGroupCollectionStatus = 'Canceled' %}
+                                        {% elseif 'Finalized' in SampleGroupStatus %}
+                                            {% set SampleGroupCollectionStatus = 'Finalized' %}
+                                        {% elseif 'Collected' in SampleGroupStatus %}
                                             {% set SampleGroupCollectionStatus = 'Collected' %}
                                             {% if 'Created' in SampleGroupStatus %}
-                                                {% set SampleGroupCollectionStatus = 'Partially Collected' %}
+                                                {% set SampleGroupCollectionStatus = 'In Progress' %}
                                             {% endif %}
                                         {% else %}
                                             {% set SampleGroupCollectionStatus = 'Created' %}
                                         {% endif %}
+                                        {% set StatusCount = 0 %}
+                                        {% for sampleStatus in SampleGroupStatus %}
+                                            {% if sampleStatus == SampleGroupCollectionStatus %}
+                                                {% set StatusCount = StatusCount + 1 %}
+                                            {% endif %}
+                                        {% endfor %}
                                         {% for sampleCode, sample in sampleInfo %}
                                             {% set SampleGroupStatus = null %}
                                             {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and sampleInfo['numberSamples'] > 0 and sample['healthProOrderId'] not in displayedOrderIDS %}
@@ -109,8 +121,8 @@
                                                             ID: {{ sample['orderId'] }}</a></div>
                                                     <div class="col-sm-2">{{ sample['sampleTypeDisplayName'] }}</div>
                                                     <div class="col-sm-2">{{ SampleGroupCollectionStatus ?? 'Created' }}</div>
-                                                    <div class="col-sm-3">({{ sampleInfo['numberSamples'] }}
-                                                        /{{ sampleInfo['expectedSamples'] }} Samples Created)
+                                                    <div class="col-sm-3">({{ StatusCount }}
+                                                        /{{ sampleInfo['expectedSamples'] }} Samples {{ SampleGroupCollectionStatus }})
                                                     </div>
                                                 </div>
                                             {% endif %}
@@ -118,6 +130,9 @@
                                     {% endif %}
                                 {% endfor %}
                             {% endfor %}
+                            {% if displayedOrderIDS is empty %}
+                                <h4>No Orders Generated</h4>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

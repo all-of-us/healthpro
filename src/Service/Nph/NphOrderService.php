@@ -130,7 +130,8 @@ class NphOrderService
         $ordersData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
             $this->participantId,
-            $this->visit
+            $this->visit,
+            $this->module
         );
         $addStoolKit = true;
         foreach ($orders as $order) {
@@ -158,7 +159,8 @@ class NphOrderService
         $samplesData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
             $this->participantId,
-            $this->visit
+            $this->visit,
+            $this->module
         );
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
@@ -478,7 +480,7 @@ class NphOrderService
                     'sampleName' => $sampleName,
                     'orderId' => $order->getOrderId(),
                     'healthProOrderId' => $order->getId(),
-                    'createDate' => $order->getCreatedTs()->format('Y-M-D'),
+                    'createDate' => $order->getCreatedTs()->format('m/d/Y'),
                     'sampleStatus' => $sample->getStatus(),
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
@@ -486,6 +488,7 @@ class NphOrderService
                     'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
                     'visitDisplayName' => $visitTypes[$order->getVisitType()],
                     'sampleGroup' => $sample->getSampleGroup(),
+                    'modifyType' => $sample->getModifyType(),
                 ];
             }
         }
@@ -643,7 +646,8 @@ class NphOrderService
         $samplesData = [];
         $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
             $this->participantId,
-            $this->visit
+            $this->visit,
+            $this->module
         );
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();

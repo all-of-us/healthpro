@@ -64,4 +64,17 @@
 .participant-module-header {
     padding-left: 0;
 }
-
+.required::after {
+    content: "*";
+    color: #a94442;
+    margin-left: 2px;
+}
+#aliquot-tube {
+    padding-left: 0;
+}
+table tr td.nopadleft {
+    padding-left: 0;
+}
+table tr td input.aliquot-volume {
+    padding-right: 0;
+}
