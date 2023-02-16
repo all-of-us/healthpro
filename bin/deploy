@@ -13,7 +13,8 @@ LOG="${APP_DIR}/deploy_"`date +%Y%m%d`"_"`date +%H%M%S`".txt"
 cd $APP_DIR
 
 if [ "$machine" == "Linux" ]; then
-  script ./deploy_log.txt -c ./bin/console pmi:deploy "$@"
+  COMMAND="./bin/console pmi:deploy ${@}"
+  script -c "$COMMAND" ./deploy_log.txt
   mv ./deploy_log.txt $LOG
 elif [ "$machine" == "Mac" ]; then
   script -k $LOG ./bin/console pmi:deploy "$@"
