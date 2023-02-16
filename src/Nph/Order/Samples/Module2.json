@@ -21,14 +21,14 @@
       "collectionVolume": "6 mL",
       "aliquots": {
         "LIHP1A1": {
-          "identifier": "LiHP1",
+          "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
           "units": "μL"
         },
         "LIHP1A2": {
-          "identifier": "LiHP1",
+          "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 1000,
