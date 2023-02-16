@@ -286,7 +286,7 @@ class User implements UserInterface
         if ($this->scrippsAwardee) {
             $roles[] = 'ROLE_AWARDEE_SCRIPPS';
         }
-        if (!empty($this->sessionInfo['managegroups'])) {
+        if (!empty($this->sessionInfo['managegroups']) || !empty($this->sessionInfo['managegroupsnph'])) {
             $roles[] = 'ROLE_MANAGE_USERS';
         }
         if (count($this->readOnlyGroups)) {

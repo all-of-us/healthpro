@@ -86,7 +86,8 @@ class UserProvider implements UserProviderInterface
         $sessionInfo = [
             'site' => $this->requestStack->getSession()->get('site'),
             'awardee' => $this->requestStack->getSession()->get('awardee'),
-            'managegroups' => $this->requestStack->getSession()->get('managegroups')
+            'managegroups' => $this->requestStack->getSession()->get('managegroups'),
+            'managegroupsnph' => $this->requestStack->getSession()->get('managegroupsnph')
         ];
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
