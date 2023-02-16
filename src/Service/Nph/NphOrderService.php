@@ -837,7 +837,8 @@ class NphOrderService
         $obj->timepoint = $rdrTimePoint;
         $sampleInfo = $this->getSamples();
         $sampleDescription = $sampleInfo[$sample->getSampleCode()];
-        $obj->sample = $sample->getRdrSampleObj($sampleDescription);
+        $samplesMetadata = $this->getSamplesMetadata($order);
+        $obj->sample = $sample->getRdrSampleObj($sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);

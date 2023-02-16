@@ -467,18 +467,27 @@ class NphSample
         return false;
     }
 
-    public function getRdrSampleObj(string $description): array
+    public function getRdrSampleObj(string $description, array $samplesMetadata = []): array
     {
         $collectedTs = $this->getCollectedTs();
         $collectedTs->setTimezone(new \DateTimeZone('UTC'));
         $finalizedTs = $this->getFinalizedTs();
         $finalizedTs->setTimezone(new \DateTimeZone('UTC'));
-        return [
+        $sampleData = [
             'test' => $this->getSampleCode(),
             'description' => $description,
             'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
             'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
         ];
+        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE) {
+            $sampleData['color'] = $samplesMetadata['urineColor'] ?? null;
+            $sampleData['clarity'] = $samplesMetadata['urineClarity'] ?? null;
+        }
+        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL) {
+            $sampleData['bowelMovement'] = $samplesMetadata['bowelType'] ?? null;
+            $sampleData['bowelMovementQuality'] = $samplesMetadata['bowelQuality'] ?? null;
+        }
+        return $sampleData;
     }
 
     public function getRdrAliquotsSampleObj(array $aliquotsInfo): array
