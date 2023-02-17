@@ -17,7 +17,8 @@ final class Version20230210142836 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-        $this->addSql('CREATE TABLE nph_field_sort (id int auto_increment not null primary key, field_value varchar(100) not null, sort_order int not null)');
+        $this->addSql('CREATE TABLE nph_field_sort (id int auto_increment not null primary key,
+                            field_value varchar(100) character set utf8mb4 collate `utf8mb4_unicode_ci` not null, sort_order int not null)');
         $this->addSql("INSERT INTO nph_field_sort (field_value, sort_order)
                             VALUES ('preLMT', 1), ('minus15min', 2), ('minus5min', 3), ('15min', 4), ('30min', 5), ('60min', 6), ('90min', 7), ('120min', 8),
                                    ('240min', 9), ('postLMT', 10), ('orangeDiet', 1), ('orangeDLW', 2), ('orangeDSMT', 3), ('orangeLMT', 4), ('blueDiet', 5),
