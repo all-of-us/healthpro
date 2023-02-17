@@ -2,11 +2,24 @@
 #
 # Wraps deploy in `script` to record output.
 #
-
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
 APP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 LOG="${APP_DIR}/deploy_"`date +%Y%m%d`"_"`date +%H%M%S`".txt"
 cd $APP_DIR
-script -k $LOG ./bin/console pmi:deploy "$@"
+
+if [ "$machine" == "Linux" ]; then
+  COMMAND="./bin/console pmi:deploy ${@}"
+  script -c "$COMMAND" ./deploy_log.txt
+  mv ./deploy_log.txt $LOG
+elif [ "$machine" == "Mac" ]; then
+  script -k $LOG ./bin/console pmi:deploy "$@"
+fi
+
 
 # strip colors: http://unix.stackexchange.com/a/4529
 perl -pi -e 's/\e\[?.*?[\@-~]//g' $LOG
