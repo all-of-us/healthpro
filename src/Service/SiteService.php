@@ -257,10 +257,10 @@ class SiteService
 
     public function switchSite($email): bool
     {
-        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
-            return $this->switchHpoSite($email);
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
+            return $this->switchNphSite($email);
         }
-        return $this->switchNphSite($email);
+        return $this->switchHpoSite($email);
     }
 
     public function switchHpoSite($email): bool
@@ -411,5 +411,14 @@ class SiteService
             }
         }
         return $siteName;
+    }
+
+    public function resetUserRoles(): void
+    {
+        $this->requestStack->getSession()->remove('site');
+        $this->requestStack->getSession()->remove('awardee');
+        $user = $this->userService->getUser();
+        $token = new PostAuthenticationGuardToken($user, 'main', $user->getAllRoles());
+        $this->tokenStorage->setToken($token);
     }
 }

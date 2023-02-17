@@ -74,8 +74,7 @@ class DefaultController extends BaseController
             $program = $request->query->get('program');
             if (in_array($program, User::PROGRAMS)) {
                 $request->getSession()->set('program', $program);
-                $request->getSession()->remove('site');
-                $request->getSession()->remove('awardee');
+                $siteService->resetUserRoles();
                 if ($siteService->autoSwitchSite()) {
                     return $this->redirectToRoute('home');
                 }

@@ -5,17 +5,20 @@ namespace App\Tests\Service;
 use App\Entity\NphSite;
 use App\Entity\Site;
 use App\Service\SiteService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class SiteServiceTest extends ServiceTestCase
 {
     protected $service;
     protected $id;
+    protected $userService;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->service = static::$container->get(SiteService::class);
+        $this->userService = static::$container->get(UserService::class);
     }
 
     public function testCaborConsentDisplay(): void
@@ -68,5 +71,24 @@ class SiteServiceTest extends ServiceTestCase
             ->setGoogleGroup($googleGroup);
         $em->persist($site);
         $em->flush();
+    }
+
+    public function testNewRoles(): void
+    {
+        $this->login('test@example.com', ['hpo-site-test@staging.pmi-ops.org', 'awardee-stsi'], 'America/Chicago');
+        $totalRoles = $this->userService->getUser()->getRoles();
+        $sites[] = (object)[
+            'email' => 'test123@staging.pmi-ops.org',
+            'name' => 'test',
+            'id' => '1234567890'
+        ];
+        $this->session->set('site', $sites);
+        $this->session->remove('awardee');
+        $user = $this->userService->getUser();
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
+        $this->assertSame(['ROLE_USER'], $userRoles);
+        $this->service->resetUserRoles();
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
+        $this->assertSame($totalRoles, $userRoles);
     }
 }
