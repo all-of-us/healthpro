@@ -21,7 +21,8 @@ class NphSampleFinalizeType extends NphOrderForm
         $this->addCollectedTimeAndNoteFields($builder, $options, $sample);
 
         if ($orderType === NphOrder::TYPE_URINE) {
-            $this->addUrineMetadataFields($builder, $options['disableMetadataFields']);
+            $disableUrineFields = $options['disableMetadataFields'] && $options['nphSample']->getModifyType() !== NphSample::UNLOCK;
+            $this->addUrineMetadataFields($builder, $disableUrineFields);
         }
 
         if ($orderType === NphOrder::TYPE_STOOL) {
