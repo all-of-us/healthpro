@@ -839,3 +839,7 @@ table.table-samples td {
 .sub-samples {
     margin-left: 20px;
 }
+
+#login-help>h4 {
+    font-weight: bold;
+}
