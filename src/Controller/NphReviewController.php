@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\NphOrder;
 use App\Form\ReviewTodayFilterType;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\ParticipantSummaryService;
@@ -82,8 +83,8 @@ class NphReviewController extends BaseController
         }
 
 
-        $samples = $this->em->getRepository('App:NphOrder')->getOrdersByDateRange($site, $startDate, $endDate);
-        $sampleCounts = $this->em->getRepository('App:NphOrder')->getSampleCollectionStatsByDate($site, $startDate, $endDate);
+        $samples = $this->em->getRepository(NphOrder::class)->getOrdersByDateRange($site, $startDate, $endDate);
+        $sampleCounts = $this->em->getRepository(NphOrder::class)->getSampleCollectionStatsByDate($site, $startDate, $endDate);
 
         $count = 0;
         $rowCounts = [];
@@ -154,8 +155,8 @@ class NphReviewController extends BaseController
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
         }
-        $samples = $this->em->getRepository('App:NphOrder')->getUnfinalizedSamples($site);
-        $sampleCounts = $this->em->getRepository('App:NphOrder')->getUnfinalizedSampleCollectionStats($site);
+        $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedSamples($site);
+        $sampleCounts = $this->em->getRepository(NphOrder::class)->getUnfinalizedSampleCollectionStats($site);
         $count = 0;
         foreach (array_keys($samples) as $key) {
             if ($count <= 5) {
@@ -182,7 +183,7 @@ class NphReviewController extends BaseController
             $this->addFlash('error', 'You must select a valid site');
             return $this->redirectToRoute('home');
         }
-        $samples = $this->em->getRepository('App:NphOrder')->getRecentlyModifiedSamples($site, new DateTime('-7 day'));
+        $samples = $this->em->getRepository(NphOrder::class)->getRecentlyModifiedSamples($site, new DateTime('-7 day'));
         $count = 0;
         foreach (array_keys($samples) as $key) {
             if ($count <= 5) {
