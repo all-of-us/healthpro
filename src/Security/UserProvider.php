@@ -86,6 +86,7 @@ class UserProvider implements UserProviderInterface
         $sessionInfo = [
             'site' => $this->requestStack->getSession()->get('site'),
             'awardee' => $this->requestStack->getSession()->get('awardee'),
+            'program' => $this->requestStack->getSession()->get('program'),
             'managegroups' => $this->requestStack->getSession()->get('managegroups'),
             'managegroupsnph' => $this->requestStack->getSession()->get('managegroupsnph')
         ];

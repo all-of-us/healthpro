@@ -97,19 +97,17 @@ class UserService
     public function getRoles($roles, $site, $awardee)
     {
         if (!empty($site)) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
+            User::removeUserRoles(['ROLE_AWARDEE', 'ROLE_AWARDEE_SCRIPPS'], $roles);
+            if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
+                User::removeUserRoles(['ROLE_USER'], $roles);
+            } else {
+                User::removeUserRoles(['ROLE_NPH_USER'], $roles);
             }
         }
         if (!empty($awardee)) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
+            User::removeUserRoles(['ROLE_USER', 'ROLE_NPH_USER'], $roles);
+            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS) {
+                User::removeUserRoles(['ROLE_AWARDEE_SCRIPPS'], $roles);
             }
         }
         return $roles;
