@@ -16,7 +16,7 @@
     <div class="alert bg-light well-sm">
         {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
     </div>
-    {% if type == 'cancel' %}
+    {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
         <p class="text-danger">Select all samples to be cancelled</p>
     {% else %}
         <p class="text-success">Select all samples to be restored</p>
@@ -27,7 +27,7 @@
         <thead>
         <tr>
             <th>
-                <input type="checkbox" id="modify_check_all"> Cancel
+                <input type="checkbox" id="modify_check_all"> {{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore'}}
             </th>
             <th>Sample</th>
             <th>Collected</th>
