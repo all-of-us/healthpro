@@ -330,6 +330,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $timePoint,
         $orderType,
         $sampleCode,
+        $sampleIdentifier,
         $collectedTs,
         $aliquots,
         $aliquotId,
@@ -378,7 +379,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals('test-nph-user1@example.com', $rdrObject->createdInfo['author']['value']);
         $this->assertEquals('nph-site-test', $rdrObject->createdInfo['site']['value']);
         // Assert sample code
-        $this->assertEquals($sampleCode, $rdrObject->sample['test']);
+        $this->assertEquals($sampleIdentifier, $rdrObject->sample['test']);
     }
 
     public function orderFinalizationDataProvider(): array
@@ -386,14 +387,14 @@ class NphOrderServiceTest extends ServiceTestCase
         $collectedTs = new \DateTime('2022-12-01');
         $aliquotTs = new \DateTime('2022-12-02');
         return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, [
+            ['preLMT', 'urine', 'URINES', 'UrineS', $collectedTs, [
                 'URINESA1' => ['10001', $aliquotTs, 500],
                 'URINESA2' => ['10002', $aliquotTs, 5]
             ], '10001', true, false, 'Pre LMT'],
-            ['preLMT', 'saliva', 'SALIVA', $collectedTs, [
+            ['preLMT', 'saliva', 'SALIVA', 'Saliva', $collectedTs, [
                 'SALIVAA1' => ['10003', $aliquotTs, 4]
             ], '10008', false, false, 'Pre LMT'],
-            ['30min', 'blood', 'SST8P5', $collectedTs, [
+            ['30min', 'blood', 'SST8P5', 'SST8.5', $collectedTs, [
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
             ], '10005', true, false, '30 min'],
