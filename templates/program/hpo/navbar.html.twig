@@ -13,16 +13,16 @@
                         <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-role navbar-program">
-                            {% if siteInfo.canSwitchProgram %}
+                        {% if siteInfo.canSwitchProgram %}
+                            <ul class="dropdown-menu dropdown-menu-role navbar-program">
                                 <li>
                                     <a href="{{ path('program_select', { program: 'nph' }) }}">
                                         <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH logo"/>
                                         Nutrition for Precision Health
                                     </a>
                                 </li>
-                            {% endif %}
-                        </ul>
+                            </ul>
+                        {% endif %}
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-nav-role">
