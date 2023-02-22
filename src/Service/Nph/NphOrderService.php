@@ -101,6 +101,11 @@ class NphOrderService
         return $this->moduleObj->getAliquots($sampleCode);
     }
 
+    public function getSampleIdentifierFromCode(string $sampleCode): string
+    {
+        return $this->moduleObj->getSampleIdentifierFromCode($sampleCode);
+    }
+
     public function getSamplesWithLabels(PersistentCollection $samplesObj): array
     {
         $samples = $this->getSamples();
@@ -836,9 +841,10 @@ class NphOrderService
         }
         $obj->timepoint = $rdrTimePoint;
         $sampleInfo = $this->getSamples();
+        $sampleIdentifier = $this->getSampleIdentifierFromCode($sample->getSampleCode());
         $sampleDescription = $sampleInfo[$sample->getSampleCode()];
         $samplesMetadata = $this->getSamplesMetadata($order);
-        $obj->sample = $sample->getRdrSampleObj($sampleDescription, $samplesMetadata);
+        $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);

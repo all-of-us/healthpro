@@ -100,12 +100,12 @@ class NphSampleTest extends NphTestCase
         $aliquotData = array_merge($this->getAliquotData(), $aliquotData);
         $this->createNphAliquot($aliquotData);
         $expectedSampleObj = [
-            'test' => 'SST8P5',
+            'test' => 'SST8.5',
             'description' => 'Test Description',
             'collected' => '2023-01-08T08:00:00Z',
             'finalized' => '2023-01-08T08:00:00Z'
         ];
-        $this->assertSame($expectedSampleObj, $sample->getRdrSampleObj('Test Description'));
+        $this->assertSame($expectedSampleObj, $sample->getRdrSampleObj('SST8.5', 'Test Description'));
 
         $aliquotInfo = [
             'SST8P5A1' => [
