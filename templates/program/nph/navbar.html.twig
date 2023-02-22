@@ -13,16 +13,16 @@
                         <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-role navbar-program">
-                            {% if siteInfo.canSwitchProgram %}
+                        {% if siteInfo.canSwitchProgram %}
+                            <ul class="dropdown-menu dropdown-menu-role navbar-program">
                                 <li>
                                     <a href="{{ path('program_select', { program: 'hpo' }) }}">
                                         <img src="{{ asset('img/all-of-us-logo.svg') }}" alt="All of Us logo"/>
                                         All Of Us Research Program
                                     </a>
                                 </li>
-                            {% endif %}
-                        </ul>
+                            </ul>
+                        {% endif %}
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-nav-role">

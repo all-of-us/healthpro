@@ -17,9 +17,9 @@
         {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
     </div>
     {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
-        <p class="text-danger">Select all samples to be cancelled</p>
+        <p class="text-danger">Select samples to be cancelled</p>
     {% else %}
-        <p class="text-success">Select all samples to be restored</p>
+        <p class="text-success">Select samples to be restored</p>
     {% endif %}
     {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {{ form_errors(sampleModifyForm) }}

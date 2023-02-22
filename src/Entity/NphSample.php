@@ -36,7 +36,7 @@ class NphSample
 
     public static $restoreReasons = [
         'Cancelled for wrong participant' => 'RESTORE_WRONG_PARTICIPANT',
-        'Can be amended instead of cancelled' => 'RESTORE_AMEND',
+        'Can be edited instead of cancelled' => 'RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
 
