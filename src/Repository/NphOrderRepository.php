@@ -129,7 +129,7 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('no')
             ->select('no.id as hpoOrderId, no.orderId, no.participantId, no.timepoint, no.visitType,
-             no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType')
+             no.createdTs, ns.sampleId, ns.sampleCode, ns.sampleGroup, ns.collectedTs, ns.finalizedTs, ns.modifyType, ns.modifiedTs')
             ->join('no.nphSamples', 'ns')
             ->where('ns.modifiedTs >= :modifiedTs')
             ->andWhere('no.site = :site')
