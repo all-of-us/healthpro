@@ -52,11 +52,11 @@
                 <td {{ participantRowSpawn }}>{{ sample.participantId }}</td>
                 {% if sample.participant is defined %}
                     <td {{ participantRowSpawn }}>
-                        <a href="{{ path('participant', { id: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
                     </td>
                     <td {{ participantRowSpawn }}>{{ sample.participant.biobankId }}</td>
                 {% else %}
-                    <td {{ participantRowSpawn }} data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
+                    <td {{ participantRowSpawn }} data-participant-id="{{ sample.participantId }}" data-href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}" class="load-name">
                         <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
                         <span class="sr-only">Loading...</span>
                     </td>
@@ -80,17 +80,17 @@
                     <td>{{ sample.sampleId[i] }}</td>
                     <td>{{ sample.email[i] }}</td>
                     {% if sample.createdTs[i] != '' %}
-                        <td>{{ sample.createdTs[i]|date("m/d/Y h:i:s A", timezone) }}</td>
+                        <td>{{ sample.createdTs[i]|date("m/d/Y h:i A", timezone) }}</td>
                     {% else %}
                         <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                     {% endif %}
                     {% if sample.collectedTs[i] != '' %}
-                        <td>{{ sample.collectedTs[i]|date("m/d/Y h:i:s A", timezone) }}</td>
+                        <td>{{ sample.collectedTs[i]|date("m/d/Y h:i A", timezone) }}</td>
                     {% else %}
                         <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                     {% endif %}
                     {% if sample.finalizedTs[i] != '' %}
-                        <td>{{ sample.finalizedTs[i]|date("m/d/Y h:i:s A", timezone) }}</td>
+                        <td>{{ sample.finalizedTs[i]|date("m/d/Y h:i A", timezone) }}</td>
                     {% else %}
                         <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                     {% endif %}
