@@ -1,13 +1,13 @@
 $(document).ready(function () {
     let measurement = $("#physicalEvaluation");
 
-    new PMI.views['PhysicalEvaluation-' + measurement.data('schema-template')]({
+    new PMI.views["PhysicalEvaluation-" + measurement.data("schema-template")]({
         el: measurement,
-        warnings: measurement.data('warnings'),
-        conversions: measurement.data('conversions'),
-        finalized: measurement.data('finalized')
+        warnings: measurement.data("warnings"),
+        conversions: measurement.data("conversions"),
+        finalized: measurement.data("finalized")
     });
-    $('#evaluationAffixSave')
+    $("#evaluationAffixSave")
         .affix({
             offset: {
                 top: 100,

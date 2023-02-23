@@ -178,7 +178,7 @@ class ReleaseTicketCommand extends Command
         }
     }
 
-    private function createTicket(string $version, array $issues, string $componentId): ?string
+    private function createTicket(string $version, array $issues, string $componentId): int
     {
         if (!$this->targetReleaseDate) {
             $this->io->text('No release date has been specified for this release.');
@@ -215,7 +215,7 @@ class ReleaseTicketCommand extends Command
         }
     }
 
-    private function createApprovalRequestComment($ticketId): ?string
+    private function createApprovalRequestComment($ticketId): int
     {
         $businessApprovalIds = $this->defaultAccountIds['business'];
         $securityApprovalIds = $this->defaultAccountIds['security'];
@@ -247,7 +247,7 @@ class ReleaseTicketCommand extends Command
         return $this->jira->createComment($ticketId, $comment);
     }
 
-    private function attachDeployOutput($version, $env, $file, $ticketId): ?string
+    private function attachDeployOutput($version, $env, $file, $ticketId): int
     {
         $appDir = realpath(__DIR__ . '/../..');
         $path = $appDir . "/{$file}";

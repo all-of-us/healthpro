@@ -1,0 +1,17 @@
+.navbar, .navbar .navbar-toggle {
+    background-color: #262262;
+}
+.navbar .navbar-toggle:focus, .navbar .navbar-toggle:hover {
+    background-color: #363272;
+}
+.navbar .navbar-nav>.open>a, .navbar .navbar-nav>.open>a:focus, .navbar .navbar-nav>.open>a:hover {
+    background-color: #161252;
+}
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
+    color: #ddd; /* increase contrast */
+}
+@media(max-width:767px) {
+    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+        color: #ddd; /* increase contrast */
+    }
+}

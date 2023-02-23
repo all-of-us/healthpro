@@ -6,13 +6,16 @@ use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
 use App\Security\User;
 use App\Service\AccessManagementService;
+use App\Service\ContextTemplateService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
 use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -25,15 +28,21 @@ class AccessManagementController extends BaseController
 
     private $googleGroupsService;
     private $loggerService;
+    private $contextTemplate;
+    private $requestStack;
 
     public function __construct(
         GoogleGroupsService $googleGroupsService,
         LoggerService $loggerService,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ContextTemplateService $contextTemplate,
+        RequestStack $requestStack
     ) {
         parent::__construct($em);
         $this->googleGroupsService = $googleGroupsService;
         $this->loggerService = $loggerService;
+        $this->contextTemplate = $contextTemplate;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -49,7 +58,7 @@ class AccessManagementController extends BaseController
      */
     public function userGroups()
     {
-        return $this->render('accessmanagement/groups.html.twig');
+        return $this->render($this->contextTemplate->GetProgramTemplate('accessmanagement/groups.html.twig'));
     }
 
     /**
@@ -57,7 +66,11 @@ class AccessManagementController extends BaseController
      */
     public function userGroup($groupId): Response
     {
-        $group = $this->getSecurityUser()->getGroupFromId($groupId);
+        if ($this->contextTemplate->isCurrentProgramHpo()) {
+            $group = $this->getSecurityUser()->getGroupFromId($groupId);
+        } elseif ($this->contextTemplate->isCurrentProgramNph()) {
+            $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
+        }
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -79,7 +92,11 @@ class AccessManagementController extends BaseController
      */
     public function member($groupId, Request $request)
     {
-        $group = $this->getSecurityUser()->getGroupFromId($groupId);
+        if ($this->contextTemplate->isCurrentProgramHpo()) {
+            $group = $this->getSecurityUser()->getGroupFromId($groupId);
+        } elseif ($this->contextTemplate->isCurrentProgramNph()) {
+            $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
+        }
         if (empty($group)) {
             throw $this->createNotFoundException();
         }
@@ -129,7 +146,11 @@ class AccessManagementController extends BaseController
      */
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
-        $group = $this->getSecurityUser()->getGroupFromId($groupId);
+        if ($this->contextTemplate->isCurrentProgramHpo()) {
+            $group = $this->getSecurityUser()->getGroupFromId($groupId);
+        } elseif ($this->contextTemplate->isCurrentProgramNph()) {
+            $group = $this->getSecurityUser()->getGroupFromId($groupId, 'nphSites');
+        }
         if (empty($group)) {
             throw $this->createNotFoundException();
         }

@@ -7,12 +7,14 @@ use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
 use App\Repository\FeatureNotificationRepository;
 use App\Service\AuthService;
+use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -27,15 +29,16 @@ class DefaultController extends BaseController
     /**
      * @Route("/", name="home")
      */
-    public function index()
+    public function index(Request $request, ContextTemplateService $contextTemplate)
     {
         $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
         if ($checkTimeZone && !$this->getSecurityUser()->getTimezone()) {
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
         }
-        if ($this->isGranted('ROLE_USER') || ($this->isGranted('ROLE_AWARDEE') && $this->isGranted('ROLE_DV_ADMIN'))) {
-            return $this->render('index.html.twig');
+        if (($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER')) || ($this->isGranted('ROLE_AWARDEE') &&
+                $this->isGranted('ROLE_DV_ADMIN'))) {
+            return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
         } elseif ($this->isGranted('ROLE_AWARDEE')) {
             return $this->redirectToRoute('workqueue_index');
         } elseif ($this->isGranted('ROLE_DV_ADMIN')) {
@@ -57,6 +60,28 @@ class DefaultController extends BaseController
     public function adminIndex()
     {
         return $this->render('admin/index.html.twig');
+    }
+
+    /**
+     * @Route("/program/select", name="program_select")
+     */
+    public function programSelectAction(Request $request, SiteService $siteService): Response
+    {
+        if (!$siteService->canSwitchProgram()) {
+            throw $this->createAccessDeniedException();
+        }
+        if ($request->query->has('program')) {
+            $program = $request->query->get('program');
+            if (in_array($program, User::PROGRAMS)) {
+                $request->getSession()->set('program', $program);
+                $siteService->resetUserRoles();
+                if ($siteService->autoSwitchSite()) {
+                    return $this->redirectToRoute('home');
+                }
+                return $this->redirectToRoute('site_select');
+            }
+        }
+        return $this->render('program-select.html.twig');
     }
 
     /**

@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+{% block title %}Unfinalized - Participant Review - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
+
+{% block body %}
+    {% include 'program/nph/review/page_heading.html.twig' %}
+    <table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('nph_review_participant_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
+        <thead>
+        <tr>
+            <th>Participant ID</th>
+            <th>Name</th>
+            <th>Order ID</th>
+            <th>Sample ID</th>
+            <th>Created <span class="badge badge-info">{{ createdCount }}</span></th>
+            <th>Collected <span class="badge badge-warning">{{ collectedCount }}</span></th>
+            <th>Aliquoted and Finalized <span class="badge badge-success">{{ finalizedCount }}</span></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for id, sample in samples %}
+            <tr>
+                <td>{{ sample.participantId }}</td>
+                {% if sample.participant is defined %}
+                    <td>
+                        <a href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
+                    </td>
+                {% else %}
+                    <td data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                        <span class="sr-only">Loading...</span>
+                    </td>
+                {% endif %}
+                <td>{{ sample.orderId }}</td>
+                <td>{{ sample.sampleId }}</td>
+                {% if sample.createdTs != '' %}
+                    <td>{{ sample.createdTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                {% if sample.collectedTs != '' %}
+                    <td>{{ sample.collectedTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                {% if sample.modifyType == 'unlock' %}
+                    <td><p class="btn btn-sm btn-warning">Unlocked</p></td>
+                    {% set modifyBadge = '<td><p class="btn btn-sm btn-warning">Unlocked</p></td>' %}
+                {% else %}
+                    {% set modifyBadge = '' %}
+                {% endif %}
+                {% if sample.finalizedTs != '' %}
+                    <td>{{ sample.finalizedTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                    <td><a href="{{ path('nph_samples_modify', { participantId: sample.participantId, orderId: sample.hpoOrderId, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-review') }}
+{% endblock %}

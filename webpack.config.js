@@ -21,7 +21,7 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './web/assets/js/app.js')
-    .addEntry('login', './web/assets/css/login.css')
+    .addEntry('login', './web/assets/js/views/Login.js')
     .addEntry('workqueue', './web/assets/js/views/workqueue.js')
     .addEntry('workqueue-consents', './web/assets/js/views/WorkQueueConsents.js')
     .addEntry('workqueue-filters', './web/assets/js/views/WorkQueueFilters.js')
@@ -63,6 +63,12 @@ Encore
     .addEntry('feature-notification', './web/assets/js/views/FeatureNotification.js')
     .addEntry('deceased-report-new', './web/assets/js/views/DeceasedReportNew.js')
     .addEntry('deceased-report-review', './web/assets/js/views/DeceasedReportReview.js')
+    .addEntry('nph-order-create', './web/assets/js/views/NphOrderCreate.js')
+    .addEntry('nph-order', './web/assets/js/views/NphOrder.js')
+    .addEntry('nph-participant-summary', './web/assets/js/views/NphParticipantSummary.js')
+    .addEntry('nph-sample-finalize', './web/assets/js/views/NphSampleFinalize.js')
+    .addEntry('nph-order-modify', './web/assets/js/views/NphOrderModify.js')
+    .addEntry('nph-review', './web/assets/js/views/NphReview.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

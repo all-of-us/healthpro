@@ -14,7 +14,7 @@ body {
     radius: 1rem;
     margin-top: 4rem;
     padding: 3rem;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 1);
     text-align: center;
     box-shadow: 10px 5px 5px rgba(255, 255, 255, 0.1);
 }
@@ -29,7 +29,7 @@ body {
 #login-action {
     min-height: 250px;
     margin-top: 5rem;
-    margin-bottom: 10rem;
+    margin-bottom: 1rem;
 }
 #login-action img {
     max-width: 250px;
@@ -56,6 +56,14 @@ body {
     position: absolute;
     right: 0;
     top: 75px;
+}
+#login-carousel > div {
+    min-height: 110px;
+}
+
+.carousel {
+    margin-left: 7rem;
+    margin-right: 7rem;
 }
 @media (max-width: 970px){
     #login-logo {

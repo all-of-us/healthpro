@@ -1,15 +1,15 @@
 $(document).ready(function () {
     var tableColumns = [];
     tableColumns.push(
-        {name: 'participantId', data: 'participantId'},
-        {name: 'patientStatus', data: 'patientStatus'},
-        {name: 'comments', data: 'comments'},
-        {name: 'organizationName', data: 'organizationName'},
-        {name: 'createdTs', data: 'createdTs'},
-        {name: 'status', data: 'status'}
+        { name: "participantId", data: "participantId" },
+        { name: "patientStatus", data: "patientStatus" },
+        { name: "comments", data: "comments" },
+        { name: "organizationName", data: "organizationName" },
+        { name: "createdTs", data: "createdTs" },
+        { name: "status", data: "status" }
     );
     var url = window.location.href;
-    var importDetailsTableSelector = $('#patient_status_import_details');
+    var importDetailsTableSelector = $("#patient_status_import_details");
     importDetailsTableSelector.DataTable({
         processing: true,
         serverSide: true,
@@ -33,14 +33,17 @@ $(document).ready(function () {
                     } else {
                         var html = '<i class="fa fa-times text-danger" aria-hidden="true"></i> Failed';
                         if (status === 2) {
-                            return html + ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Invalid Participant Id"></i>';
+                            return (
+                                html +
+                                ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Invalid Participant Id"></i>'
+                            );
                         }
                         return html;
                     }
                 }
             },
             {
-                targets: '_all',
+                targets: "_all",
                 render: $.fn.dataTable.render.text()
             }
         ]
@@ -50,13 +53,11 @@ $(document).ready(function () {
         selector: '[data-toggle="tooltip"]'
     });
 
-    $('#patient_status_import_status').DataTable({
-        order: [[1, 'desc']],
+    $("#patient_status_import_status").DataTable({
+        order: [[1, "desc"]],
         pageLength: 25,
         searching: false,
         lengthChange: false,
-        columnDefs: [
-            {orderable: false, targets: 4}
-        ]
+        columnDefs: [{ orderable: false, targets: 4 }]
     });
 });

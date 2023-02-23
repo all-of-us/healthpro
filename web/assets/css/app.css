@@ -101,17 +101,15 @@ label.label-normal {
     vertical-align: top;
     display: inline-block;
 }
+.navbar-program {
+    width: 300px;
+}
+.navbar-program img{
+    width: 30px;
+}
 .navbar-inverse {
     border: 0;
     border-radius: 0;
-}
-.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a, .navbar-inverse .navbar-text {
-    color: #ddd; /* increase contrast */
-}
-@media(max-width:767px) {
-    .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
-        color: #ddd; /* increase contrast */
-    }
 }
 .navbar-allofus, .navbar-allofus .navbar-toggle {
     background-color: #262262;
@@ -609,6 +607,10 @@ label.label-normal {
     background-color: #ffc107 !important;
 }
 
+.bg-white {
+    background-color: #ffffff !important;
+}
+
 .badge-light {
     color: #212529;
     background-color: #f8f9fa;
@@ -822,4 +824,22 @@ table.table-samples td {
 
 .user-add-warning-text {
     margin-left: -15px;
+}
+
+.program-select img {
+    max-width: 100%;
+    border: 1px solid #cecece;
+    border-radius: 10px;
+    padding: 25px;
+    height: 120px;
+}
+
+/* NPH Order */
+
+.sub-samples {
+    margin-left: 20px;
+}
+
+#login-help>h4 {
+    font-weight: bold;
 }

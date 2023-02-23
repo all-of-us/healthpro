@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+{% block title %}Unfinalized - Participant Review - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% set missingName = '' %}
+
+{% block body %}
+    {% include 'program/nph/review/page_heading.html.twig' %}
+    <table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('nph_review_participant_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
+        <thead>
+        <tr>
+            <th>Participant ID</th>
+            <th>Name</th>
+            <th>Order ID</th>
+            <th>Sample ID</th>
+            <th>Created</th>
+            <th>Collected</th>
+            <th>Aliquoted and Finalized</th>
+            <th>Modified</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for id, sample in samples %}
+            <tr>
+                <td><a href="{{ path('nph_participant_summary', {participantId: sample.participantId}) }}"> {{ sample.participantId }}</a></td>
+                {% if sample.participant is defined %}
+                    <td>
+                        <a href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
+                    </td>
+                {% else %}
+                    <td data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                        <span class="sr-only">Loading...</span>
+                    </td>
+                {% endif %}
+                <td>{{ sample.orderId }}</td>
+                <td>{{ sample.sampleId }}</td>
+                {% if sample.createdTs != '' %}
+                    <td>{{ sample.createdTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                {% if sample.collectedTs != '' %}
+                    <td>{{ sample.collectedTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                {% if sample.finalizedTs != '' %}
+                    <td>{{ sample.finalizedTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                {% if sample.modifiedTs != '' %}
+                    <td>{{ sample.modifiedTs|date("m/d/Y h:i A", timezone) }}</td>
+                {% else %}
+                    <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                {% endif %}
+                {% if sample.modifyType is not null and sample.modifyType == 'restore' %}
+                    {% set modifyString = sample.modifyType|title ~ 'd And ' %}
+                {% elseif sample.modifyType is not null and sample.modifyType != 'edited' %}
+                    {% set modifyString = sample.modifyType|title ~ 'ed And ' %}
+                {% elseif sample.modifyType is not null %}
+                    {% set modifyString = sample.modifyType|title ~ ' And ' %}
+                {% else %}
+                    {% set modifyString = '' %}
+                {% endif %}
+                {% if sample.modifyType == 'unlock' %}
+                    <td><p class="btn btn-sm btn-warning">Unlocked</p></td>
+                {% elseif sample.finalizedTs is null %}
+                    <td><p class="btn btn-sm btn-danger">{{ modifyString }}Unfinalized</p></td>
+                {% elseif sample.finalizedTs is not null %}
+                    <td><p class="btn btn-sm btn-success">{{ modifyString }}Finalized</p></td>
+                {% else %}
+                    <td><p class="btn btn-sm btn-danger">{{ modifyString }}Unfinalized</p></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-review') }}
+{% endblock %}

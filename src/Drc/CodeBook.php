@@ -146,7 +146,7 @@ class CodeBook
         }
     }
 
-    public static function ageRangeToDob($range)
+    public static function ageRangeToDob($range): array
     {
         $parameters = [];
         if (!preg_match('/^(\d+)-(\d+)?$/', $range, $matches)) {
@@ -157,7 +157,7 @@ class CodeBook
         $parameters[] = 'le' . $start->format('Y-m-d');
 
         if (isset($matches[2])) {
-            $endRange = $matches[2] + 1;
+            $endRange = (int)$matches[2] + 1;
             $end = new \DateTime("-{$endRange} years");
             $parameters[] = 'gt' . $end->format('Y-m-d');
         }

@@ -5,6 +5,7 @@ namespace App\Service;
 class TimezoneService
 {
     public static $timezoneOptions = [
+        'America/Puerto_Rico' => 'Atlantic Standard Time',
         'America/New_York' => 'Eastern Time',
         'America/Chicago' => 'Central Time',
         'America/Denver' => 'Mountain Time',

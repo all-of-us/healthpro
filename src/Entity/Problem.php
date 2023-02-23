@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -68,14 +69,14 @@ class Problem
     private $staffName;
 
     /**
-     * @var \DateTime|null
+     * @var ?DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $problemDate;
 
     /**
-     * @var \DateTime|null
+     * @var ?DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
@@ -110,21 +111,21 @@ class Problem
     private $finalizedSite;
 
     /**
-     * @var \DateTime|null
+     * @var ?DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $finalizedTs;
 
     /**
-     * @var \DateTime
+     * @var DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
     private $createdTs;
 
     /**
-     * @var \DateTime
+     * @var DateTimeInterface
      *
      * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
@@ -218,24 +219,24 @@ class Problem
         return $this;
     }
 
-    public function getProblemDate(): ?\DateTimeInterface
+    public function getProblemDate(): ?DateTimeInterface
     {
         return $this->problemDate;
     }
 
-    public function setProblemDate(?\DateTimeInterface $problemDate): self
+    public function setProblemDate(?DateTimeInterface $problemDate): self
     {
         $this->problemDate = $problemDate;
 
         return $this;
     }
 
-    public function getProviderAwareDate(): ?\DateTimeInterface
+    public function getProviderAwareDate(): ?DateTimeInterface
     {
         return $this->providerAwareDate;
     }
 
-    public function setProviderAwareDate(?\DateTimeInterface $providerAwareDate): self
+    public function setProviderAwareDate(?DateTimeInterface $providerAwareDate): self
     {
         $this->providerAwareDate = $providerAwareDate;
 
@@ -290,36 +291,36 @@ class Problem
         return $this;
     }
 
-    public function getFinalizedTs(): ?\DateTimeInterface
+    public function getFinalizedTs(): ?DateTimeInterface
     {
         return $this->finalizedTs;
     }
 
-    public function setFinalizedTs(?\DateTimeInterface $finalizedTs): self
+    public function setFinalizedTs(?DateTimeInterface $finalizedTs): self
     {
         $this->finalizedTs = $finalizedTs;
 
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): ?DateTimeInterface
     {
         return $this->createdTs;
     }
 
-    public function setCreatedTs(?\DateTimeInterface  $createdTs): self
+    public function setCreatedTs(?DateTimeInterface  $createdTs): self
     {
         $this->createdTs = $createdTs;
 
         return $this;
     }
 
-    public function getUpdatedTs(): ?\DateTimeInterface
+    public function getUpdatedTs(): ?DateTimeInterface
     {
         return $this->updatedTs;
     }
 
-    public function setUpdatedTs(?\DateTimeInterface $updatedTs): self
+    public function setUpdatedTs(?DateTimeInterface $updatedTs): self
     {
         $this->updatedTs = $updatedTs;
 

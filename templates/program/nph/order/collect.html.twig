@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+{% block title %} Order Collect - {% endblock %}
+{% block body %}
+    {% include 'program/nph/order/partials/order-header.html.twig' %}
+    <div class="alert bg-light well-sm">
+        {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
+        <div class="pull-right">
+            <a href="{{ path('nph_order_label_print', {'participantId': order.participantId, 'module': order.module, 'visit': order.visitType, 'sampleGroup': order.nphSamples[0].sampleGroup}) }}">
+                View Order Summary/Reprint Labels
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group row">
+                <div class="col-sm-6">
+                    <label>Scan or manually check all successfully collected samples:</label>
+                    <input type="text" class="form-control" id="scan_barcode" placeholder="Scan collection device">
+                    <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
+                </div>
+            </div>
+            {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+            {{ form_errors(orderCollectForm) }}
+            <table class="table table-samples">
+                <thead>
+                <tr>
+                    <th>Sample</th>
+                    <th>Collection Time</th>
+                    <th>Notes</th>
+                    <th>
+                        {% if order.canCancel %}
+                            <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                                type: 'cancel' }) }}" class="btn btn-xs btn-danger">
+                                Cancel
+                            </a>
+                        {% endif %}
+                        {% if order.canRestore %}
+                            <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                                type: 'restore' }) }}" class="btn btn-xs btn-success">
+                                Restore
+                            </a>
+                        {% endif %}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for index, nphSample in order.nphSamples %}
+                    {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
+                        <tr>
+                            <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr class="row-samples">
+                        <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+                            class="has-error"{% endif %}>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+                            {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
+                                <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
+                            {% elseif nphSample.finalizedTs is not empty %}
+                                <p class="text-success"><i class="fa fa-check-circle"></i> Aliquoted and Finalized
+                                    {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
+                            {% endif %}
+                        </td>
+                        <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+                            class="has-error"{% endif %}>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                        </td>
+                        <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                            class="has-error"{% endif %}>
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {% if index == order.nphSamples|length - 1 %}
+                                <small class="text-warning">
+                                    Comments entered in this field are transmitted to the Biobank via reconciliation
+                                    reporting.
+                                    <br>
+                                    Do not enter any participant identifying information here.
+                                </small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if nphSample.finalizedTs is not empty %}
+                                <p>
+                                    <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                                        order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
+                                        View
+                                    </a>
+                                </p>
+                                {% if nphSample.canUnlock %}
+                                    <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                                        order.id, sampleId: nphSample.id, modifyType: 'unlock'}) }}" class="btn
+                                        btn-warning btn-xs">
+                                        Edit
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
+                        class="has-error"{% endif %}>{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
+            {% if order.orderType == constant('TYPE_URINE', order) %}
+                <hr>
+                <h4>
+                    Color and Clarity
+                    <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                        </span>
+                </h4>
+                <div class="row">
+                    <div class="form-group col-sm-3">
+                        {{ form_label(orderCollectForm['urineColor']) }}
+                        {{ form_widget(orderCollectForm['urineColor']) }}
+                        {{ form_errors(orderCollectForm['urineColor']) }}
+                    </div>
+                    <div class="form-group col-sm-3">
+                        {{ form_label(orderCollectForm['urineClarity']) }}
+                        {{ form_widget(orderCollectForm['urineClarity']) }}
+                        {{ form_errors(orderCollectForm['urineClarity']) }}
+                    </div>
+                </div>
+            {% endif %}
+            {% if order.orderType == constant('TYPE_STOOL', order) %}
+                <hr>
+                <h4>
+                    Bristol Stool Chart Questions
+                    <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                    </span>
+                </h4>
+                <p>Enter the participant provided answers to the following questions:</p>
+                <div class="form-group">
+                    {{ form_label(orderCollectForm['bowelType']) }}
+                    {{ form_widget(orderCollectForm['bowelType']) }}
+                </div>
+                <div class="form-group">
+                    {{ form_label(orderCollectForm['bowelQuality']) }}
+                    {{ form_widget(orderCollectForm['bowelQuality']) }}
+                </div>
+            {% endif %}
+            {{ form_rest(orderCollectForm) }}
+            <div class="form-group">
+                {% if not order.isDisabled %}
+                    <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
+                {% endif %}
+                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                   class="btn btn-default">Exit</a>
+            </div>
+            {{ form_end(orderCollectForm) }}
+        </div>
+    </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order') }}
+{% endblock %}

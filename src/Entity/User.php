@@ -19,6 +19,9 @@ class User
     public const BIOBANK_GROUP = 'biospecimen-non-pii';
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
+    public const PROGRAM_NPH = 'nph';
+    public const PROGRAM_HPO = 'hpo';
+    public const PROGRAMS = ['hpo', 'nph'];
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 

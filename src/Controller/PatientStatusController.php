@@ -46,12 +46,12 @@ class PatientStatusController extends BaseController
             $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
-                    $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $session->get('siteOrganizationId')]);
+                    $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $session->get('siteEntity')->getOrganizationId()]);
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport
                         ->setFileName($fileName)
                         ->setOrganization($organization)
-                        ->setAwardee($session->get('siteAwardeeId'))
+                        ->setAwardee($session->get('siteEntity')->getAwardeeId())
                         ->setUserId($this->getSecurityUser()->getId())
                         ->setSite($session->get('site')->id)
                         ->setCreatedTs(new \DateTime());

@@ -84,7 +84,7 @@ class JiraService
         return $responseObject->key ?? null;
     }
 
-    public function createComment(string $ticketId, string $comment): ?string
+    public function createComment(string $ticketId, string $comment): bool
     {
         try {
             $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
@@ -92,13 +92,13 @@ class JiraService
                     'body' => $comment
                 ]
             ]);
-            return $response && $response->getStatusCode() === 201 ? true : false;
+            return $response && $response->getStatusCode() === 201;
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function attachFile(string $ticketId, string $path, string $fileName): ?string
+    public function attachFile(string $ticketId, string $path, string $fileName): bool
     {
         try {
             $headers = [
@@ -115,7 +115,7 @@ class JiraService
                     ]
                 ]
             ]);
-            return $response && $response->getStatusCode() === 200 ? true : false;
+            return $response && $response->getStatusCode() === 200;
         } catch (\Exception $e) {
             return false;
         }

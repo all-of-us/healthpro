@@ -51,15 +51,6 @@ class UserService
 
     public function getUserInfo($googleUser)
     {
-        if ($this->env->values['isUnitTest']) {
-            return [
-                'id' => 1,
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getUserId(),
-                'timezone' => $googleUser->getTimezone()
-            ];
-        }
-
         $attempts = 0;
         $maxAttempts = 3;
         do {
