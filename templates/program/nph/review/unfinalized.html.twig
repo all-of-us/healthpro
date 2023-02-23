@@ -23,7 +23,7 @@
                 <td>{{ sample.participantId }}</td>
                 {% if sample.participant is defined %}
                     <td>
-                        <a href="{{ path('participant', { id: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
+                        <a href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
                     </td>
                 {% else %}
                     <td data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
@@ -39,7 +39,7 @@
                     <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                 {% endif %}
                 {% if sample.collectedTs != '' %}
-                    <td>{{ sample.collectedTs|date("m/d/Y h:i:s A", timezone) }}</td>
+                    <td>{{ sample.collectedTs|date("m/d/Y h:i A", timezone) }}</td>
                 {% else %}
                     <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                 {% endif %}
@@ -54,7 +54,7 @@
                 {% else %}
                     <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                 {% endif %}
-                    <td><a href="{{ path('nph_samples_modify', { participantId: sample.participantId, orderId: sample.hpoOrderId, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Order</a></td>
+                    <td><a href="{{ path('nph_samples_modify', { participantId: sample.participantId, orderId: sample.hpoOrderId, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a></td>
             </tr>
         {% endfor %}
         </tbody>
