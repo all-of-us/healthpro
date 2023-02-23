@@ -172,51 +172,26 @@
                                             <em>{{ aliquot['container'] }}</em>
                                         </td>
                                     </tr>
-                                    {% if sample.modifyType == 'unlock' %}
-                                        {% for nphAliquot in sample.nphAliquots %}
-                                            {% if nphAliquot.aliquotCode == aliquotCode %}
-                                                <tr>
-                                                    <td colspan="5">
-                                                        {{ macros.displayAliquotStatus(nphAliquot.status) }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="text" class="form-control"
-                                                               value="{{ nphAliquot.aliquotId }}" disabled>
-                                                    </td>
-                                                    <td><input type="text" class="form-control"
-                                                               value="{{ nphAliquot.aliquotTs|date
-                                                                   ('n/j/Y g:ia', app.user.timezone) }}" disabled></td>
-                                                    <td><input type="text" class="form-control"
-                                                               value="{{ nphAliquot.volume }}" disabled></td>
-                                                    <td style="position: relative">
-                                                        <span style="position: absolute; bottom: 20px; left: 0;">{{ nphAliquot.units }}</span></td>
-                                                    <td>{{ form_widget(sampleFinalizeForm['cancel_' ~ nphAliquot
-                                                        .aliquotId]) }}</td>
-                                                    <td>{{ form_widget(sampleFinalizeForm['restore_' ~ nphAliquot
-                                                        .aliquotId]) }}</td>
-                                                </tr>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
                                     {% set aliquotCount = sampleData[aliquotCode] is defined ?
                                         sampleData[aliquotCode]|length : aliquot['expectedAliquots'] %}
                                     {% for i in range(0, aliquotCount - 1) %}
                                         {% if sampleFinalizeForm[aliquotCode][i] is defined %}
+                                            {% set aliquotId = sampleFinalizeForm[aliquotCode][i].vars.data %}
+                                            {% set disabled = aliquotId in sample.nphAliquotIds ? true: false %}
                                             {% if sample.nphAliquotsStatus[sampleFinalizeForm[aliquotCode][i]
                                             .vars.data] is defined %}
-                                            <tr>
-                                                <td colspan="5">
-                                                    {{ macros.displayAliquotStatus(sample.nphAliquotsStatus[sampleFinalizeForm[aliquotCode][i]
-                                                    .vars.data]) }}
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td colspan="5">
+                                                        {{ macros.displayAliquotStatus(sample.nphAliquotsStatus[sampleFinalizeForm[aliquotCode][i]
+                                                        .vars.data]) }}
+                                                    </td>
+                                                </tr>
                                             {% endif %}
                                             <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
                                                 <td {% if not sampleFinalizeForm[aliquotCode][i].vars.valid %}
                                                     class="has-error"{% endif %}>
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode][i]) }}
+                                                    {{ form_widget(sampleFinalizeForm[aliquotCode][i], {
+                                                        'attr':{'readonly':disabled}}) }}
                                                     {{ form_errors(sampleFinalizeForm[aliquotCode][i]) }}
                                                 </td>
                                                 <td {% if not sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
@@ -234,10 +209,14 @@
                                                 </td>
                                                 <td class="aliquot volume nopadleft" style="position: relative">
                                                     <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
-                                                    {% if not sample.disabled %}
+                                                    {% if not disabled %}
                                                         <i style="position: absolute; bottom: 10px; left: 33px; font-size: 22px" class="fa fa-eraser text-danger clear-aliquot-widget" role="button"></i>
                                                     {% endif %}
                                                 </td>
+                                                {% if sample.modifyType == 'unlock' and aliquotId in sample.nphAliquotIds  %}
+                                                    <td>{{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotId]) }}</td>
+                                                    <td>{{ form_widget(sampleFinalizeForm['restore_' ~ aliquotId]) }}</td>
+                                                {% endif %}
                                             </tr>
                                         {% endif %}
                                     {% endfor %}

@@ -258,7 +258,7 @@ class NphOrderController extends BaseController
                     $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter at least one aliquot'));
                 } elseif ($nphOrderService->hasDuplicateAliquotsInForm($formData, $sampleCode)) {
                     $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter a unique aliquot barcode'));
-                } elseif ($duplicate = $nphOrderService->checkDuplicateAliquotId($formData, $sampleCode)) {
+                } elseif ($duplicate = $nphOrderService->checkDuplicateAliquotId($formData, $sampleCode, $sample->getNphAliquotIds())) {
                     $sampleFinalizeForm[$duplicate['aliquotCode']][$duplicate['key']]->addError(new FormError('Aliquot ID already exists'));
                 }
             }
