@@ -597,10 +597,10 @@ class NphOrderService
         // Aliquot status is only set while editing a sample
         if ($sampleModifyType === NphSample::UNLOCK) {
             foreach ($sample->getNphAliquots() as $aliquot) {
-                if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
+                if (!empty($formData["cancel_{$aliquot->getAliquotCode()}_{$aliquot->getAliquotId()}"])) {
                     $aliquot->setStatus(NphSample::CANCEL);
                 }
-                if (!empty($formData["restore_{$aliquot->getAliquotId()}"])) {
+                if (!empty($formData["restore_{$aliquot->getAliquotCode()}_{$aliquot->getAliquotId()}"])) {
                     $aliquot->setStatus(NphSample::RESTORE);
                 }
                 $this->em->persist($aliquot);
