@@ -64,12 +64,12 @@
                 {% else %}
                     {% set modifyString = '' %}
                 {% endif %}
-                {% if sample.finalizedTs is null %}
+                {% if sample.modifyType == 'unlock' %}
+                    <td><p class="btn btn-sm btn-warning">Unlocked</p></td>
+                {% elseif sample.finalizedTs is null %}
                     <td><p class="btn btn-sm btn-danger">{{ modifyString }}Unfinalized</p></td>
                 {% elseif sample.finalizedTs is not null %}
                     <td><p class="btn btn-sm btn-success">{{ modifyString }}Finalized</p></td>
-                {% elseif sample.modifyType == 'unlock' %}
-                    <td><p class="btn btn-sm btn-warning">{{ modifyString }}Unlocked</p></td>
                 {% else %}
                     <td><p class="btn btn-sm btn-danger">{{ modifyString }}Unfinalized</p></td>
                 {% endif %}
