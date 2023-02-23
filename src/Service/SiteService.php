@@ -41,8 +41,9 @@ class SiteService
 
     public function isTestSite(): bool
     {
+        $siteEntity = $this->requestStack->getSession()->get('siteEntity');
         return $this->params->has('disable_test_access') && !empty($this->params->get('disable_test_access')) &&
-            $this->requestStack->getSession()->get('siteEntity')->getAwardeeId() === 'TEST';
+            ($siteEntity && $siteEntity->getAwardeeId() === 'TEST');
     }
 
 
@@ -100,13 +101,15 @@ class SiteService
 
     public function getSiteAwardee()
     {
-        return $this->requestStack->getSession()->get('siteEntity')->getOrganization();
+        $siteEntity = $this->requestStack->getSession()->get('siteEntity');
+        return $siteEntity ? $siteEntity->getOrganization() : null;
     }
 
 
     public function getSiteOrganization()
     {
-        return $this->requestStack->getSession()->get('siteEntity')->getOrganizationId();
+        $siteEntity = $this->requestStack->getSession()->get('siteEntity');
+        return $siteEntity ? $siteEntity->getOrganizationId() : null;
     }
 
     public function getSuperUserAwardees()
@@ -354,7 +357,8 @@ class SiteService
 
     public function displayCaborConsent(): bool
     {
-        return $this->requestStack->getSession()->get('siteEntity')->getState() === self::CABOR_STATE ? true : false;
+        $siteEntity = $this->requestStack->getSession()->get('siteEntity');
+        return $siteEntity && $siteEntity->getState() === self::CABOR_STATE ? true : false;
     }
 
     public function getSiteWithPrefix($siteId): string
