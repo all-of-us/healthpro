@@ -558,9 +558,11 @@ class NphOrderService
                                 $nphAliquot->setAliquotCode($aliquotCode);
                                 $nphAliquot->setUnits($aliquot['units']);
                             }
-                            $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                            if (!empty($formData["{$aliquotCode}Volume"][$key])) {
-                                $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            if (empty($formData["cancel_{$aliquotCode}_{$aliquotId}"]) && empty($formData["restore_{$aliquotCode}_{$aliquotId}"])) {
+                                $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                                if (!empty($formData["{$aliquotCode}Volume"][$key])) {
+                                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                                }
                             }
                             $this->em->persist($nphAliquot);
                             $this->em->flush();
