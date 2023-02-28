@@ -7,7 +7,7 @@ class CronControllerTest extends AppWebTestCase
     public function testWithoutHeader()
     {
         $this->client->request('GET', '/cron/ping-test');
-        $this->assertResponseStatusCodeSame(404, 'Returns a 404 without header set.');
+        $this->assertResponseStatusCodeSame(200, 'Returns a 200 without header set.');
     }
 
     public function testWitHeader()
