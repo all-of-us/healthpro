@@ -75,7 +75,7 @@ $(document).ready(function () {
 
     let disableEnableAliquotFields = function () {
         $(".sample-modify-checkbox:checkbox:enabled").each(function () {
-            if ($(this).is(':checked')) {
+            if ($(this).is(":checked")) {
                 $(this).closest("tr").find(".order-ts, .aliquot-volume").prop("readonly", true);
             } else {
                 $(this).closest("tr").find(".order-ts, .aliquot-volume").prop("readonly", false);
