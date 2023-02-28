@@ -30,10 +30,10 @@
                 'order_create_form' } }) }}
             {{ form_errors(orderForm) }}
             <div>
-                <label>Select the sample and timepoints:</label>
+                <label>Select the Collection sample and timepoints:</label>
                 <span class="well-sm bg-primary">
                     {{ form_widget(orderForm['checkAll']) }}
-                    Check All Timepoints and Samples
+                    Check All
                 </span>
             </div>
             <div {% if not orderForm['checkAll'].vars.valid %} class="has-error" {% endif %}>
@@ -70,7 +70,7 @@
     <div class="row" id="order_review" style="display: none">
         <div class="col-sm-12">
             <div>
-                <label>Review Timepoints/Samples</label>
+                <label>Review Timepoints and Collection Samples</label>
                 <span class="alert well-sm nph-samples-badge pull-right text-white">
                     Total # of Samples
                     <span class="badge badge-light" id="samples_count">0</span>
