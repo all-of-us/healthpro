@@ -172,7 +172,10 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL
+                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
+                        'attr' => [
+                            'class' => 'sample-modify-checkbox',
+                        ]
                     ]
                 );
                 $builder->add(
@@ -181,7 +184,10 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL,
+                        'attr' => [
+                            'class' => 'sample-modify-checkbox',
+                        ]
                     ]
                 );
             }

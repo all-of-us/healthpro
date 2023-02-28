@@ -72,4 +72,14 @@ $(document).ready(function () {
             aliquotTsSelector.blur();
         }
     });
+
+    let disableEnableAliquotFields = function () {
+        if ($(this).is(':checked')) {
+            $(this).closest("tr").find(".order-ts, .aliquot-volume").prop("readonly", true);
+        } else {
+            $(this).closest("tr").find(".order-ts, .aliquot-volume").prop("readonly", false);
+        }
+    };
+
+    $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
 });
