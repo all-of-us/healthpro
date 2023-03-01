@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/cron", condition="request.headers.get('X-Appengine-Cron') === 'true'")
+ * @Route("/cron")
  */
 class CronController extends BaseController
 {
