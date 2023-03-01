@@ -23,6 +23,9 @@ class Order
     public const ORDER_EDIT = 'edit';
     public const ORDER_REVERT = 'revert';
     public const INITIAL_VERSION = '1';
+    public const ORDER_STEP_FINALIZED = 'finalized';
+    public const ORDER_TYPE_KIT = 'kit';
+    public const ORDER_TYPE_DIVERSION = 'diversion';
 
     private $params;
     private $samples;
@@ -1519,5 +1522,11 @@ class Order
             return 'Saliva';
         }
         return 'Full HPO';
+    }
+
+    public function hideTrackingFieldByDefault(): bool
+    {
+        return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
+                === self::ORDER_TYPE_DIVERSION);
     }
 }

@@ -328,7 +328,7 @@ class OrderService
                 }
             }
         }
-        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
+        if ($step === Order::ORDER_STEP_FINALIZED && isset($formData['fedexTracking'])) {
             $this->order->setFedexTracking($formData['fedexTracking']);
         }
     }
