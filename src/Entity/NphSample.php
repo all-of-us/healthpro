@@ -364,6 +364,15 @@ class NphSample
         return $aliquotsStatus;
     }
 
+    public function getNphAliquotIds(): array
+    {
+        $aliquotIds = [];
+        foreach ($this->nphAliquots as $aliquot) {
+            $aliquotIds[] = $aliquot->getAliquotId();
+        }
+        return $aliquotIds;
+    }
+
     public function addNphAliquot(NphAliquot $nphAliquot): self
     {
         if (!$this->nphAliquots->contains($nphAliquot)) {

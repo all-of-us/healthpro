@@ -69,7 +69,9 @@ class NphSampleTest extends NphTestCase
         $expectedStatus = [
             $aliquotData['aliquotId'] => $aliquotData['status']
         ];
+        $expectedAliquotIds = ['11111111111'];
         $this->assertSame($expectedStatus, $sample->getNphAliquotsStatus());
+        $this->assertSame($expectedAliquotIds, $sample->getNphAliquotIds());
     }
 
     public function aliquotDataProvider(): array
