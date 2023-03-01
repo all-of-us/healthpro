@@ -74,11 +74,12 @@ $(document).ready(function () {
     });
 
     let disableEnableAliquotFields = function () {
-        $(".sample-modify-checkbox:checkbox:enabled").each(function () {
-            if ($(this).is(":checked")) {
-                $(this).closest("tr").find(".order-ts, .aliquot-volume").prop("readonly", true);
-            } else {
-                $(this).closest("tr").find(".order-ts, .aliquot-volume").prop("readonly", false);
+        let $checkboxes = $(".sample-modify-checkbox:checkbox:enabled");
+        $checkboxes.each(function () {
+            let $row = $(this).closest("tr");
+            $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
+            if ($row.find(".aliquot-volume").data('expected-volume')) {
+                $row.find(".aliquot-volume").prop("readonly", $(this).is(":checked"));
             }
         });
     };

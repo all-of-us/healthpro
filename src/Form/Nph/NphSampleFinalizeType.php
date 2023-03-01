@@ -217,7 +217,8 @@ class NphSampleFinalizeType extends NphOrderForm
     private function getVolumeAttributes(array $aliquot): array
     {
         $volumeAttributes = [
-            'class' => 'aliquot-volume'
+            'class' => 'aliquot-volume',
+            'data-expected-volume' => $aliquot['expectedVolume']
         ];
         if (isset($aliquot['warningMinVolume'])) {
             $volumeAttributes['data-warning-min-volume'] = $aliquot['warningMinVolume'];
