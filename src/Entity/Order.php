@@ -926,12 +926,12 @@ class Order
                 'system' => 'https://orders.mayomedicallaboratories.com/kit-id',
                 'value' => $this->getOrderId()
             ];
-            if (!empty($this->getFedexTracking())) {
-                $identifiers[] = [
-                    'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
-                    'value' => $this->getFedexTracking()
-                ];
-            }
+        }
+        if (!empty($this->getFedexTracking())) {
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
+                'value' => $this->getFedexTracking()
+            ];
         }
         if (empty($this->params['ml_mock_order']) && $this->getMayoId() != 'pmitest') {
             $identifiers[] = [
