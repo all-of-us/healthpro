@@ -104,4 +104,13 @@ class User
 
         return $this;
     }
+
+    public static function removeUserRoles(array $removeRoles, array &$roles): void
+    {
+        foreach ($removeRoles as $removeRole) {
+            if (($key = array_search($removeRole, $roles)) !== false) {
+                unset($roles[$key]);
+            }
+        }
+    }
 }

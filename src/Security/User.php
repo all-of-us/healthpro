@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User as UserEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
@@ -372,19 +373,17 @@ class User implements UserInterface
     private function getUserRoles($roles, $site, $awardee)
     {
         if (!empty($site)) {
-            if (($key = array_search('ROLE_AWARDEE', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
+            UserEntity::removeUserRoles(['ROLE_AWARDEE', 'ROLE_AWARDEE_SCRIPPS'], $roles);
+            if ($this->sessionInfo['program'] === UserEntity::PROGRAM_NPH) {
+                UserEntity::removeUserRoles(['ROLE_USER'], $roles);
+            } else {
+                UserEntity::removeUserRoles(['ROLE_NPH_USER'], $roles);
             }
         }
         if (!empty($awardee)) {
-            if (($key = array_search('ROLE_USER', $roles)) !== false) {
-                unset($roles[$key]);
-            }
-            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS && ($key = array_search('ROLE_AWARDEE_SCRIPPS', $roles)) !== false) {
-                unset($roles[$key]);
+            UserEntity::removeUserRoles(['ROLE_USER', 'ROLE_NPH_USER'], $roles);
+            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS) {
+                UserEntity::removeUserRoles(['ROLE_AWARDEE_SCRIPPS'], $roles);
             }
         }
         return $roles;
