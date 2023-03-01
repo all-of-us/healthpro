@@ -78,7 +78,7 @@ $(document).ready(function () {
         $checkboxes.each(function () {
             let $row = $(this).closest("tr");
             $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
-            if ($row.find(".aliquot-volume").data('expected-volume')) {
+            if ($row.find(".aliquot-volume").data("expected-volume")) {
                 $row.find(".aliquot-volume").prop("readonly", $(this).is(":checked"));
             }
         });
