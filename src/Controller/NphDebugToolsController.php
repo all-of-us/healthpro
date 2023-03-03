@@ -44,14 +44,13 @@ class NphDebugToolsController extends BaseController
     /**
      * @Route("/participant/{id}", name="nph_admin_debug_participant")
      */
-    public function participantAction($id, EnvironmentService $env, DebugToolsService $debugToolsService): Response
+    public function participantAction($id, NphParticipantSummaryService $nphParticipantSummaryService): Response
     {
-        $participant = $debugToolsService->getParticipantById($id);
+        $participant = $nphParticipantSummaryService->getAllParticipantDetailsById($id);
         if (!$participant) {
             throw $this->createNotFoundException();
         }
-        ksort($participant);
-        return $this->render('admin/debug/participant.html.twig', [
+        return $this->render('program/nph/admin/debug/participant.html.twig', [
             'participant' => $participant
         ]);
     }

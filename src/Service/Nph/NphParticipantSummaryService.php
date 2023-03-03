@@ -181,17 +181,16 @@ class NphParticipantSummaryService
         ";
     }
 
-    public function getAllParticipantDetailsById($participantId): ?\stdClass
+    public function getAllParticipantDetailsById($participantId): ?array
     {
         try {
             $query = $this->getAllParticipantsByIdQuery($participantId);
             $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
-            $result = json_decode($response->getBody()->getContents());
-            $edges = $result->participant->edges;
-            return !empty($edges) ? $edges[0]->node : null;
+            $result = json_decode($response->getBody()->getContents(), true);
+            $edges = $result['participant']['edges'];
+            return !empty($edges) ? $edges[0]['node'] : null;
         } catch (\Exception $e) {
             error_log($e->getMessage());
-            throw $e;
             return null;
         }
     }
