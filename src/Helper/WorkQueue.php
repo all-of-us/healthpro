@@ -2458,7 +2458,7 @@ class WorkQueue
 
     public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null, $statusDisplay = '')
     {
-        if ($statusDisplay === '') {
+        if (empty($statusDisplay) && !empty($value)) {
             $statusDisplay = self::$consentStatusDisplayText[$value];
         }
         switch ($value) {
