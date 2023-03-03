@@ -247,6 +247,8 @@ class WorkQueueTest extends TestCase
                         [
                             '' => 'View All',
                             'SUBMITTED' => 'Consented',
+                            'SUBMITTED_NOT_VALIDATED' => 'Processing',
+                            'SUBMITTED_INVALID' => 'Invalid',
                             'SUBMITTED_NO_CONSENT' => 'Refused consent',
                             'UNSET' => 'Consent not completed',
                         ],

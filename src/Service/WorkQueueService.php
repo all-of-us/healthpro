@@ -660,6 +660,11 @@ class WorkQueueService
 
     private function getConsent($participant, $columnDef): string
     {
+        if (array_key_exists('statusDisplay', $columnDef)) {
+            $statusDisplay = $columnDef['statusDisplay'][$participant->{$columnDef['rdrField']}];
+        } else {
+            $statusDisplay = null;
+        }
         return WorkQueue::{$columnDef['consentMethod']}(
             $participant->id,
             $participant->{$columnDef['reconsentField']},
@@ -674,7 +679,8 @@ class WorkQueueService
                 'consentType' => $columnDef['rdrField']
             ]) : null,
             $columnDef['historicalType'],
-            $this->userService->getUser()->getTimezone()
+            $this->userService->getUser()->getTimezone(),
+            $statusDisplay
         );
     }
 }

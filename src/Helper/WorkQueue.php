@@ -17,6 +17,7 @@ class WorkQueue
     public const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
+    public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
 
     public static $columnsDef = [
         'lastName' => [
@@ -224,7 +225,15 @@ class WorkQueue
             'pdfPath' => 'consentForElectronicHealthRecordsFilePath',
             'group' => 'consent',
             'default' => true,
-            'historicalType' => 'ehr'
+            'historicalType' => 'ehr',
+            'statusDisplay' => [
+                '' => '',
+                'SUBMITTED' => '',
+                'SUBMITTED_NOT_VALIDATED' => '<span title="The EHR Consent has been submitted and is currently undergoing validation. This process could take up to 24hrs to process." data-toggle="tooltip" data-container="body">(Processing)</span>',
+                'SUBMITTED_NOT_INVALID' => '<span title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body">Invalid</span>',
+                'SUBMITTED_NO_CONSENT' => '',
+                'UNSET' => ''
+            ]
         ],
         'ehrConsentExpireStatus' => [
             'name' => 'EHR Expiration Status',
@@ -1622,6 +1631,8 @@ class WorkQueue
             'label' => 'EHR Consent Status',
             'options' => [
                 'Consented' => 'SUBMITTED',
+                'Processing' => 'SUBMITTED_NOT_VALIDATED',
+                'Invalid' => 'SUBMITTED_INVALID',
                 'Refused consent' => 'SUBMITTED_NO_CONSENT',
                 'Consent not completed' => 'UNSET'
             ]
@@ -1894,6 +1905,8 @@ class WorkQueue
                 'options' => [
                     'View All' => '',
                     'Consented' => 'SUBMITTED',
+                    'Processing' => 'SUBMITTED_NOT_VALIDATED',
+                    'Invalid' => 'SUBMITTED_INVALID',
                     'Refused consent' => 'SUBMITTED_NO_CONSENT',
                     'Consent not completed' => 'UNSET'
                 ],
@@ -2443,21 +2456,25 @@ class WorkQueue
         return $status . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
     }
 
-    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null)
+    public static function displayConsentStatus($value, $time, $userTimezone, $displayTime = true, $link = null, $statusDisplay = '')
     {
+        if ($statusDisplay === '') {
+            $statusDisplay = self::$consentStatusDisplayText[$value];
+        }
         switch ($value) {
             case 'SUBMITTED':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
-                    . ' ' . self::$consentStatusDisplayText['SUBMITTED'];
+                    . ' ' . $statusDisplay;
+            case 'SUBMITTED_INVALID':
             case 'SUBMITTED_NO_CONSENT':
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
-                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NO_CONSENT'];
+                    . ' ' . $statusDisplay;
             case 'SUBMITTED_NOT_SURE':
                 return self::HTML_WARNING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
-                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_NOT_SURE'];
-            case 'SUBMITTED_INVALID':
-                return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
-                    . ' ' . self::$consentStatusDisplayText['SUBMITTED_INVALID'];
+                    . ' ' . $statusDisplay;
+            case 'SUBMITTED_NOT_VALIDATED':
+                return self::HTML_PROCESSING . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . $statusDisplay;
             default:
                 return self::HTML_DANGER . ' (Consent Not Completed)';
         }
@@ -2471,7 +2488,8 @@ class WorkQueue
         $consentTime,
         $consentPdfLink,
         $historyType,
-        $userTimezone
+        $userTimezone,
+        $statusDisplay
     ): string {
         if ($reconsentTime) {
             $html = self::HTML_SUCCESS . ' ' . self::dateFromString(
@@ -2481,7 +2499,7 @@ class WorkQueue
                 $reconsentPdfLink
             ) . ' (Consented Yes)';
         } else {
-            $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink);
+            $html = static::displayConsentStatus($consentStatus, $consentTime, $userTimezone, true, $consentPdfLink, $statusDisplay);
         }
         if ($reconsentTime || $consentTime) {
             $html .= '<br><a data-href="/workqueue/participant/' . $participantId . '/consent-histories/' .

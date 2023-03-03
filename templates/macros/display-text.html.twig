@@ -14,7 +14,31 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentStatus(value, time, ehrExpireStatus = '', ehrExpireDate = '') %}
+{% macro displayConsentStatus(value, time) %}
+    {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
+    {% if value == 'SUBMITTED' %}
+        <i class="fa fa-check text-success" aria-hidden="true"></i>
+        {{ time }} <br/>
+        (Consented Yes)
+    {% elseif value == 'SUBMITTED_NO_CONSENT' %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+        {{ time }} <br/>
+        (Refused Consent)
+    {% elseif value == 'SUBMITTED_NOT_SURE' %}
+        <i class="fa fa-question text-warning" aria-hidden="true"></i>
+        {{ time }} <br/>
+        (Responded Not Sure)
+    {% elseif value == 'SUBMITTED_INVALID' %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+        {{ time }} <br/>
+        (Invalid)
+    {% else %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+        (Consent Not Completed) <br/>
+    {% endif %}
+{% endmacro %}
+
+{% macro displayEHRConsentStatus(value, time, ehrExpireStatus = '', ehrExpireDate = '') %}
     {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
     {% if ehrExpireStatus == 'EXPIRED' %}
         <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
@@ -35,7 +59,11 @@
     {% elseif value == 'SUBMITTED_INVALID' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {{ time }} <br/>
-        (Invalid)
+        <span title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body">Invalid</span>
+    {% elseif value == 'SUBMITTED_NOT_VALIDATED' %}
+        <i class="fa fa-sync text-warning" aria-hidden="true"></i>
+        {{ time }} <br/>
+        <span title="The EHR Consent has been submitted and is currently undergoing validation. This process could take up to 24hrs to process." data-toggle="tooltip" data-container="body">(Processing)</span>
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
         (Consent Not Completed) <br/>
