@@ -230,7 +230,7 @@ class WorkQueue
                 '' => '',
                 'SUBMITTED' => '',
                 'SUBMITTED_NOT_VALIDATED' => '<span title="The EHR Consent has been submitted and is currently undergoing validation. This process could take up to 24hrs to process." data-toggle="tooltip" data-container="body">(Processing)</span>',
-                'SUBMITTED_NOT_INVALID' => '<span title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body">Invalid</span>',
+                'SUBMITTED_INVALID' => '<span title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body">(Invalid)</span>',
                 'SUBMITTED_NO_CONSENT' => '',
                 'UNSET' => ''
             ]
@@ -2352,6 +2352,7 @@ class WorkQueue
     public static $consentStatusDisplayText = [
         'SUBMITTED' => '(Consented Yes)',
         'SUBMITTED_NO_CONSENT' => '(Refused Consent)',
+        'SUBMITTED_NOT_VALIDATED' => '(Processing)',
         'SUBMITTED_NOT_SURE' => '(Responded Not Sure)',
         'SUBMITTED_INVALID' => '(Invalid)'
     ];
