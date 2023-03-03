@@ -463,14 +463,14 @@ class OrderController extends BaseController
                             $finalizeForm['fedexTracking']['first']->addError(new FormError('Tracking number required.'));
                         }
                     }
-                }
-                if ($finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
-                    $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking(
-                        $finalizeForm['fedexTracking']->getData(),
-                        $orderId
-                    );
-                    if (!empty($duplicateFedexTracking)) {
-                        $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
+                    if ($finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
+                        $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking(
+                            $finalizeForm['fedexTracking']->getData(),
+                            $orderId
+                        );
+                        if (!empty($duplicateFedexTracking)) {
+                            $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));
+                        }
                     }
                 }
                 if ($finalizeForm->isValid()) {
