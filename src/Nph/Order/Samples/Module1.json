@@ -22,7 +22,8 @@
           "minVolume": 0,
           "maxVolume": 500,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 0.5
+          "warningMaxVolume": 0.5,
+          "addNew": false
         },
         "SST8P5A2": {
           "identifier": "SSTS1-U",
@@ -35,7 +36,8 @@
           "minVolume": 0,
           "maxVolume": 1000,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 1
+          "warningMaxVolume": 1,
+          "addNew": true
         }
       }
     },
@@ -59,7 +61,8 @@
           "minVolume": 0,
           "maxVolume": 500,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 0.5
+          "warningMaxVolume": 0.5,
+          "addNew": false
         },
         "LIHP1A2": {
           "identifier": "LiHP1-U",
@@ -72,7 +75,8 @@
           "minVolume": 0,
           "maxVolume": 1000,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 1
+          "warningMaxVolume": 1,
+          "addNew": true
         }
       }
     },
@@ -96,7 +100,8 @@
           "minVolume": 0,
           "maxVolume": 500,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 0.5
+          "warningMaxVolume": 0.5,
+          "addNew": false
         },
         "EDTA10A2": {
           "identifier": "EDTAP1-U",
@@ -109,7 +114,8 @@
           "minVolume": 0,
           "maxVolume": 1000,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 1
+          "warningMaxVolume": 1,
+          "addNew": true
         }
       }
     },
@@ -133,7 +139,8 @@
           "minVolume": 0,
           "maxVolume": 500,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 0.5
+          "warningMaxVolume": 0.5,
+          "addNew": true
         }
       }
     },
@@ -157,7 +164,8 @@
           "minVolume": 0,
           "maxVolume": 1000,
           "warningMinVolume": 0.1,
-          "warningMaxVolume": 1
+          "warningMaxVolume": 1,
+          "addNew": false
         },
         "URINESA2": {
           "identifier": "RU2-L",
@@ -170,7 +178,8 @@
           "minVolume": 0,
           "maxVolume": 5,
           "warningMinVolume": 100,
-          "warningMaxVolume": 5000
+          "warningMaxVolume": 5000,
+          "addNew": false
         }
       }
     },
@@ -195,7 +204,8 @@
           "minVolume": 0,
           "maxVolume": 4,
           "warningMinVolume": 100,
-          "warningMaxVolume": 4000
+          "warningMaxVolume": 4000,
+          "addNew": false
         }
       }
     },
@@ -214,7 +224,8 @@
           "expectedAliquots": 1,
           "expectedVolume": null,
           "units": null,
-          "barcodeLength" : 11
+          "barcodeLength" : 11,
+          "addNew": false
         }
       }
     },
@@ -234,7 +245,8 @@
           "expectedVolume": null,
           "units": null,
           "barcodeLength" : 10,
-          "barcodePrefix": "MC"
+          "barcodePrefix": "MC",
+          "addNew": false
         }
       }
     },
@@ -254,7 +266,8 @@
           "expectedVolume": null,
           "units": null,
           "barcodeLength" : 10,
-          "barcodePrefix": "MC"
+          "barcodePrefix": "MC",
+          "addNew": false
         }
       }
     },
