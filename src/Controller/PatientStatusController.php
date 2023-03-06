@@ -12,6 +12,7 @@ use App\Service\LoggerService;
 use App\Form\PatientStatusImportFormType;
 use App\Form\PatientStatusImportConfirmFormType;
 use App\Service\PatientStatusService;
+use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
@@ -35,7 +36,8 @@ class PatientStatusController extends BaseController
         Request $request,
         SessionInterface $session,
         LoggerService $loggerService,
-        PatientStatusImportService $patientStatusImportService
+        PatientStatusImportService $patientStatusImportService,
+        SiteService $siteService
     ) {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
@@ -46,12 +48,12 @@ class PatientStatusController extends BaseController
             $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
             if ($form->isValid()) {
                 if (!empty($patientStatuses)) {
-                    $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $session->get('siteEntity')->getOrganizationId()]);
+                    $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $siteService->getSiteOrganization()]);
                     $patientStatusImport = new PatientStatusImport();
                     $patientStatusImport
                         ->setFileName($fileName)
                         ->setOrganization($organization)
-                        ->setAwardee($session->get('siteEntity')->getAwardeeId())
+                        ->setAwardee($siteService->getSiteAwardeeId())
                         ->setUserId($this->getSecurityUser()->getId())
                         ->setSite($session->get('site')->id)
                         ->setCreatedTs(new \DateTime());
