@@ -8,6 +8,7 @@ use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
 use App\Cache\DatastoreAdapter;
+use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,22 +21,25 @@ class DeceasedReportsController extends BaseController
     public const ORG_PENDING_CACHE_KEY = 'deceased_reports.org-%s.pending.count';
 
     protected $cache;
+    private $siteService;
 
     public function __construct(
         ParameterBagInterface $params,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        SiteService $siteService
     ) {
         parent::__construct($em);
         $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
+        $this->siteService = $siteService;
     }
 
     /**
      * @Route("/deceased-reports", name="deceased_reports_index")
      */
-    public function participantObservationIndex(Request $request, SessionInterface $session, DeceasedReportsService $deceasedReportsService)
+    public function participantObservationIndex(Request $request, DeceasedReportsService $deceasedReportsService)
     {
         $statusFilter = $request->query->get('status', 'preliminary');
-        $organizationId = $session->get('siteEntity')->getOrganizationId();
+        $organizationId = $this->siteService->getSiteOrganization();
         if (!$organizationId) {
             throw $this->createAccessDeniedException('Must be associated with a valid Organization.');
         }
@@ -51,9 +55,9 @@ class DeceasedReportsController extends BaseController
      * @Route("/deceased-reports/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
      * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"}, methods={"GET"})
      */
-    public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId, $reportId)
+    public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId, $reportId)
     {
-        $organizationId = $session->get('siteEntity')->getOrganizationId();
+        $organizationId = $this->siteService->getSiteOrganization();
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -92,9 +96,9 @@ class DeceasedReportsController extends BaseController
      * @Route("/deceased-reports/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
      * @Route("/read/deceased-reports/{participantId}/new", name="read_deceased_report_new", requirements={"participantId"="P\d+"})
      */
-    public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, SessionInterface $session, $participantId)
+    public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
-        $organizationId = $session->get('siteEntity')->getOrganizationId();
+        $organizationId = $this->siteService->getSiteOrganization();
         $participant = $participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -168,9 +172,9 @@ class DeceasedReportsController extends BaseController
     /**
      * @Route("/deceased-reports/stats", name="deceased_report_stats")
      */
-    public function getStats(SessionInterface $session, DeceasedReportsService $deceasedReportsService)
+    public function getStats(DeceasedReportsService $deceasedReportsService)
     {
-        $organizationId = $session->get('siteEntity')->getOrganizationId();
+        $organizationId = $this->siteService->getSiteOrganization();
         $pendingReportCountCache = $this->cache->getItem(sprintf(self::ORG_PENDING_CACHE_KEY, $organizationId));
         if ($cacheHit = $pendingReportCountCache->isHit()) {
             $pendingReportCount = (int) $pendingReportCountCache->get();

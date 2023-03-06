@@ -37,11 +37,12 @@ class SiteServiceTest extends ServiceTestCase
         self::assertFalse($this->service->displayCaborConsent());
     }
 
-    private function createSite($state): void
+    private function createSite($state = null): void
     {
         $em = static::$container->get(EntityManagerInterface::class);
         $orgId = 'TEST_ORG_' . $state . $this->id;
         $siteId = 'test' . $state . $this->id;
+        $awardee = 'TEST_AWARDEE_' . $state . $this->id;
         $site = new Site();
         $site->setStatus(true)
             ->setName('Test Site ' . $state . $this->id)
@@ -49,7 +50,9 @@ class SiteServiceTest extends ServiceTestCase
             ->setSiteId($siteId)
             ->setGoogleGroup($siteId)
             ->setWorkqueueDownload('')
-            ->setState($state);
+            ->setState($state)
+            ->setOrganization($awardee)
+            ->setAwardeeId($awardee);
         $em->persist($site);
         $em->flush();
     }
@@ -90,5 +93,18 @@ class SiteServiceTest extends ServiceTestCase
         $this->service->resetUserRoles();
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
         $this->assertSame($totalRoles, $userRoles);
+    }
+
+    public function testSiteEntity(): void
+    {
+        $this->id = uniqid();
+        $site = 'hpo-site-test' . $this->id;
+        $this->login('test@example.com', [$site]);
+
+        $this->createSite();
+        $this->service->switchSite($site . '@' . self::GROUP_DOMAIN);
+        self::assertSame('TEST_AWARDEE_' . $this->id, $this->service->getSiteAwardee());
+        self::assertSame('TEST_ORG_' . $this->id, $this->service->getSiteOrganization());
+        self::assertSame('TEST_AWARDEE_' . $this->id, $this->service->getSiteAwardeeId());
     }
 }

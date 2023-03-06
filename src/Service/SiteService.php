@@ -112,6 +112,12 @@ class SiteService
         return $siteEntity ? $siteEntity->getOrganizationId() : null;
     }
 
+    public function getSiteAwardeeId(): ?string
+    {
+        $siteEntity = $this->requestStack->getSession()->get('siteEntity');
+        return $siteEntity ? $siteEntity->getAwardeeId() : null;
+    }
+
     public function getSuperUserAwardees()
     {
         $sites = $this->getSuperUserAwardeeSites();
