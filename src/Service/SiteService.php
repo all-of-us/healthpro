@@ -224,23 +224,23 @@ class SiteService
         return null;
     }
 
-    public function isValidSite($email)
+    public function isValidSite($email): bool
     {
-        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
-            return $this->isValidHpoSite($email);
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
+            return $this->isValidProgramSite($email, NphSite::class, 'nphSites');
         }
-        return $this->isValidNphSite($email);
+        return $this->isValidProgramSite($email, Site::class);
     }
 
-    public function isValidHpoSite($email)
+    private function isValidProgramSite($email, $siteClass, $siteType = null) :bool
     {
         $user = $this->userService->getUser();
-        if (!$user || !$user->belongsToSite($email)) {
+        if (!$user || !$user->belongsToSite($email, $siteType)) {
             return false;
         }
         if ($this->env->isStable() || $this->env->isProd()) {
-            $siteGroup = $user->getSite($email);
-            $site = $this->em->getRepository(Site::class)->findOneBy([
+            $siteGroup = $user->getSite($email, $siteType);
+            $site = $this->em->getRepository($siteClass)->findOneBy([
                 'deleted' => 0,
                 'googleGroup' => $siteGroup->id,
             ]);
@@ -251,15 +251,6 @@ class SiteService
                 // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
                 return false;
             }
-        }
-        return true;
-    }
-
-    public function isValidNphSite($email): bool
-    {
-        $user = $this->userService->getUser();
-        if (!$user || !$user->belongsToSite($email, 'nphSites')) {
-            return false;
         }
         return true;
     }
