@@ -314,7 +314,7 @@ label.label-normal {
     text-align: center;
     min-width: 150px;
 }
-#participant-consent-status .status-block i.fa-check, #participant-consent-status .status-block i.fa-times, #participant-consent-status .status-block i.fa-question, #participant-consent-status .status-block i.fa-exclamation-triangle, #participant-consent-status .status-block i.fa-sync {
+#participant-consent-status .status-block i.fa-check, #participant-consent-status .status-block i.fa-times, #participant-consent-status .status-block i.fa-question, #participant-consent-status .status-block i.fa-exclamation-triangle, #participant-consent-status .status-block i.fa-sync, #participant-consent-status .status-block i.fa-exclamation-circle {
     display: block;
     font-size: 36px;
 }
