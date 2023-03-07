@@ -15,6 +15,7 @@ class WorkQueue
 
     public const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     public const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
+    public const HTML_INVALID = '<i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i>';
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
     public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
@@ -2467,6 +2468,8 @@ class WorkQueue
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
                     . ' ' . $statusDisplay;
             case 'SUBMITTED_INVALID':
+                return self::HTML_INVALID . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
+                    . ' ' . $statusDisplay;
             case 'SUBMITTED_NO_CONSENT':
                 return self::HTML_DANGER . ' ' . self::dateFromString($time, $userTimezone, $displayTime, $link)
                     . ' ' . $statusDisplay;
