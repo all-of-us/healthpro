@@ -72,7 +72,7 @@ class SiteServiceTest extends ServiceTestCase
         $this->assertSame('Test Site ' . $this->id, $this->service->getNphSiteDisplayName('test' . $this->id));
     }
 
-    private function createNphSite(): void
+    private function createNphSite($params = []): void
     {
         $em = static::$container->get(EntityManagerInterface::class);
         $googleGroup = 'test' . $this->id;
@@ -80,6 +80,9 @@ class SiteServiceTest extends ServiceTestCase
         $site->setStatus(true)
             ->setName('Test Site ' . $this->id)
             ->setGoogleGroup($googleGroup);
+        foreach ($params as $key => $value) {
+            $site->{'set' . ucfirst($key)}($value);
+        }
         $em->persist($site);
         $em->flush();
     }
@@ -137,7 +140,11 @@ class SiteServiceTest extends ServiceTestCase
         $switchSiteEmail = $site . '@' . self::GROUP_DOMAIN;
         $this->login('test@example.com', [$site]);
         $this->service->switchSite($switchSiteEmail);
-        $this->createSite(['mayolinkAccount' => $mayoLinkAccount]);
+        if ($program == User::PROGRAM_NPH) {
+            $this->createNphSite(['mayolinkAccount' => $mayoLinkAccount]);
+        } else {
+            $this->createSite(['mayolinkAccount' => $mayoLinkAccount]);
+        }
         $checkSiteEmail = $checkSiteName . $this->id . '@' . self::GROUP_DOMAIN;
         $this->session->set('program', $program);
         $this->assertEquals($expectedResult, $this->service->isValidSite($checkSiteEmail));
