@@ -4,9 +4,14 @@ namespace App\Tests\Service;
 
 use App\Entity\NphSite;
 use App\Entity\Site;
+use App\Entity\User;
+use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SiteServiceTest extends ServiceTestCase
 {
@@ -28,31 +33,34 @@ class SiteServiceTest extends ServiceTestCase
         $nonCaborSite = 'hpo-site-testTN' . $this->id;
         $this->login('test@example.com', [$caborSite, $nonCaborSite]);
 
-        $this->createSite(SiteService::CABOR_STATE);
+        $this->createSite(['state' => SiteService::CABOR_STATE]);
         $this->service->switchSite($caborSite . '@' . self::GROUP_DOMAIN);
         self::assertTrue($this->service->displayCaborConsent());
 
-        $this->createSite('TN');
+        $this->createSite(['state' => 'TN']);
         $this->service->switchSite($nonCaborSite . '@' . self::GROUP_DOMAIN);
         self::assertFalse($this->service->displayCaborConsent());
     }
 
-    private function createSite($state = null): void
+    private function createSite($params = []): void
     {
         $em = static::$container->get(EntityManagerInterface::class);
+        $state = $params['state'] ?? null;
         $orgId = 'TEST_ORG_' . $state . $this->id;
         $siteId = 'test' . $state . $this->id;
         $awardee = 'TEST_AWARDEE_' . $state . $this->id;
         $site = new Site();
         $site->setStatus(true)
-            ->setName('Test Site ' . $state . $this->id)
+            ->setName('Test Site ' . $this->id)
             ->setOrganizationId($orgId)
             ->setSiteId($siteId)
             ->setGoogleGroup($siteId)
             ->setWorkqueueDownload('')
-            ->setState($state)
             ->setOrganization($awardee)
             ->setAwardeeId($awardee);
+        foreach ($params as $key => $value) {
+            $site->{'set' . ucfirst($key)}($value);
+        }
         $em->persist($site);
         $em->flush();
     }
@@ -106,5 +114,51 @@ class SiteServiceTest extends ServiceTestCase
         self::assertSame('TEST_AWARDEE_' . $this->id, $this->service->getSiteAwardee());
         self::assertSame('TEST_ORG_' . $this->id, $this->service->getSiteOrganization());
         self::assertSame('TEST_AWARDEE_' . $this->id, $this->service->getSiteAwardeeId());
+    }
+
+    /**
+     * @dataProvider siteDataProvider
+     */
+    public function testIsValidSite($program, $mayoLinkAccount, $switchSiteName, $checkSiteName, $expectedResult): void
+    {
+        // set env to stable to test isValidSite status
+        $environmentService = $this->createMock(EnvironmentService::class);
+        $environmentService->method('isStable')->willReturn(true);
+        $this->service = new SiteService(
+            static::getContainer()->get(ParameterBagInterface::class),
+            static::getContainer()->get(RequestStack::class),
+            static::getContainer()->get(EntityManagerInterface::class),
+            static::getContainer()->get(UserService::class),
+            $environmentService,
+            static::getContainer()->get(TokenStorageInterface::class),
+        );
+        $this->id = uniqid();
+        $site = $switchSiteName . $this->id;
+        $switchSiteEmail = $site . '@' . self::GROUP_DOMAIN;
+        $this->login('test@example.com', [$site]);
+        $this->service->switchSite($switchSiteEmail);
+        $this->createSite(['mayolinkAccount' => $mayoLinkAccount]);
+        $checkSiteEmail = $checkSiteName . $this->id . '@' . self::GROUP_DOMAIN;
+        $this->session->set('program', $program);
+        $this->assertEquals($expectedResult, $this->service->isValidSite($checkSiteEmail));
+    }
+
+    public function siteDataProvider(): array
+    {
+        return [
+            // Valid mayolink account number and site email
+            [User::PROGRAM_HPO, '123456789', 'hpo-site-test', 'hpo-site-test', true],
+            // No mayolink account number and with site email
+            [User::PROGRAM_HPO, null, 'hpo-site-test', 'hpo-site-test', false],
+            // No mayolink account number and with invalid site email
+            [User::PROGRAM_HPO, null, 'hpo-site-test', 'hpo-site-test-2', false],
+
+            // Valid mayolink account number and site email
+            [User::PROGRAM_NPH, '123456789', 'nph-site-test', 'nph-site-test', true],
+            // No mayolink account number and with site email
+            [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test', false],
+            // No mayolink account number and with invalid site email
+            [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test-2', false]
+        ];
     }
 }
