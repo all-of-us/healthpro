@@ -57,7 +57,7 @@
         {{ time }} <br/>
         (Responded Not Sure)
     {% elseif value == 'SUBMITTED_INVALID' %}
-        <i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i>
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
         {{ time }} <br/>
         <span title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body">(Invalid)</span>
     {% elseif value == 'SUBMITTED_NOT_VALIDATED' %}
@@ -125,8 +125,8 @@
     {% if value in consentValues %}
         {% if type == 'ehr' and value == 'SUBMITTED_NOT_VALIDATED' %}
             <i class="fa fa-sync text-warning" aria-hidden="true" title="The EHR Consent has been submitted and is currently undergoing validation. This process could take up to 24hrs to process." data-toggle="tooltip" data-container="body"></i>
-        {% elseif type == 'ehr' and value == 'SUBMITTED_INVALID' %}
-            <i class="fa fa-exclamation-circle text-danger" aria-hidden="true" title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body"></i>
+        {% elseif type == 'ehr' and value == 'SUBMITTED_IVALID' %}
+            <i class="fa fa-times text-danger" aria-hidden="true" title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body"></i>
         {% elseif value == 'SUBMITTED' %}
             <i class="fa fa-check text-success" aria-hidden="true"></i>
         {% elseif value == 'SUBMITTED_NOT_VALIDATED' %}
