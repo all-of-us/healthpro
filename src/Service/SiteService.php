@@ -227,20 +227,20 @@ class SiteService
     public function isValidSite($email): bool
     {
         if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
-            return $this->isValidProgramSite($email, NphSite::class, 'nphSites');
+            return $this->isValidNphSite($email);
         }
-        return $this->isValidProgramSite($email, Site::class);
+        return $this->isValidHpoSite($email);
     }
 
-    private function isValidProgramSite($email, $siteClass, $siteType = null) :bool
+    private function isValidHpoSite($email): bool
     {
         $user = $this->userService->getUser();
-        if (!$user || !$user->belongsToSite($email, $siteType)) {
+        if (!$user || !$user->belongsToSite($email)) {
             return false;
         }
         if ($this->env->isStable() || $this->env->isProd()) {
-            $siteGroup = $user->getSite($email, $siteType);
-            $site = $this->em->getRepository($siteClass)->findOneBy([
+            $siteGroup = $user->getSite($email);
+            $site = $this->em->getRepository(Site::class)->findOneBy([
                 'deleted' => 0,
                 'googleGroup' => $siteGroup->id,
             ]);
@@ -249,6 +249,25 @@ class SiteService
             }
             if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
                 // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function isValidNphSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if (!$user || !$user->belongsToSite($email, 'nphSites')) {
+            return false;
+        }
+        if ($this->env->isStable() || $this->env->isProd()) {
+            $siteGroup = $user->getSite($email, 'nphSites');
+            $site = $this->em->getRepository(NphSite::class)->findOneBy([
+                'deleted' => 0,
+                'googleGroup' => $siteGroup->id,
+            ]);
+            if (!$site || empty($site->getMayolinkAccount())) {
                 return false;
             }
         }
