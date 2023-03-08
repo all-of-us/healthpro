@@ -2,6 +2,20 @@
 
 {% block title %} NPH Participant Summary {% endblock %}
 
+{% macro generateStatusLabel(status) %}
+    {% if status == 'Collected' %}
+        {% set labelClass = 'label-primary' %}
+    {% elseif status == 'Finalized' %}
+        {% set labelClass = 'label-default' %}
+    {% elseif status == 'In Progress' %}
+        {% set labelClass = 'label-warning' %}
+    {% else %}
+        {% set labelClass = 'label-default' %}
+    {% endif %}
+
+    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
+{% endmacro %}
+
 {% block body %}
     {% if hasNoParticipantAccess %}
     <div class="row">
@@ -73,74 +87,55 @@
             <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                 <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                    <div>
-                        <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
-                             role="button">Visit {{ visit['visitDisplayName'] }}<span class="caret"
-                                                                      style="float: right; margin: 9px 0;"></span></div>
-                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
-                            <a class="btn btn-primary" role="button"
-                               href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
-                            </a>
-                            {% set displayedOrderIDS = [] %}
-                            {% for timepointCode, timepoint in visit['visitInfo'] %}
-                                {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
-                                    {% if sampleInfo['numberSamples'] > 0 %}
-                                        {% if loop.first %}
-                                            <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
-                                        {% endif %}
-                                        {% set SampleGroupStatus = sampleInfo|column('sampleStatus') %}
-                                        {% if 'Unlocked' in SampleGroupStatus %}
-                                            {% set SampleGroupCollectionStatus = 'Unlocked' %}
-                                        {% elseif 'Canceled' in SampleGroupStatus %}
-                                            {% set SampleGroupCollectionStatus = 'Canceled' %}
-                                        {% elseif 'Finalized' in SampleGroupStatus %}
-                                            {% set SampleGroupCollectionStatus = 'Finalized' %}
-                                        {% elseif 'Collected' in SampleGroupStatus %}
-                                            {% set SampleGroupCollectionStatus = 'Collected' %}
-                                        {% else %}
-                                            {% set SampleGroupCollectionStatus = 'Created' %}
-                                        {% endif %}
-                                        {% set StatusCount = 0 %}
-                                        {% for sampleStatus in SampleGroupStatus %}
-                                            {% if sampleStatus == SampleGroupCollectionStatus %}
-                                                {% set StatusCount = StatusCount + 1 %}
+                    {% if VisitCode != 'sampleStatusCount' %}
+                        <div>
+                            <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
+                                 role="button">Visit {{ visit['visitDisplayName'] }}<span class="caret"
+                                                                                          style="float: right; margin: 9px 0;"></span></div>
+                            <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
+                                <a class="btn btn-primary" role="button"
+                                   href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                    <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
+                                </a>
+                                {% set displayedOrderIDS = [] %}
+                                {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                    {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                        {% if sampleInfo['numberSamples'] > 0 %}
+                                            {% if loop.first %}
+                                                <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
                                             {% endif %}
-                                        {% endfor %}
-                                        {% for sampleCode, sample in sampleInfo %}
-                                            {% set SampleGroupStatus = null %}
-                                            {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and sampleInfo['numberSamples'] > 0 and sample['healthProOrderId'] not in displayedOrderIDS %}
-                                                {% set displayedOrderIDS = displayedOrderIDS|merge([sample['healthProOrderId']]) %}
-                                                {% if StatusCount == sampleInfo['expectedSamples'] and SampleGroupCollectionStatus == 'Finalized' %}
-                                                    {% set OrderStatus = 'Completed' %}
-                                                {% elseif StatusCount == sampleInfo['expectedSamples'] and SampleGroupCollectionStatus == 'Collected' %}
-                                                    {% set OrderStatus = 'Collected' %}
-                                                {% elseif SampleGroupCollectionStatus in ['Finalized', 'Collected'] %}
-                                                    {% set OrderStatus = 'In Progress' %}
-                                                {% else %}
-                                                    {% set OrderStatus = SampleGroupCollectionStatus %}
-                                                {% endif %}
-                                                <div class="well well-sm row">
-                                                    <div class="col-sm-2">{{ sample['createDate'] }}</div>
-                                                    <div class="col-sm-3"><a
-                                                            href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample['healthProOrderId']}) }}">Order
-                                                            ID: {{ sample['orderId'] }}</a></div>
-                                                    <div class="col-sm-2">{{ sample['sampleTypeDisplayName'] }}</div>
-                                                    <div class="col-sm-2">{{ OrderStatus ?? 'Created' }}</div>
-                                                    <div class="col-sm-3">({{ StatusCount }}
-                                                        /{{ sampleInfo['expectedSamples'] }} {{ SampleGroupCollectionStatus }})
+                                            {% set StatusCount = 0 %}
+                                            {% for sampleCode, sample in sampleInfo %}
+                                                {% set SampleGroupStatus = null %}
+                                                {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and sampleInfo['numberSamples'] > 0 and sample['healthProOrderId'] not in displayedOrderIDS %}
+                                                    {% set displayedOrderIDS = displayedOrderIDS|merge([sample['healthProOrderId']]) %}
+                                                    <div class="well well-sm row">
+                                                        <div class="col-sm-2">{{ sample['createDate'] }}</div>
+                                                        <div class="col-sm-3"><a
+                                                                href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample['healthProOrderId']}) }}">Order
+                                                                ID: {{ sample['orderId'] }}</a></div>
+                                                        <div class="col-sm-2">{{ sample['sampleTypeDisplayName'] }}</div>
+                                                        {{ _self.generateStatusLabel(sample['orderStatus']) }}
+                                                        {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][sample['orderId']]|sort %}
+                                                            {% if not loop.first %}
+                                                                <div class="col-sm-9"></div>
+                                                            {% endif %}
+                                                        <div class="col-sm-3 float-right">({{ sampleStatusCount }}
+                                                            / {{ sampleInfo['expectedSamples'] }}) {{ sampleStatus }}
+                                                        </div>
+                                                        {% endfor %}
                                                     </div>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
-                            {% if displayedOrderIDS is empty %}
-                                <h4>No Orders Generated</h4>
-                            {% endif %}
+                                {% if displayedOrderIDS is empty %}
+                                    <h4>No Orders Generated</h4>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endfor %}

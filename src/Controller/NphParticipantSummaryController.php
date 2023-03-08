@@ -51,7 +51,7 @@ class NphParticipantSummaryController extends AbstractController
         }
         $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participantId);
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
-        $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo['order'], $nphProgramSummary);
+        $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo, $nphProgramSummary);
         $isCrossSite = $participant->nphPairedSiteSuffix !== $siteService->getSiteId();
         $hasNoParticipantAccess = $isCrossSite && empty($session->get('agreeCrossSite_' . $participantId));
         if ($hasNoParticipantAccess) {

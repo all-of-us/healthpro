@@ -138,4 +138,14 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getOrdersByParticipantId(string $participantId): array
+    {
+        return $this->createQueryBuilder('no')
+            ->where('no.participantId = :participantId')
+            ->setParameter('participantId', $participantId)
+            ->orderBy('no.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -337,7 +337,7 @@ class NphSample
             return 'Unlocked';
         }
 
-        if ($this->collectedTs === null) {
+        if ($this->collectedTs === null && $this->finalizedTs === null) {
             return 'Created';
         }
 

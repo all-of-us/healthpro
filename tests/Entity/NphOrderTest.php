@@ -161,4 +161,83 @@ class NphOrderTest extends NphTestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider getOrderStatusDataProvider
+     */
+    public function testGetOrderStatus($samples, $expectedStatus) {
+        $orderData = $this->getOrderData();
+        $nphOrder = $this->createNphOrder($orderData);
+        foreach ($samples as $sample) {
+            $sample['nphOrder'] = $nphOrder;
+            $this->createNphSample($sample);
+        }
+        $this->assertSame($expectedStatus, $nphOrder->getStatus());
+        $nphOrder->getStatus();
+    }
+
+    public function getOrderStatusDataProvider(): array {
+        $finalizedTs = new \DateTime('2023-01-01 08:00:00');
+        $collectedTs = new \DateTime('2023-01-01 08:00:00');
+        return [
+            [
+                [
+                    [
+                        'sampleId' => '1000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                    [
+                        'sampleId' => '2000000000',
+                        'sampleCode' => 'ST2',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                ],
+                'Finalized'
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '3000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                    [
+                        'sampleId' => '4000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                'In Progress'
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '5000000000',
+                        'sampleCode' => 'ST1',
+                        'collectedTs' => $collectedTs
+                    ],
+                    [
+                        'sampleId' => '6000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                'In Progress'
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '7000000000',
+                        'sampleCode' => 'ST1',
+                        'collectedTs' => $collectedTs
+                    ],
+                    [
+                        'sampleId' => '8000000000',
+                        'sampleCode' => 'ST2',
+                        'collectedTs' => $collectedTs
+                    ],
+                ],
+                'Collected'
+            ],
+        ];
+    }
 }
