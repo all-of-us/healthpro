@@ -319,4 +319,30 @@ class NphOrder
         }
         return false;
     }
+
+    public function getStatus(): string
+    {
+        $statusCount = [];
+        $sampleCount = count($this->nphSamples);
+        foreach ($this->nphSamples as $nphSample) {
+            $sampleStatus = $nphSample->getStatus();
+            $statusCount[$sampleStatus] = isset($statusCount[$sampleStatus]) ? $statusCount[$sampleStatus] + 1 : 1;
+        }
+        if (isset($statusCount['Canceled']) && $statusCount['Canceled'] === $sampleCount) {
+            return 'Canceled';
+        }
+        if (isset($statusCount['Canceled'])) {
+            $sampleCount = $sampleCount - $statusCount['Canceled'];
+        }
+        if (isset($statusCount['Finalized']) && $statusCount['Finalized'] === $sampleCount) {
+            return 'Finalized';
+        }
+        if (isset($statusCount['Created']) && $statusCount['Created'] === $sampleCount) {
+            return 'Created';
+        }
+        if (isset($statusCount['Collected']) && $statusCount['Collected'] === $sampleCount) {
+            return 'Collected';
+        }
+        return 'In Progress';
+    }
 }

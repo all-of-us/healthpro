@@ -53,6 +53,7 @@ class NphProgramSummaryService
     public function combineOrderSummaryWithProgramSummary($orderSummary, $programSummary): array
     {
         $combinedSummary = [];
+        $orderSummaryOrder = $orderSummary['order'];
         foreach ($programSummary as $module => $moduleSummary) {
             foreach ($moduleSummary as $visit => $visitSummary) {
                 foreach ($visitSummary['visitInfo'] as $timePoint => $timePointSummary) {
@@ -64,10 +65,10 @@ class NphProgramSummaryService
                                 continue;
                             }
                             $expectedSamples++;
-                            if (isset($orderSummary[$module][$visit][$timePoint][$sampleType][$sampleCode]['sampleId'])) {
+                            if (isset($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode]['sampleId'])) {
                                 $numberSamples++;
                             }
-                            $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];
+                            $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];
                         }
                         $combinedSummary[$module][$visit][$timePoint][$sampleType]['numberSamples'] = $numberSamples;
                         $combinedSummary[$module][$visit][$timePoint][$sampleType]['expectedSamples'] = $expectedSamples;
@@ -75,6 +76,7 @@ class NphProgramSummaryService
                     $combinedSummary[$module][$visit][$timePoint] = ['timePointInfo' => $combinedSummary[$module][$visit][$timePoint], 'timePointDisplayName' => $visitSummary['visitInfo'][$timePoint]['timePointDisplayName']];
                 }
                 $combinedSummary[$module][$visit] = ['visitInfo' => $combinedSummary[$module][$visit], 'visitDisplayName' => $visitSummary['visitDisplayName']];
+                $combinedSummary[$module]['sampleStatusCount'] = $orderSummary['sampleStatusCount'][$module] ?? [];
             }
         }
         return $combinedSummary;
