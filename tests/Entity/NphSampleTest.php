@@ -2,6 +2,8 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\NphSample;
+
 class NphSampleTest extends NphTestCase
 {
     /**
@@ -131,41 +133,50 @@ class NphSampleTest extends NphTestCase
     }
 
     /**
-     * @dataProvider addNewAliquotsDataProvider
+     * @dataProvider isDisabledDataProvider
      */
-    public function testAllowAddNewAliquots($orderType, $canAddNewAliquots)
+    public function testIsDisabled($finalizedTs, $modifyType, $expectedResult): void
     {
-        $orderData['orderType'] = $orderType;
-        $orderData = array_merge($this->getOrderData(), $orderData);
-        $nphOrder = $this->createNphOrder($orderData);
-        $sampleData = [
-            'nphOrder' => $nphOrder,
-            'finalizedTs' => null
-        ];
-        $sampleData = array_merge($this->getSampleData(), $sampleData);
-        $nphSample = $this->createNphSample($sampleData);
-        $this->assertSame($canAddNewAliquots, $nphSample->allowAddNewAliquots());
+        $nphSample = new NphSample();
+        $nphSample->setFinalizedTs($finalizedTs);
+        $nphSample->setModifyType($modifyType);
+        $this->assertEquals($expectedResult, $nphSample->isDisabled());
     }
 
-    public function addNewAliquotsDataProvider(): array
+    public function isDisabledDataProvider(): array
+    {
+        $finalizedTs = new \DateTime('2023-03-06 08:00:00');
+        return [
+            // Test cases where isDisabled should return false
+            [null, NphSample::RESTORE, false],
+            [null, NphSample::UNLOCK, false],
+            [$finalizedTs, NphSample::UNLOCK, false],
+
+            // Test cases where isDisabled should return true
+            [$finalizedTs, null, true],
+            [$finalizedTs, NphSample::CANCEL, true],
+            [null, NphSample::CANCEL, true],
+        ];
+    }
+
+    /**
+     * @dataProvider isUnlockedDataProvider
+     */
+    public function testIsUnlocked($modifyType, $expectedResult): void
+    {
+        $nphSample = new NphSample();
+        $nphSample->setModifyType($modifyType);
+        $this->assertEquals($expectedResult, $nphSample->isUnlocked());
+    }
+
+    public function isUnlockedDataProvider(): array
     {
         return [
-            [
-                'blood',
-                true
-            ],
-            [
-                'stool',
-                false
-            ],
-            [
-                'nail',
-                false
-            ],
-            [
-                'hair',
-                false
-            ]
+            [NphSample::REVERT, false],
+            [NphSample::UNLOCK, true],
+            [NphSample::CANCEL, false],
+            [NphSample::EDITED, false],
+            [NphSample::RESTORE, false],
         ];
     }
 }
