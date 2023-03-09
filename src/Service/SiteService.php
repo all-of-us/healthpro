@@ -224,15 +224,15 @@ class SiteService
         return null;
     }
 
-    public function isValidSite($email)
+    public function isValidSite($email): bool
     {
-        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
-            return $this->isValidHpoSite($email);
+        if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
+            return $this->isValidNphSite($email);
         }
-        return $this->isValidNphSite($email);
+        return $this->isValidHpoSite($email);
     }
 
-    public function isValidHpoSite($email)
+    private function isValidHpoSite($email): bool
     {
         $user = $this->userService->getUser();
         if (!$user || !$user->belongsToSite($email)) {
@@ -255,11 +255,21 @@ class SiteService
         return true;
     }
 
-    public function isValidNphSite($email): bool
+    private function isValidNphSite($email): bool
     {
         $user = $this->userService->getUser();
         if (!$user || !$user->belongsToSite($email, 'nphSites')) {
             return false;
+        }
+        if ($this->env->isStable() || $this->env->isProd()) {
+            $siteGroup = $user->getSite($email, 'nphSites');
+            $site = $this->em->getRepository(NphSite::class)->findOneBy([
+                'deleted' => 0,
+                'googleGroup' => $siteGroup->id,
+            ]);
+            if (!$site || empty($site->getMayolinkAccount())) {
+                return false;
+            }
         }
         return true;
     }
