@@ -153,19 +153,12 @@ class SiteServiceTest extends ServiceTestCase
     public function siteDataProvider(): array
     {
         return [
-            // Valid mayolink account number and site email
-            [User::PROGRAM_HPO, '123456789', 'hpo-site-test', 'hpo-site-test', true],
-            // No mayolink account number and with site email
-            [User::PROGRAM_HPO, null, 'hpo-site-test', 'hpo-site-test', false],
-            // No mayolink account number and with invalid site email
-            [User::PROGRAM_HPO, null, 'hpo-site-test', 'hpo-site-test-2', false],
-
-            // Valid mayolink account number and site email
-            [User::PROGRAM_NPH, '123456789', 'nph-site-test', 'nph-site-test', true],
-            // No mayolink account number and with site email
-            [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test', false],
-            // No mayolink account number and with invalid site email
-            [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test-2', false]
+            'valid mayolink account number and site email' => [User::PROGRAM_HPO, '123456789', 'hpo-site-test', 'hpo-site-test', true],
+            'no mayolink account number and with site email' => [User::PROGRAM_HPO, null, 'hpo-site-test', 'hpo-site-test', false],
+            'no mayolink account number and with invalid site email' => [User::PROGRAM_HPO, null, 'hpo-site-test', 'hpo-site-test-2', false],
+            'nph valid mayolink account number and site email' => [User::PROGRAM_NPH, '123456789', 'nph-site-test', 'nph-site-test', true],
+            'nph no mayolink account number and with site email' => [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test', false],
+            'nph no mayolink account number and with invalid site email' => [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test-2', false]
         ];
     }
 }
