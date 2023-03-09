@@ -371,12 +371,18 @@ class NphOrderService
     public function getExistingOrderCollectionData(NphOrder $order): array
     {
         $orderCollectionData = [];
+        $orderType = $order->getOrderType();
+        if ($orderType === NphOrder::TYPE_STOOL) {
+            $orderCollectionData[$orderType . 'CollectedTs'] = $order->getCollectedTs();
+        }
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
             if ($nphSample->getCollectedTs()) {
                 $orderCollectionData[$sampleCode] = true;
             }
-            $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
+            if ($orderType !== NphOrder::TYPE_STOOL) {
+                $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
+            }
             $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
             if ($order->getOrderType() === 'urine') {
                 if ($nphSample->getSampleMetaData()) {

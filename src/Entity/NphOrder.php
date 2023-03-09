@@ -345,4 +345,14 @@ class NphOrder
         }
         return 'In Progress';
     }
+
+    public function getCollectedTs(): ?\DateTime
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getCollectedTs()) {
+                return $nphSample->getCollectedTs();
+            }
+        }
+        return null;
+    }
 }
