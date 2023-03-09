@@ -343,19 +343,21 @@ class NphOrderService
     {
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
-            $nphSample->setCollectedUser($this->user);
-            $nphSample->setCollectedSite($this->site);
-            $nphSample->setCollectedTs($formData[$sampleCode . 'CollectedTs']);
-            $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
-            if ($order->getOrderType() === 'urine') {
-                $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
-                    'urineClarity']));
+            $collectedTs = $formData[$sampleCode . 'CollectedTs'];
+            if ($collectedTs) {
+                $nphSample->setCollectedUser($this->user);
+                $nphSample->setCollectedSite($this->site);
+                $nphSample->setCollectedTs($formData[$sampleCode . 'CollectedTs']);
+                $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+                if ($order->getOrderType() === NphOrder::TYPE_URINE) {
+                    $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+                }
+                $this->em->persist($nphSample);
+                $this->em->flush();
+                $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            $this->em->persist($nphSample);
-            $this->em->flush();
-            $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
         }
-        if ($order->getOrderType() === 'stool') {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                 'bowelQuality']));
             $this->em->persist($order);
