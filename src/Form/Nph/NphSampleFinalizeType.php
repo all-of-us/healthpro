@@ -210,7 +210,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'aliquots' => null,
             'disabled' => null,
             'nphSample' => null,
-            'disableMetadataFields' => null
+            'disableMetadataFields' => null,
+            'disableStoolCollectedTs' => null
         ]);
     }
 

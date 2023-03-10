@@ -73,6 +73,7 @@ class NphOrderForm extends AbstractType
                 'constraints' => $constraints,
                 'attr' => [
                     'class' => 'order-ts',
+                    'readonly' => $options['disableStoolCollectedTs']
                 ],
                 'disabled' => $disabled
             ]);
