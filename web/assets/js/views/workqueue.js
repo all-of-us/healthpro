@@ -78,6 +78,7 @@ $(document).ready(function () {
             var pageDropDown = $(".page-drop-down select");
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
+            $('[data-toggle="tooltip"]').tooltip();
         },
         createdRow: function (row, data) {
             if (data.isWithdrawn === true) {

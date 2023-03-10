@@ -44,7 +44,7 @@
     </div>
     <div class="col-md-12" role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 4 %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 2 %}
                 {% if loop.first %}
                     {% set tabActive = 'active' %}
                 {% else %}
@@ -59,7 +59,7 @@
     </div>
     <div class="col-sm-2 participant-activity-div">
         <ul class="nav nav-pills">
-            <li role="presentation" class="participant-activity active" ><a>Sample Collection</a></li>
+            <li role="presentation" class="participant-activity active" ><a>Collections</a></li>
         </ul>
     </div>
     <div class="col-sm-10 participant-modules">
@@ -71,7 +71,7 @@
                 {% set modulePanelDisplay = 'hidden' %}
             {% endif %}
             <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
-                <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Sample Collection</h4>
+                <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                     <div>
                         <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
@@ -128,7 +128,7 @@
                                                     <div class="col-sm-2">{{ sample['sampleTypeDisplayName'] }}</div>
                                                     <div class="col-sm-2">{{ OrderStatus ?? 'Created' }}</div>
                                                     <div class="col-sm-3">({{ StatusCount }}
-                                                        /{{ sampleInfo['expectedSamples'] }} Samples {{ SampleGroupCollectionStatus }})
+                                                        /{{ sampleInfo['expectedSamples'] }} {{ SampleGroupCollectionStatus }})
                                                     </div>
                                                 </div>
                                             {% endif %}

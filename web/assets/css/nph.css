@@ -78,3 +78,7 @@ table tr td.nopadleft {
 table tr td input.aliquot-volume {
     padding-right: 0;
 }
+
+li.participant-activity > a {
+    padding: 10px 29px
+}

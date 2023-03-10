@@ -34,6 +34,9 @@ class NphParticipantSummaryController extends AbstractController
         NphProgramSummaryService $nphProgramSummaryService
     ): Response {
         $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+        if ($participant === false) {
+            throw $this->createNotFoundException();
+        }
         $agreeForm = $this->createForm(NphCrossSiteAgreeType::class, null);
         $agreeForm->handleRequest($request);
         if ($agreeForm->isSubmitted() && $agreeForm->isValid()) {

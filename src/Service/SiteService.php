@@ -112,6 +112,12 @@ class SiteService
         return $siteEntity ? $siteEntity->getOrganizationId() : null;
     }
 
+    public function getSiteAwardeeId(): ?string
+    {
+        $siteEntity = $this->requestStack->getSession()->get('siteEntity');
+        return $siteEntity ? $siteEntity->getAwardeeId() : null;
+    }
+
     public function getSuperUserAwardees()
     {
         $sites = $this->getSuperUserAwardeeSites();
@@ -368,11 +374,8 @@ class SiteService
 
     public function canSwitchProgram(): bool
     {
-        if ($this->userService->getUser()) {
-            $roles = $this->userService->getUser()->getRoles();
-            return in_array('ROLE_NPH_USER', $roles) && count($roles) > 1;
-        }
-        return false;
+        $user = $this->userService->getUser();
+        return $user && $user->getNphSites() && $user->getSites();
     }
 
     public function autoSwitchSite(): bool

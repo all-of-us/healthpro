@@ -166,16 +166,30 @@ class NphSampleFinalizeType extends NphOrderForm
         if ($nphSample->getModifyType() === NphSample::UNLOCK) {
             $finalizedAliquots = $nphSample->getNphAliquots();
             foreach ($finalizedAliquots as $finalizedAliquot) {
-                $builder->add('cancel_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
-                    'label' => false,
-                    'required' => false,
-                    'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL
-                ]);
-                $builder->add('restore_' . $finalizedAliquot->getAliquotId(), Type\CheckboxType::class, [
-                    'label' => false,
-                    'required' => false,
-                    'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
-                ]);
+                $builder->add(
+                    "cancel_{$finalizedAliquot->getAliquotCode()}_{$finalizedAliquot->getAliquotId()}",
+                    Type\CheckboxType::class,
+                    [
+                        'label' => false,
+                        'required' => false,
+                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
+                        'attr' => [
+                            'class' => 'sample-modify-checkbox',
+                        ]
+                    ]
+                );
+                $builder->add(
+                    "restore_{$finalizedAliquot->getAliquotCode()}_{$finalizedAliquot->getAliquotId()}",
+                    Type\CheckboxType::class,
+                    [
+                        'label' => false,
+                        'required' => false,
+                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL,
+                        'attr' => [
+                            'class' => 'sample-modify-checkbox',
+                        ]
+                    ]
+                );
             }
         }
 
@@ -203,7 +217,8 @@ class NphSampleFinalizeType extends NphOrderForm
     private function getVolumeAttributes(array $aliquot): array
     {
         $volumeAttributes = [
-            'class' => 'aliquot-volume'
+            'class' => 'aliquot-volume',
+            'data-expected-volume' => $aliquot['expectedVolume']
         ];
         if (isset($aliquot['warningMinVolume'])) {
             $volumeAttributes['data-warning-min-volume'] = $aliquot['warningMinVolume'];

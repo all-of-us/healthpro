@@ -180,4 +180,92 @@ class NphParticipantSummaryService
               }
         ";
     }
+
+    public function getAllParticipantDetailsById($participantId): ?array
+    {
+        try {
+            $query = $this->getAllParticipantsByIdQuery($participantId);
+            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $edges = $result['participant']['edges'];
+            return !empty($edges) ? $edges[0]['node'] : null;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
+    private function getAllParticipantsByIdQuery(string $participantId): string
+    {
+        return " 
+            query {
+                participant (nphId: \"{$participantId}\") {
+                    totalCount
+                    resultCount
+                    edges {
+                        node {
+                            aouAianStatus
+                            aouBasicsStatus {
+                                time,
+                                value
+                            }
+                            aouDeactivationStatus {
+                                time,
+                                value
+                            }
+                            aouDeceasedStatus {
+                                time,
+                                value
+                            }
+                            aouEnrollmentStatus {
+                                time,
+                                value
+                            }
+                            aouLifestyleStatus {
+                                time,
+                                value
+                            }
+                            aouOverallHealthStatus {
+                                time
+                                value
+                            }
+                            aouSDOHStatus {
+                                time
+                                value
+                            }
+                            aouWithdrawalStatus {
+                                time
+                                value
+                            }
+                            biobankId
+                            DOB
+                            email
+                            firstName
+                            lastName
+                            middleName
+                            nphDeactivationStatus {
+                                time
+                                value
+                            }
+                            nphEnrollmentStatus {
+                                time
+                                value
+                            }
+                            nphPairedAwardee
+                            nphPairedOrg
+                            nphPairedSite
+                            nphWithdrawalStatus {
+                                time
+                                value
+                            }
+                            participantNphId
+                            phoneNumber
+                            siteId
+                            zipCode
+                        }
+                    }
+                }
+            }
+        ";
+    }
 }

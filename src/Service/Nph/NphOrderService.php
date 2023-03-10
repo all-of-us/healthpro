@@ -549,15 +549,21 @@ class NphOrderService
                 if (isset($formData[$aliquotCode])) {
                     foreach ($formData[$aliquotCode] as $key => $aliquotId) {
                         if ($aliquotId) {
-                            $nphAliquot = new NphAliquot();
-                            $nphAliquot->setNphSample($sample);
-                            $nphAliquot->setAliquotId($aliquotId);
-                            $nphAliquot->setAliquotCode($aliquotCode);
-                            $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                            if (!empty($formData["{$aliquotCode}Volume"][$key])) {
-                                $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            $nphAliquot = $this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' =>
+                                $aliquotId]);
+                            if (!$nphAliquot) {
+                                $nphAliquot = new NphAliquot();
+                                $nphAliquot->setNphSample($sample);
+                                $nphAliquot->setAliquotId($aliquotId);
+                                $nphAliquot->setAliquotCode($aliquotCode);
+                                $nphAliquot->setUnits($aliquot['units']);
                             }
-                            $nphAliquot->setUnits($aliquot['units']);
+                            if (empty($formData["cancel_{$aliquotCode}_{$aliquotId}"]) && empty($formData["restore_{$aliquotCode}_{$aliquotId}"])) {
+                                $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                                if (!empty($formData["{$aliquotCode}Volume"][$key])) {
+                                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                                }
+                            }
                             $this->em->persist($nphAliquot);
                             $this->em->flush();
                             $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
@@ -593,10 +599,10 @@ class NphOrderService
         // Aliquot status is only set while editing a sample
         if ($sampleModifyType === NphSample::UNLOCK) {
             foreach ($sample->getNphAliquots() as $aliquot) {
-                if (!empty($formData["cancel_{$aliquot->getAliquotId()}"])) {
+                if (!empty($formData["cancel_{$aliquot->getAliquotCode()}_{$aliquot->getAliquotId()}"])) {
                     $aliquot->setStatus(NphSample::CANCEL);
                 }
-                if (!empty($formData["restore_{$aliquot->getAliquotId()}"])) {
+                if (!empty($formData["restore_{$aliquot->getAliquotCode()}_{$aliquot->getAliquotId()}"])) {
                     $aliquot->setStatus(NphSample::RESTORE);
                 }
                 $this->em->persist($aliquot);
@@ -635,13 +641,11 @@ class NphOrderService
                 }
             }
         }
-        if ($sample->getModifyType() !== NphSample::UNLOCK) {
-            $aliquots = $sample->getNphAliquots();
-            foreach ($aliquots as $aliquot) {
-                $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
-                $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
-                $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
-            }
+        $aliquots = $sample->getNphAliquots();
+        foreach ($aliquots as $aliquot) {
+            $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
+            $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
+            $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
         }
         return $sampleData;
     }
@@ -709,13 +713,13 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
-    public function checkDuplicateAliquotId(array $formData, string $sampleCode): array
+    public function checkDuplicateAliquotId(array $formData, string $sampleCode, array $existingAliquotIds = []): array
     {
         $aliquots = $this->getAliquots($sampleCode);
         foreach (array_keys($aliquots) as $aliquotCode) {
             if (isset($formData[$aliquotCode])) {
                 foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                    if ($this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' => $aliquotId])) {
+                    if (!in_array($aliquotId, $existingAliquotIds) && $this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' => $aliquotId])) {
                         return [
                             'key' => $key,
                             'aliquotCode' => $aliquotCode
