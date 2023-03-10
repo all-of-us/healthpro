@@ -261,7 +261,7 @@ class NphOrder
     public function canRestore(array $activeSamples = []): bool
     {
         foreach ($this->getNphSamples() as $nphSample) {
-            if ($nphSample->getModifyType() === NphSample::CANCEL && !in_array($nphSample->getSampleCode(), $activeSamples, true)){
+            if ($nphSample->getModifyType() === NphSample::CANCEL && !in_array($nphSample->getSampleCode(), $activeSamples, true)) {
                 return true;
             }
         }
