@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\NphOrderRepository;
+use App\Repository\NphSampleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -257,10 +258,10 @@ class NphOrder
         return false;
     }
 
-    public function canRestore(): bool
+    public function canRestore(array $activeSamples = []): bool
     {
         foreach ($this->getNphSamples() as $nphSample) {
-            if ($nphSample->getModifyType() === NphSample::CANCEL) {
+            if ($nphSample->getModifyType() === NphSample::CANCEL && !in_array($nphSample->getSampleCode(), $activeSamples, true)){
                 return true;
             }
         }

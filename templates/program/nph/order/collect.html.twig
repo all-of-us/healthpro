@@ -35,7 +35,7 @@
                                 Cancel
                             </a>
                         {% endif %}
-                        {% if order.canRestore %}
+                        {% if order.canRestore(activeSamples) %}
                             <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
                                 type: 'restore' }) }}" class="btn btn-xs btn-success">
                                 Restore
