@@ -55,9 +55,9 @@ class NphOrderCollect extends NphOrderForm
                 'html5' => false,
                 'model_timezone' => 'UTC',
                 'view_timezone' => $options['timeZone'],
-                'disabled' => false,
                 'attr' => [
                     'class' => 'order-ts',
+                    'readonly' => $options['disableStoolCollectedTs']
                 ]
             ]);
             $this->addStoolMetadataFields($builder, $options['disableMetadataFields']);
@@ -77,7 +77,8 @@ class NphOrderCollect extends NphOrderForm
             'samples' => null,
             'orderType' => null,
             'timeZone' => null,
-            'disableMetadataFields' => null
+            'disableMetadataFields' => null,
+            'disableStoolCollectedTs' => null
         ]);
     }
 }

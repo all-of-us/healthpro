@@ -355,4 +355,14 @@ class NphOrder
         }
         return null;
     }
+
+    public function isStoolCollectedTsDisabled(): bool
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getCollectedTs()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraints;
 
 class NphOrderForm extends AbstractType
 {
+    const FORM_FINALIZE_TYPE = 'finalize';
+
     public static $urineColors = [
         'Color 1' => 1,
         'Color 2' => 2,
@@ -45,9 +47,9 @@ class NphOrderForm extends AbstractType
         array $options,
         string $sample,
         bool $disabled = false,
-        string $formType = 'finalize'
+        string $formType = self::FORM_FINALIZE_TYPE
     ): void {
-        if ($options['orderType'] !== NphOrder::TYPE_STOOL) {
+        if ($formType === self::FORM_FINALIZE_TYPE || $options['orderType'] !== NphOrder::TYPE_STOOL) {
             $constraints = $this->getDateTimeConstraints();
             if ($formType === 'collect') {
                 $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
@@ -61,7 +63,7 @@ class NphOrderForm extends AbstractType
                 ]);
             }
             $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-                'required' => $formType === 'finalize',
+                'required' => $formType === self::FORM_FINALIZE_TYPE,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
