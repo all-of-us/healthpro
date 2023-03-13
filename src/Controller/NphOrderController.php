@@ -243,7 +243,8 @@ class NphOrderController extends BaseController
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
                 $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' =>
-                $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled()
+                $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
+                $order->isStoolCollectedTsDisabled()
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
