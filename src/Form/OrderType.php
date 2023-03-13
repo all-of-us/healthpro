@@ -193,30 +193,27 @@ class OrderType extends AbstractType
                 }
             }
         }
-        if ($options['step'] === Order::ORDER_STEP_FINALIZED) {
-            // Display shipping method for kit and diversion type orders
-            if ($options['order']->getType() === Order::ORDER_TYPE_KIT || $options['order']->getType() === Order::ORDER_TYPE_DIVERSION) {
-                $shippingMethodOptions = [
-                    'label' => 'Select the sample shipping method',
-                    'required' => true,
-                    'disabled' => $disabled,
-                    'choices' => [
-                        'Shipped via FedEx or UPS' => 'fedex',
-                        'Shipped via Courier Service' => 'courier'
-                    ],
-                    'multiple' => false,
-                    'expanded' => true,
-                    'constraints' => new Constraints\NotBlank([
-                        'message' => 'Shipping method required'
-                    ])
-                ];
-                if ($options['order']->getFinalizedTs()) {
-                    $shippingMethodOptions['data'] = $options['order']->getFedexTracking() ? 'fedex' : 'courier';
-                }
-                $builder
-                    ->add('sampleShippingMethod', Type\ChoiceType::class, $shippingMethodOptions);
+        // Display fedex tracking for kit and diversion type orders
+        if ($options['step'] === 'finalized' && ($options['order']->getType() === 'kit' || $options['order']->getType() === 'diversion')) {
+            $shippingMethodOptions = [
+                'label' => 'Select the sample shipping method',
+                'required' => true,
+                'disabled' => $disabled,
+                'choices' => [
+                    'Shipped via FedEx or UPS' => 'fedex',
+                    'Shipped via Courier Service' => 'courier'
+                ],
+                'multiple' => false,
+                'expanded' => true,
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Shipping method required'
+                ])
+            ];
+            if ($options['order']->getFinalizedTs()) {
+                $shippingMethodOptions['data'] = $options['order']->getFedexTracking() ? 'fedex' : 'courier';
             }
             $builder
+                ->add('sampleShippingMethod', Type\ChoiceType::class, $shippingMethodOptions)
                 ->add('fedexTracking', Type\RepeatedType::class, [
                     'type' => Type\TextType::class,
                     'disabled' => $disabled,

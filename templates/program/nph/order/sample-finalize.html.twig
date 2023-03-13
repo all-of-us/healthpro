@@ -220,7 +220,7 @@
                                             </tr>
                                         {% endif %}
                                     {% endfor %}
-                                    {% if sample.allowAddNewAliquots %}
+                                    {% if not sample.disabled and (aliquot['addNew'] or sample.unlocked) %}
                                         <tr>
                                             <td>
                                                 <a type="button" class="add-aliquot-widget"

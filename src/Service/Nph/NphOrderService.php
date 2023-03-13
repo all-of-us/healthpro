@@ -436,7 +436,7 @@ class NphOrderService
     public function getParticipantOrderSummary(string $participantid): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
-        $orderInfo = $OrderRepository->findBy(['participantId' => $participantid]);
+        $orderInfo = $OrderRepository->getOrdersByParticipantId($participantid);
         return $this->generateOrderSummaryArray($orderInfo);
     }
 
@@ -466,6 +466,7 @@ class NphOrderService
     {
         $sampleCount = 0;
         $orderSummary = array();
+        $statusCount = [];
         foreach ($nphOrder as $order) {
             $samples = $order->getNphSamples()->toArray();
             foreach ($samples as $sample) {
@@ -476,6 +477,11 @@ class NphOrderService
                 $timePointsDisplay = $module->getTimePoints();
                 $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
                 $visitTypes = $module->getVisitTypes();
+                $sampleStatus = $sample->getStatus();
+                $orderId = $order->getOrderId();
+                if (isset($orderSummary[$order->getModule()][$order->getVisitType()][$order->getTimepoint()][$module->getSampleType($sample->getSampleCode())][$sample->getSampleCode()])) {
+                    continue;
+                }
                 $orderSummary[$order->getModule()]
                 [$order->getVisitType()]
                 [$order->getTimepoint()]
@@ -486,7 +492,7 @@ class NphOrderService
                     'orderId' => $order->getOrderId(),
                     'healthProOrderId' => $order->getId(),
                     'createDate' => $order->getCreatedTs()->format('m/d/Y'),
-                    'sampleStatus' => $sample->getStatus(),
+                    'sampleStatus' => $sampleStatus,
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
                     'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
@@ -494,12 +500,15 @@ class NphOrderService
                     'visitDisplayName' => $visitTypes[$order->getVisitType()],
                     'sampleGroup' => $sample->getSampleGroup(),
                     'modifyType' => $sample->getModifyType(),
+                    'orderStatus' => $order->getStatus(),
                 ];
+                $statusCount[$order->getModule()][$orderId][$sampleStatus] = isset($statusCount[$order->getModule()][$orderId][$sampleStatus]) ? $statusCount[$order->getModule()][$orderId][$sampleStatus] + 1 : 1;
             }
         }
         $returnArray = array();
         $returnArray['order'] = $orderSummary;
         $returnArray['sampleCount'] = $sampleCount;
+        $returnArray['sampleStatusCount'] = $statusCount;
         return $returnArray;
     }
 

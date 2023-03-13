@@ -597,46 +597,4 @@ class OrderTest extends KernelTestCase
             ['3.1', '3.1']
         ];
     }
-
-    /**
-     * @dataProvider orderDataProvider
-     */
-    public function testHideTrackingFieldByDefault(?string $fedexTracking, ?string $orderType, bool $expected): void
-    {
-        $order = new Order();
-        $order->setFedexTracking($fedexTracking);
-        $order->setType($orderType);
-        $this->assertEquals($expected, $order->hideTrackingFieldByDefault());
-    }
-
-    public function orderDataProvider(): array
-    {
-        return [
-            'noFedexTrackingAndTypeIsKit' => [
-                'fedexTracking' => null,
-                'orderType' => Order::ORDER_TYPE_KIT,
-                'expected' => true
-            ],
-            'fedexTrackingAndTypeIsKit' => [
-                'fedexTracking' => '123456789',
-                'orderType' => Order::ORDER_TYPE_KIT,
-                'expected' => false,
-            ],
-            'noFedexTrackingAndTypeIsDiversion' => [
-                'fedexTracking' => null,
-                'orderType' => Order::ORDER_TYPE_DIVERSION,
-                'expected' => true,
-            ],
-            'fedexTrackingAndTypeIsDiversion' => [
-                'fedexTracking' => '123456789',
-                'orderType' => Order::ORDER_TYPE_DIVERSION,
-                'expected' => false,
-            ],
-            'fedexTrackingAndTypeIsRegular' => [
-                'fedexTracking' => '123456789',
-                'orderType' => null,
-                'expected' => false,
-            ],
-        ];
-    }
 }

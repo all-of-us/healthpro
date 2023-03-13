@@ -337,7 +337,7 @@ class NphSample
             return 'Unlocked';
         }
 
-        if ($this->collectedTs === null) {
+        if ($this->collectedTs === null && $this->finalizedTs === null) {
             return 'Created';
         }
 
@@ -460,6 +460,11 @@ class NphSample
         return ($this->finalizedTs || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
     }
 
+    public function isUnlocked(): bool
+    {
+        return $this->getModifyType() === self::UNLOCK;
+    }
+
     public function getModifyReasonDisplayText(): string
     {
         $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
@@ -530,15 +535,5 @@ class NphSample
     public function setSampleGroup($sampleGroup): void
     {
         $this->sampleGroup = $sampleGroup;
-    }
-
-    public function allowAddNewAliquots(): bool
-    {
-        $order = $this->getNphOrder();
-        if (($order->getOrderType() === 'blood' || $this->getModifyType() === self::UNLOCK) && $this->isDisabled()
-            === false) {
-            return true;
-        }
-        return false;
     }
 }
