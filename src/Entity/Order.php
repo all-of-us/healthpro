@@ -23,9 +23,6 @@ class Order
     public const ORDER_EDIT = 'edit';
     public const ORDER_REVERT = 'revert';
     public const INITIAL_VERSION = '1';
-    public const ORDER_STEP_FINALIZED = 'finalized';
-    public const ORDER_TYPE_KIT = 'kit';
-    public const ORDER_TYPE_DIVERSION = 'diversion';
 
     private $params;
     private $samples;
@@ -926,12 +923,12 @@ class Order
                 'system' => 'https://orders.mayomedicallaboratories.com/kit-id',
                 'value' => $this->getOrderId()
             ];
-        }
-        if (!empty($this->getFedexTracking())) {
-            $identifiers[] = [
-                'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
-                'value' => $this->getFedexTracking()
-            ];
+            if (!empty($this->getFedexTracking())) {
+                $identifiers[] = [
+                    'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
+                    'value' => $this->getFedexTracking()
+                ];
+            }
         }
         if (empty($this->params['ml_mock_order']) && $this->getMayoId() != 'pmitest') {
             $identifiers[] = [
@@ -1522,11 +1519,5 @@ class Order
             return 'Saliva';
         }
         return 'Full HPO';
-    }
-
-    public function hideTrackingFieldByDefault(): bool
-    {
-        return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
-                === self::ORDER_TYPE_DIVERSION);
     }
 }

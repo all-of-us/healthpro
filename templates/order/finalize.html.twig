@@ -42,10 +42,7 @@
     </div>
 
     {% if finalizeForm.fedexTracking is defined %}
-        {% if order.type != constant('App\\Entity\\Order::ORDER_TYPE_KIT') %}
-            <label>Enter tracking number (optional)</label>
-        {% endif %}
-        <div id="shipping_fields" {% if order.hideTrackingFieldByDefault %} style="display:none;" {% endif %}>
+        <div id="shipping_fields" {% if order.fedexTracking is null %} style="display:none;" {% endif %}>
             <ul class="nav nav-tabs">
                 <li role="presentation" class="active"><a href="#" id="enable-number">
                         <i class="fa fa-keyboard-o" aria-hidden="true"></i>
