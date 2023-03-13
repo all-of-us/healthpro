@@ -328,7 +328,7 @@ class OrderService
                 }
             }
         }
-        if ($step === Order::ORDER_STEP_FINALIZED && isset($formData['fedexTracking'])) {
+        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
             $this->order->setFedexTracking($formData['fedexTracking']);
         }
     }
@@ -424,7 +424,7 @@ class OrderService
                 $formData["processedCentrifugeType"] = $this->order->getProcessedCentrifugeType();
             }
         }
-        if ($step === Order::ORDER_STEP_FINALIZED) {
+        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
             $formData['fedexTracking'] = $this->order->getFedexTracking();
         }
         return $formData;
