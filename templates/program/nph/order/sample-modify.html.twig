@@ -77,7 +77,7 @@
                     </p>
                 </td>
             </tr>
-            {% if nphSample.modifyType == 'cancel' and nphSample.sampleCode in activeSamples %}
+            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
             <tr class="row-message"><td></td><td colspan="3"><span class="text-warning">An active order already exists for this timepoint/sample. To restore this sample, cancel the active order.</span></td></tr>
             {% endif %}
         {% endfor %}
