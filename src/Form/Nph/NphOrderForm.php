@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphOrderForm extends AbstractType
 {
-    const FORM_FINALIZE_TYPE = 'finalize';
+    public const FORM_FINALIZE_TYPE = 'finalize';
 
     public static $urineColors = [
         'Color 1' => 1,
