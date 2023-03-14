@@ -101,9 +101,15 @@
                         {{ form_label(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_errors(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
+                        {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') %}
+                            <span class="text-warning">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                Changing the collection time for this stool sample will update the collection time for all other associated stool samples within the order.
+                            </span>
+                        {% endif %}
                     </div>
                     <hr>
-                    {% if order.orderType == 'urine' %}
+                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_URINE') %}
                         <label>
                             Color and Clarity
                             <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
@@ -122,7 +128,7 @@
                         </div>
                         <hr>
                     {% endif %}
-                    {% if order.orderType == 'stool' %}
+                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') %}
                         <label>
                             Bristol Stool Chart Questions
                             <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
@@ -137,6 +143,10 @@
                             {{ form_label(sampleFinalizeForm['bowelQuality']) }}
                             {{ form_widget(sampleFinalizeForm['bowelQuality']) }}
                         </div>
+                        <span class="text-warning">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Changing the questions for this stool sample will update the questions for all other associated stool samples within the order.
+                        </span>
                         <hr>
                     {% endif %}
                     <label>Aliquot</label>
