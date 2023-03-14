@@ -135,10 +135,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]);
                 }
                 if (isset($aliquot['maxVolume'])) {
-                    $errorMessage = 'Please verify the volume is correct.';
-                    if ($orderType === NphOrder::TYPE_BLOOD) {
-                        $errorMessage .= ' If greater than expected volume, you may add an additional aliquot.';
-                    }
+                    $errorMessage = "Please verify the volume is correct. This aliquot should contain {$aliquot['maxVolume']} {$aliquot['units']} Only.";
                     $volumeConstraints[] = new Constraints\LessThanOrEqual([
                         'value' => $aliquot['maxVolume'],
                         'message' => $errorMessage
