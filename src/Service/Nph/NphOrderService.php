@@ -562,53 +562,16 @@ class NphOrderService
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();
         $aliquots = $this->getAliquots($sampleCode);
-        if (!empty($aliquots)) {
-            foreach ($aliquots as $aliquotCode => $aliquot) {
-                if (isset($formData[$aliquotCode])) {
-                    foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                        if ($aliquotId) {
-                            $nphAliquot = $this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' =>
-                                $aliquotId]);
-                            if (!$nphAliquot) {
-                                $nphAliquot = new NphAliquot();
-                                $nphAliquot->setNphSample($sample);
-                                $nphAliquot->setAliquotId($aliquotId);
-                                $nphAliquot->setAliquotCode($aliquotCode);
-                                $nphAliquot->setUnits($aliquot['units']);
-                            }
-                            if (empty($formData["cancel_{$aliquotCode}_{$aliquotId}"]) && empty($formData["restore_{$aliquotCode}_{$aliquotId}"])) {
-                                $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
-                                if (!empty($formData["{$aliquotCode}Volume"][$key])) {
-                                    $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
-                                }
-                            }
-                            $this->em->persist($nphAliquot);
-                            $this->em->flush();
-                            $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
-                        }
-                    }
-                }
-            }
+        if ($aliquots) {
+            $this->saveNphAliquotFinalizedInfo($sample, $aliquots, $formData);
         }
-        $sample->setCollectedTs($formData["{$sampleCode}CollectedTs"]);
-        if (empty($sample->getCollectedUser())) {
-            $sample->setCollectedUser($this->user);
+        $sampleMetadata = '';
+        if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE) {
+            $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']);
         }
-        if (empty($sample->getCollectedSite())) {
-            $sample->setCollectedSite($this->site);
-        }
-        $sample->setFinalizedNotes($formData["{$sampleCode}Notes"]);
-        $sample->setFinalizedUser($this->user);
-        $sample->setFinalizedSite($this->site);
-        $sample->setFinalizedTs(new DateTime());
-        if ($sample->getNphOrder()->getOrderType() === 'urine') {
-            $sample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor',
-                'urineClarity']));
-        }
-        $this->em->persist($sample);
-        $this->em->flush();
+        $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata);
         $order = $sample->getNphOrder();
-        if ($sample->getNphOrder()->getOrderType() === 'stool') {
+        if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL) {
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
             $this->em->persist($order);
             $this->em->flush();
@@ -628,6 +591,56 @@ class NphOrderService
             }
         }
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
+    }
+
+    private function saveNphSampleFinalizedInfo(NphSample $sample, DateTime $collectedTs, string $notes, string $sampleMetadata): void
+    {
+        $sample->setCollectedTs($collectedTs);
+        if (empty($sample->getCollectedUser())) {
+            $sample->setCollectedUser($this->user);
+        }
+        if (empty($sample->getCollectedSite())) {
+            $sample->setCollectedSite($this->site);
+        }
+        $sample->setFinalizedNotes($notes);
+        $sample->setFinalizedUser($this->user);
+        $sample->setFinalizedSite($this->site);
+        $sample->setFinalizedTs(new DateTime());
+        if ($sampleMetadata) {
+            $sample->setSampleMetadata($sampleMetadata);
+        }
+        $this->em->persist($sample);
+        $this->em->flush();
+    }
+
+    private function saveNphAliquotFinalizedInfo(NphSample $sample, array $aliquots, array $formData): void
+    {
+        foreach ($aliquots as $aliquotCode => $aliquot) {
+            if (isset($formData[$aliquotCode])) {
+                foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                    if ($aliquotId) {
+                        $nphAliquot = $this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' =>
+                            $aliquotId]);
+                        if (!$nphAliquot) {
+                            $nphAliquot = new NphAliquot();
+                            $nphAliquot->setNphSample($sample);
+                            $nphAliquot->setAliquotId($aliquotId);
+                            $nphAliquot->setAliquotCode($aliquotCode);
+                            $nphAliquot->setUnits($aliquot['units']);
+                        }
+                        if (empty($formData["cancel_{$aliquotCode}_{$aliquotId}"]) && empty($formData["restore_{$aliquotCode}_{$aliquotId}"])) {
+                            $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                            if (!empty($formData["{$aliquotCode}Volume"][$key])) {
+                                $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
+                            }
+                        }
+                        $this->em->persist($nphAliquot);
+                        $this->em->flush();
+                        $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());
+                    }
+                }
+            }
+        }
     }
 
     public function getExistingSampleData(NphSample $sample): array
