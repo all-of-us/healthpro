@@ -60,12 +60,14 @@ class NphSampleRepository extends ServiceEntityRepository
             ->andWhere('o.visitType = :visitType')
             ->andWhere('o.site = :site')
             ->andWhere('s.modifyType IN (:types) or s.modifyType is null')
-            ->setParameter('participantId', $order->getParticipantId())
-            ->setParameter('module', $order->getModule())
-            ->setParameter('timepoint', $order->getTimepoint())
-            ->setParameter('visitType', $order->getVisitType())
-            ->setParameter('site', $site)
-            ->setParameter('types', [NphSample::RESTORE, NphSample::UNLOCK, NphSample::EDITED, NphSample::REVERT])
+            ->setParameters([
+                'participantId' => $order->getParticipantId(),
+                'module' => $order->getModule(),
+                'timepoint' => $order->getTimepoint(),
+                'visitType' => $order->getVisitType(),
+                'site' => $site,
+                'types' => [NphSample::RESTORE, NphSample::UNLOCK, NphSample::EDITED, NphSample::REVERT]
+            ])
             ->getQuery()
             ->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR_COLUMN)
         ;

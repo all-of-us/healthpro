@@ -36,7 +36,7 @@
         </thead>
         <tbody class="modify-samples">
         {% for index, nphSample in order.nphSamples %}
-            {% if nphSample.modifyType == 'cancel' and nphSample.sampleCode in activeSamples %}
+            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
                 {% set sampleClass = 'no-restore' %}
             {% else %}
                 {% set sampleClass = '' %}
@@ -47,7 +47,7 @@
                 </td>
                 <td>
                     <p>({{ index + 1 }}) {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
-                    {% if nphSample.modifyType == 'cancel'%}
+                    {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL')%}
                         <span class="text-danger">Cancelled</span>
                     {% else %}
                         <span class="text-success">Active</span>
