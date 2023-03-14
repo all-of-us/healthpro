@@ -23,7 +23,8 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false
+          "addNew": false,
+          "required": true
         },
         "SST8P5A2": {
           "identifier": "SSTS1-U",
@@ -62,7 +63,8 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false
+          "addNew": false,
+          "required": true
         },
         "LIHP1A2": {
           "identifier": "LiHP1-U",
@@ -101,7 +103,8 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false
+          "addNew": false,
+          "required": true
         },
         "EDTA10A2": {
           "identifier": "EDTAP1-U",
@@ -140,7 +143,8 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": true
+          "addNew": true,
+          "required": true
         }
       }
     },
@@ -165,7 +169,8 @@
           "maxVolume": 1000,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 1,
-          "addNew": false
+          "addNew": false,
+          "required": true
         },
         "URINESA2": {
           "identifier": "RU2-L",

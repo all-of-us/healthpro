@@ -64,6 +64,13 @@ class NphSampleFinalizeType extends NphOrderForm
                                 if ($condition && empty($value)) {
                                     $context->buildViolation('Barcode is required')->addViolation();
                                 }
+                            }),
+                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
+                                $formData = $context->getRoot()->getData();
+                                $key = (int)$context->getObject()->getName();
+                                if (($aliquot['required'] ?? false) && empty($value)) {
+                                    $context->buildViolation('At least one 500 μL aliquot is required, all others are optional')->addViolation();
+                                }
                             })
                         ],
                         'attr' => [
