@@ -135,13 +135,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]);
                 }
                 if (isset($aliquot['maxVolume'])) {
-                    $errorMessage = 'Please verify the volume is correct.';
-                    if ($aliquot['maxVolume'] === 500) {
-                        $errorMessage .= 'This aliquot should contain 500 μL Only.';
-                    }
-                    if ($aliquot['maxVolume'] === 1000) {
-                        $errorMessage .= 'This aliquot should contain 1000 μL Only.';
-                    }
+                    $errorMessage = "Please verify the volume is correct. This aliquot should contain {$aliquot['maxVolume']} {$aliquot['units']} Only.";
                     $volumeConstraints[] = new Constraints\LessThanOrEqual([
                         'value' => $aliquot['maxVolume'],
                         'message' => $errorMessage
