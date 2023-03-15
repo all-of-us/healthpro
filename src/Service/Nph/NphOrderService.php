@@ -377,11 +377,11 @@ class NphOrderService
         }
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
-            if ($nphSample->getCollectedTs()) {
-                $orderCollectionData[$sampleCode] = true;
-            }
             if ($orderType !== NphOrder::TYPE_STOOL) {
                 $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
+            }
+            if ($nphSample->getCollectedTs()) {
+                $orderCollectionData[$sampleCode] = true;
             }
             $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
             if ($order->getOrderType() === 'urine') {
@@ -622,7 +622,7 @@ class NphOrderService
         return false;
     }
 
-    private function saveSampleFinalizationData(array $formData, NphSample $sample): void
+    public function saveSampleFinalizationData(array $formData, NphSample $sample): void
     {
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();

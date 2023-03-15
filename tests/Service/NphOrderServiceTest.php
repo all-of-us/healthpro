@@ -237,19 +237,20 @@ class NphOrderServiceTest extends ServiceTestCase
     ): void {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
-        if ($orderType === 'stool') {
+        if ($orderType === NphOrder::TYPE_STOOL) {
             $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
             $nphSample = $this->service->createSample($sampleCode, $nphOrder, '1000000005', 'T0000000001');
         } else {
             $nphOrder = $this->service->createOrder($timePoint, $orderType);
             $nphSample = $this->service->createSample($sampleCode, $nphOrder, '1000000005');
         }
+        $collectedField = $orderType === NphOrder::TYPE_STOOL ? $orderType . 'CollectedTs' : $sampleCode . 'CollectedTs';
         $collectionFormData = [
+            $collectedField => $collectedTs,
             $sampleCode => true,
-            "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => $notes,
         ];
-        if ($orderType === 'urine' || $orderType === 'stool') {
+        if ($orderType === NphOrder::TYPE_URINE || $orderType === NphOrder::TYPE_STOOL) {
             foreach ($metaData as $type => $data) {
                 $collectionFormData[$type] = $data;
             }
@@ -473,12 +474,13 @@ class NphOrderServiceTest extends ServiceTestCase
             $nphOrder = $this->service->createOrder($timePoint, $orderType);
             $this->service->createSample($sampleCode, $nphOrder, '1000000007');
         }
+        $collectedField = $orderType === NphOrder::TYPE_STOOL ? $orderType . 'CollectedTs' : $sampleCode . 'CollectedTs';
         $collectionFormData = [
             $sampleCode => true,
-            "{$sampleCode}CollectedTs" => $collectedTs,
+            $collectedField => $collectedTs,
             "{$sampleCode}Notes" => $notes,
         ];
-        if ($orderType === 'urine' || $orderType === 'stool') {
+        if ($orderType === NphOrder::TYPE_URINE || $orderType === NphOrder::TYPE_STOOL) {
             foreach ($metaData as $type => $data) {
                 $collectionFormData[$type] = $data;
             }
