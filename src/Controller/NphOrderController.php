@@ -152,8 +152,10 @@ class NphOrderController extends BaseController
                 $oderCollectForm->addError(new FormError('Please correct the errors below'));
             }
         }
+        $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
         return $this->render('program/nph/order/collect.html.twig', [
             'order' => $order,
+            'activeSamples' => $activeSamples,
             'orderCollectForm' => $oderCollectForm->createView(),
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
@@ -371,9 +373,10 @@ class NphOrderController extends BaseController
         if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
         }
+        $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
-            'type' => $type, 'samples' => $order->getNphSamples()
+            'type' => $type, 'samples' => $order->getNphSamples(), 'activeSamples' => $activeSamples
         ]);
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {
@@ -402,6 +405,7 @@ class NphOrderController extends BaseController
             }
         }
         return $this->render('program/nph/order/sample-modify.html.twig', [
+            'activeSamples' => $activeSamples,
             'participant' => $participant,
             'order' => $order,
             'sampleModifyForm' => $nphSampleModifyForm->createView(),

@@ -36,19 +36,26 @@
         </thead>
         <tbody class="modify-samples">
         {% for index, nphSample in order.nphSamples %}
-            <tr class="row-samples">
+            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
+                {% set sampleClass = 'no-restore' %}
+            {% else %}
+                {% set sampleClass = '' %}
+            {% endif %}
+            <tr class="row-samples {{ sampleClass }}">
                 <td>
                     {{ form_widget(sampleModifyForm[nphSample.sampleCode]) }}
                 </td>
                 <td>
-                    ({{ index + 1 }}) {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
-                    {% if nphSample.modifyType == 'cancel' %}
+                    <p>({{ index + 1 }}) {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
+                    {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL')%}
                         <span class="text-danger">Cancelled</span>
                     {% else %}
                         <span class="text-success">Active</span>
                     {% endif %}
+                    </p>
                 </td>
                 <td>
+                    <p>
                     {% if nphSample.collectedTs is not empty %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {{ nphSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
@@ -56,8 +63,10 @@
                     {% else %}
                         <i class="fa fa-times text-danger"></i>
                     {% endif %}
+                    </p>
                 </td>
                 <td>
+                    <p>
                     {% if nphSample.finalizedTs is not empty %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
                         {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
@@ -65,8 +74,12 @@
                     {% else %}
                         <i class="fa fa-times text-danger"></i>
                     {% endif %}
+                    </p>
                 </td>
             </tr>
+            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
+            <tr class="row-message"><td></td><td colspan="3"><span class="text-warning">An active order already exists for this timepoint/sample. To restore this sample, cancel the active order.</span></td></tr>
+            {% endif %}
         {% endfor %}
         <tr>
             <td colspan="3" {% if not sampleModifyForm['samplesCheckAll'].vars.valid %}
