@@ -246,7 +246,7 @@ class NphOrderTest extends NphTestCase
      * @dataProvider collectedTimeProvider
      */
 
-    public function testGetCollectedTs(array $samples, \DateTime $expectedCollectedTs): void
+    public function testGetCollectedTs(array $samples, ?\DateTime $expectedCollectedTs): void
     {
         $orderData = $this->getOrderData();
         $nphOrder = $this->createNphOrder($orderData);
