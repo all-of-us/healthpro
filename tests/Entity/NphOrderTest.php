@@ -246,7 +246,7 @@ class NphOrderTest extends NphTestCase
      * @dataProvider collectedTimeProvider
      */
 
-    public function testGetCollectedTs($samples, $expectedCollectedTs): void
+    public function testGetCollectedTs(array $samples, \DateTime $expectedCollectedTs): void
     {
         $orderData = $this->getOrderData();
         $nphOrder = $this->createNphOrder($orderData);
@@ -311,7 +311,7 @@ class NphOrderTest extends NphTestCase
      * @dataProvider stoolTypeProvider
      */
 
-    public function testIsStoolCollectedTsDisabled($orderType, $samples, $expectedResult): void
+    public function testIsStoolCollectedTsDisabled(string $orderType, array $samples, bool $expectedResult): void
     {
         $orderData = $this->getOrderData();
         $orderData['orderType'] = $orderType;

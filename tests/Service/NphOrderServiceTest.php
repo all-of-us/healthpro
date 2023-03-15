@@ -10,6 +10,7 @@ use App\Service\SiteService;
 use App\Service\UserService;
 use App\Tests\testSetup;
 use Doctrine\ORM\EntityManagerInterface;
+use GPBMetadata\Google\Type\Datetime;
 use GuzzleHttp\Psr7\Response;
 
 class NphOrderServiceTest extends ServiceTestCase
@@ -243,12 +244,12 @@ class NphOrderServiceTest extends ServiceTestCase
      * @dataProvider orderCollectionDataProvider
      */
     public function testSaveOrderCollection(
-        $timePoint,
-        $orderType,
-        $sampleCode,
-        $collectedTs,
-        $notes,
-        $metaData = []
+        string $timePoint,
+        string $orderType,
+        string $sampleCode,
+        \DateTime $collectedTs,
+        string $notes,
+        array $metaData = []
     ): void {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
@@ -342,17 +343,17 @@ class NphOrderServiceTest extends ServiceTestCase
     /**
      * @dataProvider orderFinalizationDataProvider
      */
-    public function testSaveSampleFinalizationData(
-        $timePoint,
-        $orderType,
-        $sampleCode,
-        $sampleIdentifier,
-        $collectedTs,
-        $aliquots,
-        $aliquotId,
-        $duplicate,
-        $hasDuplicatesInform,
-        $expectedRdrTimePoint
+    public function testSaveFinalization(
+        string $timePoint,
+        string $orderType,
+        string $sampleCode,
+        string $sampleIdentifier,
+        \DateTime $collectedTs,
+        array $aliquots,
+        string $aliquotId,
+        bool $duplicate,
+        bool $hasDuplicatesInform,
+        string $expectedRdrTimePoint
     ): void
     {
         // Module 1
@@ -365,21 +366,25 @@ class NphOrderServiceTest extends ServiceTestCase
             "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => 'Test',
         ];
-        foreach ($aliquots as $aliquotCode => $aliquot) {
-            $finalizedFormData[$aliquotCode][] = $aliquot[0];
-            $finalizedFormData["{$aliquotCode}AliquotTs"][] = $aliquot[1];
-            $finalizedFormData["{$aliquotCode}Volume"][] = floatval($aliquot[2]);
+        if ($aliquots) {
+            foreach ($aliquots as $aliquotCode => $aliquot) {
+                $finalizedFormData[$aliquotCode][] = $aliquot[0];
+                $finalizedFormData["{$aliquotCode}AliquotTs"][] = $aliquot[1];
+                $finalizedFormData["{$aliquotCode}Volume"][] = floatval($aliquot[2]);
+            }
+            $this->assertSame($hasDuplicatesInform, $this->service->hasDuplicateAliquotsInForm($finalizedFormData, $sampleCode));
         }
-        $this->assertSame($hasDuplicatesInform, $this->service->hasDuplicateAliquotsInForm($finalizedFormData, $sampleCode));
         $this->service->saveFinalization($finalizedFormData, $nphSample);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
 
-        $finalizedFormData = [];
-        foreach ($aliquots as $aliquotCode => $aliquot) {
-            $finalizedFormData[$aliquotCode][] = $aliquotId;
+        if ($aliquots) {
+            $finalizedFormData = [];
+            foreach ($aliquots as $aliquotCode => $aliquot) {
+                $finalizedFormData[$aliquotCode][] = $aliquotId;
+            }
+            $this->assertSame($duplicate, (bool)$this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
         }
-        $this->assertSame($duplicate, (bool) $this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
 
         // Test RDR Object
         $rdrObject = $this->service->getRdrObject($nphOrder, $nphSample);
@@ -414,6 +419,7 @@ class NphOrderServiceTest extends ServiceTestCase
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
             ], '10005', true, false, '30 min'],
+            ['preLMT', 'stool', 'ST1', 'ST1-K', $collectedTs, [], '10006', true, false, 'Pre LMT'],
         ];
     }
 

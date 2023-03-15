@@ -584,7 +584,7 @@ class NphOrderService
 
             // Save finalized information for each sample
             foreach ($nphSamples as $nphSample) {
-                if (!$nphSample->getCollectedTs()) {
+                if ($nphSample !== $sample && !$nphSample->getCollectedTs()) {
                     continue;
                 }
                 $nphSampleCode = $nphSample->getSampleCode();
