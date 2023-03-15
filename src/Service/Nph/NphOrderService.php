@@ -600,7 +600,8 @@ class NphOrderService
             // Send all finalized samples to RDR if modified
             if ($isModified) {
                 foreach ($nphSamples as $nphSample) {
-                    if ($nphSample->getRdrId() && !$this->sendToRdr($nphSample, NphSample::UNLOCK)) {
+                    if ($nphSample->getRdrId() && $nphSample->getModifyType() !== NphSample::CANCEL &&
+                        !$this->sendToRdr($nphSample, NphSample::UNLOCK)) {
                         throw new \Exception('Failed sending to RDR');
                     }
                 }
