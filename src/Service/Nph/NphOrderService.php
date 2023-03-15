@@ -622,7 +622,7 @@ class NphOrderService
         return false;
     }
 
-    public function saveSampleFinalizationData(array $formData, NphSample $sample): void
+    private function saveSampleFinalizationData(array $formData, NphSample $sample): void
     {
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();
@@ -841,7 +841,7 @@ class NphOrderService
         return $this->hasDuplicateIds($totalAliquotCodes);
     }
 
-    public function sendToRdr(NphSample $sample, $modifyType = null): bool
+    private function sendToRdr(NphSample $sample, $modifyType = null): bool
     {
         $order = $sample->getNphOrder();
         $modifyType = $modifyType ?? $sample->getModifyType();
@@ -870,7 +870,7 @@ class NphOrderService
         return false;
     }
 
-    public function createRdrSample(string $participantId, \stdClass $sampleObject): ?string
+    private function createRdrSample(string $participantId, \stdClass $sampleObject): ?string
     {
         try {
             $response = $this->rdrApiService->post(
@@ -888,7 +888,7 @@ class NphOrderService
         return null;
     }
 
-    public function editRdrSample(string $participantId, string $orderId, \stdClass $sampleObject): bool
+    private function editRdrSample(string $participantId, string $orderId, \stdClass $sampleObject): bool
     {
         try {
             $response = $this->rdrApiService->put(

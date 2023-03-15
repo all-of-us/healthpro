@@ -10,6 +10,7 @@ use App\Service\SiteService;
 use App\Service\UserService;
 use App\Tests\testSetup;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Psr7\Response;
 
 class NphOrderServiceTest extends ServiceTestCase
 {
@@ -25,17 +26,31 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
         $siteService = static::$container->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
+        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $data = $this->getMockRdrResponseData();
+        $mockRdrApiService->method('post')->willReturn($this->getGuzzleResponse($data));
+        $mockRdrApiService->method('put')->willReturn($this->getGuzzleResponse($data));
         $this->service =  new NphOrderService(
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
             $this->createMock(LoggerService::class),
-            $this->createMock(RdrApiService::class)
+            $mockRdrApiService
         );
         $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
+    }
+
+    private function getGuzzleResponse($data): Response
+    {
+        return new Response(200, ['Content-Type' => 'application/json'], $data);
+    }
+
+    private function getMockRdrResponseData(): string
+    {
+        return '{"id": "12345"}';
     }
 
     public function testLoadModules(): void
@@ -356,7 +371,7 @@ class NphOrderServiceTest extends ServiceTestCase
             $finalizedFormData["{$aliquotCode}Volume"][] = floatval($aliquot[2]);
         }
         $this->assertSame($hasDuplicatesInform, $this->service->hasDuplicateAliquotsInForm($finalizedFormData, $sampleCode));
-        $this->service->saveSampleFinalizationData($finalizedFormData, $nphSample);
+        $this->service->saveFinalization($finalizedFormData, $nphSample);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
 
@@ -575,7 +590,7 @@ class NphOrderServiceTest extends ServiceTestCase
             "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => 'Test',
         ];
-        $this->service->saveSampleFinalizationData($finalizedFormData, $nphSample);
+        $this->service->saveFinalization($finalizedFormData, $nphSample);
 
         $modificationFormData = [
             'reason' => $modifyReason
