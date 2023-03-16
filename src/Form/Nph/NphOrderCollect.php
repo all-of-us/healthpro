@@ -43,7 +43,8 @@ class NphOrderCollect extends NphOrderForm
 
         if ($orderType === NphOrder::TYPE_STOOL) {
             $constraints = $this->getDateTimeConstraints();
-            array_push($constraints,
+            array_push(
+                $constraints,
                 new Constraints\NotBlank([
                     'message' => 'Collection time is required'
                 ]),
