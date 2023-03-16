@@ -47,7 +47,7 @@ class NphOrderCollect extends NphOrderForm
                 new Constraints\NotBlank([
                     'message' => 'Collection time is required'
                 ]),
-                $this->getGreaterThanTimeConstraint($options['orderCreatedTs'], 'Time must be after order generation')
+                $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs'])
             );
             $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
                 'required' => true,
