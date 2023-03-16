@@ -7,7 +7,9 @@ $(document).ready(function () {
         });
     }
 
-    $(".order-ts").pmiDateTimePicker();
+    $(".order-ts").pmiDateTimePicker({
+        maxDate: new Date().setHours(23, 59, 59, 999)
+    });
 
     $(".toggle-help-image").on("click", function (e) {
         displayHelpModal(e);
