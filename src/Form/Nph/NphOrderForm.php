@@ -62,6 +62,7 @@ class NphOrderForm extends AbstractType
                     'message' => 'Collection time is required'
                 ]);
             }
+            $constraints[] = $this->getGreaterThanTimeConstraint($options['orderCreatedTs'], 'Time must be after order generation');
             $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
                 'required' => $formType === self::FORM_FINALIZE_TYPE,
                 'label' => 'Collection Time',
@@ -137,5 +138,13 @@ class NphOrderForm extends AbstractType
                 'message' => 'Date cannot be in the future'
             ])
         ];
+    }
+
+    protected function getGreaterThanTimeConstraint(\DateTime $dateTime, string $message): Constraints\GreaterThan
+    {
+        return new Constraints\GreaterThan([
+            'value' => $dateTime,
+            'message' => $message
+        ]);
     }
 }

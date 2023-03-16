@@ -43,9 +43,12 @@ class NphOrderCollect extends NphOrderForm
 
         if ($orderType === NphOrder::TYPE_STOOL) {
             $constraints = $this->getDateTimeConstraints();
-            $constraints[] = new Constraints\NotBlank([
-                'message' => 'Collection time is required'
-            ]);
+            array_push($constraints,
+                new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]),
+                $this->getGreaterThanTimeConstraint($options['orderCreatedTs'], 'Time must be after order generation')
+            );
             $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
                 'required' => true,
                 'constraints' => $constraints,
@@ -78,7 +81,8 @@ class NphOrderCollect extends NphOrderForm
             'orderType' => null,
             'timeZone' => null,
             'disableMetadataFields' => null,
-            'disableStoolCollectedTs' => null
+            'disableStoolCollectedTs' => null,
+            'orderCreatedTs' => null
         ]);
     }
 }
