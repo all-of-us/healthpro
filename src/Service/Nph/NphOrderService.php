@@ -714,9 +714,10 @@ class NphOrderService
     {
         $sampleData = [];
         $sampleCode = $sample->getSampleCode();
+        $order = $sample->getNphOrder();
         $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
         $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
-        if ($sample->getNphOrder()->getOrderType() === 'urine') {
+        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
             if ($sample->getSampleMetaData()) {
                 $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
                 if (!empty($sampleMetadata['urineColor'])) {
@@ -727,8 +728,8 @@ class NphOrderService
                 }
             }
         }
-        if ($sample->getNphOrder()->getOrderType() === 'stool') {
-            $order = $sample->getNphOrder();
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
+            $sampleData[$sampleCode . 'CollectedTs'] = $order->getCollectedTs();
             if ($order->getMetadata()) {
                 $orderMetadata = json_decode($order->getMetadata(), true);
                 if (!empty($orderMetadata['bowelType'])) {
