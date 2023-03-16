@@ -58,6 +58,8 @@
                             {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
                             {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
                                 <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
+                            {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
+                                <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
                             {% elseif nphSample.finalizedTs is not empty %}
                                 <p class="text-success"><i class="fa fa-check-circle"></i> Aliquoted and Finalized
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
