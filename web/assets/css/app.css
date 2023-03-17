@@ -850,6 +850,10 @@ table.table-samples td {
     border-radius: 5px;
 }
 
+.stool-sub-samples {
+    padding-top: 10px;
+}
+
 .stool-samples-box-1 {
     background-color: #bcdeff;
 }
