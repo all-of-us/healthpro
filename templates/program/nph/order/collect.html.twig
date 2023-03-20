@@ -58,11 +58,9 @@
                             {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
                             {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
                                 <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
-                            {% elseif nphSample.modifyType == constant('EDITED', nphSample) and nphSample.finalizedTs is not empty %}
-                                <p class="text-success"><i class="fa fa-check-circle"></i> Edited and Finalized
-                                    {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% elseif nphSample.finalizedTs is not empty %}
-                                <p class="text-success"><i class="fa fa-check-circle"></i> Aliquoted and Finalized
+                                <p class="text-success"><i class="fa fa-check-circle"></i>
+                                    {{ nphSample.modifyType == constant('EDITED', nphSample) ? 'Edited and Finalized' : 'Aliquoted and Finalized' }}
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% endif %}
                         </td>
