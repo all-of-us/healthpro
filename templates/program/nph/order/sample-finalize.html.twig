@@ -155,12 +155,11 @@
                             <thead>
                             <tr>
                                 <td class="col-md-4 required aliquot-tube-td" id="aliquot-tube">Matrix Aliquot Tube/Aliquot Container</td>
-                                <td class="col-md-3 required">Aliquot Time</td>
+                                <td class="col-md-4 required">Aliquot Time</td>
                                 <td class="col-md-2 required">Volume</td>
                                 <td class="col-md-1"></td>
-                                {% if sample.modifyType == 'unlock' %}
-                                    <td class="col-md-1">Remove</td>
-                                    <td class="col-md-1">Restore</td>
+                                {% if sample.modifyType == constant('UNLOCK', sample) %}
+                                    <td class="col-md-1">Remove&nbsp;&nbsp;Restore</td>
                                 {% endif %}
                             </tr>
                             </thead>
@@ -224,8 +223,14 @@
                                                     {% endif %}
                                                 </td>
                                                 {% if sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
-                                                    <td>{{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}</td>
-                                                    <td>{{ form_widget(sampleFinalizeForm['restore_' ~ aliquotCode ~ '_' ~ aliquotId]) }}</td>
+                                                    <td class="row">
+                                                        <div class="col-md-6">
+                                                            {{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            {{ form_widget(sampleFinalizeForm['restore_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
+                                                        </div>
+                                                    </td>
                                                 {% endif %}
                                             </tr>
                                         {% endif %}
