@@ -72,7 +72,8 @@
                             {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
                                 <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
                             {% elseif nphSample.finalizedTs is not empty %}
-                                <p class="text-success"><i class="fa fa-check-circle"></i> Aliquoted and Finalized
+                                <p class="text-success"><i class="fa fa-check-circle"></i>
+                                    {{ nphSample.modifyType == constant('EDITED', nphSample) ? 'Edited and Finalized' : 'Aliquoted and Finalized' }}
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% endif %}
                         </td>
