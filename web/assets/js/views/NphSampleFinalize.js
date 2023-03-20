@@ -39,7 +39,9 @@ $(document).ready(function () {
             .last()
             .after(newElem);
 
-        $(".order-ts").pmiDateTimePicker();
+        $(".order-ts").pmiDateTimePicker({
+            maxDate: new Date().setHours(23, 59, 59, 999)
+        });
     });
 
     $(document).on("click", ".delete-aliquot-widget", function () {

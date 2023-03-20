@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints;
 class NphOrderForm extends AbstractType
 {
     public const FORM_FINALIZE_TYPE = 'finalize';
+    public const FORM_COLLECT_TYPE = 'collect';
 
     public static $urineColors = [
         'Color 1' => 1,
@@ -51,7 +52,7 @@ class NphOrderForm extends AbstractType
     ): void {
         if ($formType === self::FORM_FINALIZE_TYPE || $options['orderType'] !== NphOrder::TYPE_STOOL) {
             $constraints = $this->getDateTimeConstraints();
-            if ($formType === 'collect') {
+            if ($formType === self::FORM_COLLECT_TYPE) {
                 $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
                     if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
                         $context->buildViolation('Collection time is required')->addViolation();
@@ -62,6 +63,7 @@ class NphOrderForm extends AbstractType
                     'message' => 'Collection time is required'
                 ]);
             }
+            $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
             $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
                 'required' => $formType === self::FORM_FINALIZE_TYPE,
                 'label' => 'Collection Time',
@@ -134,8 +136,16 @@ class NphOrderForm extends AbstractType
             new Constraints\Type('datetime'),
             new Constraints\LessThanOrEqual([
                 'value' => new \DateTime('+5 minutes'), // add buffer for time skew
-                'message' => 'Date cannot be in the future'
+                'message' => 'Time cannot be in the future'
             ])
         ];
+    }
+
+    protected function getCollectedTimeGreaterThanConstraint(\DateTime $dateTime): Constraints\GreaterThan
+    {
+        return new Constraints\GreaterThan([
+            'value' => $dateTime,
+            'message' => 'Time must be after order generation'
+        ]);
     }
 }

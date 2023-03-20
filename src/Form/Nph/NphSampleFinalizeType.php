@@ -95,13 +95,18 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'value' => new \DateTime('+5 minutes'),
                                 'message' => 'Timestamp cannot be in the future'
                             ]),
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
+                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $sample) {
                                 $formData = $context->getRoot()->getData();
                                 $key = intval($context->getObject()->getName());
                                 $condition = $aliquot['expectedVolume'] ? ($formData[$aliquotCode][$key] ||
                                     $formData["{$aliquotCode}Volume"][$key]) : $formData[$aliquotCode][$key];
                                 if ($condition && empty($value)) {
                                     $context->buildViolation('Time is required')->addViolation();
+                                }
+                                if (!empty($formData["{$sample}CollectedTs"]) && !empty($value)) {
+                                    if ($value <= $formData["{$sample}CollectedTs"]) {
+                                        $context->buildViolation('Aliquot time must be after collection time')->addViolation();
+                                    }
                                 }
                             })
                         ],
@@ -208,7 +213,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'disabled' => null,
             'nphSample' => null,
             'disableMetadataFields' => null,
-            'disableStoolCollectedTs' => null
+            'disableStoolCollectedTs' => null,
+            'orderCreatedTs' => null
         ]);
     }
 
