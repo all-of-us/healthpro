@@ -90,3 +90,7 @@ li.participant-activity > a {
     margin-bottom: 10px;
     margin-top: 10px;
 }
+div.alert.alert-danger.well-sm {
+    margin-bottom: 0;
+    margin-top: 20px;
+}
