@@ -346,4 +346,26 @@ class NphOrder
         }
         return 'In Progress';
     }
+
+    public function getCollectedTs(): ?\DateTime
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getCollectedTs()) {
+                return $nphSample->getCollectedTs();
+            }
+        }
+        return null;
+    }
+
+    public function isStoolCollectedTsDisabled(): bool
+    {
+        if ($this->getOrderType() === self::TYPE_STOOL) {
+            foreach ($this->nphSamples as $nphSample) {
+                if ($nphSample->getCollectedTs()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

@@ -13,20 +13,31 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <div class="form-group row">
-                <div class="col-sm-6">
-                    <label>Scan or manually check all successfully collected samples:</label>
-                    <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID">
-                    <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
-                </div>
-            </div>
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(orderCollectForm) }}
+            <div class="row">
+                <div class="col-sm-6">
+                    {% if order.orderType == constant('TYPE_STOOL', order) %}
+                        <div class="form-group {% if not orderCollectForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
+                            {{ form_label(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                            {{ form_widget(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                            {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                        </div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label>Scan or manually check all successfully collected samples:</label>
+                        <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID">
+                        <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
+                    </div>
+                </div>
+            </div>
             <table class="table table-samples">
                 <thead>
                 <tr>
                     <th>Collection Sample</th>
-                    <th>Collection Time</th>
+                    {% if order.orderType != constant('TYPE_STOOL', order) %}
+                        <th>Collection Time</th>
+                    {% endif %}
                     <th>Notes</th>
                     <th>
                         {% if order.canCancel %}
@@ -65,11 +76,13 @@
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% endif %}
                         </td>
-                        <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
-                            class="has-error"{% endif %}>
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
-                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
-                        </td>
+                        {% if orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
+                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+                                class="has-error"{% endif %}>
+                                {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                            </td>
+                        {% endif %}
                         <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
                             class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
@@ -151,7 +164,7 @@
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
                 {% if not order.isDisabled %}
-                    <button type="submit" class="btn btn-primary" id="order_next_btn">Save</button>
+                    <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
                 {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>

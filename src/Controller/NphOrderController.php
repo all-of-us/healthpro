@@ -134,7 +134,8 @@ class NphOrderController extends BaseController
             NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()]
+                $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
+                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled()]
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
@@ -243,7 +244,9 @@ class NphOrderController extends BaseController
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
-                $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' => $order->isMetadataFieldDisabled()
+                $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' =>
+                $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
+                $order->isStoolCollectedTsDisabled()
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
@@ -268,7 +271,7 @@ class NphOrderController extends BaseController
                 }
             }
             if ($sampleFinalizeForm->isValid()) {
-                if ($nphOrderService->saveSampleFinalization($formData, $sample)) {
+                if ($nphOrderService->saveFinalization($formData, $sample)) {
                     $this->addFlash('success', 'Sample finalized');
                     return $this->redirectToRoute('nph_sample_finalize', [
                         'participantId' => $participantId,
