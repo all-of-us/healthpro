@@ -49,7 +49,10 @@
     min-width: 280px
 }
 .timepoint-panel {
-    min-height: 220px;
+    min-height: 195px;
+}
+div.timepoint-samples.panel-body {
+    padding: 5px;
 }
 .participant-activity-div {
     margin-top: 20px;
@@ -93,4 +96,23 @@ li.participant-activity > a {
 div.alert.alert-danger.well-sm {
     margin-bottom: 0;
     margin-top: 20px;
+}
+div.page-header.row.participant-name {
+    height: 3em;
+}
+div.participant-name>h2>span.label.label-warning.nph-module-badge {
+    line-height: 3em;
+    vertical-align: middle;
+}
+button.btn.btn-primary.pull-right.refresh-btn {
+    padding: 2px 10px;
+}
+div.order-row {
+    min-height: 3em;
+}
+.margin-top-15 {
+    margin-top: 15px;
+}
+.font-bold {
+    font-weight: bold;
 }

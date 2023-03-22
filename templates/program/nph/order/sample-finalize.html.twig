@@ -37,6 +37,18 @@
             <div class="well bg-white">
                 <div class="text-center">
                     {% if aliquots %}
+                        <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
+                        {% for aliquot in aliquots %}
+                            <p>
+                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }}
+                                {% if aliquot.expectedVolume %}
+                                    <span style="padding: 1em"></span>
+                                    Volume: {{ aliquot.expectedVolume|default('--') }} {{ aliquot.units }}
+                                {% endif %}
+                            </p>
+                        {% endfor %}
+                    {% endif %}
+                    {% if aliquots %}
                         <p><strong>Aliquot Instructions for {{ samples[sampleCode]}}</strong></p>
                     {% else %}
                         <p><strong>Instructions for Stool Kit</strong></p>
@@ -49,18 +61,6 @@
                         </div>
                         <iframe class="pdf" name="pdf" src="{{ path('aliquot_instructions_file', { id: order.orderType  }) }}#view=FitH"></iframe>
                     </div>
-                    {% if aliquots %}
-                        <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
-                        {% for aliquot in aliquots %}
-                            <p>
-                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }}
-                                {% if aliquot.expectedVolume %}
-                                <span style="padding: 1em"></span>
-                                Volume: {{ aliquot.expectedVolume|default('--') }} {{ aliquot.units }}
-                                {% endif %}
-                            </p>
-                        {% endfor %}
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -219,9 +219,6 @@
                                                 </td>
                                                 <td class="aliquot volume nopadleft" style="position: relative">
                                                     <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
-                                                    {% if not disabled %}
-                                                        <i style="position: absolute; bottom: 10px; left: 33px; font-size: 22px" class="fa fa-eraser text-danger clear-aliquot-widget" role="button"></i>
-                                                    {% endif %}
                                                 </td>
                                                 {% if sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
                                                     <td>{{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}</td>

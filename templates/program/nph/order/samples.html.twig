@@ -6,6 +6,15 @@
             <div class="stool-text-fields">
                 <div class="stool-samples-box bg-light {% if not orderForm.stoolKit.vars.valid %} has-error {% endif %}">
                     {{ form_label(orderForm.stoolKit) }}
+                    {% set break = false %}
+                    {% for stoolSample in stoolSamples%}
+                        {% if samplesOrderIds[timePoint][stoolSample] is defined and not break %}
+                            {% if samplesStatus[timePoint][stoolSample] == 'Created' %}
+                                {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
+                                {% set break = true %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                     {{ form_widget(orderForm.stoolKit) }}
                     {{ form_errors(orderForm.stoolKit) }}
                 </div>
@@ -19,9 +28,6 @@
                         {% for stoolSample in stoolSamples %}
                             {% if stoolSample in tubeType.tubes %}
                                 <div class="stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
-                                    {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                                        {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
-                                    {% endif %}
                                     {{ form_widget(orderForm[stoolSample]) }}
                                     {{ form_errors(orderForm[stoolSample]) }}
                                 </div>
