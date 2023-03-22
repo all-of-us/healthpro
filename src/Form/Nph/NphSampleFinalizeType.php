@@ -66,7 +66,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 }
                             }),
                             new Constraints\Callback(function ($value, $context) use ($aliquot) {
-                                if (($aliquot['required'] ?? false) && empty($value)) {
+                                if (($aliquot['required'] ?? false) && empty($value) && !empty($context->getValue())) {
                                     $context->buildViolation('At least one 500 μL aliquot is required, all others are optional')->addViolation();
                                 }
                             })
