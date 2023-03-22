@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\NphOrderRepository;
-use App\Repository\NphSampleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -361,7 +360,7 @@ class NphOrder
     {
         if ($this->getOrderType() === self::TYPE_STOOL) {
             foreach ($this->nphSamples as $nphSample) {
-                if ($nphSample->getCollectedTs()) {
+                if ($nphSample->getFinalizedTs()) {
                     return true;
                 }
             }
