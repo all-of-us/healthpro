@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Entity\Order;
 use App\HttpClient;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
-use App\Entity\Order;
 
 class MayolinkOrderService
 {
@@ -32,7 +32,7 @@ class MayolinkOrderService
         $this->em = $em;
         $this->twig = $twig;
         $this->logger = $logger;
-        if (!$this->params->has('ml_mock_order')) {
+        if (!$this->params->has('ml_mock_order')) { // @phpstan-ignore-line
             $this->setMayoCredentials();
         }
     }

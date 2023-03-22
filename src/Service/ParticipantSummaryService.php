@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Drc\Exception\FailedRequestException;
+use App\Drc\Exception\InvalidDobException;
+use App\Drc\Exception\InvalidResponseException;
 use App\Entity\Site;
 use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Drc\Exception\FailedRequestException;
-use App\Drc\Exception\InvalidResponseException;
-use App\Drc\Exception\InvalidDobException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ParticipantSummaryService
@@ -191,9 +191,7 @@ class ParticipantSummaryService
         foreach ($responseObject->entry as $participant) {
             if (isset($participant->resource) && is_object($participant->resource)) {
                 $participant->resource->disableTestAccess = $this->disableTestAccess;
-                if ($result = new Participant($participant->resource)) {
-                    $results[] = $result;
-                }
+                $results[] = new Participant($participant->resource);
             }
         }
 

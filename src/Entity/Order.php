@@ -1081,8 +1081,7 @@ class Order
         }
         if ($this->getRequestedSamples() &&
             ($requestedArray = json_decode($this->getRequestedSamples())) &&
-            is_array($requestedArray) &&
-            count($requestedArray) > 0
+            is_array($requestedArray)
         ) {
             return array_intersect($this->samples, $requestedArray);
         } else {
@@ -1173,8 +1172,7 @@ class Order
         }
         if ($this->getRequestedSamples() &&
             ($requestedArray = json_decode($this->getRequestedSamples())) &&
-            is_array($requestedArray) &&
-            count($requestedArray) > 0
+            is_array($requestedArray)
         ) {
             return array_intersect($this->samples, $requestedArray);
         } else {

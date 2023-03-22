@@ -2,12 +2,8 @@
 
 namespace App\Twig;
 
-use App\Entity\Awardee;
-use App\Entity\Organization;
-use App\Entity\Site;
-use App\Service\TimezoneService;
 use App\Drc\CodeBook;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Service\TimezoneService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
@@ -16,15 +12,12 @@ use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
-    private $doctrine;
     private $requestStack;
     private $router;
     private $params;
-    private $cache = [];
 
-    public function __construct(ManagerRegistry $doctrine, RouterInterface $router, RequestStack $requestStack, ParameterBagInterface $params)
+    public function __construct(RouterInterface $router, RequestStack $requestStack, ParameterBagInterface $params)
     {
-        $this->doctrine = $doctrine;
         $this->requestStack = $requestStack;
         $this->router = $router;
         $this->params = $params;
@@ -92,11 +85,9 @@ class AppExtension extends AbstractExtension
                     $message .= ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
                 }
                 return '<div class="alert alert-info">' . $message . '</div>';
-                break;
             case 'tooltip':
                 $tooltipText = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
                 return '<span title="' . $tooltipText . '" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
-                break;
             default:
                 return $message;
         }

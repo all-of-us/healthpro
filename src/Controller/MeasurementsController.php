@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\User;
 use App\Form\MeasurementBloodDonorCheckType;
@@ -10,18 +11,17 @@ use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
 use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
+use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\HelpService;
 
 class MeasurementsController extends BaseController
 {
@@ -184,7 +184,7 @@ class MeasurementsController extends BaseController
 
                             // If finalization failed, new physical measurements are created, but
                             // show errors and auto-modification options on subsequent display
-                            if (!$measurementsForm->isValid()) {
+                            if (!$measurementsForm->isValid()) { // @phpstan-ignore-line
                                 return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
                                     'measurementId' => $measurementId,
@@ -209,7 +209,7 @@ class MeasurementsController extends BaseController
 
                         // If finalization failed, values are still saved, but do not redirect
                         // so that errors can be displayed
-                        if ($measurementsForm->isValid()) {
+                        if ($measurementsForm->isValid()) { // @phpstan-ignore-line
                             return $this->redirectToRoute('measurement', [
                                 'participantId' => $participant->id,
                                 'measurementId' => $measurementId
