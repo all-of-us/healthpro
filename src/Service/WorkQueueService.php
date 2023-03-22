@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Drc\CodeBook;
 use App\Entity\Site;
 use App\Helper\Participant;
+use App\Helper\WorkQueue;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use App\Helper\WorkQueue;
-use App\Drc\CodeBook;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -43,7 +43,7 @@ class WorkQueueService
         $this->loggerService = $loggerService;
         $this->authorizationChecker = $authorizationChecker;
         $this->urlGenerator = $urlGenerator;
-        $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
+        $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'); // @phpstan-ignore-line
     }
 
     public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null, $sites = null)

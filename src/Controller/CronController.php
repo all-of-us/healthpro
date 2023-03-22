@@ -58,7 +58,7 @@ class CronController extends BaseController
      */
     public function sitesAction(ParameterBagInterface $params, SiteSyncService $siteSyncService): Response
     {
-        if (!$params->has('sites_use_rdr')) {
+        if (!$params->has('sites_use_rdr')) { // @phpstan-ignore-line
             return $this->json(['error' => 'RDR Awardee API disabled']);
         }
         $siteSyncService->sync();
@@ -70,7 +70,7 @@ class CronController extends BaseController
      */
     public function awardeesAndOrganizationsAction(ParameterBagInterface $params, SiteSyncService $siteSyncService): Response
     {
-        if (!$params->has('sites_use_rdr')) {
+        if (!$params->has('sites_use_rdr')) { // @phpstan-ignore-line
             return $this->json(['error' => 'RDR Awardee API disabled']);
         }
         $siteSyncService->syncAwardees();
@@ -182,7 +182,7 @@ class CronController extends BaseController
      */
     public function backfillOrderProcessedTimeAction(ParameterBagInterface $params)
     {
-        $limit = $params->has('backfill_order_limit') ? $params->get('backfill_order_limit') : 500;
+        $limit = $params->has('backfill_order_limit') ? $params->get('backfill_order_limit') : 500; // @phpstan-ignore-line
         $orders = $this->em->getRepository(Order::class)->getBackfillOrders($limit);
         $batchSize = 50;
         foreach ($orders as $key => $order) {

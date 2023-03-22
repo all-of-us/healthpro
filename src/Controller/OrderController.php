@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Order;
 use App\Entity\Site;
 use App\Form\OrderCreateType;
@@ -14,7 +15,6 @@ use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -234,7 +234,7 @@ class OrderController extends BaseController
             // 404 because print is not a valid route for kit orders regardless of state
             throw $this->createAccessDeniedException();
         }
-        if ($params->has('ml_mock_order')) {
+        if ($params->has('ml_mock_order')) { // @phpstan-ignore-line
             return $this->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
             $result = $this->orderService->getLabelsPdf();
@@ -593,7 +593,7 @@ class OrderController extends BaseController
         if (!in_array('print_requisition', $order->getAvailableSteps())) {
             throw $this->createNotFoundException();
         }
-        if ($params->has('ml_mock_order')) {
+        if ($params->has('ml_mock_order')) { // @phpstan-ignore-line
             return $this->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
         } else {
             if ($order->getMayoId()) {

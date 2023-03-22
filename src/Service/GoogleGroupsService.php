@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Google\Client as GoogleClient;
 use Google\Service\Directory as GoogleDirectory;
-use Google\Service\Exception as GoogleException;
 use Google\Service\Directory\Member as GoogleMember;
+use Google\Service\Exception as GoogleException;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class GoogleGroupsService
 {
@@ -17,7 +17,7 @@ class GoogleGroupsService
 
     public function __construct(ContainerBagInterface $params, EnvironmentService $env)
     {
-        $gaBypass = $env->isLocal() && $params->has('gaBypass') && $params->get('gaBypass');
+        $gaBypass = $env->isLocal() && $params->has('gaBypass') && $params->get('gaBypass'); // @phpstan-ignore-line
         if (!$env->values['isUnitTest'] && !$gaBypass) {
             $applicationName = $params->get('gaApplicationName');
             $adminEmail = $params->get('gaAdminEmail');

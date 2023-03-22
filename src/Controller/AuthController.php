@@ -30,7 +30,7 @@ class AuthController extends BaseController
             return $this->redirectToRoute('home');
         }
 
-        $dashboardUrl = $params->has('dashboard_url') ? $params->get('dashboard_url') : null;
+        $dashboardUrl = $params->has('dashboard_url') ? $params->get('dashboard_url') : null; // @phpstan-ignore-line
         if ($env->isLocal() && $userService->canMockLogin()) {
             $loginForm = $this->createForm(MockLoginType::class);
 

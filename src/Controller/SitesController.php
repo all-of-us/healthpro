@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -34,7 +34,7 @@ class SitesController extends BaseController
         $sites = $siteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('admin/sites/index.html.twig', [
             'sites' => $sites,
-            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false,
+            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false, // @phpstan-ignore-line
             'siteChoices' => SiteType::$siteChoices
         ]);
     }
@@ -44,7 +44,7 @@ class SitesController extends BaseController
      */
     public function edit(SiteRepository $siteRepository, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, $id = null)
     {
-        $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false;
+        $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false; // @phpstan-ignore-line
         if ($id) {
             $site = $siteRepository->find($id);
             if (!$site) {
@@ -152,7 +152,7 @@ class SitesController extends BaseController
      */
     public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)
     {
-        if (!$params->has('sites_use_rdr')) {
+        if (!$params->has('sites_use_rdr')) { // @phpstan-ignore-line
             $formView = false;
         } else {
             $form = $this->createForm(FormType::class);

@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Cache\DatastoreAdapter;
+use App\HttpClient;
 use Google\Client as GoogleClient;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use App\Cache\DatastoreAdapter;
-use App\HttpClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -29,15 +29,15 @@ class RdrApiService
         if ($environment->isLocal() && file_exists($basePath . '/dev_config/rdr_key.json')) {
             $this->config['key_file'] = $basePath . '/dev_config/rdr_key.json';
         }
-        if ($params->has('rdr_auth_json')) {
+        if ($params->has('rdr_auth_json')) { // @phpstan-ignore-line
             $this->config['rdr_auth_json'] = $params->get('rdr_auth_json');
         }
         // Load endpoint from configuration
-        if ($params->has('rdr_endpoint')) {
+        if ($params->has('rdr_endpoint')) { // @phpstan-ignore-line
             $this->endpoint = $params->get('rdr_endpoint');
         }
         // Set up OAuth Cache
-        if (!$params->has('rdr_auth_cache_disabled')) {
+        if (!$params->has('rdr_auth_cache_disabled')) { // @phpstan-ignore-line
             $this->logger = $logger;
             $this->cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
             $this->cache->setLogger($this->logger);

@@ -2,13 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\IdVerification;
+use App\Audit\Log;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PatientStatus;
 use App\Entity\Problem;
-use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
 use App\Form\IdVerificationType;
 use App\Form\IncentiveRemoveType;
@@ -24,7 +23,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -219,7 +217,7 @@ class ParticipantDetailsController extends BaseController
 
         $incentives = $this->em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
 
-        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
+        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true; // @phpstan-ignore-line
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
         // Generate url for blood donor check form
         $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';
@@ -245,9 +243,9 @@ class ParticipantDetailsController extends BaseController
             'canViewPatientStatus' => $canViewPatientStatus,
             'displayPatientStatusBlock' => !$isDVType,
             'canEdit' => $participant->status || $participant->editExistingOnly,
-            'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
+            'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null, // @phpstan-ignore-line
             'evaluationUrl' => $evaluationUrl,
-            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
+            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'), // @phpstan-ignore-line
             'incentiveForm' => $incentiveForm->createView(),
             'incentives' => $incentives,
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),
