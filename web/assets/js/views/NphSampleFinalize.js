@@ -31,7 +31,7 @@ $(document).ready(function () {
                 "</td>" +
                 "<td style='position: relative'><span style='position: absolute; bottom: 7px; left: 0;'>" +
                 aliquotUnits +
-                '</span></td>'
+                "</span></td>"
         );
 
         $(".aliquots-row-" + aliquotId)

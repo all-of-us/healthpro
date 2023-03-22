@@ -6,7 +6,7 @@ $(document).ready(function () {
     });
 
     $(".nav-tabs > li").click(function (e) {
-        if ($(this).find('button').length === 0) {
+        if ($(this).find("button").length === 0) {
             $(this).addClass("active").siblings().removeClass("active");
             $("#ModuleGroup" + $(this).data("modulenumber"))
                 .removeClass("hidden")
