@@ -339,8 +339,7 @@ class NphOrderTest extends NphTestCase
                         'sampleCode' => 'ST2'
                     ],
                 ],
-                false,
-                true
+                false
             ],
             [
                 NphOrder::TYPE_STOOL,
@@ -355,7 +354,7 @@ class NphOrderTest extends NphTestCase
                         'sampleCode' => 'ST2',
                     ],
                 ],
-                true
+                false
             ],
             [
                 NphOrder::TYPE_URINE,
@@ -367,7 +366,22 @@ class NphOrderTest extends NphTestCase
                     ],
                 ],
                 false
-            ]
+            ],
+            [
+                NphOrder::TYPE_STOOL,
+                [
+                    [
+                        'sampleId' => '6000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $collectedTs
+                    ],
+                    [
+                        'sampleId' => '7000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                true
+            ],
         ];
     }
 }
