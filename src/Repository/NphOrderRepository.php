@@ -107,7 +107,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->where('no.site = :site')
             ->andWhere('ns.finalizedTs IS NULL')
-            ->andWhere('ns.modifyType != :modifyType')
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
             ->setParameters(['site' => $siteId, 'modifyType' => NphSample::CANCEL])
             ->getQuery()
             ->getResult();
@@ -121,7 +121,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->where('ns.finalizedTs IS NULL')
             ->andWhere('no.site = :site')
-            ->andWhere('ns.modifyType != :modifyType')
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
             ->setParameters(['site' => $site, 'modifyType' => NphSample::CANCEL])
             ->orderBy('no.id', 'ASC')
             ->getQuery()
