@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\NphFieldSort;
 use App\Entity\NphOrder;
+use App\Entity\NphSample;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
@@ -106,7 +107,8 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->where('no.site = :site')
             ->andWhere('ns.finalizedTs IS NULL')
-            ->setParameter('site', $siteId)
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
+            ->setParameters(['site' => $siteId, 'modifyType' => NphSample::CANCEL])
             ->getQuery()
             ->getResult();
     }
@@ -119,7 +121,8 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->where('ns.finalizedTs IS NULL')
             ->andWhere('no.site = :site')
-            ->setParameter('site', $site)
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
+            ->setParameters(['site' => $site, 'modifyType' => NphSample::CANCEL])
             ->orderBy('no.id', 'ASC')
             ->getQuery()
             ->getResult();

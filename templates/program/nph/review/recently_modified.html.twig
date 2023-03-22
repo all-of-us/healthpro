@@ -55,13 +55,13 @@
                 {% else %}
                     <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
                 {% endif %}
-                {% if sample.modifyType == constant('UNLOCK', sample) %}
+                {% if sample.modifyType == constant('App\\Entity\\NphSample::UNLOCK') %}
                     <td><p class="btn btn-sm btn-warning">Unlocked</p></td>
-                {% elseif sample.modifyType == constant('CANCEL', sample) %}
+                {% elseif sample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
                     <td><p class="btn btn-sm btn-danger">Cancelled</p></td>
                 {% elseif sample.finalizedTs is null %}
                     <td><p class="btn btn-sm btn-warning">Unfinalized</p></td>
-                {% elseif sample.finalizedTs is not null and sample.modifyType == constant('EDITED', sample) %}
+                {% elseif sample.finalizedTs is not null and sample.modifyType == constant('App\\Entity\\NphSample::EDITED') %}
                     <td><p class="btn btn-sm btn-success">Edited and Finalized</p></td>
                 {% elseif sample.finalizedTs is not null %}
                     <td><p class="btn btn-sm btn-success">Finalized</p></td>
