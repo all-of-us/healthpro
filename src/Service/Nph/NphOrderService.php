@@ -581,15 +581,17 @@ class NphOrderService
                 }
             }
 
-            // Save finalized information for each sample
+            // Update collected time for all samples that are collected
             foreach ($nphSamples as $nphSample) {
-                if ($nphSample !== $sample && !$nphSample->getCollectedTs()) {
-                    continue;
+                if ($nphSample->getCollectedTs()) {
+                    $nphSample->setCollectedTs($collectedTs);
                 }
-                $nphSampleCode = $nphSample->getSampleCode();
-                $notes = $formData["{$nphSampleCode}Notes"] ?? null;
-                $this->saveNphSampleFinalizedInfo($nphSample, $collectedTs, $notes);
             }
+
+            // Save finalized info for the current sample
+            $nphSampleCode = $sample->getSampleCode();
+            $notes = $formData["{$nphSampleCode}Notes"] ?? null;
+            $this->saveNphSampleFinalizedInfo($sample, $collectedTs, $notes);
 
             // Update order metadata
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
