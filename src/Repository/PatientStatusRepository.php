@@ -24,7 +24,7 @@ class PatientStatusRepository extends ServiceEntityRepository
 
     public function getOrgPatientStatusData($participantId, $organizationId)
     {
-        $query = "
+        $query = '
             SELECT ps.id as ps_id,
                    ps.organization,
                    ps.awardee,
@@ -43,7 +43,7 @@ class PatientStatusRepository extends ServiceEntityRepository
             WHERE ps.participant_id = :participantId
               AND ps.organization = :organization
             ORDER BY ps.id DESC
-        ";
+        ';
         $data = $this->getEntityManager()->getConnection()->fetchAll($query, [
             'participantId' => $participantId,
             'organization' => $organizationId
@@ -57,7 +57,7 @@ class PatientStatusRepository extends ServiceEntityRepository
 
     public function getOrgPatientStatusHistoryData($participantId, $organization)
     {
-        $query = "
+        $query = '
             SELECT ps.id as ps_id,
                    ps.organization,
                    ps.awardee,
@@ -77,7 +77,7 @@ class PatientStatusRepository extends ServiceEntityRepository
             WHERE ps.participant_id = :participantId
               AND ps.organization = :organization
             ORDER BY psh.id DESC
-        ";
+        ';
         $results = $this->getEntityManager()->getConnection()->fetchAll($query, [
             'participantId' => $participantId,
             'organization' => $organization
@@ -92,7 +92,7 @@ class PatientStatusRepository extends ServiceEntityRepository
 
     public function getAwardeePatientStatusData($participantId, $organization)
     {
-        $query = "
+        $query = '
             SELECT ps.id as ps_id,
                    ps.organization,
                    ps.awardee,
@@ -115,7 +115,7 @@ class PatientStatusRepository extends ServiceEntityRepository
             WHERE ps.participant_id = :participantId
               AND ps.organization != :organization
             ORDER BY ps.id DESC
-        ";
+        ';
         $results = $this->getEntityManager()->getConnection()->fetchAll($query, [
             'participantId' => $participantId,
             'organization' => $organization
@@ -167,11 +167,10 @@ class PatientStatusRepository extends ServiceEntityRepository
                 ->setFirstResult($params['start'])
                 ->setMaxResults($params['length'])
                 ->getResult();
-        } else {
-            return $queryBuilder
-                ->getQuery()
-                ->getResult();
         }
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
     }
 
     public function getOnsitePatientStatusesCount($awardee, $params): int

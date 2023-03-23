@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
 use App\Security\User;
@@ -9,13 +10,11 @@ use App\Service\AccessManagementService;
 use App\Service\ContextTemplateService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
-use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -167,7 +166,7 @@ class AccessManagementController extends BaseController
                     $result = $this->googleGroupsService->removeMember($group->email, $member->email);
                     if ($result['status'] === 'success') {
                         if ($removeGoupMemberForm->get('reason')->getData() === 'no') {
-                            $currentTime = new \DateTime("now");
+                            $currentTime = new \DateTime('now');
                             $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), RemoveGroupMemberType::ATTESTATIONS);
                             $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime, $attestation);
                         }

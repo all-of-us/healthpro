@@ -20,6 +20,15 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         parent::__construct();
     }
 
+    public function prune(): bool
+    {
+        $cache = new Cache();
+        $results = $cache->getBatch('expire', new \DateTime(), '<', $this->limit);
+        $cache->deleteBatch($results);
+
+        return true;
+    }
+
     protected function doFetch(array $ids): iterable
     {
         $values = [];
@@ -38,7 +47,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
 
     protected function doHave($id): bool
     {
-        return (bool)$this->doFetch([$id]);
+        return (bool) $this->doFetch([$id]);
     }
 
     protected function doDelete(array $ids): bool
@@ -78,15 +87,6 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
     {
         $cache = new Cache();
         $results = $cache->getBatch(null, null, null, $this->limit);
-        $cache->deleteBatch($results);
-
-        return true;
-    }
-
-    public function prune(): bool
-    {
-        $cache = new Cache();
-        $results = $cache->getBatch('expire', new \DateTime(), '<', $this->limit);
         $cache->deleteBatch($results);
 
         return true;

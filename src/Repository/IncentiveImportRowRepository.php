@@ -37,7 +37,7 @@ class IncentiveImportRowRepository extends ServiceEntityRepository
 
     public function deleteUnconfirmedImportData($date): void
     {
-        $query = "DELETE iir FROM incentive_import_row iir inner join incentive_import ii on iir.import_id = ii.id where ii.created_ts < :date and ii.confirm = :confirm";
+        $query = 'DELETE iir FROM incentive_import_row iir inner join incentive_import ii on iir.import_id = ii.id where ii.created_ts < :date and ii.confirm = :confirm';
         $params = ['date' => $date, 'confirm' => 0];
         $statement = $this->getEntityManager()->getConnection()->prepare($query);
         $statement->execute($params);

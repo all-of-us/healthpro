@@ -2,27 +2,20 @@
 
 namespace App\Service;
 
-use App\Entity\Order;
 use App\Entity\Measurement;
+use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ReviewService
 {
-    protected $em;
-    protected $participantSummaryService;
-
-    public function __construct(EntityManagerInterface $em, ParticipantSummaryService $participantSummaryService)
-    {
-        $this->em = $em;
-        $this->participantSummaryService = $participantSummaryService;
-    }
-
     public static $orderStatus = [
         'created_ts' => 'Created',
         'collected_ts' => 'Collected',
         'processed_ts' => 'Processed',
         'finalized_ts' => 'Finalized'
     ];
+    protected $em;
+    protected $participantSummaryService;
 
     protected static $measurementsStatus = [
         'created_ts' => 'Created',
@@ -40,58 +33,10 @@ class ReviewService
         'idVerificationsCount' => 0
     ];
 
-    protected function getTodayRows($startTime, $endTime, $site)
+    public function __construct(EntityManagerInterface $em, ParticipantSummaryService $participantSummaryService)
     {
-        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, o.type as order_type, ' .
-            'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
-            'oh.type as h_type, ' .
-            'u.email as created_by ' .
-            'FROM orders o ' .
-            'LEFT JOIN orders_history oh ' .
-            'ON o.history_id = oh.id ' .
-            'LEFT JOIN users u ' .
-            'ON o.user_id = u.id WHERE ' .
-            '(o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ' .
-            'AND ((o.created_ts >= :startTime AND o.created_ts < :endTime) ' .
-            'OR (o.collected_ts >= :startTime AND o.collected_ts < :endTime) ' .
-            'OR (o.processed_ts >= :startTime AND o.processed_ts < :endTime) ' .
-            'OR (o.finalized_ts >= :startTime AND o.finalized_ts < :endTime) ' .
-            'OR (oh.created_ts >= :startTime AND oh.created_ts < :endTime)) ';
-        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, null, ' .
-            'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
-            'eh.type as h_type, ' .
-            'null ' .
-            'FROM evaluations e ' .
-            'LEFT JOIN evaluations_history eh ' .
-            'ON e.history_id = eh.id WHERE ' .
-            'e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) ' .
-            'AND (e.site = :site OR e.finalized_site = :site) ' .
-            'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
-            'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
-            'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
-        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.created_ts, null, null, null, null, null, null, ' .
-            'null, ' .
-            'null, ' .
-            'null ' .
-            'FROM incentive i ' .
-            'WHERE i.site = :site ' .
-            'AND i.created_ts >= :startTime ' .
-            'AND i.created_ts < :endTime ';
-        $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
-            'null, ' .
-            'null, ' .
-            'null ' .
-            'FROM id_verification idv ' .
-            'WHERE idv.site = :site ' .
-            'AND idv.created_ts >= :startTime ' .
-            'AND idv.created_ts < :endTime ';
-        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) UNION ($idVerificationsQuery) ORDER BY latest_ts DESC";
-
-        return $this->em->getConnection()->fetchAll($query, [
-            'startTime' => $startTime,
-            'endTime' => $endTime,
-            'site' => $site
-        ]);
+        $this->em = $em;
+        $this->participantSummaryService = $participantSummaryService;
     }
 
     public function getTodayParticipants($startTime, $endTime, $site = null)
@@ -139,29 +84,6 @@ class ReviewService
         }
 
         return $participants;
-    }
-
-    protected function getTodayOrderRows($today)
-    {
-        $ordersQuery = 'SELECT o.*, ' .
-            'oh.type as h_type, ' .
-            's.name as created_site_name, ' .
-            'sc.name as collected_site_name, ' .
-            'sp.name as processed_site_name, ' .
-            'sf.name as finalized_site_name ' .
-            'FROM orders o ' .
-            'LEFT JOIN orders_history oh ON o.history_id = oh.id ' .
-            'LEFT JOIN sites s ON s.site_id = o.site ' .
-            'LEFT JOIN sites sc ON sc.site_id = o.collected_site ' .
-            'LEFT JOIN sites sp ON sp.site_id = o.processed_site ' .
-            'LEFT JOIN sites sf ON sf.site_id = o.finalized_site ' .
-            'WHERE ' .
-            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
-            'ORDER BY o.created_ts DESC';
-
-        return $this->em->getConnection()->fetchAll($ordersQuery, [
-            'today' => $today
-        ]);
     }
 
     public function getTodayOrders($today)
@@ -224,5 +146,82 @@ class ReviewService
                 break;
             }
         }
+    }
+
+    protected function getTodayRows($startTime, $endTime, $site)
+    {
+        $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, o.type as order_type, ' .
+            'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
+            'oh.type as h_type, ' .
+            'u.email as created_by ' .
+            'FROM orders o ' .
+            'LEFT JOIN orders_history oh ' .
+            'ON o.history_id = oh.id ' .
+            'LEFT JOIN users u ' .
+            'ON o.user_id = u.id WHERE ' .
+            '(o.site = :site OR o.collected_site = :site OR o.processed_site = :site OR o.finalized_site = :site) ' .
+            'AND ((o.created_ts >= :startTime AND o.created_ts < :endTime) ' .
+            'OR (o.collected_ts >= :startTime AND o.collected_ts < :endTime) ' .
+            'OR (o.processed_ts >= :startTime AND o.processed_ts < :endTime) ' .
+            'OR (o.finalized_ts >= :startTime AND o.finalized_ts < :endTime) ' .
+            'OR (oh.created_ts >= :startTime AND oh.created_ts < :endTime)) ';
+        $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, null, ' .
+            'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
+            'eh.type as h_type, ' .
+            'null ' .
+            'FROM evaluations e ' .
+            'LEFT JOIN evaluations_history eh ' .
+            'ON e.history_id = eh.id WHERE ' .
+            'e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL) ' .
+            'AND (e.site = :site OR e.finalized_site = :site) ' .
+            'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
+            'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
+            'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
+        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.created_ts, null, null, null, null, null, null, ' .
+            'null, ' .
+            'null, ' .
+            'null ' .
+            'FROM incentive i ' .
+            'WHERE i.site = :site ' .
+            'AND i.created_ts >= :startTime ' .
+            'AND i.created_ts < :endTime ';
+        $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
+            'null, ' .
+            'null, ' .
+            'null ' .
+            'FROM id_verification idv ' .
+            'WHERE idv.site = :site ' .
+            'AND idv.created_ts >= :startTime ' .
+            'AND idv.created_ts < :endTime ';
+        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) UNION ($idVerificationsQuery) ORDER BY latest_ts DESC";
+
+        return $this->em->getConnection()->fetchAll($query, [
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'site' => $site
+        ]);
+    }
+
+    protected function getTodayOrderRows($today)
+    {
+        $ordersQuery = 'SELECT o.*, ' .
+            'oh.type as h_type, ' .
+            's.name as created_site_name, ' .
+            'sc.name as collected_site_name, ' .
+            'sp.name as processed_site_name, ' .
+            'sf.name as finalized_site_name ' .
+            'FROM orders o ' .
+            'LEFT JOIN orders_history oh ON o.history_id = oh.id ' .
+            'LEFT JOIN sites s ON s.site_id = o.site ' .
+            'LEFT JOIN sites sc ON sc.site_id = o.collected_site ' .
+            'LEFT JOIN sites sp ON sp.site_id = o.processed_site ' .
+            'LEFT JOIN sites sf ON sf.site_id = o.finalized_site ' .
+            'WHERE ' .
+            '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
+            'ORDER BY o.created_ts DESC';
+
+        return $this->em->getConnection()->fetchAll($ordersQuery, [
+            'today' => $today
+        ]);
     }
 }

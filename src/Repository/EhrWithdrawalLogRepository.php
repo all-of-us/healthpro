@@ -29,6 +29,6 @@ class EhrWithdrawalLogRepository extends ServiceEntityRepository
             ->groupBy('e.awardeeId')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

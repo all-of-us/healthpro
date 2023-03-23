@@ -67,111 +67,6 @@ class User implements UserInterface
         return $this->info;
     }
 
-    private function computeSites($siteType)
-    {
-        $sites = [];
-        $sitePrefix = $siteType === 'hpo' ? self::SITE_PREFIX : self::SITE_NPH_PREFIX;
-        // site membership is determined by the user's groups
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), $sitePrefix) === 0) {
-                $id = preg_replace('/@.*$/', '', $group->getEmail());
-                // Prevent admin group from being added to the sites list as it has the same site prefix.
-                if ($id !== self::NPH_ADMIN_GROUP) {
-                    $id = str_replace($sitePrefix, '', $id);
-                    $sites[] = (object)[
-                        'email' => $group->getEmail(),
-                        'name' => $group->getName(),
-                        'id' => $id
-                    ];
-                }
-            }
-        }
-        return $sites;
-    }
-
-    private function computeAwardees()
-    {
-        $awardees = [];
-        // awardee membership is determined by the user's groups
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::AWARDEE_PREFIX) === 0) {
-                $id = preg_replace('/@.*$/', '', $group->getEmail());
-                $id = str_replace(self::AWARDEE_PREFIX, '', $id);
-                $awardees[] = (object)[
-                    'email' => $group->getEmail(),
-                    'name' => $group->getName(),
-                    'id' => $id
-                ];
-                // Check for scripps awardee
-                if ($id === self::AWARDEE_SCRIPPS) {
-                    $this->scrippsAwardee = true;
-                }
-            }
-        }
-        return $awardees;
-    }
-
-    private function computeAdminAccess($type)
-    {
-        $hasAccess = false;
-        $groupPrefix = $type === 'hpo' ? self::ADMIN_GROUP : self::NPH_ADMIN_GROUP;
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), $groupPrefix . '@') === 0) {
-                $hasAccess = true;
-            }
-        }
-        return $hasAccess;
-    }
-
-    private function computeAdminDvAccess()
-    {
-        $hasAccess = false;
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::ADMIN_DV . '@') === 0) {
-                $hasAccess = true;
-            }
-        }
-        return $hasAccess;
-    }
-
-    private function computeBiobankAccess()
-    {
-        $hasAccess = false;
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::BIOBANK_GROUP . '@') === 0) {
-                $hasAccess = true;
-            }
-        }
-        return $hasAccess;
-    }
-
-    private function computeScrippsAccess()
-    {
-        $hasAccess = false;
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::SCRIPPS_GROUP . '@') === 0) {
-                $hasAccess = true;
-            }
-        }
-        return $hasAccess;
-    }
-
-    private function computeReadOnlyGroups()
-    {
-        $readOnlyGroups = [];
-        foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::READ_ONLY_GROUP . '@') === 0) {
-                $id = preg_replace('/@.*$/', '', $group->getEmail());
-                $readOnlyGroups[] = (object)[
-                    'email' => $group->getEmail(),
-                    'name' => $group->getName(),
-                    'id' => $id
-                ];
-            }
-        }
-        return $readOnlyGroups;
-    }
-
 
     public function hasTwoFactorAuth(): bool
     {
@@ -353,9 +248,8 @@ class User implements UserInterface
     {
         if (isset($this->info['id'])) {
             return $this->info['id'];
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function getSiteFromId(string $siteId, string $siteType = 'sites')
@@ -368,25 +262,6 @@ class User implements UserInterface
             }
         }
         return $site;
-    }
-
-    private function getUserRoles($roles, $site, $awardee)
-    {
-        if (!empty($site)) {
-            UserEntity::removeUserRoles(['ROLE_AWARDEE', 'ROLE_AWARDEE_SCRIPPS'], $roles);
-            if ($this->sessionInfo['program'] === UserEntity::PROGRAM_NPH) {
-                UserEntity::removeUserRoles(['ROLE_USER'], $roles);
-            } else {
-                UserEntity::removeUserRoles(['ROLE_NPH_USER'], $roles);
-            }
-        }
-        if (!empty($awardee)) {
-            UserEntity::removeUserRoles(['ROLE_USER', 'ROLE_NPH_USER'], $roles);
-            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS) {
-                UserEntity::removeUserRoles(['ROLE_AWARDEE_SCRIPPS'], $roles);
-            }
-        }
-        return $roles;
     }
 
     public function getReadOnlyGroups()
@@ -434,5 +309,129 @@ class User implements UserInterface
             return $group;
         }
         return $this->getReadOnlyGroupFromId($groupId);
+    }
+
+    private function computeSites($siteType)
+    {
+        $sites = [];
+        $sitePrefix = $siteType === 'hpo' ? self::SITE_PREFIX : self::SITE_NPH_PREFIX;
+        // site membership is determined by the user's groups
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), $sitePrefix) === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                // Prevent admin group from being added to the sites list as it has the same site prefix.
+                if ($id !== self::NPH_ADMIN_GROUP) {
+                    $id = str_replace($sitePrefix, '', $id);
+                    $sites[] = (object) [
+                        'email' => $group->getEmail(),
+                        'name' => $group->getName(),
+                        'id' => $id
+                    ];
+                }
+            }
+        }
+        return $sites;
+    }
+
+    private function computeAwardees()
+    {
+        $awardees = [];
+        // awardee membership is determined by the user's groups
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::AWARDEE_PREFIX) === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $id = str_replace(self::AWARDEE_PREFIX, '', $id);
+                $awardees[] = (object) [
+                    'email' => $group->getEmail(),
+                    'name' => $group->getName(),
+                    'id' => $id
+                ];
+                // Check for scripps awardee
+                if ($id === self::AWARDEE_SCRIPPS) {
+                    $this->scrippsAwardee = true;
+                }
+            }
+        }
+        return $awardees;
+    }
+
+    private function computeAdminAccess($type)
+    {
+        $hasAccess = false;
+        $groupPrefix = $type === 'hpo' ? self::ADMIN_GROUP : self::NPH_ADMIN_GROUP;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), $groupPrefix . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeAdminDvAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::ADMIN_DV . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeBiobankAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::BIOBANK_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeScrippsAccess()
+    {
+        $hasAccess = false;
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::SCRIPPS_GROUP . '@') === 0) {
+                $hasAccess = true;
+            }
+        }
+        return $hasAccess;
+    }
+
+    private function computeReadOnlyGroups()
+    {
+        $readOnlyGroups = [];
+        foreach ($this->groups as $group) {
+            if (strpos($group->getEmail(), self::READ_ONLY_GROUP . '@') === 0) {
+                $id = preg_replace('/@.*$/', '', $group->getEmail());
+                $readOnlyGroups[] = (object) [
+                    'email' => $group->getEmail(),
+                    'name' => $group->getName(),
+                    'id' => $id
+                ];
+            }
+        }
+        return $readOnlyGroups;
+    }
+
+    private function getUserRoles($roles, $site, $awardee)
+    {
+        if (!empty($site)) {
+            UserEntity::removeUserRoles(['ROLE_AWARDEE', 'ROLE_AWARDEE_SCRIPPS'], $roles);
+            if ($this->sessionInfo['program'] === UserEntity::PROGRAM_NPH) {
+                UserEntity::removeUserRoles(['ROLE_USER'], $roles);
+            } else {
+                UserEntity::removeUserRoles(['ROLE_NPH_USER'], $roles);
+            }
+        }
+        if (!empty($awardee)) {
+            UserEntity::removeUserRoles(['ROLE_USER', 'ROLE_NPH_USER'], $roles);
+            if (isset($awardee->id) && $awardee->id !== User::AWARDEE_SCRIPPS) {
+                UserEntity::removeUserRoles(['ROLE_AWARDEE_SCRIPPS'], $roles);
+            }
+        }
+        return $roles;
     }
 }

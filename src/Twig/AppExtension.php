@@ -2,11 +2,8 @@
 
 namespace App\Twig;
 
-use App\Entity\Awardee;
-use App\Entity\Organization;
-use App\Entity\Site;
-use App\Service\TimezoneService;
 use App\Drc\CodeBook;
+use App\Service\TimezoneService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;

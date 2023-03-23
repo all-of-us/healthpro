@@ -2,24 +2,23 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\MissingNotificationLog;
 use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
-use App\Audit\Log;
 
 class MissingMeasurementsAndOrdersNotificationService
 {
+    public const MEASUREMENT_TYPE = 'measurement';
+    public const ORDER_TYPE = 'order';
     protected $em;
     protected $loggerService;
     protected $env;
     protected $params;
     protected $twig;
-
-    public const MEASUREMENT_TYPE = 'measurement';
-    public const ORDER_TYPE = 'order';
 
     public function __construct(
         EntityManagerInterface $em,

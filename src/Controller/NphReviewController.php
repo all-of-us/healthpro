@@ -5,11 +5,10 @@ namespace App\Controller;
 use App\Entity\NphOrder;
 use App\Form\ReviewTodayFilterType;
 use App\Service\Nph\NphParticipantSummaryService;
-use App\Service\ParticipantSummaryService;
 use App\Service\ReviewService;
 use App\Service\SiteService;
-use DateTimeZone;
 use DateTime;
+use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -92,20 +91,20 @@ class NphReviewController extends BaseController
             if (!array_key_exists($samples[$key]['participantId'], $rowCounts)) {
                 $rowCounts[$samples[$key]['participantId']]['participantRow'] = 0;
             }
-            if (!array_key_exists('module'.$samples[$key]['module'], $rowCounts[$samples[$key]['participantId']])) {
-                $rowCounts[$samples[$key]['participantId']]['module'.$samples[$key]['module']] = 0;
+            if (!array_key_exists('module' . $samples[$key]['module'], $rowCounts[$samples[$key]['participantId']])) {
+                $rowCounts[$samples[$key]['participantId']]['module' . $samples[$key]['module']] = 0;
             }
             $rowCounts[$samples[$key]['participantId']]['participantRow'] += $samples[$key]['createdCount'] + 1;
-            $rowCounts[$samples[$key]['participantId']]['module'.$samples[$key]['module']] += $samples[$key]['createdCount'] + 1;
+            $rowCounts[$samples[$key]['participantId']]['module' . $samples[$key]['module']] += $samples[$key]['createdCount'] + 1;
             if ($count <= 5) {
                 $samples[$key]['participant'] = $this->participantSummaryService->getParticipantById($samples[$key]['participantId']);
             }
-            $samples[$key]['email'] = explode(",", $samples[$key]['email']);
-            $samples[$key]['sampleId'] = explode(",", $samples[$key]['sampleId']);
-            $samples[$key]['sampleCode'] = explode(",", $samples[$key]['sampleCode']);
-            $samples[$key]['createdTs'] = explode(",", $samples[$key]['createdTs']);
-            $samples[$key]['collectedTs'] = explode(",", $samples[$key]['collectedTs']);
-            $samples[$key]['finalizedTs'] = explode(",", $samples[$key]['finalizedTs']);
+            $samples[$key]['email'] = explode(',', $samples[$key]['email']);
+            $samples[$key]['sampleId'] = explode(',', $samples[$key]['sampleId']);
+            $samples[$key]['sampleCode'] = explode(',', $samples[$key]['sampleCode']);
+            $samples[$key]['createdTs'] = explode(',', $samples[$key]['createdTs']);
+            $samples[$key]['collectedTs'] = explode(',', $samples[$key]['collectedTs']);
+            $samples[$key]['finalizedTs'] = explode(',', $samples[$key]['finalizedTs']);
             $count++;
         }
 

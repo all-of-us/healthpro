@@ -7,8 +7,6 @@ use App\Entity\Measurement;
 use App\Entity\Order;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 
 class HFHRepairService
 {
@@ -29,18 +27,18 @@ class HFHRepairService
         $count = 0;
         $conn = $this->em->getConnection();
         if ($pariticpantId === null) {
-            $sql = "SELECT * FROM henry_ford_repair LIMIT 0, :repairLimit";
+            $sql = 'SELECT * FROM henry_ford_repair LIMIT 0, :repairLimit';
             $stmt = $conn->prepare($sql);
             $stmt->bindParam('repairLimit', $repairLimit, ParameterType::INTEGER);
         } else {
-            $sql = "SELECT * FROM henry_ford_repair WHERE participant_id = :participantId LIMIT 0, :repairLimit";
+            $sql = 'SELECT * FROM henry_ford_repair WHERE participant_id = :participantId LIMIT 0, :repairLimit';
             $stmt = $conn->prepare($sql);
             $stmt->bindParam('repairLimit', $repairLimit, ParameterType::INTEGER);
             $stmt->bindParam('participantId', $pariticpantId, ParameterType::STRING);
         }
         $stmt->executeQuery();
         $results = $stmt->fetchAll();
-        $deleteSql = "DELETE FROM henry_ford_repair where id = :id";
+        $deleteSql = 'DELETE FROM henry_ford_repair where id = :id';
         foreach ($results as $result) {
             $count++;
             try {

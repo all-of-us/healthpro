@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\MeasurementHistory;
 use App\Entity\Site;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -155,20 +155,6 @@ class MeasurementService
         return $obj;
     }
 
-    protected function getMeasurementUserSiteData($user, $site)
-    {
-        return [
-            'author' => [
-                'system' => 'https://www.pmi-ops.org/healthpro-username',
-                'value' => $user
-            ],
-            'site' => [
-                'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => $site
-            ]
-        ];
-    }
-
     public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
     {
         try {
@@ -264,5 +250,19 @@ class MeasurementService
     public function getLastError()
     {
         return $this->rdrApiService->getLastError();
+    }
+
+    protected function getMeasurementUserSiteData($user, $site)
+    {
+        return [
+            'author' => [
+                'system' => 'https://www.pmi-ops.org/healthpro-username',
+                'value' => $user
+            ],
+            'site' => [
+                'system' => 'https://www.pmi-ops.org/site-id',
+                'value' => $site
+            ]
+        ];
     }
 }

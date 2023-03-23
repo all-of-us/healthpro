@@ -44,6 +44,23 @@ class Fhir
         $this->summary = $options['summary'];
     }
 
+    public function toObject()
+    {
+        $fhir = new StdClass();
+        $fhir->entry = [];
+        $fhir->resourceType = 'Bundle';
+        $fhir->type = 'document';
+        foreach (array_keys($this->metricUrns) as $metric) {
+            if ($entry = $this->getEntry($metric)) {
+                $fhir->entry[] = $entry;
+            } else {
+                unset($this->metricUrns[$metric]);
+            }
+        }
+        array_unshift($fhir->entry, $this->getComposition());
+        return $fhir;
+    }
+
     protected static function ordinalLabel($text, $replicate)
     {
         switch ($replicate) {
@@ -93,7 +110,7 @@ class Fhir
                     if (empty($value) && empty($this->data->{$modification}[$i])) {
                         continue;
                     }
-                    $metrics[] = $field->name . '-' . ($i+1); // 1-indexed
+                    $metrics[] = $field->name . '-' . ($i + 1); // 1-indexed
                 }
             } else {
                 if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
@@ -121,7 +138,7 @@ class Fhir
             if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
                 continue;
             }
-            $index = (int)$m[1] - 1;
+            $index = (int) $m[1] - 1;
             if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                 $metrics[$k] = 'blood-pressure-' . $m[1];
             } else {
@@ -175,15 +192,15 @@ class Fhir
                     [
                         'reference' => "Practitioner/{$this->createdUser}",
                         'extension' => [[
-                            'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
-                            'valueCode' => "created"
+                            'url' => 'http://terminology.pmi-ops.org/StructureDefinition/authoring-step',
+                            'valueCode' => 'created'
                         ]]
                     ],
                     [
                         'reference' => "Practitioner/{$this->finalizedUser}",
                         'extension' => [[
-                            'url' => "http://terminology.pmi-ops.org/StructureDefinition/authoring-step",
-                            'valueCode' => "finalized"
+                            'url' => 'http://terminology.pmi-ops.org/StructureDefinition/authoring-step',
+                            'valueCode' => 'finalized'
                         ]]
                     ]
                 ],
@@ -207,11 +224,11 @@ class Fhir
                 ],
                 'extension' => [
                     [
-                        'url' => "http://terminology.pmi-ops.org/StructureDefinition/authored-location",
+                        'url' => 'http://terminology.pmi-ops.org/StructureDefinition/authored-location',
                         'valueString' => 'Location/' . User::SITE_PREFIX . $this->createdSite
                     ],
                     [
-                        'url' => "http://terminology.pmi-ops.org/StructureDefinition/finalized-location",
+                        'url' => 'http://terminology.pmi-ops.org/StructureDefinition/finalized-location',
                         'valueString' => 'Location/' . User::SITE_PREFIX . $this->finalizedSite
                     ]
                 ],
@@ -331,7 +348,7 @@ class Fhir
             ]
         ];
         if (!is_null($value)) {
-            $entry['resource']['valueString'] = (string)$value;
+            $entry['resource']['valueString'] = (string) $value;
         }
         return $entry;
     }
@@ -344,11 +361,11 @@ class Fhir
             $urnKey = $metric . '-protocol-modification';
             $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}) ? $this->data->{"{$metric}-protocol-modification-notes"} : '';
         } else {
-            $conceptCode = $this->data->{"{$metric}-protocol-modification"}[$replicate-1];
+            $conceptCode = $this->data->{"{$metric}-protocol-modification"}[$replicate - 1];
             $urnKey = $metric . '-protocol-modification-' . $replicate;
-            $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate-1] : '';
+            $notes = isset($this->data->{"{$metric}-protocol-modification-notes"}[$replicate - 1]) ? $this->data->{"{$metric}-protocol-modification-notes"}[$replicate - 1] : '';
         }
-        $options = array_flip((array)$this->schema->fields["{$metric}-protocol-modification"]->options);
+        $options = array_flip((array) $this->schema->fields["{$metric}-protocol-modification"]->options);
 
         // Add display text for blood bank donor and EHR modifications
         if ($conceptCode === Measurement::BLOOD_DONOR_PROTOCOL_MODIFICATION) {
@@ -394,11 +411,11 @@ class Fhir
     protected function protocolModificationManual($metric, $replicate = null)
     {
         $codeDisplay = ucfirst(str_replace('-', ' ', $metric)) . ' protocol modifications';
-        $conceptCode = 'manual-'.$metric;
+        $conceptCode = 'manual-' . $metric;
         if (is_null($replicate)) {
             $urnKey = $conceptCode;
         } else {
-            $urnKey = $conceptCode .'-'. $replicate;
+            $urnKey = $conceptCode . '-' . $replicate;
         }
         $conceptDisplay = ucfirst(str_replace('-', ' ', $conceptCode));
         return [
@@ -767,9 +784,7 @@ class Fhir
         ];
     }
 
-    /*
-     * $replicate can be integer for replicate number OR 'mean'
-     */
+    // $replicate can be integer for replicate number OR 'mean'
     protected function getBpComponent($component, $replicate)
     {
         switch ($component) {
@@ -996,7 +1011,7 @@ class Fhir
         if (isset($this->data->{'blood-pressure-location'})) {
             $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
         }
-        if ($related = $this->meanProtocolModifications([2,3], 'blood-pressure-protocol-modification-', 'manual-blood-pressure-')) {
+        if ($related = $this->meanProtocolModifications([2, 3], 'blood-pressure-protocol-modification-', 'manual-blood-pressure-')) {
             $entry['resource']['related'] = $related;
         }
         return $entry;
@@ -1052,7 +1067,7 @@ class Fhir
             ],
             'valueCodeableConcept' => $concept
         ]];
-        if ($related = $this->meanProtocolModifications([2,3], 'blood-pressure-protocol-modification-', 'manual-heart-rate-')) {
+        if ($related = $this->meanProtocolModifications([2, 3], 'blood-pressure-protocol-modification-', 'manual-heart-rate-')) {
             $entry['resource']['related'] = $related;
         }
         return $entry;
@@ -1078,7 +1093,7 @@ class Fhir
                 ]
             ]
         );
-        if ($related = $this->meanProtocolModifications([1,2,3], 'hip-circumference-protocol-modification-')) {
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'hip-circumference-protocol-modification-')) {
             $entry['resource']['related'] = $related;
         }
         return $entry;
@@ -1107,7 +1122,7 @@ class Fhir
         if (isset($this->data->{'waist-circumference-location'})) {
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
         }
-        if ($related = $this->meanProtocolModifications([1,2,3], 'waist-circumference-protocol-modification-')) {
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'waist-circumference-protocol-modification-')) {
             $entry['resource']['related'] = $related;
         }
         return $entry;
@@ -1123,9 +1138,9 @@ class Fhir
             $this->data->notes,
             'Additional notes',
             [[
-                'code' =>  'notes',
-                'display' =>  'Additional notes',
-                'system' =>  'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                'code' => 'notes',
+                'display' => 'Additional notes',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
             ]]
         );
     }
@@ -1143,27 +1158,9 @@ class Fhir
         if (method_exists($this, $method)) {
             if ($replicate === false) {
                 return $this->$method();
-            } else {
-                return $this->$method($replicate);
             }
+            return $this->$method($replicate);
         }
-    }
-
-    public function toObject()
-    {
-        $fhir = new StdClass();
-        $fhir->entry = [];
-        $fhir->resourceType = 'Bundle';
-        $fhir->type = 'document';
-        foreach (array_keys($this->metricUrns) as $metric) {
-            if ($entry = $this->getEntry($metric)) {
-                $fhir->entry[] = $entry;
-            } else {
-                unset($this->metricUrns[$metric]);
-            }
-        }
-        array_unshift($fhir->entry, $this->getComposition());
-        return $fhir;
     }
 
     protected function getEffectiveDateTime($field, $replicate = 1)

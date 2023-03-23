@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -93,10 +93,9 @@ class SitesController extends BaseController
                     $this->addFlash('success', 'Site added.');
                 }
                 return $this->redirectToRoute('admin_sites');
-            } else {
-                if (count($form->getErrors()) == 0) {
-                    $form->addError(new FormError('Please correct the errors below.'));
-                }
+            }
+            if (count($form->getErrors()) == 0) {
+                $form->addError(new FormError('Please correct the errors below.'));
             }
         }
 

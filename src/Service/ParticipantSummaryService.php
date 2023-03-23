@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Drc\Exception\FailedRequestException;
+use App\Drc\Exception\InvalidDobException;
+use App\Drc\Exception\InvalidResponseException;
 use App\Entity\Site;
 use App\Helper\Participant;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Drc\Exception\FailedRequestException;
-use App\Drc\Exception\InvalidResponseException;
-use App\Drc\Exception\InvalidDobException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ParticipantSummaryService

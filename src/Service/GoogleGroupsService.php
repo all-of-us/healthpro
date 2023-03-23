@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Google\Client as GoogleClient;
 use Google\Service\Directory as GoogleDirectory;
-use Google\Service\Exception as GoogleException;
 use Google\Service\Directory\Member as GoogleMember;
+use Google\Service\Exception as GoogleException;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class GoogleGroupsService
 {
@@ -35,53 +35,6 @@ class GoogleGroupsService
             $this->client = new GoogleDirectory($client);
             $this->domain = $params->get('gaDomain');
         }
-    }
-
-    /**
-     * Executes an API call, automatically retrying in cases where we are
-     * being rate-limited.
-     */
-    private function callApi(string $resourceName, string $methodName, array $params)
-    {
-        $resource = $this->client->$resourceName;
-        $method = new \ReflectionMethod(get_class($resource), $methodName);
-        $doRetry = false;
-        $retryCount = 0;
-        do {
-            try {
-                $response = $method->invokeArgs($resource, $params);
-                $doRetry = false;
-            } catch (\Exception $e) {
-                $message = json_decode($e->getMessage());
-                $reason = isset($message->error->errors[0]->reason) ? $message->error->errors[0]->reason : 'unknown';
-                if (in_array($e->getCode(), [403, 429]) && in_array($reason, ['userRateLimitExceeded', 'quotaExceeded', 'rateLimitExceeded']) && $retryCount < self::RETRY_LIMIT) {
-                    $micros = self::calculateBackoff($retryCount);
-                    error_log("$resourceName.$methodName was rate-limited; " .
-                        "retrying in " . (round($micros / 1000000, 3)) .
-                        " seconds...");
-                    usleep($micros);
-                    $doRetry = true;
-                    $retryCount++;
-                } else {
-                    error_log($e->getCode() . '-' . $reason);
-                    throw $e;
-                }
-            }
-        } while ($doRetry);
-        return !empty($response) ? $response : '';
-    }
-
-    /**
-     * Calculates the amount of time (in microseconds) to sleep after a failed API call as
-     * specified by Google's recommended "exponential backoff" algorithm.
-     * @see https://developers.google.com/drive/v3/web/handle-errors#exponential-backoff
-     */
-    private static function calculateBackoff(int $retryCount): int
-    {
-        $seconds = pow(2, $retryCount);
-        $millis = mt_rand(1, 999);
-
-        return $seconds * 1000000 + $millis * 1000;
     }
 
     /** Gets all groups to which a user belongs (or all groups if no user). */
@@ -128,9 +81,8 @@ class GoogleGroupsService
             $result = $this->callApi('members', 'get', [$groupEmail, $userEmail]);
             if ($result) {
                 return $result->getRole();
-            } else {
-                return null;
             }
+            return null;
         } catch (GoogleException $e) {
             return null;
         }
@@ -229,6 +181,58 @@ class GoogleGroupsService
         }
     }
 
+    public function isMfaGroupUser($email): bool
+    {
+        return in_array(self::MFA_EXCEPTION_GROUP, $this->getUserGroupIds($email));
+    }
+
+    /**
+     * Executes an API call, automatically retrying in cases where we are
+     * being rate-limited.
+     */
+    private function callApi(string $resourceName, string $methodName, array $params)
+    {
+        $resource = $this->client->$resourceName;
+        $method = new \ReflectionMethod(get_class($resource), $methodName);
+        $doRetry = false;
+        $retryCount = 0;
+        do {
+            try {
+                $response = $method->invokeArgs($resource, $params);
+                $doRetry = false;
+            } catch (\Exception $e) {
+                $message = json_decode($e->getMessage());
+                $reason = isset($message->error->errors[0]->reason) ? $message->error->errors[0]->reason : 'unknown';
+                if (in_array($e->getCode(), [403, 429]) && in_array($reason, ['userRateLimitExceeded', 'quotaExceeded', 'rateLimitExceeded']) && $retryCount < self::RETRY_LIMIT) {
+                    $micros = self::calculateBackoff($retryCount);
+                    error_log("$resourceName.$methodName was rate-limited; " .
+                        'retrying in ' . (round($micros / 1000000, 3)) .
+                        ' seconds...');
+                    usleep($micros);
+                    $doRetry = true;
+                    $retryCount++;
+                } else {
+                    error_log($e->getCode() . '-' . $reason);
+                    throw $e;
+                }
+            }
+        } while ($doRetry);
+        return !empty($response) ? $response : '';
+    }
+
+    /**
+     * Calculates the amount of time (in microseconds) to sleep after a failed API call as
+     * specified by Google's recommended "exponential backoff" algorithm.
+     * @see https://developers.google.com/drive/v3/web/handle-errors#exponential-backoff
+     */
+    private static function calculateBackoff(int $retryCount): int
+    {
+        $seconds = pow(2, $retryCount);
+        $millis = mt_rand(1, 999);
+
+        return $seconds * 1000000 + $millis * 1000;
+    }
+
     private function getUserGroupIds($email): array
     {
         $groups = $this->getGroups($email, false);
@@ -237,10 +241,5 @@ class GoogleGroupsService
             $groupIds[] = $group->email;
         }
         return $groupIds;
-    }
-
-    public function isMfaGroupUser($email): bool
-    {
-        return in_array(self::MFA_EXCEPTION_GROUP, $this->getUserGroupIds($email));
     }
 }

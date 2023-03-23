@@ -2,8 +2,8 @@
 
 namespace App\Helper;
 
-use App\Util;
 use App\Drc\CodeBook;
+use App\Util;
 
 /**
  * Define magic properties to fix phpstan errors
@@ -16,7 +16,6 @@ use App\Drc\CodeBook;
  * @property string $firstName
  * @property string $phoneNumber
  */
-
 class Participant
 {
     public $status = true;
@@ -79,6 +78,163 @@ class Participant
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
         }
+    }
+
+    /**
+     * Magic methods for RDR data
+     */
+    public function __get($key)
+    {
+        if (isset($this->rdrData->{$key})) {
+            return CodeBook::display($this->rdrData->{$key});
+        }
+        if (strpos($key, 'num') === 0) {
+            return 0;
+        }
+        return null;
+    }
+
+    public function __isset($key)
+    {
+        return true;
+    }
+
+    public function getShortId()
+    {
+        if (strlen($this->id) >= 36) {
+            return strtoupper(Util::shortenUuid($this->id));
+        }
+        return $this->id;
+    }
+
+    public function getMayolinkDob()
+    {
+        return new \DateTime('1933-03-03');
+    }
+
+    public function getAddress($multiline = false)
+    {
+        $address = '';
+        if ($this->streetAddress) {
+            $address .= $this->streetAddress;
+            // Check if streetAddress2 is set, RDR doesn't return this field if it's empty
+            if (!empty($this->streetAddress2)) {
+                $address .= $multiline ? "\n" : ', ';
+                $address .= $this->streetAddress2;
+            }
+            if ($this->city || $this->state || $this->zipCode) {
+                $address .= $multiline ? "\n" : ', ';
+            }
+        }
+        if ($this->city) {
+            $address .= $this->city;
+            $address .= $this->state ? ', ' : ' ';
+        }
+        if ($this->state) {
+            $address .= $this->state . ' ';
+        }
+        if ($this->zipCode) {
+            $address .= $this->zipCode;
+        }
+        return trim($address);
+    }
+
+    public function getAge()
+    {
+        if (!$this->dob) {
+            return null;
+        }
+        return $this->dob
+            ->diff(new \DateTime())
+            ->y;
+    }
+
+    public function checkIdentifiers($notes)
+    {
+        if (empty($notes)) {
+            return false;
+        }
+        $identifiers = [];
+        $dob = $this->dob;
+        if ($dob) {
+            $identifiers['dob'] = [
+                $dob->format('m/d/y'),
+                $dob->format('m-d-y'),
+                $dob->format('m.d.y'),
+                $dob->format('m/d/Y'),
+                $dob->format('m-d-Y'),
+                $dob->format('m.d.Y'),
+                $dob->format('d/m/y'),
+                $dob->format('d-m-y'),
+                $dob->format('d.m.y'),
+                $dob->format('d/m/Y'),
+                $dob->format('d-m-Y'),
+                $dob->format('d.m.Y'),
+                $dob->format('n/j/y'),
+                $dob->format('n-j-y'),
+                $dob->format('n.j.y'),
+                $dob->format('n/j/Y'),
+                $dob->format('n-j-Y'),
+                $dob->format('n.j.Y'),
+                $dob->format('j/n/y'),
+                $dob->format('j-n-y'),
+                $dob->format('j.n.y'),
+                $dob->format('j/n/Y'),
+                $dob->format('j-n-Y'),
+                $dob->format('j.n.Y')
+            ];
+        }
+        if ($this->email) {
+            $identifiers['email'] = [$this->email];
+        }
+
+        // Detect dob and email
+        foreach ($identifiers as $key => $identifier) {
+            foreach ($identifier as $value) {
+                if (stripos($notes, $value) !== false) {
+                    return [$key, $value];
+                }
+            }
+        }
+
+        // Detect name
+        if ($this->firstName && $this->lastName) {
+            $fName = preg_quote($this->firstName, '/');
+            $lName = preg_quote($this->lastName, '/');
+            if (preg_match("/(?:\W|^)({$fName}\W*{$lName}|{$lName}\W*{$fName})(?:\W|$)/i", $notes, $matches)) {
+                return ['name', $matches[1]];
+            }
+        }
+
+        // Detect address
+        if ($this->streetAddress) {
+            $address = preg_split('/[\s]/', $this->streetAddress);
+            $address = array_map(function ($value) {
+                return preg_quote($value, '/');
+            }, $address);
+            $pattern = '/(?:\W|^)';
+            $pattern .= join('\W*', $address);
+            $pattern .= '(?:\W|$)/i';
+
+            if (preg_match($pattern, $notes, $matches)) {
+                return ['address', $matches[0]];
+            }
+        }
+
+        // Detect phone number
+        $phone = preg_replace('/\D/', '', $this->phoneNumber);
+        if ($phone) {
+            $identifiers['phone'] = [$phone];
+            if (strlen($phone) === 10) {
+                $num1 = preg_quote(substr($phone, 0, 3));
+                $num2 = preg_quote(substr($phone, 3, 3));
+                $num3 = preg_quote(substr($phone, 6));
+                if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
+                    return ['phone', $matches[1]];
+                }
+            }
+        }
+        return false;
     }
 
     private function parseRdrParticipant($participant)
@@ -254,167 +410,6 @@ class Participant
         }
     }
 
-    public function getShortId()
-    {
-        if (strlen($this->id) >= 36) {
-            return strtoupper(Util::shortenUuid($this->id));
-        } else {
-            return $this->id;
-        }
-    }
-
-    public function getMayolinkDob()
-    {
-        return new \DateTime('1933-03-03');
-    }
-
-    public function getAddress($multiline = false)
-    {
-        $address = '';
-        if ($this->streetAddress) {
-            $address .= $this->streetAddress;
-            // Check if streetAddress2 is set, RDR doesn't return this field if it's empty
-            if (!empty($this->streetAddress2)) {
-                $address .= $multiline ? "\n" : ', ';
-                $address .= $this->streetAddress2;
-            }
-            if ($this->city || $this->state || $this->zipCode) {
-                $address .= $multiline ? "\n" : ', ';
-            }
-        }
-        if ($this->city) {
-            $address .= $this->city;
-            $address .= $this->state ? ', ' : ' ';
-        }
-        if ($this->state) {
-            $address .= $this->state . ' ';
-        }
-        if ($this->zipCode) {
-            $address .= $this->zipCode;
-        }
-        return trim($address);
-    }
-
-    public function getAge()
-    {
-        if (!$this->dob) {
-            return null;
-        } else {
-            return $this->dob
-                ->diff(new \DateTime())
-                ->y;
-        }
-    }
-
-    /**
-     * Magic methods for RDR data
-     */
-    public function __get($key)
-    {
-        if (isset($this->rdrData->{$key})) {
-            return CodeBook::display($this->rdrData->{$key});
-        } else {
-            if (strpos($key, 'num') === 0) {
-                return 0;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public function __isset($key)
-    {
-        return true;
-    }
-
-    public function checkIdentifiers($notes)
-    {
-        if (empty($notes)) {
-            return false;
-        }
-        $identifiers = [];
-        $dob = $this->dob;
-        if ($dob) {
-            $identifiers['dob'] = [
-                $dob->format('m/d/y'),
-                $dob->format('m-d-y'),
-                $dob->format('m.d.y'),
-                $dob->format('m/d/Y'),
-                $dob->format('m-d-Y'),
-                $dob->format('m.d.Y'),
-                $dob->format('d/m/y'),
-                $dob->format('d-m-y'),
-                $dob->format('d.m.y'),
-                $dob->format('d/m/Y'),
-                $dob->format('d-m-Y'),
-                $dob->format('d.m.Y'),
-                $dob->format('n/j/y'),
-                $dob->format('n-j-y'),
-                $dob->format('n.j.y'),
-                $dob->format('n/j/Y'),
-                $dob->format('n-j-Y'),
-                $dob->format('n.j.Y'),
-                $dob->format('j/n/y'),
-                $dob->format('j-n-y'),
-                $dob->format('j.n.y'),
-                $dob->format('j/n/Y'),
-                $dob->format('j-n-Y'),
-                $dob->format('j.n.Y')
-            ];
-        }
-        if ($this->email) {
-            $identifiers['email'] = [$this->email];
-        }
-
-        // Detect dob and email
-        foreach ($identifiers as $key => $identifier) {
-            foreach ($identifier as $value) {
-                if (stripos($notes, $value) !== false) {
-                    return [$key, $value];
-                }
-            }
-        }
-
-        // Detect name
-        if ($this->firstName && $this->lastName) {
-            $fName = preg_quote($this->firstName, '/');
-            $lName = preg_quote($this->lastName, '/');
-            if (preg_match("/(?:\W|^)({$fName}\W*{$lName}|{$lName}\W*{$fName})(?:\W|$)/i", $notes, $matches)) {
-                return ['name', $matches[1]];
-            }
-        }
-
-        // Detect address
-        if ($this->streetAddress) {
-            $address = preg_split('/[\s]/', $this->streetAddress);
-            $address = array_map(function ($value) {
-                return preg_quote($value, '/');
-            }, $address);
-            $pattern = '/(?:\W|^)';
-            $pattern .= join('\W*', $address);
-            $pattern .= '(?:\W|$)/i';
-
-            if (preg_match($pattern, $notes, $matches)) {
-                return ['address', $matches[0]];
-            }
-        }
-
-        // Detect phone number
-        $phone = preg_replace('/\D/', '', $this->phoneNumber);
-        if ($phone) {
-            $identifiers['phone'] = [$phone];
-            if (strlen($phone) === 10) {
-                $num1 = preg_quote(substr($phone, 0, 3));
-                $num2 = preg_quote(substr($phone, 3, 3));
-                $num3 = preg_quote(substr($phone, 6));
-                if (preg_match("/(\W*{$num1}\W*{$num2}\W*{$num3})/i", $notes, $matches)) {
-                    return ['phone', $matches[1]];
-                }
-            }
-        }
-        return false;
-    }
-
     private function getSiteSuffix($site)
     {
         return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
@@ -445,9 +440,8 @@ class Participant
     {
         if ($participant->consentCohort === 'COHORT_2' && isset($participant->cohort2PilotFlag) && $participant->cohort2PilotFlag === 'COHORT_2_PILOT') {
             return self::$consentCohortValues[$participant->cohort2PilotFlag];
-        } else {
-            return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;
         }
+        return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;
     }
 
     private function getParticipantIncentiveDateGiven($participantIncentives): string
