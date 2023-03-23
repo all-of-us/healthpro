@@ -7,15 +7,14 @@ use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\NphSite;
-use App\Entity\Site;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
 use App\Service\LoggerService;
 use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 
 class NphOrderService
@@ -576,7 +575,7 @@ class NphOrderService
             $isModified = false;
             if ($sample->getModifyType() === NphSample::UNLOCK) {
                 $orderMetadata = json_decode($order->getMetadata(), true);
-                if ($collectedTs !== $sample->getCollectedTs() || $orderMetadata['bowelType'] !== $formData['bowelType']
+                if ($collectedTs != $sample->getCollectedTs() || $orderMetadata['bowelType'] !== $formData['bowelType']
                     || $orderMetadata['bowelQuality'] !== $formData['bowelQuality']) {
                     $isModified = true;
                 }
