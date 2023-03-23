@@ -217,7 +217,7 @@ class ParticipantDetailsController extends BaseController
 
         $incentives = $this->em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
 
-        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true; // @phpstan-ignore-line
+        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
         // Generate url for blood donor check form
         $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';
@@ -243,9 +243,9 @@ class ParticipantDetailsController extends BaseController
             'canViewPatientStatus' => $canViewPatientStatus,
             'displayPatientStatusBlock' => !$isDVType,
             'canEdit' => $participant->status || $participant->editExistingOnly,
-            'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null, // @phpstan-ignore-line
+            'disablePatientStatusMessage' => $params->has('disable_patient_status_message') ? $params->get('disable_patient_status_message') : null,
             'evaluationUrl' => $evaluationUrl,
-            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'), // @phpstan-ignore-line
+            'showConsentPDFs' => (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'),
             'incentiveForm' => $incentiveForm->createView(),
             'incentives' => $incentives,
             'incentiveDeleteForm' => $incentiveDeleteForm->createView(),

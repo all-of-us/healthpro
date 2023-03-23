@@ -43,7 +43,7 @@ class WorkQueueService
         $this->loggerService = $loggerService;
         $this->authorizationChecker = $authorizationChecker;
         $this->urlGenerator = $urlGenerator;
-        $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue'); // @phpstan-ignore-line
+        $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
     }
 
     public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null, $sites = null)

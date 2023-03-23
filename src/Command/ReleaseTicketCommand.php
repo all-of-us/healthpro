@@ -31,7 +31,7 @@ class ReleaseTicketCommand extends Command
     {
         $this->jira = $jira;
         $this->templating = $templating;
-        if ($params->has('jira_account_ids')) { // @phpstan-ignore-line
+        if ($params->has('jira_account_ids')) {
             $this->defaultAccountIds = $params->get('jira_account_ids');
         }
         parent::__construct();

@@ -32,7 +32,7 @@ class MayolinkOrderService
         $this->em = $em;
         $this->twig = $twig;
         $this->logger = $logger;
-        if (!$this->params->has('ml_mock_order')) { // @phpstan-ignore-line
+        if (!$this->params->has('ml_mock_order')) {
             $this->setMayoCredentials();
         }
     }

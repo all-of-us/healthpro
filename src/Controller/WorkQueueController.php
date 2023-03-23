@@ -47,7 +47,7 @@ class WorkQueueController extends BaseController
         $this->requestStack = $requestStack;
         $this->workQueueService = $workQueueService;
         $this->siteService = $siteService;
-        $this->displayParticipantConsentsTab = $params->has('feature.participantconsentsworkqueue') ? $params->get('feature.participantconsentsworkqueue') : false; // @phpstan-ignore-line
+        $this->displayParticipantConsentsTab = $params->has('feature.participantconsentsworkqueue') ? $params->get('feature.participantconsentsworkqueue') : false;
     }
 
     /**
@@ -370,7 +370,7 @@ class WorkQueueController extends BaseController
         }
 
         $problems = $this->em->getRepository(Problem::class)->getProblemsWithCommentsCount($id);
-        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true; // @phpstan-ignore-line
+        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         return $this->render('workqueue/participant.html.twig', [
             'participant' => $participant,
             'cacheEnabled' => $cacheEnabled,

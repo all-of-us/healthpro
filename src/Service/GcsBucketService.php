@@ -22,7 +22,7 @@ class GcsBucketService
                 'keyFilePath' => $this->config['key_file']
             ]);
         }
-        if ($params->has('rdr_auth_json')) { // @phpstan-ignore-line
+        if ($params->has('rdr_auth_json')) {
             $this->config['rdr_auth_json'] = json_decode($params->get('rdr_auth_json'), true);
             $this->storageClient = new StorageClient([
                 'keyFile' => $this->config['rdr_auth_json']

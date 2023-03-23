@@ -38,7 +38,7 @@ class NphAdminController extends BaseController
         $sites = $nphSiteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('program/nph/admin/sites/index.html.twig', [
             'sites' => $sites,
-            'sync' => $params->has('nph_sites_use_rdr') ? $params->get('nph_sites_use_rdr') : false, // @phpstan-ignore-line
+            'sync' => $params->has('nph_sites_use_rdr') ? $params->get('nph_sites_use_rdr') : false,
             'siteChoices' => NphSiteType::$siteChoices
         ]);
     }

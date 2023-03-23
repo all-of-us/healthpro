@@ -34,7 +34,7 @@ class SitesController extends BaseController
         $sites = $siteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('admin/sites/index.html.twig', [
             'sites' => $sites,
-            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false, // @phpstan-ignore-line
+            'sync' => $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false,
             'siteChoices' => SiteType::$siteChoices
         ]);
     }
@@ -44,7 +44,7 @@ class SitesController extends BaseController
      */
     public function edit(SiteRepository $siteRepository, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, $id = null)
     {
-        $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false; // @phpstan-ignore-line
+        $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false;
         if ($id) {
             $site = $siteRepository->find($id);
             if (!$site) {
@@ -152,7 +152,7 @@ class SitesController extends BaseController
      */
     public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)
     {
-        if (!$params->has('sites_use_rdr')) { // @phpstan-ignore-line
+        if (!$params->has('sites_use_rdr')) {
             $formView = false;
         } else {
             $form = $this->createForm(FormType::class);

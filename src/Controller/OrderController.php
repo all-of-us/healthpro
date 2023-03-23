@@ -234,7 +234,7 @@ class OrderController extends BaseController
             // 404 because print is not a valid route for kit orders regardless of state
             throw $this->createAccessDeniedException();
         }
-        if ($params->has('ml_mock_order')) { // @phpstan-ignore-line
+        if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
         } else {
             $result = $this->orderService->getLabelsPdf();
@@ -593,7 +593,7 @@ class OrderController extends BaseController
         if (!in_array('print_requisition', $order->getAvailableSteps())) {
             throw $this->createNotFoundException();
         }
-        if ($params->has('ml_mock_order')) { // @phpstan-ignore-line
+        if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
         } else {
             $pdf = $this->orderService->getRequisitionPdf();
