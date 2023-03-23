@@ -2,6 +2,7 @@
 
 namespace App\Form\Nph;
 
+use App\Entity\NphOrder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,8 +21,9 @@ class NphOrderCollect extends NphOrderForm
                 'label' => $sampleLabel,
                 'required' => false,
                 'constraints' => [
-                    new Constraints\Callback(function ($value, $context) use ($sampleCode) {
-                        if ($value === false && !empty($context->getRoot()["{$sampleCode}CollectedTs"]->getData())) {
+                    new Constraints\Callback(function ($value, $context) use ($sampleCode, $orderType) {
+                        if ($orderType !== NphOrder::TYPE_STOOL && $value === false && !empty($context->getRoot()
+                            ["{$sampleCode}CollectedTs"]->getData())) {
                             $context->buildViolation('Collected sample required')->addViolation();
                         }
                     })
@@ -35,11 +37,33 @@ class NphOrderCollect extends NphOrderForm
             $sampleIndex++;
         }
 
-        if ($orderType === 'urine') {
+        if ($orderType === NphOrder::TYPE_URINE) {
             $this->addUrineMetadataFields($builder, $options['disableMetadataFields']);
         }
 
-        if ($orderType === 'stool') {
+        if ($orderType === NphOrder::TYPE_STOOL) {
+            $constraints = $this->getDateTimeConstraints();
+            array_push(
+                $constraints,
+                new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]),
+                $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs'])
+            );
+            $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
+                'required' => true,
+                'constraints' => $constraints,
+                'label' => 'Collection Time',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => $options['timeZone'],
+                'attr' => [
+                    'class' => 'order-ts',
+                    'readonly' => $options['disableStoolCollectedTs']
+                ]
+            ]);
             $this->addStoolMetadataFields($builder, $options['disableMetadataFields']);
         }
 
@@ -57,7 +81,9 @@ class NphOrderCollect extends NphOrderForm
             'samples' => null,
             'orderType' => null,
             'timeZone' => null,
-            'disableMetadataFields' => null
+            'disableMetadataFields' => null,
+            'disableStoolCollectedTs' => null,
+            'orderCreatedTs' => null
         ]);
     }
 }

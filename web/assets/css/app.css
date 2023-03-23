@@ -843,3 +843,21 @@ table.table-samples td {
 #login-help>h4 {
     font-weight: bold;
 }
+
+.stool-samples-box {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.stool-sub-samples {
+    padding-top: 10px;
+}
+
+.stool-samples-box-1 {
+    background-color: #bcdeff;
+}
+
+.stool-samples-box-2 {
+    background-color: #fef6a6;
+}

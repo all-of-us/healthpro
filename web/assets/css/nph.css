@@ -82,3 +82,15 @@ table tr td input.aliquot-volume {
 li.participant-activity > a {
     padding: 10px 29px
 }
+.table>tbody>tr.row-message>td {
+    padding: 0 0 10px 0;
+    margin: 0;
+}
+.table>tbody>tr.row-samples>td>p {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+div.alert.alert-danger.well-sm {
+    margin-bottom: 0;
+    margin-top: 20px;
+}

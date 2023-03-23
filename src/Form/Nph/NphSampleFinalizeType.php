@@ -64,6 +64,11 @@ class NphSampleFinalizeType extends NphOrderForm
                                 if ($condition && empty($value)) {
                                     $context->buildViolation('Barcode is required')->addViolation();
                                 }
+                            }),
+                            new Constraints\Callback(function ($value, $context) use ($aliquot) {
+                                if (($aliquot['required'] ?? false) && empty($value) && !empty($context->getValue())) {
+                                    $context->buildViolation('At least one 500 μL aliquot is required')->addViolation();
+                                }
                             })
                         ],
                         'attr' => [
@@ -95,13 +100,18 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'value' => new \DateTime('+5 minutes'),
                                 'message' => 'Timestamp cannot be in the future'
                             ]),
-                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
+                            new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $sample) {
                                 $formData = $context->getRoot()->getData();
                                 $key = intval($context->getObject()->getName());
                                 $condition = $aliquot['expectedVolume'] ? ($formData[$aliquotCode][$key] ||
                                     $formData["{$aliquotCode}Volume"][$key]) : $formData[$aliquotCode][$key];
                                 if ($condition && empty($value)) {
                                     $context->buildViolation('Time is required')->addViolation();
+                                }
+                                if (!empty($formData["{$sample}CollectedTs"]) && !empty($value)) {
+                                    if ($value <= $formData["{$sample}CollectedTs"]) {
+                                        $context->buildViolation('Aliquot time must be after collection time')->addViolation();
+                                    }
                                 }
                             })
                         ],
@@ -135,10 +145,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]);
                 }
                 if (isset($aliquot['maxVolume'])) {
-                    $errorMessage = 'Please verify the volume is correct.';
-                    if ($orderType === NphOrder::TYPE_BLOOD) {
-                        $errorMessage .= ' If greater than expected volume, you may add an additional aliquot.';
-                    }
+                    $errorMessage = "Please verify the volume is correct. This aliquot should contain {$aliquot['maxVolume']} {$aliquot['units']} Only.";
                     $volumeConstraints[] = new Constraints\LessThanOrEqual([
                         'value' => $aliquot['maxVolume'],
                         'message' => $errorMessage
@@ -210,7 +217,9 @@ class NphSampleFinalizeType extends NphOrderForm
             'aliquots' => null,
             'disabled' => null,
             'nphSample' => null,
-            'disableMetadataFields' => null
+            'disableMetadataFields' => null,
+            'disableStoolCollectedTs' => null,
+            'orderCreatedTs' => null
         ]);
     }
 

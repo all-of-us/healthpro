@@ -1,25 +1,33 @@
 {% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit, samplesStatus) %}
     {% set formField = orderForm[timePoint] %}
     {% for sample in formField.children %}
-        {% if sample.vars.value == 'STOOL' %}
+        {% if sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL') %}
             <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample, {'attr': {'class': 'stool-checkbox'}}) }} {{ sample.vars.label }}</label></div>
             <div class="stool-text-fields">
-                <div {% if not orderForm.stoolKit.vars.valid %} class="has-error" {% endif %}>
+                <div class="stool-samples-box bg-light {% if not orderForm.stoolKit.vars.valid %} has-error {% endif %}">
                     {{ form_label(orderForm.stoolKit) }}
                     {{ form_widget(orderForm.stoolKit) }}
                     {{ form_errors(orderForm.stoolKit) }}
                 </div>
-                <br>
-                {% for stoolSample in stoolSamples %}
-                    <div {% if not orderForm[stoolSample].vars.valid %} class="has-error" {% endif %}>
-                        {{ form_label(orderForm[stoolSample]) }}
-                        {% if samplesOrderIds[timePoint][stoolSample] is defined %}
-                            {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
-                        {% endif %}
-                        {{ form_widget(orderForm[stoolSample]) }}
-                        {{ form_errors(orderForm[stoolSample]) }}
+                {% set stoolTubes = [
+                    {'label': '95% Ethanol Tubes (2)', 'tubes': ['ST1', 'ST2']},
+                    {'label': 'DNA/RNA Shield Tubes (2)', 'tubes': ['ST3', 'ST4']}
+                ] %}
+                {% for tubeType in stoolTubes %}
+                    <div class="stool-samples-box stool-samples-box-{{ loop.index }}">
+                        <label>{{ tubeType.label }}</label>
+                        {% for stoolSample in stoolSamples %}
+                            {% if stoolSample in tubeType.tubes %}
+                                <div class="stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
+                                    {% if samplesOrderIds[timePoint][stoolSample] is defined %}
+                                        {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
+                                    {% endif %}
+                                    {{ form_widget(orderForm[stoolSample]) }}
+                                    {{ form_errors(orderForm[stoolSample]) }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                    <br>
                 {% endfor %}
             </div>
         {% else %}

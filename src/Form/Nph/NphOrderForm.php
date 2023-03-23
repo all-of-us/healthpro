@@ -2,6 +2,7 @@
 
 namespace App\Form\Nph;
 
+use App\Entity\NphOrder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -9,6 +10,9 @@ use Symfony\Component\Validator\Constraints;
 
 class NphOrderForm extends AbstractType
 {
+    public const FORM_FINALIZE_TYPE = 'finalize';
+    public const FORM_COLLECT_TYPE = 'collect';
+
     public static $urineColors = [
         'Color 1' => 1,
         'Color 2' => 2,
@@ -44,41 +48,38 @@ class NphOrderForm extends AbstractType
         array $options,
         string $sample,
         bool $disabled = false,
-        string $formType = 'finalize'
+        string $formType = self::FORM_FINALIZE_TYPE
     ): void {
-        $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
-        $constraints = [
-            new Constraints\Type('datetime'),
-            new Constraints\LessThanOrEqual([
-                'value' => $constraintDateTime,
-                'message' => 'Date cannot be in the future'
-            ])
-        ];
-        if ($formType === 'collect') {
-            $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
-                if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
-                    $context->buildViolation('Collection time is required')->addViolation();
-                }
-            });
-        } else {
-            $constraints[] = new Constraints\NotBlank([
-                'message' => 'Collection time is required'
+        if ($formType === self::FORM_FINALIZE_TYPE || $options['orderType'] !== NphOrder::TYPE_STOOL) {
+            $constraints = $this->getDateTimeConstraints();
+            if ($formType === self::FORM_COLLECT_TYPE) {
+                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
+                    if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
+                        $context->buildViolation('Collection time is required')->addViolation();
+                    }
+                });
+            } else {
+                $constraints[] = new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]);
+            }
+            $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
+            $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
+                'required' => $formType === self::FORM_FINALIZE_TYPE,
+                'label' => 'Collection Time',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => $options['timeZone'],
+                'constraints' => $constraints,
+                'attr' => [
+                    'class' => 'order-ts',
+                    'readonly' => $options['disableStoolCollectedTs']
+                ],
+                'disabled' => $disabled
             ]);
         }
-        $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-            'required' => $formType === 'finalize',
-            'label' => 'Collection Time',
-            'widget' => 'single_text',
-            'format' => 'M/d/yyyy h:mm a',
-            'html5' => false,
-            'model_timezone' => 'UTC',
-            'view_timezone' => $options['timeZone'],
-            'constraints' => $constraints,
-            'attr' => [
-                'class' => 'order-ts',
-            ],
-            'disabled' => $disabled
-        ]);
         $builder->add("{$sample}Notes", Type\TextareaType::class, [
             'label' => 'Notes',
             'required' => false,
@@ -126,6 +127,25 @@ class NphOrderForm extends AbstractType
             'multiple' => false,
             'placeholder' => 'Select bowel movement quality',
             'disabled' => $disabled
+        ]);
+    }
+
+    protected function getDateTimeConstraints(): array
+    {
+        return [
+            new Constraints\Type('datetime'),
+            new Constraints\LessThanOrEqual([
+                'value' => new \DateTime('+5 minutes'), // add buffer for time skew
+                'message' => 'Time cannot be in the future'
+            ])
+        ];
+    }
+
+    protected function getCollectedTimeGreaterThanConstraint(\DateTime $dateTime): Constraints\GreaterThan
+    {
+        return new Constraints\GreaterThan([
+            'value' => $dateTime,
+            'message' => 'Time must be after order generation'
         ]);
     }
 }

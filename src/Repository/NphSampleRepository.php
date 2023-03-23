@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,4 +48,28 @@ class NphSampleRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findActiveSampleCodes(NphOrder $order, $site)
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.sampleCode')
+            ->join('s.nphOrder', 'o')
+            ->andWhere('o.participantId = :participantId')
+            ->andWhere('o.module = :module')
+            ->andWhere('o.timepoint = :timepoint')
+            ->andWhere('o.visitType = :visitType')
+            ->andWhere('o.site = :site')
+            ->andWhere('s.modifyType IN (:types) or s.modifyType is null')
+            ->setParameters([
+                'participantId' => $order->getParticipantId(),
+                'module' => $order->getModule(),
+                'timepoint' => $order->getTimepoint(),
+                'visitType' => $order->getVisitType(),
+                'site' => $site,
+                'types' => [NphSample::RESTORE, NphSample::UNLOCK, NphSample::EDITED, NphSample::REVERT]
+            ])
+            ->getQuery()
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR_COLUMN)
+        ;
+    }
 }

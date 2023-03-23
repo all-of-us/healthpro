@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\NphFieldSort;
 use App\Entity\NphOrder;
+use App\Entity\NphSample;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
@@ -72,8 +73,8 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
             ->leftJoin(NphFieldSort::class, 'nfs', Join::WITH, 'nfs.fieldValue = no.timepoint')
-            ->where('no.createdTs >= :startDate')
-            ->andWhere('no.createdTs <= :endDate')
+            ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
+            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate')
             ->andWhere('no.site = :site')
             ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
             ->orderBy('no.participantId', 'DESC')
@@ -91,8 +92,8 @@ class NphOrderRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('no')
             ->select('count(no.createdTs) as createdCount, count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
             ->join('no.nphSamples', 'ns')
-            ->where('no.createdTs >= :startDate')
-            ->andWhere('no.createdTs <= :endDate')
+            ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
+            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate')
             ->andWhere('no.site = :site')
             ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
             ->getQuery()
@@ -106,7 +107,8 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->where('no.site = :site')
             ->andWhere('ns.finalizedTs IS NULL')
-            ->setParameter('site', $siteId)
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
+            ->setParameters(['site' => $siteId, 'modifyType' => NphSample::CANCEL])
             ->getQuery()
             ->getResult();
     }
@@ -119,7 +121,8 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->where('ns.finalizedTs IS NULL')
             ->andWhere('no.site = :site')
-            ->setParameter('site', $site)
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
+            ->setParameters(['site' => $site, 'modifyType' => NphSample::CANCEL])
             ->orderBy('no.id', 'ASC')
             ->getQuery()
             ->getResult();

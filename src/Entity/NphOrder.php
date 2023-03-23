@@ -257,10 +257,10 @@ class NphOrder
         return false;
     }
 
-    public function canRestore(): bool
+    public function canRestore(array $activeSamples = []): bool
     {
         foreach ($this->getNphSamples() as $nphSample) {
-            if ($nphSample->getModifyType() === NphSample::CANCEL) {
+            if ($nphSample->getModifyType() === NphSample::CANCEL && !in_array($nphSample->getSampleCode(), $activeSamples, true)) {
                 return true;
             }
         }
@@ -344,5 +344,27 @@ class NphOrder
             return 'Collected';
         }
         return 'In Progress';
+    }
+
+    public function getCollectedTs(): ?\DateTime
+    {
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getCollectedTs()) {
+                return $nphSample->getCollectedTs();
+            }
+        }
+        return null;
+    }
+
+    public function isStoolCollectedTsDisabled(): bool
+    {
+        if ($this->getOrderType() === self::TYPE_STOOL) {
+            foreach ($this->nphSamples as $nphSample) {
+                if ($nphSample->getFinalizedTs()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

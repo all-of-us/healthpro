@@ -2,6 +2,7 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\NphOrder;
 use App\Entity\NphSample;
 
 class NphOrderTest extends NphTestCase
@@ -237,6 +238,149 @@ class NphOrderTest extends NphTestCase
                     ],
                 ],
                 'Collected'
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider collectedTimeProvider
+     */
+
+    public function testGetCollectedTs(array $samples, ?\DateTime $expectedCollectedTs): void
+    {
+        $orderData = $this->getOrderData();
+        $nphOrder = $this->createNphOrder($orderData);
+        foreach ($samples as $sample) {
+            $sample['nphOrder'] = $nphOrder;
+            $this->createNphSample($sample);
+        }
+        $this->assertSame($expectedCollectedTs, $nphOrder->getCollectedTs());
+    }
+
+    public function collectedTimeProvider(): array
+    {
+        $collectedTs1 = new \DateTime('2023-03-15 08:00:00');
+        $collectedTs2 = new \DateTime('2023-03-16 08:00:00');
+        return [
+            [
+                [
+                    [
+                        'sampleId' => '1000000000',
+                        'sampleCode' => 'ST1',
+                    ],
+                    [
+                        'sampleId' => '2000000000',
+                        'sampleCode' => 'ST2'
+                    ],
+                ],
+                null
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '3000000000',
+                        'sampleCode' => 'ST1',
+                        'collectedTs' => $collectedTs1
+                    ],
+                    [
+                        'sampleId' => '4000000000',
+                        'sampleCode' => 'ST2',
+                        'collectedTs' => $collectedTs2
+                    ],
+                ],
+                $collectedTs1
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '3000000000',
+                        'sampleCode' => 'ST1',
+                    ],
+                    [
+                        'sampleId' => '4000000000',
+                        'sampleCode' => 'ST2',
+                        'collectedTs' => $collectedTs2
+                    ],
+                ],
+                $collectedTs2
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider stoolTypeProvider
+     */
+
+    public function testIsStoolCollectedTsDisabled(string $orderType, array $samples, bool $expectedResult): void
+    {
+        $orderData = $this->getOrderData();
+        $orderData['orderType'] = $orderType;
+        $nphOrder = $this->createNphOrder($orderData);
+        foreach ($samples as $sample) {
+            $sample['nphOrder'] = $nphOrder;
+            $this->createNphSample($sample);
+        }
+        $this->assertSame($expectedResult, $nphOrder->isStoolCollectedTsDisabled());
+    }
+
+    public function stoolTypeProvider(): array
+    {
+        $collectedTs = new \DateTime();
+        return [
+            [
+                NphOrder::TYPE_STOOL,
+                [
+                    [
+                        'sampleId' => '1000000000',
+                        'sampleCode' => 'ST1'
+                    ],
+                    [
+                        'sampleId' => '2000000000',
+                        'sampleCode' => 'ST2'
+                    ],
+                ],
+                false
+            ],
+            [
+                NphOrder::TYPE_STOOL,
+                [
+                    [
+                        'sampleId' => '3000000000',
+                        'sampleCode' => 'ST1',
+                        'collectedTs' => $collectedTs
+                    ],
+                    [
+                        'sampleId' => '4000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                false
+            ],
+            [
+                NphOrder::TYPE_URINE,
+                [
+                    [
+                        'sampleId' => '5000000000',
+                        'sampleCode' => 'URINES',
+                        'collectedTs' => $collectedTs
+                    ],
+                ],
+                false
+            ],
+            [
+                NphOrder::TYPE_STOOL,
+                [
+                    [
+                        'sampleId' => '6000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $collectedTs
+                    ],
+                    [
+                        'sampleId' => '7000000000',
+                        'sampleCode' => 'ST2',
+                    ],
+                ],
+                true
             ],
         ];
     }
