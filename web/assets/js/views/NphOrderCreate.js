@@ -86,7 +86,7 @@ $(document).ready(function () {
         let confirmMessage =
             "Are you sure you want to generate orders and print labels? " +
             "This action will officially create the order and sample IDs. " +
-            "Click cancel to go back and edit timepoints/samples." +
+            "Click cancel to go back and edit timepoints/samples. " +
             "Click OK to create order(s) and print labels.";
         if (confirm(confirmMessage)) {
             $("#order_create_form").submit();
