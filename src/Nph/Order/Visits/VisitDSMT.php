@@ -21,8 +21,8 @@ class VisitDSMT extends TimePoints
     ];
 
     protected $timePointSampleTypes = [
-        'preDSMT' => ['urine', 'saliva'],
-        'postDSMT' => ['urine', 'saliva']
+        'preDSMT' => ['urine', 'saliva', 'hair', 'nail', 'stool'],
+        'postDSMT' => ['urine']
     ];
 
     public function __construct($module)
