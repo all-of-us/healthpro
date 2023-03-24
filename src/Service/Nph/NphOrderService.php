@@ -33,8 +33,6 @@ class NphOrderService
     private $user;
     private $site;
 
-    private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT', 'day0'];
-
     private static $placeholderSamples = ['STOOL'];
 
     public function __construct(
@@ -272,8 +270,7 @@ class NphOrderService
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            // TODO: dynamically load stool visit type
-            $nphOrder = $this->createOrder('preLMT', NphOrder::TYPE_STOOL, $formData['stoolKit']);
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit']);
             foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
@@ -281,6 +278,16 @@ class NphOrderService
             }
         }
         return $sampleGroup;
+    }
+
+    private function getStoolTimePoint(array $formData): ?string
+    {
+        foreach (array_keys($this->getTimePoints()) as $timePoint) {
+            if (in_array(NphSample::SAMPLE_STOOL, $formData[$timePoint])) {
+                return $timePoint;
+            }
+        }
+        return null;
     }
 
     public function createOrder(string $timePoint, string $orderType, string $orderId = null): NphOrder
