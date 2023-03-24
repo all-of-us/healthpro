@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Problem;
@@ -11,6 +12,7 @@ use App\Form\WorkQueueParticipantLookupSearchType;
 use App\Form\WorkQueueViewDeleteType;
 use App\Form\WorkQueueViewType;
 use App\Form\WorkQueueViewUpdateType;
+use App\Helper\WorkQueue;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
@@ -23,8 +25,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Helper\WorkQueue;
-use App\Audit\Log;
 
 /**
  * @Route("/workqueue")

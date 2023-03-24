@@ -5,8 +5,9 @@ namespace App\EventListener;
 use App\Audit\Log;
 use App\Entity\FeatureNotification;
 use App\Entity\FeatureNotificationUserMap;
+use App\Entity\Notice;
 use App\Entity\User;
-use App\Service\EnvironmentService;
+use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,8 +18,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment as TwigEnvironment;
-use App\Entity\Notice;
-use App\Service\LoggerService;
 
 class RequestListener
 {
@@ -29,7 +28,6 @@ class RequestListener
     private $userService;
     private $siteService;
     private $authorizationChecker;
-    private $env;
     private $tokenStorage;
 
     private $request;
@@ -42,7 +40,6 @@ class RequestListener
         UserService $userService,
         SiteService $siteService,
         AuthorizationCheckerInterface $authorizationChecker,
-        EnvironmentService $env,
         TokenStorageInterface $tokenStorage
     ) {
         $this->logger = $logger;
@@ -52,7 +49,6 @@ class RequestListener
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->authorizationChecker = $authorizationChecker;
-        $this->env = $env;
         $this->tokenStorage = $tokenStorage;
     }
 

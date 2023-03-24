@@ -2,20 +2,17 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Form\GroupMemberType;
 use App\Form\RemoveGroupMemberType;
-use App\Security\User;
 use App\Service\AccessManagementService;
 use App\Service\ContextTemplateService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
-use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -29,20 +26,17 @@ class AccessManagementController extends BaseController
     private $googleGroupsService;
     private $loggerService;
     private $contextTemplate;
-    private $requestStack;
 
     public function __construct(
         GoogleGroupsService $googleGroupsService,
         LoggerService $loggerService,
         EntityManagerInterface $em,
-        ContextTemplateService $contextTemplate,
-        RequestStack $requestStack
+        ContextTemplateService $contextTemplate
     ) {
         parent::__construct($em);
         $this->googleGroupsService = $googleGroupsService;
         $this->loggerService = $loggerService;
         $this->contextTemplate = $contextTemplate;
-        $this->requestStack = $requestStack;
     }
 
     /**

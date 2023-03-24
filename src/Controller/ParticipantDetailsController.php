@@ -2,13 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\IdVerification;
+use App\Audit\Log;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PatientStatus;
 use App\Entity\Problem;
-use App\Entity\User;
 use App\Form\CrossOriginAgreeType;
 use App\Form\IdVerificationType;
 use App\Form\IncentiveRemoveType;
@@ -24,7 +23,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\HeaderUtils;

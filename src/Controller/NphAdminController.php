@@ -2,16 +2,12 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Form\NphSiteType;
 use App\Repository\NphSiteRepository;
-use App\Service\EnvironmentService;
 use App\Service\LoggerService;
-use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
-use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

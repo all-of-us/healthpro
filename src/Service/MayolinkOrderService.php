@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Entity\Order;
 use App\HttpClient;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
-use App\Entity\Order;
 
 class MayolinkOrderService
 {

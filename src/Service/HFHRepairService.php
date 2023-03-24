@@ -7,20 +7,16 @@ use App\Entity\Measurement;
 use App\Entity\Order;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
 
 class HFHRepairService
 {
     private EntityManagerInterface $em;
     private LoggerService $loggerService;
-    private $env;
 
-    public function __construct(EntityManagerInterface $em, LoggerService $logger, EnvironmentService $env)
+    public function __construct(EntityManagerInterface $em, LoggerService $logger)
     {
         $this->em = $em;
         $this->loggerService = $logger;
-        $this->env = $env;
     }
 
     public function repairHFHParticipants(int $repairLimit = 100, $pariticpantId = null): void

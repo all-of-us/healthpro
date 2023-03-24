@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Order;
 use App\Entity\Site;
 use App\Form\OrderCreateType;
@@ -14,7 +15,6 @@ use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -145,7 +145,7 @@ class OrderController extends BaseController
                     $order->setType('saliva');
                 }
             }
-            if ($createForm->isValid()) {
+            if ($createForm->isValid()) { // @phpstan-ignore-line
                 $order->setUser($this->getUserEntity());
                 $order->setSite($this->siteService->getSiteId());
                 $order->setParticipantId($participant->id);
@@ -596,9 +596,7 @@ class OrderController extends BaseController
         if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
         } else {
-            if ($order->getMayoId()) {
-                $pdf = $this->orderService->getRequisitionPdf();
-            }
+            $pdf = $this->orderService->getRequisitionPdf();
             if (!empty($pdf)) {
                 return new Response($pdf, 200, ['Content-Type' => 'application/pdf']);
             } else {

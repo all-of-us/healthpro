@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Cache\DatastoreAdapter;
+use App\HttpClient;
 use Google\Client as GoogleClient;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use App\Cache\DatastoreAdapter;
-use App\HttpClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
