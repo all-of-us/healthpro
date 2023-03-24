@@ -33,7 +33,7 @@ class NphOrderService
     private $user;
     private $site;
 
-    private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
+    private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT', 'day0'];
 
     private static $placeholderSamples = ['STOOL'];
 
@@ -251,29 +251,30 @@ class NphOrderService
         $sampleGroup = $this->generateSampleGroup();
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
-                if (in_array($timePoint, self::$nonBloodTimePoints)) {
-                    $nailSamples = [];
-                    foreach ($samples as $sample) {
-                        if (in_array($sample, $this->getSamplesByType('nail'))) {
-                            $nailSamples[] = $sample;
-                        } elseif (!in_array($sample, self::$placeholderSamples)) {
-                            $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
-                            $this->createSample($sample, $nphOrder, $sampleGroup);
-                        }
+                $samplesByType = [];
+                foreach ($samples as $sample) {
+                    if (in_array($sample, $this->getSamplesByType(NphOrder::TYPE_NAIL))) {
+                        $samplesByType['nail'][] = $sample;
+                    } elseif (in_array($sample, $this->getSamplesByType(NphOrder::TYPE_BLOOD))) {
+                        $samplesByType['blood'][] = $sample;
+                    } elseif (!in_array($sample, self::$placeholderSamples)) {
+                        $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
+                        $this->createSample($sample, $nphOrder, $sampleGroup);
                     }
-                    if (!empty($nailSamples)) {
-                        $this->createOrderWithSamples($timePoint, 'nail', $nailSamples, $sampleGroup);
-                    }
-                } else {
-                    $this->createOrderWithSamples($timePoint, 'blood', $samples, $sampleGroup);
+                }
+                if (!empty($samplesByType['nail'])) {
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_NAIL, $samplesByType['nail'], $sampleGroup);
+                }
+                if (!empty($samplesByType['blood'])) {
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_BLOOD, $samplesByType['blood'], $sampleGroup);
                 }
             }
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
             // TODO: dynamically load stool visit type
-            $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
-            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+            $nphOrder = $this->createOrder('preLMT', NphOrder::TYPE_STOOL, $formData['stoolKit']);
+            foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
                 }
