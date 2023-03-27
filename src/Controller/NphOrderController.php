@@ -100,8 +100,9 @@ class NphOrderController extends BaseController
             'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
-            'nailSamples' => $nphOrderService->getSamplesByType('nail'),
+            'stoolSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_STOOL),
+            'nailSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_NAIL),
+            'bloodSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_BLOOD),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
             'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
             'showPreview' => $showPreview

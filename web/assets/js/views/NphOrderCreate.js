@@ -16,62 +16,53 @@ $(document).ready(function () {
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
         let stoolSamples = orderCreateSelector.data("stool-samples");
-        let prePostTimePoints = ["preLMT", "postLMT"];
+        let bloodSamples = orderCreateSelector.data("blood-samples");
         let samplesCount = 0;
         $(".timepoint-samples").each(function () {
             let timePoint = $(this).data("timepoint");
-            if (prePostTimePoints.includes(timePoint)) {
-                let nailSubSamples = [];
-                $(this)
-                    .find("input:checkbox")
-                    .each(function () {
-                        if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
-                            let sample = $(this).val();
-                            if (sample === SAMPLE_STOOL) {
-                                let stoolKitSelector = $("#nph_order_stoolKit");
-                                if (stoolKitSelector.val()) {
-                                    let stoolKitSamples = "";
-                                    stoolSamples.forEach(function (stoolSample) {
-                                        let stoolInputSelector = $("#nph_order_" + stoolSample);
-                                        if (stoolInputSelector.val()) {
-                                            stoolKitSamples +=
-                                                ", " + samples[stoolSample] + ": " + stoolInputSelector.val();
-                                            samplesCount++;
-                                        }
-                                    });
-                                    if (stoolKitSamples) {
-                                        addTimePointSamples(
-                                            timePoints[timePoint],
-                                            "Stool: KIT ID " + stoolKitSelector.val() + stoolKitSamples + ""
-                                        );
+            let nailSubSamples = [];
+            let bloodSubSamples = [];
+            $(this)
+                .find("input:checkbox")
+                .each(function () {
+                    if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
+                        let sample = $(this).val();
+                        if (sample === SAMPLE_STOOL) {
+                            let stoolKitSelector = $("#nph_order_stoolKit");
+                            if (stoolKitSelector.val()) {
+                                let stoolKitSamples = "";
+                                stoolSamples.forEach(function (stoolSample) {
+                                    let stoolInputSelector = $("#nph_order_" + stoolSample);
+                                    if (stoolInputSelector.val()) {
+                                        stoolKitSamples +=
+                                            ", " + samples[stoolSample] + ": " + stoolInputSelector.val();
+                                        samplesCount++;
                                     }
+                                });
+                                if (stoolKitSamples) {
+                                    addTimePointSamples(
+                                        timePoints[timePoint],
+                                        "Stool: KIT ID " + stoolKitSelector.val() + stoolKitSamples + ""
+                                    );
                                 }
-                            } else if (nailSamples.includes(sample)) {
-                                nailSubSamples.push(samples[$(this).val()]);
-                                samplesCount++;
-                            } else {
-                                addTimePointSamples(timePoints[timePoint], samples[sample]);
-                                samplesCount++;
                             }
-                        }
-                    });
-                if (nailSubSamples.length > 0) {
-                    addTimePointSamples(timePoints[timePoint], "Nail: " + nailSubSamples.join(", ") + "");
-                }
-            } else {
-                let bloodSamples = [];
-                $(this)
-                    .find("input:checkbox")
-                    .each(function () {
-                        if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
-                            bloodSamples.push(samples[$(this).val()]);
+                        } else if (nailSamples.includes(sample)) {
+                            nailSubSamples.push(samples[$(this).val()]);
+                            samplesCount++;
+                        } else if (bloodSamples.includes(sample)) {
+                            bloodSubSamples.push(samples[$(this).val()]);
+                            samplesCount++;
+                        } else {
+                            addTimePointSamples(timePoints[timePoint], samples[sample]);
                             samplesCount++;
                         }
-                    });
-                if (bloodSamples.length > 0) {
-                    bloodSamples = bloodSamples.join(", ");
-                    addTimePointSamples(timePoints[timePoint], "Blood: " + bloodSamples);
-                }
+                    }
+                });
+            if (nailSubSamples.length > 0) {
+                addTimePointSamples(timePoints[timePoint], "Nail: " + nailSubSamples.join(", ") + "");
+            }
+            if (bloodSubSamples.length > 0) {
+                addTimePointSamples(timePoints[timePoint], "Blood: " + bloodSubSamples.join(", ") + "");
             }
         });
         $("#samples_count").html(samplesCount);
