@@ -121,7 +121,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool) $sampleObj->getFinalizedTs()
+                'disabled' => (bool)$sampleObj->getFinalizedTs()
             ];
         }
         return $sampleLabels;
@@ -759,9 +759,9 @@ class NphOrderService
     {
         $length = 10;
         // Avoid leading 0s
-        $id = (string) rand(1, 9);
+        $id = (string)rand(1, 9);
         for ($i = 0; $i < $length - 1; $i++) {
-            $id .= (string) rand(0, 9);
+            $id .= (string)rand(0, 9);
         }
         return $id;
     }
