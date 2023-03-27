@@ -34,12 +34,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ParticipantDetailsController extends BaseController
 {
-    public function __construct(
-        EntityManagerInterface $em
-    ) {
-        parent::__construct($em);
-    }
-
     private const VALID_CONSENT_TYPES = [
         'consentForStudyEnrollment' => 'consentForStudyEnrollmentFilePath',
         'consentForElectronicHealthRecords' => 'consentForElectronicHealthRecordsFilePath',
@@ -48,6 +42,11 @@ class ParticipantDetailsController extends BaseController
         'reconsentForStudyEnrollmentAuthored' => 'reconsentForStudyEnrollmentFilePath',
         'reconsentForElectronicHealthRecordsAuthored' => 'rconsentForElectronicHealthRecordsFilePath'
     ];
+    public function __construct(
+        EntityManagerInterface $em
+    ) {
+        parent::__construct($em);
+    }
 
     /**
      * @Route("/participant/{id}", name="participant")
@@ -187,7 +186,7 @@ class ParticipantDetailsController extends BaseController
             if ($idVerificationForm->isValid()) {
                 if ($idVerificationService->createIdVerification($id, $idVerificationForm->getData())) {
                     $this->addFlash('id-verification-success', 'ID Verification Saved');
-                    return $this->redirectToRoute("participant", ['id' => $id]);
+                    return $this->redirectToRoute('participant', ['id' => $id]);
                 }
                 $this->addFlash('id-verification-error', 'Error saving id verification . Please try again');
             } else {
@@ -331,7 +330,7 @@ class ParticipantDetailsController extends BaseController
             } else {
                 $this->addFlash('incentive-error', 'Invalid form');
             }
-            return $this->redirectToRoute("participant", ['id' => $id]);
+            return $this->redirectToRoute('participant', ['id' => $id]);
         }
 
         return $this->render('/partials/participant-incentive.html.twig', [

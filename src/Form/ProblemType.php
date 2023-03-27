@@ -5,9 +5,9 @@ namespace App\Form;
 use App\Entity\Problem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type as Type;
-use Symfony\Component\Validator\Constraints as Constraints;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Constraints;
 
 class ProblemType extends AbstractType
 {
@@ -19,7 +19,7 @@ class ProblemType extends AbstractType
             'required' => true,
             'disabled' => $options['formDisabled'],
             'choices' => [
-                Problem::PROBLEM_TYPE_OPTIONS[0]=> Problem::RELATED_BASELINE,
+                Problem::PROBLEM_TYPE_OPTIONS[0] => Problem::RELATED_BASELINE,
                 Problem::PROBLEM_TYPE_OPTIONS[1] => Problem::UNRELATED_BASELINE,
                 Problem::PROBLEM_TYPE_OPTIONS[2] => Problem::OTHER
             ],

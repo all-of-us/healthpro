@@ -236,15 +236,13 @@ class OrderController extends BaseController
         }
         if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleLabels.pdf');
-        } else {
-            $result = $this->orderService->getLabelsPdf();
-            if ($result['status'] === 'success') {
-                return new Response($result['pdf'], 200, ['Content-Type' => 'application/pdf']);
-            } else {
-                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result['errorMessage'] . '</strong></body></html>';
-                return new Response($html, 200, ['Content-Type' => 'text/html']);
-            }
         }
+        $result = $this->orderService->getLabelsPdf();
+        if ($result['status'] === 'success') {
+            return new Response($result['pdf'], 200, ['Content-Type' => 'application/pdf']);
+        }
+        $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>' . $result['errorMessage'] . '</strong></body></html>';
+        return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -299,9 +297,8 @@ class OrderController extends BaseController
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
-            } else {
-                $collectForm->addError(new FormError('Please correct the errors below'));
             }
+            $collectForm->addError(new FormError('Please correct the errors below'));
         }
         return $this->render('order/collect.html.twig', [
             'participant' => $this->orderService->getParticipant(),
@@ -395,9 +392,8 @@ class OrderController extends BaseController
                     'participantId' => $participantId,
                     'orderId' => $orderId
                 ]);
-            } else {
-                $processForm->addError(new FormError('Please correct the errors below'));
             }
+            $processForm->addError(new FormError('Please correct the errors below'));
         }
         return $this->render('order/process.html.twig', [
             'participant' => $this->orderService->getParticipant(),
@@ -595,15 +591,13 @@ class OrderController extends BaseController
         }
         if ($params->has('ml_mock_order')) {
             return $this->redirect($request->getBaseUrl() . '/assets/SampleRequisition.pdf');
-        } else {
-            $pdf = $this->orderService->getRequisitionPdf();
-            if (!empty($pdf)) {
-                return new Response($pdf, 200, ['Content-Type' => 'application/pdf']);
-            } else {
-                $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
-                return new Response($html, 200, ['Content-Type' => 'text/html']);
-            }
         }
+        $pdf = $this->orderService->getRequisitionPdf();
+        if (!empty($pdf)) {
+            return new Response($pdf, 200, ['Content-Type' => 'application/pdf']);
+        }
+        $html = '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>Requisition pdf file could not be loaded</strong></body></html>';
+        return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -657,14 +651,12 @@ class OrderController extends BaseController
                     $this->addFlash('success', "Order {$successText}");
                     if ($type === $order::ORDER_UNLOCK && $request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
                         return $this->redirect($request->query->get('return'));
-                    } else {
-                        return $this->redirectToRoute('participant', [
-                            'id' => $participantId
-                        ]);
                     }
-                } else {
-                    $this->addFlash('error', "Failed to {$type} order. Please try again.");
+                    return $this->redirectToRoute('participant', [
+                        'id' => $participantId
+                    ]);
                 }
+                $this->addFlash('error', "Failed to {$type} order. Please try again.");
             } else {
                 $this->addFlash('error', 'Please correct the errors below');
             }
@@ -753,7 +745,6 @@ class OrderController extends BaseController
      * @Route("/participant/{participantId}/order/{orderId}/biobank/summary", name="biobank_summary")
      * @Route("/read/participant/{participantId}/order/{orderId}/biobank/summary", name="read_biobank_summary")
      */
-
     public function biobankSummaryAction($participantId, $orderId)
     {
         $order = $this->loadOrder($participantId, $orderId);

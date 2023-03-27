@@ -104,6 +104,20 @@ class NphParticipantSummaryService
         return $results;
     }
 
+    public function getAllParticipantDetailsById($participantId): ?array
+    {
+        try {
+            $query = $this->getAllParticipantsByIdQuery($participantId);
+            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $edges = $result['participant']['edges'];
+            return !empty($edges) ? $edges[0]['node'] : null;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
     private function getParticipantByIdQuery(string $participantId): string
     {
         return " 
@@ -177,20 +191,6 @@ class NphParticipantSummaryService
                 }
               }
         ";
-    }
-
-    public function getAllParticipantDetailsById($participantId): ?array
-    {
-        try {
-            $query = $this->getAllParticipantsByIdQuery($participantId);
-            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
-            $result = json_decode($response->getBody()->getContents(), true);
-            $edges = $result['participant']['edges'];
-            return !empty($edges) ? $edges[0]['node'] : null;
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
-        }
     }
 
     private function getAllParticipantsByIdQuery(string $participantId): string

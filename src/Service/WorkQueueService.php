@@ -46,7 +46,7 @@ class WorkQueueService
         $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
     }
 
-    public function participantSummarySearch($organization, &$params, $type = null, $sortColumns  = null, $sites = null)
+    public function participantSummarySearch($organization, &$params, $type = null, $sortColumns = null, $sites = null)
     {
         $rdrParams = [];
         $next = true;
@@ -291,7 +291,7 @@ class WorkQueueService
                     if ($columnDef['type'] === 'sample') {
                         $newSample = $field;
                         foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                            if (array_key_exists($field, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$field]} === 'RECEIVED') {
+                            if (array_key_exists($field, $sampleAlias) && $participant->{'sampleStatus' . $sampleAlias[$field]} === 'RECEIVED') {
                                 $newSample = $sampleAlias[$field];
                                 break;
                             }
@@ -481,7 +481,7 @@ class WorkQueueService
             } elseif (isset($columnDef['type']) && $columnDef['type'] === 'sample') {
                 $newSample = $field;
                 foreach (WorkQueue::$samplesAlias as $sampleAlias) {
-                    if (array_key_exists($field, $sampleAlias) && $participant->{"sampleStatus" . $sampleAlias[$field]} === 'RECEIVED') {
+                    if (array_key_exists($field, $sampleAlias) && $participant->{'sampleStatus' . $sampleAlias[$field]} === 'RECEIVED') {
                         $newSample = $sampleAlias[$field];
                         break;
                     }

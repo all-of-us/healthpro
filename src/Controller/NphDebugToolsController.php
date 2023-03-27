@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Form\DebugParticipantLookupType;
-use App\Service\DebugToolsService;
-use App\Service\EnvironmentService;
 use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;

@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use App\Model\Measurement\Fhir;
 use App\Exception\InvalidSchemaException;
 use App\Exception\MissingSchemaException;
 use App\Helper\Util;
+use App\Model\Measurement\Fhir;
+use Doctrine\ORM\Mapping as ORM;
 use stdClass;
 
 /**
@@ -34,16 +34,6 @@ class Measurement
     public const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
     public const EVALUATION_CANCEL_STATUS = 'entered-in-error';
     public const EVALUATION_RESTORE_STATUS = 'final';
-
-    private $currentVersion;
-
-    private $fieldData;
-
-    private $schema;
-
-    protected $finalizedUserEmail;
-
-    protected $finalizedSiteInfo;
 
     public static $cancelReasons = [
         'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
@@ -85,6 +75,16 @@ class Measurement
         'waist-circumference-source-ehr-date',
         'hip-circumference-source-ehr-date'
     ];
+
+    protected $finalizedUserEmail;
+
+    protected $finalizedSiteInfo;
+
+    private $currentVersion;
+
+    private $fieldData;
+
+    private $schema;
 
     /**
      * @ORM\Id()
@@ -365,7 +365,7 @@ class Measurement
     {
         foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
             if (!empty($this->fieldData->{$ehrProtocolDateField})) {
-                $this->fieldData->{$ehrProtocolDateField}  = new \DateTime($this->fieldData->{$ehrProtocolDateField});
+                $this->fieldData->{$ehrProtocolDateField} = new \DateTime($this->fieldData->{$ehrProtocolDateField});
             }
         }
     }
@@ -403,40 +403,6 @@ class Measurement
         }
     }
 
-    protected function normalizeData($type = null)
-    {
-        foreach ($this->fieldData as $key => $value) {
-            if ($value === 0) {
-                $this->fieldData->$key = null;
-            }
-            if ($type === 'save' && !is_null($this->fieldData->$key) && in_array($key, self::$ehrProtocolDateFields)) {
-                $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
-            }
-        }
-        /** @var stdClass $field */
-        foreach ($this->schema->fields as $field) {
-            if (isset($field->replicates)) {
-                $key = $field->name;
-                if (!isset($this->fieldData->$key) || is_null($this->fieldData->$key)) {
-                    $dataArray = array_fill(0, $field->replicates, null);
-                    $this->fieldData->$key = $dataArray;
-                } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
-                    $dataArray = array_fill(0, $field->replicates, null);
-                    $dataArray[0] = $this->fieldData->$key;
-                    $this->fieldData->$key = $dataArray;
-                }
-            } else {
-                $key = $field->name;
-                if (!isset($this->fieldData->$key)) {
-                    $this->fieldData->$key = null;
-                }
-            }
-        }
-        if ($this->isEhrProtocolForm()) {
-            $this->addEhrProtocolModifications();
-        }
-    }
-
     public function getFhir($datetime, $parentRdr = null)
     {
         $fhir = new Fhir([
@@ -453,64 +419,6 @@ class Measurement
             'summary' => $this->getSummary()
         ]);
         return $fhir->toObject();
-    }
-
-    protected static function cmToFtIn($cm)
-    {
-        $inches = self::cmToIn($cm);
-        $feet = floor($inches / 12);
-        $inches = round(fmod($inches, 12));
-        return "$feet ft $inches in";
-    }
-
-    protected static function cmToIn($cm)
-    {
-        return round($cm * 0.3937, 1);
-    }
-
-    protected static function kgToLb($kg)
-    {
-        return round($kg * 2.2046, 1);
-    }
-
-    protected function calculateMean($field)
-    {
-        $secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
-        $twoClosestFields = [
-            'hip-circumference',
-            'waist-circumference'
-        ];
-        if (in_array($field, $secondThirdFields)) {
-            $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
-        } else {
-            $values = $this->fieldData->{$field};
-        }
-        $values = array_filter($values);
-        if (count($values) > 0) {
-            if (count($values) === 3 && in_array($field, $twoClosestFields)) {
-                sort($values);
-                if ($values[1] - $values[0] < $values[2] - $values[1]) {
-                    array_pop($values);
-                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
-                    array_shift($values);
-                }
-            }
-            return array_sum($values) / count($values);
-        } else {
-            return null;
-        }
-    }
-
-    protected static function calculateBmi($height, $weight)
-    {
-        if ($height && $weight) {
-            return $weight / (($height / 100) * ($height / 100));
-        }
-        return false;
     }
 
     public function getSummary()
@@ -682,10 +590,10 @@ class Measurement
             }
         }
         if ($this->fieldData->{'height-source'} === 'ehr') {
-            $this->fieldData->{"height-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+            $this->fieldData->{'height-protocol-modification'} = self::EHR_PROTOCOL_MODIFICATION;
         }
         if ($this->fieldData->{'weight-source'} === 'ehr') {
-            $this->fieldData->{"weight-protocol-modification"} = self::EHR_PROTOCOL_MODIFICATION;
+            $this->fieldData->{'weight-protocol-modification'} = self::EHR_PROTOCOL_MODIFICATION;
         }
         if ($this->fieldData->{'waist-circumference-source'} === 'ehr') {
             $this->fieldData->{'waist-circumference-protocol-modification'} = array_fill(0, 3, self::EHR_PROTOCOL_MODIFICATION);
@@ -717,7 +625,7 @@ class Measurement
 
     public function addBloodDonorProtocolModificationForHeight()
     {
-        $this->fieldData->{"height-protocol-modification"} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
+        $this->fieldData->{'height-protocol-modification'} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
     public function getFinalizeErrors()
@@ -826,13 +734,104 @@ class Measurement
         return true;
     }
 
-    protected function isMinVersion($minVersion)
-    {
-        return Util::versionIsAtLeast($this->version, $minVersion);
-    }
-
     public function getFormVersion()
     {
         return empty($this->version) ? $this->currentVersion : $this->version;
+    }
+
+    protected function normalizeData($type = null)
+    {
+        foreach ($this->fieldData as $key => $value) {
+            if ($value === 0) {
+                $this->fieldData->$key = null;
+            }
+            if ($type === 'save' && !is_null($this->fieldData->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
+            }
+        }
+        /** @var stdClass $field */
+        foreach ($this->schema->fields as $field) {
+            if (isset($field->replicates)) {
+                $key = $field->name;
+                if (!isset($this->fieldData->$key) || is_null($this->fieldData->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $this->fieldData->$key = $dataArray;
+                } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $dataArray[0] = $this->fieldData->$key;
+                    $this->fieldData->$key = $dataArray;
+                }
+            } else {
+                $key = $field->name;
+                if (!isset($this->fieldData->$key)) {
+                    $this->fieldData->$key = null;
+                }
+            }
+        }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
+        }
+    }
+
+    protected static function cmToFtIn($cm)
+    {
+        $inches = self::cmToIn($cm);
+        $feet = floor($inches / 12);
+        $inches = round(fmod($inches, 12));
+        return "$feet ft $inches in";
+    }
+
+    protected static function cmToIn($cm)
+    {
+        return round($cm * 0.3937, 1);
+    }
+
+    protected static function kgToLb($kg)
+    {
+        return round($kg * 2.2046, 1);
+    }
+
+    protected function calculateMean($field)
+    {
+        $secondThirdFields = [
+            'blood-pressure-systolic',
+            'blood-pressure-diastolic',
+            'heart-rate'
+        ];
+        $twoClosestFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
+        if (in_array($field, $secondThirdFields)) {
+            $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
+        } else {
+            $values = $this->fieldData->{$field};
+        }
+        $values = array_filter($values);
+        if (count($values) > 0) {
+            if (count($values) === 3 && in_array($field, $twoClosestFields)) {
+                sort($values);
+                if ($values[1] - $values[0] < $values[2] - $values[1]) {
+                    array_pop($values);
+                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
+                    array_shift($values);
+                }
+            }
+            return array_sum($values) / count($values);
+        }
+        return null;
+    }
+
+    protected static function calculateBmi($height, $weight)
+    {
+        if ($height && $weight) {
+            return $weight / (($height / 100) * ($height / 100));
+        }
+        return false;
+    }
+
+    protected function isMinVersion($minVersion)
+    {
+        return Util::versionIsAtLeast($this->version, $minVersion);
     }
 }

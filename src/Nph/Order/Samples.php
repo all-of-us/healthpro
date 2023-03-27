@@ -4,8 +4,6 @@ namespace App\Nph\Order;
 
 class Samples
 {
-    private $visitObj;
-
     public static $aliquotDocuments = [
         'blood' => [
             'title' => 'HPRO Blood Aliquoting Instructions',
@@ -44,6 +42,7 @@ class Samples
             'filename' => 'HPRO Module 3 Saliva Aliquoting Instructions.pdf'
         ]
     ];
+    private $visitObj;
 
     public function __construct($module, $visit)
     {
@@ -127,7 +126,7 @@ class Samples
         if (key_exists('collectionVolume', $samplesInfo[$sampleCode])) {
             return $samplesInfo[$sampleCode]['collectionVolume'];
         }
-        return "";
+        return '';
     }
 
     public function getSampleIdentifierFromCode(string $sampleCode): string

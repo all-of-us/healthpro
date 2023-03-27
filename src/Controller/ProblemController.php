@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Problem;
 use App\Entity\ProblemComment;
 use App\Form\ProblemCommentType;
@@ -13,7 +14,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\ProblemNotificationService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
@@ -87,7 +87,7 @@ class ProblemController extends BaseController
      * @Route("/participant/{participantId}/problem", name="problem_form_new")
      * @Route("/participant/{participantId}/problem/{problemId}", name="problem_form")
      */
-    public function problemForm($participantId, $problemId=null, Request $request, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
+    public function problemForm($participantId, $problemId = null, Request $request, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
     {
         $formDisabled = false;
         $enableConstraints = false;
@@ -106,10 +106,9 @@ class ProblemController extends BaseController
             $problem = $problemRepository->findOneBy(['id' => $problemId, 'participantId' => $participantId]);
             if (!$problem) {
                 throw $this->createNotFoundException('Problem report not found.');
-            } else {
-                if (!empty($problem->getFinalizedTs())) {
-                    $formDisabled = true;
-                }
+            }
+            if (!empty($problem->getFinalizedTs())) {
+                $formDisabled = true;
             }
         } else {
             $problem = new Problem();
@@ -167,10 +166,9 @@ class ProblemController extends BaseController
                 return $this->redirectToRoute('participant', [
                     'id' => $participantId
                 ]);
-            } else {
-                if (count($problemForm->getErrors()) == 0) {
-                    $problemForm->addError(new FormError('Please correct the errors below.'));
-                }
+            }
+            if (count($problemForm->getErrors()) == 0) {
+                $problemForm->addError(new FormError('Please correct the errors below.'));
             }
         }
         if (!empty($problem->getFinalizedTs())) {

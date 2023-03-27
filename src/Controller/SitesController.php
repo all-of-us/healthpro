@@ -93,10 +93,9 @@ class SitesController extends BaseController
                     $this->addFlash('success', 'Site added.');
                 }
                 return $this->redirectToRoute('admin_sites');
-            } else {
-                if (count($form->getErrors()) == 0) {
-                    $form->addError(new FormError('Please correct the errors below.'));
-                }
+            }
+            if (count($form->getErrors()) == 0) {
+                $form->addError(new FormError('Please correct the errors below.'));
             }
         }
 

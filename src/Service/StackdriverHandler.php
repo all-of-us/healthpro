@@ -3,10 +3,10 @@
 namespace App\Service;
 
 use Google\Cloud\Logging\LoggingClient;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use Monolog\Formatter\FormatterInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class StackdriverHandler extends AbstractProcessingHandler
@@ -51,46 +51,6 @@ class StackdriverHandler extends AbstractProcessingHandler
         $this->stackdriverLogger = $stackdriverClient->logger($logName, $logOptions);
     }
 
-    protected function getDefaultFormatter(): FormatterInterface
-    {
-        $formatter = new LineFormatter("%message% %context%", null, true);
-        $formatter->includeStacktraces();
-        $formatter->ignoreEmptyContextAndExtra();
-
-        return $formatter;
-    }
-
-
-    private function getTraceFromHeader($traceContext)
-    {
-        $projectId = getenv('GOOGLE_CLOUD_PROJECT');
-        // trace context header has the format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
-        if ($projectId && $traceContext && preg_match('/^([0-9a-f]+)\//', $traceContext, $m)) {
-            $traceId = $m[1];
-            return "projects/{$projectId}/traces/{$traceId}";
-        } else {
-            return false;
-        }
-    }
-
-    private function getEntryFromRecord(array $record)
-    {
-        $entryOptions = [
-            'severity' => $record['level_name'],
-            'timestamp' => $record['datetime']
-        ];
-        if (isset($record['extra']['labels'])) {
-            $entryOptions['labels'] = $record['extra']['labels'];
-        }
-        if (isset($record['extra']['trace_header'])) {
-            if ($trace = $this->getTraceFromHeader($record['extra']['trace_header'])) {
-                $entryOptions['trace'] = $trace;
-            }
-        }
-
-        return $this->stackdriverLogger->entry((string)$record['formatted'], $entryOptions);
-    }
-
     public function handleBatch(array $records): void
     {
         $entries = [];
@@ -103,6 +63,15 @@ class StackdriverHandler extends AbstractProcessingHandler
             $entries[] = $this->getEntryFromRecord($record);
         }
         $this->stackdriverLogger->writeBatch($entries);
+    }
+
+    protected function getDefaultFormatter(): FormatterInterface
+    {
+        $formatter = new LineFormatter('%message% %context%', null, true);
+        $formatter->includeStacktraces();
+        $formatter->ignoreEmptyContextAndExtra();
+
+        return $formatter;
     }
 
     protected function write(array $record): void
@@ -123,5 +92,35 @@ class StackdriverHandler extends AbstractProcessingHandler
         }
         $entry = $this->getEntryFromRecord($record);
         $this->stackdriverLogger->write($entry);
+    }
+
+
+    private function getTraceFromHeader($traceContext)
+    {
+        $projectId = getenv('GOOGLE_CLOUD_PROJECT');
+        // trace context header has the format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
+        if ($projectId && $traceContext && preg_match('/^([0-9a-f]+)\//', $traceContext, $m)) {
+            $traceId = $m[1];
+            return "projects/{$projectId}/traces/{$traceId}";
+        }
+        return false;
+    }
+
+    private function getEntryFromRecord(array $record)
+    {
+        $entryOptions = [
+            'severity' => $record['level_name'],
+            'timestamp' => $record['datetime']
+        ];
+        if (isset($record['extra']['labels'])) {
+            $entryOptions['labels'] = $record['extra']['labels'];
+        }
+        if (isset($record['extra']['trace_header'])) {
+            if ($trace = $this->getTraceFromHeader($record['extra']['trace_header'])) {
+                $entryOptions['trace'] = $trace;
+            }
+        }
+
+        return $this->stackdriverLogger->entry((string) $record['formatted'], $entryOptions);
     }
 }

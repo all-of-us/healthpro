@@ -161,7 +161,7 @@ class AccessManagementController extends BaseController
                     $result = $this->googleGroupsService->removeMember($group->email, $member->email);
                     if ($result['status'] === 'success') {
                         if ($removeGoupMemberForm->get('reason')->getData() === 'no') {
-                            $currentTime = new \DateTime("now");
+                            $currentTime = new \DateTime('now');
                             $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), RemoveGroupMemberType::ATTESTATIONS);
                             $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime, $attestation);
                         }

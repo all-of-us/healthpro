@@ -84,6 +84,41 @@ class RequestListener
         $this->checkFeatureNotifications();
     }
 
+    public function onKernelFinishRequest()
+    {
+        if ($this->canSetSessionVariables()) {
+            $this->setSessionVariables();
+        }
+    }
+
+    /**
+     * "Upkeep" routes are routes that we typically want to allow through
+     * even when workflow dictates otherwise.
+     */
+    public function isUpkeepRoute()
+    {
+        $route = $this->request->attributes->get('_route');
+        return (in_array($route, [
+            'logout',
+            'timeout',
+            'keep_alive',
+            'client_timeout',
+            'agree_usage'
+        ]));
+    }
+
+    public function isStreamingResponseRoute()
+    {
+        $route = $this->request->attributes->get('_route');
+        return (in_array($route, [
+            'workqueue_export',
+            'help_sopFile',
+            'on_site_patient_status_export',
+            'on_site_incentive_tracking_export',
+            'on_site_id_verification_export'
+        ]));
+    }
+
     private function logRequest()
     {
         $this->logger->log(Log::REQUEST);
@@ -147,7 +182,7 @@ class RequestListener
             (
                 $this->authorizationChecker->isGranted('ROLE_USER')
                 || $this->authorizationChecker->isGranted('ROLE_NPH_USER')
-                ||$this->authorizationChecker->isGranted('ROLE_AWARDEE')
+                || $this->authorizationChecker->isGranted('ROLE_AWARDEE')
             )) {
             if (!$this->siteService->autoSwitchSite() && !$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/site/select');
@@ -163,47 +198,12 @@ class RequestListener
         }
     }
 
-    public function onKernelFinishRequest()
-    {
-        if ($this->canSetSessionVariables()) {
-            $this->setSessionVariables();
-        }
-    }
-
-    /**
-     * "Upkeep" routes are routes that we typically want to allow through
-     * even when workflow dictates otherwise.
-     */
-    public function isUpkeepRoute()
-    {
-        $route = $this->request->attributes->get('_route');
-        return (in_array($route, [
-            'logout',
-            'timeout',
-            'keep_alive',
-            'client_timeout',
-            'agree_usage'
-        ]));
-    }
-
     private function ignoreRoutes(): bool
     {
         return preg_match(
             '/^\/(_profiler|_wdt|cron|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
             $this->request->getPathInfo()
         );
-    }
-
-    public function isStreamingResponseRoute()
-    {
-        $route = $this->request->attributes->get('_route');
-        return (in_array($route, [
-            'workqueue_export',
-            'help_sopFile',
-            'on_site_patient_status_export',
-            'on_site_incentive_tracking_export',
-            'on_site_id_verification_export'
-        ]));
     }
 
     private function setSessionVariables(): void

@@ -9,7 +9,6 @@ namespace App\Helper;
  * @property string $firstName
  * @property string $phoneNumber
  */
-
 class NphParticipant
 {
     public $id;
@@ -29,6 +28,22 @@ class NphParticipant
             $this->rdrData = $rdrParticipant;
             $this->parseRdrParticipant($rdrParticipant);
         }
+    }
+
+    /**
+     * Magic methods for RDR data
+     */
+    public function __get(string $key)
+    {
+        if (isset($this->rdrData->{$key})) {
+            return $this->rdrData->{$key};
+        }
+        return null;
+    }
+
+    public function __isset(string $key)
+    {
+        return true;
     }
 
     private function parseRdrParticipant(\stdClass $participant)
@@ -57,21 +72,5 @@ class NphParticipant
     private function getSiteSuffix($site)
     {
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
-    }
-
-    /**
-     * Magic methods for RDR data
-     */
-    public function __get(string $key)
-    {
-        if (isset($this->rdrData->{$key})) {
-            return $this->rdrData->{$key};
-        }
-        return null;
-    }
-
-    public function __isset(string $key)
-    {
-        return true;
     }
 }

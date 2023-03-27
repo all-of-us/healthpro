@@ -308,7 +308,7 @@ class Problem
         return $this->createdTs;
     }
 
-    public function setCreatedTs(?DateTimeInterface  $createdTs): self
+    public function setCreatedTs(?DateTimeInterface $createdTs): self
     {
         $this->createdTs = $createdTs;
 

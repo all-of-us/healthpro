@@ -32,10 +32,10 @@ class PatientStatusImportService
     public function extractCsvFileData($file, &$form, &$patientStatuses)
     {
         $fileHandle = fopen($file->getPathname(), 'r');
-        $headers = fgetcsv($fileHandle, 0, ",");
+        $headers = fgetcsv($fileHandle, 0, ',');
         // Guess file format using headers
         if (count($headers) < 2) {
-            $form['patient_status_csv']->addError(new FormError("Invalid file format"));
+            $form['patient_status_csv']->addError(new FormError('Invalid file format'));
             return;
         }
         $validStatus = array_values(self::$patientStatus);
@@ -46,7 +46,7 @@ class PatientStatusImportService
             return;
         }
         $row = 2;
-        while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
+        while (($data = fgetcsv($fileHandle, 0, ',')) !== false) {
             $patientStatus = [];
             if (!Import::isValidParticipantId($data[0])) {
                 $form['patient_status_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));

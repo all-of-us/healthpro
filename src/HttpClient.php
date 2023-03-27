@@ -3,8 +3,8 @@
 namespace App;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\StreamHandler;
+use GuzzleHttp\HandlerStack;
 use Psr\Http\Message\RequestInterface;
 
 /**

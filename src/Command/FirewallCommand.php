@@ -5,10 +5,10 @@ namespace App\Command;
 use GeoIp2\Database\Reader;
 use GuzzleHttp\Client;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 class FirewallCommand extends Command
@@ -30,24 +30,24 @@ class FirewallCommand extends Command
         $output->setFormatter(new OutputFormatter(true)); // color output
         $dbFile = "{$this->appDir}/bin/GeoLite2-Country.mmdb";
         if (!file_exists($dbFile)) {
-            $output->writeln("Downloading GeoIP2 country database...");
+            $output->writeln('Downloading GeoIP2 country database...');
             $db = file_get_contents('https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz');
             file_put_contents($dbFile, gzdecode($db));
             $output->writeln("... database downloaded to {$dbFile}");
             $output->writeln('');
         }
-        $output->writeln("Querying IPs...");
+        $output->writeln('Querying IPs...');
         $client = new Client([
             'base_uri' => 'https://my.incapsula.com'
         ]);
         $response = $client->request('POST', '/api/integration/v1/ips', [
             'query' => ['content' => 'json']
         ]);
-        $networks = json_decode((string)$response->getBody());
+        $networks = json_decode((string) $response->getBody());
         $output->writeln('... IPv4 addrs: ' . count($networks->ipRanges) . ', IPv6 addrs: ' . count($networks->ipv6Ranges));
         $output->writeln('');
 
-        $output->writeln("Checking country codes...");
+        $output->writeln('Checking country codes...');
         $reader = new Reader($dbFile);
         $rules = [
             [100, 'ALLOW', '0.0.0.0/8', 'Internal App Engine requests']

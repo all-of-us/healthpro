@@ -17,6 +17,10 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 class SiteService
 {
     public const CABOR_STATE = 'CA';
+    protected $siteNameMapper = [];
+    protected $nphSiteNameMapper = [];
+    protected $organizationNameMapper = [];
+    protected $awardeeNameMapper = [];
 
     private $params;
     private $requestStack;
@@ -24,10 +28,6 @@ class SiteService
     private $userService;
     private $env;
     private $tokenStorage;
-    protected $siteNameMapper = [];
-    protected $nphSiteNameMapper = [];
-    protected $organizationNameMapper = [];
-    protected $awardeeNameMapper = [];
 
     public function __construct(ParameterBagInterface $params, RequestStack $requestStack, EntityManagerInterface $em, UserService $userService, EnvironmentService $env, TokenStorageInterface $tokenStorage)
     {
@@ -232,48 +232,6 @@ class SiteService
         return $this->isValidHpoSite($email);
     }
 
-    private function isValidHpoSite($email): bool
-    {
-        $user = $this->userService->getUser();
-        if (!$user || !$user->belongsToSite($email)) {
-            return false;
-        }
-        if ($this->env->isStable() || $this->env->isProd()) {
-            $siteGroup = $user->getSite($email);
-            $site = $this->em->getRepository(Site::class)->findOneBy([
-                'deleted' => 0,
-                'googleGroup' => $siteGroup->id,
-            ]);
-            if (!$site) {
-                return false;
-            }
-            if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
-                // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private function isValidNphSite($email): bool
-    {
-        $user = $this->userService->getUser();
-        if (!$user || !$user->belongsToSite($email, 'nphSites')) {
-            return false;
-        }
-        if ($this->env->isStable() || $this->env->isProd()) {
-            $siteGroup = $user->getSite($email, 'nphSites');
-            $site = $this->em->getRepository(NphSite::class)->findOneBy([
-                'deleted' => 0,
-                'googleGroup' => $siteGroup->id,
-            ]);
-            if (!$site || empty($site->getMayolinkAccount())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public function switchSite($email): bool
     {
         if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
@@ -298,9 +256,8 @@ class SiteService
             // Clears previously set site meta data
             $this->saveSiteMetaDataInSession();
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function switchNphSite($email): bool
@@ -312,18 +269,8 @@ class SiteService
             $this->setNewRoles($user);
             $this->saveSiteMetaDataInSession();
             return true;
-        } else {
-            return false;
         }
-    }
-
-    protected function setNewRoles($user)
-    {
-        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
-        if ($user->getAllRoles() != $userRoles) {
-            $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
-            $this->tokenStorage->setToken($token);
-        }
+        return false;
     }
 
     public function saveSiteMetaDataInSession()
@@ -437,5 +384,56 @@ class SiteService
         $user = $this->userService->getUser();
         $token = new PostAuthenticationGuardToken($user, 'main', $user->getAllRoles());
         $this->tokenStorage->setToken($token);
+    }
+
+    protected function setNewRoles($user)
+    {
+        $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
+        if ($user->getAllRoles() != $userRoles) {
+            $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
+            $this->tokenStorage->setToken($token);
+        }
+    }
+
+    private function isValidHpoSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if (!$user || !$user->belongsToSite($email)) {
+            return false;
+        }
+        if ($this->env->isStable() || $this->env->isProd()) {
+            $siteGroup = $user->getSite($email);
+            $site = $this->em->getRepository(Site::class)->findOneBy([
+                'deleted' => 0,
+                'googleGroup' => $siteGroup->id,
+            ]);
+            if (!$site) {
+                return false;
+            }
+            if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
+                // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function isValidNphSite($email): bool
+    {
+        $user = $this->userService->getUser();
+        if (!$user || !$user->belongsToSite($email, 'nphSites')) {
+            return false;
+        }
+        if ($this->env->isStable() || $this->env->isProd()) {
+            $siteGroup = $user->getSite($email, 'nphSites');
+            $site = $this->em->getRepository(NphSite::class)->findOneBy([
+                'deleted' => 0,
+                'googleGroup' => $siteGroup->id,
+            ]);
+            if (!$site || empty($site->getMayolinkAccount())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

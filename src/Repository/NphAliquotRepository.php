@@ -34,7 +34,7 @@ class NphAliquotRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+     */
 
     /*
     public function findOneBySomeField($value): ?NphAliquot
@@ -46,5 +46,5 @@ class NphAliquotRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    */
+     */
 }

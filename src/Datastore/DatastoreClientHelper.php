@@ -2,9 +2,9 @@
 
 namespace App\Datastore;
 
-use Google\Cloud\Datastore\DatastoreClient;
-use Google\Auth\HttpHandler\Guzzle6HttpHandler;
 use App\HttpClient;
+use Google\Auth\HttpHandler\Guzzle6HttpHandler;
+use Google\Cloud\Datastore\DatastoreClient;
 
 class DatastoreClientHelper
 {
@@ -12,10 +12,10 @@ class DatastoreClientHelper
 
     public function __construct()
     {
-        # Custom http client used to set httpHandler
+        // Custom http client used to set httpHandler
         $client = new HttpClient();
 
-        # Instantiates a Datastore client
+        // Instantiates a Datastore client
         $this->datastore = new DatastoreClient([
             'httpHandler' => new Guzzle6HttpHandler($client),
         ]);
