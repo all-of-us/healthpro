@@ -457,7 +457,7 @@ class NphSample
 
     public function isDisabled(): bool
     {
-        return ($this->finalizedTs || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
+        return ($this->rdrId || $this->modifyType === self::CANCEL) && $this->getModifyType() !== self::UNLOCK;
     }
 
     public function isUnlocked(): bool
