@@ -280,6 +280,7 @@ class NphOrderController extends BaseController
                     ]);
                 }
                 $this->addFlash('error', 'Failed finalizing sample. Please try again.');
+                $this->em->refresh($sample);
             } else {
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
             }

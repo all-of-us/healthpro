@@ -121,7 +121,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool)$sampleObj->getFinalizedTs()
+                'disabled' => (bool) $sampleObj->getFinalizedTs()
             ];
         }
         return $sampleLabels;
@@ -267,16 +267,6 @@ class NphOrderService
             }
         }
         return $sampleGroup;
-    }
-
-    private function getStoolTimePoint(array $formData): ?string
-    {
-        foreach (array_keys($this->getTimePoints()) as $timePoint) {
-            if (in_array(NphSample::SAMPLE_STOOL, $formData[$timePoint])) {
-                return $timePoint;
-            }
-        }
-        return null;
     }
 
     public function createOrder(string $timePoint, string $orderType, string $orderId = null): NphOrder
@@ -755,13 +745,23 @@ class NphOrderService
         return $formErrors;
     }
 
+    private function getStoolTimePoint(array $formData): ?string
+    {
+        foreach (array_keys($this->getTimePoints()) as $timePoint) {
+            if (in_array(NphSample::SAMPLE_STOOL, $formData[$timePoint])) {
+                return $timePoint;
+            }
+        }
+        return null;
+    }
+
     private function getNumericId(): string
     {
         $length = 10;
         // Avoid leading 0s
-        $id = (string)rand(1, 9);
+        $id = (string) rand(1, 9);
         for ($i = 0; $i < $length - 1; $i++) {
-            $id .= (string)rand(0, 9);
+            $id .= (string) rand(0, 9);
         }
         return $id;
     }
