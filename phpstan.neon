@@ -2,7 +2,6 @@ parameters:
     level: 4
     paths:
         - src
-    treatPhpDocTypesAsCertain: false
     bootstrapFiles:
         - vendor/autoload.php
     doctrine:
@@ -10,3 +9,4 @@ parameters:
     symfony:
         container_xml_path: var/cache/dev/App_KernelDevDebugContainer.xml
         constantHassers: false
+    treatPhpDocTypesAsCertain: false
