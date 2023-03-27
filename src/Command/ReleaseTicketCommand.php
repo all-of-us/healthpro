@@ -50,6 +50,49 @@ class ReleaseTicketCommand extends Command
             );
     }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->io = new SymfonyStyle($input, $output);
+
+        $comment = $input->getOption('comment');
+
+        if ($comment === 'approval') {
+            $this->io->section('Approval request comment');
+            $ticketId = $this->io->ask('Enter ticket id');
+            return $this->createApprovalRequestComment($ticketId);
+        }
+
+        $version = $this->selectVersion();
+        if ($version === null) {
+            $this->io->warning('No version selected.');
+            return 1;
+        }
+
+        $componentId = $this->selectComponent();
+
+        if ($comment === 'file') {
+            $file = $this->selectDeployFile();
+            if ($file === null) {
+                $this->io->warning('No deploy files found.');
+                return 1;
+            }
+
+            $env = $this->selectEnvironment();
+
+            $this->io->section('Attach deploy output');
+            $ticketId = $this->io->ask('Enter ticket id');
+            return $this->attachDeployOutput($version, $env, $file, $ticketId);
+        }
+
+        $issues = $this->getIssues($version);
+        if ($issues === null) {
+            $this->io->comment('Exiting.');
+            return 1;
+        }
+
+        return $this->createTicket($version, $issues, $componentId);
+    }
+
     private function selectVersion(): ?string
     {
         $this->io->section('Unreleased and recent versions');
@@ -149,7 +192,7 @@ class ReleaseTicketCommand extends Command
         $tableRows = [];
         $issues = [];
         foreach ($jiraIssues as $jiraIssue) {
-            $issue = (object)[
+            $issue = (object) [
                 'id' => $jiraIssue->key,
                 'title' => $jiraIssue->fields->summary ?? '',
                 'type' => $jiraIssue->fields->issuetype->name ?? '',
@@ -173,9 +216,8 @@ class ReleaseTicketCommand extends Command
 
         if ($this->io->confirm('Does this look right?')) {
             return $issues;
-        } else {
-            return null;
         }
+        return null;
     }
 
     private function createTicket(string $version, array $issues, string $componentId): int
@@ -209,10 +251,9 @@ class ReleaseTicketCommand extends Command
                 $createResult
             ));
             return 0;
-        } else {
-            $this->io->error('Failed to create release ticket');
-            return 1;
         }
+        $this->io->error('Failed to create release ticket');
+        return 1;
     }
 
     private function createApprovalRequestComment($ticketId): int
@@ -232,10 +273,9 @@ class ReleaseTicketCommand extends Command
                 $ticketId
             ));
             return 0;
-        } else {
-            $this->io->error('Failed to create approval request');
-            return 1;
         }
+        $this->io->error('Failed to create approval request');
+        return 1;
     }
 
     private function createDeployComment($ticketId, $env, $deployFileName): ?string
@@ -267,52 +307,8 @@ class ReleaseTicketCommand extends Command
                 $ticketId
             ));
             return 0;
-        } else {
-            $this->io->error('Failed to attach deploy output');
-            return 1;
         }
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->io = new SymfonyStyle($input, $output);
-
-        $comment = $input->getOption('comment');
-
-        if ($comment === 'approval') {
-            $this->io->section('Approval request comment');
-            $ticketId = $this->io->ask('Enter ticket id');
-            return $this->createApprovalRequestComment($ticketId);
-        }
-
-        $version = $this->selectVersion();
-        if ($version === null) {
-            $this->io->warning('No version selected.');
-            return 1;
-        }
-
-        $componentId = $this->selectComponent();
-
-        if ($comment === 'file') {
-            $file = $this->selectDeployFile();
-            if ($file === null) {
-                $this->io->warning('No deploy files found.');
-                return 1;
-            }
-
-            $env = $this->selectEnvironment();
-
-            $this->io->section('Attach deploy output');
-            $ticketId = $this->io->ask('Enter ticket id');
-            return $this->attachDeployOutput($version, $env, $file, $ticketId);
-        }
-
-        $issues = $this->getIssues($version);
-        if ($issues === null) {
-            $this->io->comment('Exiting.');
-            return 1;
-        }
-
-        return $this->createTicket($version, $issues, $componentId);
+        $this->io->error('Failed to attach deploy output');
+        return 1;
     }
 }

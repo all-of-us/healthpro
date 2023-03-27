@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use App\HttpClient;
 use App\Service\HelpService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use App\HttpClient;
 
 /**
  * @Route("/help")
@@ -31,7 +31,6 @@ class HelpController extends BaseController
     /**
      * @Route("/videos", name="help_videos")
      */
-
     public function videosAction(SessionInterface $session)
     {
         $id = $session->get('orderType') === 'dv' ? 'biobank-dv' : 'biobank-hpo';
@@ -41,7 +40,6 @@ class HelpController extends BaseController
     /**
      * @Route("/videos/{id}", name="help_videosPlaylist")
      */
-
     public function videosPlaylistAction($id, Request $request, HelpService $helpService)
     {
         if (!array_key_exists($id, $helpService::$videoPlaylists)) {
@@ -63,7 +61,6 @@ class HelpController extends BaseController
     /**
      * @Route("/faq", name="help_faq")
      */
-
     public function faqAction(HelpService $helpService)
     {
         return $this->render('help/faq.html.twig', ['faqs' => $helpService::$faqs]);
@@ -72,7 +69,6 @@ class HelpController extends BaseController
     /**
      * @Route("/sop", name="help_sop")
      */
-
     public function sopAction(HelpService $helpService)
     {
         return $this->render('help/sop.html.twig', [
@@ -85,7 +81,6 @@ class HelpController extends BaseController
     /**
      * @Route("/sop/{id}/{language}", name="help_sopView")
      */
-
     public function sopViewAction($id, $language, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);
@@ -106,7 +101,6 @@ class HelpController extends BaseController
     /**
      * @Route("/sop/file/{id}/{language}", name="help_sopFile")
      */
-
     public function sopFileAction($id, $language, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);
@@ -142,7 +136,6 @@ class HelpController extends BaseController
     /**
      * @Route("/sop/redirect/{id}", name="help_sopRedirect")
      */
-
     public function sopRedirectAction($id, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);

@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\FeatureNotification;
 use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
-use App\Repository\FeatureNotificationRepository;
 use App\Service\AuthService;
 use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
 use App\Service\SiteService;
-use App\Audit\Log;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,9 +48,8 @@ class DefaultController extends BaseController
             return $this->redirectToRoute('biobank_home');
         } elseif ($this->isGranted('ROLE_READ_ONLY')) {
             return $this->redirectToRoute('read_home');
-        } else {
-            throw $this->createAccessDeniedException();
         }
+        throw $this->createAccessDeniedException();
     }
 
     /**
@@ -100,9 +98,8 @@ class DefaultController extends BaseController
             }
             if ($siteService->switchSite($siteId)) {
                 return $this->redirectToRoute('home');
-            } else {
-                throw $this->createAccessDeniedException();
             }
+            throw $this->createAccessDeniedException();
         }
         return $this->render('site-select.html.twig');
     }

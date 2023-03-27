@@ -12,13 +12,6 @@
 
     {% include 'program/nph/order/partials/generate-orders-header.html.twig' %}
 
-    {% if samplesOrderIds is not empty %}
-        <div class="alert alert-warning">
-            <p><strong>Existing order found within this visit.</strong></p>
-            If you need to create a new order while a previous order exists, please cancel the existing order first.
-        </div>
-    {% endif %}
-
     <div class="row" id="order_create" {% if showPreview %} style="display: none" {% endif %}
          data-samples="{{ samples|json_encode() }}"
          data-time-points="{{ timePoints|json_encode() }}"
@@ -57,11 +50,11 @@
                     </div>
                 </div>
             {% endfor %}
-            </div>
-                <div class="row">
+                <div class="col-sm-12">
                     <a class="btn btn-default" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
                     {{ form_widget(orderForm.validate) }}
                 </div>
+            </div>
             {{ form_rest(orderForm) }}
             {{ form_end(orderForm) }}
             <br>

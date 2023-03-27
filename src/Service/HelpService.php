@@ -6,13 +6,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class HelpService
 {
-    protected $params;
-
-    public function __construct(ParameterBagInterface $params)
-    {
-        $this->params = $params;
-    }
-
     public static $SupportedLanguages = [
         'en',
         'es'
@@ -235,6 +228,12 @@ class HelpService
         'data_dictionaries' => 'https://www.aoucollaborations.net/x/a8U_/',
         'release_notes' => 'https://www.aoucollaborations.net/x/MQElvw'
     ];
+    protected $params;
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->params = $params;
+    }
 
     public function getStoragePath()
     {

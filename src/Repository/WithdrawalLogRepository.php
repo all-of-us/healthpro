@@ -31,6 +31,6 @@ class WithdrawalLogRepository extends ServiceEntityRepository
             ->groupBy('w.hpoId')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

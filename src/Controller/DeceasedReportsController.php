@@ -2,17 +2,16 @@
 
 namespace App\Controller;
 
+use App\Cache\DatastoreAdapter;
 use App\Entity\DeceasedReport;
 use App\Form\DeceasedReportReviewType;
 use App\Form\DeceasedReportType;
 use App\Service\DeceasedReportsService;
 use App\Service\ParticipantSummaryService;
-use App\Cache\DatastoreAdapter;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DeceasedReportsController extends BaseController
@@ -225,7 +224,7 @@ class DeceasedReportsController extends BaseController
         ]);
     }
 
-    /* Private Methods */
+    // Private Methods
 
     private function resetPendingCountCache($organizationId): bool
     {

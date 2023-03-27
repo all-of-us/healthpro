@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SiteSyncService
 {
+    public const SITE_PREFIX = 'hpo-site-';
     private $rdrApiService;
     private $em;
     private $env;
@@ -24,8 +25,6 @@ class SiteSyncService
     private $entries;
     private $googleGroupsService;
     private $adminEmails = [];
-
-    public const SITE_PREFIX = 'hpo-site-';
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -43,36 +42,6 @@ class SiteSyncService
         $this->params = $params;
         $this->normalizer = $normalizer;
         $this->googleGroupsService = $googleGroupsService;
-    }
-
-    private function getAwardeeEntriesFromRdr()
-    {
-        if (!is_null($this->entries)) {
-            return $this->entries;
-        }
-        $response = $this->rdrApiService->get($this->orgEndpoint);
-        $responseObject = json_decode($response->getBody()->getContents());
-        if ($responseObject && !empty($responseObject->entry)) {
-            $this->entries = $responseObject->entry;
-            return $this->entries;
-        }
-        return [];
-    }
-
-    private function getSitesFromDb()
-    {
-        $sitesRepository = $this->em->getRepository(Site::class);
-        $sites = $sitesRepository->findBy(['deleted' => 0]);
-        $sitesById = [];
-        foreach ($sites as $site) {
-            $sitesById[$site->getGoogleGroup()] = $site;
-        }
-        return $sitesById;
-    }
-
-    private static function getSiteSuffix($site)
-    {
-        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 
     public function dryRun()
@@ -301,5 +270,35 @@ class SiteSyncService
             }
         }
         return $siteAdmins;
+    }
+
+    private function getAwardeeEntriesFromRdr()
+    {
+        if (!is_null($this->entries)) {
+            return $this->entries;
+        }
+        $response = $this->rdrApiService->get($this->orgEndpoint);
+        $responseObject = json_decode($response->getBody()->getContents());
+        if ($responseObject && !empty($responseObject->entry)) {
+            $this->entries = $responseObject->entry;
+            return $this->entries;
+        }
+        return [];
+    }
+
+    private function getSitesFromDb()
+    {
+        $sitesRepository = $this->em->getRepository(Site::class);
+        $sites = $sitesRepository->findBy(['deleted' => 0]);
+        $sitesById = [];
+        foreach ($sites as $site) {
+            $sitesById[$site->getGoogleGroup()] = $site;
+        }
+        return $sitesById;
+    }
+
+    private static function getSiteSuffix($site)
+    {
+        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 }

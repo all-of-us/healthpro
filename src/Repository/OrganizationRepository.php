@@ -25,6 +25,6 @@ class OrganizationRepository extends ServiceEntityRepository
             ->delete()
             ->getQuery()
             ->execute()
-            ;
+        ;
     }
 }

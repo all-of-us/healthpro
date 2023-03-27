@@ -4,8 +4,8 @@ namespace App\Form;
 
 use App\Entity\NphSite;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
@@ -14,7 +14,7 @@ class NphSiteType extends AbstractType
 {
     public static $siteChoices = [
         'status' => [
-            'Active'=> 1,
+            'Active' => 1,
             'Inactive' => 0
         ]
     ];

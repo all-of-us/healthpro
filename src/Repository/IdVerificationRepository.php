@@ -39,11 +39,10 @@ class IdVerificationRepository extends ServiceEntityRepository
                 ->setFirstResult($params['start'])
                 ->setMaxResults($params['length'])
                 ->getResult();
-        } else {
-            return $queryBuilder
-                ->getQuery()
-                ->getResult();
         }
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
     }
 
     public function getOnsiteIdVerificationsCount($site, $params): int

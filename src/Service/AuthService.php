@@ -3,11 +3,11 @@
 namespace App\Service;
 
 use App\Drc\GoogleUser;
+use Exception;
+use Google\Client as GoogleClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Exception;
-use Google\Client as GoogleClient;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -33,27 +33,6 @@ class AuthService
         $this->callbackUrl = $this->generateUrl('login_callback');
         $this->tokenStorage = $tokenStorage;
         $this->env = $env;
-    }
-
-    private function getGoogleClient(): GoogleClient
-    {
-        $client = new GoogleClient();
-        $client->setClientId($this->params->get('auth_client_id'));
-        $client->setClientSecret($this->params->get('auth_client_secret'));
-        $client->setRedirectUri($this->callbackUrl);
-        $client->setScopes(['email', 'profile']);
-
-        return $client;
-    }
-
-    private function setSessionState(string $state): void
-    {
-        $this->requestStack->getSession()->set('auth_state', $state);
-    }
-
-    private function getSessionState(): ?string
-    {
-        return $this->requestStack->getSession()->get('auth_state');
     }
 
     public function getAuthUrl(): string
@@ -111,5 +90,26 @@ class AuthService
             return $path . $this->urlGenerator->generate($route, $parameters);
         }
         return $this->urlGenerator->generate($route, $parameters, UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    private function getGoogleClient(): GoogleClient
+    {
+        $client = new GoogleClient();
+        $client->setClientId($this->params->get('auth_client_id'));
+        $client->setClientSecret($this->params->get('auth_client_secret'));
+        $client->setRedirectUri($this->callbackUrl);
+        $client->setScopes(['email', 'profile']);
+
+        return $client;
+    }
+
+    private function setSessionState(string $state): void
+    {
+        $this->requestStack->getSession()->set('auth_state', $state);
+    }
+
+    private function getSessionState(): ?string
+    {
+        return $this->requestStack->getSession()->get('auth_state');
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\DeactivateLog;
 use App\Entity\Site;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
-use App\Audit\Log;
 
 class DeactivateNotificationService extends EmailNotificationService
 {

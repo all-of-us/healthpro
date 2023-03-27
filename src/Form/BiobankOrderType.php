@@ -3,10 +3,10 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class BiobankOrderType extends AbstractType
 {
@@ -16,7 +16,7 @@ class BiobankOrderType extends AbstractType
         $samples = $options['order']->getCustomRequestedSamples();
         if (!empty($samples)) {
             $samplesDisabled = $disabled;
-            $builder->add("finalizedSamples", Type\ChoiceType::class, [
+            $builder->add('finalizedSamples', Type\ChoiceType::class, [
                 'expanded' => true,
                 'multiple' => true,
                 'label' => 'Which samples are being shipped to the All of Us℠ Biobank?',
@@ -37,7 +37,7 @@ class BiobankOrderType extends AbstractType
                 'multiple' => false
             ]);
         }
-        $builder->add("finalizedNotes", Type\TextareaType::class, [
+        $builder->add('finalizedNotes', Type\TextareaType::class, [
             'label' => 'Additional notes on finalization',
             'disabled' => $disabled,
             'required' => false,

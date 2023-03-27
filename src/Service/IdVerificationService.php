@@ -84,7 +84,7 @@ class IdVerificationService
     public function sendToRdr($postData)
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Onsite/Id/Verification", $postData);
+            $response = $this->rdrApiService->post('rdr/v1/Onsite/Id/Verification', $postData);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && !empty($result->verificationType)) {
                 $this->loggerService->log(Log::ID_VERIFICATION_ADD, [

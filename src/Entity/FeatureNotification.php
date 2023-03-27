@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\FeatureNotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

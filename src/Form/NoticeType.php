@@ -4,11 +4,11 @@ namespace App\Form;
 
 use App\Entity\Notice;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class NoticeType extends AbstractType
 {
@@ -46,7 +46,7 @@ class NoticeType extends AbstractType
                 'label' => 'Take Page/Application Down?',
                 'required' => true,
                 'choices' => [
-                    'No'=> 0,
+                    'No' => 0,
                     'Yes' => 1
                 ],
                 'constraints' => [
@@ -89,7 +89,7 @@ class NoticeType extends AbstractType
         $builder->get('status')
             ->addModelTransformer(new CallbackTransformer(
                 function ($int) {
-                    return (bool)$int;
+                    return (bool) $int;
                 },
                 function ($bool) {
                     return $bool ? 1 : 0;

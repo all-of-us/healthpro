@@ -11,11 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class IdVerificationImport
 {
-    public function __construct()
-    {
-        $this->idVerificationImportRows = new ArrayCollection();
-    }
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -57,6 +52,10 @@ class IdVerificationImport
      * @ORM\OneToMany(targetEntity=IdVerificationImportRow::class, mappedBy="import")
      */
     private $idVerificationImportRows;
+    public function __construct()
+    {
+        $this->idVerificationImportRows = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

@@ -80,7 +80,7 @@ class MeasurementsController extends BaseController
             $measurement = new Measurement();
             $this->measurementService->load($measurement, $type);
             if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
-                $measurement->setFieldData((object)[
+                $measurement->setFieldData((object) [
                     'weight-protocol-modification' => 'whole-blood-donor'
                 ]);
             }
@@ -190,15 +190,13 @@ class MeasurementsController extends BaseController
                                     'measurementId' => $measurementId,
                                     'showAutoModification' => 1
                                 ]);
-                            } else {
-                                return $this->redirectToRoute('measurement', [
-                                    'participantId' => $participant->id,
-                                    'measurementId' => $measurementId
-                                ]);
                             }
-                        } else {
-                            $this->addFlash('error', 'Failed to create new physical measurements');
+                            return $this->redirectToRoute('measurement', [
+                                'participantId' => $participant->id,
+                                'measurementId' => $measurementId
+                            ]);
                         }
+                        $this->addFlash('error', 'Failed to create new physical measurements');
                     } else {
                         $this->em->persist($measurement);
                         $this->em->flush();
@@ -321,9 +319,8 @@ class MeasurementsController extends BaseController
                     return $this->redirectToRoute('participant', [
                         'id' => $participantId
                     ]);
-                } else {
-                    $this->addFlash('error', "Failed to {$type} physical measurements. Please try again.");
                 }
+                $this->addFlash('error', "Failed to {$type} physical measurements. Please try again.");
             } else {
                 $this->addFlash('error', 'Please correct the errors below');
             }
@@ -426,11 +423,10 @@ class MeasurementsController extends BaseController
                     'type' => Measurement::BLOOD_DONOR,
                     'wholeblood' => $bloodDonorCheckForm['bloodDonorType']->getData() === 'whole-blood' ? 1 : 0
                 ]);
-            } else {
-                return $this->redirectToRoute('measurement', [
-                    'participantId' => $participant->id
-                ]);
             }
+            return $this->redirectToRoute('measurement', [
+                'participantId' => $participant->id
+            ]);
         }
         return $this->render('measurement/blood-donor-check.html.twig', [
             'participant' => $participant,

@@ -39,9 +39,8 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxData['data'] = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount($siteService->getSiteAwardee(), $ajaxParams);
             return $this->json($ajaxData);
-        } else {
-            return $this->render('onsite/patient-status.html.twig', ['params' => $params]);
         }
+        return $this->render('onsite/patient-status.html.twig', ['params' => $params]);
     }
 
     /**
@@ -80,7 +79,7 @@ class OnSiteDetailsReportingController extends BaseController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-        $filename = "on_site_details_patient_status_" . date('Ymd-His') . '.csv';
+        $filename = 'on_site_details_patient_status_' . date('Ymd-His') . '.csv';
 
         return new StreamedResponse($stream, 200, [
             'Content-Type' => 'text/csv',
@@ -113,9 +112,8 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxData['data'] = $onSiteDetailsReportingService->getIncentiveTrackingAjaxData($incentives);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $incentiveRepository->getOnsiteIncentivesCount($siteService->getSiteId(), $ajaxParams);
             return $this->json($ajaxData);
-        } else {
-            return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
         }
+        return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
     }
 
     /**
@@ -156,7 +154,7 @@ class OnSiteDetailsReportingController extends BaseController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-        $filename = "on_site_details_incentive_tracking_" . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
+        $filename = 'on_site_details_incentive_tracking_' . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
 
         return new StreamedResponse($stream, 200, [
             'Content-Type' => 'text/csv',
@@ -188,9 +186,8 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] =
                 $idVerificationRepository->getOnsiteIdVerificationsCount($siteService->getSiteId(), $ajaxParams);
             return $this->json($ajaxData);
-        } else {
-            return $this->render('onsite/id-verification.html.twig', ['params' => $params]);
         }
+        return $this->render('onsite/id-verification.html.twig', ['params' => $params]);
     }
 
     /**
@@ -229,7 +226,7 @@ class OnSiteDetailsReportingController extends BaseController
             fputcsv($output, ['Confidential Information']);
             fclose($output);
         };
-        $filename = "on_site_details_id_verification_" . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
+        $filename = 'on_site_details_id_verification_' . $siteService->getSiteId() . '_' . date('Ymd-His') . '.csv';
 
         return new StreamedResponse($stream, 200, [
             'Content-Type' => 'text/csv',

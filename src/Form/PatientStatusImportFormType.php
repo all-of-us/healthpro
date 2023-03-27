@@ -22,6 +22,5 @@ class PatientStatusImportFormType extends AbstractType
             ->add('Upload', Type\SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
-        ;
     }
 }
