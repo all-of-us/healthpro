@@ -17,16 +17,12 @@ class NphSampleModifyType extends AbstractType
             $samples = $options['samples'];
             foreach ($samples as $sample) {
                 $disabled = false;
-                $checked = false;
                 if ($options['type'] === NphSample::CANCEL) {
                     $disabled = $sample->getModifyType() === NphSample::CANCEL;
-                    $checked = true;
                 } elseif ($options['type'] === NphSample::RESTORE) {
                     $disabled = $sample->getModifyType() !== NphSample::CANCEL;
-                    $checked = true;
                     if (!$disabled) {
                         $disabled = in_array($sample->getSampleCode(), $options['activeSamples'], true);
-                        $checked = false;
                     }
                 }
                 $builder->add($sample->getSampleCode(), Type\CheckboxType::class, [
@@ -34,7 +30,7 @@ class NphSampleModifyType extends AbstractType
                     'required' => false,
                     'disabled' => $disabled,
                     'attr' => [
-                        'checked' => $checked,
+                        'checked' => $disabled,
                     ]
                 ]);
             }
