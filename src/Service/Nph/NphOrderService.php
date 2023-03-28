@@ -123,7 +123,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool) $sampleObj->getFinalizedTs()
+                'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL
             ];
         }
         return $sampleLabels;
