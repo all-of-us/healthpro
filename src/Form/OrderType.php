@@ -5,10 +5,10 @@ namespace App\Form;
 use App\Entity\Order;
 use App\Entity\Site;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class OrderType extends AbstractType
 {
@@ -37,7 +37,7 @@ class OrderType extends AbstractType
         $samplesLabel = "Which samples were successfully {$verb}?";
         $notesLabel = "Additional notes on {$noun}";
         if ($options['step'] == 'finalized') {
-            $samplesLabel = "Which samples are being shipped to the All of Us℠ Biobank?";
+            $samplesLabel = 'Which samples are being shipped to the All of Us℠ Biobank?';
         }
         if ($options['step'] == 'processed') {
             $tsLabel = 'Time of blood processing completion';
@@ -138,11 +138,10 @@ class OrderType extends AbstractType
                     }
                     if (in_array($val, $enabledSamples)) {
                         return $attr;
-                    } else {
-                        $attr['disabled'] = true;
-                        $attr['class'] = 'sample-disabled';
-                        return $attr;
                     }
+                    $attr['disabled'] = true;
+                    $attr['class'] = 'sample-disabled';
+                    return $attr;
                 }
             ]);
         }

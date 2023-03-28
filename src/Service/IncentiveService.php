@@ -2,9 +2,9 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Incentive;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 
 class IncentiveService
 {
@@ -126,18 +126,6 @@ class IncentiveService
         return false;
     }
 
-    private function getIncentiveFromFormData($incentiveForm)
-    {
-        $incentive = $incentiveForm->getData();
-        if ($incentive->getIncentiveAmount() === 'other') {
-            $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
-        }
-        if ($incentive->getIncentiveType() === 'promotional') {
-            $incentive->setIncentiveAmount(0);
-        }
-        return $incentive;
-    }
-
     public function hasAccess($participant): bool
     {
         return
@@ -150,5 +138,17 @@ class IncentiveService
     {
         $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/Incentives", $postData);
         return json_decode($response->getBody()->getContents());
+    }
+
+    private function getIncentiveFromFormData($incentiveForm)
+    {
+        $incentive = $incentiveForm->getData();
+        if ($incentive->getIncentiveAmount() === 'other') {
+            $incentive->setIncentiveAmount($incentiveForm['other_incentive_amount']->getData());
+        }
+        if ($incentive->getIncentiveType() === 'promotional') {
+            $incentive->setIncentiveAmount(0);
+        }
+        return $incentive;
     }
 }

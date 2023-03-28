@@ -141,9 +141,8 @@ class CodeBook
             return self::$map[$code];
         } elseif (strpos($code, 'PIIState_') === 0) {
             return substr($code, 9);
-        } else {
-            return $code;
         }
+        return $code;
     }
 
     public static function ageRangeToDob($range): array
@@ -157,7 +156,7 @@ class CodeBook
         $parameters[] = 'le' . $start->format('Y-m-d');
 
         if (isset($matches[2])) {
-            $endRange = (int)$matches[2] + 1;
+            $endRange = (int) $matches[2] + 1;
             $end = new \DateTime("-{$endRange} years");
             $parameters[] = 'gt' . $end->format('Y-m-d');
         }

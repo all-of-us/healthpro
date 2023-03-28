@@ -3,8 +3,8 @@
 namespace App\Datastore;
 
 use App\Datastore\Entities\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use DateTime;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 
 class DatastoreSessionHandler extends AbstractSessionHandler
 {
@@ -54,9 +54,8 @@ class DatastoreSessionHandler extends AbstractSessionHandler
             $session = Session::fetchOneById($id);
             if ($session) {
                 return $session->data;
-            } else {
-                return '';
             }
+            return '';
         } catch (\Exception $e) {
             // Destroy session if session id is invalid
             $this->destroy($id);

@@ -92,11 +92,10 @@ class IncentiveRepository extends ServiceEntityRepository
                 ->setFirstResult($params['start'])
                 ->setMaxResults($params['length'])
                 ->getResult();
-        } else {
-            return $queryBuilder
-                ->getQuery()
-                ->getResult();
         }
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
     }
 
     public function getOnsiteIncentivesCount($site, $params): int

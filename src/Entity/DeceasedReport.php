@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use Symfony\Component\Validator\Constraints as Assert;
-
 class DeceasedReport
 {
     public const MECHANISMS = [
@@ -256,7 +254,7 @@ class DeceasedReport
         return $this;
     }
 
-    /* Model Methods */
+    // Model Methods
 
     public function getReportmechanismDisplay(): ?string
     {

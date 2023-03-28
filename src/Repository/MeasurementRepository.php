@@ -42,7 +42,7 @@ class MeasurementRepository extends ServiceEntityRepository
      */
     public function getSiteUnfinalizedEvaluations($siteId)
     {
-        $evaluationsQuery = "
+        $evaluationsQuery = '
             SELECT e.*,
                    eh.evaluation_id AS eh_evaluation_id,
                    eh.user_id AS eh_user_id,
@@ -57,7 +57,7 @@ class MeasurementRepository extends ServiceEntityRepository
               AND (eh.type != :type
               OR eh.type IS NULL)
             ORDER BY e.created_ts DESC
-        ";
+        ';
         return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
             'site' => $siteId,
             'type' => Measurement::EVALUATION_CANCEL
@@ -69,7 +69,7 @@ class MeasurementRepository extends ServiceEntityRepository
      */
     public function getSiteRecentModifiedEvaluations($siteId)
     {
-        $evaluationsQuery = "
+        $evaluationsQuery = '
             SELECT e.*,
                    eh.evaluation_id AS eh_order_id,
                    eh.user_id AS eh_user_id,
@@ -86,7 +86,7 @@ class MeasurementRepository extends ServiceEntityRepository
               AND e.id NOT IN (SELECT parent_id FROM evaluations WHERE parent_id IS NOT NULL)
               AND (eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY OR e.updated_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY)
             ORDER BY modified_ts DESC
-        ";
+        ';
         return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
             'site' => $siteId,
             'type' => Measurement::EVALUATION_CANCEL
@@ -95,7 +95,7 @@ class MeasurementRepository extends ServiceEntityRepository
 
     public function getUnloggedMissingMeasurements(): array
     {
-        $evaluationsQuery = "SELECT id FROM evaluations WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND rdr_id IS NULL";
+        $evaluationsQuery = 'SELECT id FROM evaluations WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND rdr_id IS NULL';
         return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
             'type' => MissingNotificationLog::MEASUREMENT_TYPE
         ]);

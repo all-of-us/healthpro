@@ -31,6 +31,6 @@ class DeactivateLogRepository extends ServiceEntityRepository
             ->groupBy('d.hpoId')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

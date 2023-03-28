@@ -2,15 +2,16 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Organization;
 use App\Entity\PatientStatusImport;
 use App\Entity\PatientStatusImportRow;
+use App\Form\PatientStatusImportConfirmFormType;
+use App\Form\PatientStatusImportFormType;
 use App\Repository\PatientStatusRepository;
+use App\Service\LoggerService;
 use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusImportService;
-use App\Service\LoggerService;
-use App\Form\PatientStatusImportFormType;
-use App\Form\PatientStatusImportConfirmFormType;
 use App\Service\PatientStatusService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +21,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Audit\Log;
 
 class PatientStatusController extends BaseController
 {
@@ -116,9 +116,9 @@ class PatientStatusController extends BaseController
                 $this->em->flush();
             }
             return $this->redirectToRoute('patientStatusImport');
-        } else {
-            $importPatientStatuses = $patientStatusImport->getPatientStatusImportRows()->slice(0, 100);
         }
+        $importPatientStatuses = $patientStatusImport->getPatientStatusImportRows()->slice(0, 100);
+
         return $this->render('patientstatus/confirmation.html.twig', [
             'patientStatuses' => $importPatientStatuses,
             'importConfirmForm' => $form->createView(),
@@ -143,9 +143,8 @@ class PatientStatusController extends BaseController
             $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusImport, $patientStatusImportRows);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusImportRows());
             return new JsonResponse($ajaxData);
-        } else {
-            return $this->render('patientstatus/import-details.html.twig');
         }
+        return $this->render('patientstatus/import-details.html.twig');
     }
 
     /**

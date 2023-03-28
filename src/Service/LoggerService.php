@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Datastore\Entities\AuditLog;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use App\Audit\Log;
 
 class LoggerService
 {
@@ -39,48 +39,6 @@ class LoggerService
         if (!$this->env->values['isUnitTest'] && !$this->env->isPhpDevServer() && $action != Log::REQUEST) {
             $this->logDatastore();
         }
-    }
-
-    protected function buildLogArray()
-    {
-        $logArray = [];
-        $logArray['action'] = $this->action;
-        $logArray['data'] = $this->data;
-        $logArray['ts'] = new \DateTime();
-        $logArray = array_merge($logArray, $this->getLogMetadata());
-        return $logArray;
-    }
-
-    protected function logSyslog()
-    {
-        $logArray = $this->buildLogArray();
-        $syslogData = [];
-        $syslogData[] = $logArray['ip'];
-        $syslogData[] = $logArray['user'];
-        $syslogData[] = $logArray['site'];
-        $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
-        if ($logArray['data']) {
-            $syslogData[] = json_encode($logArray['data']);
-        }
-        $this->logger->info(implode(' ', $syslogData));
-    }
-
-    protected function logDatastore()
-    {
-        $logArray = $this->buildLogArray();
-        $data = [
-            'action' => $logArray['action'],
-            'timestamp' => $logArray['ts'],
-            'user' => $logArray['user'],
-            'site' => $logArray['site'],
-            'ip' => $logArray['ip']
-        ];
-        if ($logArray['data']) {
-            $data['data'] = json_encode($logArray['data']);
-        }
-        $auditLog = new AuditLog();
-        $auditLog->setData($data);
-        $auditLog->save();
     }
 
     public function getLogMetaData()
@@ -132,5 +90,47 @@ class LoggerService
             'site' => $site,
             'ip' => $ip
         ];
+    }
+
+    protected function buildLogArray()
+    {
+        $logArray = [];
+        $logArray['action'] = $this->action;
+        $logArray['data'] = $this->data;
+        $logArray['ts'] = new \DateTime();
+        $logArray = array_merge($logArray, $this->getLogMetadata());
+        return $logArray;
+    }
+
+    protected function logSyslog()
+    {
+        $logArray = $this->buildLogArray();
+        $syslogData = [];
+        $syslogData[] = $logArray['ip'];
+        $syslogData[] = $logArray['user'];
+        $syslogData[] = $logArray['site'];
+        $syslogData[] = '[' . self::PMI_AUDIT_PREFIX . $logArray['action'] . ']';
+        if ($logArray['data']) {
+            $syslogData[] = json_encode($logArray['data']);
+        }
+        $this->logger->info(implode(' ', $syslogData));
+    }
+
+    protected function logDatastore()
+    {
+        $logArray = $this->buildLogArray();
+        $data = [
+            'action' => $logArray['action'],
+            'timestamp' => $logArray['ts'],
+            'user' => $logArray['user'],
+            'site' => $logArray['site'],
+            'ip' => $logArray['ip']
+        ];
+        if ($logArray['data']) {
+            $data['data'] = json_encode($logArray['data']);
+        }
+        $auditLog = new AuditLog();
+        $auditLog->setData($data);
+        $auditLog->save();
     }
 }

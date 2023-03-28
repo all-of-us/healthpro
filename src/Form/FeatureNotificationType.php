@@ -4,11 +4,11 @@ namespace App\Form;
 
 use App\Entity\FeatureNotification;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class FeatureNotificationType extends AbstractType
 {
@@ -78,7 +78,7 @@ class FeatureNotificationType extends AbstractType
         $builder->get('status')
             ->addModelTransformer(new CallbackTransformer(
                 function ($int) {
-                    return (bool)$int;
+                    return (bool) $int;
                 },
                 function ($bool) {
                     return $bool ? 1 : 0;

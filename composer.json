@@ -67,7 +67,8 @@
         "phpstan/extension-installer": "^1.1",
         "symfony/stopwatch": "*",
         "symfony/web-profiler-bundle": "*",
-        "dama/doctrine-test-bundle": "^6.7"
+        "dama/doctrine-test-bundle": "^6.7",
+        "friendsofphp/php-cs-fixer": "^3.14"
     },
     "extra": {
         "symfony": {

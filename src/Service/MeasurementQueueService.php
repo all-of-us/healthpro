@@ -2,13 +2,13 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\MeasurementQueue;
 use App\Model\Measurement\Fhir;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use App\Audit\Log;
 
 class MeasurementQueueService
 {

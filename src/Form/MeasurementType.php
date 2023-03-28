@@ -3,12 +3,12 @@
 namespace App\Form;
 
 use App\Entity\Measurement;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class MeasurementType extends AbstractType
 {
@@ -72,7 +72,7 @@ class MeasurementType extends AbstractType
                 if (is_array($field->options)) {
                     $fieldOptions['choices'] = array_combine($field->options, $field->options);
                 } else {
-                    $fieldOptions['choices'] = (array)$field->options;
+                    $fieldOptions['choices'] = (array) $field->options;
                 }
                 $fieldOptions['placeholder'] = false;
             } elseif ($type === 'checkbox') {
@@ -150,6 +150,14 @@ class MeasurementType extends AbstractType
         ]);
     }
 
+    protected static function calculateBmi($height, $weight)
+    {
+        if ($height && $weight) {
+            return $weight / (($height / 100) * ($height / 100));
+        }
+        return false;
+    }
+
     private function addDiastolicBloodPressureConstraint($form, $field)
     {
         $compareType = $field->compare->type;
@@ -172,13 +180,5 @@ class MeasurementType extends AbstractType
         }
         $compareConstraint = new Constraints\Collection($collectionConstraintFields);
         return [$compareConstraint];
-    }
-
-    protected static function calculateBmi($height, $weight)
-    {
-        if ($height && $weight) {
-            return $weight / (($height / 100) * ($height / 100));
-        }
-        return false;
     }
 }

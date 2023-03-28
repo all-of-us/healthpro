@@ -98,7 +98,7 @@ class Message
                 try {
                     $mandrill->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
-                    $this->logger->error("Error sending Mandrill message");
+                    $this->logger->error('Error sending Mandrill message');
                     $this->logger->error($e->getMessage());
                 }
                 break;

@@ -27,18 +27,63 @@ abstract class EmailNotificationService
     protected $filterSummaries = false;
     protected $logEntity;
 
-    abstract protected function getSearchParams($id, $lastDeactivate);
-
-    protected function filterSummaries($summaries)
-    {
-        return $summaries;
-    }
-
     public function getOrganizations()
     {
         $rows = $this->siteRepository->getOrganizations();
         $lastTypes = $this->getLatestOrganizationsFromLogs();
         return $this->getCustomArray($rows, $lastTypes);
+    }
+
+    public function getAwardees()
+    {
+        $rows = $this->siteRepository->getAwardees();
+        $lastTypes = $this->getLatestAwardeesFromLogs();
+        return $this->getCustomArray($rows, $lastTypes);
+    }
+
+    public function sendEmails()
+    {
+        $results = $this->getResults();
+        foreach ($results as $result) {
+            $participants = $this->getParticipants($result['id'], $result['last']);
+            $this->insertLogsRemoveDups($result, $participants);
+            if (count($participants) === 0) {
+                $this->loggerService->log($this->log, [
+                    'org' => $result['id'],
+                    'status' => 'Nothing to notify'
+                ]);
+            } else {
+                if (count($result['emails']) === 0) {
+                    $this->loggerService->log($this->log, [
+                        'org' => $result['id'],
+                        'status' => "{$this->statusText} participants but no one to notify",
+                        'count' => count($participants)
+                    ]);
+                } else {
+                    $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
+                    $message
+                        ->setTo($result['emails'])
+                        ->render($this->render, [
+                            $this->level => $result['id'],
+                            'participants' => $participants
+                        ])
+                        ->send();
+                    $this->loggerService->log($this->log, [
+                        'org' => $result['id'],
+                        'status' => 'Notifications sent',
+                        'count' => count($participants),
+                        'notified' => $result['emails']
+                    ]);
+                }
+            }
+        }
+    }
+
+    abstract protected function getSearchParams($id, $lastDeactivate);
+
+    protected function filterSummaries($summaries)
+    {
+        return $summaries;
     }
 
     protected function getLatestOrganizationsFromLogs()
@@ -49,13 +94,6 @@ abstract class EmailNotificationService
             $lastTypes[$row['organizationId']] = $row['ts'];
         }
         return $lastTypes;
-    }
-
-    public function getAwardees()
-    {
-        $rows = $this->siteRepository->getAwardees();
-        $lastTypes = $this->getLatestAwardeesFromLogs();
-        return $this->getCustomArray($rows, $lastTypes);
     }
 
     protected function getLatestAwardeesFromLogs()
@@ -144,44 +182,6 @@ abstract class EmailNotificationService
                 unset($participants[$k]);
                 // Entity managers gets closed on UniqueConstraintViolationException so reset it
                 $this->managerRegistry->resetManager();
-            }
-        }
-    }
-
-    public function sendEmails()
-    {
-        $results = $this->getResults();
-        foreach ($results as $result) {
-            $participants = $this->getParticipants($result['id'], $result['last']);
-            $this->insertLogsRemoveDups($result, $participants);
-            if (count($participants) === 0) {
-                $this->loggerService->log($this->log, [
-                    'org' => $result['id'],
-                    'status' => 'Nothing to notify'
-                ]);
-            } else {
-                if (count($result['emails']) === 0) {
-                    $this->loggerService->log($this->log, [
-                        'org' => $result['id'],
-                        'status' => "{$this->statusText} participants but no one to notify",
-                        'count' => count($participants)
-                    ]);
-                } else {
-                    $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
-                    $message
-                        ->setTo($result['emails'])
-                        ->render($this->render, [
-                            $this->level => $result['id'],
-                            'participants' => $participants
-                        ])
-                        ->send();
-                    $this->loggerService->log($this->log, [
-                        'org' => $result['id'],
-                        'status' => 'Notifications sent',
-                        'count' => count($participants),
-                        'notified' => $result['emails']
-                    ]);
-                }
             }
         }
     }

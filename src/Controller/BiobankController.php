@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Order;
 use App\Entity\Site;
 use App\Form\BiobankOrderType;
@@ -15,7 +16,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\ReviewService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -181,8 +181,8 @@ class BiobankController extends BaseController
                     if (empty($order->getMayoId())) {
                         $finalizedTs = new DateTime();
                         $samples = [];
-                        if ($finalizeForm["finalizedSamples"]->getData() && is_array($finalizeForm["finalizedSamples"]->getData())) {
-                            $samples = array_values($finalizeForm["finalizedSamples"]->getData());
+                        if ($finalizeForm['finalizedSamples']->getData() && is_array($finalizeForm['finalizedSamples']->getData())) {
+                            $samples = array_values($finalizeForm['finalizedSamples']->getData());
                         }
                         // Check centrifuge type for dv kit orders
                         $centrifugeType = null;

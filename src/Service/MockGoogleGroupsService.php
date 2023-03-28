@@ -11,10 +11,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class MockGoogleGroupsService
 {
+    public static $groups = [];
     private $params;
     private $env;
-
-    public static $groups = [];
 
     public function __construct(ParameterBagInterface $params, EnvironmentService $env)
     {

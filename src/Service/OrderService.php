@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\Site;
@@ -10,7 +11,6 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use App\Audit\Log;
 
 class OrderService
 {
@@ -52,17 +52,6 @@ class OrderService
         $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order']);
         $this->order = $order;
         $this->order->loadSamplesSchema($params);
-    }
-
-    protected function getOrderParams($fields)
-    {
-        $params = [];
-        foreach ($fields as $field) {
-            if ($this->params->has($field) && !empty($this->params->get($field))) {
-                $params[$field] = $this->params->get($field);
-            }
-        }
-        return $params;
     }
 
     public function setParticipant($participant)
@@ -128,7 +117,7 @@ class OrderService
     public function getOrders(array $query = []): array
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/BiobankOrder", [
+            $response = $this->rdrApiService->get('rdr/v1/BiobankOrder', [
                 'query' => $query
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -259,17 +248,6 @@ class OrderService
         return $id;
     }
 
-    private function getNumericId()
-    {
-        $length = 10;
-        // Avoid leading 0s
-        $id = (string)rand(1, 9);
-        for ($i = 0; $i < $length - 1; $i++) {
-            $id .= (string)rand(0, 9);
-        }
-        return $id;
-    }
-
     public function setOrderUpdateFromForm($step, $form)
     {
         $formData = $form->getData();
@@ -318,8 +296,8 @@ class OrderService
                 } else {
                     $this->order->setProcessedSamplesTs(json_encode([]));
                 }
-                if ($this->order->getType() !== 'saliva' && !empty($formData["processedCentrifugeType"])) {
-                    $this->order->setProcessedCentrifugeType($formData["processedCentrifugeType"]);
+                if ($this->order->getType() !== 'saliva' && !empty($formData['processedCentrifugeType'])) {
+                    $this->order->setProcessedCentrifugeType($formData['processedCentrifugeType']);
                 }
                 // Remove finalized samples when not processed
                 if (!empty($this->order->getFinalizedSamples())) {
@@ -389,7 +367,7 @@ class OrderService
         $formData = [];
         if ($this->order->{'get' . ucfirst($step) . 'Notes'}()) {
             $formData["{$step}Notes"] = $this->order->{'get' . ucfirst($step) . 'Notes'}();
-        };
+        }
         if ($step != 'processed') {
             if ($this->order->{'get' . ucfirst($step) . 'Ts'}()) {
                 $formData["{$step}Ts"] = $this->order->{'get' . ucfirst($step) . 'Ts'}();
@@ -421,7 +399,7 @@ class OrderService
                 }
             }
             if ($this->order->getProcessedCentrifugeType()) {
-                $formData["processedCentrifugeType"] = $this->order->getProcessedCentrifugeType();
+                $formData['processedCentrifugeType'] = $this->order->getProcessedCentrifugeType();
             }
         }
         if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
@@ -477,9 +455,8 @@ class OrderService
     {
         if ($this->order->getStatus() === Order::ORDER_UNLOCK) {
             return $this->editRdrOrder();
-        } else {
-            return $this->createRdrOrder();
         }
+        return $this->createRdrOrder();
     }
 
     public function createRdrOrder()
@@ -631,7 +608,7 @@ class OrderService
         // Update tracking number
         if (!empty($object->identifier)) {
             foreach ($object->identifier as $identifier) {
-                if (preg_match("/tracking-number/i", $identifier->system)) {
+                if (preg_match('/tracking-number/i', $identifier->system)) {
                     $trackingNumber = $identifier->value;
                     break;
                 }
@@ -770,5 +747,27 @@ class OrderService
             $this->order->setVersion($this->params->get('order_samples_version'));
         }
         return $this->order;
+    }
+
+    protected function getOrderParams($fields)
+    {
+        $params = [];
+        foreach ($fields as $field) {
+            if ($this->params->has($field) && !empty($this->params->get($field))) {
+                $params[$field] = $this->params->get($field);
+            }
+        }
+        return $params;
+    }
+
+    private function getNumericId()
+    {
+        $length = 10;
+        // Avoid leading 0s
+        $id = (string) rand(1, 9);
+        for ($i = 0; $i < $length - 1; $i++) {
+            $id .= (string) rand(0, 9);
+        }
+        return $id;
     }
 }

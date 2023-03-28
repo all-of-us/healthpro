@@ -46,7 +46,7 @@ class SiteRepository extends ServiceEntityRepository
             ->groupBy('s.awardeeId')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 
     /**

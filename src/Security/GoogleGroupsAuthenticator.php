@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Service\AuthService;
 use App\Service\EnvironmentService;
 use App\Service\UserService;
+use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
-use Exception;
 use Twig\Environment;
 
 class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
@@ -39,7 +39,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $this->env = $env;
         $this->userService = $userService;
         $this->twig = $twig;
-        $this->requestStack= $requestStack;
+        $this->requestStack = $requestStack;
     }
 
     public function supports(Request $request): bool
@@ -51,8 +51,8 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     }
 
     /**
-     @return mixed
-    */
+     * @return mixed
+     */
     public function getCredentials(Request $request)
     {
         if (!$request->query->has('state') || !$request->query->has('state')) {
@@ -81,7 +81,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             return true; // Bypass groups auth
         }
         if (!($user instanceof User)) {
-            throw new Exception("Invalid user type");
+            throw new Exception('Invalid user type');
         }
 
         $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();

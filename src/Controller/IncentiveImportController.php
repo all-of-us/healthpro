@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\IncentiveImport;
 use App\Form\IncentiveImportConfirmFormType;
 use App\Form\IncentiveImportFormType;
@@ -12,7 +13,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Audit\Log;
 
 class IncentiveImportController extends BaseController
 {

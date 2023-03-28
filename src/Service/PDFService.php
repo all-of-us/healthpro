@@ -30,30 +30,6 @@ class PDFService
         $this->twig = $twig;
     }
 
-    /**
-     * @throws MpdfException
-     * @throws SyntaxError
-     * @throws RuntimeError
-     * @throws LoaderError
-     */
-    private function renderPDF(string $name, string $sampleType, ?\DateTime $DOB, string $specimenID, string
-    $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
-    {
-        $this->mpdf->WriteHTML(
-            $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
-                    'PatientName' => $name,
-                    'sampleType' => $sampleType,
-                    'dob' => $DOB ? $DOB->format('Y-m-d') : null,
-                    'SpecimenID' => $specimenID,
-                    'ModuleNum' => $moduleNum,
-                    'TimePoint' => $timePoint,
-                    'SampleCode' => $sampleCode,
-                    'VisitType' => $VisitType,
-                    'CollectionVolume' => $collectionVolume
-                ])
-        );
-    }
-
     public function batchPDF(array $OrderSummary, NphParticipant $participant, string $module, string $visit): string
     {
         $stoolPrinted = false;
@@ -70,12 +46,12 @@ class PDFService
                             );
                         }
                         $sampleId = $sample['sampleId'];
-                        if ($sampleType === "stool" && $stoolPrinted === false) {
-                            $sample['identifier'] = "ST-KIT";
+                        if ($sampleType === 'stool' && $stoolPrinted === false) {
+                            $sample['identifier'] = 'ST-KIT';
                             $sampleId = $sample['orderId'];
-                            $sampleId = preg_replace("/KIT-?/", "", $sampleId);
+                            $sampleId = preg_replace('/KIT-?/', '', $sampleId);
                             $stoolPrinted = true;
-                        } elseif ($sampleType === "stool" && $stoolPrinted === true) {
+                        } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
                             continue;
                         }
                         $this->renderPDF(
@@ -90,15 +66,38 @@ class PDFService
                             $sample['sampleCollectionVolume']
                         );
                     } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
-                        return "Unable to render PDF";
+                        return 'Unable to render PDF';
                     }
                 }
             }
         }
         try {
-            return $this->mpdf->Output($participant->id.'.pdf', Destination::STRING_RETURN);
+            return $this->mpdf->Output($participant->id . '.pdf', Destination::STRING_RETURN);
         } catch (MpdfException $exception) {
-            return "Unable to render PDF";
+            return 'Unable to render PDF';
         }
+    }
+
+    /**
+     * @throws MpdfException
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    private function renderPDF(string $name, string $sampleType, ?\DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
+    {
+        $this->mpdf->WriteHTML(
+            $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
+                    'PatientName' => $name,
+                    'sampleType' => $sampleType,
+                    'dob' => $DOB ? $DOB->format('Y-m-d') : null,
+                    'SpecimenID' => $specimenID,
+                    'ModuleNum' => $moduleNum,
+                    'TimePoint' => $timePoint,
+                    'SampleCode' => $sampleCode,
+                    'VisitType' => $VisitType,
+                    'CollectionVolume' => $collectionVolume
+                ])
+        );
     }
 }

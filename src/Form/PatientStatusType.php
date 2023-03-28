@@ -3,12 +3,11 @@
 namespace App\Form;
 
 use App\Entity\PatientStatus;
-use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type;
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints;
 
 class PatientStatusType extends AbstractType
 {
@@ -25,12 +24,11 @@ class PatientStatusType extends AbstractType
                     'message' => 'Please select patient status'
                 ])
             ])
-            ->add("comments", Type\TextareaType::class, [
+            ->add('comments', Type\TextareaType::class, [
                 'label' => 'Comments',
                 'required' => $options['require_comment'],
                 'constraints' => new Constraints\Type('string')
             ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
