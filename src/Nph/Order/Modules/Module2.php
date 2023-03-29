@@ -19,11 +19,11 @@ class Module2 extends Samples
 
     private static $visitTypeMapper = [
         'OrangeDiet' => 'Diet',
-        'OrangeDSMT' => 'LMT',
+        'OrangeDSMT' => 'DSMT',
         'BlueDiet' => 'Diet',
         'BlueDSMT' => 'LMT',
         'PurpleDiet' => 'Diet',
-        'PurpleDSMT' => 'LMT'
+        'PurpleDSMT' => 'DSMT'
     ];
 
     public function __construct($visit)

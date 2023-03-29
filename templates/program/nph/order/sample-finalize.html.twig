@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="col-sm-7">
-            {% if sample.finalizedTs is not empty %}
+            {% if sample.rdrId and sample.finalizedTs %}
                 <div class="alert alert-success well-sm">
                     <strong>
                         Finalized
