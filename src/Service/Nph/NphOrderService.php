@@ -491,14 +491,12 @@ class NphOrderService
                 $visitTypes = $module->getVisitTypes();
                 $sampleStatus = $sample->getStatus();
                 $orderId = $order->getOrderId();
-                if (isset($orderSummary[$order->getModule()][$order->getVisitType()][$order->getTimepoint()][$module->getSampleType($sample->getSampleCode())][$sample->getSampleCode()])) {
-                    continue;
-                }
                 $orderSummary[$order->getModule()]
                 [$order->getVisitType()]
                 [$order->getTimepoint()]
                 [$module->getSampleType($sample->getSampleCode())]
-                [$sample->getSampleCode()] = [
+                [$sample->getSampleCode()]
+                [$order->getOrderId()] = [
                     'sampleId' => $sample->getSampleID(),
                     'sampleName' => $sampleName,
                     'orderId' => $order->getOrderId(),

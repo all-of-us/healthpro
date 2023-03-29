@@ -58,15 +58,22 @@ class NphProgramSummaryService
             foreach ($moduleSummary as $visit => $visitSummary) {
                 foreach ($visitSummary['visitInfo'] as $timePoint => $timePointSummary) {
                     foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
-                        $numberSamples = 0;
+                        $numberSamples = [];
                         $expectedSamples = 0;
                         foreach (array_keys($sample) as $sampleCode) {
                             if ($sampleCode === 'STOOL' || $sampleCode === 'NAIL') {
                                 continue;
                             }
                             $expectedSamples++;
-                            if (isset($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode]['sampleId'])) {
-                                $numberSamples++;
+                            if (isset($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode])) {
+                                foreach ($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] as $orderid => $orderInfo) {
+                                    if (!isset($numberSamples[$orderid])) {
+                                        $numberSamples[$orderid] = 0;
+                                    }
+                                    if ($orderInfo['sampleId'] !== null) {
+                                        $numberSamples[$orderid]++;
+                                    }
+                                }
                             }
                             $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];
                         }
