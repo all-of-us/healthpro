@@ -121,7 +121,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool) $sampleObj->getFinalizedTs()
+                'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL
             ];
         }
         return $sampleLabels;
@@ -332,6 +332,11 @@ class NphOrderService
                     if ($order->getOrderType() === NphOrder::TYPE_URINE) {
                         $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
                     }
+                } else {
+                    $nphSample->setCollectedUser(null);
+                    $nphSample->setCollectedSite(null);
+                    $nphSample->setCollectedTs(null);
+                    $nphSample->setCollectedNotes(null);
                 }
                 $this->em->persist($nphSample);
                 $this->em->flush();
