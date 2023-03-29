@@ -10,6 +10,7 @@ use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
 use App\Service\SiteService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -31,9 +32,14 @@ class NphParticipantSummaryController extends AbstractController
         SiteService $siteService,
         NphParticipantSummaryService $nphParticipantSummaryService,
         NphOrderService $nphOrderService,
-        NphProgramSummaryService $nphProgramSummaryService
+        NphProgramSummaryService $nphProgramSummaryService,
+        ParameterBagInterface $params
     ): Response {
-        $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+        $refresh = $request->query->get('refresh');
+        $participant = $nphParticipantSummaryService->getParticipantById($participantId, $refresh);
+        if ($refresh) {
+            return $this->redirectToRoute('nph_participant_summary', ['participantId' => $participantId]);
+        }
         if ($participant === false) {
             throw $this->createNotFoundException();
         }
@@ -65,11 +71,13 @@ class NphParticipantSummaryController extends AbstractController
                 'site' => $participant->nphPairedSiteSuffix
             ]);
         }
+        $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
+            'cacheEnabled' => $cacheEnabled
         ]);
     }
 }

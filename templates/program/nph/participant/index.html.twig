@@ -54,9 +54,19 @@
             <svg id="participantBarcode" data-id="{{ participant.id }}"></svg>
         </div>
     </div>
+    {% if cacheEnabled %}
+        <div class="row pull-right">
+            Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
+            <a href="{{ path('nph_participant_summary', { participantId: participant.id, refresh: 1 }) }}"
+               class="btn btn-primary btn-xs">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+                Refresh
+            </a>
+        </div>
+    {% endif %}
     <div class="col-md-12" role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 2 %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo %}
                 {% if loop.first %}
                     {% set tabActive = 'active' %}
                 {% else %}
@@ -65,8 +75,6 @@
                 <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
                         Module {{ moduleNumber }}</a></li>
             {% endfor %}
-            <li class="pull-right"><button class="btn btn-primary pull-right refresh-btn" style="position: relative"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button></li>
-
         </ul>
     </div>
     <div class="col-sm-2 participant-activity-div">
