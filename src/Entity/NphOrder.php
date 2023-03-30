@@ -304,7 +304,7 @@ class NphOrder
     public function isDisabled(): bool
     {
         foreach ($this->nphSamples as $nphSample) {
-            if (empty($nphSample->getFinalizedTs())) {
+            if (empty($nphSample->getRdrId())) {
                 return false;
             }
         }
@@ -314,7 +314,7 @@ class NphOrder
     public function isMetadataFieldDisabled(): bool
     {
         foreach ($this->nphSamples as $nphSample) {
-            if ($nphSample->getFinalizedTs()) {
+            if ($nphSample->getRdrId()) {
                 return true;
             }
         }
@@ -361,7 +361,7 @@ class NphOrder
     {
         if ($this->getOrderType() === self::TYPE_STOOL) {
             foreach ($this->nphSamples as $nphSample) {
-                if ($nphSample->getFinalizedTs()) {
+                if ($nphSample->getRdrId()) {
                     return true;
                 }
             }

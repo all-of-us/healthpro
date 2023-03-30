@@ -113,19 +113,18 @@ class NphOrderTest extends NphTestCase
 
     public function isDisabledAndMetadataDisabledDataProvider(): array
     {
-        $finalizedTs = new \DateTime('2023-01-01 08:00:00');
         return [
             [
                 [
                     [
                         'sampleId' => '1000000000',
                         'sampleCode' => 'ST1',
-                        'finalizedTs' => $finalizedTs
+                        'rdrId' => 100
                     ],
                     [
                         'sampleId' => '2000000000',
                         'sampleCode' => 'ST2',
-                        'finalizedTs' => $finalizedTs
+                        'rdrId' => 101
                     ],
                 ],
                 true,
@@ -136,7 +135,7 @@ class NphOrderTest extends NphTestCase
                     [
                         'sampleId' => '3000000000',
                         'sampleCode' => 'ST1',
-                        'finalizedTs' => $finalizedTs
+                        'rdrId' => 102
                     ],
                     [
                         'sampleId' => '4000000000',
@@ -373,7 +372,7 @@ class NphOrderTest extends NphTestCase
                     [
                         'sampleId' => '6000000000',
                         'sampleCode' => 'ST1',
-                        'finalizedTs' => $collectedTs
+                        'rdrId' => 100
                     ],
                     [
                         'sampleId' => '7000000000',
