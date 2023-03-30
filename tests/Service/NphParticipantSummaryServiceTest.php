@@ -46,6 +46,26 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
         $this->assertEquals('John', $result['firstName']);
     }
 
+    public function testSearch()
+    {
+        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $data = $this->getMockRdrResponseData();
+        $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
+        $nphParticipantService = new NphParticipantSummaryService(
+            $mockRdrApiService,
+            static::getContainer()->get(ParameterBagInterface::class)
+        );
+        $params = [
+            'lastName' => 'John',
+            'firstName' => 'Doe',
+            'dob' => "01/01/1990",
+        ];
+        $results = $nphParticipantService->search($params);
+        foreach ($results as $result) {
+            $this->assertInstanceOf(NphParticipant::class, $result);
+        }
+    }
+
     private function getGuzzleResponse($data): Response
     {
         return new Response(200, ['Content-Type' => 'application/json'], $data);
