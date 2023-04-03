@@ -2581,9 +2581,8 @@ class WorkQueue
             return self::HTML_NOTICE . ' (not applicable) ';
         } elseif ($questionnaireOnDnaProgram === 'SUBMITTED') {
             return self::HTML_SUCCESS . ' ' . self::dateFromString($questionnaireOnDnaProgramAuthored, $userTimezone);
-        } else {
-            return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
         }
+        return self::HTML_DANGER . '<span class="text-danger"> (review not completed) </span>';
     }
 
     public static function getRetentionEligibleStatus($value, $time, $userTimezone)
@@ -2794,7 +2793,7 @@ class WorkQueue
 
     public static function isValidDate($date)
     {
-        $dt = DateTime::createFromFormat("m/d/Y", $date);
+        $dt = DateTime::createFromFormat('m/d/Y', $date);
         return $dt !== false && !array_sum($dt::getLastErrors());
     }
 
@@ -2849,9 +2848,9 @@ class WorkQueue
     public static function getParticipantIncentive($participantIncentives): string
     {
         if ($incentiveDateGiven = self::getParticipantIncentiveDateGiven($participantIncentives)) {
-            return self:: HTML_SUCCESS . ' ' . $incentiveDateGiven;
+            return self::HTML_SUCCESS . ' ' . $incentiveDateGiven;
         }
-        return self:: HTML_DANGER;
+        return self::HTML_DANGER;
     }
 
     public static function getParticipantIncentiveDateGiven($participantIncentives): string

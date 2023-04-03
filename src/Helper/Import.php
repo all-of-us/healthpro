@@ -42,6 +42,6 @@ class Import
 
     public static function isValidDate($date): bool
     {
-        return (bool)strtotime($date);
+        return (bool) strtotime($date);
     }
 }

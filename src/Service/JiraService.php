@@ -10,11 +10,11 @@ class JiraService
 {
     public const INSTANCE_URL = 'https://precisionmedicineinitiative.atlassian.net';
     public const DESTINATION_COMPONENT_ID = '10074';
-
-    private $client;
     private const SOURCE_PROJECT_KEY = 'HPRO';
     private const DESTINATION_PROJECT_KEY = 'PD';
     private const DESTINATION_ISSUE_TYPE_ID = '10000'; // 10000 = story
+
+    private $client;
 
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {

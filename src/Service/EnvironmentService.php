@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use Exception;
 use App\Datastore\Entities\Configuration;
+use Exception;
 
 class EnvironmentService
 {
@@ -14,8 +14,6 @@ class EnvironmentService
     public const ENV_PROD = 'prod';  // production environment
     public const DEFAULT_TIMEZONE = 'America/New_York';
     public const DATASTORE_EMULATOR_HOST = 'localhost:8081';
-
-    protected $name;
     public $configuration = [];
     public $values = [];
 
@@ -29,6 +27,8 @@ class EnvironmentService
         'America/Anchorage' => 'Alaska Time',
         'Pacific/Honolulu' => 'Hawaii Time'
     ];
+
+    protected $name;
 
     public function __construct(array $values = [])
     {
@@ -74,9 +74,8 @@ class EnvironmentService
             return self::ENV_PROD;
         } elseif ($this->isPhpDevServer()) {
             return self::ENV_LOCAL;
-        } else {
-            throw new Exception("Bad environment: $env");
         }
+        throw new Exception("Bad environment: $env");
     }
 
     public function isLocal()

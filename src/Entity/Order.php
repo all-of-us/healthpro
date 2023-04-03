@@ -24,15 +24,6 @@ class Order
     public const ORDER_REVERT = 'revert';
     public const INITIAL_VERSION = '1';
 
-    private $params;
-    private $samples;
-    private $samplesInformation;
-    private $salivaSamples;
-    private $salivaSamplesInformation;
-    private $salivaInstructions;
-    private $currentVersion;
-    private $origin;
-
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
 
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
@@ -105,6 +96,15 @@ class Order
         'Order can be amended instead of cancelled' => 'ORDER_RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
+
+    private $params;
+    private $samples;
+    private $samplesInformation;
+    private $salivaSamples;
+    private $salivaSamplesInformation;
+    private $salivaInstructions;
+    private $currentVersion;
+    private $origin;
 
     /**
      * @ORM\Id()
@@ -1015,80 +1015,6 @@ class Order
         ];
     }
 
-    protected function getSampleTime($set, $sample)
-    {
-        $samples = json_decode($this->{'get' . $set . 'Samples'}());
-        if (!is_array($samples) || !in_array($sample, $samples)) {
-            return false;
-        }
-        if ($set == 'Processed') {
-            $processedSampleTimes = json_decode($this->getProcessedSamplesTs(), true);
-            if (!empty($processedSampleTimes[$sample])) {
-                try {
-                    $time = new DateTime();
-                    $time->setTimestamp($processedSampleTimes[$sample]);
-                    return $time->format('Y-m-d\TH:i:s\Z');
-                } catch (\Exception $e) {
-                }
-            }
-        } else {
-            if ($this->{'get' . $set . 'Ts'}()) {
-                $time = clone $this->{'get' . $set . 'Ts'}();
-                $time->setTimezone(new \DateTimeZone('UTC'));
-                return $time->format('Y-m-d\TH:i:s\Z');
-            }
-        }
-    }
-
-    protected function getRdrSamples()
-    {
-        $samples = [];
-        foreach ($this->getModifiedRequestedSamples() as $description => $test) {
-            // Convert new samples
-            $rdrTest = $test;
-            if ($test == '1SS08') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2SST8' : '1SST8';
-            }
-            if ($test == '1PS08') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PST8' : '1PST8';
-            }
-            $sample = [
-                'test' => $rdrTest,
-                'description' => $description,
-                'processingRequired' => in_array($test, self::$samplesRequiringProcessing)
-            ];
-            if ($collected = $this->getSampleTime('Collected', $test)) {
-                $sample['collected'] = $collected;
-            }
-            if ($sample['processingRequired']) {
-                $processed = $this->getSampleTime('Processed', $test);
-                if ($processed) {
-                    $sample['processed'] = $processed;
-                }
-            }
-            if ($finalized = $this->getSampleTime('Finalized', $test)) {
-                $sample['finalized'] = $finalized;
-            }
-            $samples[] = $sample;
-        }
-        return $samples;
-    }
-
-    protected function getModifiedRequestedSamples()
-    {
-        if ($this->getType() == 'saliva') {
-            return $this->salivaSamples;
-        }
-        if ($this->getRequestedSamples() &&
-            ($requestedArray = json_decode($this->getRequestedSamples())) &&
-            is_array($requestedArray)
-        ) {
-            return array_intersect($this->samples, $requestedArray);
-        } else {
-            return $this->samples;
-        }
-    }
-
     public function getStatus()
     {
         $history = $this->getHistory();
@@ -1175,9 +1101,8 @@ class Order
             is_array($requestedArray)
         ) {
             return array_intersect($this->samples, $requestedArray);
-        } else {
-            return $this->samples;
         }
+        return $this->samples;
     }
 
     public function getEnabledSamples($set)
@@ -1517,5 +1442,78 @@ class Order
             return 'Saliva';
         }
         return 'Full HPO';
+    }
+
+    protected function getSampleTime($set, $sample)
+    {
+        $samples = json_decode($this->{'get' . $set . 'Samples'}());
+        if (!is_array($samples) || !in_array($sample, $samples)) {
+            return false;
+        }
+        if ($set == 'Processed') {
+            $processedSampleTimes = json_decode($this->getProcessedSamplesTs(), true);
+            if (!empty($processedSampleTimes[$sample])) {
+                try {
+                    $time = new DateTime();
+                    $time->setTimestamp($processedSampleTimes[$sample]);
+                    return $time->format('Y-m-d\TH:i:s\Z');
+                } catch (\Exception $e) {
+                }
+            }
+        } else {
+            if ($this->{'get' . $set . 'Ts'}()) {
+                $time = clone $this->{'get' . $set . 'Ts'}();
+                $time->setTimezone(new \DateTimeZone('UTC'));
+                return $time->format('Y-m-d\TH:i:s\Z');
+            }
+        }
+    }
+
+    protected function getRdrSamples()
+    {
+        $samples = [];
+        foreach ($this->getModifiedRequestedSamples() as $description => $test) {
+            // Convert new samples
+            $rdrTest = $test;
+            if ($test == '1SS08') {
+                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2SST8' : '1SST8';
+            }
+            if ($test == '1PS08') {
+                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PST8' : '1PST8';
+            }
+            $sample = [
+                'test' => $rdrTest,
+                'description' => $description,
+                'processingRequired' => in_array($test, self::$samplesRequiringProcessing)
+            ];
+            if ($collected = $this->getSampleTime('Collected', $test)) {
+                $sample['collected'] = $collected;
+            }
+            if ($sample['processingRequired']) {
+                $processed = $this->getSampleTime('Processed', $test);
+                if ($processed) {
+                    $sample['processed'] = $processed;
+                }
+            }
+            if ($finalized = $this->getSampleTime('Finalized', $test)) {
+                $sample['finalized'] = $finalized;
+            }
+            $samples[] = $sample;
+        }
+        return $samples;
+    }
+
+    protected function getModifiedRequestedSamples()
+    {
+        if ($this->getType() == 'saliva') {
+            return $this->salivaSamples;
+        }
+        if ($this->getRequestedSamples() &&
+            ($requestedArray = json_decode($this->getRequestedSamples())) &&
+            is_array($requestedArray)
+        ) {
+            return array_intersect($this->samples, $requestedArray);
+        }
+        return $this->samples;
     }
 }

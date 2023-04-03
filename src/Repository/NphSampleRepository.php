@@ -35,7 +35,7 @@ class NphSampleRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+     */
 
     /*
     public function findOneBySomeField($value): ?NphSample
@@ -47,7 +47,7 @@ class NphSampleRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    */
+     */
 
     public function findActiveSampleCodes(NphOrder $order, $site)
     {

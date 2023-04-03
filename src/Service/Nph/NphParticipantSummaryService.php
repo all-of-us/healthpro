@@ -7,7 +7,6 @@ use App\Drc\Exception\InvalidDobException;
 use App\Drc\Exception\InvalidResponseException;
 use App\Helper\NphParticipant;
 use App\Service\RdrApiService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NphParticipantSummaryService
@@ -17,18 +16,16 @@ class NphParticipantSummaryService
 
     protected RdrApiService $api;
     protected ParameterBagInterface $params;
-    protected EntityManagerInterface $em;
 
-    public function __construct(RdrApiService $api, ParameterBagInterface $params, EntityManagerInterface $em)
+    public function __construct(RdrApiService $api, ParameterBagInterface $params)
     {
         $this->api = $api;
         $this->params = $params;
-        $this->em = $em;
     }
 
-    public function getParticipantById($participantId, $refresh = null)
+    public function getParticipantById(string $participantId, string $refresh = null)
     {
-        if (!is_string($participantId) || !preg_match('/^\w+$/', $participantId)) {
+        if (!preg_match('/^\w+$/', $participantId)) {
             return false;
         }
         $participant = false;
@@ -104,6 +101,20 @@ class NphParticipantSummaryService
         return $results;
     }
 
+    public function getAllParticipantDetailsById($participantId): ?array
+    {
+        try {
+            $query = $this->getAllParticipantsByIdQuery($participantId);
+            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $edges = $result['participant']['edges'];
+            return !empty($edges) ? $edges[0]['node'] : null;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
     private function getParticipantByIdQuery(string $participantId): string
     {
         return " 
@@ -177,20 +188,6 @@ class NphParticipantSummaryService
                 }
               }
         ";
-    }
-
-    public function getAllParticipantDetailsById($participantId): ?array
-    {
-        try {
-            $query = $this->getAllParticipantsByIdQuery($participantId);
-            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
-            $result = json_decode($response->getBody()->getContents(), true);
-            $edges = $result['participant']['edges'];
-            return !empty($edges) ? $edges[0]['node'] : null;
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
-        }
     }
 
     private function getAllParticipantsByIdQuery(string $participantId): string

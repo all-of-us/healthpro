@@ -78,7 +78,35 @@ class RdrApiService
         return $this->getClient($path)->request('POST', $this->endpoint . $path, $params);
     }
 
-    /* Private Methods */
+    public function logException(\Exception $e)
+    {
+        $this->lastError = $e->getMessage();
+        if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+            $this->logger->critical($e->getMessage());
+            $response = $e->getResponse();
+            $responseCode = $response->getStatusCode();
+            $contents = $response->getBody()->getContents();
+            $this->logger->info("Response code: {$responseCode}");
+            $this->logger->info("Response body: {$contents}");
+            $this->lastError = $contents;
+            $this->lastErrorCode = $responseCode;
+        } else {
+            // No response - request probably timed out
+            $this->logger->error($e->getMessage());
+        }
+    }
+
+    public function getLastError()
+    {
+        return $this->lastError;
+    }
+
+    public function getLastErrorCode()
+    {
+        return $this->lastErrorCode;
+    }
+
+    // Private Methods
 
     private function getClient($resourceEndpoint = null)
     {
@@ -107,33 +135,5 @@ class RdrApiService
             'base_uri' => $endpoint,
             'timeout' => 50
         ]));
-    }
-
-    public function logException(\Exception $e)
-    {
-        $this->lastError = $e->getMessage();
-        if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
-            $this->logger->critical($e->getMessage());
-            $response = $e->getResponse();
-            $responseCode = $response->getStatusCode();
-            $contents = $response->getBody()->getContents();
-            $this->logger->info("Response code: {$responseCode}");
-            $this->logger->info("Response body: {$contents}");
-            $this->lastError = $contents;
-            $this->lastErrorCode = $responseCode;
-        } else {
-            // No response - request probably timed out
-            $this->logger->error($e->getMessage());
-        }
-    }
-
-    public function getLastError()
-    {
-        return $this->lastError;
-    }
-
-    public function getLastErrorCode()
-    {
-        return $this->lastErrorCode;
     }
 }

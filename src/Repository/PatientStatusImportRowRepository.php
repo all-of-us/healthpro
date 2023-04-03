@@ -21,7 +21,7 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
 
     public function deleteUnconfirmedImportData($date)
     {
-        $query = "DELETE psir FROM patient_status_import_rows psir inner join patient_status_import psi on psir.import_id = psi.id where psi.created_ts < :date and psi.confirm = :confirm";
+        $query = 'DELETE psir FROM patient_status_import_rows psir inner join patient_status_import psi on psir.import_id = psi.id where psi.created_ts < :date and psi.confirm = :confirm';
         $params = ['date' => $date, 'confirm' => 0];
         $statement = $this->getEntityManager()->getConnection()->prepare($query);
         $statement->execute($params);
@@ -29,7 +29,7 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
 
     public function getPatientStatusImportRows($limit): array
     {
-        $query = "
+        $query = '
             SELECT psir.*,
                    psi.site,
                    psi.created_ts as authored,
@@ -44,7 +44,7 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
             LEFT JOIN users u ON psi.user_id = u.id
             WHERE psir.rdr_status = :rdrStatus
             ORDER BY psir.id ASC
-        ";
+        ';
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit;
         }

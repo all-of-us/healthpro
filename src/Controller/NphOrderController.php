@@ -100,8 +100,9 @@ class NphOrderController extends BaseController
             'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'stoolSamples' => $nphOrderService->getSamplesByType('stool'),
-            'nailSamples' => $nphOrderService->getSamplesByType('nail'),
+            'stoolSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_STOOL),
+            'nailSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_NAIL),
+            'bloodSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_BLOOD),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
             'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
             'showPreview' => $showPreview
@@ -192,9 +193,8 @@ class NphOrderController extends BaseController
                         'orderId' => $sample->getNphOrder()->getId(),
                         'sampleId' => $sample->getId()
                     ]);
-                } else {
-                    $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
                 }
+                $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
             }
             $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
         }
@@ -278,9 +278,9 @@ class NphOrderController extends BaseController
                         'orderId' => $orderId,
                         'sampleId' => $sampleId
                     ]);
-                } else {
-                    $this->addFlash('error', 'Failed finalizing sample. Please try again.');
                 }
+                $this->addFlash('error', 'Failed finalizing sample. Please try again.');
+                $this->em->refresh($sample);
             } else {
                 $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
             }
@@ -307,9 +307,8 @@ class NphOrderController extends BaseController
                         'orderId' => $orderId,
                         'sampleId' => $sampleId
                     ]);
-                } else {
-                    $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
                 }
+                $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
             }
         }
 
@@ -331,8 +330,7 @@ class NphOrderController extends BaseController
     /**
      * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint/{sampleGroup}", name="nph_order_label_print")
      */
-    public function orderSummary($participantId, $module, $visit, $sampleGroup, NphParticipantSummaryService
-    $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
+    public function orderSummary($participantId, $module, $visit, $sampleGroup, NphParticipantSummaryService $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
@@ -395,17 +393,15 @@ class NphOrderController extends BaseController
                         'participantId' => $participantId,
                         'orderId' => $orderId
                     ]);
-                } else {
-                    $this->addFlash('error', "Failed to {$type} one or more samples. Please try again.");
-                    return $this->redirectToRoute('nph_samples_modify', [
-                        'participantId' => $participantId,
-                        'orderId' => $orderId,
-                        'type' => $type
-                    ]);
                 }
-            } else {
-                $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
+                $this->addFlash('error', "Failed to {$type} one or more samples. Please try again.");
+                return $this->redirectToRoute('nph_samples_modify', [
+                    'participantId' => $participantId,
+                    'orderId' => $orderId,
+                    'type' => $type
+                ]);
             }
+            $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
         }
         return $this->render('program/nph/order/sample-modify.html.twig', [
             'activeSamples' => $activeSamples,
@@ -503,17 +499,9 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    private function checkCrossSiteParticipant(string $participantSiteId): void
-    {
-        if ($participantSiteId !== $this->siteService->getSiteId()) {
-            throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
-        }
-    }
-
     /**
      * @Route("/aliquot/instructions/file/{id}", name="aliquot_instructions_file")
      */
-
     public function aliquotInstructions($id, HelpService $helpService)
     {
         $document = Samples::$aliquotDocuments[$id] ?? null;
@@ -537,6 +525,13 @@ class NphOrderController extends BaseController
             error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
             echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
             exit;
+        }
+    }
+
+    private function checkCrossSiteParticipant(string $participantSiteId): void
+    {
+        if ($participantSiteId !== $this->siteService->getSiteId()) {
+            throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
         }
     }
 }

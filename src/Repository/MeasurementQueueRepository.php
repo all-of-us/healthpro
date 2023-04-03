@@ -34,7 +34,7 @@ class MeasurementQueueRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+     */
 
     /*
     public function findOneBySomeField($value): ?MeasurementQueue
@@ -46,5 +46,5 @@ class MeasurementQueueRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    */
+     */
 }

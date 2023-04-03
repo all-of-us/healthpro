@@ -135,10 +135,12 @@ class NphSampleTest extends NphTestCase
     /**
      * @dataProvider isDisabledDataProvider
      */
-    public function testIsDisabled($finalizedTs, $modifyType, $expectedResult): void
+    public function testIsDisabled($rdrId, $modifyType, $expectedResult): void
     {
         $nphSample = new NphSample();
-        $nphSample->setFinalizedTs($finalizedTs);
+        if ($rdrId) {
+            $nphSample->setRdrId($rdrId);
+        }
         $nphSample->setModifyType($modifyType);
         $this->assertEquals($expectedResult, $nphSample->isDisabled());
     }
@@ -150,11 +152,11 @@ class NphSampleTest extends NphTestCase
             // Test cases where isDisabled should return false
             [null, NphSample::RESTORE, false],
             [null, NphSample::UNLOCK, false],
-            [$finalizedTs, NphSample::UNLOCK, false],
+            [100, NphSample::UNLOCK, false],
 
             // Test cases where isDisabled should return true
-            [$finalizedTs, null, true],
-            [$finalizedTs, NphSample::CANCEL, true],
+            [101, null, true],
+            [102, NphSample::CANCEL, true],
             [null, NphSample::CANCEL, true],
         ];
     }

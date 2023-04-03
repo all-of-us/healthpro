@@ -16,29 +16,6 @@ class NphProgramSummaryService
         return $modules;
     }
 
-    private function getModuleSummary($module): array
-    {
-        $moduleSummary = [];
-        $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
-        $visits = $moduleClass::getVisitTypes();
-        foreach (array_keys($visits) as $visit) {
-            $module = new $moduleClass($visit);
-            $moduleSummary[$visit] = $module->getTimePointSamples();
-            foreach ($moduleSummary[$visit] as $timePoint => $timePointSamples) {
-                foreach ($timePointSamples as $sampleCode => $sample) {
-                    unset($moduleSummary[$visit][$timePoint][$sampleCode]);
-                    if (!array_key_exists($module->getSampleType($sampleCode), $moduleSummary[$visit][$timePoint])) {
-                        $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)] = [];
-                    }
-                    $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)][$sampleCode] = $sample;
-                }
-                $moduleSummary[$visit][$timePoint] = ['timePointInfo' => $moduleSummary[$visit][$timePoint], 'timePointDisplayName' => $module->getTimePoints()[$timePoint]];
-            }
-            $moduleSummary[$visit] = ['visitInfo' => $moduleSummary[$visit], 'visitDisplayName' => $visits[$visit]];
-        }
-        return $moduleSummary;
-    }
-
     public function getProgramSummary(): array
     {
         $programSummary = [];
@@ -87,5 +64,28 @@ class NphProgramSummaryService
             }
         }
         return $combinedSummary;
+    }
+
+    private function getModuleSummary($module): array
+    {
+        $moduleSummary = [];
+        $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
+        $visits = $moduleClass::getVisitTypes();
+        foreach (array_keys($visits) as $visit) {
+            $module = new $moduleClass($visit);
+            $moduleSummary[$visit] = $module->getTimePointSamples();
+            foreach ($moduleSummary[$visit] as $timePoint => $timePointSamples) {
+                foreach ($timePointSamples as $sampleCode => $sample) {
+                    unset($moduleSummary[$visit][$timePoint][$sampleCode]);
+                    if (!array_key_exists($module->getSampleType($sampleCode), $moduleSummary[$visit][$timePoint])) {
+                        $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)] = [];
+                    }
+                    $moduleSummary[$visit][$timePoint][$module->getSampleType($sampleCode)][$sampleCode] = $sample;
+                }
+                $moduleSummary[$visit][$timePoint] = ['timePointInfo' => $moduleSummary[$visit][$timePoint], 'timePointDisplayName' => $module->getTimePoints()[$timePoint]];
+            }
+            $moduleSummary[$visit] = ['visitInfo' => $moduleSummary[$visit], 'visitDisplayName' => $visits[$visit]];
+        }
+        return $moduleSummary;
     }
 }

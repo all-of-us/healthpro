@@ -12,16 +12,16 @@ trait ResponseSecurityHeadersTrait
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
 
         // define content security policy
-        $contentSecurityPolicy = "default-src"
+        $contentSecurityPolicy = 'default-src'
             . " 'self'" // allow all local content
             . " 'unsafe-eval'" // required for setTimeout and setInterval
             . " 'unsafe-inline'" // for the places we are using inline JS
-            . " www.google-analytics.com www.googletagmanager.com" // Google Analytics
-            . " storage.googleapis.com" // for SOP PDFs stored in a Google Storage bucket
-            . " fonts.googleapis.com" // for custom display and body fonts
-            . " www.youtube.com" // for training videos hosted on YouTube
-            . " *.kaltura.com" // for training videos hosted on Kaltura
-            . " cdn.plot.ly;" // allow plot.ly remote requests
+            . ' www.google-analytics.com www.googletagmanager.com' // Google Analytics
+            . ' storage.googleapis.com' // for SOP PDFs stored in a Google Storage bucket
+            . ' fonts.googleapis.com' // for custom display and body fonts
+            . ' www.youtube.com' // for training videos hosted on YouTube
+            . ' *.kaltura.com' // for training videos hosted on Kaltura
+            . ' cdn.plot.ly;' // allow plot.ly remote requests
 
             . " img-src www.google-analytics.com 'self' data:;" // allow Google Analytcs, self, and data: urls for img src
 

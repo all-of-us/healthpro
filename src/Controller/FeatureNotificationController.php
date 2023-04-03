@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\FeatureNotification;
 use App\Form\FeatureNotificationType;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +36,7 @@ class FeatureNotificationController extends BaseController
     /**
      * @Route("/notification/{id}", name="admin_feature_notification")
      */
-    public function edit(LoggerService $loggerService, Request $request, $id=null)
+    public function edit(LoggerService $loggerService, Request $request, $id = null)
     {
         if ($id) {
             $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
@@ -75,11 +75,10 @@ class FeatureNotificationController extends BaseController
                     $this->addFlash('success', 'Feature notification updated');
                 }
                 return $this->redirect($this->generateUrl('admin_feature_notifications'));
-            } else {
-                // Add a form-level error if there are none
-                if (count($form->getErrors()) == 0) {
-                    $form->addError(new FormError('Please correct the errors below'));
-                }
+            }
+            // Add a form-level error if there are none
+            if (count($form->getErrors()) == 0) {
+                $form->addError(new FormError('Please correct the errors below'));
             }
         }
 

@@ -32,9 +32,8 @@ class SettingsController extends BaseController
             $this->addFlash('success', 'Your settings have been updated');
             if ($request->query->has('return') && preg_match('/^\/\w/', $request->query->get('return'))) {
                 return $this->redirect($request->query->get('return'));
-            } else {
-                return $this->redirectToRoute('home');
             }
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('settings/settings.html.twig', [

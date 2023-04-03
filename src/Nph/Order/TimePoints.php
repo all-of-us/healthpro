@@ -8,7 +8,7 @@ class TimePoints
 
     protected $timePoints;
 
-    protected $rdrTimePoints;
+    protected $rdrTimePoints = [];
 
     protected $timePointSampleTypes;
 

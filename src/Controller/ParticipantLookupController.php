@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
+use App\Drc\Exception\ParticipantSearchExceptionInterface;
 use App\Form\ParticipantLookupEmailType;
 use App\Form\ParticipantLookupIdType;
 use App\Form\ParticipantLookupSearchType;
 use App\Form\ParticipantLookupTelephoneType;
 use App\Service\ParticipantSummaryService;
-use App\Drc\Exception\ParticipantSearchExceptionInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;

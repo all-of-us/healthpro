@@ -7,8 +7,6 @@ use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Problem;
 use App\Entity\WorkqueueView;
-use App\Form\WorkQueueParticipantLookupIdType;
-use App\Form\WorkQueueParticipantLookupSearchType;
 use App\Form\WorkQueueViewDeleteType;
 use App\Form\WorkQueueViewType;
 use App\Form\WorkQueueViewUpdateType;
@@ -186,41 +184,40 @@ class WorkQueueController extends BaseController
                 $responseCode = 500;
             }
             return $this->json($ajaxData, $responseCode);
-        } else {
-            if (!$this->requestStack->getSession()->has('workQueueColumns')) {
-                $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
-            }
-            if ($viewId) {
-                $workQueueViewColumns = json_decode($workQueueView->getColumns(), true);
-                $this->requestStack->getSession()->set('workQueueViewColumns', $workQueueViewColumns);
-            }
-            return $this->render('workqueue/index.html.twig', [
-                'filters' => $filters,
-                'advancedFilters' => $advancedFilters,
-                'surveys' => WorkQueue::$surveys,
-                'samples' => WorkQueue::$samples,
-                'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
-                'participants' => [],
-                'params' => $params,
-                'awardee' => $awardee,
-                'isRdrError' => $this->workQueueService->isRdrError(),
-                'samplesAlias' => WorkQueue::$samplesAlias,
-                'canExport' => $this->workQueueService->canExport(),
-                'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
-                'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab,
-                'columns' => WorkQueue::$columns,
-                'columnsDef' => WorkQueue::$columnsDef,
-                'filterIcons' => WorkQueue::$filterIcons,
-                'columnGroups' => WorkQueue::$columnGroups,
-                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
-                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
-                'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
-                    $this->getUserEntity()], ['defaultView' => 'desc', 'id' => 'desc']),
-                'workQueueView' => $workQueueView ?? null,
-                'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView(),
-                'workQueueViewUpdateForm' => $this->createForm(WorkQueueViewUpdateType::class)->createView(),
-            ]);
         }
+        if (!$this->requestStack->getSession()->has('workQueueColumns')) {
+            $this->requestStack->getSession()->set('workQueueColumns', WorkQueue::getWorkQueueColumns());
+        }
+        if ($viewId) {
+            $workQueueViewColumns = json_decode($workQueueView->getColumns(), true);
+            $this->requestStack->getSession()->set('workQueueViewColumns', $workQueueViewColumns);
+        }
+        return $this->render('workqueue/index.html.twig', [
+            'filters' => $filters,
+            'advancedFilters' => $advancedFilters,
+            'surveys' => WorkQueue::$surveys,
+            'samples' => WorkQueue::$samples,
+            'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
+            'participants' => [],
+            'params' => $params,
+            'awardee' => $awardee,
+            'isRdrError' => $this->workQueueService->isRdrError(),
+            'samplesAlias' => WorkQueue::$samplesAlias,
+            'canExport' => $this->workQueueService->canExport(),
+            'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
+            'displayParticipantConsentsTab' => $this->displayParticipantConsentsTab,
+            'columns' => WorkQueue::$columns,
+            'columnsDef' => WorkQueue::$columnsDef,
+            'filterIcons' => WorkQueue::$filterIcons,
+            'columnGroups' => WorkQueue::$columnGroups,
+            'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
+            'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
+            'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
+                $this->getUserEntity()], ['defaultView' => 'desc', 'id' => 'desc']),
+            'workQueueView' => $workQueueView ?? null,
+            'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView(),
+            'workQueueViewUpdateForm' => $this->createForm(WorkQueueViewUpdateType::class)->createView(),
+        ]);
     }
 
     /**
@@ -498,35 +495,34 @@ class WorkQueueController extends BaseController
             $ajaxData['recordsTotal'] = 0;
             $ajaxData['data'] = [];
             return $this->json($ajaxData, 200);
-        } else {
-            $params['exportType'] = 'consents';
-            if (!$this->requestStack->getSession()->has('workQueueConsentColumns')) {
-                $workQueueConsentColumns = WorkQueue::getWorkQueueConsentColumns();
-                $this->requestStack->getSession()->set('workQueueConsentColumns', $workQueueConsentColumns);
-            }
-            return $this->render('workqueue/consents.html.twig', [
-                'filters' => $filters,
-                'advancedFilters' => $consentAdvanceFilters,
-                'surveys' => WorkQueue::$surveys,
-                'samples' => WorkQueue::$samples,
-                'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
-                'participants' => [],
-                'params' => $params,
-                'awardee' => $awardee,
-                'isRdrError' => $this->workQueueService->isRdrError(),
-                'samplesAlias' => WorkQueue::$samplesAlias,
-                'canExport' => $this->workQueueService->canExport(),
-                'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
-                'columnsDef' => WorkQueue::$columnsDef,
-                'consentColumns' => WorkQueue::$consentColumns,
-                'filterIcons' => WorkQueue::$filterIcons,
-                'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters),
-                'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
-                'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
-                    $this->getUserEntity()], ['defaultView' => 'desc', 'id' => 'desc']),
-                'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
-            ]);
         }
+        $params['exportType'] = 'consents';
+        if (!$this->requestStack->getSession()->has('workQueueConsentColumns')) {
+            $workQueueConsentColumns = WorkQueue::getWorkQueueConsentColumns();
+            $this->requestStack->getSession()->set('workQueueConsentColumns', $workQueueConsentColumns);
+        }
+        return $this->render('workqueue/consents.html.twig', [
+            'filters' => $filters,
+            'advancedFilters' => $consentAdvanceFilters,
+            'surveys' => WorkQueue::$surveys,
+            'samples' => WorkQueue::$samples,
+            'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
+            'participants' => [],
+            'params' => $params,
+            'awardee' => $awardee,
+            'isRdrError' => $this->workQueueService->isRdrError(),
+            'samplesAlias' => WorkQueue::$samplesAlias,
+            'canExport' => $this->workQueueService->canExport(),
+            'exportConfiguration' => $this->workQueueService->getExportConfiguration(),
+            'columnsDef' => WorkQueue::$columnsDef,
+            'consentColumns' => WorkQueue::$consentColumns,
+            'filterIcons' => WorkQueue::$filterIcons,
+            'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($consentAdvanceFilters),
+            'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
+            'workQueueViews' => $this->em->getRepository(WorkqueueView::class)->findBy(['user' =>
+                $this->getUserEntity()], ['defaultView' => 'desc', 'id' => 'desc']),
+            'workQueueViewDeleteForm' => $this->createForm(WorkQueueViewDeleteType::class)->createView()
+        ]);
     }
 
     /**

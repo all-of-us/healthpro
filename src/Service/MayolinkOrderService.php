@@ -37,22 +37,11 @@ class MayolinkOrderService
         }
     }
 
-    private function setMayoCredentials()
-    {
-        $this->client = new HttpClient(['cookies' => true]);
-        $this->ordersEndpoint = $this->params->get('ml_orders_endpoint');
-        $this->userName = $this->params->get('ml_username');
-        $this->password = $this->params->get('ml_password');
-        if (empty($this->ordersEndpoint) || empty($this->userName) || empty($this->password)) {
-            throw new \Exception('MayoLINK connection is not configured.');
-        }
-    }
-
     public function createOrder($options)
     {
         $samples = $this->getSamples('collected', $options);
         $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
-        $xmlFile = "mayolink/order-create.xml.twig";
+        $xmlFile = 'mayolink/order-create.xml.twig';
         $xml = $this->twig->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->createOrder}", [
@@ -76,7 +65,7 @@ class MayolinkOrderService
     {
         $samples = $this->getSamples('requested', $options);
         $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
-        $xmlFile = "mayolink/order-labels.xml.twig";
+        $xmlFile = 'mayolink/order-labels.xml.twig';
         $xml = $this->twig->render($xmlFile, $parameters);
         try {
             $response = $this->client->request('POST', "{$this->ordersEndpoint}/{$this->labelPdf}", [
@@ -158,5 +147,16 @@ class MayolinkOrderService
             }
         }
         return $mayoSamples;
+    }
+
+    private function setMayoCredentials()
+    {
+        $this->client = new HttpClient(['cookies' => true]);
+        $this->ordersEndpoint = $this->params->get('ml_orders_endpoint');
+        $this->userName = $this->params->get('ml_username');
+        $this->password = $this->params->get('ml_password');
+        if (empty($this->ordersEndpoint) || empty($this->userName) || empty($this->password)) {
+            throw new \Exception('MayoLINK connection is not configured.');
+        }
     }
 }

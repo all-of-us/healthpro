@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="col-sm-7">
-            {% if sample.finalizedTs is not empty %}
+            {% if sample.rdrId and sample.finalizedTs %}
                 <div class="alert alert-success well-sm">
                     <strong>
                         Finalized
@@ -261,8 +261,8 @@
                         {{ form_errors(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                     </div>
                     <p>
-                        <button type="submit" class="btn btn-primary {% if sample.disabled %} disabled {% endif %}"
-                                id="sample_finalize_btn" formnovalidate>
+                        <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
+                                {% if sample.disabled %} disabled {% endif %} formnovalidate>
                             Mark as Finalized
                         </button>
                         <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
