@@ -433,7 +433,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertIsArray($orderSummary);
         $this->assertArrayHasKey('order', $orderSummary);
         $this->assertSame(count($orderSummary['order']), 1);
-        $this->assertArrayHasKey('sampleName', $orderSummary['order']['1']['LMT']['preLMT']['urine']['URINES']);
+        $this->assertArrayHasKey('sampleName', $orderSummary['order']['1']['LMT']['preLMT']['urine']['URINES']['100000001']);
     }
 
     public function testGetParticipantOrderSummaryByVisitAndModule(): void
@@ -444,7 +444,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertIsArray($orderSummary);
         $this->assertArrayHasKey('order', $orderSummary);
         $this->assertSame(count($orderSummary['order']), 1);
-        $this->assertArrayHasKey('sampleName', $orderSummary['order']['preLMT']['urine']['URINES']);
+        $this->assertArrayHasKey('sampleName', $orderSummary['order']['preLMT']['urine']['URINES']['100000001']);
     }
 
     public function testGetSamplesWithStatus(): void
