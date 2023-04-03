@@ -96,15 +96,17 @@
                                     <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
                                 </a>
                                 {% set displayedOrderIDS = [] %}
+                                {% set displayedTimePointHeaders = [] %}
                                 {% for timepointCode, timepoint in visit['visitInfo'] %}
                                     {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
                                         {% if sampleInfo['numberSamples'] is not empty %}
-                                            {% if loop.first %}
-                                                <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
-                                            {% endif %}
                                             {% for sampleCode, sample in sampleInfo %}
                                                 {% for orderid, numberSamples in sampleInfo['numberSamples'] %}
                                                     {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
+                                                        {% if timepointCode not in displayedTimePointHeaders %}
+                                                            {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
+                                                            <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+                                                        {% endif %}
                                                         {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
                                                         <div class="well well-sm order-row">
                                                             <div class="clearfix">
