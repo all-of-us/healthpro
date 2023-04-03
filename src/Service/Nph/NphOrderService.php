@@ -499,7 +499,7 @@ class NphOrderService
         $returnArray['sampleStatusCount'] = $statusCount;
         return $returnArray;
     }
-    
+
     public function hasAtLeastOneAliquotSample(array $formData, string $sampleCode): bool
     {
         $aliquots = $this->getAliquots($sampleCode);
@@ -830,56 +830,6 @@ class NphOrderService
     private function mapMetadata($metadata, $type, $values): string
     {
         return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
-    }
-
-    private function generateOrderSummaryArray(array $nphOrder): array
-    {
-        $sampleCount = 0;
-        $orderSummary = [];
-        $statusCount = [];
-        foreach ($nphOrder as $order) {
-            $samples = $order->getNphSamples()->toArray();
-            foreach ($samples as $sample) {
-                $sampleCount++;
-                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
-                $module = new $moduleClass($order->getVisitType());
-                $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
-                $timePointsDisplay = $module->getTimePoints();
-                $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
-                $visitTypes = $module->getVisitTypes();
-                $sampleStatus = $sample->getStatus();
-                $orderId = $order->getOrderId();
-                if (isset($orderSummary[$order->getModule()][$order->getVisitType()][$order->getTimepoint()][$module->getSampleType($sample->getSampleCode())][$sample->getSampleCode()])) {
-                    continue;
-                }
-                $orderSummary[$order->getModule()]
-                [$order->getVisitType()]
-                [$order->getTimepoint()]
-                [$module->getSampleType($sample->getSampleCode())]
-                [$sample->getSampleCode()] = [
-                    'sampleId' => $sample->getSampleID(),
-                    'sampleName' => $sampleName,
-                    'orderId' => $order->getOrderId(),
-                    'healthProOrderId' => $order->getId(),
-                    'createDate' => $order->getCreatedTs()->format('m/d/Y'),
-                    'sampleStatus' => $sampleStatus,
-                    'sampleCollectionVolume' => $sampleCollectionVolume,
-                    'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
-                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
-                    'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
-                    'visitDisplayName' => $visitTypes[$order->getVisitType()],
-                    'sampleGroup' => $sample->getSampleGroup(),
-                    'modifyType' => $sample->getModifyType(),
-                    'orderStatus' => $order->getStatus(),
-                ];
-                $statusCount[$order->getModule()][$orderId][$sampleStatus] = isset($statusCount[$order->getModule()][$orderId][$sampleStatus]) ? $statusCount[$order->getModule()][$orderId][$sampleStatus] + 1 : 1;
-            }
-        }
-        $returnArray = [];
-        $returnArray['order'] = $orderSummary;
-        $returnArray['sampleCount'] = $sampleCount;
-        $returnArray['sampleStatusCount'] = $statusCount;
-        return $returnArray;
     }
 
     private function saveSampleFinalization(array $formData, NphSample $sample): bool

@@ -47,12 +47,12 @@ class PDFService
                                 );
                             }
                             $sampleId = $sample['sampleId'];
-                            if ($sampleType === "stool" && $stoolPrinted === false) {
-                                $sample['identifier'] = "ST-KIT";
+                            if ($sampleType === 'stool' && $stoolPrinted === false) {
+                                $sample['identifier'] = 'ST-KIT';
                                 $sampleId = $sample['orderId'];
-                                $sampleId = preg_replace("/KIT-?/", "", $sampleId);
+                                $sampleId = preg_replace('/KIT-?/', '', $sampleId);
                                 $stoolPrinted = true;
-                            } elseif ($sampleType === "stool" && $stoolPrinted === true) {
+                            } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
                                 continue;
                             }
                             $this->renderPDF(
@@ -66,31 +66,9 @@ class PDFService
                                 $sample['visitDisplayName'],
                                 $sample['sampleCollectionVolume']
                             );
-                        } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
-                            return "Unable to render PDF";
+                        } catch (MpdfException|LoaderError|RuntimeError|SyntaxError $e) {
+                            return 'Unable to render PDF';
                         }
-                        $sampleId = $sample['sampleId'];
-                        if ($sampleType === 'stool' && $stoolPrinted === false) {
-                            $sample['identifier'] = 'ST-KIT';
-                            $sampleId = $sample['orderId'];
-                            $sampleId = preg_replace('/KIT-?/', '', $sampleId);
-                            $stoolPrinted = true;
-                        } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
-                            continue;
-                        }
-                        $this->renderPDF(
-                            $participantFullName,
-                            $sampleType,
-                            $participant->dob,
-                            $sampleId,
-                            $module,
-                            $sample['timepointDisplayName'],
-                            $sample['identifier'],
-                            $sample['visitDisplayName'],
-                            $sample['sampleCollectionVolume']
-                        );
-                    } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
-                        return 'Unable to render PDF';
                     }
                 }
             }
