@@ -35,38 +35,40 @@ class PDFService
         $stoolPrinted = false;
         foreach ($OrderSummary as $timePointOrder) {
             foreach ($timePointOrder as $sampleType => $sampleInfo) {
-                foreach ($sampleInfo as $sample) {
-                    try {
-                        $participantFullName = $participant->firstName . ' ' . $participant->lastName;
-                        if (strlen($participantFullName) > 20) {
-                            $participantFullName = substr(
-                                $participant->firstName[0] . '. ' . $participant->lastName,
-                                0,
-                                20
+                foreach (array_keys($sampleInfo) as $sampleCode) {
+                    foreach ($sampleInfo[$sampleCode] as $sample) {
+                        try {
+                            $participantFullName = $participant->firstName . ' ' . $participant->lastName;
+                            if (strlen($participantFullName) > 20) {
+                                $participantFullName = substr(
+                                    $participant->firstName[0] . '. ' . $participant->lastName,
+                                    0,
+                                    20
+                                );
+                            }
+                            $sampleId = $sample['sampleId'];
+                            if ($sampleType === 'stool' && $stoolPrinted === false) {
+                                $sample['identifier'] = 'ST-KIT';
+                                $sampleId = $sample['orderId'];
+                                $sampleId = preg_replace('/KIT-?/', '', $sampleId);
+                                $stoolPrinted = true;
+                            } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
+                                continue;
+                            }
+                            $this->renderPDF(
+                                $participantFullName,
+                                $sampleType,
+                                $participant->dob,
+                                $sampleId,
+                                $module,
+                                $sample['timepointDisplayName'],
+                                $sample['identifier'],
+                                $sample['visitDisplayName'],
+                                $sample['sampleCollectionVolume']
                             );
+                        } catch (MpdfException|LoaderError|RuntimeError|SyntaxError $e) {
+                            return 'Unable to render PDF';
                         }
-                        $sampleId = $sample['sampleId'];
-                        if ($sampleType === 'stool' && $stoolPrinted === false) {
-                            $sample['identifier'] = 'ST-KIT';
-                            $sampleId = $sample['orderId'];
-                            $sampleId = preg_replace('/KIT-?/', '', $sampleId);
-                            $stoolPrinted = true;
-                        } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
-                            continue;
-                        }
-                        $this->renderPDF(
-                            $participantFullName,
-                            $sampleType,
-                            $participant->dob,
-                            $sampleId,
-                            $module,
-                            $sample['timepointDisplayName'],
-                            $sample['identifier'],
-                            $sample['visitDisplayName'],
-                            $sample['sampleCollectionVolume']
-                        );
-                    } catch (MpdfException | LoaderError | RuntimeError | SyntaxError $e) {
-                        return 'Unable to render PDF';
                     }
                 }
             }
