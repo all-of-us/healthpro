@@ -19,45 +19,45 @@ use Symfony\Component\Yaml\Parser;
 class DeployCommand extends Command
 {
     /** GAE application IDs for production. */
-    private static $PROD_APP_IDS = [
+    private static array $PROD_APP_IDS = [
         'healthpro-prod'
     ];
 
     /** GAE application IDs for security testing and/or training. */
-    private static $STABLE_APP_IDS = [
+    private static array $STABLE_APP_IDS = [
         'pmi-hpo-test'
     ];
 
     /** GAE application IDs for staging. */
-    private static $STAGING_APP_IDS = [
+    private static array $STAGING_APP_IDS = [
         'pmi-hpo-staging', // dry run environment
         'healthpro-beta', // beta environment
         'healthpro-staging' // staging environment
     ];
 
     /** Create release tag when deploying these application IDs. */
-    private static $TAG_APP_IDS = [
+    private static array $TAG_APP_IDS = [
         'healthpro-prod',
         'pmi-hpo-test'
     ];
 
     /** Apply enhanced instance class and scaling for these application IDs. */
-    private static $SCALE_APP_IDS = [
+    private static array $SCALE_APP_IDS = [
         'healthpro-prod'
     ];
 
     // #@+ Config settings set by execute().
-    private $appDir;
-    private $appId;
-    private $local;
-    private $noInteraction;
-    private $port;
-    private $in;
-    private $out;
-    private $release;
+    private string $appDir;
+    private string $appId;
+    private bool $local;
+    private bool $noInteraction;
+    private int $port;
+    private InputInterface $in;
+    private OutputInterface $out;
+    private string $release;
 
     /** Determines the environment we are deploying to. */
-    public function determineEnv()
+    public function determineEnv(): string
     {
         if ($this->local) {
             return EnvironmentService::ENV_LOCAL;
@@ -70,7 +70,7 @@ class DeployCommand extends Command
         } elseif ($this->isProd()) {
             return EnvironmentService::ENV_PROD;
         }
-        throw new \Exception('Unable to determine environment!');
+        throw new Exception('Unable to determine environment!');
     }
 
     protected function configure()
@@ -184,6 +184,30 @@ class DeployCommand extends Command
             copy($envFavicon, $favicon);
         }
 
+        if ($this->local || $this->verifyDeploy($input, $output)) {
+            $this->exec($cmd, true, true);
+            if ($this->isTaggable()) {
+                $this->tagRelease();
+            }
+            $output->writeln('');
+            $output->writeln('All done 👍'); // emoji :thumbs-up:
+            // taggable implies we are tracking/auditing
+            if ($this->isTaggable()) {
+                $output->writeln('');
+                $output->writeln('<error>Remember to attach deploy output to Jira ticket!</error>');
+            }
+        } else {
+            $output->writeln('');
+            $output->writeln('Fine then, be that way 😾'); // emoji :pouting_cat:
+        }
+        return 0;
+    }
+
+    private function verifyDeploy(InputInterface $input, OutputInterface $output): bool
+    {
+        if ($this->noInteraction) {
+            return true;
+        }
         /** @var QuestionHelper $question */
         $question = $this->getHelper('question');
         $this->exec('git status'); // display git status
@@ -198,46 +222,30 @@ class DeployCommand extends Command
             false,
             '/^(y|yes)$/'
         );
-        if ($this->local || ($question->ask($input, $output, $gitStatus) && $question->ask($input, $output, $reallyDeploy))) {
-            $this->exec($cmd, true, true);
-            if ($this->isTaggable()) {
-                $this->tagRelease();
-            }
-            $output->writeln('');
-            $output->writeln('All done 👍'); // emoji :thumbsup:
-            // taggable implies we are tracking/auditing
-            if ($this->isTaggable()) {
-                $output->writeln('');
-                $output->writeln('<error>Remember to attach deploy output to Jira ticket!</error>');
-            }
-        } else {
-            $output->writeln('');
-            $output->writeln('Fine then, be that way 😾'); // emoji :pouting_cat:
-        }
-        return 0;
+        return $question->ask($input, $output, $gitStatus) && $question->ask($input, $output, $reallyDeploy);
     }
 
-    private function isDev()
+    private function isDev(): bool
     {
         return !$this->local && !$this->isStable() && !$this->isStaging() && !$this->isProd();
     }
 
-    private function isStable()
+    private function isStable(): bool
     {
         return !$this->local && in_array($this->appId, self::$STABLE_APP_IDS);
     }
 
-    private function isStaging()
+    private function isStaging(): bool
     {
         return !$this->local && in_array($this->appId, self::$STAGING_APP_IDS);
     }
 
-    private function isProd()
+    private function isProd(): bool
     {
         return !$this->local && in_array($this->appId, self::$PROD_APP_IDS);
     }
 
-    private function isTaggable()
+    private function isTaggable(): bool
     {
         return !$this->local && in_array($this->appId, self::$TAG_APP_IDS);
     }
@@ -245,7 +253,7 @@ class DeployCommand extends Command
     /** Adds and pushes a release tag to git. */
     private function tagRelease()
     {
-        $tag = $tag = "REL_{$this->appId}_{$this->release}";
+        $tag = "REL_{$this->appId}_{$this->release}";
         $this->out->writeln('');
         $this->out->writeln("<info>Setting release tag to {$tag}...</info>");
         $this->exec("git tag $tag");
@@ -342,7 +350,7 @@ class DeployCommand extends Command
         $this->out->writeln('Checking URL handler security...');
         foreach ($config['handlers'] as $handler) {
             if (empty($handler['secure']) || $handler['secure'] !== 'always') {
-                throw new \Exception("Handler URL '{$handler['url']}' does not force SSL!");
+                throw new Exception("Handler URL '{$handler['url']}' does not force SSL!");
             }
         }
         $this->out->writeln('... all ' . count($config['handlers']) . ' handlers are secure.');
@@ -399,7 +407,7 @@ class DeployCommand extends Command
         $process->mustRun();
         $vulnerabilities = json_decode($process->getOutput(), true);
         if (!is_array($vulnerabilities)) {
-            throw new \Exception('Unexpected result from symfony security:check');
+            throw new Exception('Unexpected result from symfony security:check');
         }
         // Ignore vulnerabilities in composerignore.json file
         $vulnerabilities = $this->removeComposerIgnore($vulnerabilities);
@@ -410,12 +418,12 @@ class DeployCommand extends Command
             $this->out->writeln('');
             if (!$this->noInteraction) {
                 if (!$this->local) {
-                    throw new \Exception('Fix security vulnerabilities before deploying');
+                    throw new Exception('Fix security vulnerabilities before deploying');
                 }
                 /** @var QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('Continue anyways? '))) {
-                    throw new \Exception('Aborting due to security vulnerability');
+                    throw new Exception('Aborting due to security vulnerability');
                 }
             }
         }
@@ -433,7 +441,7 @@ class DeployCommand extends Command
                 /** @var QuestionHelper $helper */
                 $helper = $this->getHelper('question');
                 if (!$helper->ask($this->in, $this->out, new ConfirmationQuestion('<error>Continue despite JS security vulnerabilities?</error> '))) {
-                    throw new \Exception('Aborting due to JS security vulnerability');
+                    throw new Exception('Aborting due to JS security vulnerability');
                 }
             }
         }
@@ -445,7 +453,7 @@ class DeployCommand extends Command
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      * ($type parameter in run callback is required but not used)
      */
-    private function exec($cmd, $mustRun = true, $raw = false)
+    private function exec($cmd, $mustRun = true, $raw = false): Process
     {
         $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);
@@ -460,7 +468,7 @@ class DeployCommand extends Command
         return $process;
     }
 
-    private function removeComposerIgnore($vulnerabilities)
+    private function removeComposerIgnore($vulnerabilities): array
     {
         $newVulnerabilities = $vulnerabilities;
         $ignoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'composerignore.json'), true);
@@ -485,7 +493,7 @@ class DeployCommand extends Command
         return $newVulnerabilities;
     }
 
-    private function isVulnerabilityIgnored($vulnerabilities, $link)
+    private function isVulnerabilityIgnored($vulnerabilities, $link): bool
     {
         foreach ($vulnerabilities as $vulnerability) {
             if ($link == $vulnerability['link']) {
