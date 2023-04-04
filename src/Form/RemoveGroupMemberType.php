@@ -17,7 +17,6 @@ class RemoveGroupMemberType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $programType = $options['isNphProgram'] ? 'NPH' : 'All of Us';
         $builder
             ->add('confirm', Type\ChoiceType::class, [
                 'label' => 'Are you sure you want to remove this member?',
@@ -61,8 +60,8 @@ class RemoveGroupMemberType extends AbstractType
                 'multiple' => false,
                 'placeholder' => false,
                 'choices' => [
-                    "Staff member no longer supports the {$programType} program or has left the institution" => 'no',
-                    "Staff member still supports the {$programType} program but not this specific site" => 'yes'
+                    "Staff member no longer supports the {$options['programDisplayText']} program or has left the institution" => 'no',
+                    "Staff member still supports the {$options['programDisplayText']} program but not this specific site" => 'yes'
                 ],
                 'constraints' => [
                     new Constraints\Callback(function ($removeReason, $context) {
@@ -96,7 +95,7 @@ class RemoveGroupMemberType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'isNphProgram' => false
+            'programDisplayText' => null
         ]);
     }
 }

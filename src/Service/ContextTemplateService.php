@@ -39,4 +39,9 @@ class ContextTemplateService implements RuntimeExtensionInterface
     {
         return $this->session->get('program', User::PROGRAM_HPO) === User::PROGRAM_NPH;
     }
+
+    public function getCurrentProgramDisplayText(): string
+    {
+        return $this->session->get('program') === User::PROGRAM_NPH ? 'NPH' : 'All of Us';
+    }
 }

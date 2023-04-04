@@ -13,19 +13,22 @@ class AccessManagementService
     private $params;
     private $twig;
     private $userService;
+    private $contextTemplateService;
 
     public function __construct(
         LoggerService $loggerService,
         EnvironmentService $env,
         ParameterBagInterface $params,
         Environment $twig,
-        UserService $userService
+        UserService $userService,
+        ContextTemplateService $contextTemplateService
     ) {
         $this->loggerService = $loggerService;
         $this->env = $env;
         $this->params = $params;
         $this->twig = $twig;
         $this->userService = $userService;
+        $this->contextTemplateService = $contextTemplateService;
     }
 
     public function sendEmail($group, $member, $memberLastDay, $currentTime, $attestation = null): void
@@ -40,7 +43,8 @@ class AccessManagementService
                     'memberLastDay' => $memberLastDay->format('m/d/Y'),
                     'loggedUser' => $this->userService->getUser()->getEmail(),
                     'currentTime' => $currentTime->format('Y-m-d H:i:s e'),
-                    'attestation' => $attestation
+                    'attestation' => $attestation,
+                    'programDisplayText' => $this->contextTemplateService->getCurrentProgramDisplayText()
                 ])
                 ->send();
             $this->loggerService->log(Log::GROUP_MEMBER_REMOVE_NOTIFY, [
