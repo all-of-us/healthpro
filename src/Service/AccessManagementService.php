@@ -31,8 +31,13 @@ class AccessManagementService
         $this->contextTemplateService = $contextTemplateService;
     }
 
-    public function sendEmail($group, $member, $memberLastDay, $currentTime, $attestation = null): void
-    {
+    public function sendEmail(
+        string $group,
+        string $member,
+        \DateTime $memberLastDay,
+        \DateTime $currentTime,
+        string $attestation = null
+    ): void {
         $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
         if ($this->params->has('feature.drcsupportemail') && $this->params->get('feature.drcsupportemail')) {
             $message
