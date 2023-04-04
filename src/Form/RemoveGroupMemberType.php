@@ -15,7 +15,7 @@ class RemoveGroupMemberType extends AbstractType
         'I attest that this user has left the program <strong class="attest-choice-text">involuntarily.</strong>' => 'no'
     ];
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('confirm', Type\ChoiceType::class, [
@@ -92,7 +92,7 @@ class RemoveGroupMemberType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'programDisplayText' => null
