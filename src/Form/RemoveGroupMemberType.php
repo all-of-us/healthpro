@@ -5,6 +5,7 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
 class RemoveGroupMemberType extends AbstractType
@@ -16,6 +17,7 @@ class RemoveGroupMemberType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $programType = $options['isNphProgram'] ? 'NPH' : 'All of Us';
         $builder
             ->add('confirm', Type\ChoiceType::class, [
                 'label' => 'Are you sure you want to remove this member?',
@@ -59,8 +61,8 @@ class RemoveGroupMemberType extends AbstractType
                 'multiple' => false,
                 'placeholder' => false,
                 'choices' => [
-                    'Staff member no longer supports the All of Us program or has left the institution' => 'no',
-                    'Staff member still supports the All of Us program but not this specific site' => 'yes'
+                    "Staff member no longer supports the {$programType} program or has left the institution" => 'no',
+                    "Staff member still supports the {$programType} program but not this specific site" => 'yes'
                 ],
                 'constraints' => [
                     new Constraints\Callback(function ($removeReason, $context) {
@@ -89,5 +91,12 @@ class RemoveGroupMemberType extends AbstractType
                     })
                 ]
             ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'isNphProgram' => false
+        ]);
     }
 }
