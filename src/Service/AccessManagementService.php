@@ -8,12 +8,12 @@ use Twig\Environment;
 
 class AccessManagementService
 {
-    private $loggerService;
-    private $env;
-    private $params;
-    private $twig;
-    private $userService;
-    private $contextTemplateService;
+    private LoggerService $loggerService;
+    private EnvironmentService $env;
+    private ParameterBagInterface $params;
+    private Environment $twig;
+    private UserService $userService;
+    private ContextTemplateService $contextTemplateService;
 
     public function __construct(
         LoggerService $loggerService,
