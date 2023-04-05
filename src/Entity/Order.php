@@ -1447,6 +1447,12 @@ class Order
         return 'Full HPO';
     }
 
+    public function hideTrackingFieldByDefault(): bool
+    {
+        return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
+                === self::ORDER_TYPE_DIVERSION);
+    }
+
     protected function getSampleTime($set, $sample)
     {
         $samples = json_decode($this->{'get' . $set . 'Samples'}());
@@ -1518,11 +1524,5 @@ class Order
             return array_intersect($this->samples, $requestedArray);
         }
         return $this->samples;
-    }
-
-    public function hideTrackingFieldByDefault(): bool
-    {
-        return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
-                === self::ORDER_TYPE_DIVERSION);
     }
 }
