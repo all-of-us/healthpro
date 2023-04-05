@@ -453,7 +453,7 @@ class OrderController extends BaseController
                     $label = Order::$identifierLabel[$type[0]];
                     $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
-                if ($order->getType() === 'kit' || $order->getType() === 'diversion') {
+                if ($order->getType() === Order::ORDER_TYPE_KIT || $order->getType() === Order::ORDER_TYPE_DIVERSION) {
                     if ($finalizeForm->has('sampleShippingMethod')) {
                         if ($finalizeForm['sampleShippingMethod']->getData() === 'fedex' && empty($finalizeForm['fedexTracking']->getData())) {
                             $finalizeForm['fedexTracking']['first']->addError(new FormError('Tracking number required.'));
