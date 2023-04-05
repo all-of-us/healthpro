@@ -48,7 +48,7 @@ class DeployCommand extends Command
 
     // #@+ Config settings set by execute().
     private string $appDir;
-    private string $appId;
+    private ?string $appId;
     private bool $local;
     private bool $noInteraction;
     private int $port;
