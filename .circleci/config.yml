@@ -9,7 +9,7 @@ jobs:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
 
     docker:
-    - image: circleci/php:8.1-cli-node
+    - image: cimg/php:8.1.17-node
     - image: mysql:5.7
       environment:
         MYSQL_ROOT_PASSWORD: passw0rd
@@ -18,9 +18,8 @@ jobs:
         MYSQL_PASSWORD: passw0rd
 
     steps:
-    - run: sudo apt-get update && sudo apt-get install -y default-mysql-client libpng-dev
+    - run: sudo apt-get update && sudo apt-get install -y default-mysql-client libfreetype6-dev libpng-dev
     - run: sudo docker-php-ext-install pdo_mysql
-    - run: sudo docker-php-ext-install gd
     - checkout
 
     # Our primary container isn't MYSQL so run a sleep command until it's ready.
