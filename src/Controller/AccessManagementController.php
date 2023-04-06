@@ -152,7 +152,7 @@ class AccessManagementController extends BaseController
         if (empty($member) || $member->getRole() !== 'MEMBER') {
             throw $this->createNotFoundException();
         }
-        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class);
+        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class, null, ['programDisplayText' => $this->contextTemplate->getCurrentProgramDisplayText()]);
         $removeGoupMemberForm->handleRequest($request);
         if ($removeGoupMemberForm->isSubmitted()) {
             if ($removeGoupMemberForm->isValid()) {

@@ -8,28 +8,36 @@ use Twig\Environment;
 
 class AccessManagementService
 {
-    private $loggerService;
-    private $env;
-    private $params;
-    private $twig;
-    private $userService;
+    private LoggerService $loggerService;
+    private EnvironmentService $env;
+    private ParameterBagInterface $params;
+    private Environment $twig;
+    private UserService $userService;
+    private ContextTemplateService $contextTemplateService;
 
     public function __construct(
         LoggerService $loggerService,
         EnvironmentService $env,
         ParameterBagInterface $params,
         Environment $twig,
-        UserService $userService
+        UserService $userService,
+        ContextTemplateService $contextTemplateService
     ) {
         $this->loggerService = $loggerService;
         $this->env = $env;
         $this->params = $params;
         $this->twig = $twig;
         $this->userService = $userService;
+        $this->contextTemplateService = $contextTemplateService;
     }
 
-    public function sendEmail($group, $member, $memberLastDay, $currentTime, $attestation = null): void
-    {
+    public function sendEmail(
+        string $group,
+        string $member,
+        \DateTime $memberLastDay,
+        \DateTime $currentTime,
+        string $attestation = null
+    ): void {
         $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
         if ($this->params->has('feature.drcsupportemail') && $this->params->get('feature.drcsupportemail')) {
             $message
@@ -40,7 +48,8 @@ class AccessManagementService
                     'memberLastDay' => $memberLastDay->format('m/d/Y'),
                     'loggedUser' => $this->userService->getUser()->getEmail(),
                     'currentTime' => $currentTime->format('Y-m-d H:i:s e'),
-                    'attestation' => $attestation
+                    'attestation' => $attestation,
+                    'programDisplayText' => $this->contextTemplateService->getCurrentProgramDisplayText()
                 ])
                 ->send();
             $this->loggerService->log(Log::GROUP_MEMBER_REMOVE_NOTIFY, [
