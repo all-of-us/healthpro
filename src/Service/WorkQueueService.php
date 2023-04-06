@@ -228,7 +228,7 @@ class WorkQueueService
         }
 
         if (!empty($params['ageRange']) || WorkQueue::hasDateFields($params)) {
-            $rdrParams = http_build_query($rdrParams, null, '&', PHP_QUERY_RFC3986);
+            $rdrParams = http_build_query($rdrParams, '', '&', PHP_QUERY_RFC3986);
         }
 
         // convert age range to dob filters - using string instead of array to support multiple params with same name

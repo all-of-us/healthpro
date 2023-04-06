@@ -1415,7 +1415,7 @@ class Order
             'notes' => $finalizedNotes,
             'samples' => $finalizedSamples
         ];
-        $this->setBiobankFinalized(1);
+        $this->setBiobankFinalized(true);
         $this->setBiobankChanges(json_encode($biobankChanges));
     }
 
