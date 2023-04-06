@@ -32,12 +32,14 @@ class NphOrderForm extends AbstractType
     ];
 
     public static $bowelMovements = [
+        'Response not provided' => 'not_provided',
         'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2' => 'difficult',
         'I had diarrhea (watery stool), and my stool looks like Type 5, 6, and/or 7' => 'watery',
         'I had normal formed stool, and my stool looks like Type 3 and/or 4' => 'normal'
     ];
 
     public static $bowelMovementQuality = [
+        'Response not provided' => 'not_provided',
         'I tend to be constipated (have difficulty passing stool) - Type 1 and 2' => 'difficult',
         'I tend to have diarrhea (watery stool) - Type 5, 6, and 7' => 'watery',
         'I tend to have normal formed stool - Type 3 and 4' => 'normal'

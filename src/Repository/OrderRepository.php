@@ -50,7 +50,7 @@ class OrderRepository extends ServiceEntityRepository
             ->setParameters(['fedexTracking' => $fedexTracking, 'orderId' => $orderId])
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 
     /**
@@ -58,7 +58,7 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getSiteUnfinalizedOrders($siteId)
     {
-        $ordersQuery = "
+        $ordersQuery = '
             SELECT o.*,
                    oh.order_id AS oh_order_id,
                    oh.user_id AS oh_user_id,
@@ -72,7 +72,7 @@ class OrderRepository extends ServiceEntityRepository
               AND ((oh.type != :type1 AND oh.type != :type2)
               OR oh.type IS NULL)
             ORDER BY o.created_ts DESC
-        ";
+        ';
         $orders = $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'site' => $siteId,
             'type1' => Order::ORDER_CANCEL,
@@ -119,7 +119,7 @@ class OrderRepository extends ServiceEntityRepository
      */
     public function getSiteRecentModifiedOrders($siteId)
     {
-        $ordersQuery = "
+        $ordersQuery = '
             SELECT o.*,
                    oh.order_id AS oh_order_id,
                    oh.user_id AS oh_user_id,
@@ -133,7 +133,7 @@ class OrderRepository extends ServiceEntityRepository
               AND oh.type != :type2
               AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
             ORDER BY oh.created_ts DESC
-        ";
+        ';
         return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'site' => $siteId,
             'type1' => Order::ORDER_ACTIVE,
@@ -143,7 +143,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function getUnfinalizedOrders(): array
     {
-        $ordersQuery = "
+        $ordersQuery = '
             SELECT o.*,
                    oh.order_id AS oh_order_id,
                    oh.user_id AS oh_user_id,
@@ -164,7 +164,7 @@ class OrderRepository extends ServiceEntityRepository
               AND ((oh.type != :type1 AND oh.type != :type2)
               OR oh.type IS NULL)
             ORDER BY o.created_ts DESC
-        ";
+        ';
         $orders = $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'type1' => Order::ORDER_CANCEL,
             'type2' => Order::ORDER_EDIT,
@@ -183,7 +183,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function getUnlockedOrders(): array
     {
-        $ordersQuery = "
+        $ordersQuery = '
             SELECT o.*,
                    oh.order_id AS oh_order_id,
                    oh.user_id AS oh_user_id,
@@ -202,7 +202,7 @@ class OrderRepository extends ServiceEntityRepository
             LEFT JOIN sites sf ON sf.site_id = o.finalized_site AND sf.deleted = :deleted
             WHERE oh.type = :type
             ORDER BY o.created_ts DESC
-        ";
+        ';
         return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'type' => Order::ORDER_UNLOCK,
             'deleted' => 0
@@ -211,7 +211,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function getRecentModifiedOrders(): array
     {
-        $ordersQuery = "
+        $ordersQuery = '
             SELECT o.*,
                    oh.order_id AS oh_order_id,
                    oh.user_id AS oh_user_id,
@@ -232,7 +232,7 @@ class OrderRepository extends ServiceEntityRepository
               AND oh.type != :type2
               AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
             ORDER BY oh.created_ts DESC
-        ";
+        ';
         return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'type1' => Order::ORDER_ACTIVE,
             'type2' => Order::ORDER_RESTORE,
@@ -243,7 +243,7 @@ class OrderRepository extends ServiceEntityRepository
 
     public function getUnloggedMissingOrders(): array
     {
-        $ordersQuery = "SELECT id FROM orders WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND mayo_id IS NOT NULL AND rdr_id IS NULL";
+        $ordersQuery = 'SELECT id FROM orders WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND mayo_id IS NOT NULL AND rdr_id IS NULL';
         return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
             'type' => MissingNotificationLog::ORDER_TYPE
         ]);
@@ -259,17 +259,17 @@ class OrderRepository extends ServiceEntityRepository
             ->addOrderBy('o.id', 'DESC')
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 
     public function getBackfillOrders($limit)
     {
         return $this->createQueryBuilder('o')
-            ->where("o.processedTs < o.collectedTs")
+            ->where('o.processedTs < o.collectedTs')
             ->andWhere('o.processedSamplesTs is not null')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult()
-            ;
+        ;
     }
 }

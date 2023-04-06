@@ -18,14 +18,14 @@
             <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ visitDisplayName }}</div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="padding-top: 2em">
         <div class="col-sm-6">
-            <div class="row">
-                <label>Order Summary</label>
-                <span class="alert well-sm nph-samples-badge pull-right text-white">
-                    Total # of Samples
-                    <span class="badge badge-light" id="samples_count">{{ sampleCount }}</span>
-                </span>
+            <div class="clearfix">
+                    <label>Order Summary</label>
+                    <span class="alert well-sm nph-samples-badge pull-right text-white">
+                        Total # of Samples
+                        <span class="badge badge-light" id="samples_count">{{ sampleCount }}</span>
+                    </span>
             </div>
             <table class="table table-small table-striped table-bordered">
                 <tr class="">
@@ -35,26 +35,28 @@
                     <th>Collection Samples</th>
                     <th>Collection Sample ID</th>
                 </tr>
-                {% set lastOrderID = '' %}
+                {% set lastSampleType = '' %}
                 {% for timepointName,timepoint in orderSummary %}
-                    {% for orderId, orderInfo in timepoint %}
-                        {% if orderId != lastOrderID %}
-                            {% set printOrderTD = true %}
+                    {% for sampleType, sampleInfo in timepoint %}
+                        {% if sampleType != lastSampleType %}
+                            {% set printSampleTd = true %}
                         {% else %}
-                            {% set printOrderTD = false %}
+                            {% set printSampleTd = false %}
                         {% endif %}
-                        {% for sampleCode,sampleInfo in orderInfo %}
-                             <tr>
-                                 {% if printOrderTD %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': sampleInfo.healthProOrderId}) }}">{{ sampleInfo.orderId }}</a></td>
-                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.timepointDisplayName }}</td>
-                                    <td rowspan="{{ orderInfo|length }}">{{ sampleInfo.sampleTypeDisplayName }}</td>
-                                    {% set printOrderTD = false %}
-                                 {% endif %}
-                                 <td>{{ sampleInfo.sampleName }}</td>
-                                 <td>{{ sampleInfo.sampleId }}</td>
-                             </tr>
-                         {% endfor %}
+                        {% for sampleCode,sampleCodeInfo in sampleInfo %}
+                            {% for orderId, orderInfo in sampleCodeInfo %}
+                            <tr>
+                                {% if printSampleTd %}
+                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderInfo.healthProOrderId}) }}">{{ orderInfo.orderId }}</a></td>
+                                    <td rowspan="{{ orderInfo|length }}">{{ orderInfo.timepointDisplayName }}</td>
+                                    <td rowspan="{{ orderInfo|length }}">{{ orderInfo.sampleTypeDisplayName }}</td>
+                                    {% set printSampleTd = false %}
+                                {% endif %}
+                                <td>{{ orderInfo.sampleName }}</td>
+                                <td>{{ orderInfo.sampleId }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
                     {% endfor %}
                 {% endfor %}
             </table>

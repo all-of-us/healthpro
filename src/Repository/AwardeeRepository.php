@@ -25,6 +25,6 @@ class AwardeeRepository extends ServiceEntityRepository
             ->delete()
             ->getQuery()
             ->execute()
-            ;
+        ;
     }
 }

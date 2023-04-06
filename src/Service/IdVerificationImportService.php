@@ -8,10 +8,10 @@ use App\Entity\IdVerificationImportRow;
 use App\Form\IdVerificationType;
 use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Psr\Log\LoggerInterface;
 
 class IdVerificationImportService
 {
@@ -51,10 +51,10 @@ class IdVerificationImportService
     {
         $idVerifications = [];
         $fileHandle = fopen($file->getPathname(), 'r');
-        $headers = fgetcsv($fileHandle, 0, ",");
+        $headers = fgetcsv($fileHandle, 0, ',');
         // Guess file format using headers
         if (count($headers) < 2) {
-            $form['id_verification_csv']->addError(new FormError("Invalid file format"));
+            $form['id_verification_csv']->addError(new FormError('Invalid file format'));
             return;
         }
         $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : Import::DEFAULT_CSV_ROWS_LIMIT;
@@ -64,7 +64,7 @@ class IdVerificationImportService
             return;
         }
         $row = 2;
-        while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
+        while (($data = fgetcsv($fileHandle, 0, ',')) !== false) {
             $idVerification = [];
             if (!Import::isValidParticipantId($data[0])) {
                 $form['id_verification_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
@@ -215,6 +215,13 @@ class IdVerificationImportService
         return $idVerification;
     }
 
+    public function deleteUnconfirmedImportData(): void
+    {
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->em->getRepository(IdVerificationImportRow::class)->deleteUnconfirmedImportData($date);
+    }
+
     private function sendIdVerification($idVerification): bool
     {
         $postData = $this->idVerificationService->getRdrObject($idVerification);
@@ -251,12 +258,5 @@ class IdVerificationImportService
                 }
             }
         }
-    }
-
-    public function deleteUnconfirmedImportData(): void
-    {
-        $date = (new \DateTime('UTC'))->modify('-1 hours');
-        $date = $date->format('Y-m-d H:i:s');
-        $this->em->getRepository(IdVerificationImportRow::class)->deleteUnconfirmedImportData($date);
     }
 }

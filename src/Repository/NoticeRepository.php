@@ -19,20 +19,6 @@ class NoticeRepository extends ServiceEntityRepository
         parent::__construct($registry, Notice::class);
     }
 
-    private static function patternToRegex($pattern)
-    {
-        // temporarily change wildcard asterisks to % to avoid escaping
-        $regex = str_replace('*', '%', $pattern);
-        // escape pattern for regex
-        $regex = preg_quote($regex, '/');
-        // replace wildcards with regex .*
-        $regex = str_replace('%', '.*', $regex);
-        // add delimeters, start and end characters, and case-insensitive modifier
-        $regex = '/^' . $regex . '$/i';
-
-        return $regex;
-    }
-
     /**
      * @return Notice[] Returns an array of currently active Notice objects that match a URL path
      */
@@ -56,5 +42,19 @@ class NoticeRepository extends ServiceEntityRepository
         }
 
         return $matchingNotices;
+    }
+
+    private static function patternToRegex($pattern)
+    {
+        // temporarily change wildcard asterisks to % to avoid escaping
+        $regex = str_replace('*', '%', $pattern);
+        // escape pattern for regex
+        $regex = preg_quote($regex, '/');
+        // replace wildcards with regex .*
+        $regex = str_replace('%', '.*', $regex);
+        // add delimeters, start and end characters, and case-insensitive modifier
+        $regex = '/^' . $regex . '$/i';
+
+        return $regex;
     }
 }

@@ -18,15 +18,6 @@ class Mandrill
         ]);
     }
 
-    protected function post($endpoint, array $data = [])
-    {
-        $data['key'] = $this->apiKey;
-        $response = $this->client->request('POST', $endpoint, [
-            'json' => $data
-        ]);
-        return json_decode($response->getBody()->getContents());
-    }
-
     public function ping()
     {
         $result = $this->post('users/ping.json');
@@ -54,5 +45,14 @@ class Mandrill
             && isset($result[0])
             && isset($result[0]->status)
             && $result[0]->status === 'sent';
+    }
+
+    protected function post($endpoint, array $data = [])
+    {
+        $data['key'] = $this->apiKey;
+        $response = $this->client->request('POST', $endpoint, [
+            'json' => $data
+        ]);
+        return json_decode($response->getBody()->getContents());
     }
 }

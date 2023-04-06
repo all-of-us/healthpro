@@ -20,9 +20,14 @@ class VisitDSMT extends TimePoints
         'postDSMT' => 'Post DSMT'
     ];
 
+    protected $rdrTimePoints = [
+        'minus15min' => 'Minus 15 min',
+        'minus5min' => 'Minus 5 min',
+    ];
+
     protected $timePointSampleTypes = [
-        'preDSMT' => ['urine', 'saliva'],
-        'postDSMT' => ['urine', 'saliva']
+        'preDSMT' => ['urine', 'saliva', 'hair', 'nail', 'stool'],
+        'postDSMT' => ['urine']
     ];
 
     public function __construct($module)

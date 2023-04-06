@@ -11,11 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class IncentiveImport
 {
-    public function __construct()
-    {
-        $this->incentiveImportRows = new ArrayCollection();
-    }
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -57,6 +52,10 @@ class IncentiveImport
      * @ORM\OneToMany(targetEntity="IncentiveImportRow", mappedBy="import", cascade={"persist", "remove"})
      */
     private $incentiveImportRows;
+    public function __construct()
+    {
+        $this->incentiveImportRows = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

@@ -5,8 +5,9 @@ namespace App\EventListener;
 use App\Audit\Log;
 use App\Entity\FeatureNotification;
 use App\Entity\FeatureNotificationUserMap;
+use App\Entity\Notice;
 use App\Entity\User;
-use App\Service\EnvironmentService;
+use App\Service\LoggerService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,8 +18,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment as TwigEnvironment;
-use App\Entity\Notice;
-use App\Service\LoggerService;
 
 class RequestListener
 {
@@ -29,7 +28,6 @@ class RequestListener
     private $userService;
     private $siteService;
     private $authorizationChecker;
-    private $env;
     private $tokenStorage;
 
     private $request;
@@ -42,7 +40,6 @@ class RequestListener
         UserService $userService,
         SiteService $siteService,
         AuthorizationCheckerInterface $authorizationChecker,
-        EnvironmentService $env,
         TokenStorageInterface $tokenStorage
     ) {
         $this->logger = $logger;
@@ -52,7 +49,6 @@ class RequestListener
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->authorizationChecker = $authorizationChecker;
-        $this->env = $env;
         $this->tokenStorage = $tokenStorage;
     }
 
@@ -86,6 +82,41 @@ class RequestListener
         }
 
         $this->checkFeatureNotifications();
+    }
+
+    public function onKernelFinishRequest()
+    {
+        if ($this->canSetSessionVariables()) {
+            $this->setSessionVariables();
+        }
+    }
+
+    /**
+     * "Upkeep" routes are routes that we typically want to allow through
+     * even when workflow dictates otherwise.
+     */
+    public function isUpkeepRoute()
+    {
+        $route = $this->request->attributes->get('_route');
+        return (in_array($route, [
+            'logout',
+            'timeout',
+            'keep_alive',
+            'client_timeout',
+            'agree_usage'
+        ]));
+    }
+
+    public function isStreamingResponseRoute()
+    {
+        $route = $this->request->attributes->get('_route');
+        return (in_array($route, [
+            'workqueue_export',
+            'help_sopFile',
+            'on_site_patient_status_export',
+            'on_site_incentive_tracking_export',
+            'on_site_id_verification_export'
+        ]));
     }
 
     private function logRequest()
@@ -151,7 +182,7 @@ class RequestListener
             (
                 $this->authorizationChecker->isGranted('ROLE_USER')
                 || $this->authorizationChecker->isGranted('ROLE_NPH_USER')
-                ||$this->authorizationChecker->isGranted('ROLE_AWARDEE')
+                || $this->authorizationChecker->isGranted('ROLE_AWARDEE')
             )) {
             if (!$this->siteService->autoSwitchSite() && !$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/site/select');
@@ -167,47 +198,12 @@ class RequestListener
         }
     }
 
-    public function onKernelFinishRequest()
-    {
-        if ($this->canSetSessionVariables()) {
-            $this->setSessionVariables();
-        }
-    }
-
-    /**
-     * "Upkeep" routes are routes that we typically want to allow through
-     * even when workflow dictates otherwise.
-     */
-    public function isUpkeepRoute()
-    {
-        $route = $this->request->attributes->get('_route');
-        return (in_array($route, [
-            'logout',
-            'timeout',
-            'keep_alive',
-            'client_timeout',
-            'agree_usage'
-        ]));
-    }
-
     private function ignoreRoutes(): bool
     {
         return preg_match(
             '/^\/(_profiler|_wdt|cron|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
             $this->request->getPathInfo()
         );
-    }
-
-    public function isStreamingResponseRoute()
-    {
-        $route = $this->request->attributes->get('_route');
-        return (in_array($route, [
-            'workqueue_export',
-            'help_sopFile',
-            'on_site_patient_status_export',
-            'on_site_incentive_tracking_export',
-            'on_site_id_verification_export'
-        ]));
     }
 
     private function setSessionVariables(): void

@@ -25,8 +25,7 @@ class TimezoneService
     {
         if (array_key_exists($timezone, static::$timezoneOptions)) {
             return static::$timezoneOptions[$timezone];
-        } else {
-            return $timezone;
         }
+        return $timezone;
     }
 }

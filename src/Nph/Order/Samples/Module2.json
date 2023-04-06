@@ -1,5 +1,5 @@
 {
-  "version": "1",
+  "version": "2",
   "notes": "Module 2 samples",
   "samplesInformation": {
     "SST8P5": {
@@ -9,7 +9,38 @@
       "specimen": "Serum SST",
       "type": "blood",
       "identifier": "SST8.5",
-      "collectionVolume": "8.5 mL"
+      "collectionVolume": "8.5 mL",
+      "aliquots": {
+        "SST8P5A1": {
+          "identifier": "SSTS1-U",
+          "container": "1.4mL Matrix tube (500μL)",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 500,
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
+          "addNew": false,
+          "required": true
+        },
+        "SST8P5A2": {
+          "identifier": "SSTS1-U",
+          "container": "1.4mL Matrix tube (1000μL)",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 3,
+          "expectedVolume": 1000,
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1,
+          "addNew": true
+        }
+      }
     },
     "LIHP1": {
       "label": "6 mL Li Hep",
@@ -22,17 +53,32 @@
       "aliquots": {
         "LIHP1A1": {
           "identifier": "LiHP1-U",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube (500μL)",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 500,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
+          "addNew": false,
+          "required": true
         },
         "LIHP1A2": {
           "identifier": "LiHP1-U",
-          "container": "1.4mL Matrix tube",
+          "container": "1.4mL Matrix tube (1000μL)",
+          "description": "1.4mL Matrix tube",
           "expectedAliquots": 2,
           "expectedVolume": 1000,
-          "units": "μL"
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1,
+          "addNew": true
         }
       }
     },
@@ -43,7 +89,38 @@
       "specimen": "Whole Blood EDTA",
       "type": "blood",
       "identifier": "EDTA10",
-      "collectionVolume": "10 mL"
+      "collectionVolume": "10 mL",
+      "aliquots": {
+        "EDTA10A1": {
+          "identifier": "EDTAP1-U",
+          "container": "1.4mL Matrix tube (500μL)",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 500,
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
+          "addNew": false,
+          "required": true
+        },
+        "EDTA10A2": {
+          "identifier": "EDTAP1-U",
+          "container": "1.4mL Matrix tube (1000μL)",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 4,
+          "expectedVolume": 1000,
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1,
+          "addNew": true
+        }
+      }
     },
     "P800": {
       "label": "2 mL P800",
@@ -52,7 +129,24 @@
       "specimen": "Whole Blood EDTA",
       "type": "blood",
       "identifier": "P800",
-      "collectionVolume": "2 mL"
+      "collectionVolume": "2 mL",
+      "aliquots": {
+        "P800A1": {
+          "identifier": "P800P1-U",
+          "container": "1.4mL Matrix tube (500μL)",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 2,
+          "expectedVolume": 500,
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
+          "addNew": true,
+          "required": true
+        }
+      }
     },
     "URINES": {
       "label": "Spot Urine",
@@ -61,7 +155,38 @@
       "specimen": "Urine",
       "type": "urine",
       "identifier": "UrineS",
-      "collectionVolume": "100 mL"
+      "collectionVolume": "100 mL",
+      "aliquots": {
+        "URINESA1": {
+          "identifier": "RU1-U",
+          "container": "1.4mL Matrix tube (1000μL)",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 7,
+          "expectedVolume": 1000,
+          "units": "μL",
+          "barcodeLength" : 10,
+          "minVolume": 0,
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1,
+          "addNew": false,
+          "required": true
+        },
+        "URINESA2": {
+          "identifier": "RU2-L",
+          "container": "6mL Urine Aliquot tube",
+          "description": "6mL Urine Aliquot tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 5,
+          "units": "mL",
+          "barcodeLength" : 11,
+          "minVolume": 0,
+          "maxVolume": 5,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 5000,
+          "addNew": false
+        }
+      }
     },
     "SALIVA": {
       "label": "Saliva",
@@ -70,7 +195,24 @@
       "specimen": "Saliva",
       "type": "saliva",
       "identifier": "Saliva",
-      "collectionVolume": "50 mL"
+      "collectionVolume": "50 mL",
+      "aliquots": {
+        "SALIVAA1": {
+          "identifier": "SA1-U",
+          "container": "5mL Matrix tube",
+          "description": "5mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 4,
+          "units": "mL",
+          "barcodeLength" : 10,
+          "barcodePrefix": "MC",
+          "minVolume": 0,
+          "maxVolume": 4,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 4000,
+          "addNew": false
+        }
+      }
     },
     "STOOL": {
       "label": "Stool",
@@ -87,7 +229,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST1"
+      "identifier": "ST1-K"
     },
     "ST2": {
       "label": "95% Ethanol Tube 2",
@@ -95,7 +237,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST2"
+      "identifier": "ST2-K"
     },
     "ST3": {
       "label": "DNA/RNA Shield Tube 1",
@@ -103,7 +245,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST3"
+      "identifier": "ST3-K"
     },
     "ST4": {
       "label": "DNA/RNA Shield Tube 2",
@@ -111,7 +253,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST4"
+      "identifier": "ST4-K"
     }
   }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\Notice;
 use App\Form\NoticeType;
 use App\Repository\NoticeRepository;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Audit\Log;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +36,7 @@ class NoticeController extends BaseController
     /**
      * @Route("/notice/{id}", name="admin_notice")
      */
-    public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id=null)
+    public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id = null)
     {
         if ($id) {
             $notice = $noticeRepository->find($id);
@@ -70,11 +70,10 @@ class NoticeController extends BaseController
                     $this->addFlash('success', 'Notice updated');
                 }
                 return $this->redirect($this->generateUrl('admin_notices'));
-            } else {
-                // Add a form-level error if there are none
-                if (count($form->getErrors()) == 0) {
-                    $form->addError(new FormError('Please correct the errors below'));
-                }
+            }
+            // Add a form-level error if there are none
+            if (count($form->getErrors()) == 0) {
+                $form->addError(new FormError('Please correct the errors below'));
             }
         }
 

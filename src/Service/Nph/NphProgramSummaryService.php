@@ -16,6 +16,56 @@ class NphProgramSummaryService
         return $modules;
     }
 
+    public function getProgramSummary(): array
+    {
+        $programSummary = [];
+        $modules = $this->getModules();
+        foreach ($modules as $module) {
+            $moduleSummary = $this->getModuleSummary($module);
+            $programSummary[$module] = $moduleSummary;
+        }
+        return $programSummary;
+    }
+
+    public function combineOrderSummaryWithProgramSummary($orderSummary, $programSummary): array
+    {
+        $combinedSummary = [];
+        $orderSummaryOrder = $orderSummary['order'];
+        foreach ($programSummary as $module => $moduleSummary) {
+            foreach ($moduleSummary as $visit => $visitSummary) {
+                foreach ($visitSummary['visitInfo'] as $timePoint => $timePointSummary) {
+                    foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
+                        $numberSamples = [];
+                        $expectedSamples = 0;
+                        foreach (array_keys($sample) as $sampleCode) {
+                            if ($sampleCode === 'STOOL' || $sampleCode === 'NAIL') {
+                                continue;
+                            }
+                            $expectedSamples++;
+                            if (isset($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode])) {
+                                foreach ($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] as $orderid => $orderInfo) {
+                                    if (!isset($numberSamples[$orderid])) {
+                                        $numberSamples[$orderid] = 0;
+                                    }
+                                    if ($orderInfo['sampleId'] !== null) {
+                                        $numberSamples[$orderid]++;
+                                    }
+                                }
+                            }
+                            $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];
+                        }
+                        $combinedSummary[$module][$visit][$timePoint][$sampleType]['numberSamples'] = $numberSamples;
+                        $combinedSummary[$module][$visit][$timePoint][$sampleType]['expectedSamples'] = $expectedSamples;
+                    }
+                    $combinedSummary[$module][$visit][$timePoint] = ['timePointInfo' => $combinedSummary[$module][$visit][$timePoint], 'timePointDisplayName' => $visitSummary['visitInfo'][$timePoint]['timePointDisplayName']];
+                }
+                $combinedSummary[$module][$visit] = ['visitInfo' => $combinedSummary[$module][$visit], 'visitDisplayName' => $visitSummary['visitDisplayName']];
+                $combinedSummary[$module]['sampleStatusCount'] = $orderSummary['sampleStatusCount'][$module] ?? [];
+            }
+        }
+        return $combinedSummary;
+    }
+
     private function getModuleSummary($module): array
     {
         $moduleSummary = [];
@@ -37,48 +87,5 @@ class NphProgramSummaryService
             $moduleSummary[$visit] = ['visitInfo' => $moduleSummary[$visit], 'visitDisplayName' => $visits[$visit]];
         }
         return $moduleSummary;
-    }
-
-    public function getProgramSummary(): array
-    {
-        $programSummary = [];
-        $modules = $this->getModules();
-        foreach ($modules as $module) {
-            $moduleSummary = $this->getModuleSummary($module);
-            $programSummary[$module] = $moduleSummary;
-        }
-        return $programSummary;
-    }
-
-    public function combineOrderSummaryWithProgramSummary($orderSummary, $programSummary): array
-    {
-        $combinedSummary = [];
-        $orderSummaryOrder = $orderSummary['order'];
-        foreach ($programSummary as $module => $moduleSummary) {
-            foreach ($moduleSummary as $visit => $visitSummary) {
-                foreach ($visitSummary['visitInfo'] as $timePoint => $timePointSummary) {
-                    foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
-                        $numberSamples = 0;
-                        $expectedSamples = 0;
-                        foreach (array_keys($sample) as $sampleCode) {
-                            if ($sampleCode === 'STOOL' || $sampleCode === 'NAIL') {
-                                continue;
-                            }
-                            $expectedSamples++;
-                            if (isset($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode]['sampleId'])) {
-                                $numberSamples++;
-                            }
-                            $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];
-                        }
-                        $combinedSummary[$module][$visit][$timePoint][$sampleType]['numberSamples'] = $numberSamples;
-                        $combinedSummary[$module][$visit][$timePoint][$sampleType]['expectedSamples'] = $expectedSamples;
-                    }
-                    $combinedSummary[$module][$visit][$timePoint] = ['timePointInfo' => $combinedSummary[$module][$visit][$timePoint], 'timePointDisplayName' => $visitSummary['visitInfo'][$timePoint]['timePointDisplayName']];
-                }
-                $combinedSummary[$module][$visit] = ['visitInfo' => $combinedSummary[$module][$visit], 'visitDisplayName' => $visitSummary['visitDisplayName']];
-                $combinedSummary[$module]['sampleStatusCount'] = $orderSummary['sampleStatusCount'][$module] ?? [];
-            }
-        }
-        return $combinedSummary;
     }
 }

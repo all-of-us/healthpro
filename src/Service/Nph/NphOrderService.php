@@ -33,8 +33,6 @@ class NphOrderService
     private $user;
     private $site;
 
-    private static $nonBloodTimePoints = ['preLMT', 'postLMT', 'preDSMT', 'postDSMT'];
-
     private static $placeholderSamples = ['STOOL'];
 
     public function __construct(
@@ -123,7 +121,7 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => (bool)$sampleObj->getFinalizedTs()
+                'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL
             ];
         }
         return $sampleLabels;
@@ -235,45 +233,34 @@ class NphOrderService
         return $id;
     }
 
-    private function getNumericId(): string
-    {
-        $length = 10;
-        // Avoid leading 0s
-        $id = (string)rand(1, 9);
-        for ($i = 0; $i < $length - 1; $i++) {
-            $id .= (string)rand(0, 9);
-        }
-        return $id;
-    }
-
     public function createOrdersAndSamples(array $formData): string
     {
         $sampleGroup = $this->generateSampleGroup();
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
-                if (in_array($timePoint, self::$nonBloodTimePoints)) {
-                    $nailSamples = [];
-                    foreach ($samples as $sample) {
-                        if (in_array($sample, $this->getSamplesByType('nail'))) {
-                            $nailSamples[] = $sample;
-                        } elseif (!in_array($sample, self::$placeholderSamples)) {
-                            $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
-                            $this->createSample($sample, $nphOrder, $sampleGroup);
-                        }
+                $samplesByType = [];
+                foreach ($samples as $sample) {
+                    if (in_array($sample, $this->getSamplesByType(NphOrder::TYPE_NAIL))) {
+                        $samplesByType['nail'][] = $sample;
+                    } elseif (in_array($sample, $this->getSamplesByType(NphOrder::TYPE_BLOOD))) {
+                        $samplesByType['blood'][] = $sample;
+                    } elseif (!in_array($sample, self::$placeholderSamples)) {
+                        $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
+                        $this->createSample($sample, $nphOrder, $sampleGroup);
                     }
-                    if (!empty($nailSamples)) {
-                        $this->createOrderWithSamples($timePoint, 'nail', $nailSamples, $sampleGroup);
-                    }
-                } else {
-                    $this->createOrderWithSamples($timePoint, 'blood', $samples, $sampleGroup);
+                }
+                if (!empty($samplesByType['nail'])) {
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_NAIL, $samplesByType['nail'], $sampleGroup);
+                }
+                if (!empty($samplesByType['blood'])) {
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_BLOOD, $samplesByType['blood'], $sampleGroup);
                 }
             }
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            // TODO: dynamically load stool visit type
-            $nphOrder = $this->createOrder('preLMT', 'stool', $formData['stoolKit']);
-            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit']);
+            foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
                 }
@@ -320,14 +307,6 @@ class NphOrderService
         return $nphSample;
     }
 
-    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup): void
-    {
-        $nphOrder = $this->createOrder($timePoint, $orderType);
-        foreach ($samples as $sample) {
-            $this->createSample($sample, $nphOrder, $sampleGroup);
-        }
-    }
-
     public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
     {
         foreach ($order->getNphSamples() as $nphSample) {
@@ -338,33 +317,42 @@ class NphOrderService
         return false;
     }
 
-    public function saveOrderCollection(array $formData, NphOrder $order): NphOrder
+    public function saveOrderCollection(array $formData, NphOrder $order): ?NphOrder
     {
-        $orderType = $order->getOrderType();
-        foreach ($order->getNphSamples() as $nphSample) {
-            $sampleCode = $nphSample->getSampleCode();
-            if ($formData[$sampleCode]) {
-                $nphSample->setCollectedUser($this->user);
-                $nphSample->setCollectedSite($this->site);
-                $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
-                $nphSample->setCollectedTs($collectedTs);
-                $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
-                if ($order->getOrderType() === NphOrder::TYPE_URINE) {
-                    $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+        try {
+            $orderType = $order->getOrderType();
+            foreach ($order->getNphSamples() as $nphSample) {
+                $sampleCode = $nphSample->getSampleCode();
+                if ($formData[$sampleCode]) {
+                    $nphSample->setCollectedUser($this->user);
+                    $nphSample->setCollectedSite($this->site);
+                    $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                    $nphSample->setCollectedTs($collectedTs);
+                    $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+                    if ($order->getOrderType() === NphOrder::TYPE_URINE) {
+                        $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+                    }
+                } else {
+                    $nphSample->setCollectedUser(null);
+                    $nphSample->setCollectedSite(null);
+                    $nphSample->setCollectedTs(null);
+                    $nphSample->setCollectedNotes(null);
                 }
+                $this->em->persist($nphSample);
+                $this->em->flush();
+                $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            $this->em->persist($nphSample);
-            $this->em->flush();
-            $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
+            if ($orderType === NphOrder::TYPE_STOOL) {
+                $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
+                    'bowelQuality']));
+                $this->em->persist($order);
+                $this->em->flush();
+                $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+            }
+            return $order;
+        } catch (\Exception $e) {
+            return null;
         }
-        if ($orderType === NphOrder::TYPE_STOOL) {
-            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
-                'bowelQuality']));
-            $this->em->persist($order);
-            $this->em->flush();
-            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
-        }
-        return $order;
     }
 
     public function getExistingOrderCollectionData(NphOrder $order): array
@@ -427,18 +415,12 @@ class NphOrderService
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
-            ;
         } elseif ($order->getOrderType() === 'urine') {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
             $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
         }
         return $metadata;
-    }
-
-    private function mapMetadata($metadata, $type, $values): string
-    {
-        return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
     }
 
     public function getParticipantOrderSummary(string $participantid): array
@@ -470,56 +452,6 @@ class NphOrderService
         return $orderSummary;
     }
 
-    private function generateOrderSummaryArray(array $nphOrder): array
-    {
-        $sampleCount = 0;
-        $orderSummary = array();
-        $statusCount = [];
-        foreach ($nphOrder as $order) {
-            $samples = $order->getNphSamples()->toArray();
-            foreach ($samples as $sample) {
-                $sampleCount++;
-                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
-                $module = new $moduleClass($order->getVisitType());
-                $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
-                $timePointsDisplay = $module->getTimePoints();
-                $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
-                $visitTypes = $module->getVisitTypes();
-                $sampleStatus = $sample->getStatus();
-                $orderId = $order->getOrderId();
-                if (isset($orderSummary[$order->getModule()][$order->getVisitType()][$order->getTimepoint()][$module->getSampleType($sample->getSampleCode())][$sample->getSampleCode()])) {
-                    continue;
-                }
-                $orderSummary[$order->getModule()]
-                [$order->getVisitType()]
-                [$order->getTimepoint()]
-                [$module->getSampleType($sample->getSampleCode())]
-                [$sample->getSampleCode()] = [
-                    'sampleId' => $sample->getSampleID(),
-                    'sampleName' => $sampleName,
-                    'orderId' => $order->getOrderId(),
-                    'healthProOrderId' => $order->getId(),
-                    'createDate' => $order->getCreatedTs()->format('m/d/Y'),
-                    'sampleStatus' => $sampleStatus,
-                    'sampleCollectionVolume' => $sampleCollectionVolume,
-                    'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
-                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
-                    'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
-                    'visitDisplayName' => $visitTypes[$order->getVisitType()],
-                    'sampleGroup' => $sample->getSampleGroup(),
-                    'modifyType' => $sample->getModifyType(),
-                    'orderStatus' => $order->getStatus(),
-                ];
-                $statusCount[$order->getModule()][$orderId][$sampleStatus] = isset($statusCount[$order->getModule()][$orderId][$sampleStatus]) ? $statusCount[$order->getModule()][$orderId][$sampleStatus] + 1 : 1;
-            }
-        }
-        $returnArray = array();
-        $returnArray['order'] = $orderSummary;
-        $returnArray['sampleCount'] = $sampleCount;
-        $returnArray['sampleStatusCount'] = $statusCount;
-        return $returnArray;
-    }
-
     public function hasAtLeastOneAliquotSample(array $formData, string $sampleCode): bool
     {
         $aliquots = $this->getAliquots($sampleCode);
@@ -542,6 +474,362 @@ class NphOrderService
             return $this->saveStoolSampleFinalization($formData, $sample);
         }
         return $this->saveSampleFinalization($formData, $sample);
+    }
+
+    public function getExistingSampleData(NphSample $sample): array
+    {
+        $sampleData = [];
+        $sampleCode = $sample->getSampleCode();
+        $order = $sample->getNphOrder();
+        $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
+        $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
+        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
+            if ($sample->getSampleMetaData()) {
+                $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
+                if (!empty($sampleMetadata['urineColor'])) {
+                    $sampleData['urineColor'] = $sampleMetadata['urineColor'];
+                }
+                if (!empty($sampleMetadata['urineClarity'])) {
+                    $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
+                }
+            }
+        }
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
+            $sampleData[$sampleCode . 'CollectedTs'] = $order->getCollectedTs();
+            if ($order->getMetadata()) {
+                $orderMetadata = json_decode($order->getMetadata(), true);
+                if (!empty($orderMetadata['bowelType'])) {
+                    $sampleData['bowelType'] = $orderMetadata['bowelType'];
+                }
+                if (!empty($orderMetadata['bowelQuality'])) {
+                    $sampleData['bowelQuality'] = $orderMetadata['bowelQuality'];
+                }
+            }
+        }
+        $aliquots = $sample->getNphAliquots();
+        foreach ($aliquots as $aliquot) {
+            $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
+            $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
+            $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
+        }
+        return $sampleData;
+    }
+
+    public function getSamplesWithStatus(): array
+    {
+        $samplesData = [];
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
+            $this->participantId,
+            $this->visit,
+            $this->module
+        );
+        foreach ($orders as $order) {
+            $samples = $order->getNphSamples();
+            foreach ($samples as $sample) {
+                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $sample->getStatus();
+            }
+        }
+        return $samplesData;
+    }
+
+    public function saveSamplesModification(array $formData, string $type, NphOrder $order): bool
+    {
+        $status = true;
+        foreach ($order->getNphSamples() as $sample) {
+            if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
+                $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                if ($sample->getRdrId()) {
+                    if ($this->cancelRestoreSample(
+                        $sample->getRdrId(),
+                        $order->getParticipantId(),
+                        $type,
+                        $sampleObject
+                    )) {
+                        $this->saveSampleModificationsData($sample, $type, $formData);
+                    } else {
+                        $status = false;
+                    }
+                } else {
+                    $this->saveSampleModificationsData($sample, $type, $formData);
+                }
+            }
+        }
+        return $status;
+    }
+
+    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
+    {
+        $this->saveSampleModificationsData($sample, $type, $formData);
+        return $sample;
+    }
+
+    public function checkDuplicateAliquotId(array $formData, string $sampleCode, array $existingAliquotIds = []): array
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        foreach (array_keys($aliquots) as $aliquotCode) {
+            if (isset($formData[$aliquotCode])) {
+                foreach ($formData[$aliquotCode] as $key => $aliquotId) {
+                    if (!in_array($aliquotId, $existingAliquotIds) && $this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' => $aliquotId])) {
+                        return [
+                            'key' => $key,
+                            'aliquotCode' => $aliquotCode
+                        ];
+                    }
+                }
+            }
+        }
+        return [];
+    }
+
+    public function hasDuplicateAliquotsInForm(array $formData, string $sampleCode): bool
+    {
+        $aliquots = $this->getAliquots($sampleCode);
+        $totalAliquotCodes = [];
+        foreach (array_keys($aliquots) as $aliquotCode) {
+            if (isset($formData[$aliquotCode])) {
+                $totalAliquotCodes = array_merge($totalAliquotCodes, $formData[$aliquotCode]);
+            }
+        }
+        return $this->hasDuplicateIds($totalAliquotCodes);
+    }
+
+    public function getRdrObject(NphOrder $order, NphSample $sample, string $type = 'create'): \stdClass
+    {
+        $obj = new \StdClass();
+        $obj->subject = 'Patient/' . $order->getParticipantId();
+        $nphSite = $this->em->getRepository(NphSite::class)->findOneBy(['googleGroup' => $sample->getFinalizedSite()]);
+        $clientId = !empty($nphSite) ? $nphSite->getMayolinkAccount() : null;
+        $identifiers = [
+            [
+                'system' => 'https://www.pmi-ops.org/order-id',
+                'value' => $order->getOrderId()
+            ],
+            [
+                'system' => 'https://www.pmi-ops.org/sample-id',
+                'value' => $sample->getSampleId()
+            ],
+            [
+                'system' => 'https://www.pmi-ops.org/client-id',
+                'value' => $clientId
+            ],
+        ];
+        $createdSite = NphSite::getSiteIdWithPrefix($order->getSite());
+        $collectedSite = NphSite::getSiteIdWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
+        $finalizedSite = NphSite::getSiteIdWithPrefix($sample->getFinalizedSite());
+        $obj->createdInfo = $this->getUserSiteData($order->getUser()->getEmail(), $createdSite);
+        $obj->collectedInfo = $this->getUserSiteData($sample->getCollectedUser() ? $sample->getCollectedUser()
+            ->getEmail() : $sample->getFinalizedUser()->getEmail(), $collectedSite);
+        $obj->finalizedInfo = $this->getUserSiteData($sample->getFinalizedUser()->getEmail(), $finalizedSite);
+        $obj->identifier = $identifiers;
+        $createdTs = $order->getCreatedTs();
+        $createdTs->setTimezone(new \DateTimeZone('UTC'));
+        $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
+        $obj->module = $order->getModule();
+        $obj->visitType = $order->getVisitType();
+        // Handle RDR specific timepoint needs
+        if ($this->getRdrTimePoints() && isset($this->getRdrTimePoints()[$order->getTimepoint()])) {
+            $rdrTimePoint = $this->getRdrTimePoints()[$order->getTimepoint()];
+        } else {
+            $rdrTimePoint = $this->getTimePoints()[$order->getTimepoint()];
+        }
+        $obj->timepoint = $rdrTimePoint;
+        $sampleInfo = $this->getSamples();
+        $sampleIdentifier = $this->getSampleIdentifierFromCode($sample->getSampleCode());
+        $sampleDescription = $sampleInfo[$sample->getSampleCode()];
+        $samplesMetadata = $this->getSamplesMetadata($order);
+        $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
+        $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
+        if ($aliquotsInfo) {
+            $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
+        }
+        $notes = [
+            'collected' => $sample->getCollectedNotes(),
+            'finalized' => $sample->getFinalizedNotes()
+        ];
+        $obj->notes = $notes;
+        if ($type === 'amend') {
+            $obj->amendedReason = $sample->getModifyReason();
+            $obj->amendedInfo = $this->getUserSiteData(
+                $sample->getModifiedUser() ? $sample->getModifiedUser()->getEmail() : $this->user->getEmail(),
+                NphSite::getSiteIdWithPrefix($sample->getModifiedSite() ?? $this->site)
+            );
+        }
+        return $obj;
+    }
+
+    public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
+    {
+        $obj = new \StdClass();
+        $statusType = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
+        $obj->status = $statusType;
+        $obj->amendedReason = $reason;
+        $user = $this->user->getEmail();
+        $site = NphSite::getSiteIdWithPrefix($this->site);
+        $obj->{$statusType . 'Info'} = $this->getUserSiteData($user, $site);
+        return $obj;
+    }
+
+    public function cancelRestoreSample(
+        string $orderId,
+        string $participantId,
+        string $type,
+        \stdClass $sampleObject
+    ): bool {
+        try {
+            $response = $this->rdrApiService->patch(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
+                $sampleObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            $rdrStatus = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
+            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    public function getVisitTypes(): array
+    {
+        return $this->moduleObj->getVisitTypes();
+    }
+
+    public function validateGenerateOrdersData(array $formData): array
+    {
+        $formErrors = [];
+        $hasSample = false;
+        foreach (array_keys($this->getTimePoints()) as $timePoint) {
+            if (!empty($formData[$timePoint])) {
+                $hasSample = true;
+                break;
+            }
+        }
+        if (empty($formData['stoolKit'])) {
+            if ($hasSample === false) {
+                $formErrors[] = [
+                    'field' => 'checkAll',
+                    'message' => 'Please select or enter at least one sample'
+                ];
+                return $formErrors;
+            }
+        } else {
+            $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $formData['stoolKit']
+            ]);
+            if ($nphOrder) {
+                $formErrors[] = [
+                    'field' => 'stoolKit',
+                    'message' => 'This Kit ID has already been used for another order'
+                ];
+            }
+            $totalStoolTubes = [];
+            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+                if (!empty($formData[$stoolSample])) {
+                    $totalStoolTubes[] = $formData[$stoolSample];
+                    $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
+                        'sampleId' => $formData[$stoolSample]
+                    ]);
+                    if ($nphSample) {
+                        $formErrors[] = [
+                            'field' => $stoolSample,
+                            'message' => 'This Tube ID has already been used for another sample'
+                        ];
+                    }
+                }
+            }
+            if ($this->hasDuplicateIds($totalStoolTubes)) {
+                $formErrors[] = [
+                    'field' => 'checkAll',
+                    'message' => 'Please enter unique Stool Tube IDs'
+                ];
+            }
+        }
+        return $formErrors;
+    }
+
+    private function generateOrderSummaryArray(array $nphOrder): array
+    {
+        $sampleCount = 0;
+        $orderSummary = [];
+        $statusCount = [];
+        foreach ($nphOrder as $order) {
+            $samples = $order->getNphSamples()->toArray();
+            foreach ($samples as $sample) {
+                $sampleCount++;
+                $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
+                $module = new $moduleClass($order->getVisitType());
+                $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
+                $timePointsDisplay = $module->getTimePoints();
+                $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
+                $visitTypes = $module->getVisitTypes();
+                $sampleStatus = $sample->getStatus();
+                $orderId = $order->getOrderId();
+                $orderSummary[$order->getModule()]
+                [$order->getVisitType()]
+                [$order->getTimepoint()]
+                [$module->getSampleType($sample->getSampleCode())]
+                [$sample->getSampleCode()]
+                [$order->getOrderId()] = [
+                    'sampleId' => $sample->getSampleID(),
+                    'sampleName' => $sampleName,
+                    'orderId' => $order->getOrderId(),
+                    'healthProOrderId' => $order->getId(),
+                    'createDate' => $order->getCreatedTs()->format('m/d/Y'),
+                    'sampleStatus' => $sampleStatus,
+                    'sampleCollectionVolume' => $sampleCollectionVolume,
+                    'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
+                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
+                    'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
+                    'visitDisplayName' => $visitTypes[$order->getVisitType()],
+                    'sampleGroup' => $sample->getSampleGroup(),
+                    'modifyType' => $sample->getModifyType(),
+                    'orderStatus' => $order->getStatus(),
+                ];
+                $statusCount[$order->getModule()][$orderId][$sampleStatus] = isset($statusCount[$order->getModule()][$orderId][$sampleStatus]) ? $statusCount[$order->getModule()][$orderId][$sampleStatus] + 1 : 1;
+            }
+        }
+        $returnArray = [];
+        $returnArray['order'] = $orderSummary;
+        $returnArray['sampleCount'] = $sampleCount;
+        $returnArray['sampleStatusCount'] = $statusCount;
+        return $returnArray;
+    }
+
+    private function getStoolTimePoint(array $formData): ?string
+    {
+        foreach (array_keys($this->getTimePoints()) as $timePoint) {
+            if (in_array(NphSample::SAMPLE_STOOL, $formData[$timePoint])) {
+                return $timePoint;
+            }
+        }
+        return null;
+    }
+
+    private function getNumericId(): string
+    {
+        $length = 10;
+        // Avoid leading 0s
+        $id = (string) rand(1, 9);
+        for ($i = 0; $i < $length - 1; $i++) {
+            $id .= (string) rand(0, 9);
+        }
+        return $id;
+    }
+
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup): void
+    {
+        $nphOrder = $this->createOrder($timePoint, $orderType);
+        foreach ($samples as $sample) {
+            $this->createSample($sample, $nphOrder, $sampleGroup);
+        }
+    }
+
+    private function mapMetadata($metadata, $type, $values): string
+    {
+        return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
     }
 
     private function saveSampleFinalization(array $formData, NphSample $sample): bool
@@ -608,15 +896,13 @@ class NphOrderService
                 }
                 $connection->commit();
                 return true;
-            } else {
-                // Send sample to RDR
-                if ($this->sendToRdr($sample)) {
-                    $connection->commit();
-                    return true;
-                } else {
-                    throw new \Exception('Failed sending to RDR');
-                }
             }
+            // Send sample to RDR
+            if ($this->sendToRdr($sample)) {
+                $connection->commit();
+                return true;
+            }
+            throw new \Exception('Failed sending to RDR');
         } catch (\Exception $e) {
             $connection->rollback();
         }
@@ -711,93 +997,6 @@ class NphOrderService
         }
     }
 
-    public function getExistingSampleData(NphSample $sample): array
-    {
-        $sampleData = [];
-        $sampleCode = $sample->getSampleCode();
-        $order = $sample->getNphOrder();
-        $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
-        $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
-        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
-            if ($sample->getSampleMetaData()) {
-                $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
-                if (!empty($sampleMetadata['urineColor'])) {
-                    $sampleData['urineColor'] = $sampleMetadata['urineColor'];
-                }
-                if (!empty($sampleMetadata['urineClarity'])) {
-                    $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
-                }
-            }
-        }
-        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
-            $sampleData[$sampleCode . 'CollectedTs'] = $order->getCollectedTs();
-            if ($order->getMetadata()) {
-                $orderMetadata = json_decode($order->getMetadata(), true);
-                if (!empty($orderMetadata['bowelType'])) {
-                    $sampleData['bowelType'] = $orderMetadata['bowelType'];
-                }
-                if (!empty($orderMetadata['bowelQuality'])) {
-                    $sampleData['bowelQuality'] = $orderMetadata['bowelQuality'];
-                }
-            }
-        }
-        $aliquots = $sample->getNphAliquots();
-        foreach ($aliquots as $aliquot) {
-            $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
-            $sampleData["{$aliquot->getAliquotCode()}AliquotTs"][] = $aliquot->getAliquotTs();
-            $sampleData["{$aliquot->getAliquotCode()}Volume"][] = $aliquot->getVolume();
-        }
-        return $sampleData;
-    }
-
-    public function getSamplesWithStatus(): array
-    {
-        $samplesData = [];
-        $orders = $this->em->getRepository(NphOrder::class)->getOrdersByVisitType(
-            $this->participantId,
-            $this->visit,
-            $this->module
-        );
-        foreach ($orders as $order) {
-            $samples = $order->getNphSamples();
-            foreach ($samples as $sample) {
-                $samplesData[$order->getTimepoint()][$sample->getSampleCode()] = $sample->getStatus();
-            }
-        }
-        return $samplesData;
-    }
-
-    public function saveSamplesModification(array $formData, string $type, NphOrder $order): bool
-    {
-        $status = true;
-        foreach ($order->getNphSamples() as $sample) {
-            if (isset($formData[$sample->getSampleCode()]) && $formData[$sample->getSampleCode()] === true) {
-                $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
-                if ($sample->getRdrId()) {
-                    if ($this->cancelRestoreSample(
-                        $sample->getRdrId(),
-                        $order->getParticipantId(),
-                        $type,
-                        $sampleObject
-                    )) {
-                        $this->saveSampleModificationsData($sample, $type, $formData);
-                    } else {
-                        $status = false;
-                    }
-                } else {
-                    $this->saveSampleModificationsData($sample, $type, $formData);
-                }
-            }
-        }
-        return $status;
-    }
-
-    public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
-    {
-        $this->saveSampleModificationsData($sample, $type, $formData);
-        return $sample;
-    }
-
     private function saveSampleModificationsData(NphSample $sample, string $type, array $formData): void
     {
         if ($formData['reason'] === 'OTHER') {
@@ -811,36 +1010,6 @@ class NphOrderService
         $this->em->persist($sample);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
-    }
-
-    public function checkDuplicateAliquotId(array $formData, string $sampleCode, array $existingAliquotIds = []): array
-    {
-        $aliquots = $this->getAliquots($sampleCode);
-        foreach (array_keys($aliquots) as $aliquotCode) {
-            if (isset($formData[$aliquotCode])) {
-                foreach ($formData[$aliquotCode] as $key => $aliquotId) {
-                    if (!in_array($aliquotId, $existingAliquotIds) && $this->em->getRepository(NphAliquot::class)->findOneBy(['aliquotId' => $aliquotId])) {
-                        return [
-                            'key' => $key,
-                            'aliquotCode' => $aliquotCode
-                        ];
-                    }
-                }
-            }
-        }
-        return [];
-    }
-
-    public function hasDuplicateAliquotsInForm(array $formData, string $sampleCode): bool
-    {
-        $aliquots = $this->getAliquots($sampleCode);
-        $totalAliquotCodes = [];
-        foreach (array_keys($aliquots) as $aliquotCode) {
-            if (isset($formData[$aliquotCode])) {
-                $totalAliquotCodes = array_merge($totalAliquotCodes, $formData[$aliquotCode]);
-            }
-        }
-        return $this->hasDuplicateIds($totalAliquotCodes);
     }
 
     private function sendToRdr(NphSample $sample, $modifyType = null): bool
@@ -908,70 +1077,6 @@ class NphOrderService
         return false;
     }
 
-    public function getRdrObject(NphOrder $order, NphSample $sample, string $type = 'create'): \stdClass
-    {
-        $obj = new \StdClass();
-        $obj->subject = 'Patient/' . $order->getParticipantId();
-        $nphSite = $this->em->getRepository(NphSite::class)->findOneBy(['googleGroup' => $sample->getFinalizedSite()]);
-        $clientId = !empty($nphSite) ? $nphSite->getMayolinkAccount() : null;
-        $identifiers = [
-            [
-                'system' => 'https://www.pmi-ops.org/order-id',
-                'value' => $order->getOrderId()
-            ],
-            [
-                'system' => 'https://www.pmi-ops.org/sample-id',
-                'value' => $sample->getSampleId()
-            ],
-            [
-                'system' => 'https://www.pmi-ops.org/client-id',
-                'value' => $clientId
-            ],
-        ];
-        $createdSite = NphSite::getSiteIdWithPrefix($order->getSite());
-        $collectedSite = NphSite::getSiteIdWithPrefix($sample->getCollectedSite() ?? $sample->getFinalizedSite());
-        $finalizedSite = NphSite::getSiteIdWithPrefix($sample->getFinalizedSite());
-        $obj->createdInfo = $this->getUserSiteData($order->getUser()->getEmail(), $createdSite);
-        $obj->collectedInfo = $this->getUserSiteData($sample->getCollectedUser() ? $sample->getCollectedUser()
-            ->getEmail() : $sample->getFinalizedUser()->getEmail(), $collectedSite);
-        $obj->finalizedInfo = $this->getUserSiteData($sample->getFinalizedUser()->getEmail(), $finalizedSite);
-        $obj->identifier = $identifiers;
-        $createdTs = $order->getCreatedTs();
-        $createdTs->setTimezone(new \DateTimeZone('UTC'));
-        $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
-        $obj->module = $order->getModule();
-        $obj->visitType = $order->getVisitType();
-        // Handle RDR specific timepoint needs
-        if ($this->getRdrTimePoints() && isset($this->getRdrTimePoints()[$order->getTimepoint()])) {
-            $rdrTimePoint = $this->getRdrTimePoints()[$order->getTimepoint()];
-        } else {
-            $rdrTimePoint = $this->getTimePoints()[$order->getTimepoint()];
-        }
-        $obj->timepoint = $rdrTimePoint;
-        $sampleInfo = $this->getSamples();
-        $sampleIdentifier = $this->getSampleIdentifierFromCode($sample->getSampleCode());
-        $sampleDescription = $sampleInfo[$sample->getSampleCode()];
-        $samplesMetadata = $this->getSamplesMetadata($order);
-        $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
-        $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        if ($aliquotsInfo) {
-            $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
-        }
-        $notes = [
-            'collected' => $sample->getCollectedNotes(),
-            'finalized' => $sample->getFinalizedNotes()
-        ];
-        $obj->notes = $notes;
-        if ($type === 'amend') {
-            $obj->amendedReason = $sample->getModifyReason();
-            $obj->amendedInfo = $this->getUserSiteData(
-                $sample->getModifiedUser() ? $sample->getModifiedUser()->getEmail() : $this->user->getEmail(),
-                NphSite::getSiteIdWithPrefix($sample->getModifiedSite() ?? $this->site)
-            );
-        }
-        return $obj;
-    }
-
     private function getUserSiteData(string $user, string $site): array
     {
         return [
@@ -984,99 +1089,6 @@ class NphOrderService
                 'value' => $site
             ]
         ];
-    }
-
-    public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
-    {
-        $obj = new \StdClass();
-        $statusType = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
-        $obj->status = $statusType;
-        $obj->amendedReason = $reason;
-        $user = $this->user->getEmail();
-        $site = NphSite::getSiteIdWithPrefix($this->site);
-        $obj->{$statusType . 'Info'} = $this->getUserSiteData($user, $site);
-        return $obj;
-    }
-
-    public function cancelRestoreSample(
-        string $orderId,
-        string $participantId,
-        string $type,
-        \stdClass $sampleObject
-    ): bool {
-        try {
-            $response = $this->rdrApiService->patch(
-                "rdr/v1/api/v1/nph/Participant/{$participantId}/BiobankOrder/{$orderId}",
-                $sampleObject
-            );
-            $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === NphSample::CANCEL ? 'cancelled' : 'restored';
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
-    }
-
-    public function getVisitTypes(): array
-    {
-        return $this->moduleObj->getVisitTypes();
-    }
-
-    public function validateGenerateOrdersData(array $formData): array
-    {
-        $formErrors = [];
-        $hasSample = false;
-        foreach (array_keys($this->getTimePoints()) as $timePoint) {
-            if (!empty($formData[$timePoint])) {
-                $hasSample = true;
-                break;
-            }
-        }
-        if (empty($formData['stoolKit'])) {
-            if ($hasSample === false) {
-                $formErrors[] = [
-                    'field' => 'checkAll',
-                    'message' => 'Please select or enter at least one sample'
-                ];
-                return $formErrors;
-            }
-        } else {
-            $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
-                'orderId' => $formData['stoolKit']
-            ]);
-            if ($nphOrder) {
-                $formErrors[] = [
-                    'field' => 'stoolKit',
-                    'message' => 'This Kit ID has already been used for another order'
-                ];
-            }
-            $totalStoolTubes = [];
-            foreach ($this->getSamplesByType('stool') as $stoolSample) {
-                if (!empty($formData[$stoolSample])) {
-                    $totalStoolTubes[] = $formData[$stoolSample];
-                    $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
-                        'sampleId' => $formData[$stoolSample]
-                    ]);
-                    if ($nphSample) {
-                        $formErrors[] = [
-                            'field' => $stoolSample,
-                            'message' => 'This Tube ID has already been used for another sample'
-                        ];
-                    }
-                }
-            }
-            if ($this->hasDuplicateIds($totalStoolTubes)) {
-                $formErrors[] = [
-                    'field' => 'checkAll',
-                    'message' => 'Please enter unique Stool Tube IDs'
-                ];
-            }
-        }
-        return $formErrors;
     }
 
     private function hasDuplicateIds(array $totalIds): bool

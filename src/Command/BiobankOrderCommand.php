@@ -95,7 +95,7 @@ class BiobankOrderCommand extends Command
         $pageSize = $input->getOption('page_size');
         $pretty = ($input->getOption('pretty') !== false) ? JSON_PRETTY_PRINT : 0;
         // Validate start and end dates
-        if ((bool)!strtotime($start_date) || (bool)!strtotime($end_date)) {
+        if ((bool) !strtotime($start_date) || (bool) !strtotime($end_date)) {
             $output->writeln(sprintf(
                 '<error>Invalid dates: "%s", "%s"</error>',
                 $start_date,

@@ -130,7 +130,7 @@
         <div class="col-sm-12">
             {{ form_rest(sampleModifyForm) }}
             <p>
-                <button type="submit" name="reportable" class="btn btn-danger">{{ type|capitalize }}</button>
+                <button type="submit" name="reportable" class="btn btn-{{ type == constant('App\\Entity\\NphSample::RESTORE') ? 'success' : 'danger' }}">{{ type|capitalize }}</button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
             </p>

@@ -7,7 +7,6 @@ use App\Drc\Exception\InvalidDobException;
 use App\Drc\Exception\InvalidResponseException;
 use App\Helper\NphParticipant;
 use App\Service\RdrApiService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NphParticipantSummaryService
@@ -17,25 +16,23 @@ class NphParticipantSummaryService
 
     protected RdrApiService $api;
     protected ParameterBagInterface $params;
-    protected EntityManagerInterface $em;
 
-    public function __construct(RdrApiService $api, ParameterBagInterface $params, EntityManagerInterface $em)
+    public function __construct(RdrApiService $api, ParameterBagInterface $params)
     {
         $this->api = $api;
         $this->params = $params;
-        $this->em = $em;
     }
 
-    public function getParticipantById($participantId, $refresh = null)
+    public function getParticipantById(string $participantId, string $refresh = null)
     {
-        if (!is_string($participantId) || !preg_match('/^\w+$/', $participantId)) {
+        if (!preg_match('/^\w+$/', $participantId)) {
             return false;
         }
         $participant = false;
         $cacheKey = 'nph_rdr_participant_' . $participantId;
         $cacheEnabled = $this->params->has('rdr_disable_cache') ? !$this->params->get('rdr_disable_cache') : true;
         $cacheTime = $this->params->has('cache_time') ? intval($this->params->get('cache_time')) : self::CACHE_TIME;
-        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->has('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
         $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
         if ($cacheEnabled && !$refresh) {
             try {
@@ -98,12 +95,24 @@ class NphParticipantSummaryService
         }
         $results = [];
         foreach ($edges as $edge) {
-            if ($result = new NphParticipant($edge->node)) {
-                $results[] = $result;
-            }
+            $results[] = new NphParticipant($edge->node);
         }
 
         return $results;
+    }
+
+    public function getAllParticipantDetailsById($participantId): ?array
+    {
+        try {
+            $query = $this->getAllParticipantsByIdQuery($participantId);
+            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
+            $result = json_decode($response->getBody()->getContents(), true);
+            $edges = $result['participant']['edges'];
+            return !empty($edges) ? $edges[0]['node'] : null;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
     }
 
     private function getParticipantByIdQuery(string $participantId): string
@@ -179,20 +188,6 @@ class NphParticipantSummaryService
                 }
               }
         ";
-    }
-
-    public function getAllParticipantDetailsById($participantId): ?array
-    {
-        try {
-            $query = $this->getAllParticipantsByIdQuery($participantId);
-            $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
-            $result = json_decode($response->getBody()->getContents(), true);
-            $edges = $result['participant']['edges'];
-            return !empty($edges) ? $edges[0]['node'] : null;
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
-        }
     }
 
     private function getAllParticipantsByIdQuery(string $participantId): string

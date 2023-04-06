@@ -8,10 +8,10 @@ use App\Entity\IncentiveImport;
 use App\Entity\IncentiveImportRow;
 use App\Helper\Import;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Psr\Log\LoggerInterface;
 
 class IncentiveImportService
 {
@@ -54,10 +54,10 @@ class IncentiveImportService
     {
         $incentives = [];
         $fileHandle = fopen($file->getPathname(), 'r');
-        $headers = fgetcsv($fileHandle, 0, ",");
+        $headers = fgetcsv($fileHandle, 0, ',');
         // Guess file format using headers
         if (count($headers) < 2) {
-            $form['incentive_csv']->addError(new FormError("Invalid file format"));
+            $form['incentive_csv']->addError(new FormError('Invalid file format'));
             return;
         }
         $rowsLimit = $this->params->has('csv_rows_limit') ? intval($this->params->get('csv_rows_limit')) : self::DEFAULT_CSV_ROWS_LIMIT;
@@ -67,7 +67,7 @@ class IncentiveImportService
             return;
         }
         $row = 2;
-        while (($data = fgetcsv($fileHandle, 0, ",")) !== false) {
+        while (($data = fgetcsv($fileHandle, 0, ',')) !== false) {
             $incentive = [];
             if (!Import::isValidParticipantId($data[0])) {
                 $form['incentive_csv']->addError(new FormError("Invalid participant ID Format {$data[0]} in line {$row}, column 1"));
@@ -201,25 +201,6 @@ class IncentiveImportService
         return $rows;
     }
 
-    private function sendIncentive($participantId, $incentive, $user): bool
-    {
-        $postData = $this->getRdrObject($incentive, $user);
-        try {
-            $result = $this->incentiveService->sendToRdr($participantId, $postData);
-            if (is_object($result) && isset($result->incentiveId)) {
-                $incentive->setUser($user);
-                $incentive->setRdrId($result->incentiveId);
-                $this->em->persist($incentive);
-                $this->loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
-                return true;
-            }
-        } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
-            return false;
-        }
-        return false;
-    }
-
     public function sendIncentivesToRdr(): void
     {
         $limit = $this->params->has('patient_status_queue_limit') ? intval($this->params->get('patient_status_queue_limit')) : 0;
@@ -303,6 +284,49 @@ class IncentiveImportService
         return $incentive;
     }
 
+    public function deleteUnconfirmedImportData(): void
+    {
+        $date = (new \DateTime('UTC'))->modify('-1 hours');
+        $date = $date->format('Y-m-d H:i:s');
+        $this->em->getRepository(IncentiveImportRow::class)->deleteUnconfirmedImportData($date);
+    }
+
+    public function getRdrObject($incentive, $user)
+    {
+        $obj = new \StdClass();
+        $obj->createdBy = $user ? $user->getEmail() : '';
+        $obj->site = $this->siteService->getSiteWithPrefix($incentive->getSite());
+        $obj->dateGiven = $incentive->getIncentiveDateGiven()->format('Y-m-d\TH:i:s\Z');
+        $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
+        $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
+        if ($incentive->getGiftCardType()) {
+            $obj->giftcardType = $incentive->getGiftCardType();
+        }
+        $obj->amount = $incentive->getIncentiveAmount();
+        $obj->notes = $incentive->getNotes();
+        $obj->declined = $incentive->getDeclined();
+        return $obj;
+    }
+
+    private function sendIncentive($participantId, $incentive, $user): bool
+    {
+        $postData = $this->getRdrObject($incentive, $user);
+        try {
+            $result = $this->incentiveService->sendToRdr($participantId, $postData);
+            if (is_object($result) && isset($result->incentiveId)) {
+                $incentive->setUser($user);
+                $incentive->setRdrId($result->incentiveId);
+                $this->em->persist($incentive);
+                $this->loggerService->log(Log::INCENTIVE_ADD, $incentive->getId());
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
     private function updateImportStatus($importIds): void
     {
         foreach ($importIds as $importId) {
@@ -333,29 +357,5 @@ class IncentiveImportService
                 }
             }
         }
-    }
-
-    public function deleteUnconfirmedImportData(): void
-    {
-        $date = (new \DateTime('UTC'))->modify('-1 hours');
-        $date = $date->format('Y-m-d H:i:s');
-        $this->em->getRepository(IncentiveImportRow::class)->deleteUnconfirmedImportData($date);
-    }
-
-    public function getRdrObject($incentive, $user)
-    {
-        $obj = new \StdClass();
-        $obj->createdBy = $user ? $user->getEmail() : '';
-        $obj->site = $this->siteService->getSiteWithPrefix($incentive->getSite());
-        $obj->dateGiven = $incentive->getIncentiveDateGiven()->format('Y-m-d\TH:i:s\Z');
-        $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
-        $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
-        if ($incentive->getGiftCardType()) {
-            $obj->giftcardType = $incentive->getGiftCardType();
-        }
-        $obj->amount = $incentive->getIncentiveAmount();
-        $obj->notes = $incentive->getNotes();
-        $obj->declined = $incentive->getDeclined();
-        return $obj;
     }
 }

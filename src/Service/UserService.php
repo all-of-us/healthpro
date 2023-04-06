@@ -2,13 +2,13 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Helper\MockUserHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use App\Entity\User;
 use Symfony\Component\Security\Core\Security;
 
 class UserService

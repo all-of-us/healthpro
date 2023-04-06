@@ -6,17 +6,12 @@ use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
-use App\Security\User;
-use Hoa\Math\Context;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class UserProvider implements UserProviderInterface
 {

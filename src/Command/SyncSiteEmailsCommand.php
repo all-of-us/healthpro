@@ -10,13 +10,9 @@ use App\Service\LoggerService;
 use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -27,15 +23,13 @@ class SyncSiteEmailsCommand extends Command
     private $loggerService;
     private $normalizer;
     private $em;
-    private $router;
 
-    public function __construct(EnvironmentService $environmentService, SiteSyncService $siteSyncService, LoggerService $loggerService, NormalizerInterface $normalizer, EntityManagerInterface $em, UrlGeneratorInterface $router)
+    public function __construct(EnvironmentService $environmentService, SiteSyncService $siteSyncService, LoggerService $loggerService, NormalizerInterface $normalizer, EntityManagerInterface $em)
     {
         $this->environmentService = $environmentService;
         $this->siteSyncService = $siteSyncService;
         $this->loggerService = $loggerService;
         $this->normalizer = $normalizer;
-        $this->router = $router;
         $this->em = $em;
         parent::__construct();
     }

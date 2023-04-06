@@ -40,22 +40,30 @@
         </div>
     </div>
     {% else %}
-    <div class="page-header row">
+    <div class="page-header row participant-name">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
             <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module 1</span>
         </h2>
     </div>
     <div class="page-header row participant-information">
-        <div class="col-md-5">
+        <div class="col-md-9">
             {% include 'program/nph/order/partials/participant-details.html.twig' %}
-        </div>
-        <div class="col-md-4">
         </div>
         <div class="col-md-3">
             <svg id="participantBarcode" data-id="{{ participant.id }}"></svg>
         </div>
     </div>
+    {% if cacheEnabled %}
+        <div class="row pull-right">
+            Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
+            <a href="{{ path('nph_participant_summary', { participantId: participant.id, refresh: 1 }) }}"
+               class="btn btn-primary btn-xs">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+                Refresh
+            </a>
+        </div>
+    {% endif %}
     <div class="col-md-12" role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber < 2 %}
@@ -67,8 +75,6 @@
                 <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
                         Module {{ moduleNumber }}</a></li>
             {% endfor %}
-            <li class="pull-right"><button class="btn btn-primary pull-right" style="position: relative"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</button></li>
-
         </ul>
     </div>
     <div class="col-sm-2 participant-activity-div">
@@ -90,7 +96,7 @@
                     {% if VisitCode != 'sampleStatusCount' %}
                         <div>
                             <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
-                                 role="button">Visit {{ visit['visitDisplayName'] }}<span class="caret"
+                                 role="button" style="font-weight: bold">Visit {{ visit['visitDisplayName'] }}<span class="caret"
                                                                                           style="float: right; margin: 9px 0;"></span></div>
                             <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
                                 <a class="btn btn-primary" role="button"
@@ -98,34 +104,38 @@
                                     <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
                                 </a>
                                 {% set displayedOrderIDS = [] %}
+                                {% set displayedTimePointHeaders = [] %}
                                 {% for timepointCode, timepoint in visit['visitInfo'] %}
                                     {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
-                                        {% if sampleInfo['numberSamples'] > 0 %}
-                                            {% if loop.first %}
-                                                <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
-                                            {% endif %}
-                                            {% set StatusCount = 0 %}
+                                        {% if sampleInfo['numberSamples'] is not empty %}
                                             {% for sampleCode, sample in sampleInfo %}
-                                                {% set SampleGroupStatus = null %}
-                                                {% if sample is iterable and sample|length > 0 and sample['sampleId'] is not null and sampleInfo['numberSamples'] > 0 and sample['healthProOrderId'] not in displayedOrderIDS %}
-                                                    {% set displayedOrderIDS = displayedOrderIDS|merge([sample['healthProOrderId']]) %}
-                                                    <div class="well well-sm row">
-                                                        <div class="col-sm-2">{{ sample['createDate'] }}</div>
-                                                        <div class="col-sm-3"><a
-                                                                href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample['healthProOrderId']}) }}">Order
-                                                                ID: {{ sample['orderId'] }}</a></div>
-                                                        <div class="col-sm-2">{{ sample['sampleTypeDisplayName'] }}</div>
-                                                        {{ _self.generateStatusLabel(sample['orderStatus']) }}
-                                                        {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][sample['orderId']]|sort %}
+                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] %}
+                                                    {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
+                                                        {% if timepointCode not in displayedTimePointHeaders %}
+                                                            {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
+                                                            <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+                                                        {% endif %}
+                                                        {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
+                                                        <div class="well well-sm order-row">
+                                                            <div class="clearfix">
+                                                            <div class="col-sm-2">{{ sample[orderid]['createDate'] }}</div>
+                                                            <div class="col-sm-3"><a
+                                                                    href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
+                                                                    ID: {{ orderid }}</a></div>
+                                                            <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
+                                                            {{ _self.generateStatusLabel(sample[orderid]['orderStatus']) }}
+                                                            {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                             {% if not loop.first %}
                                                                 <div class="col-sm-9"></div>
                                                             {% endif %}
-                                                        <div class="col-sm-3 float-right">({{ sampleStatusCount }}
-                                                            / {{ sampleInfo['expectedSamples'] }}) {{ sampleStatus }}
+                                                            <div class="col-sm-3 float-right">({{ sampleStatusCount }}
+                                                                / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
+                                                            </div>
+                                                            {% endfor %}
+                                                                </div>
                                                         </div>
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
                                             {% endfor %}
                                         {% endif %}
                                     {% endfor %}

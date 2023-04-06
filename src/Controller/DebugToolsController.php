@@ -15,9 +15,9 @@ use App\Service\OrderService;
 use App\Service\PatientStatusService;
 use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @Route("/admin/debug")
@@ -109,9 +109,8 @@ class DebugToolsController extends BaseController
                     }
                 }
                 return $this->redirectToRoute('admin_debug_missing_measurements');
-            } else {
-                $this->addFlash('error', 'Please select at least one physical measurements');
             }
+            $this->addFlash('error', 'Please select at least one physical measurements');
         }
         return $this->render('admin/debug/missing-measurements.html.twig', [
             'missing' => $missing,
@@ -169,9 +168,8 @@ class DebugToolsController extends BaseController
                     }
                 }
                 return $this->redirectToRoute('admin_debug_missing_orders');
-            } else {
-                $this->addFlash('error', 'Please select at least one order');
             }
+            $this->addFlash('error', 'Please select at least one order');
         }
         return $this->render('admin/debug/missing-orders.html.twig', [
             'missing' => $missing,
