@@ -23,6 +23,9 @@ class Order
     public const ORDER_EDIT = 'edit';
     public const ORDER_REVERT = 'revert';
     public const INITIAL_VERSION = '1';
+    public const ORDER_STEP_FINALIZED = 'finalized';
+    public const ORDER_TYPE_KIT = 'kit';
+    public const ORDER_TYPE_DIVERSION = 'diversion';
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
 
@@ -918,17 +921,17 @@ class Order
             'system' => 'https://www.pmi-ops.org',
             'value' => $this->getOrderId()
         ];
-        if ($this->getType() === 'kit') {
+        if ($this->getType() === self::ORDER_TYPE_KIT) {
             $identifiers[] = [
                 'system' => 'https://orders.mayomedicallaboratories.com/kit-id',
                 'value' => $this->getOrderId()
             ];
-            if (!empty($this->getFedexTracking())) {
-                $identifiers[] = [
-                    'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
-                    'value' => $this->getFedexTracking()
-                ];
-            }
+        }
+        if (!empty($this->getFedexTracking())) {
+            $identifiers[] = [
+                'system' => 'https://orders.mayomedicallaboratories.com/tracking-number',
+                'value' => $this->getFedexTracking()
+            ];
         }
         if (empty($this->params['ml_mock_order']) && $this->getMayoId() != 'pmitest') {
             $identifiers[] = [
@@ -1442,6 +1445,12 @@ class Order
             return 'Saliva';
         }
         return 'Full HPO';
+    }
+
+    public function hideTrackingFieldByDefault(): bool
+    {
+        return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
+                === self::ORDER_TYPE_DIVERSION);
     }
 
     protected function getSampleTime($set, $sample)
