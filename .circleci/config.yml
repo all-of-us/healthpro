@@ -9,74 +9,77 @@ jobs:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
 
     docker:
-    - image: circleci/php:7.4-cli-node
-    - image: mysql:5.7
-      environment:
-        MYSQL_ROOT_PASSWORD: passw0rd
-        MYSQL_DATABASE: circle_test
-        MYSQL_USER: ubuntu
-        MYSQL_PASSWORD: passw0rd
+      - image: circleci/php:7.4-cli-node
+      - image: mysql:5.7
+        environment:
+          MYSQL_ROOT_PASSWORD: passw0rd
+          MYSQL_DATABASE: circle_test
+          MYSQL_USER: ubuntu
+          MYSQL_PASSWORD: passw0rd
 
     steps:
-    - run: sudo apt-get update && sudo apt-get install -y default-mysql-client libpng-dev
-    - run: sudo docker-php-ext-install pdo_mysql
-    - run: sudo docker-php-ext-install gd
-    - checkout
+      - run: sudo apt-get update && sudo apt-get install -y default-mysql-client
+          libpng-dev
+      - run: sudo docker-php-ext-install pdo_mysql
+      - run: sudo docker-php-ext-install gd
+      - checkout
 
-    # Our primary container isn't MYSQL so run a sleep command until it's ready.
-    - run:
-        name: Waiting for MySQL to be ready
-        command: |
-          for i in `seq 1 30`;
-          do
-            nc -z 127.0.0.1 3306 && echo Success && exit 0
-            echo -n .
-            sleep 1
-          done
-          echo Failed waiting for MySQL && exit 1
+      # Our primary container isn't MYSQL so run a sleep command until it's ready.
+      - run:
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 30`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
 
-    # Artifacts
-    - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+      # Artifacts
+      - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
 
-    # Dependencies
-    - run: sudo composer self-update --2
-    - restore_cache: # special step to restore the dependency cache if `composer.lock` does not change
-        keys:
-          - composer-v1-{{ checksum "composer.lock" }}
-          # fallback to using the latest cache if no exact match is found (See https://circleci.com/docs/2.0/caching/)
-          - composer-v1-
-    - run: composer install -n
-    - save_cache: # special step to save the dependency cache with the `composer.lock` cache key template
-        key: composer-v1-{{ checksum "composer.lock" }}
-        paths:
-          - vendor
+      # Dependencies
+      - run: sudo composer self-update --2
+      - restore_cache: # special step to restore the dependency cache if `composer.lock` does not change
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+            # fallback to using the latest cache if no exact match is found (See https://circleci.com/docs/2.0/caching/)
+            - composer-v1-
+      - run: composer install -n
+      - save_cache: # special step to save the dependency cache with the `composer.lock` cache key template
+          key: composer-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
 
-    # Webpack
-    - run: npm install
-    - run: npx encore prod
+      # Webpack
+      - run: npm install
+      - run: npx encore prod
 
-    # Install PHP CS Fixer
-    - run: composer install --working-dir=./tools/php-cs-fixer
+      # Install PHP CS Fixer
+      - run: composer install --working-dir=./tools/php-cs-fixer
 
-    # Database
-    - run: ./ci/database.sh
+      # Database
+      - run: ./ci/database.sh
 
-    # Test
-    - run: ./ci/test.sh
+      # Test
+      - run: ./ci/test.sh
 
-    # PHP CS Fixer
-    - run: ./ci/php-cs-fixer.sh
+      # PHP CS Fixer
+      - run: ./ci/php-cs-fixer.sh
 
-    # PHPStan
-    - run: ./ci/phpstan.sh
+      # PHPStan
+      - run: ./ci/phpstan.sh
 
-    # CS Fixer
-    - run: npx prettier --check ./web/assets/js
+      # CS Fixer
+      - run: npx prettier --check ./web/assets/js
 
-    # Teardown
-    - store_test_results:
-        path: /tmp/circleci-test-results
-    - store_artifacts:
-        path: /tmp/circleci-artifacts
-    - store_artifacts:
-        path: /tmp/circleci-test-results
+      # Teardown
+      - store_test_results:
+          path: /tmp/circleci-test-results
+      - store_artifacts:
+          path: /tmp/circleci-artifacts
+      - store_artifacts:
+          path: /tmp/circleci-test-results
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
