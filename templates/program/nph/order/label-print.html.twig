@@ -47,9 +47,9 @@
                             {% for orderId, orderInfo in sampleCodeInfo %}
                             <tr>
                                 {% if printSampleTd %}
-                                    <td rowspan="{{ orderInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderInfo.healthProOrderId}) }}">{{ orderInfo.orderId }}</a></td>
-                                    <td rowspan="{{ orderInfo|length }}">{{ orderInfo.timepointDisplayName }}</td>
-                                    <td rowspan="{{ orderInfo|length }}">{{ orderInfo.sampleTypeDisplayName }}</td>
+                                    <td rowspan="{{ sampleInfo|length }}"><a href="{{ path('nph_order_collect', {'participantId': participant.id, 'orderId': orderInfo.healthProOrderId}) }}">{{ orderInfo.orderId }}</a></td>
+                                    <td rowspan="{{ sampleInfo|length }}">{{ orderInfo.timepointDisplayName }}</td>
+                                    <td rowspan="{{ sampleInfo|length }}">{{ orderInfo.sampleTypeDisplayName }}</td>
                                     {% set printSampleTd = false %}
                                 {% endif %}
                                 <td>{{ orderInfo.sampleName }}</td>
