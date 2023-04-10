@@ -18,7 +18,7 @@ jobs:
         MYSQL_PASSWORD: passw0rd
 
     steps:
-    - run: sudo apt-get update && sudo apt-get install -y default-mysql-client libfreetype6-dev libpng-dev
+    - run: sudo apt-get update && sudo apt-get install -y default-mysql-client libpng-dev
     - run: sudo docker-php-ext-install pdo_mysql
     - checkout
 
