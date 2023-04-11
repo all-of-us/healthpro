@@ -15,25 +15,26 @@ class NphOrderCollect extends NphOrderForm
         $samples = $options['samples'];
         $orderType = $options['orderType'];
         $sampleIndex = 1;
-        foreach ($samples as $sampleCode => $sample) {
-            $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
-            $builder->add($sampleCode, Type\CheckboxType::class, [
+        foreach ($samples as $sampleId => $sample) {
+            $sampleCode = $sample['sampleCode'];
+            $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sampleId})";
+            $builder->add($sampleCode . $sampleId, Type\CheckboxType::class, [
                 'label' => $sampleLabel,
                 'required' => false,
                 'constraints' => [
-                    new Constraints\Callback(function ($value, $context) use ($sampleCode, $orderType) {
+                    new Constraints\Callback(function ($value, $context) use ($sampleCode, $orderType, $sampleId) {
                         if ($orderType !== NphOrder::TYPE_STOOL && $value === false && !empty($context->getRoot()
-                            ["{$sampleCode}CollectedTs"]->getData())) {
+                            ["{$sampleCode}{$sampleId}CollectedTs"]->getData())) {
                             $context->buildViolation('Collected sample required')->addViolation();
                         }
                     })
                 ],
                 'attr' => [
-                    'data-sample-id' => $sample['id'],
+                    'data-sample-id' => $sampleId,
                 ],
                 'disabled' => $sample['disabled']
             ]);
-            $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, $sample['disabled'], 'collect');
+            $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, $sampleId, $sample['disabled'], 'collect');
             $sampleIndex++;
         }
 

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Form\DlwType;
 use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
@@ -128,8 +129,23 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+        if ($order->getOrderType() === NphOrder::TYPE_DLW) {
+            $orders = $this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($order->getParticipantId(), $order->getNphSamples()[0]->getSampleGroup());
+        } else {
+            $orders = [$order];
+        }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
-        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+        $sampleLabelsIds = [];
+        foreach ($orders as $order) {
+            $test = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+            $sampleLabelsIds += $test;
+        }
+        if ($order->getOrderType() === NphOrder::TYPE_DLW) {
+            $dlwForm = $this->createForm(DlwType::class);
+            $dlwForm = $dlwForm->createView();
+        } else {
+            $dlwForm = null;
+        }
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
@@ -141,7 +157,7 @@ class NphOrderController extends BaseController
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
             $formData = $oderCollectForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $orders) === false) {
                 $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($oderCollectForm->isValid()) {
@@ -156,9 +172,10 @@ class NphOrderController extends BaseController
         }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
         return $this->render('program/nph/order/collect.html.twig', [
-            'order' => $order,
+            'orders' => $orders,
             'activeSamples' => $activeSamples,
             'orderCollectForm' => $oderCollectForm->createView(),
+            'dlwForm' => $dlwForm,
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
@@ -526,6 +543,61 @@ class NphOrderController extends BaseController
             echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
             exit;
         }
+    }
+
+    /**
+     * @Route("/participant/{participantId}/order/{orderId}/dlw/collect", name="")
+     */
+    public function dlwSampleCollect(
+        $participantId,
+        $orderId,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        Request $request
+    ): Response {
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        $orders = $this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($order->getParticipantId(), $order->getNphSamples()[0]->getSampleGroup());
+        $form = $this->createForm(DlwType::class);
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+        $oderCollectForm = $this->createForm(
+            NphOrderCollect::class,
+            $orderCollectionData,
+            ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
+                $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
+                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()]
+        );
+        $oderCollectForm->handleRequest($request);
+        if ($oderCollectForm->isSubmitted()) {
+            $formData = $oderCollectForm->getData();
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
+            if ($oderCollectForm->isValid()) {
+                if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                    $this->addFlash('success', 'Order collection saved');
+                } else {
+                    $this->addFlash('error', 'Order collection failed');
+                }
+            } else {
+                $oderCollectForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+        $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
+        return $this->render('program/nph/order/dlw-collect.html.twig', [
+            'dlwForm' => $form->createView(),
+            'dlwOrders' => $orders,
+        ]);
     }
 
     private function checkCrossSiteParticipant(string $participantSiteId): void

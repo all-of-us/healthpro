@@ -2,7 +2,7 @@
 <div class="page-header">
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
-        {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
+        {{ orders[0].createdTs|date('n/j/Y', app.user.timezone) }}
         <small>
             <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">
                 {{ participant.lastName }}, {{ participant.firstName }}

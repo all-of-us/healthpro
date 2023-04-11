@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-sm-12">
+        {{ form_start(dlwForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+        {{ form_errors(dlwForm) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_label(dlwForm['doseBatchId'])}}
+                {{ form_widget(dlwForm['doseBatchId'])}}
+                {{ form_errors(dlwForm['doseBatchId'])}}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(dlwForm['actualDose']) }}
+                {{ form_widget(dlwForm['actualDose']) }}
+                {{ form_errors(dlwForm['actualDose']) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(dlwForm['participantWeight'])}}
+                {{ form_widget(dlwForm['participantWeight'])}}
+                {{ form_errors(dlwForm['participantWeight'])}}
+            </div>
+            <div class="col-md-6">
+                {{ form_label(dlwForm['calculatedDosage']) }}
+                {{ form_widget(dlwForm['calculatedDosage']) }}
+                {{ form_errors(dlwForm['calculatedDosage']) }}
+            </div>
+        </div>
+    </div>
+</div>

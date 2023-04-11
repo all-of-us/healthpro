@@ -4,9 +4,20 @@
 {% block body %}
     {% include 'program/nph/order/partials/order-header.html.twig' %}
     <div class="alert bg-light well-sm margin-top-15">
-        <span class="font-bold">{{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}</span>
+        <span class="font-bold">{{ timePoints[orders[0].timepoint] }} {{ orders[0].orderType|capitalize }}</span>
         <div class="pull-right">
-            <a href="{{ path('nph_order_label_print', {'participantId': order.participantId, 'module': order.module, 'visit': order.visitType, 'sampleGroup': order.nphSamples[0].sampleGroup}) }}">
+            <a href="{{ path('nph_order_label_print', {'participantId': orders[0].participantId, 'module': orders[0].module, 'visit': orders[0].visitType, 'sampleGroup': orders[0].nphSamples[0].sampleGroup}) }}">
+                View Order Summary/Reprint Labels
+            </a>
+        </div>
+    </div>
+    {% if dlwForm is not null %}
+        {% include 'program/nph/order/partials/dlw-fields.html.twig' %}
+    {% endif %}
+    <div class="alert bg-light well-sm margin-top-15">
+        <span class="font-bold">{{ timePoints[orders[0].timepoint] }} {{ orders[0].orderType|capitalize }}</span>
+        <div class="pull-right">
+            <a href="{{ path('nph_order_label_print', {'participantId': orders[0].participantId, 'module': orders[0].module, 'visit': orders[0].visitType, 'sampleGroup': orders[0].nphSamples[0].sampleGroup}) }}">
                 View Order Summary/Reprint Labels
             </a>
         </div>
@@ -17,11 +28,11 @@
             {{ form_errors(orderCollectForm) }}
             <div class="row">
                 <div class="col-sm-6">
-                    {% if order.orderType == constant('TYPE_STOOL', order) %}
-                        <div class="form-group {% if not orderCollectForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
-                            {{ form_label(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
-                            {{ form_widget(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
-                            {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                    {% if orders[0].orderType == constant('TYPE_STOOL', orders[0]) %}
+                        <div class="form-group {% if not orderCollectForm[orders[0].orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
+                            {{ form_label(orderCollectForm[orders[0].orderType ~ 'CollectedTs']) }}
+                            {{ form_widget(orderCollectForm[orders[0].orderType ~ 'CollectedTs']) }}
+                            {{ form_errors(orderCollectForm[orders[0].orderType ~ 'CollectedTs']) }}
                         </div>
                     {% endif %}
                     <div class="form-group">
@@ -32,10 +43,13 @@
                 </div>
             </div>
             <table class="table table-samples">
+                {% set theadPrinted = '' %}
+                {% for order in orders %}
+                {% if theadPrinted == '' %}
                 <thead>
                 <tr>
                     <th>Collection Sample</th>
-                    {% if order.orderType != constant('TYPE_STOOL', order) %}
+                    {% if orders[0].orderType != constant('TYPE_STOOL', order) %}
                         <th>Collection Time</th>
                     {% endif %}
                     <th>Notes</th>
@@ -55,6 +69,8 @@
                     </th>
                 </tr>
                 </thead>
+                {% set theadPrinted = 'printed' %}
+                {% endif %}
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
                     {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
@@ -63,10 +79,10 @@
                         </tr>
                     {% endif %}
                     <tr class="row-samples">
-                        <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+                        <td {% if not orderCollectForm[nphSample.sampleCode~nphSample.sampleId].vars.valid %}
                             class="has-error"{% endif %}>
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
-                            {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode~nphSample.sampleId]) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode~nphSample.sampleId]) }}
                             {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
                                 <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
                             {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
@@ -77,17 +93,17 @@
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% endif %}
                         </td>
-                        {% if orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
-                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+                        {% if orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs'] is defined %}
+                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs'].vars.valid %}
                                 class="has-error"{% endif %}>
-                                {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
-                                {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                {{ form_widget(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs']) }}
+                                {{ form_errors(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs']) }}
                             </td>
                         {% endif %}
-                        <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                        <td {% if not orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'Notes'].vars.valid %}
                             class="has-error"{% endif %}>
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
-                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {{ form_widget(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'Notes']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'Notes']) }}
                             {% if index == order.nphSamples|length - 1 %}
                                 <small class="text-warning">
                                     Comments entered in this field are transmitted to the Biobank via reconciliation
@@ -120,10 +136,11 @@
                     <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
                         class="has-error"{% endif %}>{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
                 </tr>
+                {% endfor %}
                 </tbody>
             </table>
             <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
-            {% if order.orderType == constant('TYPE_URINE', order) %}
+            {% if orders[0].orderType == constant('TYPE_URINE', orders[0]) %}
                 <hr>
                 <h4>
                     Color and Clarity
@@ -144,7 +161,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if order.orderType == constant('TYPE_STOOL', order) %}
+            {% if orders[0].orderType == constant('TYPE_STOOL', orders[0]) %}
                 <hr>
                 <h4>
                     Bristol Stool Chart Questions
@@ -164,7 +181,7 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                {% if not order.isDisabled %}
+                {% if not orders[0].isDisabled %}
                     <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
                 {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"

@@ -118,9 +118,9 @@ class NphOrderService
         $samples = $this->getSamples();
         $sampleLabels = [];
         foreach ($samplesObj as $sampleObj) {
-            $sampleLabels[$sampleObj->getSampleCode()] = [
+            $sampleLabels[$sampleObj->getSampleId()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
-                'id' => $sampleObj->getSampleId(),
+                'sampleCode' => $sampleObj->getSampleCode(),
                 'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL
             ];
         }
@@ -307,11 +307,13 @@ class NphOrderService
         return $nphSample;
     }
 
-    public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
+    public function isAtLeastOneSampleChecked(array $formData, array $orders): bool
     {
-        foreach ($order->getNphSamples() as $nphSample) {
-            if (isset($formData[$nphSample->getSampleCode()]) && $formData[$nphSample->getSampleCode()] === true) {
-                return true;
+        foreach ($orders as $order) {
+            foreach ($order->getNphSamples() as $nphSample) {
+                if (isset($formData[$nphSample->getSampleCode().$nphSample->getSampleId()]) && $formData[$nphSample->getSampleCode().$nphSample->getSampleId()] === true) {
+                    return true;
+                }
             }
         }
         return false;
@@ -323,12 +325,12 @@ class NphOrderService
             $orderType = $order->getOrderType();
             foreach ($order->getNphSamples() as $nphSample) {
                 $sampleCode = $nphSample->getSampleCode();
-                if ($formData[$sampleCode]) {
+                if ($formData[$sampleCode . $nphSample->getSampleId()]) {
                     $nphSample->setCollectedUser($this->user);
                     $nphSample->setCollectedSite($this->site);
-                    $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                    $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . $nphSample->getSampleId() . 'CollectedTs'];
                     $nphSample->setCollectedTs($collectedTs);
-                    $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+                    $nphSample->setCollectedNotes($formData[$sampleCode . $nphSample->getSampleId() . 'Notes']);
                     if ($order->getOrderType() === NphOrder::TYPE_URINE) {
                         $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
                     }
@@ -364,13 +366,14 @@ class NphOrderService
         }
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
+            $sampleId = $nphSample->getSampleId();
             if ($orderType !== NphOrder::TYPE_STOOL) {
-                $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
+                $orderCollectionData[$sampleCode . $sampleId . 'CollectedTs'] = $nphSample->getCollectedTs();
             }
             if ($nphSample->getCollectedTs()) {
-                $orderCollectionData[$sampleCode] = true;
+                $orderCollectionData[$sampleCode . $sampleId] = true;
             }
-            $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
+            $orderCollectionData[$sampleCode . $sampleId . 'Notes'] = $nphSample->getCollectedNotes();
             if ($order->getOrderType() === 'urine') {
                 if ($nphSample->getSampleMetaData()) {
                     $sampleMetadata = json_decode($nphSample->getSampleMetaData(), true);

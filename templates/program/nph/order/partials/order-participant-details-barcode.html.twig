@@ -1,10 +1,10 @@
-<div class="row" id="order_info" data-order-id="{{ order.orderId }}">
+<div class="row" id="order_info" data-order-id="{{ orders[0].orderId }}">
     <div class="col-sm-9">
         {% include 'program/nph/order/partials/participant-details.html.twig' %}
     </div>
     <div class="col-sm-3 text-center">
         <strong class="text-primary">
-            Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }} | {{ order
+            Module {{ orders[0].module }} | Visit {{ orders[0].visitType }} | {{ timePoints[orders[0].timepoint] }} | {{ orders[0]
             .orderType|capitalize }}
         </strong>
         <div><svg id="order-barcode"></svg></div>
