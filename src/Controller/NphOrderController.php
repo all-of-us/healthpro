@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Collections\NPHOrderCollection;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\DlwType;
@@ -129,10 +130,11 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+
         if ($order->getOrderType() === NphOrder::TYPE_DLW) {
-            $orders = $this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($order->getParticipantId(), $order->getNphSamples()[0]->getSampleGroup());
+            $orders = new NPHOrderCollection($this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($order->getParticipantId(), $order->getNphSamples()[0]->getSampleGroup()));
         } else {
-            $orders = [$order];
+            $orders = new NPHOrderCollection([$order]);
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
         $sampleLabelsIds = [];
@@ -146,7 +148,10 @@ class NphOrderController extends BaseController
         } else {
             $dlwForm = null;
         }
-        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+        $orderCollectionData = [];
+        foreach ($orders as $order) {
+            $orderCollectionData += $nphOrderService->getExistingOrderCollectionData($order);
+        }
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
             $orderCollectionData,
@@ -161,7 +166,7 @@ class NphOrderController extends BaseController
                 $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($oderCollectForm->isValid()) {
-                if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                if ($nphOrderService->saveOrderCollection($formData, $orders)) {
                     $this->addFlash('success', 'Order collection saved');
                 } else {
                     $this->addFlash('error', 'Order collection failed');

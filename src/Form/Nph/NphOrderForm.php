@@ -57,7 +57,7 @@ class NphOrderForm extends AbstractType
             $constraints = $this->getDateTimeConstraints();
             if ($formType === self::FORM_COLLECT_TYPE) {
                 $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample, $sampleId) {
-                    if (empty($value) && $context->getRoot()[$sample . $sampleId]->getData() === true) {
+                    if (empty($value) && $context->getRoot()[$sampleId]->getData() === true) {
                         $context->buildViolation('Collection time is required')->addViolation();
                     }
                 });
@@ -67,7 +67,7 @@ class NphOrderForm extends AbstractType
                 ]);
             }
             $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
-            $builder->add("{$sample}{$sampleId}CollectedTs", Type\DateTimeType::class, [
+            $builder->add("{$sampleId}CollectedTs", Type\DateTimeType::class, [
                 'required' => $formType === self::FORM_FINALIZE_TYPE,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
@@ -83,7 +83,7 @@ class NphOrderForm extends AbstractType
                 'disabled' => $disabled
             ]);
         }
-        $builder->add("{$sample}{$sampleId}Notes", Type\TextareaType::class, [
+        $builder->add("{$sampleId}Notes", Type\TextareaType::class, [
             'label' => 'Notes',
             'required' => false,
             'constraints' => new Constraints\Type('string'),

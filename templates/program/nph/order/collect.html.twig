@@ -3,24 +3,20 @@
 {% block title %} Order Collect - {% endblock %}
 {% block body %}
     {% include 'program/nph/order/partials/order-header.html.twig' %}
-    <div class="alert bg-light well-sm margin-top-15">
-        <span class="font-bold">{{ timePoints[orders[0].timepoint] }} {{ orders[0].orderType|capitalize }}</span>
-        <div class="pull-right">
-            <a href="{{ path('nph_order_label_print', {'participantId': orders[0].participantId, 'module': orders[0].module, 'visit': orders[0].visitType, 'sampleGroup': orders[0].nphSamples[0].sampleGroup}) }}">
-                View Order Summary/Reprint Labels
-            </a>
-        </div>
-    </div>
     {% if dlwForm is not null %}
         {% include 'program/nph/order/partials/dlw-fields.html.twig' %}
     {% endif %}
     <div class="alert bg-light well-sm margin-top-15">
+        {% if dlwForm is not null %}
+            <span class="font-bold">Sample Collection</span>
+        {% else %}
         <span class="font-bold">{{ timePoints[orders[0].timepoint] }} {{ orders[0].orderType|capitalize }}</span>
         <div class="pull-right">
             <a href="{{ path('nph_order_label_print', {'participantId': orders[0].participantId, 'module': orders[0].module, 'visit': orders[0].visitType, 'sampleGroup': orders[0].nphSamples[0].sampleGroup}) }}">
                 View Order Summary/Reprint Labels
             </a>
         </div>
+        {% endif %}
     </div>
     <div class="row">
         <div class="col-sm-12">
@@ -79,10 +75,10 @@
                         </tr>
                     {% endif %}
                     <tr class="row-samples">
-                        <td {% if not orderCollectForm[nphSample.sampleCode~nphSample.sampleId].vars.valid %}
+                        <td {% if not orderCollectForm[nphSample.sampleId].vars.valid %}
                             class="has-error"{% endif %}>
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode~nphSample.sampleId]) }}
-                            {{ form_errors(orderCollectForm[nphSample.sampleCode~nphSample.sampleId]) }}
+                            {{ form_widget(orderCollectForm[nphSample.sampleId]) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleId]) }}
                             {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
                                 <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
                             {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
@@ -93,17 +89,17 @@
                                     {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
                             {% endif %}
                         </td>
-                        {% if orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs'] is defined %}
-                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs'].vars.valid %}
+                        {% if orderCollectForm[nphSample.sampleId ~ 'CollectedTs'] is defined %}
+                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleId ~ 'CollectedTs'].vars.valid %}
                                 class="has-error"{% endif %}>
-                                {{ form_widget(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs']) }}
-                                {{ form_errors(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'CollectedTs']) }}
+                                {{ form_widget(orderCollectForm[nphSample.sampleId ~ 'CollectedTs']) }}
+                                {{ form_errors(orderCollectForm[nphSample.sampleId ~ 'CollectedTs']) }}
                             </td>
                         {% endif %}
-                        <td {% if not orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'Notes'].vars.valid %}
+                        <td {% if not orderCollectForm[nphSample.sampleId ~ 'Notes'].vars.valid %}
                             class="has-error"{% endif %}>
-                            {{ form_widget(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'Notes']) }}
-                            {{ form_errors(orderCollectForm[nphSample.sampleCode~nphSample.sampleId ~ 'Notes']) }}
+                            {{ form_widget(orderCollectForm[nphSample.sampleId ~ 'Notes']) }}
+                            {{ form_errors(orderCollectForm[nphSample.sampleId ~ 'Notes']) }}
                             {% if index == order.nphSamples|length - 1 %}
                                 <small class="text-warning">
                                     Comments entered in this field are transmitted to the Biobank via reconciliation

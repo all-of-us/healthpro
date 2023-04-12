@@ -18,13 +18,13 @@ class NphOrderCollect extends NphOrderForm
         foreach ($samples as $sampleId => $sample) {
             $sampleCode = $sample['sampleCode'];
             $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sampleId})";
-            $builder->add($sampleCode . $sampleId, Type\CheckboxType::class, [
+            $builder->add($sampleId, Type\CheckboxType::class, [
                 'label' => $sampleLabel,
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) use ($sampleCode, $orderType, $sampleId) {
                         if ($orderType !== NphOrder::TYPE_STOOL && $value === false && !empty($context->getRoot()
-                            ["{$sampleCode}{$sampleId}CollectedTs"]->getData())) {
+                            ["{$sampleId}CollectedTs"]->getData())) {
                             $context->buildViolation('Collected sample required')->addViolation();
                         }
                     })
