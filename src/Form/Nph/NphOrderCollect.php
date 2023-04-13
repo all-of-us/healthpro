@@ -32,7 +32,6 @@ class NphOrderCollect extends NphOrderForm
                     'data-sample-id' => $sampleId,
                 ],
                 'disabled' => $sample['disabled'],
-                'data' => !empty($sample['collectedTs'])
             ]);
             $this->addCollectedTimeAndNoteFields($builder, $options, $sampleId, $sample['disabled'], 'collect');
             $sampleIndex++;

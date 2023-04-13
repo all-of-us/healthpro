@@ -372,12 +372,12 @@ class NphOrderService
             $sampleCode = $nphSample->getSampleCode();
             $sampleId = $nphSample->getSampleId();
             if ($orderType !== NphOrder::TYPE_STOOL) {
-                $orderCollectionData[$sampleCode . $sampleId . 'CollectedTs'] = $nphSample->getCollectedTs();
+                $orderCollectionData[$sampleId . 'CollectedTs'] = $nphSample->getCollectedTs();
             }
             if ($nphSample->getCollectedTs()) {
-                $orderCollectionData[$sampleCode . $sampleId] = true;
+                $orderCollectionData[$sampleId] = true;
             }
-            $orderCollectionData[$sampleCode . $sampleId . 'Notes'] = $nphSample->getCollectedNotes();
+            $orderCollectionData[$sampleId . 'Notes'] = $nphSample->getCollectedNotes();
             if ($order->getOrderType() === 'urine') {
                 if ($nphSample->getSampleMetaData()) {
                     $sampleMetadata = json_decode($nphSample->getSampleMetaData(), true);
