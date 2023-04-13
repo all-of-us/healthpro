@@ -48,7 +48,6 @@ class NphOrderForm extends AbstractType
     protected function addCollectedTimeAndNoteFields(
         FormBuilderInterface $builder,
         array $options,
-        string $sample,
         string $sampleId,
         bool $disabled = false,
         string $formType = self::FORM_FINALIZE_TYPE
@@ -56,7 +55,7 @@ class NphOrderForm extends AbstractType
         if ($formType === self::FORM_FINALIZE_TYPE || $options['orderType'] !== NphOrder::TYPE_STOOL) {
             $constraints = $this->getDateTimeConstraints();
             if ($formType === self::FORM_COLLECT_TYPE) {
-                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample, $sampleId) {
+                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sampleId) {
                     if (empty($value) && $context->getRoot()[$sampleId]->getData() === true) {
                         $context->buildViolation('Collection time is required')->addViolation();
                     }

@@ -308,7 +308,7 @@ class NphOrderService
         return $nphSample;
     }
 
-    public function isAtLeastOneSampleChecked(array $formData, array $orders): bool
+    public function isAtLeastOneSampleChecked(array $formData, NPHOrderCollection $orders): bool
     {
         foreach ($orders as $order) {
             foreach ($order->getNphSamples() as $nphSample) {
@@ -320,19 +320,19 @@ class NphOrderService
         return false;
     }
 
-    public function saveOrderCollection(array $formData, NPHOrderCollection $orders): array
+    public function saveOrderCollection(array $formData, NPHOrderCollection $orders): ?NPHOrderCollection
     {
         foreach ($orders as $order) {
             try {
+                $key = $orders->key();
                 $orderType = $order->getOrderType();
                 foreach ($order->getNphSamples() as $nphSample) {
-                    $sampleCode = $nphSample->getSampleCode();
-                    if ($formData[$sampleCode . $nphSample->getSampleId()]) {
+                    if ($formData[$nphSample->getSampleId()]) {
                         $nphSample->setCollectedUser($this->user);
                         $nphSample->setCollectedSite($this->site);
-                        $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . $nphSample->getSampleId() . 'CollectedTs'];
+                        $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$nphSample->getSampleId() . 'CollectedTs'];
                         $nphSample->setCollectedTs($collectedTs);
-                        $nphSample->setCollectedNotes($formData[$sampleCode . $nphSample->getSampleId() . 'Notes']);
+                        $nphSample->setCollectedNotes($formData[$nphSample->getSampleId() . 'Notes']);
                         if ($order->getOrderType() === NphOrder::TYPE_URINE) {
                             $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
                         }
@@ -353,11 +353,12 @@ class NphOrderService
                     $this->em->flush();
                     $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
                 }
-                return $order;
+                $orders->offsetSet($key, $order);
             } catch (\Exception $e) {
                 return null;
             }
         }
+        return $orders;
     }
 
     public function getExistingOrderCollectionData(NphOrder $order): array

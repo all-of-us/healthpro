@@ -126,31 +126,27 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
-        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
-        if (empty($order)) {
+        $initialOrder = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($initialOrder)) {
             throw $this->createNotFoundException('Order not found.');
         }
-
-        if ($order->getOrderType() === NphOrder::TYPE_DLW) {
-            $orders = new NPHOrderCollection($this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($order->getParticipantId(), $order->getNphSamples()[0]->getSampleGroup()));
+        if ($initialOrder->getOrderType() === NphOrder::TYPE_DLW) {
+            $orders = new NPHOrderCollection(...$this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($initialOrder->getParticipantId(), $initialOrder->getNphSamples()[0]->getSampleGroup()));
         } else {
-            $orders = new NPHOrderCollection([$order]);
+            $orders = new NPHOrderCollection($initialOrder);
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($initialOrder->getModule(), $initialOrder->getVisitType(), $participantId, $participant->biobankId);
         $sampleLabelsIds = [];
+        $orderCollectionData = [];
         foreach ($orders as $order) {
-            $test = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
-            $sampleLabelsIds += $test;
+            $sampleLabelsIds += $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+            $orderCollectionData += $nphOrderService->getExistingOrderCollectionData($order);
         }
-        if ($order->getOrderType() === NphOrder::TYPE_DLW) {
+        if ($orders[0]->getOrderType() === NphOrder::TYPE_DLW) {
             $dlwForm = $this->createForm(DlwType::class);
             $dlwForm = $dlwForm->createView();
         } else {
             $dlwForm = null;
-        }
-        $orderCollectionData = [];
-        foreach ($orders as $order) {
-            $orderCollectionData += $nphOrderService->getExistingOrderCollectionData($order);
         }
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
