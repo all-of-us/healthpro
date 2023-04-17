@@ -56,7 +56,7 @@ class UserProvider implements UserProviderInterface
                                 $manageGroups[] = $group->getEmail();
                             }
                         }
-                        if (strpos($group->getEmail(), User::SITE_NPH_PREFIX) === 0 || strpos($group->getEmail(), User::READ_ONLY_GROUP) === 0) {
+                        if ((!str_contains($group->getEmail(), User::NPH_ADMIN_GROUP) && strpos($group->getEmail(), User::SITE_NPH_PREFIX) === 0) || strpos($group->getEmail(), User::READ_ONLY_GROUP) === 0) {
                             $role = $this->googleGroups->getRole($googleUser->getEmail(), $group->getEmail());
                             if (in_array($role, ['OWNER', 'MANAGER'])) {
                                 $manageGroupsNPH[] = $group->getEmail();
