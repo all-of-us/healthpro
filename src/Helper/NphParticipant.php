@@ -16,6 +16,7 @@ class NphParticipant
     public $rdrData;
     public $dob;
     public $nphPairedSiteSuffix;
+    public $module;
 
 
     public function __construct(?\stdClass $rdrParticipant = null)
@@ -67,10 +68,18 @@ class NphParticipant
         if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
             $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
         }
+
+        $this->module = $this->getParticipantModule();
     }
 
     private function getSiteSuffix($site)
     {
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
+    }
+
+    private function getParticipantModule(): int
+    {
+        //TODO:: retrieve this from RDR participant api
+        return 1;
     }
 }
