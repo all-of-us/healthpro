@@ -9,7 +9,8 @@
             </button>
             <ul class="nav navbar-nav">
                 <li class="dropdown">
-                    <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
+                        data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
                         <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
                         {% if not showRoleDropdown %}
                             HealthPro
