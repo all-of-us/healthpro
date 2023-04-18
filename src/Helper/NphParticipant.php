@@ -11,12 +11,12 @@ namespace App\Helper;
  */
 class NphParticipant
 {
-    public $id;
-    public $cacheTime;
-    public $rdrData;
-    public $dob;
-    public $nphPairedSiteSuffix;
-    public $module;
+    public ?string $id;
+    public ?\DateTime $cacheTime;
+    public ?\stdClass $rdrData;
+    public ?\DateTime $dob;
+    public ?string $nphPairedSiteSuffix;
+    public int $module;
 
 
     public function __construct(?\stdClass $rdrParticipant = null)
@@ -47,7 +47,7 @@ class NphParticipant
         return true;
     }
 
-    private function parseRdrParticipant(\stdClass $participant)
+    private function parseRdrParticipant(\stdClass $participant): void
     {
         if (!is_object($participant)) {
             return;
@@ -72,7 +72,7 @@ class NphParticipant
         $this->module = $this->getParticipantModule();
     }
 
-    private function getSiteSuffix($site)
+    private function getSiteSuffix(string $site): string
     {
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
     }
