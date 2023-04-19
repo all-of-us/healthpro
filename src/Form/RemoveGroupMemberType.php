@@ -15,6 +15,11 @@ class RemoveGroupMemberType extends AbstractType
         'I attest that this user has left the program <strong class="attest-choice-text">involuntarily.</strong>' => 'no'
     ];
 
+    public const EMAIL_ATTESTATIONS = [
+        'I attest that this user has left the program voluntarily' => 'yes',
+        'I attest that this user has left the program involuntarily' => 'no'
+    ];
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
