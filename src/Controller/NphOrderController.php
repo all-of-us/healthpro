@@ -33,7 +33,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class NphOrderController extends BaseController
 {
-    private $siteService;
+    private SiteService $siteService;
 
     public function __construct(EntityManagerInterface $em, SiteService $siteService)
     {
@@ -246,7 +246,8 @@ class NphOrderController extends BaseController
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
                 $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' =>
                 $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
-                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()
+                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(),
+                'module' => $order->getModule()
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
