@@ -278,7 +278,7 @@ class BiobankController extends BaseController
     {
         $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
         if (!$participant) {
-            throw $this->createNotFoundException(404);
+            throw $this->createNotFoundException('404');
         }
         $participant = $participant[0];
 

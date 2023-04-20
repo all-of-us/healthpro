@@ -306,7 +306,7 @@ class OrderService
                 }
             }
         }
-        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
+        if ($step === Order::ORDER_STEP_FINALIZED && isset($formData['fedexTracking'])) {
             $this->order->setFedexTracking($formData['fedexTracking']);
         }
     }
@@ -402,7 +402,7 @@ class OrderService
                 $formData['processedCentrifugeType'] = $this->order->getProcessedCentrifugeType();
             }
         }
-        if ($step === 'finalized' && ($this->order->getType() === 'kit' || $this->order->getType() === 'diversion')) {
+        if ($step === Order::ORDER_STEP_FINALIZED) {
             $formData['fedexTracking'] = $this->order->getFedexTracking();
         }
         return $formData;
@@ -721,7 +721,7 @@ class OrderService
         $this->order->setProcessedSamples(json_encode(!empty($processedSamples) ? $processedSamples : []));
         $this->order->setProcessedSamplesTs(json_encode(!empty($processedSamplesTs) ? $processedSamplesTs : []));
         $this->order->setFinalizedSamples(json_encode(!empty($finalizedSamples) ? $finalizedSamples : []));
-        $this->order->setQuanumFinalizedSamples(!empty($finalizedSamples) ? join($finalizedSamples, ', ') : '');
+        $this->order->setQuanumFinalizedSamples(!empty($finalizedSamples) ? join(',', $finalizedSamples) : '');
         $this->order->setCollectedNotes($collectedNotes);
         $this->order->setProcessedNotes($processedNotes);
         $this->order->setFinalizedNotes($finalizedNotes);

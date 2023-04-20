@@ -152,7 +152,7 @@ class AccessManagementController extends BaseController
         if (empty($member) || $member->getRole() !== 'MEMBER') {
             throw $this->createNotFoundException();
         }
-        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class);
+        $removeGoupMemberForm = $this->createForm(RemoveGroupMemberType::class, null, ['programDisplayText' => $this->contextTemplate->getCurrentProgramDisplayText()]);
         $removeGoupMemberForm->handleRequest($request);
         if ($removeGoupMemberForm->isSubmitted()) {
             if ($removeGoupMemberForm->isValid()) {
@@ -162,7 +162,7 @@ class AccessManagementController extends BaseController
                     if ($result['status'] === 'success') {
                         if ($removeGoupMemberForm->get('reason')->getData() === 'no') {
                             $currentTime = new \DateTime('now');
-                            $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), RemoveGroupMemberType::ATTESTATIONS);
+                            $attestation = array_search($removeGoupMemberForm->get('attestation')->getData(), RemoveGroupMemberType::EMAIL_ATTESTATIONS);
                             $accessManagementService->sendEmail($group->email, $member->email, $removeGoupMemberForm->get('memberLastDay')->getData(), $currentTime, $attestation);
                         }
                         $this->addFlash('success', $result['message']);
