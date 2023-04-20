@@ -64,7 +64,8 @@
           "maxVolume": 4,
           "warningMinVolume": 100,
           "warningMaxVolume": 4000,
-          "addNew": false
+          "addNew": false,
+          "collectMetadata": false
         },
         "SALIVAA2": {
           "identifier": "SA2-U",
@@ -79,7 +80,20 @@
           "maxVolume": 4,
           "warningMinVolume": 100,
           "warningMaxVolume": 4000,
-          "addNew": false
+          "addNew": false,
+          "collectMetadata": true,
+          "metadataFields": [
+            {
+              "identifier": "glycerolAdditiveVolume",
+              "name": "glycerol additive volume",
+              "type": "number",
+              "label": "Glycerol Volume",
+              "units": "uL",
+              "placeholder": "volume of glycerol added in uL",
+              "entryType": "Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType",
+              "required": true
+            }
+          ]
         }
       }
     },

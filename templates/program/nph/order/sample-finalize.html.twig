@@ -231,6 +231,19 @@
                                                 {% endif %}
                                             </tr>
                                         {% endif %}
+                                        {% if aliquot['collectMetadata'] is defined and aliquot['collectMetadata'] == true %}
+                                            {% for metadataField in aliquot['metadataFields'] %}
+                                                <tr>
+                                                    <td colspan="1">{{ metadataField['label'] }}</td>
+                                                    <td colspan="2">{{ form_widget(sampleFinalizeForm[aliquotCode~metadataField['identifier']]) }}</td>
+                                                </tr>
+                                                {% if metadataField['identifier'] == 'glycerolAdditiveVolume' %}
+                                                    <tr>
+                                                        <td colspan="3">Sample Volume: <em id="tubeVol">0 uL</em> + Glycerol Vol: <em id="glycerolVol">0 uL</em> = Total Volume: <em id="totalVol">0 uL</em></td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                     {% endfor %}
                                     {% if not sample.disabled and (aliquot['addNew'] or sample.unlocked) %}
                                         <tr>
