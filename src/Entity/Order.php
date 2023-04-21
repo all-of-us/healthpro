@@ -281,6 +281,26 @@ class Order
      */
     private $finalizedSite;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $createdTimezone;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $collectedTimezone;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $processedTimezone;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $finalizedTimezone;
+
     private $quanumCollectedUser;
 
     private $quanumProcessedUser;
@@ -673,6 +693,54 @@ class Order
     public function setBiobankChanges(?string $biobankChanges): self
     {
         $this->biobankChanges = $biobankChanges;
+
+        return $this;
+    }
+
+    public function getCreatedTimezone(): ?int
+    {
+        return $this->createdTimezone;
+    }
+
+    public function setCreatedTimezone(?int $createdTimezone): self
+    {
+        $this->createdTimezone = $createdTimezone;
+
+        return $this;
+    }
+
+    public function getCollectedTimezone(): ?int
+    {
+        return $this->collectedTimezone;
+    }
+
+    public function setCollectedTimezone(?int $collectedTimezone): self
+    {
+        $this->collectedTimezone = $collectedTimezone;
+
+        return $this;
+    }
+
+    public function getProcessedTimezone(): ?int
+    {
+        return $this->processedTimezone;
+    }
+
+    public function setProcessedTimezone(?int $processedTimezone): self
+    {
+        $this->processedTimezone = $processedTimezone;
+
+        return $this;
+    }
+
+    public function getFinalizedTimezone(): ?int
+    {
+        return $this->finalizedTimezone;
+    }
+
+    public function setFinalizedTimezone(?int $finalizedTimezone): self
+    {
+        $this->finalizedTimezone = $finalizedTimezone;
 
         return $this;
     }

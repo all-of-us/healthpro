@@ -20,7 +20,7 @@ final class Version20230420195952 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-        $this->addSql('ALTER TABLE orders ADD created_timezone VARCHAR(100) DEFAULT NULL, collected_timezone VARCHAR(100) DEFAULT NULL, processed_timezone VARCHAR(100) DEFAULT NULL, finalized_timezone VARCHAR(100) DEFAULT NULL');
+        $this->addSql('ALTER TABLE orders ADD created_timezone INT DEFAULT NULL, collected_timezone INT DEFAULT NULL, processed_timezone INT DEFAULT NULL, finalized_timezone INT DEFAULT NULL');
 
     }
 
