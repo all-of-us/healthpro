@@ -988,6 +988,9 @@ class NphOrderService
                                 $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
                             }
                         }
+                        if (!empty($formData["${aliquotCode}glycerolAdditiveVolume"])) {
+                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"]]));
+                        }
                         $this->em->persist($nphAliquot);
                         $this->em->flush();
                         $this->loggerService->log(Log::NPH_ALIQUOT_CREATE, $nphAliquot->getId());

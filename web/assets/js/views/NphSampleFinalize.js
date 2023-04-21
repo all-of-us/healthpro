@@ -93,12 +93,10 @@ $(document).ready(function () {
     };
 
     function calculateGlycerolVolume(sampleVolumeField, glycerolVolumeField) {
-        let sampleVolume = parseInt($(sampleVolumeField).val()) * 1000;
+        let sampleVolume = $(sampleVolumeField).val() ? parseInt($(sampleVolumeField).val()) * 1000 : 0;
         let glycerolVolume = $(glycerolVolumeField).val() ? parseInt($(glycerolVolumeField).val()) : 0;
-        let totalVolume = sampleVolume + glycerolVolume;
-        $('#tubeVol').html(`${sampleVolume} uL`);
-        $('#glycerolVol').html(`${glycerolVolume} uL`);
-        $('#totalVol').html(`${totalVolume} uL`);
+        let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
+        $('#totalVol').html(`${totalVolume} mL`);
     }
 
     disableEnableAliquotFields();
