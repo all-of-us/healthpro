@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class NphPDFController extends AbstractController
 {
-    //TODO: Refactor to work off shyams NPHOrderService->getExistingOrdersData
     /**
      * @Route("/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}", name="nph_render_pdf")
      */
