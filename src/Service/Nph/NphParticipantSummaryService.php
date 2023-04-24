@@ -127,7 +127,7 @@ class NphParticipantSummaryService
                             firstName
                             lastName
                             participantNphId
-                            DOB
+                            nphDateOfBirth
                             biobankId
                             nphPairedSite
                         }
@@ -180,7 +180,7 @@ class NphParticipantSummaryService
                             firstName
                             lastName
                             participantNphId
-                            DOB
+                            nphDateOfBirth
                             biobankId
                             nphPairedSite
                         }
@@ -233,7 +233,7 @@ class NphParticipantSummaryService
                                 value
                             }
                             biobankId
-                            DOB
+                            nphDateOfBirth
                             email
                             firstName
                             lastName

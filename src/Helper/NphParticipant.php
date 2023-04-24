@@ -56,9 +56,9 @@ class NphParticipant
             $this->id = $participant->participantNphId;
         }
         // Set dob to DateTime object
-        if (isset($participant->DOB)) {
+        if (isset($participant->nphDateOfBirth)) {
             try {
-                $this->dob = new \DateTime($participant->DOB);
+                $this->dob = new \DateTime($participant->nphDateOfBirth);
             } catch (\Exception $e) {
                 $this->dob = null;
             }

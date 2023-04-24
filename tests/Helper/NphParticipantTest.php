@@ -11,7 +11,7 @@ class NphParticipantTest extends TestCase
     {
         $participant = new NphParticipant((object)[
             'participantNphId' => '10000000000000',
-            'DOB' => '1999-05-20',
+            'nphDateOfBirth' => '1999-05-20',
         ]);
         $this->assertSame('10000000000000', $participant->id);
         $this->assertSame('1999-05-20', $participant->dob->format('Y-m-d'));
