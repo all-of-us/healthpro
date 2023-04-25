@@ -124,4 +124,12 @@ class User
             }
         }
     }
+
+    public function getTimezoneId(): int
+    {
+        if ($this->timezone) {
+            return array_search($this->timezone, self::$timezones);
+        }
+        return 2;
+    }
 }
