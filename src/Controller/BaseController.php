@@ -40,4 +40,12 @@ class BaseController extends AbstractController
     {
         return !empty($params[$key]) ? \DateTime::createFromFormat('!m/d/Y', $params[$key]) : null;
     }
+
+    protected function getUserTimezone(): int
+    {
+        if ($user = $this->getUserEntity()) {
+            return array_search($user->getTimezone(), UserEntity::$timezones);
+        }
+        return 2;
+    }
 }
