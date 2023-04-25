@@ -259,7 +259,7 @@ class OrderService
         if ($step != 'processed') {
             if ($formData["{$step}Ts"]) {
                 $this->order->{'set' . ucfirst($step) . 'Ts'}($formData["{$step}Ts"]);
-                $this->order->{'set' . ucfirst($step) . 'Ts'}($this->userService->getUserEntity()->getTimezoneId());
+                $this->order->{'set' . ucfirst($step) . 'TimezoneId'}($this->userService->getUserEntity()->getTimezoneId());
             } else {
                 $this->order->{'set' . ucfirst($step) . 'Ts'}(null);
             }

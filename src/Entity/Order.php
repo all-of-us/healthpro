@@ -284,22 +284,22 @@ class Order
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $createdTimezone;
+    private $createdTimezoneId;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $collectedTimezone;
+    private $collectedTimezoneId;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $processedTimezone;
+    private $processedTimezoneId;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $finalizedTimezone;
+    private $finalizedTimezoneId;
 
     private $quanumCollectedUser;
 
@@ -697,52 +697,72 @@ class Order
         return $this;
     }
 
-    public function getCreatedTimezone(): ?int
+    public function getCreatedTimezoneId(): ?int
     {
-        return $this->createdTimezone;
+        return $this->createdTimezoneId;
     }
 
-    public function setCreatedTimezone(?int $createdTimezone): self
+    public function setCreatedTimezoneId(?int $createdTimezoneId): self
     {
-        $this->createdTimezone = $createdTimezone;
+        $this->createdTimezoneId = $createdTimezoneId;
 
         return $this;
     }
 
-    public function getCollectedTimezone(): ?int
+    public function getCollectedTimezoneId(): ?int
     {
-        return $this->collectedTimezone;
+        return $this->collectedTimezoneId;
     }
 
-    public function setCollectedTimezone(?int $collectedTimezone): self
+    public function setCollectedTimezoneId(?int $collectedTimezoneId): self
     {
-        $this->collectedTimezone = $collectedTimezone;
+        $this->collectedTimezoneId = $collectedTimezoneId;
 
         return $this;
     }
 
-    public function getProcessedTimezone(): ?int
+    public function getProcessedTimezoneId(): ?int
     {
-        return $this->processedTimezone;
+        return $this->processedTimezoneId;
     }
 
-    public function setProcessedTimezone(?int $processedTimezone): self
+    public function setProcessedTimezoneId(?int $processedTimezoneId): self
     {
-        $this->processedTimezone = $processedTimezone;
+        $this->processedTimezoneId = $processedTimezoneId;
 
         return $this;
     }
 
-    public function getFinalizedTimezone(): ?int
+    public function getFinalizedTimezoneId(): ?int
     {
-        return $this->finalizedTimezone;
+        return $this->finalizedTimezoneId;
     }
 
-    public function setFinalizedTimezone(?int $finalizedTimezone): self
+    public function setFinalizedTimezoneId(?int $finalizedTimezoneId): self
     {
-        $this->finalizedTimezone = $finalizedTimezone;
+        $this->finalizedTimezoneId = $finalizedTimezoneId;
 
         return $this;
+    }
+
+    public function getCreatedTimezone(): ?string
+    {
+        return User::$timezones[$this->createdTimezoneId] ?? null;
+    }
+
+    public function getCollectedTimezone(): ?string
+    {
+        return User::$timezones[$this->collectedTimezoneId] ?? null;
+    }
+
+    public function getProcessedTimezone(): ?string
+    {
+        return User::$timezones[$this->processedTimezoneId] ?? null;
+    }
+
+    public function getFinalizedTimezone(): ?string
+    {
+        return User::$timezones[$this->finalizedTimezoneId] ?? null;
     }
 
     public function getHistory(): ?OrderHistory
