@@ -1,6 +1,6 @@
 $(document).ready(function () {
     let onSiteDetails = $("#on_site_details");
-    let readOnlyView = onSiteDetails.data('read-only-view');
+    let readOnlyView = onSiteDetails.data("read-only-view");
 
     $("#incentive_create form").parsley();
 
