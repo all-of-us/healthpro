@@ -117,13 +117,15 @@
                         </span>
                         </label>
                         <div class="row">
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {% if not sampleFinalizeForm['urineColor'].vars.valid %} has-error{% endif %}">
                                 {{ form_label(sampleFinalizeForm['urineColor']) }}
                                 {{ form_widget(sampleFinalizeForm['urineColor']) }}
+                                {{ form_errors(sampleFinalizeForm['urineColor']) }}
                             </div>
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {% if not sampleFinalizeForm['urineClarity'].vars.valid %} has-error{% endif %}">
                                 {{ form_label(sampleFinalizeForm['urineClarity']) }}
                                 {{ form_widget(sampleFinalizeForm['urineClarity']) }}
+                                {{ form_errors(sampleFinalizeForm['urineClarity']) }}
                             </div>
                         </div>
                         <hr>
@@ -135,13 +137,15 @@
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                         </label>
-                        <div class="form-group">
+                        <div class="form-group {% if not sampleFinalizeForm['bowelType'].vars.valid %} has-error{% endif %}">
                             {{ form_label(sampleFinalizeForm['bowelType']) }}
                             {{ form_widget(sampleFinalizeForm['bowelType']) }}
+                            {{ form_errors(sampleFinalizeForm['bowelType']) }}
                         </div>
-                        <div class="form-group">
+                        <div class="form-group {% if not sampleFinalizeForm['bowelQuality'].vars.valid %} has-error{% endif %}">
                             {{ form_label(sampleFinalizeForm['bowelQuality']) }}
                             {{ form_widget(sampleFinalizeForm['bowelQuality']) }}
+                            {{ form_errors(sampleFinalizeForm['bowelQuality']) }}
                         </div>
                         <span class="text-warning">
                             <i class="fa fa-exclamation-triangle"></i>
