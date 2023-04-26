@@ -90,46 +90,64 @@ class NphOrderForm extends AbstractType
         ]);
     }
 
-    protected function addUrineMetadataFields(FormBuilderInterface $builder, $disabled = false): void
-    {
-        $builder->add('urineColor', Type\ChoiceType::class, [
+    protected function addUrineMetadataFields(
+        FormBuilderInterface $builder,
+        bool $disabled = false,
+        string $formType = self::FORM_FINALIZE_TYPE
+    ): void {
+        $required = $formType === self::FORM_FINALIZE_TYPE;
+        $urineColorOptions = [
             'label' => 'Urine Color',
-            'required' => true,
+            'required' => $required,
             'choices' => NphOrderCollect::$urineColors,
             'multiple' => false,
             'placeholder' => 'Select Urine Color',
             'disabled' => $disabled
-        ]);
-
-        $builder->add('urineClarity', Type\ChoiceType::class, [
+        ];
+        $urineClarityOptions = [
             'label' => 'Urine Clarity',
-            'required' => true,
+            'required' => $required,
             'choices' => NphOrderCollect::$urineClarity,
             'multiple' => false,
             'placeholder' => 'Select Urine Clarity',
             'disabled' => $disabled
-        ]);
+        ];
+        if ($formType === self::FORM_FINALIZE_TYPE) {
+            $urineColorOptions['constraints'] = $this->getNotBlankConstraint();
+            $urineClarityOptions['constraints'] = $this->getNotBlankConstraint();
+        }
+        $builder->add('urineColor', Type\ChoiceType::class, $urineColorOptions);
+        $builder->add('urineClarity', Type\ChoiceType::class, $urineClarityOptions);
     }
 
-    protected function addStoolMetadataFields(FormBuilderInterface $builder, $disabled = false): void
-    {
-        $builder->add('bowelType', Type\ChoiceType::class, [
+    protected function addStoolMetadataFields(
+        FormBuilderInterface $builder,
+        bool $disabled = false,
+        string $formType = self::FORM_FINALIZE_TYPE
+    ): void {
+        $required = $formType === self::FORM_FINALIZE_TYPE;
+        $bowelTypeOptions = [
             'label' => 'Describe the bowel movement for this collection',
-            'required' => true,
+            'required' => $required,
             'choices' => self::$bowelMovements,
             'multiple' => false,
             'placeholder' => 'Select bowel movement type',
             'disabled' => $disabled
-        ]);
-
-        $builder->add('bowelQuality', Type\ChoiceType::class, [
+        ];
+        $bowelQualityOptions = [
             'label' => 'Describe the typical quality of your bowel movements',
-            'required' => true,
+            'required' => $required,
             'choices' => self::$bowelMovementQuality,
             'multiple' => false,
             'placeholder' => 'Select bowel movement quality',
             'disabled' => $disabled
-        ]);
+        ];
+        if ($formType === self::FORM_FINALIZE_TYPE) {
+            $bowelTypeOptions['constraints'] = $this->getNotBlankConstraint();
+            $bowelQualityOptions['constraints'] = $this->getNotBlankConstraint();
+        }
+        $builder->add('bowelType', Type\ChoiceType::class, $bowelTypeOptions);
+        $builder->add('bowelQuality', Type\ChoiceType::class, $bowelQualityOptions);
     }
 
     protected function getDateTimeConstraints(): array
@@ -148,6 +166,13 @@ class NphOrderForm extends AbstractType
         return new Constraints\GreaterThan([
             'value' => $dateTime,
             'message' => 'Time must be after order generation'
+        ]);
+    }
+
+    private function getNotBlankConstraint(): Constraints\NotBlank
+    {
+        return new Constraints\NotBlank([
+            'message' => 'Please select an option'
         ]);
     }
 }
