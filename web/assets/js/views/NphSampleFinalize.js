@@ -88,4 +88,10 @@ $(document).ready(function () {
     disableEnableAliquotFields();
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
+
+    $(document).ready(function () {
+        $("body").bind("cut copy paste", function (e) {
+            e.preventDefault();
+        });
+    });
 });

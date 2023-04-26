@@ -51,4 +51,10 @@ $(document).ready(function () {
             sampleScanErrorSel.hide();
         }
     });
+
+    $(document).ready(function () {
+        $("body").bind("cut copy paste", function (e) {
+            e.preventDefault();
+        });
+    });
 });

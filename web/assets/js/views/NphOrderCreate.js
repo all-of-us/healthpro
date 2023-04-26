@@ -138,4 +138,10 @@ $(document).ready(function () {
             $(this).parent().find(".timepointCheckAll").prop("checked", timePointsChecked);
         });
     });
+
+    $(document).ready(function () {
+        $("#Actual").bind("cut copy paste", function (e) {
+            e.preventDefault();
+        });
+    });
 });
