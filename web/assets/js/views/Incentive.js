@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    let onSiteDetails = $("#on_site_details");
+    let readOnlyView = onSiteDetails.data('read-only-view');
+
     $("#incentive_create form").parsley();
 
     var setIncentiveDateGiven = function () {
@@ -61,7 +64,9 @@ $(document).ready(function () {
                 $(otherIncentiveAmountSelector).val("");
                 $(otherIncentiveAmountSelector).removeAttr("required");
             } else {
-                $(incentiveAmountSelector).removeAttr("disabled");
+                if (!readOnlyView) {
+                    $(incentiveAmountSelector).removeAttr("disabled");
+                }
                 $(incentiveAmountSelector).attr("required", "required");
             }
         }
@@ -133,29 +138,31 @@ $(document).ready(function () {
         });
     });
 
-    /* Gift card search */
-    var getGiftCards = new Bloodhound({
-        name: "giftCardType",
-        datumTokenizer: Bloodhound.tokenizers.whitespace,
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        limit: 10,
-        prefetch: "/ajax/search/giftcard-prefill",
-        remote: {
-            url: "/ajax/search/giftcard/%QUERY",
-            wildcard: "%QUERY"
-        }
-    });
-
-    var handleGiftCardAutoPopulate = function (idPrefix = "#incentive_create") {
-        $(idPrefix + " .gift-card").typeahead(
-            {
-                highlight: true
-            },
-            {
-                source: getGiftCards
+    if (!readOnlyView) {
+        /* Gift card search */
+        var getGiftCards = new Bloodhound({
+            name: "giftCardType",
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: 10,
+            prefetch: "/ajax/search/giftcard-prefill",
+            remote: {
+                url: "/ajax/search/giftcard/%QUERY",
+                wildcard: "%QUERY"
             }
-        );
-    };
+        });
+
+        var handleGiftCardAutoPopulate = function (idPrefix = "#incentive_create") {
+            $(idPrefix + " .gift-card").typeahead(
+                {
+                    highlight: true
+                },
+                {
+                    source: getGiftCards
+                }
+            );
+        };
+    }
 
     var incentiveEditModal = "#incentive_edit_form_modal";
 
@@ -170,7 +177,10 @@ $(document).ready(function () {
     });
 
     setIncentiveDateGiven();
-    handleGiftCardAutoPopulate();
+
+    if (!readOnlyView) {
+        handleGiftCardAutoPopulate();
+    }
 
     if (hasIncentives) {
         $("#incentives-data-box").show();
