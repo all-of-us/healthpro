@@ -8,7 +8,8 @@
 
 {% macro displayDateAndTimezone(order, dateType) %}
     {% if order[dateType~'_ts'] %}
-        {% set timezone = attribute(order, dateType~'Timezone') ?? app.user.timezone  %}
+        {% set timezoneId = attribute(order, dateType~'_timezone_id') %}
+        {% set timezone = timezoneId ? userTimezones[timezoneId] : app.user.timezone  %}
         {{ order[dateType~'_ts']|date('n/j/Y g:ia T', timezone) }}
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
