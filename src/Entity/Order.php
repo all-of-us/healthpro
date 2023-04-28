@@ -1434,7 +1434,7 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType)
+    public function checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType, $timezoneId)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->getCollectedSamples()) ? json_decode($this->getCollectedSamples(), true) : [];
@@ -1461,6 +1461,7 @@ class Order
         // Do not set processed time for saliva orders
         if ($this->type !== 'saliva' && empty($processedSamplesTs)) {
             $this->setProcessedTs($createdTs);
+            $this->setProcessedTimezoneId($timezoneId);
             $this->setProcessedUser(null);
             $biobankChanges['processed'] = [
                 'time' => $createdTs->getTimestamp(),
@@ -1495,6 +1496,7 @@ class Order
             $biobankChanges['processed']['centrifuge_type'] = $centrifugeType;
         }
         $this->setFinalizedTs($finalizedTs);
+        $this->setFinalizedTimezoneId($timezoneId);
         $this->setFinalizedSite($this->getSite());
         $this->setFinalizedUser(null);
         $this->setFinalizedNotes($finalizedNotes);
