@@ -11,12 +11,12 @@ namespace App\Helper;
  */
 class NphParticipant
 {
-    public ?string $id;
-    public ?\DateTime $cacheTime;
-    public ?\stdClass $rdrData;
-    public ?\DateTime $dob;
-    public ?string $nphPairedSiteSuffix;
-    public int $module;
+    public $id;
+    public $cacheTime;
+    public $rdrData;
+    public $dob;
+    public $nphPairedSiteSuffix;
+    public $module;
 
 
     public function __construct(?\stdClass $rdrParticipant = null)

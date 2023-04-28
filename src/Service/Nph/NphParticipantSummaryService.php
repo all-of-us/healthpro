@@ -149,7 +149,7 @@ class NphParticipantSummaryService
                 if ($field === 'dob') {
                     try {
                         $date = new \DateTime($params['dob']);
-                        $field = 'dateOfBirth';
+                        $field = 'nphDateOfBirth';
                         $value = $date->format('Y-m-d');
                     } catch (\Exception $e) {
                         throw new InvalidDobException();
