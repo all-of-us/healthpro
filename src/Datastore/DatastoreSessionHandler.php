@@ -39,13 +39,13 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function gc($maxlifetime): bool
+    public function gc($maxlifetime): int|false
     {
         $modified = new DateTime("-{$maxlifetime} seconds");
         $session = new Session();
         $results = $session->getBatch('modified', $modified, '<');
         $session->deleteBatch($results);
-        return true;
+        return 1;
     }
 
     public function doRead($id): string
