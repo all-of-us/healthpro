@@ -48,6 +48,11 @@ class OrderHistory
      */
     private $createdTs;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $createdTimezoneId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,6 +126,18 @@ class OrderHistory
     public function setCreatedTs(\DateTimeInterface $createdTs): self
     {
         $this->createdTs = $createdTs;
+
+        return $this;
+    }
+
+    public function getCreatedTimezoneId(): ?int
+    {
+        return $this->createdTimezoneId;
+    }
+
+    public function setCreatedTimezoneId(?int $createdTimezoneId): self
+    {
+        $this->createdTimezoneId = $createdTimezoneId;
 
         return $this;
     }
