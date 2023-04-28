@@ -468,7 +468,7 @@ class NphSample
     public function getModifyReasonDisplayText(): string
     {
         $reasonDisplayText = array_search($this->getModifyReason(), self::$cancelReasons);
-        return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
+        return !empty($reasonDisplayText) ? $reasonDisplayText : "Other; {$this->getModifyReason()}";
     }
 
     public function canUnlock(): bool
