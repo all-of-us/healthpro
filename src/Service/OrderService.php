@@ -555,6 +555,7 @@ class OrderService
             $orderHistory->setSite($this->siteService->getSiteId());
             $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
             $orderHistory->setCreatedTs(new DateTime());
+            $orderHistory->setCreatedTimezoneId($this->userService->getUserEntity()->getTimezoneId());
             $this->em->persist($orderHistory);
             $this->em->flush();
             $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);

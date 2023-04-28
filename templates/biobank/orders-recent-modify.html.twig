@@ -73,7 +73,7 @@
                     {{ macros.displaySite(order.finalized_site_name, order.finalized_site) }}
                 </td>
                 <td data-order="{{ order.oh_created_ts }}">
-                    {{ macros.displayDate(order, 'oh_created_ts') }}
+                    {{ macros.displayDateAndTimezone(order, 'oh_created') }}
                 </td>
                 <td align="center">
                     {% if order.oh_type == 'edit' %}

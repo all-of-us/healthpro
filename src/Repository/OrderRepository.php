@@ -218,6 +218,7 @@ class OrderRepository extends ServiceEntityRepository
                    oh.site AS oh_site,
                    oh.type AS oh_type,
                    oh.created_ts AS oh_created_ts,
+                   oh.created_timezone_id AS oh_created_timezone_id,
                    s.name as created_site_name,
                    sc.name as collected_site_name,
                    sp.name as processed_site_name,
