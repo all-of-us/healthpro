@@ -1,4 +1,22 @@
 {% set readOnlyView = readOnlyView|default(false) %}
+{% set isBiobankView = biobankView is defined %}
+{% macro displayDateTime(order, dateType, isBiobankView) %}
+    {% if attribute(order, dateType~'Ts') %}
+        {% set timeFormat = 'n/j/Y g:ia' %}
+        {% set timezone = app.user.timezone %}
+        {% if isBiobankView %}
+            {% set timeFormat =  'n/j/Y g:ia T' %}
+            {% set timezoneId = attribute(order, dateType~'TimezoneId') %}
+            {% if timezoneId %}
+                {% set timezone = userTimezones[timezoneId] %}
+            {% endif %}
+        {% endif %}
+        {{ attribute(order, dateType~'Ts')|date(timeFormat, timezone) }}
+    {% else %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+    {% endif %}
+{% endmacro %}
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
@@ -25,24 +43,24 @@
                     <small class="text-muted">
                         {% set historyType = order.history.type is defined ? order.history.type : '' %}
                         {% if historyType == 'cancel' %}
-                            <span class="label label-danger">Cancelled</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            <span class="label label-danger">Cancelled</span> {{ _self.displayDateTime(order.history, 'created', isBiobankView) }}
                         {% elseif not order.finalizedTs and not order.version %}
                             <span class="label label-danger">Expired</span>
                         {% elseif historyType == 'unlock' %}
-                            <span class="label label-primary">Unlocked for editing</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            <span class="label label-primary">Unlocked for editing</span> {{ _self.displayDateTime(order.history, 'created', isBiobankView) }}
                         {% elseif historyType == 'edit' %}
-                            <span class="label label-success">Edited &amp; Finalized</span> {{ order.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            <span class="label label-success">Edited &amp; Finalized</span> {{ _self.displayDateTime(order.history, 'created', isBiobankView) }}
                         {% elseif order.finalizedTs and order.rdrId %}
                             {% if order.biobankFinalized %}
                                 <span class="label label-warning">Biobank Finalized</span>
                             {% else %}
                                 <span class="label label-success">Finalized</span>
                             {% endif %}
-                            {{ order.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            {{ _self.displayDateTime(order, 'finalized', isBiobankView) }}
                         {% elseif order.processedTs %}
-                            <span class="label label-info">Processed</span> {{ order.processedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            <span class="label label-info">Processed</span> {{ _self.displayDateTime(order, 'processed', isBiobankView) }}
                         {% elseif order.collectedTs %}
-                            <span class="label label-default">Collected</span> {{ order.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            <span class="label label-default">Collected</span> {{ _self.displayDateTime(order, 'collected', isBiobankView) }}
                         {% endif %}
                     </small>
                     {% if order.collectedTs %} <br/> {% endif %}
