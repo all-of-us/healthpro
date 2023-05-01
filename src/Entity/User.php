@@ -128,7 +128,8 @@ class User
     public function getTimezoneId(): int
     {
         if ($this->timezone) {
-            return array_search($this->timezone, self::$timezones);
+            $timezoneId = array_search($this->timezone, self::$timezones);
+            return ($timezoneId !== false) ? $timezoneId : 2;
         }
         return 2;
     }
