@@ -151,6 +151,7 @@ class OrderController extends BaseController
                 $order->setParticipantId($participant->id);
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
+                $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
                 $order->setVersion($order->getCurrentVersion());
                 if ($session->get('orderType') === 'hpo') {
                     $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
@@ -365,6 +366,7 @@ class OrderController extends BaseController
                         $order->setProcessedTs($processedTs);
                     }
                 }
+                $order->setProcessedTimezoneId($this->getUserEntity()->getTimezoneId());
                 if (!$order->isUnlocked()) {
                     $order->setProcessedUser($this->getUserEntity());
                     $order->setProcessedSite($this->siteService->getSiteId());

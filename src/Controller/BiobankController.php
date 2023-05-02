@@ -201,6 +201,7 @@ class BiobankController extends BaseController
                         if (empty($collectedTs)) {
                             $createdTs = $order->getCreatedTs();
                             $order->setCollectedTs($createdTs);
+                            $order->setCollectedTimezoneId($this->getUserEntity()->getTimezoneId());
                         }
                         $order->setFinalizedSamples(json_encode($samples));
 
@@ -213,7 +214,8 @@ class BiobankController extends BaseController
                                 $finalizedTs,
                                 $samples,
                                 $finalizeForm['finalizedNotes']->getData(),
-                                $centrifugeType
+                                $centrifugeType,
+                                $this->getUserEntity()->getTimezoneId()
                             );
                             // Save mayo id
                             $order->setMayoId($result['mayoId']);

@@ -259,6 +259,7 @@ class OrderService
         if ($step != 'processed') {
             if ($formData["{$step}Ts"]) {
                 $this->order->{'set' . ucfirst($step) . 'Ts'}($formData["{$step}Ts"]);
+                $this->order->{'set' . ucfirst($step) . 'TimezoneId'}($this->userService->getUserEntity()->getTimezoneId());
             } else {
                 $this->order->{'set' . ucfirst($step) . 'Ts'}(null);
             }
@@ -554,6 +555,7 @@ class OrderService
             $orderHistory->setSite($this->siteService->getSiteId());
             $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
             $orderHistory->setCreatedTs(new DateTime());
+            $orderHistory->setCreatedTimezoneId($this->userService->getUserEntity()->getTimezoneId());
             $this->em->persist($orderHistory);
             $this->em->flush();
             $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);
