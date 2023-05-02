@@ -11,12 +11,12 @@ namespace App\Helper;
  */
 class NphParticipant
 {
-    public ?string $id;
-    public ?\DateTime $cacheTime;
-    public ?\stdClass $rdrData;
-    public ?\DateTime $dob;
-    public ?string $nphPairedSiteSuffix;
-    public int $module;
+    public $id;
+    public $cacheTime;
+    public $rdrData;
+    public $dob;
+    public $nphPairedSiteSuffix;
+    public $module;
 
 
     public function __construct(?\stdClass $rdrParticipant = null)
@@ -57,9 +57,9 @@ class NphParticipant
             $this->id = $participant->participantNphId;
         }
         // Set dob to DateTime object
-        if (isset($participant->DOB)) {
+        if (isset($participant->nphDateOfBirth)) {
             try {
-                $this->dob = new \DateTime($participant->DOB);
+                $this->dob = new \DateTime($participant->nphDateOfBirth);
             } catch (\Exception $e) {
                 $this->dob = null;
             }
