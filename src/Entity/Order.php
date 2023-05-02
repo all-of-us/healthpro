@@ -301,6 +301,11 @@ class Order
      */
     private $finalizedTimezoneId;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $submissionTs;
+
     private $quanumCollectedUser;
 
     private $quanumProcessedUser;
@@ -763,6 +768,18 @@ class Order
     public function getFinalizedTimezone(): ?string
     {
         return User::$timezones[$this->finalizedTimezoneId] ?? null;
+    }
+
+    public function getSubmissionTs(): ?DateTimeInterface
+    {
+        return $this->submissionTs;
+    }
+
+    public function setSubmissionTs(?DateTimeInterface $submissionTs): self
+    {
+        $this->submissionTs = $submissionTs;
+
+        return $this;
     }
 
     public function getHistory(): ?OrderHistory
