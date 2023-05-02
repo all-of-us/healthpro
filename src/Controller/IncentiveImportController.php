@@ -104,7 +104,7 @@ class IncentiveImportController extends BaseController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = $request->request->all();
-            $incentiveImportRows = $incentiveImport->getIncentiveImportRows()->slice($params['start'], $params['length']);
+            $incentiveImportRows = $incentiveImport->getIncentiveImportRows()->slice((int) $params['start'], (int) $params['length']);
             $ajaxData = [];
             $ajaxData['data'] = $incentiveImportService->getAjaxData($incentiveImport, $incentiveImportRows);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($incentiveImport->getIncentiveImportRows());
