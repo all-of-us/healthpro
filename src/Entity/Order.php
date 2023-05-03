@@ -1513,6 +1513,7 @@ class Order
             $biobankChanges['processed']['centrifuge_type'] = $centrifugeType;
         }
         $this->setFinalizedTs($finalizedTs);
+        $this->setSubmissionTs($finalizedTs);
         $this->setFinalizedTimezoneId($timezoneId);
         $this->setFinalizedSite($this->getSite());
         $this->setFinalizedUser(null);
