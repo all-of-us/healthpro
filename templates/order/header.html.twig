@@ -94,7 +94,8 @@
                 {% if order.biobankFinalized and attribute(order, activeStep~'User') is empty %}
                     <a class="btn btn-success btn-xs pull-right" href="{{ path(routePrefix ~ 'biobank_summary', { participantId: participant.id, orderId: order.id }) }}" target="_blank">Summary</a>
                 {% endif %}
-                {% if order.submissionTs %}
+                {# TODO: Replace with class constants #}
+                {% if activeStep == 'finalized' and order.submissionTs %}
                     <h4 class="pull-right submission-label">
                         <span class="label label-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
                     </h4>
