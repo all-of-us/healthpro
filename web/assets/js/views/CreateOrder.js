@@ -52,4 +52,10 @@
             $("input:not(:checked)").closest("tr").addClass("custom-text-muted");
         }
     });
+
+    $(document).ready(function () {
+        $("input[name='kitId']").bind("cut copy paste", function (e) {
+            e.preventDefault();
+        });
+    });
 })(jQuery); // END wrapper
