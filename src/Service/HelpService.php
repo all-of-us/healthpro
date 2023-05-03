@@ -98,42 +98,42 @@ class HelpService
                 'SOP-002' => [
                     'title' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order',
                     'filename' => 'SOP-002 DV Registering a PMI Kit and Creating a PMI Biobank Order.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-004' => [
                     'title' => 'SOP-004 DV Blood Specimens Collection and Processing',
                     'filename' => 'SOP-004 DV Blood Specimens Collection and Processing.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-006' => [
                     'title' => 'SOP-006 DV Urine Specimen Collection',
                     'filename' => 'SOP-006 DV Urine Specimen Collection.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-011' => [
                     'title' => 'SOP-011 DV Packaging and Shipping PMI Specimens',
                     'filename' => 'SOP-011 DV Packaging and Shipping PMI Specimens.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-019' => [
                     'title' => 'SOP-019 DV Specimen Rejection Criteria',
                     'filename' => 'SOP-019 DV Specimen Rejection Criteria.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-021' => [
                     'title' => 'SOP-021 DV Biobank Order Downtime Procedure',
                     'filename' => 'SOP-021 DV Biobank Order Downtime Procedure.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-023' => [
                     'title' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders',
                     'filename' => 'SOP-023 DV Cancelling, Editing, & Restoring Biobank Orders .pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ],
                 'SOP-025' => [
                     'title' => 'SOP-025 DV Biobank Order Review',
                     'filename' => 'SOP-025 DV Biobank Order Review.pdf',
-                    'languages' => ['en']
+                    'languages' => ['es', 'en']
                 ]
             ]
         ],

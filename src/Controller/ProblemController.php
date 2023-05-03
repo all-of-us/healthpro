@@ -87,8 +87,14 @@ class ProblemController extends BaseController
      * @Route("/participant/{participantId}/problem", name="problem_form_new")
      * @Route("/participant/{participantId}/problem/{problemId}", name="problem_form")
      */
-    public function problemForm($participantId, $problemId = null, Request $request, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
-    {
+    public function problemForm(
+        string $participantId,
+        Request $request,
+        ParticipantSummaryService $participantSummaryService,
+        ProblemRepository $problemRepository,
+        ProblemCommentRepository $problemCommentRepository,
+        ?string $problemId = null
+    ): Response {
         $formDisabled = false;
         $enableConstraints = false;
 

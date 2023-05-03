@@ -281,6 +281,26 @@ class Order
      */
     private $finalizedSite;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $createdTimezoneId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $collectedTimezoneId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $processedTimezoneId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $finalizedTimezoneId;
+
     private $quanumCollectedUser;
 
     private $quanumProcessedUser;
@@ -675,6 +695,74 @@ class Order
         $this->biobankChanges = $biobankChanges;
 
         return $this;
+    }
+
+    public function getCreatedTimezoneId(): ?int
+    {
+        return $this->createdTimezoneId;
+    }
+
+    public function setCreatedTimezoneId(?int $createdTimezoneId): self
+    {
+        $this->createdTimezoneId = $createdTimezoneId;
+
+        return $this;
+    }
+
+    public function getCollectedTimezoneId(): ?int
+    {
+        return $this->collectedTimezoneId;
+    }
+
+    public function setCollectedTimezoneId(?int $collectedTimezoneId): self
+    {
+        $this->collectedTimezoneId = $collectedTimezoneId;
+
+        return $this;
+    }
+
+    public function getProcessedTimezoneId(): ?int
+    {
+        return $this->processedTimezoneId;
+    }
+
+    public function setProcessedTimezoneId(?int $processedTimezoneId): self
+    {
+        $this->processedTimezoneId = $processedTimezoneId;
+
+        return $this;
+    }
+
+    public function getFinalizedTimezoneId(): ?int
+    {
+        return $this->finalizedTimezoneId;
+    }
+
+    public function setFinalizedTimezoneId(?int $finalizedTimezoneId): self
+    {
+        $this->finalizedTimezoneId = $finalizedTimezoneId;
+
+        return $this;
+    }
+
+    public function getCreatedTimezone(): ?string
+    {
+        return User::$timezones[$this->createdTimezoneId] ?? null;
+    }
+
+    public function getCollectedTimezone(): ?string
+    {
+        return User::$timezones[$this->collectedTimezoneId] ?? null;
+    }
+
+    public function getProcessedTimezone(): ?string
+    {
+        return User::$timezones[$this->processedTimezoneId] ?? null;
+    }
+
+    public function getFinalizedTimezone(): ?string
+    {
+        return User::$timezones[$this->finalizedTimezoneId] ?? null;
     }
 
     public function getHistory(): ?OrderHistory
@@ -1346,7 +1434,7 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType)
+    public function checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType, $timezoneId)
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->getCollectedSamples()) ? json_decode($this->getCollectedSamples(), true) : [];
@@ -1373,6 +1461,7 @@ class Order
         // Do not set processed time for saliva orders
         if ($this->type !== 'saliva' && empty($processedSamplesTs)) {
             $this->setProcessedTs($createdTs);
+            $this->setProcessedTimezoneId($timezoneId);
             $this->setProcessedUser(null);
             $biobankChanges['processed'] = [
                 'time' => $createdTs->getTimestamp(),
@@ -1407,6 +1496,7 @@ class Order
             $biobankChanges['processed']['centrifuge_type'] = $centrifugeType;
         }
         $this->setFinalizedTs($finalizedTs);
+        $this->setFinalizedTimezoneId($timezoneId);
         $this->setFinalizedSite($this->getSite());
         $this->setFinalizedUser(null);
         $this->setFinalizedNotes($finalizedNotes);

@@ -25,6 +25,17 @@ class User
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
+    public static array $timezones = [
+        1 => 'America/Puerto_Rico',
+        2 => 'America/New_York',
+        3 => 'America/Chicago',
+        4 => 'America/Denver',
+        5 => 'America/Phoenix',
+        6 => 'America/Los_Angeles',
+        7 => 'America/Anchorage',
+        8 => 'Pacific/Honolulu'
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -112,5 +123,14 @@ class User
                 unset($roles[$key]);
             }
         }
+    }
+
+    public function getTimezoneId(): int
+    {
+        if ($this->timezone) {
+            $timezoneId = array_search($this->timezone, self::$timezones);
+            return ($timezoneId !== false) ? $timezoneId : 2;
+        }
+        return 2;
     }
 }

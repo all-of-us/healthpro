@@ -16,6 +16,7 @@ class NphParticipant
     public $rdrData;
     public $dob;
     public $nphPairedSiteSuffix;
+    public $module;
 
 
     public function __construct(?\stdClass $rdrParticipant = null)
@@ -46,7 +47,7 @@ class NphParticipant
         return true;
     }
 
-    private function parseRdrParticipant(\stdClass $participant)
+    private function parseRdrParticipant(\stdClass $participant): void
     {
         if (!is_object($participant)) {
             return;
@@ -56,9 +57,9 @@ class NphParticipant
             $this->id = $participant->participantNphId;
         }
         // Set dob to DateTime object
-        if (isset($participant->DOB)) {
+        if (isset($participant->nphDateOfBirth)) {
             try {
-                $this->dob = new \DateTime($participant->DOB);
+                $this->dob = new \DateTime($participant->nphDateOfBirth);
             } catch (\Exception $e) {
                 $this->dob = null;
             }
@@ -67,10 +68,18 @@ class NphParticipant
         if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
             $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
         }
+
+        $this->module = $this->getParticipantModule();
     }
 
-    private function getSiteSuffix($site)
+    private function getSiteSuffix(string $site): string
     {
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
+    }
+
+    private function getParticipantModule(): int
+    {
+        //TODO:: retrieve this from RDR participant api
+        return 1;
     }
 }
