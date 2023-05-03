@@ -12,12 +12,6 @@
                     <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
                         data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
                         <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
-                        {% if not showRoleDropdown %}
-                            HealthPro
-                            {% if isTraining %}
-                                <div class="navbar-brand-subtitle">training</div>
-                            {% endif %}
-                        {% endif %}
                     </a>
                     {% if siteInfo.canSwitchProgram %}
                         <ul class="dropdown-menu dropdown-menu-role navbar-program">
@@ -30,6 +24,16 @@
                         </ul>
                     {% endif %}
                 </li>
+                {% if not showRoleDropdown %}
+                    <li>
+                        <a class="navbar-brand " href="{{ path('home') }}">
+                            HealthPro
+                            {% if isTraining %}
+                                <div class="navbar-brand-subtitle">training</div>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
             {% if showRoleDropdown %}
                 <ul class="nav navbar-nav">
