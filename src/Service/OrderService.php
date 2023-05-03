@@ -307,8 +307,11 @@ class OrderService
                 }
             }
         }
-        if ($step === Order::ORDER_STEP_FINALIZED && isset($formData['fedexTracking'])) {
-            $this->order->setFedexTracking($formData['fedexTracking']);
+        if ($step === Order::ORDER_STEP_FINALIZED) {
+            $this->order->setSubmissionTs(new \DateTime());
+            if (isset($formData['fedexTracking'])) {
+                $this->order->setFedexTracking($formData['fedexTracking']);
+            }
         }
     }
 

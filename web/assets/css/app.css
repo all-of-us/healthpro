@@ -648,6 +648,9 @@ table.table-samples td {
 .custom-text-muted {
     color: #dadada;
 }
+.submission-label {
+    margin-right: 10px;
+}
 
 /* Help */
 .help-footer {
