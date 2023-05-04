@@ -54,7 +54,7 @@
     });
 
     $(document).ready(function () {
-        $("input[name='kitId']").bind("cut copy paste", function (e) {
+        $("[id^=order_create_kitId]").bind("cut copy paste", function (e) {
             e.preventDefault();
         });
     });
