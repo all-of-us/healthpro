@@ -29,11 +29,14 @@ class NphOrderLookupController extends AbstractController
         SiteService $siteService,
         NphParticipantSummaryService $participantSummary
     ): Response {
-        $idForm = $this->createForm(OrderLookupIdType::class, null);
+        $idForm = $this->createForm(OrderLookupIdType::class, null, ['lookupType' => OrderLookupIdType::NPH_LOOKUP_TYPE]);
         $idForm->handleRequest($request);
 
         if ($idForm->isSubmitted() && $idForm->isValid()) {
             $id = $idForm->get('orderId')->getData();
+            if ($idForm->get('checkKitId')->getData()) {
+                $id = OrderLookupIdType::KIT_ID_PREFIX . $id;
+            }
 
             $order = $this->em->getRepository(NphOrder::class)->findOneBy([
                 'orderId' => $id

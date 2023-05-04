@@ -8,7 +8,14 @@
         <div class="col-sm-6 col-md-5">
             <h3><i class="fa fa-barcode" aria-hidden="true"></i> Find by ID</h3>
             {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
-            {{ form_widget(idForm) }}
+            <div class="form-group {% if not idForm.orderId.vars.valid %} has-error{% endif %}">
+                <div class="pull-right">
+                    {{ form_widget(idForm.checkKitId) }}
+                </div>
+                {{ form_label(idForm.orderId) }}
+                {{ form_widget(idForm.orderId) }}
+                {{ form_errors(idForm.orderId) }}
+            </div>
             <p>
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
