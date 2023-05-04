@@ -127,7 +127,7 @@ class NphParticipantSummaryService
                             firstName
                             lastName
                             participantNphId
-                            DOB
+                            nphDateOfBirth
                             biobankId
                             nphPairedSite
                         }
@@ -149,7 +149,7 @@ class NphParticipantSummaryService
                 if ($field === 'dob') {
                     try {
                         $date = new \DateTime($params['dob']);
-                        $field = 'dateOfBirth';
+                        $field = 'nphDateOfBirth';
                         $value = $date->format('Y-m-d');
                     } catch (\Exception $e) {
                         throw new InvalidDobException();
@@ -180,7 +180,7 @@ class NphParticipantSummaryService
                             firstName
                             lastName
                             participantNphId
-                            DOB
+                            nphDateOfBirth
                             biobankId
                             nphPairedSite
                         }
@@ -233,7 +233,7 @@ class NphParticipantSummaryService
                                 value
                             }
                             biobankId
-                            DOB
+                            nphDateOfBirth
                             email
                             firstName
                             lastName
