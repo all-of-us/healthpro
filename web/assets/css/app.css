@@ -94,6 +94,9 @@ label.label-normal {
     margin-top: -17px;
     text-align: right;
 }
+.single-subtitle {
+    margin-top: -6px;
+}
 .navbar-brand img {
     margin-top: -10px;
     margin-right: 5px;

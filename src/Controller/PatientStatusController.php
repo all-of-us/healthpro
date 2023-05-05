@@ -138,7 +138,7 @@ class PatientStatusController extends BaseController
         //For ajax requests
         if ($request->isXmlHttpRequest()) {
             $params = $request->request->all();
-            $patientStatusImportRows = $patientStatusImport->getPatientStatusImportRows()->slice($params['start'], $params['length']);
+            $patientStatusImportRows = $patientStatusImport->getPatientStatusImportRows()->slice((int) $params['start'], (int) $params['length']);
             $ajaxData = [];
             $ajaxData['data'] = $patientStatusImportService->getAjaxData($patientStatusImport, $patientStatusImportRows);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = count($patientStatusImport->getPatientStatusImportRows());
