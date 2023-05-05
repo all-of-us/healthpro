@@ -117,7 +117,7 @@ class NphParticipantSummaryService
 
     private function getParticipantByIdQuery(string $participantId): string
     {
-        return " 
+        return "
             query {
                 participant (nphId: \"{$participantId}\") {
                     totalCount
@@ -130,6 +130,10 @@ class NphParticipantSummaryService
                             nphDateOfBirth
                             biobankId
                             nphPairedSite
+                            nphModule1ConsentStatus {
+                                time
+                                value
+                            }
                         }
                     }
                 }
@@ -170,7 +174,7 @@ class NphParticipantSummaryService
             }
         }
         $searchParams = implode(',', $searchParams);
-        return " 
+        return "
             query {
                 participant ({$searchParams}) {
                     totalCount
@@ -192,7 +196,7 @@ class NphParticipantSummaryService
 
     private function getAllParticipantsByIdQuery(string $participantId): string
     {
-        return " 
+        return "
             query {
                 participant (nphId: \"{$participantId}\") {
                     totalCount
