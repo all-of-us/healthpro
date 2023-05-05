@@ -9,7 +9,7 @@
             <h3><i class="fa fa-barcode" aria-hidden="true"></i> Find by ID</h3>
             {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             <div class="form-group {% if not idForm.orderId.vars.valid %} has-error{% endif %}">
-                <div class="pull-right">
+                <div class="pull-right text-primary">
                     {{ form_widget(idForm.checkKitId) }}
                 </div>
                 {{ form_label(idForm.orderId) }}
