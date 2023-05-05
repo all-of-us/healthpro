@@ -3,6 +3,13 @@
         <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong {% if attribute(order, 'biobankFinalized') and attribute(order, type~'User') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'User') is not empty ? attribute(order, type~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, type~'Site')) }}</strong>
+            {# TODO: Replace with class constants #}
+            {% if type == 'finalized' and order.submissionTs %}
+                <h4 class="pull-right submission-label">
+                    {% set fianlizedTimezone = order.finalizedTimezoneId ? userTimezones[order.finalizedTimezoneId] : app.user.timezone  %}
+                    <span class="label label-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia T', fianlizedTimezone) }}</span>
+                </h4>
+            {% endif %}
         </div>
     {% elseif order.origin is defined and order.origin == 'careevolution' and attribute(order, type~'User') is not empty %}
         <div class="alert alert-success well-sm">
