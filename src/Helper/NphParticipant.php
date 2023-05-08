@@ -47,6 +47,16 @@ class NphParticipant
         return true;
     }
 
+    public function getModule1TissueConsentStatus(): ?bool
+    {
+        foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
+            if ($consent->value === 'm1_consent_tissue' && $consent->optin === 'PERMIT') {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function parseRdrParticipant(\stdClass $participant): void
     {
         if (!is_object($participant)) {
@@ -81,15 +91,5 @@ class NphParticipant
     {
         //TODO:: retrieve this from RDR participant api
         return 1;
-    }
-
-    public function getModule1TissueConsentStatus(): ?bool
-    {
-        foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
-            if ($consent->value === 'm1_consent_tissue' && $consent->optin === 'PERMIT') {
-                return true;
-            }
-        }
-        return false;
     }
 }
