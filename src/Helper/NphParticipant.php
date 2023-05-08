@@ -53,7 +53,7 @@ class NphParticipant
     {
         if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
             foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
-                if ($consent->value === self::MODULE1_CONSENT_TISSUE && $consent->optin === self::OPTIN_PERMIT) {
+                if ($consent->value === self::MODULE1_CONSENT_TISSUE && $consent->optIn === self::OPTIN_PERMIT) {
                     return true;
                 }
             }

@@ -133,6 +133,7 @@ class NphParticipantSummaryService
                             nphModule1ConsentStatus {
                                 time
                                 value
+                                optIn
                             }
                         }
                     }
