@@ -115,7 +115,8 @@ class RequestListener
             'help_sopFile',
             'on_site_patient_status_export',
             'on_site_incentive_tracking_export',
-            'on_site_id_verification_export'
+            'on_site_id_verification_export',
+            'aliquot_instructions_file'
         ]));
     }
 
