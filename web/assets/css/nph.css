@@ -66,6 +66,8 @@ div.timepoint-samples.panel-body {
 }
 .participant-module-header {
     padding-left: 0;
+    width: 75%;
+    float: left;
 }
 .required::after {
     content: "*";
@@ -112,6 +114,10 @@ div.order-row {
 }
 .font-bold {
     font-weight: bold;
+}
+.hair-nail-optin {
+    float: right;
+    margin-top: 7px;
 }
 .sample-finalize-eraser {
     position: absolute;
