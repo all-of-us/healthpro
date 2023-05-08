@@ -221,7 +221,10 @@
                                                     </span>
                                                 </td>
                                                 <td class="aliquot volume nopadleft" style="position: relative">
-                                                    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
+                                                    <span class="aliquot-volume-units">{{ aliquot['units'] }}</span>
+                                                    {% if not disabled %}
+                                                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
+                                                    {% endif %}
                                                 </td>
                                                 {% if sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
                                                     <td class="row">

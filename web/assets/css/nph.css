@@ -113,3 +113,14 @@ div.order-row {
 .font-bold {
     font-weight: bold;
 }
+.sample-finalize-eraser {
+    position: absolute;
+    bottom: 10px;
+    left: 33px;
+    font-size: 22px
+}
+.aliquot-volume-units {
+    position: absolute;
+    bottom: 7px;
+    left: 0;
+}
