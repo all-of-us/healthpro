@@ -341,7 +341,7 @@ class NphOrderController extends BaseController
         return $this->render(
             'program/nph/order/label-print.html.twig',
             ['participant' => $participant,
-             'orderSummary' => $orderInfo['order'],
+                'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
                 'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
