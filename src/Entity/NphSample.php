@@ -160,6 +160,21 @@ class NphSample
      */
     private $sampleGroup;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $collectedTimezoneId;
+    
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $finalizedTimezoneId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $modifiedTimezoneId;
+
     public function __construct()
     {
         $this->nphAliquots = new ArrayCollection();
@@ -323,6 +338,42 @@ class NphSample
     public function setRdrId(?string $rdrId): self
     {
         $this->rdrId = $rdrId;
+
+        return $this;
+    }
+
+    public function getCollectedTimezoneId(): ?int
+    {
+        return $this->collectedTimezoneId;
+    }
+
+    public function setCollectedTimezoneId(?int $collectedTimezoneId): self
+    {
+        $this->collectedTimezoneId = $collectedTimezoneId;
+
+        return $this;
+    }
+
+    public function getFinalizedTimezoneId(): ?int
+    {
+        return $this->finalizedTimezoneId;
+    }
+
+    public function setFinalizedTimezoneId(?int $finalizedTimezoneId): self
+    {
+        $this->finalizedTimezoneId = $finalizedTimezoneId;
+
+        return $this;
+    }
+
+    public function getModifiedTimezoneId(): ?int
+    {
+        return $this->modifiedTimezoneId;
+    }
+
+    public function setModifiedTimezoneId(?int $modifiedTimezoneId): self
+    {
+        $this->modifiedTimezoneId = $modifiedTimezoneId;
 
         return $this;
     }
