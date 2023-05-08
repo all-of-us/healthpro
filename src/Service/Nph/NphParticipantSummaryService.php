@@ -257,6 +257,11 @@ class NphParticipantSummaryService
                             phoneNumber
                             siteId
                             zipCode
+                            nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            }
                         }
                     }
                 }
