@@ -284,6 +284,7 @@ class NphOrderService
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
         $nphOrder->setCreatedTs(new DateTime());
+        $nphOrder->setCreatedTimezoneId($this->getTimezoneid());
         $nphOrder->setOrderType($orderType);
         $this->em->persist($nphOrder);
         $this->em->flush();
@@ -328,6 +329,7 @@ class NphOrderService
                     $nphSample->setCollectedSite($this->site);
                     $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
                     $nphSample->setCollectedTs($collectedTs);
+                    $nphSample->setCollectedTimezoneId($this->getTimezoneid());
                     $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
                     if ($order->getOrderType() === NphOrder::TYPE_URINE) {
                         $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
@@ -336,6 +338,7 @@ class NphOrderService
                     $nphSample->setCollectedUser(null);
                     $nphSample->setCollectedSite(null);
                     $nphSample->setCollectedTs(null);
+                    $nphSample->setCollectedTimezoneId(null);
                     $nphSample->setCollectedNotes(null);
                 }
                 $this->em->persist($nphSample);
@@ -942,6 +945,7 @@ class NphOrderService
     private function saveNphSampleFinalizedInfo(NphSample $sample, DateTime $collectedTs, ?string $notes, ?string $sampleMetadata = null): void
     {
         $sample->setCollectedTs($collectedTs);
+        $sample->setCollectedTimezoneId($this->getTimezoneid());
         if (!$sample->getCollectedUser()) {
             $sample->setCollectedUser($this->user);
         }
@@ -959,6 +963,9 @@ class NphOrderService
         }
         if (!$sample->getFinalizedTs()) {
             $sample->setFinalizedTs(new DateTime());
+        }
+        if (!$sample->getFinalizedTimezoneId()) {
+            $sample->setFinalizedTimezoneId($this->getTimezoneid());
         }
         if ($sampleMetadata) {
             $sample->setSampleMetadata($sampleMetadata);
@@ -984,6 +991,7 @@ class NphOrderService
                         }
                         if (empty($formData["cancel_{$aliquotCode}_{$aliquotId}"]) && empty($formData["restore_{$aliquotCode}_{$aliquotId}"])) {
                             $nphAliquot->setAliquotTs($formData["{$aliquotCode}AliquotTs"][$key]);
+                            $nphAliquot->setAliquotTimezoneId($this->getTimezoneid());
                             if (!empty($formData["{$aliquotCode}Volume"][$key])) {
                                 $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
                             }
@@ -1003,6 +1011,7 @@ class NphOrderService
             $formData['reason'] = $formData['otherText'];
         }
         $sample->setModifiedTs(new \DateTime());
+        $sample->setModifiedTimezoneId($this->getTimezoneid());
         $sample->setModifiedSite($this->site);
         $sample->setModifiedUser($this->user);
         $sample->setModifyReason($formData['reason']);
@@ -1098,5 +1107,10 @@ class NphOrderService
         });
         $uniqueIds = array_unique($totalIds);
         return count($totalIds) > count($uniqueIds);
+    }
+
+    private function getTimezoneid(): ?int
+    {
+        return $this->userService->getUserEntity()->getTimezoneId();
     }
 }
