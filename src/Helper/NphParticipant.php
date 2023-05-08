@@ -49,7 +49,7 @@ class NphParticipant
         return true;
     }
 
-    private function getModule1TissueConsentStatus(): ?bool
+    private function getModule1TissueConsentStatus(): bool
     {
         if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
             foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
