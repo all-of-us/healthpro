@@ -66,7 +66,7 @@ class NphOrderController extends BaseController
             $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
                 $nphOrderService->getSamplesByType('stool'),
-                'module1tissueCollectConsent' => $participant->getModule1TissueConsentStatus(),
+                'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
                 'module' => $module]
         );
         $showPreview = false;

@@ -11,13 +11,15 @@ namespace App\Helper;
  */
 class NphParticipant
 {
+    public const MODULE1_CONSENT_TISSUE = 'm1_consent_tissue';
+    public const OPTIN_PERMIT = 'PERMIT';
     public $id;
     public $cacheTime;
     public $rdrData;
     public $dob;
     public $nphPairedSiteSuffix;
     public $module;
-
+    public $module1TissueConsentStatus;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -47,10 +49,10 @@ class NphParticipant
         return true;
     }
 
-    public function getModule1TissueConsentStatus(): ?bool
+    private function getModule1TissueConsentStatus(): ?bool
     {
         foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
-            if ($consent->value === 'm1_consent_tissue' && $consent->optin === 'PERMIT') {
+            if ($consent->value === self::MODULE1_CONSENT_TISSUE && $consent->optin === self::OPTIN_PERMIT) {
                 return true;
             }
         }
@@ -78,7 +80,7 @@ class NphParticipant
         if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
             $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
         }
-
+        $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
         $this->module = $this->getParticipantModule();
     }
 
