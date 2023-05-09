@@ -867,3 +867,9 @@ table.table-samples td {
 .stool-samples-box-2 {
     background-color: #fef6a6;
 }
+
+/* NPH Participant details */
+
+.no-dob-banner {
+    display: inline-block;
+}
