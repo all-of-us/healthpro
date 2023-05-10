@@ -94,9 +94,9 @@
                 <div>
                     <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
                     {% if participant.module1TissueConsentStatus %}
-                        <span class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
+                        <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
                     {% else %}
-                        <span class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
+                        <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
                     {% endif %}
                 </div>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}

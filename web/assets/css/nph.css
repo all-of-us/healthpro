@@ -130,3 +130,10 @@ div.order-row {
     bottom: 7px;
     left: 0;
 }
+#hair-nail-warning {
+    margin-bottom: 0;
+    font-size: 12px;
+}
+.sample-disabled-colored {
+    color: #A59D9B;
+}

@@ -138,4 +138,6 @@ $(document).ready(function () {
             $(this).parent().find(".timepointCheckAll").prop("checked", timePointsChecked);
         });
     });
+
+    $(".sample-disabled-colored").parent().addClass("sample-disabled-colored");
 });
