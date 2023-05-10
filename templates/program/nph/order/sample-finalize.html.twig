@@ -190,7 +190,7 @@
                                     {% for i in range(0, aliquotCount - 1) %}
                                         {% if sampleFinalizeForm[aliquotCode][i] is defined %}
                                             {% set aliquotId = sampleFinalizeForm[aliquotCode][i].vars.data %}
-                                            {% set disabled = sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined ? true: false %}
+                                            {% set disabled = sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined ? true : false %}
                                             {% if sample.nphAliquotsStatus[sampleFinalizeForm[aliquotCode][i]
                                             .vars.data] is defined %}
                                                 <tr>
@@ -222,7 +222,7 @@
                                                 </td>
                                                 <td class="aliquot volume nopadleft" style="position: relative">
                                                     <span class="aliquot-volume-units">{{ aliquot['units'] }}</span>
-                                                    {% if not disabled %}
+                                                    {% if not sample.disabled %}
                                                         <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
                                                     {% endif %}
                                                 </td>
