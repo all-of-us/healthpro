@@ -42,7 +42,7 @@
                             <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
                             {{ form_label(orderForm[timePoint]) }}
                         </div>
-                        {% if 'STOOL' in orderSamples|keys and participant.module1TissueConsentStatus == false %}
+                        {% if constant('App\\Entity\\NphSample::SAMPLE_STOOL') in orderSamples|keys and participant.module1TissueConsentStatus == false %}
                             <div id="hair-nail-warning" class="navbar-warning alert alert-warning">
                                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                 The participant has <u>not</u> opted into hair and nail collections.
