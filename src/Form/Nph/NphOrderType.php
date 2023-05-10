@@ -93,7 +93,7 @@ class NphOrderType extends AbstractType
                     } elseif ($options['module'] === '1' && $options['module1tissueCollectConsent'] === false
                         && in_array($val, self::TISSUE_CONSENT_SAMPLES)) {
                         $attr['disabled'] = true;
-                        $attr['class'] = 'sample-disabled';
+                        $attr['class'] = 'sample-disabled sample-disabled-colored';
                         $attr['checked'] = false;
                     }
                     return $attr;
