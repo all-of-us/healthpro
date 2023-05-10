@@ -139,5 +139,5 @@ $(document).ready(function () {
         });
     });
 
-    $('.sample-disabled-colored').parent().addClass('sample-disabled-colored')
+    $(".sample-disabled-colored").parent().addClass("sample-disabled-colored");
 });
