@@ -387,7 +387,7 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeBiobankAccess($type)
+    private function computeBiobankAccess(string $type): bool
     {
         $groupPrefix = $type === 'hpo' ? self::BIOBANK_GROUP : self::NPH_BIOBANK_GROUP;
         $hasAccess = false;
