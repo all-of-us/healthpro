@@ -47,8 +47,7 @@ class NphOrderLookupController extends AbstractController
                 if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
                     return $this->redirectToRoute('nph_order_collect', [
                         'participantId' => $order->getParticipantId(),
-                        'orderId' => $order->getId(),
-                        'participant' => $participant
+                        'orderId' => $order->getId()
                     ]);
                 }
                 $crossSiteErrorMessage = 'Lookup for this order ID is not permitted because the participant is paired with another site';

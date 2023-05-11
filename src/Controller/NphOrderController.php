@@ -65,7 +65,9 @@ class NphOrderController extends BaseController
             NphOrderType::class,
             $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
-                $nphOrderService->getSamplesByType('stool')]
+                $nphOrderService->getSamplesByType('stool'),
+                'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
+                'module' => $module]
         );
         $showPreview = false;
         $oderForm->handleRequest($request);
@@ -339,7 +341,7 @@ class NphOrderController extends BaseController
         return $this->render(
             'program/nph/order/label-print.html.twig',
             ['participant' => $participant,
-             'orderSummary' => $orderInfo['order'],
+                'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
                 'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],

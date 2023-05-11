@@ -66,6 +66,8 @@ div.timepoint-samples.panel-body {
 }
 .participant-module-header {
     padding-left: 0;
+    width: 75%;
+    float: left;
 }
 .required::after {
     content: "*";
@@ -112,4 +114,26 @@ div.order-row {
 }
 .font-bold {
     font-weight: bold;
+}
+.hair-nail-optin {
+    float: right;
+    margin-top: 7px;
+}
+.sample-finalize-eraser {
+    position: absolute;
+    bottom: 10px;
+    left: 33px;
+    font-size: 22px
+}
+.aliquot-volume-units {
+    position: absolute;
+    bottom: 7px;
+    left: 0;
+}
+#hair-nail-warning {
+    margin-bottom: 0;
+    font-size: 12px;
+}
+.sample-disabled-colored {
+    color: #A59D9B;
 }

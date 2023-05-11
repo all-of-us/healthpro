@@ -88,6 +88,11 @@ class NphOrder
      */
     private $biobankId;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $createdTimezoneId;
+
     public function __construct()
     {
         $this->nphSamples = new ArrayCollection();
@@ -244,6 +249,18 @@ class NphOrder
     public function setMetadata(?string $metadata): self
     {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    public function getCreatedTimezoneId(): ?int
+    {
+        return $this->createdTimezoneId;
+    }
+
+    public function setCreatedTimezoneId(?int $createdTimezoneId): self
+    {
+        $this->createdTimezoneId = $createdTimezoneId;
 
         return $this;
     }
