@@ -20,8 +20,9 @@ class User implements UserInterface
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
     public const READ_ONLY_GROUP = 'tactisview';
-
     public const DEFAULT_TIMEZONE = 'America/New_York';
+    public const HPO_TYPE = 'hpo';
+    public const NPH_TYPE = 'nph';
 
     private $googleUser;
     private $groups;
@@ -48,14 +49,14 @@ class User implements UserInterface
         $this->info = $info;
         $this->timezone = is_null($timezone) && isset($info['timezone']) ? $info['timezone'] : $timezone;
         $this->sessionInfo = $sessionInfo;
-        $this->sites = $this->computeSites('hpo');
-        $this->nphSites = $this->computeSites('nph');
+        $this->sites = $this->computeSites(self::HPO_TYPE);
+        $this->nphSites = $this->computeSites(self::NPH_TYPE);
         $this->awardees = $this->computeAwardees();
-        $this->adminAccess = $this->computeAdminAccess('hpo');
-        $this->nphAdminAccess = $this->computeAdminAccess('nph');
+        $this->adminAccess = $this->computeAdminAccess(self::HPO_TYPE);
+        $this->nphAdminAccess = $this->computeAdminAccess(self::NPH_TYPE);
         $this->adminDvAccess = $this->computeAdminDvAccess();
-        $this->biobankAccess = $this->computeBiobankAccess('hpo');
-        $this->nphBiobankAccess = $this->computeBiobankAccess('nph');
+        $this->biobankAccess = $this->computeBiobankAccess(self::HPO_TYPE);
+        $this->nphBiobankAccess = $this->computeBiobankAccess(self::NPH_TYPE);
         $this->scrippsAccess = $this->computeScrippsAccess();
         $this->readOnlyGroups = $this->computeReadOnlyGroups();
     }
