@@ -16,6 +16,7 @@ class User implements UserInterface
     public const TWOFACTOR_PREFIX = 'x-site-';
     public const ADMIN_DV = 'dv-admin';
     public const BIOBANK_GROUP = 'biospecimen-non-pii';
+    public const NPH_BIOBANK_GROUP = 'nph-biospecimen-non-pii';
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
     public const READ_ONLY_GROUP = 'tactisview';
@@ -35,6 +36,7 @@ class User implements UserInterface
     private $sessionInfo;
     private $adminDvAccess;
     private $biobankAccess;
+    private $nphBiobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
     private $readOnlyGroups;
@@ -52,7 +54,8 @@ class User implements UserInterface
         $this->adminAccess = $this->computeAdminAccess('hpo');
         $this->nphAdminAccess = $this->computeAdminAccess('nph');
         $this->adminDvAccess = $this->computeAdminDvAccess();
-        $this->biobankAccess = $this->computeBiobankAccess();
+        $this->biobankAccess = $this->computeBiobankAccess('hpo');
+        $this->nphBiobankAccess = $this->computeBiobankAccess('nph');
         $this->scrippsAccess = $this->computeScrippsAccess();
         $this->readOnlyGroups = $this->computeReadOnlyGroups();
     }
@@ -175,6 +178,9 @@ class User implements UserInterface
         }
         if ($this->biobankAccess) {
             $roles[] = 'ROLE_BIOBANK';
+        }
+        if ($this->nphBiobankAccess) {
+            $roles[] = 'ROLE_NPH_BIOBANK';
         }
         if ($this->scrippsAccess) {
             $roles[] = 'ROLE_SCRIPPS';
@@ -381,11 +387,12 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeBiobankAccess()
+    private function computeBiobankAccess($type)
     {
+        $groupPrefix = $type === 'hpo' ? self::BIOBANK_GROUP : self::NPH_BIOBANK_GROUP;
         $hasAccess = false;
         foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::BIOBANK_GROUP . '@') === 0) {
+            if (strpos($group->getEmail(), $groupPrefix . '@') === 0) {
                 $hasAccess = true;
             }
         }
