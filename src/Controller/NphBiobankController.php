@@ -64,7 +64,7 @@ class NphBiobankController extends BaseController
      */
     public function participantAction(string $biobankId): Response
     {
-        //TODO
-        return '';
+        //TODO Implement biobank participant details page
+        return $this->render('program/nph/biobank/participant.html.twig');
     }
 }
