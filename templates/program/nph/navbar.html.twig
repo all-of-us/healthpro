@@ -73,6 +73,14 @@
                                     </a>
                                 </li>
                             {% endif %}
+                            {% if is_granted('ROLE_NPH_BIOBANK') %}
+                                <li>
+                                    <a href="{{ path('nph_biobank_home') }}">
+                                        <i class="fas fa-arrow-circle-right"></i>
+                                        <strong>Biobank</strong>
+                                    </a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </li>
                 </ul>
