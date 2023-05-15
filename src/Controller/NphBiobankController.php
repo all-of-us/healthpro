@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\NphSample;
+use App\Form\Nph\NphSampleLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -66,5 +68,31 @@ class NphBiobankController extends BaseController
     {
         //TODO Implement biobank participant details page
         return $this->render('program/nph/biobank/participant.html.twig');
+    }
+
+    /**
+     * @Route("/samples/aliquot", name="nph_biobank_samples_aliquot")
+     */
+    public function sampleAliquotLookupAction(Request $request): Response
+    {
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleIdForm->handleRequest($request);
+
+        if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
+            $id = $sampleIdForm->get('sampleId')->getData();
+
+            $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+                'sampleId' => $id
+            ]);
+            if ($sample) {
+                //TODO Redirect to biobank aliquot finalize page
+                dd($sample);
+            }
+            $this->addFlash('error', 'Sample ID not found');
+        }
+
+        return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
+            'sampleIdForm' => $sampleIdForm->createView()
+        ]);
     }
 }
