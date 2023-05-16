@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\NphAliquot;
 use App\Entity\NphSample;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
@@ -87,6 +88,12 @@ class NphBiobankController extends BaseController
             $sample = $this->em->getRepository(NphSample::class)->findOneBy([
                 'sampleId' => $id
             ]);
+            if (!$sample) {
+                $aliquot = $this->em->getRepository(NphAliquot::class)->findOneBy([
+                    'aliquotId' => $id
+                ]);
+                $sample = $aliquot->getNphSample();
+            }
             if ($sample) {
                 //TODO Redirect to biobank aliquot finalize page
                 dd($sample);
