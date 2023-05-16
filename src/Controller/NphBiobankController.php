@@ -75,7 +75,10 @@ class NphBiobankController extends BaseController
      */
     public function sampleAliquotLookupAction(Request $request): Response
     {
-        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null, [
+            'label' => 'Aliquot or Collection Sample ID',
+            'placeholder' => 'Scan barcode or enter sample ID'
+        ]);
         $sampleIdForm->handleRequest($request);
 
         if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
