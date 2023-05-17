@@ -81,20 +81,16 @@
                     Color and Clarity
                 </h4>
                 {% set sampleMetadata =  nphSample.sampleMetadataArray %}
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Urine Color</th>
-                        <th>Urine Clarity</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>{{ sampleMetadata['urineColor']|default('--') }}</td>
-                        <td>{{ sampleMetadata['urineClarity']|default('--') }}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div><strong>Urine Color</strong></div>
+                        <div>{{ sampleMetadata['urineColor']|default('--') }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div><strong>Urine Clarity</strong></div>
+                        <div>{{ sampleMetadata['urineClarity']|default('--') }}</div>
+                    </div>
+                </div>
             {% endif %}
             {% if order.orderType == constant('TYPE_STOOL', order) %}
                 <hr>
@@ -102,21 +98,18 @@
                     Bristol Stool Chart Questions
                 </h4>
                 {% set orderMetadata =  order.metadataArray %}
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Bowel Type</th>
-                        <th>Bowel Quality</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>{{ orderMetadata['bowelType']|default('--') }}</td>
-                        <td>{{ orderMetadata['bowelQuality']|default('--') }}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div><strong>Bowel Type</strong></div>
+                        <div>{{ orderMetadata['bowelType']|default('--') }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div><strong>Bowel Quality</strong></div>
+                        <div>{{ orderMetadata['bowelQuality']|default('--') }}</div>
+                    </div>
+                </div>
             {% endif %}
+            <br>
             <div class="form-group">
                 <a href="{{ path('nph_biobank_participant', { biobankId: participant.biobankId }) }}"
                    class="btn btn-default">Exit</a>

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Form\Nph\NphOrderForm;
 use App\Repository\NphSampleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -590,6 +591,17 @@ class NphSample
 
     public function getSampleMetadataArray(): ?array
     {
-        return json_decode($this->getSampleMetadata(), true);
+        $sampleMetadata = json_decode($this->getSampleMetadata(), true);
+        if ($sampleMetadata) {
+            $sampleMetadata['urineColor'] = isset($sampleMetadata['urineColor']) ? array_search(
+                $sampleMetadata['urineColor'],
+                NphOrderForm::$urineColors
+            ) : '';
+            $sampleMetadata['urineClarity'] = isset($sampleMetadata['urineClarity']) ? array_search(
+                $sampleMetadata['urineClarity'],
+                NphOrderForm::$urineClarity
+            ) : '';
+        }
+        return $sampleMetadata;
     }
 }
