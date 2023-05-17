@@ -383,4 +383,35 @@ class NphOrderTest extends NphTestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider metadataProvider
+     */
+    public function testGetMetadataArray(string $metadata, array $expected): void
+    {
+        $nphOrder = new NphOrder();
+        $nphOrder->setMetadata($metadata);
+        $result = $nphOrder->getMetadataArray();
+        $this->assertEquals($expected, $result);
+    }
+
+    public function metadataProvider(): array
+    {
+        return [
+            [
+                '{"bowelType":"difficult","bowelQuality":"difficult"}',
+                [
+                    'bowelType' => 'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2',
+                    'bowelQuality' => 'I tend to be constipated (have difficulty passing stool) - Type 1 and 2',
+                ],
+            ],
+            [
+                '{"bowelType":"watery","bowelQuality":"watery"}',
+                [
+                    'bowelType' => 'I had diarrhea (watery stool), and my stool looks like Type 5, 6, and/or 7',
+                    'bowelQuality' => 'I tend to have diarrhea (watery stool) - Type 5, 6, and 7',
+                ],
+            ]
+        ];
+    }
 }
