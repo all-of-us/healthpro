@@ -385,4 +385,9 @@ class NphOrder
         }
         return false;
     }
+
+    public function getMetadataArray(): ?array
+    {
+        return json_decode($this->getMetadata(), true);
+    }
 }

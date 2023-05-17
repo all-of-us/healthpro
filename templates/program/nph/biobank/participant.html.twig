@@ -82,7 +82,7 @@
                                                             <div class="clearfix">
                                                                 <div class="col-sm-2">{{ sample[orderid]['createDate'] }}</div>
                                                                 <div class="col-sm-3">
-                                                                    <a href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">
+                                                                    <a href="{{ path('nph_biobank_order_collect', {biobankId: participant.biobankId, orderId: sample[orderid]['healthProOrderId']}) }}">
                                                                         Order ID: {{ orderid }}
                                                                     </a>
                                                                 </div>

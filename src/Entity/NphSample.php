@@ -587,4 +587,9 @@ class NphSample
     {
         $this->sampleGroup = $sampleGroup;
     }
+
+    public function getSampleMetadataArray(): ?array
+    {
+        return json_decode($this->getSampleMetadata(), true);
+    }
 }

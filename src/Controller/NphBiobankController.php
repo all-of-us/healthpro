@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\NphAliquot;
+use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
@@ -70,8 +71,8 @@ class NphBiobankController extends BaseController
     public function participantAction(
         string $biobankId,
         NphOrderService $nphOrderService,
-        NphProgramSummaryService $nphProgramSummaryService): Response
-    {
+        NphProgramSummaryService $nphProgramSummaryService
+    ): Response {
         $participant = $this->nphParticipantSummaryService->search(['biobankId' => $biobankId]);
         if (empty($participant)) {
             throw $this->createNotFoundException();
@@ -118,6 +119,33 @@ class NphBiobankController extends BaseController
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/{biobankId}/order/{orderId}/collect", name="nph_biobank_order_collect")
+     */
+    public function orderCollectDetailsAction(
+        $biobankId,
+        $orderId,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService
+    ): Response {
+        $participant = $nphNphParticipantSummaryService->search(['biobankId' => $biobankId]);
+        if (empty($participant)) {
+            throw $this->createNotFoundException();
+        }
+        $participant = $participant[0];
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participant->id, $participant->biobankId);
+        return $this->render('program/nph/biobank/order-collect-details.html.twig', [
+            'order' => $order,
+            'participant' => $participant,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
         ]);
     }
 }
