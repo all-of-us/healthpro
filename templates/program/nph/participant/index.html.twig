@@ -106,10 +106,17 @@
                                  role="button" style="font-weight: bold">Visit {{ visit['visitDisplayName'] }}<span class="caret"
                                                                                           style="float: right; margin: 9px 0;"></span></div>
                             <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
-                                <a class="btn btn-primary" role="button"
-                                   href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                    <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
-                                </a>
+                                {% if participant.dob %}
+                                    <a class="btn btn-primary" role="button"
+                                       href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                        <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
+                                    </a>
+                                {% else %}
+                                    <span class="alert alert-danger no-dob-banner">
+                                        <i class="text-danger fa fa-exclamation-circle"></i>
+                                        DOB has not been provided. The participant must complete “The Basics” survey that captures their DOB to unlock order generation.
+                                    </span>
+                                {% endif %}
                                 {% set displayedOrderIDS = [] %}
                                 {% set displayedTimePointHeaders = [] %}
                                 {% for timepointCode, timepoint in visit['visitInfo'] %}

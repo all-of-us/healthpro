@@ -56,6 +56,9 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        if (!$participant->dob) {
+            throw $this->createAccessDeniedException('DOB has not been provided. The participant must complete “The Basics” survey that captures their DOB to unlock order generation.');
+        }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
