@@ -48,7 +48,7 @@
                 {% for index, nphSample in order.nphSamples %}
                     <tr class="row-samples">
                         <td>
-                            {{ nphSample.sampleCode }} ({{ nphSample.sampleId }})
+                            {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
                             {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
                                 <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing
                                 </p>
@@ -64,7 +64,7 @@
                         <td>{{ nphSample.collectedNotes|default('--') }}</td>
                         <td>
                             <p>
-                                {# TODO Link to biobank aliquot page #}
+                                {# TODO Link to Andrew's biobank aliquot finalize page #}
                                 <a href="" class="btn btn-primary btn-xs">
                                     View
                                 </a>

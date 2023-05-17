@@ -111,7 +111,7 @@ class NphBiobankController extends BaseController
                 $sample = $aliquot->getNphSample();
             }
             if ($sample) {
-                //TODO Redirect to biobank aliquot finalize page
+                //TODO Redirect to Andrew's biobank aliquot finalize page
                 dd($sample);
             }
             $this->addFlash('error', 'Sample ID not found');
