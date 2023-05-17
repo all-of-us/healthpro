@@ -1,20 +1,8 @@
 {% extends 'program/nph/biobank/base.html.twig' %}
 
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+
 {% block title %} Participant Details {% endblock %}
-
-{% macro generateStatusLabel(status) %}
-    {% if status == 'Collected' %}
-        {% set labelClass = 'label-primary' %}
-    {% elseif status == 'Finalized' %}
-        {% set labelClass = 'label-default' %}
-    {% elseif status == 'In Progress' %}
-        {% set labelClass = 'label-warning' %}
-    {% else %}
-        {% set labelClass = 'label-default' %}
-    {% endif %}
-
-    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
-{% endmacro %}
 
 {% block body %}
     <div class="page-header row participant-name">
@@ -99,7 +87,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
-                                                                {{ _self.generateStatusLabel(sample[orderid]['orderStatus']) }}
+                                                                {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
                                                                 {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                     {% if not loop.first %}
                                                                         <div class="col-sm-9"></div>

@@ -28,3 +28,16 @@
         <span class="text-success">Active</span>
     {% endif %}
 {% endmacro %}
+
+{% macro generateStatusLabel(status) %}
+    {% if status == 'Collected' %}
+        {% set labelClass = 'label-primary' %}
+    {% elseif status == 'Finalized' %}
+        {% set labelClass = 'label-default' %}
+    {% elseif status == 'In Progress' %}
+        {% set labelClass = 'label-warning' %}
+    {% else %}
+        {% set labelClass = 'label-default' %}
+    {% endif %}
+    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
+{% endmacro %}
