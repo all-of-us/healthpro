@@ -6,7 +6,9 @@ use App\Entity\NphAliquot;
 use App\Entity\NphSample;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
+use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
+use App\Service\Nph\NphProgramSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,10 +67,23 @@ class NphBiobankController extends BaseController
     /**
      * @Route("/{biobankId}", name="nph_biobank_participant")
      */
-    public function participantAction(string $biobankId): Response
+    public function participantAction(
+        string $biobankId,
+        NphOrderService $nphOrderService,
+        NphProgramSummaryService $nphProgramSummaryService): Response
     {
-        //TODO Implement biobank participant details page
-        return $this->render('program/nph/biobank/participant.html.twig');
+        $participant = $this->nphParticipantSummaryService->search(['biobankId' => $biobankId]);
+        if (empty($participant)) {
+            throw $this->createNotFoundException();
+        }
+        $participant = $participant[0];
+        $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participant->id);
+        $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
+        $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo, $nphProgramSummary);
+        return $this->render('program/nph/biobank/participant.html.twig', [
+            'participant' => $participant,
+            'programSummaryAndOrderInfo' => $combined
+        ]);
     }
 
     /**
