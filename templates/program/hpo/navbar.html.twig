@@ -76,7 +76,7 @@
                             {% endif %}
                             {% for key, roleNav in roleNavs|filter((roleNav, key) =>
                                 is_granted(roleNav.role) and
-                                not (key == 'biobank' and is_granted('ROLE_SCRIPPS'))
+                                not (key == 'biobank' and is_granted('ROLE_SCRIPPS')) and key != 'nph_biobank'
                                 ) %}
                                 {# Scripps and biobank roles point to the same route, so only display one if user has both roles #}
                                 <li>

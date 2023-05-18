@@ -332,7 +332,7 @@ class SiteService
     public function canSwitchProgram(): bool
     {
         $user = $this->userService->getUser();
-        return $user && $user->getNphSites() && $user->getSites();
+        return $user && (($user->getNphSites() && $user->getSites()) || $this->hasMultipleBiobankRoles());
     }
 
     public function autoSwitchSite(): bool
@@ -354,6 +354,9 @@ class SiteService
                 $this->switchSite($sites[0]->email);
                 $autoSwitch = true;
             }
+        }
+        if (count($sites) === 0 && $this->hasMultipleBiobankRoles()) {
+            $autoSwitch = true;
         }
         return $autoSwitch;
     }
@@ -435,5 +438,11 @@ class SiteService
             }
         }
         return true;
+    }
+
+    private function hasMultipleBiobankRoles(): bool
+    {
+        $user = $this->userService->getUser();
+        return $user && in_array('ROLE_BIOBANK', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles());
     }
 }

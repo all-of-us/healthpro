@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\NphAliquot;
+use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
+use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
+use App\Service\Nph\NphProgramSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,10 +68,23 @@ class NphBiobankController extends BaseController
     /**
      * @Route("/{biobankId}", name="nph_biobank_participant")
      */
-    public function participantAction(string $biobankId): Response
-    {
-        //TODO Implement biobank participant details page
-        return $this->render('program/nph/biobank/participant.html.twig');
+    public function participantAction(
+        string $biobankId,
+        NphOrderService $nphOrderService,
+        NphProgramSummaryService $nphProgramSummaryService
+    ): Response {
+        $participant = $this->nphParticipantSummaryService->search(['biobankId' => $biobankId]);
+        if (empty($participant)) {
+            throw $this->createNotFoundException();
+        }
+        $participant = $participant[0];
+        $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participant->id);
+        $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
+        $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo, $nphProgramSummary);
+        return $this->render('program/nph/biobank/participant.html.twig', [
+            'participant' => $participant,
+            'programSummaryAndOrderInfo' => $combined
+        ]);
     }
 
     /**
@@ -95,7 +111,7 @@ class NphBiobankController extends BaseController
                 $sample = $aliquot->getNphSample();
             }
             if ($sample) {
-                //TODO Redirect to biobank aliquot finalize page
+                //TODO Redirect to Andrew's biobank aliquot finalize page
                 dd($sample);
             }
             $this->addFlash('error', 'Sample ID not found');
@@ -103,6 +119,33 @@ class NphBiobankController extends BaseController
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/{biobankId}/order/{orderId}/collect", name="nph_biobank_order_collect")
+     */
+    public function orderCollectDetailsAction(
+        $biobankId,
+        $orderId,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService
+    ): Response {
+        $participant = $nphNphParticipantSummaryService->search(['biobankId' => $biobankId]);
+        if (empty($participant)) {
+            throw $this->createNotFoundException();
+        }
+        $participant = $participant[0];
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participant->id, $participant->biobankId);
+        return $this->render('program/nph/biobank/order-collect-details.html.twig', [
+            'order' => $order,
+            'participant' => $participant,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
         ]);
     }
 }
