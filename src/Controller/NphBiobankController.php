@@ -6,6 +6,7 @@ use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\Nph\NphSampleLookupType;
+use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -63,6 +64,41 @@ class NphBiobankController extends BaseController
         return $this->render('program/nph/biobank/participants.html.twig', [
             'idForm' => $idForm->createView()
         ]);
+    }
+
+    /**
+     * @Route("/orderlookup", name="nph_biobank_order_lookup")
+     */
+    public function orderLookupAction(
+        Request $request,
+        NphParticipantSummaryService $participantSummary
+    ): Response {
+        $idForm = $this->createForm(OrderLookupIdType::class, null);
+        $idForm->handleRequest($request);
+
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
+            $id = $idForm->get('orderId')->getData();
+
+            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $id
+            ]);
+
+            if ($order) {
+                $participant = $participantSummary->getParticipantById($order->getParticipantId());
+                return $this->redirectToRoute('nph_biobank_order_collect', [
+                    'biobankId' => $participant->biobankId,
+                    'orderId' => $order->getId()
+                ]);
+            }
+            $this->addFlash('error', 'Order ID not found');
+        }
+        return $this->render(
+            'program/nph/order/orderlookup.html.twig',
+            [
+                'idForm' => $idForm->createView(),
+                'recentOrders' => null,
+            ]
+        );
     }
 
     /**

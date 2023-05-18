@@ -110,8 +110,7 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lookup <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ path('nph_biobank_participants') }}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
-                            {# TODO Link to Andrew's order lookup page #}
-                            <li><a href=""><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</a></li>
+                            <li><a href="{{ path('nph_biobank_order_lookup') }}"><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</a></li>
                             <li><a href="{{ path('nph_biobank_samples_aliquot') }}"><i class="fa fa-laptop-medical" aria-hidden="true"></i> Aliquot Lookup</a></li>
                         </ul>
                     </li>
