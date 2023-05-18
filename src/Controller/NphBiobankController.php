@@ -71,7 +71,6 @@ class NphBiobankController extends BaseController
      */
     public function orderLookupAction(
         Request $request,
-        SiteService $siteService,
         NphParticipantSummaryService $participantSummary
     ): Response {
         $idForm = $this->createForm(OrderLookupIdType::class, null);
@@ -89,12 +88,10 @@ class NphBiobankController extends BaseController
                 if (!$participant) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
-                    return $this->redirectToRoute('nph_order_collect', [
-                        'participantId' => $order->getParticipantId(),
-                        'orderId' => $order->getId()
-                    ]);
-                }
+                return $this->redirectToRoute('nph_order_collect', [
+                    'participantId' => $order->getParticipantId(),
+                    'orderId' => $order->getId()
+                ]);
             }
             $this->addFlash('error', 'Order ID not found');
         }
