@@ -39,18 +39,6 @@ class NphOrderLookupController extends AbstractController
         return $this->generateOrderLookupView('program/nph/order/orderlookup.html.twig', $idForm, $recentOrders);
     }
 
-    /**
-     * @Route("/nph/biobank/orders", name="nph_order_lookup_biobank")
-     */
-    public function biobankIndex(
-        Request $request,
-        SiteService $siteService,
-        NphParticipantSummaryService $participantSummary
-    ): Response {
-        $idForm = $this->getIdForm($request, $siteService, $participantSummary);
-        return $this->generateOrderLookupView('program/nph/order/orderlookup.html.twig', $idForm);
-    }
-
     private function getIdForm(
         Request $request,
         SiteService $siteService,
