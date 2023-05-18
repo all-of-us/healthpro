@@ -88,8 +88,8 @@ class NphBiobankController extends BaseController
                 if (!$participant) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                return $this->redirectToRoute('nph_order_collect', [
-                    'participantId' => $order->getParticipantId(),
+                return $this->redirectToRoute('nph_biobank_order_collect', [
+                    'biobankId' => $participant->biobankId,
                     'orderId' => $order->getId()
                 ]);
             }
