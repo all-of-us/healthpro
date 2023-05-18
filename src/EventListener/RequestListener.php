@@ -228,7 +228,7 @@ class RequestListener
     {
         // Default program should not be set if user has option to switch programs
         if (!$this->siteService->canSwitchProgram()) {
-            if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+            if ($this->authorizationChecker->isGranted('ROLE_NPH_USER') || $this->authorizationChecker->isGranted('ROLE_NPH_BIOBANK')) {
                 $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
             } else {
                 $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);
