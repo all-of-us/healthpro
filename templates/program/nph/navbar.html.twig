@@ -77,7 +77,11 @@
                                 <li>
                                     <a href="{{ path('nph_biobank_home') }}">
                                         <i class="fas fa-arrow-circle-right"></i>
-                                        <strong>Biobank</strong>
+                                        {% if currentRoleNav == 'nph_biobank' %}
+                                            <strong>Biobank</strong>
+                                        {% else %}
+                                            Biobank
+                                        {% endif %}
                                     </a>
                                 </li>
                             {% endif %}
