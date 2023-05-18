@@ -44,7 +44,10 @@ class DefaultController extends BaseController
             return $this->redirectToRoute('problem_reports');
         } elseif ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('admin_home');
-        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
+        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_NPH_BIOBANK')) {
+            if ($request->getSession()->get('program') === User::PROGRAM_NPH) {
+                return $this->redirectToRoute('nph_biobank_home');
+            }
             return $this->redirectToRoute('biobank_home');
         } elseif ($this->isGranted('ROLE_READ_ONLY')) {
             return $this->redirectToRoute('read_home');
