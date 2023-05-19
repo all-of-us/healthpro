@@ -153,6 +153,9 @@ class NphBiobankController extends BaseController
             if ($sample) {
                 $participantId = $sample->getNphOrder()->getParticipantId();
                 $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+                if (!$participant) {
+                    throw $this->createNotFoundException("Participant not found for sample ID $sample->getSampleId()");
+                }
                 return $this->redirectToRoute('nph_biobank_sample_finalize', [
                     'biobankId' => $participant->biobankId,
                     'sampleId' => $sample->getId(),
