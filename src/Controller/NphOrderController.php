@@ -328,7 +328,8 @@ class NphOrderController extends BaseController
             'sampleData' => $sampleData,
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
             'modifyType' => $modifyType ?? '',
-            'revertForm' => $this->createForm(NphSampleRevertType::class)->createView()
+            'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
+            'biobankView' => false,
         ]);
     }
 

@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
+use App\Form\Nph\NphSampleModifyType;
+use App\Form\Nph\NphSampleRevertType;
 use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\Nph\NphOrderService;
@@ -13,6 +16,7 @@ use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -126,7 +130,7 @@ class NphBiobankController extends BaseController
     /**
      * @Route("/samples/aliquot", name="nph_biobank_samples_aliquot")
      */
-    public function sampleAliquotLookupAction(Request $request): Response
+    public function sampleAliquotLookupAction(NphParticipantSummaryService $nphParticipantSummaryService, Request $request): Response
     {
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null, [
             'label' => 'Aliquot or Collection Sample ID',
@@ -147,8 +151,13 @@ class NphBiobankController extends BaseController
                 $sample = $aliquot->getNphSample();
             }
             if ($sample) {
-                //TODO Redirect to Andrew's biobank aliquot finalize page
-                dd($sample);
+                $participantId = $sample->getNphOrder()->getParticipantId();
+                $participant = $nphParticipantSummaryService->getParticipantById($participantId);
+                return $this->redirectToRoute('nph_biobank_sample_finalize', [
+                    'biobankId' => $participant->biobankId,
+                    'sampleId' => $sample->getId(),
+                    'orderId' => $sample->getNphOrder()->getId(),
+                ]);
             }
             $this->addFlash('error', 'Sample ID not found');
         }
@@ -182,6 +191,128 @@ class NphBiobankController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
+        ]);
+    }
+
+    /**
+     * @Route("/{biobankId}/order/{orderId}/sample/{sampleId}/finalize", name="nph_biobank_sample_finalize")
+     */
+    public function aliquotFinalizeAction(
+        $biobankId,
+        $orderId,
+        $sampleId,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphParticipantSummaryService,
+        Request $request
+    ) {
+        $participant = $nphParticipantSummaryService->search(['biobankId' => $biobankId]);
+        $participant = $participant[0];
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
+        if (empty($order)) {
+            throw $this->createNotFoundException('Order not found.');
+        }
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'nphOrder' => $order, 'id' => $sampleId
+        ]);
+        $nphOrderService->loadModules(
+            $order->getModule(),
+            $order->getVisitType(),
+            $participant->id,
+            $participant->biobankId
+        );
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleCode = $sample->getSampleCode();
+        $sampleData = $nphOrderService->getExistingSampleData($sample);
+        $sampleFinalizeForm = $this->createForm(
+            NphSampleFinalizeType::class,
+            $sampleData,
+            ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
+                $order->getOrderType() === 'stool' ? $sample->isDisabled() : true, 'nphSample' => $sample, 'disableMetadataFields' =>
+                $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
+                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()
+            ]
+        );
+        $sampleFinalizeForm->handleRequest($request);
+        if ($sampleFinalizeForm->isSubmitted()) {
+            if ($sample->isDisabled()) {
+                throw $this->createAccessDeniedException();
+            }
+            $formData = $sampleData = $sampleFinalizeForm->getData();
+            if (!empty($nphOrderService->getAliquots($sampleCode))) {
+                if ($sample->getModifyType() !== NphSample::UNLOCK && $nphOrderService->hasAtLeastOneAliquotSample(
+                    $formData,
+                    $sampleCode
+                ) === false) {
+                    $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter at least one aliquot'));
+                } elseif ($nphOrderService->hasDuplicateAliquotsInForm($formData, $sampleCode)) {
+                    $sampleFinalizeForm['aliquotError']->addError(new FormError('Please enter a unique aliquot barcode'));
+                } else {
+                    $duplicate = $nphOrderService->checkDuplicateAliquotId($formData, $sampleCode, $sample->getNphAliquotIds());
+                    if ($duplicate) {
+                        $sampleFinalizeForm[$duplicate['aliquotCode']][$duplicate['key']]->addError(new FormError('Aliquot ID already exists'));
+                    }
+                }
+            }
+            if ($sampleFinalizeForm->isValid()) {
+                if ($nphOrderService->saveFinalization($formData, $sample, true)) {
+                    $this->addFlash('success', 'Sample finalized');
+                    return $this->redirectToRoute('nph_biobank_sample_finalize', [
+                        'biobankId' => $participant->biobankId,
+                        'orderId' => $orderId,
+                        'sampleId' => $sampleId
+                    ]);
+                }
+                $this->addFlash('error', 'Failed finalizing sample. Please try again.');
+                $this->em->refresh($sample);
+            } else {
+                $sampleFinalizeForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+
+        if ($request->query->has('modifyType')) {
+            $modifyType = $request->query->get('modifyType');
+            if ($modifyType !== NphSample::UNLOCK || $sample->canUnlock() === false) {
+                throw $this->createNotFoundException();
+            }
+            if ($modifyType === $sample->getModifyType()) {
+                throw $this->createNotFoundException();
+            }
+            $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, ['type' => $modifyType]);
+            $nphSampleModifyForm->handleRequest($request);
+            if ($nphSampleModifyForm->isSubmitted()) {
+                $sampleModifyData = $nphSampleModifyForm->getData();
+                if ($nphSampleModifyForm->isValid()) {
+                    $nphOrderService->saveSampleModification($sampleModifyData, NphSample::UNLOCK, $sample);
+                    $successText = $sample::$modifySuccessText;
+                    $this->addFlash('success', "Sample {$successText[$modifyType]}");
+                    return $this->redirectToRoute('nph_sample_finalize', [
+                        'participantId' => $participant->id,
+                        'orderId' => $orderId,
+                        'sampleId' => $sampleId
+                    ]);
+                }
+                $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+
+        return $this->render('program/nph/order/sample-finalize.html.twig', [
+            'sampleIdForm' => $sampleIdForm->createView(),
+            'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
+            'sample' => $sample,
+            'participant' => $participant,
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples(),
+            'aliquots' => $nphOrderService->getAliquots($sampleCode),
+            'sampleData' => $sampleData,
+            'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
+            'modifyType' => $modifyType ?? '',
+            'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
+            'disableForm' => true,
+            'biobankView' => true,
         ]);
     }
 }

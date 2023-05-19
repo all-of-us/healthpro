@@ -175,6 +175,10 @@ class NphSample
      * @ORM\Column(type="integer", nullable=true)
      */
     private $modifiedTimezoneId;
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $biobankFinalized;
 
     public function __construct()
     {
@@ -341,6 +345,18 @@ class NphSample
         $this->rdrId = $rdrId;
 
         return $this;
+    }
+
+    public function setBiobankFinalized(bool $biobankFinalized): self
+    {
+        $this->biobankFinalized = $biobankFinalized;
+
+        return $this;
+    }
+
+    public function getBiobankFinalized(): ?bool
+    {
+        return $this->biobankFinalized;
     }
 
     public function getCollectedTimezoneId(): ?int
@@ -603,5 +619,12 @@ class NphSample
             ) : '';
         }
         return $sampleMetadata;
+    }
+
+    public function getMostRecentSite()
+    {
+        if ($this->getCollectedSite()) {
+            return $this->getCollectedSite();
+        }
     }
 }

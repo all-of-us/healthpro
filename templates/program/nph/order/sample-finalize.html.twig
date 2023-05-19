@@ -272,7 +272,11 @@
                                 {% if sample.disabled %} disabled {% endif %} formnovalidate>
                             Mark as Finalized
                         </button>
-                        <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% if biobankView %}
+                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% else %}
+                            <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% endif %}
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
                     {% if sample.modifyType == 'unlock' %}
