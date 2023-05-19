@@ -412,6 +412,11 @@ class NphSample
         if ($this->finalizedTs === null) {
             return 'Collected';
         }
+
+        if ($this->biobankFinalized) {
+            return 'Biobank Finalized';
+        }
+
         return 'Finalized';
     }
 
