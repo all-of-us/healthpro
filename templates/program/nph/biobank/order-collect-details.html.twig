@@ -65,7 +65,7 @@
                         <td>
                             <p>
                                 {# TODO Link to Andrew's biobank aliquot finalize page #}
-                                <a href="" class="btn btn-primary btn-xs">
+                                <a href="{{ path('nph_biobank_sample_finalize', {biobankId: participant.biobankId, sampleId: nphSample.id, orderId: order.id}) }}" class="btn btn-primary btn-xs">
                                     View
                                 </a>
                             </p>

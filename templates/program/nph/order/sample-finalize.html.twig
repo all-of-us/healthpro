@@ -67,11 +67,20 @@
         <div class="col-sm-7">
             {% if sample.rdrId and sample.finalizedTs %}
                 <div class="alert alert-success well-sm">
+                    {% if sample.biobankFinalized %}
+                        <i class="fa fa-exclamation-circle"></i>
+                        <strong class="warning-text">
+                            Finalized
+                            by Biobank user
+                            on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        </strong>
+                    {% else %}
                     <strong>
                         Finalized
                         by {{ sample.finalizedUser.email|default('Unknown') }}
                         on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                     </strong>
+                    {% endif %}
                 </div>
             {% endif %}
             <div class="panel panel-default">
@@ -269,10 +278,17 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if sample.disabled %} disabled {% endif %} formnovalidate>
+                                {% if sample.disabled or (not order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') and biobankView) %}
+                                    disabled
+                                {% endif %}
+                                formnovalidate>
                             Mark as Finalized
                         </button>
-                        <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% if biobankView %}
+                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% else %}
+                            <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% endif %}
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
                     {% if sample.modifyType == 'unlock' %}

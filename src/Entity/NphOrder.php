@@ -362,6 +362,9 @@ class NphOrder
         if (isset($statusCount['Collected']) && $statusCount['Collected'] === $sampleCount) {
             return 'Collected';
         }
+        if ((isset($statusCount['Finalized']) && isset($statusCount['Biobank Finalized'])) && ($statusCount['Finalized'] + $statusCount['Biobank Finalized'] === $sampleCount)) {
+            return 'Finalized';
+        }
         return 'In Progress';
     }
 

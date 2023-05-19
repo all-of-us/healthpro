@@ -470,11 +470,11 @@ class NphOrderService
         return false;
     }
 
-    public function saveFinalization(array $formData, NphSample $sample): bool
+    public function saveFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
     {
         $order = $sample->getNphOrder();
         if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
-            return $this->saveStoolSampleFinalization($formData, $sample);
+            return $this->saveStoolSampleFinalization($formData, $sample, $biobankFinalization);
         }
         return $this->saveSampleFinalization($formData, $sample);
     }
@@ -852,7 +852,7 @@ class NphOrderService
         }
     }
 
-    private function saveStoolSampleFinalization(array $formData, NphSample $sample): bool
+    private function saveStoolSampleFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -882,7 +882,7 @@ class NphOrderService
             // Save finalized info for the current sample
             $nphSampleCode = $sample->getSampleCode();
             $notes = $formData["{$nphSampleCode}Notes"] ?? null;
-            $this->saveNphSampleFinalizedInfo($sample, $collectedTs, $notes);
+            $this->saveNphSampleFinalizedInfo($sample, $collectedTs, $notes, null, $biobankFinalization);
 
             // Update order metadata
             $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
@@ -942,7 +942,7 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
-    private function saveNphSampleFinalizedInfo(NphSample $sample, DateTime $collectedTs, ?string $notes, ?string $sampleMetadata = null): void
+    private function saveNphSampleFinalizedInfo(NphSample $sample, DateTime $collectedTs, ?string $notes, ?string $sampleMetadata = null, $biobankFinalization = false): void
     {
         $sample->setCollectedTs($collectedTs);
         $sample->setCollectedTimezoneId($this->getTimezoneid());
@@ -958,8 +958,10 @@ class NphOrderService
         if (!$sample->getFinalizedUser()) {
             $sample->setFinalizedUser($this->user);
         }
-        if (!$sample->getFinalizedSite()) {
+        if (!$sample->getFinalizedSite() && !$biobankFinalization) {
             $sample->setFinalizedSite($this->site);
+        } elseif (!$sample->getFinalizedSite() && $biobankFinalization) {
+            $sample->setFinalizedSite($sample->getCollectedSite());
         }
         if (!$sample->getFinalizedTs()) {
             $sample->setFinalizedTs(new DateTime());
@@ -969,6 +971,9 @@ class NphOrderService
         }
         if ($sampleMetadata) {
             $sample->setSampleMetadata($sampleMetadata);
+        }
+        if (!$sample->getBiobankFinalized()) {
+            $sample->setBiobankFinalized($biobankFinalization);
         }
         $this->em->persist($sample);
         $this->em->flush();
