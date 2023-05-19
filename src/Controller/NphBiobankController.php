@@ -171,8 +171,8 @@ class NphBiobankController extends BaseController
      * @Route("/{biobankId}/order/{orderId}/collect", name="nph_biobank_order_collect")
      */
     public function orderCollectDetailsAction(
-        $biobankId,
-        $orderId,
+        string $biobankId,
+        string $orderId,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService
     ): Response {
@@ -198,9 +198,9 @@ class NphBiobankController extends BaseController
      * @Route("/{biobankId}/order/{orderId}/sample/{sampleId}/finalize", name="nph_biobank_sample_finalize")
      */
     public function aliquotFinalizeAction(
-        $biobankId,
-        $orderId,
-        $sampleId,
+        string $biobankId,
+        string $orderId,
+        string $sampleId,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService,
         Request $request

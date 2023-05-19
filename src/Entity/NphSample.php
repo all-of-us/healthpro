@@ -625,11 +625,4 @@ class NphSample
         }
         return $sampleMetadata;
     }
-
-    public function getMostRecentSite()
-    {
-        if ($this->getCollectedSite()) {
-            return $this->getCollectedSite();
-        }
-    }
 }

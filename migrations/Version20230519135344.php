@@ -14,7 +14,7 @@ final class Version20230519135344 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'Adds biobank finalized field to the nph_samples table to show when a sample has been finalized by the biobank';
     }
 
     public function up(Schema $schema) : void
