@@ -269,7 +269,10 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if sample.disabled %} disabled {% endif %} formnovalidate>
+                                {% if sample.disabled or (not order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') and biobankView) %}
+                                    disabled
+                                {% endif %}
+                                formnovalidate>
                             Mark as Finalized
                         </button>
                         {% if biobankView %}

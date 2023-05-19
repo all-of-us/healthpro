@@ -311,8 +311,7 @@ class NphBiobankController extends BaseController
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
             'modifyType' => $modifyType ?? '',
             'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
-            'disableForm' => true,
-            'biobankView' => true,
+            'biobankView' => true
         ]);
     }
 }
