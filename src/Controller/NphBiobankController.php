@@ -166,7 +166,8 @@ class NphBiobankController extends BaseController
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
-            'sampleIdForm' => $sampleIdForm->createView()
+            'sampleIdForm' => $sampleIdForm->createView(),
+            'biobankView' => true
         ]);
     }
 
