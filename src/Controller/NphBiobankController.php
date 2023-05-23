@@ -148,7 +148,9 @@ class NphBiobankController extends BaseController
                 $aliquot = $this->em->getRepository(NphAliquot::class)->findOneBy([
                     'aliquotId' => $id
                 ]);
-                $sample = $aliquot->getNphSample();
+                if ($aliquot) {
+                    $sample = $aliquot->getNphSample();
+                }
             }
             if ($sample) {
                 $participantId = $sample->getNphOrder()->getParticipantId();
