@@ -19,8 +19,7 @@
 {% macro displayModifiedInfo(obj, displayTimezone = false) %}
     {{ obj.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(obj.modifiedSite) }} on
     {% if displayTimezone %}
-        {% set timezone = obj.modifiedTimezoneId ? userTimezones[obj.modifiedTimezoneId] : app.user.timezone  %}
-        {{ obj.modifiedTs|date('F j, Y g:ia T', timezone) }}
+        {{ _self.displayDateAndTimezone(obj.modifiedTs, obj.modifiedTimezoneId) }}
     {% else %}
         {{ obj.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
     {% endif %}
@@ -49,8 +48,11 @@
 
 {% macro displayDateAndTimezone(time, timezoneId) %}
     {% if time %}
-        {% set timezone = timezoneId ? userTimezones[timezoneId] : app.user.timezone  %}
-        {{ time|date('n/j/Y g:ia T', timezone) }}
+        {% if timezoneId %}
+            {{ time|date('n/j/Y g:ia T', userTimezones[timezoneId]) }}
+        {% else %}
+            {{ time|date('n/j/Y g:ia', app.user.timezone) }}
+        {% endif %}
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}
