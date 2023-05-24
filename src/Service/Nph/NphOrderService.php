@@ -324,22 +324,24 @@ class NphOrderService
             $orderType = $order->getOrderType();
             foreach ($order->getNphSamples() as $nphSample) {
                 $sampleCode = $nphSample->getSampleCode();
-                if ($formData[$sampleCode]) {
-                    $nphSample->setCollectedUser($this->user);
-                    $nphSample->setCollectedSite($this->site);
-                    $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
-                    $nphSample->setCollectedTs($collectedTs);
-                    $nphSample->setCollectedTimezoneId($this->getTimezoneid());
-                    $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
-                    if ($order->getOrderType() === NphOrder::TYPE_URINE) {
-                        $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+                if (isset($formData[$sampleCode])) {
+                    if ($formData[$sampleCode]) {
+                        $nphSample->setCollectedUser($this->user);
+                        $nphSample->setCollectedSite($this->site);
+                        $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                        $nphSample->setCollectedTs($collectedTs);
+                        $nphSample->setCollectedTimezoneId($this->getTimezoneid());
+                        $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+                        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
+                            $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+                        }
+                    } else {
+                        $nphSample->setCollectedUser(null);
+                        $nphSample->setCollectedSite(null);
+                        $nphSample->setCollectedTs(null);
+                        $nphSample->setCollectedTimezoneId(null);
+                        $nphSample->setCollectedNotes(null);
                     }
-                } else {
-                    $nphSample->setCollectedUser(null);
-                    $nphSample->setCollectedSite(null);
-                    $nphSample->setCollectedTs(null);
-                    $nphSample->setCollectedTimezoneId(null);
-                    $nphSample->setCollectedNotes(null);
                 }
                 $this->em->persist($nphSample);
                 $this->em->flush();
