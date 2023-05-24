@@ -46,6 +46,11 @@
                 </thead>
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
+                    {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
+                        <tr>
+                            <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample, true) }}</td>
+                        </tr>
+                    {% endif %}
                     <tr class="row-samples">
                         <td>
                             {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
