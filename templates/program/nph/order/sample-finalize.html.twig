@@ -87,7 +87,7 @@
                     <strong>
                         Finalized
                         by {{ sample.finalizedUser.email|default('Unknown') }}
-                        on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
                     </strong>
                     {% endif %}
                 </div>
