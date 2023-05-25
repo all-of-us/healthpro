@@ -86,7 +86,7 @@
                     {% else %}
                     <strong>
                         Finalized
-                        by {{ sample.finalizedUser.email|default('Unknown') }}
+                        by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                         on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                     </strong>
                     {% endif %}
