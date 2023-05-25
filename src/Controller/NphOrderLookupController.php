@@ -36,6 +36,9 @@ class NphOrderLookupController extends AbstractController
             $order->participant = $participantSummary->getParticipantById($order->getParticipantId());
         }
         $idForm = $this->getIdForm($request, $siteService, $participantSummary);
+        if ($idForm instanceof RedirectResponse) {
+            return $idForm;
+        }
         return $this->generateOrderLookupView('program/nph/order/orderlookup.html.twig', $idForm, $recentOrders);
     }
 
@@ -71,7 +74,7 @@ class NphOrderLookupController extends AbstractController
         }
         return $idForm;
     }
-    private function generateOrderLookupView($formpath, $idForm, $recentOrders = null): Response
+    private function generateOrderLookupView(string $formpath, FormInterface $idForm, array $recentOrders = null): Response
     {
         return $this->render($formpath, [
             'idForm' => $idForm->createView(),
