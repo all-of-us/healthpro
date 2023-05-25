@@ -76,18 +76,18 @@
         <div class="col-sm-7">
             {% if sample.rdrId and sample.finalizedTs %}
                 <div class="alert alert-success well-sm">
-                    {% if sample.biobankFinalized %}
+                    {% if biobankView %}
                         <i class="fa fa-exclamation-circle"></i>
                         <strong class="warning-text">
                             Finalized
-                            by Biobank user
+                            by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                             on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
                         </strong>
                     {% else %}
                     <strong>
                         Finalized
                         by {{ sample.finalizedUser.email|default('Unknown') }}
-                        on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
+                        on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                     </strong>
                     {% endif %}
                 </div>
