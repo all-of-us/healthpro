@@ -62,10 +62,10 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getOrdersByDateRange(string $siteId, DateTime $startDate, DateTime $endDate): array
+    public function getOrdersByDateRange(DateTime $startDate, DateTime $endDate, string $siteId = null): array
     {
         $queryBuilder = $this->createQueryBuilder('no')
-            ->select('no.participantId, no.timepoint, no.module, no.visitType, group_concat(u.email) as email, no.id as hpoOrderId,
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, group_concat(u.email) as email, no.id as hpoOrderId,
              no.orderId, group_concat(IFNULL(ns.sampleCode, \'\')) as sampleCode, group_concat(IFNULL(ns.sampleId, \'\')) as sampleId,
               group_concat(IFNULL(no.createdTs, \'\')) as createdTs, group_concat(IFNULL(ns.collectedTs, \'\')) as collectedTs,
                group_concat(IFNULL(ns.finalizedTs, \'\')) as finalizedTs, count(no.createdTs) as createdCount,
@@ -74,30 +74,34 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.user', 'u')
             ->leftJoin(NphFieldSort::class, 'nfs', Join::WITH, 'nfs.fieldValue = no.timepoint')
             ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
-            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate')
-            ->andWhere('no.site = :site')
-            ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
+            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate');
+        if ($siteId) {
+            $queryBuilder->andWhere('no.site = :site');
+        }
+        $queryBuilder
+            ->setParameters($this->getDateRangeParams($startDate, $endDate, $siteId))
             ->orderBy('no.participantId', 'DESC')
             ->addorderBy('no.module', 'ASC')
             ->addorderBy('no.visitType', 'DESC')
             ->addOrderBy('nfs.sortOrder', 'asc')
             ->addOrderBy('no.orderId', 'DESC')
-            ->groupBy('no.participantId, no.module, no.timepoint, no.orderId, nfs.sortOrder')
-            ->getQuery();
-        return $queryBuilder->getResult();
+            ->groupBy('no.participantId, no.module, no.timepoint, no.orderId, nfs.sortOrder');
+        return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getSampleCollectionStatsByDate(string $siteId, DateTime $startDate, DateTime $endDate): array
+    public function getSampleCollectionStatsByDate(DateTime $startDate, DateTime $endDate, string $siteId = null): array
     {
-        return $this->createQueryBuilder('no')
+        $queryBuilder = $this->createQueryBuilder('no')
             ->select('count(no.createdTs) as createdCount, count(ns.collectedTs) as collectedCount, count(ns.finalizedTs) as finalizedCount')
             ->join('no.nphSamples', 'ns')
             ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
-            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate')
-            ->andWhere('no.site = :site')
-            ->setParameters(['site' => $siteId, 'startDate' => $startDate, 'endDate' => $endDate])
-            ->getQuery()
-            ->getResult();
+            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate');
+        if ($siteId) {
+            $queryBuilder->andWhere('no.site = :site');
+        }
+        $queryBuilder
+            ->setParameters($this->getDateRangeParams($startDate, $endDate, $siteId));
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function getUnfinalizedSampleCollectionStats(string $siteId): array
@@ -150,5 +154,17 @@ class NphOrderRepository extends ServiceEntityRepository
             ->orderBy('no.id', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    private function getDateRangeParams(DateTime $startDate, DateTime $endDate, ?string $siteId): array
+    {
+        $params = [
+            'startDate' => $startDate,
+            'endDate' => $endDate
+        ];
+        if ($siteId) {
+            $params['site'] = $siteId;
+        }
+        return $params;
     }
 }

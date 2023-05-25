@@ -12,6 +12,7 @@ use App\Form\Nph\NphSampleRevertType;
 use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\Nph\NphOrderService;
+use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,15 +29,18 @@ class NphBiobankController extends BaseController
 {
     protected NphParticipantSummaryService $nphParticipantSummaryService;
     protected ParameterBagInterface $params;
+    protected NphParticipantReviewService $nphParticipantReviewService;
 
     public function __construct(
         EntityManagerInterface $em,
         NphParticipantSummaryService $nphParticipantSummaryService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        NphParticipantReviewService $nphParticipantReviewService
     ) {
         parent::__construct($em);
         $this->nphParticipantSummaryService = $nphParticipantSummaryService;
         $this->params = $params;
+        $this->nphParticipantReviewService = $nphParticipantReviewService;
     }
 
     /**
@@ -103,6 +107,25 @@ class NphBiobankController extends BaseController
                 'recentOrders' => null,
             ]
         );
+    }
+
+    /**
+     * @Route("/review", name="nph_biobank_review_today")
+     */
+    public function index(Request $request): Response
+    {
+        $startDate = new \DateTime('today', new \DateTimeZone($this->getSecurityUser()->getTimeZone()));
+        $endDate = new \DateTime('tomorrow', new \DateTimeZone($this->getSecurityUser()->getTimeZone()));
+        $samples = $this->em->getRepository(NphOrder::class)->getOrdersByDateRange($startDate, $endDate);
+        $sampleCounts = $this->em->getRepository(NphOrder::class)->getSampleCollectionStatsByDate($startDate, $endDate);
+        $todaysSamples = $this->nphParticipantReviewService->getTodaysSamples($samples, true);
+        return $this->render('/program/nph/biobank/today.html.twig', [
+            'samples' => $todaysSamples['samples'],
+            'collectedCount' => $sampleCounts[0]['collectedCount'],
+            'finalizedCount' => $sampleCounts[0]['finalizedCount'],
+            'createdCount' => $sampleCounts[0]['createdCount'],
+            'rowCounts' => $todaysSamples['rowCounts']
+        ]);
     }
 
     /**

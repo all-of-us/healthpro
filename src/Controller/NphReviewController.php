@@ -87,8 +87,8 @@ class NphReviewController extends BaseController
         }
 
 
-        $samples = $this->em->getRepository(NphOrder::class)->getOrdersByDateRange($site, $startDate, $endDate);
-        $sampleCounts = $this->em->getRepository(NphOrder::class)->getSampleCollectionStatsByDate($site, $startDate, $endDate);
+        $samples = $this->em->getRepository(NphOrder::class)->getOrdersByDateRange($startDate, $endDate, $site);
+        $sampleCounts = $this->em->getRepository(NphOrder::class)->getSampleCollectionStatsByDate($startDate, $endDate, $site);
 
         $todaysSamples = $this->nphParticipantReviewService->getTodaysSamples($samples);
 

@@ -11,7 +11,7 @@ class NphParticipantReviewService
         $this->nphParticipantSummaryService = $nphParticipantSummaryService;
     }
 
-    public function getTodaysSamples(?array $samples): array
+    public function getTodaysSamples(?array $samples, $biobankView = false): array
     {
         $count = 0;
         $rowCounts = [];
@@ -24,7 +24,7 @@ class NphParticipantReviewService
             }
             $rowCounts[$samples[$key]['participantId']]['participantRow'] += $samples[$key]['createdCount'] + 1;
             $rowCounts[$samples[$key]['participantId']]['module' . $samples[$key]['module']] += $samples[$key]['createdCount'] + 1;
-            if ($count <= 5) {
+            if (!$biobankView && $count <= 5) {
                 $samples[$key]['participant'] = $this->nphParticipantSummaryService->getParticipantById($samples[$key]['participantId']);
             }
             $samples[$key]['email'] = explode(',', $samples[$key]['email']);
