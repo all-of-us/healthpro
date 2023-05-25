@@ -56,15 +56,13 @@
                                 <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
                             {% elseif nphSample.finalizedTs is not empty %}
                                 <p class="text-success"><i class="fa fa-check-circle"></i>
-                                    {{ nphSample.modifyType == constant('EDITED', nphSample) ? 'Edited and Finalized' : 'Aliquoted and Finalized' }}
-                                    {{ macros.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}</p>
+                                    {{ macros.displayAliquotStatus(nphSample) }}
                             {% endif %}
                         </td>
                         <td>{{ macros.displayDateAndTimezone(nphSample.collectedTs, nphSample.collectedTimezoneId) }}</td>
                         <td>{{ nphSample.collectedNotes|default('--') }}</td>
                         <td>
                             <p>
-                                {# TODO Link to Andrew's biobank aliquot finalize page #}
                                 <a href="{{ path('nph_biobank_sample_finalize', {biobankId: participant.biobankId, sampleId: nphSample.id, orderId: order.id}) }}" class="btn btn-primary btn-xs">
                                     View
                                 </a>
