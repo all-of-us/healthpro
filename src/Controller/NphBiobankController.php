@@ -101,6 +101,7 @@ class NphBiobankController extends BaseController
             [
                 'idForm' => $idForm->createView(),
                 'recentOrders' => null,
+                'biobankView' => true,
             ]
         );
     }
