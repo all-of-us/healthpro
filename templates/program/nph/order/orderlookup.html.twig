@@ -1,4 +1,4 @@
-{% extends 'render-base.html.twig' %}
+{% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% block title %}Orders - {% endblock %}
 {% block body %}
     <div class="page-header">
@@ -14,6 +14,7 @@
             </p>
             {{ form_end(idForm) }}
         </div>
+        {% if recentOrders is not null %}
             <div class="col-sm-6 col-md-7">
                 <hr class="visible-xs"/>
                 <h3><i class="fa fa-clock-o" aria-hidden="true"></i> Recent orders</h3>
@@ -41,4 +42,5 @@
             </div>
         {% endif %}
     </div>
+    {% endif %}
 {% endblock %}

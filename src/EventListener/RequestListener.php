@@ -202,7 +202,7 @@ class RequestListener
     private function ignoreRoutes(): bool
     {
         return preg_match(
-            '/^\/(_profiler|_wdt|cron|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage)($|\/).*/',
+            '/^\/(_profiler|_wdt|cron|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
             $this->request->getPathInfo()
         );
     }
@@ -228,7 +228,7 @@ class RequestListener
     {
         // Default program should not be set if user has option to switch programs
         if (!$this->siteService->canSwitchProgram()) {
-            if ($this->authorizationChecker->isGranted('ROLE_NPH_USER')) {
+            if ($this->authorizationChecker->isGranted('ROLE_NPH_USER') || $this->authorizationChecker->isGranted('ROLE_NPH_BIOBANK')) {
                 $this->requestStack->getSession()->set('program', User::PROGRAM_NPH);
             } else {
                 $this->requestStack->getSession()->set('program', User::PROGRAM_HPO);

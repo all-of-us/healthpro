@@ -16,11 +16,13 @@ class User implements UserInterface
     public const TWOFACTOR_PREFIX = 'x-site-';
     public const ADMIN_DV = 'dv-admin';
     public const BIOBANK_GROUP = 'biospecimen-non-pii';
+    public const NPH_BIOBANK_GROUP = 'nph-biospecimen-non-pii';
     public const SCRIPPS_GROUP = 'scripps-non-pii';
     public const AWARDEE_SCRIPPS = 'stsi';
     public const READ_ONLY_GROUP = 'tactisview';
-
     public const DEFAULT_TIMEZONE = 'America/New_York';
+    public const HPO_TYPE = 'hpo';
+    public const NPH_TYPE = 'nph';
 
     private $googleUser;
     private $groups;
@@ -35,6 +37,7 @@ class User implements UserInterface
     private $sessionInfo;
     private $adminDvAccess;
     private $biobankAccess;
+    private $nphBiobankAccess;
     private $scrippsAccess;
     private $scrippsAwardee;
     private $readOnlyGroups;
@@ -46,13 +49,14 @@ class User implements UserInterface
         $this->info = $info;
         $this->timezone = is_null($timezone) && isset($info['timezone']) ? $info['timezone'] : $timezone;
         $this->sessionInfo = $sessionInfo;
-        $this->sites = $this->computeSites('hpo');
-        $this->nphSites = $this->computeSites('nph');
+        $this->sites = $this->computeSites(self::HPO_TYPE);
+        $this->nphSites = $this->computeSites(self::NPH_TYPE);
         $this->awardees = $this->computeAwardees();
-        $this->adminAccess = $this->computeAdminAccess('hpo');
-        $this->nphAdminAccess = $this->computeAdminAccess('nph');
+        $this->adminAccess = $this->computeAdminAccess(self::HPO_TYPE);
+        $this->nphAdminAccess = $this->computeAdminAccess(self::NPH_TYPE);
         $this->adminDvAccess = $this->computeAdminDvAccess();
-        $this->biobankAccess = $this->computeBiobankAccess();
+        $this->biobankAccess = $this->computeBiobankAccess(self::HPO_TYPE);
+        $this->nphBiobankAccess = $this->computeBiobankAccess(self::NPH_TYPE);
         $this->scrippsAccess = $this->computeScrippsAccess();
         $this->readOnlyGroups = $this->computeReadOnlyGroups();
     }
@@ -175,6 +179,9 @@ class User implements UserInterface
         }
         if ($this->biobankAccess) {
             $roles[] = 'ROLE_BIOBANK';
+        }
+        if ($this->nphBiobankAccess) {
+            $roles[] = 'ROLE_NPH_BIOBANK';
         }
         if ($this->scrippsAccess) {
             $roles[] = 'ROLE_SCRIPPS';
@@ -381,11 +388,12 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeBiobankAccess()
+    private function computeBiobankAccess(string $type): bool
     {
+        $groupPrefix = $type === 'hpo' ? self::BIOBANK_GROUP : self::NPH_BIOBANK_GROUP;
         $hasAccess = false;
         foreach ($this->groups as $group) {
-            if (strpos($group->getEmail(), self::BIOBANK_GROUP . '@') === 0) {
+            if (strpos($group->getEmail(), $groupPrefix . '@') === 0) {
                 $hasAccess = true;
             }
         }

@@ -10,7 +10,6 @@ use App\Service\SiteService;
 use App\Service\UserService;
 use App\Tests\testSetup;
 use Doctrine\ORM\EntityManagerInterface;
-use GPBMetadata\Google\Type\Datetime;
 use GuzzleHttp\Psr7\Response;
 
 class NphOrderServiceTest extends ServiceTestCase
@@ -31,7 +30,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('post')->willReturn($this->getGuzzleResponse($data));
         $mockRdrApiService->method('put')->willReturn($this->getGuzzleResponse($data));
-        $this->service =  new NphOrderService(
+        $this->service = new NphOrderService(
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
@@ -42,16 +41,6 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
-    }
-
-    private function getGuzzleResponse($data): Response
-    {
-        return new Response(200, ['Content-Type' => 'application/json'], $data);
-    }
-
-    private function getMockRdrResponseData(): string
-    {
-        return '{"id": "12345"}';
     }
 
     public function testLoadModules(): void
@@ -353,9 +342,9 @@ class NphOrderServiceTest extends ServiceTestCase
         string $aliquotId,
         bool $duplicate,
         bool $hasDuplicatesInform,
-        string $expectedRdrTimePoint
-    ): void
-    {
+        string $expectedRdrTimePoint,
+        bool $biobankFinalized,
+    ): void {
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
 
@@ -374,16 +363,17 @@ class NphOrderServiceTest extends ServiceTestCase
             }
             $this->assertSame($hasDuplicatesInform, $this->service->hasDuplicateAliquotsInForm($finalizedFormData, $sampleCode));
         }
-        $this->service->saveFinalization($finalizedFormData, $nphSample);
+        $this->service->saveFinalization($finalizedFormData, $nphSample, $biobankFinalized);
         $this->assertSame($collectedTs, $nphSample->getCollectedTs());
         $this->assertSame($finalizedFormData, $this->service->getExistingSampleData($nphSample));
+        $this->assertSame($biobankFinalized, $nphSample->getBiobankFinalized());
 
         if ($aliquots) {
             $finalizedFormData = [];
             foreach ($aliquots as $aliquotCode => $aliquot) {
                 $finalizedFormData[$aliquotCode][] = $aliquotId;
             }
-            $this->assertSame($duplicate, (bool)$this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
+            $this->assertSame($duplicate, (bool) $this->service->checkDuplicateAliquotId($finalizedFormData, $sampleCode));
         }
 
         // Test RDR Object
@@ -411,22 +401,23 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'urine', 'URINES', 'UrineS', $collectedTs, [
                 'URINESA1' => ['10001', $aliquotTs, 500],
                 'URINESA2' => ['10002', $aliquotTs, 5]
-            ], '10001', true, false, 'Pre LMT'],
+            ], '10001', true, false, 'Pre LMT', false],
             ['preLMT', 'saliva', 'SALIVA', 'Saliva', $collectedTs, [
                 'SALIVAA1' => ['10003', $aliquotTs, 4]
-            ], '10008', false, false, 'Pre LMT'],
+            ], '10008', false, false, 'Pre LMT', false],
             ['30min', 'blood', 'SST8P5', 'SST8.5', $collectedTs, [
                 'SST8P5A1' => ['10004', $aliquotTs, 500],
                 'SST8P5A2' => ['10005', $aliquotTs, 1000]
-            ], '10005', true, false, '30 min'],
-            ['preLMT', 'stool', 'ST1', 'ST1-K', $collectedTs, [], '10006', true, false, 'Pre LMT'],
+            ], '10005', true, false, '30 min', false],
+            ['preLMT', 'stool', 'ST1', 'ST1-K', $collectedTs, [], '10006', true, false, 'Pre LMT', false],
+            ['preLMT', 'stool', 'ST1', 'ST1-K', $collectedTs, [], '10006', true, false, 'Pre LMT', true],
         ];
     }
 
     public function testGetParticipantOrderSummary(): void
     {
         $orderSummary = $this->service->getParticipantOrderSummary('P0000000001');
-        $this->assertSame(array('order' => array(), 'sampleCount' => 0, 'sampleStatusCount' => []), $orderSummary);
+        $this->assertSame(['order' => [], 'sampleCount' => 0, 'sampleStatusCount' => []], $orderSummary);
         $participant = $this->testSetup->generateParticipant();
         $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
         $orderSummary = $this->service->getParticipantOrderSummary($participant->id);
@@ -663,5 +654,15 @@ class NphOrderServiceTest extends ServiceTestCase
                 [['field' => 'checkAll', 'message' => 'Please enter unique Stool Tube IDs']]
             ],
         ];
+    }
+
+    private function getGuzzleResponse($data): Response
+    {
+        return new Response(200, ['Content-Type' => 'application/json'], $data);
+    }
+
+    private function getMockRdrResponseData(): string
+    {
+        return '{"id": "12345"}';
     }
 }

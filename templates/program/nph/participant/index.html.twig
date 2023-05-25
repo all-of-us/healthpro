@@ -1,20 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+
 {% block title %} NPH Participant Summary {% endblock %}
-
-{% macro generateStatusLabel(status) %}
-    {% if status == 'Collected' %}
-        {% set labelClass = 'label-primary' %}
-    {% elseif status == 'Finalized' %}
-        {% set labelClass = 'label-default' %}
-    {% elseif status == 'In Progress' %}
-        {% set labelClass = 'label-warning' %}
-    {% else %}
-        {% set labelClass = 'label-default' %}
-    {% endif %}
-
-    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
-{% endmacro %}
 
 {% block body %}
     {% if hasNoParticipantAccess %}
@@ -106,10 +94,17 @@
                                  role="button" style="font-weight: bold">Visit {{ visit['visitDisplayName'] }}<span class="caret"
                                                                                           style="float: right; margin: 9px 0;"></span></div>
                             <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
-                                <a class="btn btn-primary" role="button"
-                                   href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                    <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
-                                </a>
+                                {% if participant.dob %}
+                                    <a class="btn btn-primary" role="button"
+                                       href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                        <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
+                                    </a>
+                                {% else %}
+                                    <span class="alert alert-danger no-dob-banner">
+                                        <i class="text-danger fa fa-exclamation-circle"></i>
+                                        DOB has not been provided. The participant must complete “The Basics” survey that captures their DOB to unlock order generation.
+                                    </span>
+                                {% endif %}
                                 {% set displayedOrderIDS = [] %}
                                 {% set displayedTimePointHeaders = [] %}
                                 {% for timepointCode, timepoint in visit['visitInfo'] %}
@@ -130,7 +125,7 @@
                                                                     href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
                                                                     ID: {{ orderid }}</a></div>
                                                             <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
-                                                            {{ _self.generateStatusLabel(sample[orderid]['orderStatus']) }}
+                                                            {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
                                                             {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                             {% if not loop.first %}
                                                                 <div class="col-sm-9"></div>

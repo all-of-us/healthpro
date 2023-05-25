@@ -1,0 +1,4 @@
+{% if is_granted('ROLE_NPH_BIOBANK') %}
+    {% set currentRoleNav = 'nph_biobank' %}
+{% endif %}
+{% extends 'base.html.twig' %}

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Form\Nph\NphOrderForm;
 use App\Repository\NphOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -361,6 +362,9 @@ class NphOrder
         if (isset($statusCount['Collected']) && $statusCount['Collected'] === $sampleCount) {
             return 'Collected';
         }
+        if ((isset($statusCount['Finalized']) && isset($statusCount['Biobank Finalized'])) && ($statusCount['Finalized'] + $statusCount['Biobank Finalized'] === $sampleCount)) {
+            return 'Finalized';
+        }
         return 'In Progress';
     }
 
@@ -384,5 +388,21 @@ class NphOrder
             }
         }
         return false;
+    }
+
+    public function getMetadataArray(): ?array
+    {
+        $metadata = json_decode($this->getMetadata(), true);
+        if ($metadata) {
+            $metadata['bowelType'] = isset($metadata['bowelType']) ? array_search(
+                $metadata['bowelType'],
+                NphOrderForm::$bowelMovements
+            ) : '';
+            $metadata['bowelQuality'] = isset($metadata['bowelQuality']) ? array_search(
+                $metadata['bowelQuality'],
+                NphOrderForm::$bowelMovementQuality
+            ) : '';
+        }
+        return $metadata;
     }
 }

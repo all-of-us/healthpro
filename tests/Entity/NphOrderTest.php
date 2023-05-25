@@ -10,7 +10,6 @@ class NphOrderTest extends NphTestCase
     /**
      * @dataProvider canCancelRestoreDataProvider
      */
-
     public function testCanCancelRestore($samples, $canCancel, $canRestore)
     {
         $orderData = $this->getOrderData();
@@ -98,7 +97,6 @@ class NphOrderTest extends NphTestCase
     /**
      * @dataProvider isDisabledAndMetadataDisabledDataProvider
      */
-
     public function testIsDisabledAndMetadataDisabled($samples, $isDisabled, $isMetadataFieldDisabled)
     {
         $orderData = $this->getOrderData();
@@ -165,7 +163,8 @@ class NphOrderTest extends NphTestCase
     /**
      * @dataProvider getOrderStatusDataProvider
      */
-    public function testGetOrderStatus($samples, $expectedStatus) {
+    public function testGetOrderStatus($samples, $expectedStatus)
+    {
         $orderData = $this->getOrderData();
         $nphOrder = $this->createNphOrder($orderData);
         foreach ($samples as $sample) {
@@ -173,10 +172,10 @@ class NphOrderTest extends NphTestCase
             $this->createNphSample($sample);
         }
         $this->assertSame($expectedStatus, $nphOrder->getStatus());
-        $nphOrder->getStatus();
     }
 
-    public function getOrderStatusDataProvider(): array {
+    public function getOrderStatusDataProvider(): array
+    {
         $finalizedTs = new \DateTime('2023-01-01 08:00:00');
         $collectedTs = new \DateTime('2023-01-01 08:00:00');
         return [
@@ -186,6 +185,22 @@ class NphOrderTest extends NphTestCase
                         'sampleId' => '1000000000',
                         'sampleCode' => 'ST1',
                         'finalizedTs' => $finalizedTs
+                    ],
+                    [
+                        'sampleId' => '2000000000',
+                        'sampleCode' => 'ST2',
+                        'finalizedTs' => $finalizedTs
+                    ],
+                ],
+                'Finalized'
+            ],
+            [
+                [
+                    [
+                        'sampleId' => '1000000000',
+                        'sampleCode' => 'ST1',
+                        'finalizedTs' => $finalizedTs,
+                        'biobankFinalized' => true
                     ],
                     [
                         'sampleId' => '2000000000',
@@ -244,7 +259,6 @@ class NphOrderTest extends NphTestCase
     /**
      * @dataProvider collectedTimeProvider
      */
-
     public function testGetCollectedTs(array $samples, ?\DateTime $expectedCollectedTs): void
     {
         $orderData = $this->getOrderData();
@@ -309,7 +323,6 @@ class NphOrderTest extends NphTestCase
     /**
      * @dataProvider stoolTypeProvider
      */
-
     public function testIsStoolCollectedTsDisabled(string $orderType, array $samples, bool $expectedResult): void
     {
         $orderData = $this->getOrderData();
@@ -381,6 +394,37 @@ class NphOrderTest extends NphTestCase
                 ],
                 true
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider metadataProvider
+     */
+    public function testGetMetadataArray(string $metadata, array $expected): void
+    {
+        $nphOrder = new NphOrder();
+        $nphOrder->setMetadata($metadata);
+        $result = $nphOrder->getMetadataArray();
+        $this->assertEquals($expected, $result);
+    }
+
+    public function metadataProvider(): array
+    {
+        return [
+            [
+                '{"bowelType":"difficult","bowelQuality":"difficult"}',
+                [
+                    'bowelType' => 'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2',
+                    'bowelQuality' => 'I tend to be constipated (have difficulty passing stool) - Type 1 and 2',
+                ],
+            ],
+            [
+                '{"bowelType":"watery","bowelQuality":"watery"}',
+                [
+                    'bowelType' => 'I had diarrhea (watery stool), and my stool looks like Type 5, 6, and/or 7',
+                    'bowelQuality' => 'I tend to have diarrhea (watery stool) - Type 5, 6, and 7',
+                ],
+            ]
         ];
     }
 }
