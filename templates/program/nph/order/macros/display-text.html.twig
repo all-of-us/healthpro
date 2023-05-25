@@ -66,6 +66,6 @@
             {% set biobank = '' %}
         {% endif %}
         {{ nphSample.modifyType == constant('EDITED', nphSample) ? 'Edited and ' ~ biobank ~'Finalized' : 'Aliquoted and ' ~ biobank ~' Finalized' }}
-        {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+        {{ _self.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}
     {% endif %}
 {% endmacro %}

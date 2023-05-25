@@ -18,8 +18,13 @@
                 <button type="submit" class="btn btn-primary">
                     Unlock Sample
                 </button>
-                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
+                {% if biobankView %}
+                    <a href="{{ path('nph_biobank_participant', { biobankId: participant.biobankid }) }}"
+                       class="btn btn-default">Exit</a>
+                {% else %}
+                    <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                       class="btn btn-default">Exit</a>
+                {% endif %}
             </p>
             {{ form_end(sampleModifyForm) }}
             <hr>
@@ -27,9 +32,13 @@
     {% endif %}
     <div class="row">
         <div class="col-sm-5">
-            {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
-                path('nph_samples_aliquot') } }) }}
-            {{ form_widget(sampleIdForm) }}
+            {% if biobankView %}
+                {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
+                    path('nph_biobank_samples_aliquot') } }) }}
+            {% else %}
+                {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
+                    path('nph_samples_aliquot') } }) }}
+            {% endif %}
             <p>
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
@@ -67,41 +76,28 @@
         <div class="col-sm-7">
             {% if sample.rdrId and sample.finalizedTs %}
                 <div class="alert alert-success well-sm">
-                    {% if sample.biobankFinalized %}
+                    {% if biobankView %}
                         <i class="fa fa-exclamation-circle"></i>
                         <strong class="warning-text">
                             Finalized
-                            by Biobank user
-                            on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                            by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
+                            on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
                         </strong>
                     {% else %}
                     <strong>
                         Finalized
-                        by {{ sample.finalizedUser.email|default('Unknown') }}
+                        by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                         on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                     </strong>
                     {% endif %}
                 </div>
             {% endif %}
             <div class="panel panel-default">
-                <div class="panel-heading clearfix">
-                    <div class="col-sm-5">
-                        <strong>Name</strong> {{ participant.lastName }}, {{ participant.firstName }} {{ participant
-                        .middleName }} <br>
-                        <strong>Participant ID</strong> {{ participant.id }} <br>
-                        <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
-                        <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
-                        <strong>DOB</strong> {{ participant.dob ? participant.dob|date('n/j/Y') : '--' }} <br>
-                    </div>
-                    <div class="col-sm-7 text-right">
-                        <strong class="text-primary">
-                            Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
-                            | {{ samples[sampleCode]}}
-                        </strong><br>
-                        <strong>Order ID</strong> {{ sample.nphOrder.orderId }}<br>
-                        <strong>Collection Sample ID</strong> {{ sample.sampleId }}
-                    </div>
-                </div>
+                {% if biobankView %}
+                    {% include 'program/nph/order/partials/sample-finalize-participant-details-biobank.html.twig' %}
+                {% else %}
+                    {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
+                {% endif %}
                 <div class="panel-body">
                     {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
@@ -278,7 +274,7 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if sample.disabled or (not order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') and biobankView) %}
+                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or sample.disabled %}
                                     disabled
                                 {% endif %}
                                 formnovalidate>
