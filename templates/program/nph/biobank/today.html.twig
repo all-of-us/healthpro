@@ -18,9 +18,9 @@
             <th>Samples</th>
             <th>Sample ID</th>
             <th>Created By</th>
-            <th>Created <span class="badge">0</span></th>
-            <th>Collected <span class="badge badge-warning">0</span></th>
-            <th>Aliquoted and Finalized <span class="badge badge-success">0</span></th>
+            <th>Created <span class="badge" id="created_ts">0</span></th>
+            <th>Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
+            <th>Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
             <th>Status</th>
         </tr>
         </thead>
@@ -38,9 +38,9 @@
                 <td>{{ sample.sampleCode }}</td>
                 <td>{{ sample.sampleId }}</td>
                 <td>{{ sample.email }}</td>
-                <td>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
-                <td>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
-                <td>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
+                <td {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
+                <td {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
+                <td {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
                 <td>{{ macros.displayBiobankSampleStatus(sample) }}</td>
             </tr>
         {% endfor %}
@@ -49,12 +49,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            $('table').DataTable({
-                order: [[9, 'desc']],
-                pageLength: 25
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('nph-biobank-review') }}
 {% endblock %}

@@ -69,6 +69,7 @@ Encore
     .addEntry('nph-sample-finalize', './web/assets/js/views/NphSampleFinalize.js')
     .addEntry('nph-order-modify', './web/assets/js/views/NphOrderModify.js')
     .addEntry('nph-review', './web/assets/js/views/NphReview.js')
+    .addEntry('nph-biobank-review', './web/assets/js/views/NphBiobankReview.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
