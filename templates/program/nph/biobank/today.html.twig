@@ -2,7 +2,7 @@
 {% block title %}Today - Biobank Orders - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
-{% import 'review/_macros.html.twig' as today %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 
 {% block body %}
     {% include 'program/nph/biobank/review-page-heading.html.twig' %}
@@ -38,9 +38,9 @@
                 <td>{{ sample.sampleCode }}</td>
                 <td>{{ sample.sampleId }}</td>
                 <td>{{ sample.email }}</td>
-                <td>{{ sample.createdTs|date("m/d/Y h:i A", app.user.timezone) }}</td>
-                <td>{{ sample.collectedTs|date("m/d/Y h:i A", app.user.timezone) }}</td>
-                <td>{{ sample.finalizedTs|date("m/d/Y h:i A", app.user.timezone) }}</td>
+                <td>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
+                <td>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
+                <td>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
                 <td></td>
             </tr>
         {% endfor %}
