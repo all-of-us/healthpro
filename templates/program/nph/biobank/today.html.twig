@@ -41,7 +41,7 @@
                 <td>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
                 <td>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
                 <td>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
-                <td></td>
+                <td>{{ macros.displayBiobankSampleStatus(sample) }}</td>
             </tr>
         {% endfor %}
         </tbody>
