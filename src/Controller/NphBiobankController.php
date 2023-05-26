@@ -110,12 +110,23 @@ class NphBiobankController extends BaseController
     }
 
     /**
-     * @Route("/review", name="nph_biobank_review_today")
+     * @Route("/review/orders/today", name="nph_biobank_orders_today")
      */
-    public function index(Request $request): Response
+    public function ordersTodayAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getTodaysBiobankOrders($this->getSecurityUser()->getTimeZone());
-        return $this->render('/program/nph/biobank/today.html.twig', [
+        return $this->render('/program/nph/biobank/orders-today.html.twig', [
+            'samples' => $samples
+        ]);
+    }
+
+    /**
+     * @Route("/review/orders/unfinalized", name="nph_biobank_orders_unfinalized")
+     */
+    public function orderUnfinalizedAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedBiobankOrders();
+        return $this->render('/program/nph/biobank/orders-unfinalized.html.twig', [
             'samples' => $samples
         ]);
     }
