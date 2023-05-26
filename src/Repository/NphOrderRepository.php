@@ -156,6 +156,23 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getTodaysBiobankOrders($timezone): array
+    {
+        $startDate = new \DateTime('today', new \DateTimeZone($timezone));
+        $endDate = new \DateTime('tomorrow', new \DateTimeZone($timezone));
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, ns.finalizedTs, ns.finalizedTimezoneId')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
+            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate');
+        $queryBuilder
+            ->setParameters(['startDate' => $startDate, 'endDate' => $endDate])
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     private function getDateRangeParams(DateTime $startDate, DateTime $endDate, ?string $siteId): array
     {
         $params = [

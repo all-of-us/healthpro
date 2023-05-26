@@ -6,10 +6,10 @@
 
 {% block body %}
     {% include 'program/nph/biobank/review-page-heading.html.twig' %}
-    <table class="table table-bordered table-small table-review" id="table-today">
+    <table class="table table-bordered table-small">
         <thead>
         <tr>
-            <th rowspan="2">Site</th>
+            <th>Site</th>
             <th>Biobank ID</th>
             <th>Module</th>
             <th>Visit</th>
@@ -18,66 +18,43 @@
             <th>Samples</th>
             <th>Sample ID</th>
             <th>Created By</th>
-            <th>Created <span class="badge">{{ createdCount }}</span></th>
-            <th>Collected <span class="badge badge-warning">{{ collectedCount }}</span></th>
-            <th>Aliquoted and Finalized <span class="badge badge-success">{{ finalizedCount }}</span></th>
+            <th>Created <span class="badge">0</span></th>
+            <th>Collected <span class="badge badge-warning">0</span></th>
+            <th>Aliquoted and Finalized <span class="badge badge-success">0</span></th>
             <th>Status</th>
         </tr>
         </thead>
         <tbody>
-        {% set biobankId = 0 %}
-        {% set lastModule = 0 %}
-        {% set lastVisit = '' %}
-        {% for id, sample in samples %}
-            {% set sampleLength = sample.sampleId|length %}
-            {% set rowSpanLength = sampleLength + 1 %}
-            {% set rowSpan = 'rowspan =' ~ rowSpanLength %}
-            {% set participantRowSpan = 'rowspan =' ~ rowCounts[sample.participantId]['participantRow'] %}
-            {% set moduleRowSpan = 'rowspan =' ~ rowCounts[sample.participantId]['module'~sample.module] %}
-            {% if biobankId != sample.biobankId %}
-                <td {{ participantRowSpan }}>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
-                <td {{ participantRowSpan }}>{{ sample.biobankId }}</td>
-            {% endif %}
-            {% if lastModule != sample.module or biobankId != sample.biobankId %}
-                <td {{ moduleRowSpan }}>
-                    {{ sample.module }}
-                </td>
-                <td {{ moduleRowSpan }}>{{ sample.visitType }}</td>
-            {% endif %}
-            <td {{ rowSpan }}>{{ sample.timepoint }}</td>
-            <td {{ rowSpan }}><a
-                        href="{{ path('nph_order_collect', {participantId: sample.participantId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
-            </td>
-            {% for i in 0..sampleLength - 1 %}
-                <tr>
-                    <td>{{ sample.sampleCode[i] }}</td>
-                    <td>{{ sample.sampleId[i] }}</td>
-                    <td>{{ sample.email[i] }}</td>
-                    {% if sample.createdTs[i] != '' %}
-                        <td>{{ sample.createdTs[i]|date("m/d/Y h:i A", app.user.timezone) }}</td>
-                    {% else %}
-                        <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
-                    {% endif %}
-                    {% if sample.collectedTs[i] != '' %}
-                        <td>{{ sample.collectedTs[i]|date("m/d/Y h:i A", app.user.timezone) }}</td>
-                    {% else %}
-                        <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
-                    {% endif %}
-                    {% if sample.finalizedTs[i] != '' %}
-                        <td>{{ sample.finalizedTs[i]|date("m/d/Y h:i A", app.user.timezone) }}</td>
-                    {% else %}
-                        <td><i class="fa fa-times text-danger" aria-hidden="true"></i></td>
-                    {% endif %}
-                    <td></td>
-                </tr>
-            {% endfor %}
-            {% set biobankId = sample.biobankId %}
-            {% set lastModule = sample.module %}
-        {% else %}
+        {% for sample in samples %}
             <tr>
-                <td colspan="99" align="center">No records found</td>
+                <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
+                <td>{{ sample.biobankId }}</td>
+                <td>{{ sample.module }}</td>
+                <td>{{ sample.visitType }}</td>
+                <td>{{ sample.timepoint }}</td>
+                <td>
+                    <a href="{{ path('nph_order_collect', {participantId: sample.participantId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
+                </td>
+                <td>{{ sample.sampleCode }}</td>
+                <td>{{ sample.sampleId }}</td>
+                <td>{{ sample.email }}</td>
+                <td>{{ sample.createdTs|date("m/d/Y h:i A", app.user.timezone) }}</td>
+                <td>{{ sample.collectedTs|date("m/d/Y h:i A", app.user.timezone) }}</td>
+                <td>{{ sample.finalizedTs|date("m/d/Y h:i A", app.user.timezone) }}</td>
+                <td></td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+{% endblock %}
+
+{% block pagejs %}
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                order: [[9, 'desc']],
+                pageLength: 25
+            });
+        });
+    </script>
 {% endblock %}

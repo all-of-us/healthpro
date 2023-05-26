@@ -114,17 +114,9 @@ class NphBiobankController extends BaseController
      */
     public function index(Request $request): Response
     {
-        $startDate = new \DateTime('today', new \DateTimeZone($this->getSecurityUser()->getTimeZone()));
-        $endDate = new \DateTime('tomorrow', new \DateTimeZone($this->getSecurityUser()->getTimeZone()));
-        $samples = $this->em->getRepository(NphOrder::class)->getOrdersByDateRange($startDate, $endDate);
-        $sampleCounts = $this->em->getRepository(NphOrder::class)->getSampleCollectionStatsByDate($startDate, $endDate);
-        $todaysSamples = $this->nphParticipantReviewService->getTodaysSamples($samples, true);
+        $samples = $this->em->getRepository(NphOrder::class)->getTodaysBiobankOrders($this->getSecurityUser()->getTimeZone());
         return $this->render('/program/nph/biobank/today.html.twig', [
-            'samples' => $todaysSamples['samples'],
-            'collectedCount' => $sampleCounts[0]['collectedCount'],
-            'finalizedCount' => $sampleCounts[0]['finalizedCount'],
-            'createdCount' => $sampleCounts[0]['createdCount'],
-            'rowCounts' => $todaysSamples['rowCounts']
+            'samples' => $samples
         ]);
     }
 
