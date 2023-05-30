@@ -125,8 +125,19 @@ class NphBiobankController extends BaseController
      */
     public function orderUnfinalizedAction(): Response
     {
-        $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedBiobankOrders();
+        $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedBiobankSamples();
         return $this->render('/program/nph/biobank/orders-unfinalized.html.twig', [
+            'samples' => $samples
+        ]);
+    }
+
+    /**
+     * @Route("/review/orders/unlocked", name="nph_biobank_orders_unlocked")
+     */
+    public function orderUnlockedAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getUnlockedBiobankSamples();
+        return $this->render('/program/nph/biobank/orders-unlocked.html.twig', [
             'samples' => $samples
         ]);
     }
