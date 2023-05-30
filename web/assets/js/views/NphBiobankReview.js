@@ -1,6 +1,6 @@
 $(document).ready(function () {
     $('table').DataTable({
-        order: [[9, 'desc']],
+        order: [[8, 'desc']],
         pageLength: 25
     });
 

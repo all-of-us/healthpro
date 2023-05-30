@@ -81,6 +81,10 @@
         {% set status = 'Edited & Finalized' %}
     {% elseif nphSample.finalizedTs %}
         {% set status = nphSample.biobankFinalized ? 'Biobank Finalized' : 'Finalized' %}
+    {% elseif nphSample.collectedTs %}
+        {% set status = 'Collected' %}
+    {% elseif nphSample.createdTs %}
+        {% set status = 'Created' %}
     {% endif %}
     {{ status }}
 {% endmacro %}
