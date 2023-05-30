@@ -58,14 +58,14 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayAliquotStatus(nphSample) %}
+{% macro displayCollectAliquotStatus(nphSample) %}
     {% if nphSample is not null %}
         {% if nphSample.getBiobankFinalized %}
             {% set biobank = 'Biobank ' %}
         {% else %}
             {% set biobank = '' %}
         {% endif %}
-        {{ nphSample.modifyType == constant('EDITED', nphSample) ? 'Edited and ' ~ biobank ~'Finalized' : 'Aliquoted and ' ~ biobank ~' Finalized' }}
+        {{ nphSample.modifyType == constant('App\\Entity\\NphSample::EDITED') ? 'Edited and ' ~ biobank ~'Finalized' : 'Aliquoted and ' ~ biobank ~' Finalized' }}
         {{ _self.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}
     {% endif %}
 {% endmacro %}
