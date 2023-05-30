@@ -200,6 +200,22 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    public function getRecentlyModifiedBiobankSamples($timezone): array
+    {
+        $endDate = new \DateTime('-7 days', new \DateTimeZone($timezone));
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.modifiedTs, ns.modifiedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('ns.modifyType is not NULL')
+            ->andWhere('ns.modifiedTs >= :endDate')
+            ->setParameter('endDate', $endDate)
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     private function getDateRangeParams(DateTime $startDate, DateTime $endDate, ?string $siteId): array
     {
         $params = [

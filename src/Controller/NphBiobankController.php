@@ -124,7 +124,7 @@ class NphBiobankController extends BaseController
     /**
      * @Route("/review/orders/unfinalized", name="nph_biobank_orders_unfinalized")
      */
-    public function orderUnfinalizedAction(): Response
+    public function ordersUnfinalizedAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedBiobankSamples();
         return $this->render('/program/nph/biobank/orders-unfinalized.html.twig', [
@@ -135,11 +135,23 @@ class NphBiobankController extends BaseController
     /**
      * @Route("/review/orders/unlocked", name="nph_biobank_orders_unlocked")
      */
-    public function orderUnlockedAction(): Response
+    public function ordersUnlockedAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getUnlockedBiobankSamples();
         return $this->render('/program/nph/biobank/orders-unlocked.html.twig', [
             'samples' => $samples
+        ]);
+    }
+
+    /**
+     * @Route("/review/orders/recent/modified", name="nph_biobank_orders_recently_modified")
+     */
+    public function ordersRecentlyModifiedAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getRecentlyModifiedBiobankSamples($this->getSecurityUser()->getTimeZone());
+        return $this->render('/program/nph/biobank/orders-recently-modified.html.twig', [
+            'samples' => $samples,
+            'viewType' => 'recent'
         ]);
     }
 
