@@ -73,7 +73,7 @@
                                 <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
                             {% elseif nphSample.finalizedTs is not empty %}
                                 <p class="text-success"><i class="fa fa-check-circle"></i>
-                                    {{ macros.displayAliquotStatus(nphSample) }}
+                                    {{ macros.displayCollectAliquotStatus(nphSample) }}
                                 </p>
                             {% endif %}
                         </td>
