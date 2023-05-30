@@ -409,6 +409,16 @@ class WorkQueue
             'csvFormatDate' => true,
             'group' => 'metrics'
         ],
+        'healthDataStream' => [
+            'name' => 'Health Data Stream',
+            'rdrField' => 'healthDataStreamSharingStatusV3_1',
+            'sortField' => 'healthDataStreamSharingStatusV3_1',
+            'method' => 'getHealthDataSharingStatus',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'metrics'
+        ],
         'patientStatusYes' => [
             'name' => 'Yes',
             'csvName' => 'Patient Status: Yes',
@@ -1264,6 +1274,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStream',
         'patientStatusYes',
         'patientStatusNo',
         'patientStatusNoAccess',
@@ -1414,6 +1425,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStream',
         'patientStatusYes',
         'patientStatusNo',
         'patientStatusNoAccess',
@@ -1512,6 +1524,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStream',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -1735,7 +1748,8 @@ class WorkQueue
                 'Yes' => 'yes',
                 'No' => 'no'
             ]
-        ]
+        ],
+
     ];
 
     public static $consentFilters = [
@@ -2277,7 +2291,8 @@ class WorkQueue
             'gRoRConsent',
             'primaryLanguage',
             'isEhrDataAvailable',
-            'latestEhrReceiptTime'
+            'latestEhrReceiptTime',
+            'healthDataStream'
         ],
         'contact' => [
             'participantId',
@@ -2606,6 +2621,20 @@ class WorkQueue
                 return self::HTML_SUCCESS . ' (Actively and Passively Retained)';
             default:
                 return self::HTML_DANGER . ' (Not Retained)';
+        }
+    }
+
+    public static function getHealthDataSharingStatus($value)
+    {
+        switch ($value) {
+            case 'NEVER_SHARED':
+                return self::HTML_DANGER . ' No';
+            case 'EVER_SHARED':
+                return self::HTML_SUCCESS . ' Yes';
+            case 'CURRENTLY_SHARING':
+                return self::HTML_SUCCESS . ' Yes (Currently Sharing)';
+            default:
+                return '';
         }
     }
 
