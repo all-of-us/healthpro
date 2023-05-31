@@ -151,7 +151,7 @@ class NphBiobankController extends BaseController
         $samples = $this->em->getRepository(NphOrder::class)->getRecentlyModifiedBiobankSamples($this->getSecurityUser()->getTimeZone());
         return $this->render('/program/nph/biobank/orders-recently-modified.html.twig', [
             'samples' => $samples,
-            'viewType' => 'recent'
+            'modifiedOrdersView' => true
         ]);
     }
 

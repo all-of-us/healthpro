@@ -13,7 +13,7 @@
         <th>Created <span class="badge" id="created_ts">0</span></th>
         <th>Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
         <th>Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
-        {% if viewType is defined and viewType == 'recent' %}
+        {% if modifiedOrdersView is defined %}
             <th>Modified</th>
         {% endif %}
         <th>Status</th>
@@ -35,7 +35,7 @@
             <td {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
             <td {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
             <td {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
-            {% if viewType is defined and viewType == 'recent' %}
+            {% if modifiedOrdersView is defined %}
                 <td>{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
             {% endif %}
             <td>{{ macros.displayBiobankSampleStatus(sample) }}</td>
