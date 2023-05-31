@@ -11,7 +11,7 @@ class NphParticipantReviewService
         $this->nphParticipantSummaryService = $nphParticipantSummaryService;
     }
 
-    public function getTodaysSamples(?array $samples, $biobankView = false): array
+    public function getTodaysSamples(?array $samples, bool $biobankView = false): array
     {
         $count = 0;
         $rowCounts = [];
