@@ -135,4 +135,47 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $this->assertCount(1, $samples);
         $this->assertSame($samples[0]['modifyType'], NphSample::UNLOCK);
     }
+
+    public function testGetTodaysBiobankOrders(): void
+    {
+        $timezone = 'America/Chicago';
+        $startDate = new \DateTime('today', new \DateTimeZone($timezone));
+        $endDate = new \DateTime('tomorrow', new \DateTimeZone($timezone));
+        $samples = $this->repo->getTodaysBiobankOrders($timezone);
+        foreach ($samples as $sample) {
+            if ($sample['site'] === $this->nphOrder->getSite()) {
+                $this->assertGreaterThanOrEqual($startDate, $sample['createdTs']);
+                $this->assertLessThanOrEqual($endDate, $sample['createdTs']);
+            }
+        }
+    }
+
+    public function testGetUnfinalizedBiobankSamples(): void
+    {
+        $samples = $this->repo->getUnfinalizedBiobankSamples();
+        foreach ($samples as $sample) {
+            $this->assertSame(null, $sample['finalizedTs']);
+        }
+    }
+
+    public function testGetUnlockedBiobankSamples(): void
+    {
+        $samples = $this->repo->getUnlockedBiobankSamples();
+        foreach ($samples as $sample) {
+            $this->assertSame(NphSample::UNLOCK, $sample['modifyType']);
+        }
+    }
+
+    public function testGetRecentlyModifiedBiobankSamples(): void
+    {
+        $timezone = 'America/Chicago';
+        $endDate = new \DateTime('-7 days', new \DateTimeZone($timezone));
+        $samples = $this->repo->getRecentlyModifiedBiobankSamples($timezone);
+        foreach ($samples as $sample) {
+            $this->assertNotNull($sample['modifyType']);
+            if ($sample['site'] === $this->nphOrder->getSite()) {
+                $this->assertGreaterThanOrEqual($endDate, $sample['modifiedTs']);
+            }
+        }
+    }
 }

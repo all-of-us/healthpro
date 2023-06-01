@@ -12,6 +12,7 @@ use App\Form\Nph\NphSampleRevertType;
 use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Service\Nph\NphOrderService;
+use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,15 +29,18 @@ class NphBiobankController extends BaseController
 {
     protected NphParticipantSummaryService $nphParticipantSummaryService;
     protected ParameterBagInterface $params;
+    protected NphParticipantReviewService $nphParticipantReviewService;
 
     public function __construct(
         EntityManagerInterface $em,
         NphParticipantSummaryService $nphParticipantSummaryService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        NphParticipantReviewService $nphParticipantReviewService
     ) {
         parent::__construct($em);
         $this->nphParticipantSummaryService = $nphParticipantSummaryService;
         $this->params = $params;
+        $this->nphParticipantReviewService = $nphParticipantReviewService;
     }
 
     /**
@@ -104,6 +108,51 @@ class NphBiobankController extends BaseController
                 'biobankView' => true,
             ]
         );
+    }
+
+    /**
+     * @Route("/review/orders/today", name="nph_biobank_orders_today")
+     */
+    public function ordersTodayAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getTodaysBiobankOrders($this->getSecurityUser()->getTimeZone());
+        return $this->render('/program/nph/biobank/orders-today.html.twig', [
+            'samples' => $samples
+        ]);
+    }
+
+    /**
+     * @Route("/review/orders/unfinalized", name="nph_biobank_orders_unfinalized")
+     */
+    public function ordersUnfinalizedAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedBiobankSamples();
+        return $this->render('/program/nph/biobank/orders-unfinalized.html.twig', [
+            'samples' => $samples
+        ]);
+    }
+
+    /**
+     * @Route("/review/orders/unlocked", name="nph_biobank_orders_unlocked")
+     */
+    public function ordersUnlockedAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getUnlockedBiobankSamples();
+        return $this->render('/program/nph/biobank/orders-unlocked.html.twig', [
+            'samples' => $samples
+        ]);
+    }
+
+    /**
+     * @Route("/review/orders/recent/modified", name="nph_biobank_orders_recently_modified")
+     */
+    public function ordersRecentlyModifiedAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getRecentlyModifiedBiobankSamples($this->getSecurityUser()->getTimeZone());
+        return $this->render('/program/nph/biobank/orders-recently-modified.html.twig', [
+            'samples' => $samples,
+            'modifiedOrdersView' => true
+        ]);
     }
 
     /**

@@ -1,0 +1,45 @@
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+<table class="table table-bordered table-small">
+    <thead>
+    <tr>
+        <th>Site</th>
+        <th>Biobank ID</th>
+        <th>Module</th>
+        <th>Visit</th>
+        <th>Timepoint</th>
+        <th>Order ID</th>
+        <th>Samples</th>
+        <th>Sample ID</th>
+        <th>Created <span class="badge" id="created_ts">0</span></th>
+        <th>Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
+        <th>Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
+        {% if modifiedOrdersView is defined %}
+            <th>Modified</th>
+        {% endif %}
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for sample in samples %}
+        <tr>
+            <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
+            <td>{{ sample.biobankId }}</td>
+            <td>{{ sample.module }}</td>
+            <td>{{ sample.visitType }}</td>
+            <td>{{ sample.timepoint }}</td>
+            <td>
+                <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
+            </td>
+            <td>{{ sample.sampleCode }}</td>
+            <td>{{ sample.sampleId }}</td>
+            <td {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
+            <td {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
+            <td {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
+            {% if modifiedOrdersView is defined %}
+                <td>{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
+            {% endif %}
+            <td>{{ macros.displayBiobankSampleStatus(sample) }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
