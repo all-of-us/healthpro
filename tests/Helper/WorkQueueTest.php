@@ -165,6 +165,8 @@ class WorkQueueTest extends TestCase
             'Language of Primary Consent',
             'EHR Data Transfer',
             'Most Recent EHR Receipt',
+            'Health Data Stream Sharing Status',
+            'Health Data Stream Sharing Date',
             'Patient Status: Yes',
             'Patient Status: No',
             'Patient Status: No Access',
