@@ -1,0 +1,122 @@
+{% extends 'program/nph/biobank/base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+{% block title %} Order Collection Details - {% endblock %}
+{% block body %}
+    <div class="page-header row participant-name">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i> Order Collection Details
+        </h2>
+    </div>
+    <div class="page-header row participant-information">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-3">
+                    <div><strong>Biobank ID</strong></div>
+                    <div>{{ participant.biobankId }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div><strong>Site</strong></div>
+                    <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+                </div>
+                <div class="col-sm-4 col-sm-offset-2">
+                    <strong class="text-primary">
+                        Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
+                        | {{ order
+                        .orderType|capitalize }}
+                    </strong>
+                    <p>Order ID: <strong>{{ order.orderId }}</strong></p>
+                    <h4><i class="fa fa-medkit" aria-hidden="true"></i> {{ order.createdTs|date('n/j/Y') }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="alert bg-light well-sm margin-top-15">
+        <span class="font-bold">{{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}</span>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-samples">
+                <thead>
+                <tr>
+                    <th>Collection Sample</th>
+                    <th>Collection Time</th>
+                    <th>Notes</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for index, nphSample in order.nphSamples %}
+                    {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
+                        <tr>
+                            <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample, true) }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr class="row-samples">
+                        <td>
+                            {{ samples[nphSample.sampleCode] }} ({{ nphSample.sampleId }})
+                            {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
+                                <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing
+                                </p>
+                            {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
+                                <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
+                            {% elseif nphSample.finalizedTs is not empty %}
+                                <p class="text-success"><i class="fa fa-check-circle"></i>
+                                    {{ macros.displayCollectAliquotStatus(nphSample) }}
+                            {% endif %}
+                        </td>
+                        <td>{{ macros.displayDateAndTimezone(nphSample.collectedTs, nphSample.collectedTimezoneId) }}</td>
+                        <td>{{ nphSample.collectedNotes|default('--') }}</td>
+                        <td>
+                            <p>
+                                <a href="{{ path('nph_biobank_sample_finalize', {biobankId: participant.biobankId, sampleId: nphSample.id, orderId: order.id}) }}" class="btn btn-primary btn-xs">
+                                    View
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% if order.orderType == constant('TYPE_URINE', order) %}
+                {% set nphSample = order.nphSamples[0] %}
+                <hr>
+                <h4>
+                    Color and Clarity
+                </h4>
+                {% set sampleMetadata =  nphSample.sampleMetadataArray %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <div><strong>Urine Color</strong></div>
+                        <div>{{ sampleMetadata['urineColor']|default('--') }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div><strong>Urine Clarity</strong></div>
+                        <div>{{ sampleMetadata['urineClarity']|default('--') }}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if order.orderType == constant('TYPE_STOOL', order) %}
+                <hr>
+                <h4>
+                    Bristol Stool Chart Questions
+                </h4>
+                {% set orderMetadata =  order.metadataArray %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <div><strong>Bowel Type</strong></div>
+                        <div>{{ orderMetadata['bowelType']|default('--') }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div><strong>Bowel Quality</strong></div>
+                        <div>{{ orderMetadata['bowelQuality']|default('--') }}</div>
+                    </div>
+                </div>
+            {% endif %}
+            <br>
+            <div class="form-group">
+                <a href="{{ path('nph_biobank_participant', { biobankId: participant.biobankId }) }}"
+                   class="btn btn-default">Exit</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

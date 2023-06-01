@@ -57,6 +57,11 @@ class NphAliquot
     private $status;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $aliquotTimezoneId;
+
+    /**
      * @ORM\Column(type="json", nullable=true)
      */
     private $aliquotMetadata = [];
@@ -146,6 +151,18 @@ class NphAliquot
     public function setStatus(?string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getAliquotTimezoneId(): ?int
+    {
+        return $this->aliquotTimezoneId;
+    }
+
+    public function setAliquotTimezoneId(?int $aliquotTimezoneId): self
+    {
+        $this->aliquotTimezoneId = $aliquotTimezoneId;
 
         return $this;
     }

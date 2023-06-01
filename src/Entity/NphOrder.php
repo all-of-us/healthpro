@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Form\Nph\NphOrderForm;
 use App\Repository\NphOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -87,6 +88,11 @@ class NphOrder
      * @ORM\Column(type="string", length=50)
      */
     private $biobankId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $createdTimezoneId;
 
     public function __construct()
     {
@@ -248,6 +254,18 @@ class NphOrder
         return $this;
     }
 
+    public function getCreatedTimezoneId(): ?int
+    {
+        return $this->createdTimezoneId;
+    }
+
+    public function setCreatedTimezoneId(?int $createdTimezoneId): self
+    {
+        $this->createdTimezoneId = $createdTimezoneId;
+
+        return $this;
+    }
+
     public function canCancel(): bool
     {
         foreach ($this->getNphSamples() as $nphSample) {
@@ -344,6 +362,9 @@ class NphOrder
         if (isset($statusCount['Collected']) && $statusCount['Collected'] === $sampleCount) {
             return 'Collected';
         }
+        if ((isset($statusCount['Finalized']) && isset($statusCount['Biobank Finalized'])) && ($statusCount['Finalized'] + $statusCount['Biobank Finalized'] === $sampleCount)) {
+            return 'Finalized';
+        }
         return 'In Progress';
     }
 
@@ -367,5 +388,21 @@ class NphOrder
             }
         }
         return false;
+    }
+
+    public function getMetadataArray(): ?array
+    {
+        $metadata = json_decode($this->getMetadata(), true);
+        if ($metadata) {
+            $metadata['bowelType'] = isset($metadata['bowelType']) ? array_search(
+                $metadata['bowelType'],
+                NphOrderForm::$bowelMovements
+            ) : '';
+            $metadata['bowelQuality'] = isset($metadata['bowelQuality']) ? array_search(
+                $metadata['bowelQuality'],
+                NphOrderForm::$bowelMovementQuality
+            ) : '';
+        }
+        return $metadata;
     }
 }

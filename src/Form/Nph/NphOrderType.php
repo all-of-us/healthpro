@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints;
 class NphOrderType extends AbstractType
 {
     private const STOOL_ST1 = 'ST1';
+    private const TISSUE_CONSENT_SAMPLES = ['HAIR', 'NAILB', 'NAILL'];
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -83,12 +84,17 @@ class NphOrderType extends AbstractType
                 'label' => $timePoints[$timePoint],
                 'choices' => array_flip($samples),
                 'required' => false,
-                'choice_attr' => function ($val) use ($ordersData, $timePoint) {
+                'choice_attr' => function ($val) use ($ordersData, $timePoint, $options) {
                     $attr = [];
                     if (isset($ordersData[$timePoint]) && in_array($val, $ordersData[$timePoint])) {
                         $attr['disabled'] = true;
                         $attr['class'] = 'sample-disabled';
                         $attr['checked'] = true;
+                    } elseif ($options['module'] === '1' && $options['module1tissueCollectConsent'] === false
+                        && in_array($val, self::TISSUE_CONSENT_SAMPLES)) {
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled sample-disabled-colored';
+                        $attr['checked'] = false;
                     }
                     return $attr;
                 }
@@ -112,7 +118,9 @@ class NphOrderType extends AbstractType
         $resolver->setDefaults([
             'timePointSamples' => null,
             'timePoints' => null,
-            'stoolSamples' => null
+            'stoolSamples' => null,
+            'module' => null,
+            'module1tissueCollectConsent' => null,
         ]);
     }
 

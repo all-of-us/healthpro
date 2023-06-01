@@ -1,24 +1,28 @@
-{% macro displayModifyBannerMessage(obj) %}
+{% macro displayModifyBannerMessage(obj, displayTimezone = false) %}
     {% if obj.modifyType == 'cancel' %}
         <div class="alert alert-danger well-sm">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong>
-                Cancelled by {{ _self.displayModifiedInfo(obj) }}
+                Cancelled by {{ _self.displayModifiedInfo(obj, displayTimezone) }}
             </strong>
             <p><strong>Reason:</strong> {{ obj.modifyReasonDisplayText }}</p>
         </div>
     {% elseif obj.modifyType == 'unlock' %}
         <div class="alert alert-warning well-sm">
             <strong>
-                Unlocked for editing by {{ _self.displayModifiedInfo(obj) }}
+                Unlocked for editing by {{ _self.displayModifiedInfo(obj, displayTimezone) }}
             </strong>
         </div>
     {% endif %}
 {% endmacro %}
 
-{% macro displayModifiedInfo(obj) %}
+{% macro displayModifiedInfo(obj, displayTimezone = false) %}
     {{ obj.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(obj.modifiedSite) }} on
-    {{ obj.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
+    {% if displayTimezone %}
+        {{ _self.displayDateAndTimezone(obj.modifiedTs, obj.modifiedTimezoneId) }}
+    {% else %}
+        {{ obj.modifiedTs|date('F j, Y g:ia', app.user.timezone) }}
+    {% endif %}
 {% endmacro %}
 
 {% macro displayAliquotStatus(status) %}
@@ -26,5 +30,42 @@
         <span class="text-danger">Removed</span>
     {% else %}
         <span class="text-success">Active</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro generateStatusLabel(status) %}
+    {% if status == 'Collected' %}
+        {% set labelClass = 'label-primary' %}
+    {% elseif status == 'Finalized' %}
+        {% set labelClass = 'label-default' %}
+    {% elseif status == 'In Progress' %}
+        {% set labelClass = 'label-warning' %}
+    {% else %}
+        {% set labelClass = 'label-default' %}
+    {% endif %}
+    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
+{% endmacro %}
+
+{% macro displayDateAndTimezone(time, timezoneId) %}
+    {% if time %}
+        {% if timezoneId %}
+            {{ time|date('n/j/Y g:ia T', userTimezones[timezoneId]) }}
+        {% else %}
+            {{ time|date('n/j/Y g:ia', app.user.timezone) }}
+        {% endif %}
+    {% else %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro displayCollectAliquotStatus(nphSample) %}
+    {% if nphSample is not null %}
+        {% if nphSample.getBiobankFinalized %}
+            {% set biobank = 'Biobank ' %}
+        {% else %}
+            {% set biobank = '' %}
+        {% endif %}
+        {{ nphSample.modifyType == constant('App\\Entity\\NphSample::EDITED') ? 'Edited and ' ~ biobank ~'Finalized' : 'Aliquoted and ' ~ biobank ~' Finalized' }}
+        {{ _self.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}
     {% endif %}
 {% endmacro %}

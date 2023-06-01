@@ -94,6 +94,9 @@ label.label-normal {
     margin-top: -17px;
     text-align: right;
 }
+.single-subtitle {
+    margin-top: -6px;
+}
 .navbar-brand img {
     margin-top: -10px;
     margin-right: 5px;
@@ -648,6 +651,9 @@ table.table-samples td {
 .custom-text-muted {
     color: #dadada;
 }
+.submission-label {
+    margin-right: 10px;
+}
 
 /* Help */
 .help-footer {
@@ -860,4 +866,10 @@ table.table-samples td {
 
 .stool-samples-box-2 {
     background-color: #fef6a6;
+}
+
+/* NPH Participant details */
+
+.no-dob-banner {
+    display: inline-block;
 }

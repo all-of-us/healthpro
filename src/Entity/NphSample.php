@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Form\Nph\NphOrderForm;
 use App\Repository\NphSampleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -159,6 +160,25 @@ class NphSample
      * @ORM\Column(type="integer", nullable=false)
      */
     private $sampleGroup;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $collectedTimezoneId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $finalizedTimezoneId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $modifiedTimezoneId;
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $biobankFinalized;
 
     public function __construct()
     {
@@ -327,6 +347,54 @@ class NphSample
         return $this;
     }
 
+    public function setBiobankFinalized(bool $biobankFinalized): self
+    {
+        $this->biobankFinalized = $biobankFinalized;
+
+        return $this;
+    }
+
+    public function getBiobankFinalized(): ?bool
+    {
+        return $this->biobankFinalized;
+    }
+
+    public function getCollectedTimezoneId(): ?int
+    {
+        return $this->collectedTimezoneId;
+    }
+
+    public function setCollectedTimezoneId(?int $collectedTimezoneId): self
+    {
+        $this->collectedTimezoneId = $collectedTimezoneId;
+
+        return $this;
+    }
+
+    public function getFinalizedTimezoneId(): ?int
+    {
+        return $this->finalizedTimezoneId;
+    }
+
+    public function setFinalizedTimezoneId(?int $finalizedTimezoneId): self
+    {
+        $this->finalizedTimezoneId = $finalizedTimezoneId;
+
+        return $this;
+    }
+
+    public function getModifiedTimezoneId(): ?int
+    {
+        return $this->modifiedTimezoneId;
+    }
+
+    public function setModifiedTimezoneId(?int $modifiedTimezoneId): self
+    {
+        $this->modifiedTimezoneId = $modifiedTimezoneId;
+
+        return $this;
+    }
+
     public function getStatus(): string
     {
         if ($this->modifyType === NphSample::CANCEL) {
@@ -344,6 +412,11 @@ class NphSample
         if ($this->finalizedTs === null) {
             return 'Collected';
         }
+
+        if ($this->biobankFinalized) {
+            return 'Biobank Finalized';
+        }
+
         return 'Finalized';
     }
 
@@ -535,5 +608,21 @@ class NphSample
     public function setSampleGroup($sampleGroup): void
     {
         $this->sampleGroup = $sampleGroup;
+    }
+
+    public function getSampleMetadataArray(): ?array
+    {
+        $sampleMetadata = json_decode($this->getSampleMetadata(), true);
+        if ($sampleMetadata) {
+            $sampleMetadata['urineColor'] = isset($sampleMetadata['urineColor']) ? array_search(
+                $sampleMetadata['urineColor'],
+                NphOrderForm::$urineColors
+            ) : '';
+            $sampleMetadata['urineClarity'] = isset($sampleMetadata['urineClarity']) ? array_search(
+                $sampleMetadata['urineClarity'],
+                NphOrderForm::$urineClarity
+            ) : '';
+        }
+        return $sampleMetadata;
     }
 }

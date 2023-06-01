@@ -1,8 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
 {% block body %}
     <div class="page-header">
-        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot {{ biobankView ? 'Lookup' : 'Samples' }}</h2>
     </div>
     <div class="row">
         <div class="col-sm-6 col-md-5">
