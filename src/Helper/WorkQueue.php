@@ -415,9 +415,17 @@ class WorkQueue
             'sortField' => 'healthDataStreamSharingStatusV3_1',
             'method' => 'getHealthDataSharingStatus',
             'htmlClass' => 'text-center',
+            'rdrDateField' => 'healthDataStreamSharingStatusV3_1Time',
             'toggleColumn' => true,
+            'displayTime' => true,
             'visible' => false,
-            'group' => 'metrics'
+            'params' => 3,
+            'group' => 'metrics',
+            'csvNames' => [
+                'Health Data Stream Sharing Status',
+                'Health Data Stream Sharing Date'
+            ],
+            'csvMethod' => 'csvHealthDataSharingStatus'
         ],
         'patientStatusYes' => [
             'name' => 'Yes',
@@ -2624,17 +2632,16 @@ class WorkQueue
         }
     }
 
-    public static function getHealthDataSharingStatus($value)
+    public static function getHealthDataSharingStatus($value, $time, $userTimezone)
     {
         switch ($value) {
-            case 'NEVER_SHARED':
-                return self::HTML_DANGER . ' No';
             case 'EVER_SHARED':
-                return self::HTML_SUCCESS . ' Yes';
+                return self::HTML_SUCCESS . ' Yes ' . self::dateFromString($time, $userTimezone);
             case 'CURRENTLY_SHARING':
-                return self::HTML_SUCCESS . ' Yes (Currently Sharing)';
+                return self::HTML_SUCCESS . ' Yes (Currently Sharing) ' . self::dateFromString($time, $userTimezone);
+            case 'NEVER_SHARED':
             default:
-                return '';
+                return self::HTML_DANGER . ' Never Shared';
         }
     }
 
@@ -2742,6 +2749,21 @@ class WorkQueue
             return self::dateFromString($authoredDate, $userTimezone);
         }
         return !$displayDate ? 0 : '';
+    }
+
+    public static function csvHealthDataSharingStatus($healthDataSharingStatus, $displayDate = false, $userTimezone = null)
+    {
+        if ($healthDataSharingStatus) {
+            switch ($healthDataSharingStatus) {
+                case 'NEVER_SHARED':
+                    return 0;
+                case 'EVER_SHARED':
+                    return 1;
+                case 'CURRENTLY_SHARING':
+                    return 2;
+            }
+        }
+        return 0;
     }
 
     public static function hasDateFields($params)
