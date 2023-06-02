@@ -5,7 +5,7 @@ $(document).ready(function () {
     });
 
     $("#confirm_finalize_btn").on("click", function () {
-        $("#confirmation_modal").modal("hide")
+        $("#confirmation_modal").modal("hide");
         $("form[name='nph_sample_finalize']").submit();
     });
 
