@@ -37,6 +37,7 @@
             {% else %}
                 {{ form_start(sampleIdForm, { attr: { action: path('nph_samples_aliquot') } }) }}
             {% endif %}
+            {{ form_widget(sampleIdForm) }}
             <p>
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
