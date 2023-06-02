@@ -1433,7 +1433,6 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
-        'healthDataStream',
         'patientStatusYes',
         'patientStatusNo',
         'patientStatusNoAccess',
@@ -1501,7 +1500,8 @@ class WorkQueue
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
-        'LifeFunctioning'
+        'LifeFunctioning',
+        'healthDataStream'
     ];
 
     public static $sortColumns = [
