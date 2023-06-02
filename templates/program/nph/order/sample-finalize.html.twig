@@ -12,7 +12,6 @@
                 <td colspan="1">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
                     {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'style': 'width: 30%; float: left; top: 20px; position: relative'}}) }}
-                    {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
                     <span style="top: 25px; position: relative">{{ aliquot['units'] }}</span>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
                     <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
@@ -23,6 +22,11 @@
                     <span style="top: 25px; position: relative">=</span>
                     <span style="position: relative">Total Volume</span>
                     <span style="position: relative; left: 20px; top: 5px" id="totalVol">#</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
                 </td>
             </tr>
         {% endfor %}
