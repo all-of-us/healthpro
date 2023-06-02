@@ -1,7 +1,11 @@
 $(document).ready(function () {
     $("#sample_finalize_btn").on("click", function () {
-        let confirmMessage = "Are you sure you want to finalize this sample?";
-        return confirm(confirmMessage);
+        $("#confirmation_modal").modal("show");
+    });
+
+    $("#confirm_finalize_btn").on("click", function () {
+        $("#confirmation_modal").modal("hide")
+        $("form[name='nph_sample_finalize']").submit();
     });
 
     $(".add-aliquot-widget").click(function () {
