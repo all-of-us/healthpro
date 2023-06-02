@@ -11,7 +11,7 @@ final class Version20230419140846 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Adds aliquot metadata field for additional information about aliquots';
     }
 
     public function up(Schema $schema): void
