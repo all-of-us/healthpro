@@ -165,15 +165,15 @@ class WorkQueueTest extends TestCase
             'Language of Primary Consent',
             'EHR Data Transfer',
             'Most Recent EHR Receipt',
-            'Health Data Stream Sharing Status',
-            'Health Data Stream Sharing Date',
             'Patient Status: Yes',
             'Patient Status: No',
             'Patient Status: No Access',
             'Patient Status: Unknown',
             'Core Participant Minus PM Date',
             'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent'
+            'Date of EHR Re-Consent',
+            'Health Data Stream Sharing Status',
+            'Health Data Stream Sharing Date',
         ], $exportHeaders);
     }
 

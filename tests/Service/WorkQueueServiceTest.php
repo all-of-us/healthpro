@@ -169,8 +169,6 @@ class WorkQueueServiceTest extends ServiceTestCase
             0,
             '0',
             '',
-            0,
-            0,
             'AZ_TUCSON_BANNER_HEALTH',
             '',
             '',
@@ -275,7 +273,9 @@ class WorkQueueServiceTest extends ServiceTestCase
             '8/3/2022 3:00 pm',
             '8/3/2022 3:00 pm',
             1,
-            '9/22/2022 3:00 pm'
+            '9/22/2022 3:00 pm',
+            0,
+            0,
         ], $row);
     }
 
