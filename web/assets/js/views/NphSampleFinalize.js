@@ -1,5 +1,6 @@
 $(document).ready(function () {
-    $("#sample_finalize_btn").on("click", function () {
+    $("#sample_finalize_btn").on("click", function (e) {
+        e.preventDefault();
         $("#confirmation_modal").modal("show");
     });
 
