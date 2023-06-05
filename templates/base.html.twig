@@ -1,3 +1,4 @@
+{% set bootstrapVersion = bootstrapVersion|default(3) %}
 {% set isTraining = isStable %}
 {% set roleNavs = {
     admin: {
@@ -43,7 +44,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-{% include LoadProgramTemplate('navbar.html.twig') %}
+{% include LoadProgramTemplate(bootstrapVersion == 5 ? 'navbar-bs5.html.twig' : 'navbar.html.twig') %}
 {% if isTraining %}
     <div class="navbar-warning alert alert-warning">
         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -133,7 +134,7 @@
 <div id="is-xs" class="visible-xs"></div>
 {% include 'base-body.html.twig' %}
 
-{{ encore_entry_script_tags('app') }}
+{{ encore_entry_script_tags(bootstrapVersion == 5 ? 'app5' : 'app') }}
 
 {% block pagejs %}{% endblock %}
 </body>
