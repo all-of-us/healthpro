@@ -46,7 +46,7 @@ class WorkQueueService
         $this->showConsentPDFs = (bool) $params->has('feature.participantconsentsworkqueue') && $params->get('feature.participantconsentsworkqueue');
     }
 
-    public function participantSummarySearch($organization, &$params, $type = null, $sortColumns = null, $sites = null)
+    public function participantSummarySearch($organization, & $params, $type = null, $sortColumns = null, $sites = null)
     {
         $rdrParams = [];
         $next = true;

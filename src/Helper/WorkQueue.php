@@ -2693,7 +2693,7 @@ class WorkQueue
         return $headers;
     }
 
-    public static function mapExportColumns(&$columns): void
+    public static function mapExportColumns(& $columns): void
     {
         foreach ($columns as $column) {
             if (isset(self::$tableExportMap[$column])) {
@@ -2767,9 +2767,8 @@ class WorkQueue
         } else {
             if (!is_null($healthDataSharingStatus)) {
                 return self::dateFromString($healthDataSharingStatus, $userTimezone);
-            } else {
-                return '';
             }
+            return '';
         }
     }
 
