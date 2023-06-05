@@ -409,6 +409,25 @@ class WorkQueue
             'csvFormatDate' => true,
             'group' => 'metrics'
         ],
+        'healthDataStream' => [
+            'name' => 'Health Data Stream',
+            'rdrField' => 'healthDataStreamSharingStatusV3_1',
+            'sortField' => 'healthDataStreamSharingStatusV3_1',
+            'method' => 'getHealthDataSharingStatus',
+            'htmlClass' => 'text-center',
+            'rdrDateField' => 'healthDataStreamSharingStatusV3_1Time',
+            'toggleColumn' => true,
+            'displayTime' => true,
+            'visible' => false,
+            'params' => 3,
+            'group' => 'metrics',
+            'csvNames' => [
+                'Health Data Stream Sharing Status',
+                'Health Data Stream Sharing Date'
+            ],
+            'csvMethod' => 'csvHealthDataSharingStatus',
+            'formatDate' => true
+        ],
         'patientStatusYes' => [
             'name' => 'Yes',
             'csvName' => 'Patient Status: Yes',
@@ -1264,6 +1283,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStream',
         'patientStatusYes',
         'patientStatusNo',
         'patientStatusNoAccess',
@@ -1481,7 +1501,8 @@ class WorkQueue
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
-        'LifeFunctioning'
+        'LifeFunctioning',
+        'healthDataStream'
     ];
 
     public static $sortColumns = [
@@ -1512,6 +1533,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStream',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -1735,7 +1757,8 @@ class WorkQueue
                 'Yes' => 'yes',
                 'No' => 'no'
             ]
-        ]
+        ],
+
     ];
 
     public static $consentFilters = [
@@ -2277,7 +2300,8 @@ class WorkQueue
             'gRoRConsent',
             'primaryLanguage',
             'isEhrDataAvailable',
-            'latestEhrReceiptTime'
+            'latestEhrReceiptTime',
+            'healthDataStream'
         ],
         'contact' => [
             'participantId',
@@ -2609,6 +2633,19 @@ class WorkQueue
         }
     }
 
+    public static function getHealthDataSharingStatus(string|null $value, string|null $time, string $userTimezone): string
+    {
+        switch ($value) {
+            case 'EVER_SHARED':
+                return self::HTML_SUCCESS . ' Yes ' . self::dateFromString($time, $userTimezone);
+            case 'CURRENTLY_SHARING':
+                return self::HTML_SUCCESS . ' Yes (Currently Sharing) ' . self::dateFromString($time, $userTimezone);
+            case 'NEVER_SHARED':
+            default:
+                return self::HTML_DANGER . ' Never Shared';
+        }
+    }
+
     public static function getEhrAvailableStatus($value)
     {
         if ($value) {
@@ -2713,6 +2750,26 @@ class WorkQueue
             return self::dateFromString($authoredDate, $userTimezone);
         }
         return !$displayDate ? 0 : '';
+    }
+
+    public static function csvHealthDataSharingStatus(string|null $healthDataSharingStatus, string $type, bool $displayDate = false, string $userTimezone = null): string|int
+    {
+        if ($displayDate === false) {
+            switch ($healthDataSharingStatus) {
+                case 'EVER_SHARED':
+                    return 1;
+                case 'CURRENTLY_SHARING':
+                    return 2;
+                case 'NEVER_SHARED':
+                default:
+                    return 0;
+            }
+        } else {
+            if (!is_null($healthDataSharingStatus)) {
+                return self::dateFromString($healthDataSharingStatus, $userTimezone);
+            }
+            return '';
+        }
     }
 
     public static function hasDateFields($params)
