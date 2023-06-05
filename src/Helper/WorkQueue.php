@@ -2693,7 +2693,7 @@ class WorkQueue
         return $headers;
     }
 
-    public static function mapExportColumns(& $columns): void
+    public static function mapExportColumns(&$columns): void
     {
         foreach ($columns as $column) {
             if (isset(self::$tableExportMap[$column])) {
