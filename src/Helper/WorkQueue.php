@@ -425,7 +425,8 @@ class WorkQueue
                 'Health Data Stream Sharing Status',
                 'Health Data Stream Sharing Date'
             ],
-            'csvMethod' => 'csvHealthDataSharingStatus'
+            'csvMethod' => 'csvHealthDataSharingStatus',
+            'formatDate' => true
         ],
         'patientStatusYes' => [
             'name' => 'Yes',
@@ -2632,7 +2633,7 @@ class WorkQueue
         }
     }
 
-    public static function getHealthDataSharingStatus($value, $time, $userTimezone)
+    public static function getHealthDataSharingStatus(string|null $value, string|null $time, string $userTimezone): string
     {
         switch ($value) {
             case 'EVER_SHARED':
@@ -2751,19 +2752,25 @@ class WorkQueue
         return !$displayDate ? 0 : '';
     }
 
-    public static function csvHealthDataSharingStatus($healthDataSharingStatus, $displayDate = false, $userTimezone = null)
+    public static function csvHealthDataSharingStatus(string|null $healthDataSharingStatus, string $type, bool $displayDate = false, string $userTimezone = null): string|int
     {
-        if ($healthDataSharingStatus) {
+        if ($displayDate === false) {
             switch ($healthDataSharingStatus) {
-                case 'NEVER_SHARED':
-                    return 0;
                 case 'EVER_SHARED':
                     return 1;
                 case 'CURRENTLY_SHARING':
                     return 2;
+                case 'NEVER_SHARED':
+                default:
+                    return 0;
+            }
+        } else {
+            if (!is_null($healthDataSharingStatus)) {
+                return self::dateFromString($healthDataSharingStatus, $userTimezone);
+            } else {
+                return '';
             }
         }
-        return 0;
     }
 
     public static function hasDateFields($params)
