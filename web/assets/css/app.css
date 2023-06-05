@@ -868,6 +868,11 @@ table.table-samples td {
     background-color: #fef6a6;
 }
 
+.nph-finalize-modal-header {
+    background-color: #459500;
+    color: #FFFFFF;
+}
+
 /* NPH Participant details */
 
 .no-dob-banner {
