@@ -1235,7 +1235,16 @@ class WorkQueue
             'name' => 'Date of EHR Re-Consent',
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
-        ]
+        ],
+        'consentForNphModule1' => [
+            'name' => 'NPH Module 1 Consent',
+            'group' => 'ancillaryStudies',
+            'rdrField' => 'genderIdentity',
+            'columnToggle' => true,
+            'method' => 'getNphStudyStatus',
+            'ancillaryStudy' => true,
+            'displayTime' => true,
+        ],
     ];
 
     public static $columns = [
@@ -1326,6 +1335,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
+        'consentForNphModule1'
     ];
 
     public static $columnGroups = [
@@ -1336,7 +1346,8 @@ class WorkQueue
         'contact' => 'Contact',
         'surveys' => 'PPI Surveys',
         'enrollment' => 'In Person Enrollment',
-        'demographics' => 'Demographics'
+        'demographics' => 'Demographics',
+        'ancillaryStudies' => 'Ancillary Studies'
     ];
 
     public static $consentColumns = [
@@ -1574,6 +1585,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
+        'consentForNphModule1'
     ];
 
     public static $consentSortColumns = [
@@ -2878,5 +2890,22 @@ class WorkQueue
             return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
         }
         return self::HTML_DANGER;
+    }
+
+    public static function getNphStudyStatus(Participant $participant, string $userTimezone, bool $displayTime = false): string
+    {
+        if ($participant->nphWithdrawal) {
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphWithdrawalAuthored, $userTimezone, $displayTime);
+        } elseif ($participant->nphDeactivation) {
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphDeactivationAuthored, $userTimezone, $displayTime);
+        } elseif ($participant->consentForNphModule1) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->consentForNphModule1Authored, $userTimezone, $displayTime);
+        }
+        return self::HTML_DANGER;
+    }
+
+    public static function getCsvNphStudyStatus(Participant $participant, string $userTimezone, bool $displayTime = false): string
+    {
+
     }
 }

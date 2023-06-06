@@ -371,6 +371,12 @@ class WorkQueueService
                                 );
                             }
                         }
+                    } elseif (isset($columnDef['ancillaryStudy']) && $columnDef['ancillaryStudy']) {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant,
+                            $userTimezone,
+                            $columnDef['displayTime']
+                        );
                     } elseif (isset($columnDef['statusText'])) {
                         $row[$field] = WorkQueue::{$columnDef['method']}(
                             $participant->{$columnDef['rdrField']},
