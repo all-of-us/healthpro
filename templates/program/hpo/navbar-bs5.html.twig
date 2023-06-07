@@ -7,17 +7,17 @@
         {% if siteInfo.canSwitchProgram %}
             <ul class="dropdown-menu dropdown-menu-role navbar-program">
                 <li>
-                    <a class="dropdown-item" href="{{ path('program_select', { program: 'nph' }) }}">
+                    <a class="dropdown-item ms-2" href="{{ path('program_select', { program: 'nph' }) }}">
                         <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH logo"/>
                         Nutrition for Precision Health
                     </a>
                 </li>
             </ul>
         {% endif %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pmi-navbar-collapse" aria-controls="pmi-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if not showRoleDropdown %}
                     <li class="nav-item">
