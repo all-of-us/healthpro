@@ -1236,7 +1236,7 @@ class WorkQueue
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
         ],
-        'consentForNphModule1' => [
+        'NphStudyStatus' => [
             'name' => 'NPH Module 1 Consent',
             'group' => 'ancillaryStudies',
             'rdrField' => 'genderIdentity',
@@ -1335,7 +1335,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'consentForNphModule1'
+        'NphStudyStatus'
     ];
 
     public static $columnGroups = [
@@ -1585,7 +1585,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'consentForNphModule1'
+        'NphStudyStatus'
     ];
 
     public static $consentSortColumns = [
@@ -2090,6 +2090,18 @@ class WorkQueue
                     'Unpaired' => 'UNSET'
                 ]
             ],
+        ],
+        'Ancillary Studies' => [
+            'NphStudyStatus' => [
+                'label' => 'Nutrition For Precision Health',
+                'options' => [
+                    'View All' => '',
+                    'Not Consented' => 'NOT_CONSENTED',
+                    'Module 1 Consented' => 'MODULE_1_CONSENTED',
+                    'Deactivated' => 'DEACTIVATED',
+                    'Withdrawn' => 'WITHDRAWN'
+                ]
+            ],
         ]
     ];
 
@@ -2116,7 +2128,8 @@ class WorkQueue
         'Demographics' => 'fa-globe',
         'EHR' => 'fa-laptop-medical',
         'Retention' => 'fa-check-double',
-        'Pairing' => 'fa-building'
+        'Pairing' => 'fa-building',
+        'Ancillary Studies' => 'fa-microscope'
     ];
 
     //These are currently not working in the RDR

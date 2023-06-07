@@ -177,6 +177,17 @@ class WorkQueueService
         if (!empty($params['EtMConsent'])) {
             $rdrParams['consentForEtM'] = $params['EtMConsent'];
         }
+        if (!empty($params['NphStudyStatus'])) {
+            if ($params['NphStudyStatus'] === 'DEACTIVATED') {
+                $rdrParams['nphDeactivation'] = 1;
+            } elseif ($params['NphStudyStatus'] === 'NOT_CONSENTED') {
+                $rdrParams['consentForNphModule1'] = 0;
+            } elseif ($params['NphStudyStatus'] === 'MODULE_1_CONSENTED') {
+                $rdrParams['consentForNphModule1'] = 1;
+            } elseif ($params['NphStudyStatus'] === 'WITHDRAWN') {
+                $rdrParams['nphWithdrawal'] = 1;
+            }
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
