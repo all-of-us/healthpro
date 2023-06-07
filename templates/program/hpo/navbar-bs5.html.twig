@@ -1,26 +1,24 @@
-<nav class="navbar navbar-expand-lg navbar-inverse {% if isTraining %} navbar-warning-below{% else %} navbar{% endif %}">
+<nav class="navbar navbar-expand-lg navbar-inverse {% if isTraining %} navbar-warning-below {% endif %}">
     <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item dropdown">
-                    <a class="nav-link navbar-brand" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
-                        data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
-                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+        <a class="nav-link navbar-brand" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
+            data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
+            <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+        </a>
+        {% if siteInfo.canSwitchProgram %}
+            <ul class="dropdown-menu dropdown-menu-role navbar-program">
+                <li>
+                    <a class="dropdown-item" href="{{ path('program_select', { program: 'nph' }) }}">
+                        <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH logo"/>
+                        Nutrition for Precision Health
                     </a>
-                    {% if siteInfo.canSwitchProgram %}
-                        <ul class="dropdown-menu dropdown-menu-role navbar-program">
-                            <li>
-                                <a class="dropdown-item" href="{{ path('program_select', { program: 'nph' }) }}">
-                                    <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH logo"/>
-                                    Nutrition for Precision Health
-                                </a>
-                            </li>
-                        </ul>
-                    {% endif %}
                 </li>
+            </ul>
+        {% endif %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if not showRoleDropdown %}
                     <li class="nav-item">
                         <a class="nav-link navbar-brand " href="{{ path('home') }}">
