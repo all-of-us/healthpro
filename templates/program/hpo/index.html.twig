@@ -72,7 +72,7 @@
             </div>
         {% endif %}
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
-            <div class="col-sm-6 col-md-4" id="deceased_report_block">
+            <div class="col-sm-6 col-md-4 position-relative" id="deceased_report_block">
                 <a href="{{ path('deceased_reports_index') }}" class="btn btn-lg btn-block btn-outline-secondary w-100 text-dark">
                     <i class="fa fa-hourglass-o" aria-hidden="true"></i>
                     Deceased Participants
