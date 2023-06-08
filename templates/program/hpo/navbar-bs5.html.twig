@@ -107,7 +107,7 @@
                     {% if not currentRoleNav %}
                         {% if app.session.get('site') %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
+                                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
                                     {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
                                 </a>
@@ -115,7 +115,7 @@
                         {% endif %}
                         {% if app.session.get('awardee') %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
+                                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
                                     {{ app.session.get('awardee').name }}
                                 </a>
