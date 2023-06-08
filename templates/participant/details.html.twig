@@ -442,7 +442,7 @@
                                             <dd>
                                                 {% if participant.healthDataStreamSharingStatusV3_1 %}
                                                     {% if participant.healthDataStreamSharingStatusV3_1 == 'CURRENTLY_SHARING' %}
-                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        <i class="fa fa-check-double text-success" aria-hidden="true"></i>
                                                         {{ participant.healthDataStreamSharingStatusV3_1Time|date('m/d/Y', app.user.timezone) }} (Currently Sharing)
                                                     {% elseif participant.healthDataStreamSharingStatusV3_1 == 'EVER_SHARED' %}
                                                         <i class="fa fa-check text-success" aria-hidden="true"></i>

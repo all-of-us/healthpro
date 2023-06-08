@@ -19,6 +19,7 @@ class WorkQueue
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
     public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
+    public const HTML_SUCCESS_DOUBLE = '<i class="fa fa-check-double text-success" aria-hidden="true"></i>';
 
     public static $columnsDef = [
         'lastName' => [
@@ -425,8 +426,7 @@ class WorkQueue
                 'Health Data Stream Sharing Status',
                 'Health Data Stream Sharing Date'
             ],
-            'csvMethod' => 'csvHealthDataSharingStatus',
-            'formatDate' => true
+            'csvMethod' => 'csvHealthDataSharingStatus'
         ],
         'patientStatusYes' => [
             'name' => 'Yes',
@@ -2637,12 +2637,12 @@ class WorkQueue
     {
         switch ($value) {
             case 'EVER_SHARED':
-                return self::HTML_SUCCESS . ' Yes ' . self::dateFromString($time, $userTimezone);
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone) . ' (Ever Shared) ';
             case 'CURRENTLY_SHARING':
-                return self::HTML_SUCCESS . ' Yes (Currently Sharing) ' . self::dateFromString($time, $userTimezone);
+                return self::HTML_SUCCESS_DOUBLE . ' ' . self::dateFromString($time, $userTimezone) . ' (Currently Sharing) ';
             case 'NEVER_SHARED':
             default:
-                return self::HTML_DANGER . ' Never Shared';
+                return self::HTML_DANGER . ' (Never Shared)';
         }
     }
 

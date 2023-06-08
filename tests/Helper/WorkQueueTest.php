@@ -450,10 +450,10 @@ class WorkQueueTest extends TestCase
         $dateTime = new \DateTime('now');
         $time = $dateTime->format('D M d, Y G:i');
         $dateTime->setTimezone(new \DateTimeZone('America/Chicago'));
-        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> Never Shared', WorkQueue::getHealthDataSharingStatus(null, null, 'America/Chicago'));
-        $this->assertSame('<i class="fa fa-check text-success" aria-hidden="true"></i> Yes ' . $dateTime->format('n/j/Y g:i a'), WorkQueue::getHealthDataSharingStatus('EVER_SHARED', $time, 'America/Chicago'));
-        $this->assertSame('<i class="fa fa-check text-success" aria-hidden="true"></i> Yes (Currently Sharing) ' . $dateTime->format('n/j/Y g:i a'), WorkQueue::getHealthDataSharingStatus('CURRENTLY_SHARING', $time, 'America/Chicago'));
-        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> Never Shared', WorkQueue::getHealthDataSharingStatus('NEVER_SHARED', null, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)', WorkQueue::getHealthDataSharingStatus(null, null, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-check text-success" aria-hidden="true"></i> ' . $dateTime->format('n/j/Y g:i a') . ' (Ever Shared) ', WorkQueue::getHealthDataSharingStatus('EVER_SHARED', $time, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-check-double text-success" aria-hidden="true"></i> ' . $dateTime->format('n/j/Y g:i a') . ' (Currently Sharing) ', WorkQueue::getHealthDataSharingStatus('CURRENTLY_SHARING', $time, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)', WorkQueue::getHealthDataSharingStatus('NEVER_SHARED', null, 'America/Chicago'));
     }
 
     public function testCsvHealthDataSharingStatus(): void
