@@ -1533,7 +1533,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
-        'healthDataStream',
+        'healthDataStreamSharingStatusV3_1Time',
         'patientStatus',
         'patientStatus',
         'patientStatus',
