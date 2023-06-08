@@ -2639,7 +2639,7 @@ class WorkQueue
             case 'EVER_SHARED':
                 return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone) . ' (Ever Shared) ';
             case 'CURRENTLY_SHARING':
-                return self::HTML_SUCCESS_DOUBLE . ' ' . self::dateFromString($time, $userTimezone) . ' (Currently Sharing) ' ;
+                return self::HTML_SUCCESS_DOUBLE . ' ' . self::dateFromString($time, $userTimezone) . ' (Currently Sharing) ';
             case 'NEVER_SHARED':
             default:
                 return self::HTML_DANGER . ' (Never Shared)';
