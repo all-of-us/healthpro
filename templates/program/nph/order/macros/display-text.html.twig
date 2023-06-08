@@ -69,3 +69,22 @@
         {{ _self.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}
     {% endif %}
 {% endmacro %}
+
+{% macro displayBiobankSampleStatus(nphSample) %}
+    {% set type = nphSample.modifyType %}
+    {% set status = '' %}
+    {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
+        {% set status = 'Cancelled' %}
+    {% elseif type == constant('App\\Entity\\NphSample::UNLOCK') %}
+        {% set status = 'Unlocked' %}
+    {% elseif type == constant('App\\Entity\\NphSample::EDITED') %}
+        {% set status = 'Edited & Finalized' %}
+    {% elseif nphSample.finalizedTs %}
+        {% set status = nphSample.biobankFinalized ? 'Biobank Finalized' : 'Finalized' %}
+    {% elseif nphSample.collectedTs %}
+        {% set status = 'Collected' %}
+    {% elseif nphSample.createdTs %}
+        {% set status = 'Created' %}
+    {% endif %}
+    {{ status }}
+{% endmacro %}

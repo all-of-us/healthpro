@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\NphOrder;
 use App\Form\ReviewTodayFilterType;
+use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\ReviewService;
 use App\Service\SiteService;
@@ -25,16 +26,20 @@ class NphReviewController extends BaseController
 
     protected $siteService;
 
+    protected NphParticipantReviewService $nphParticipantReviewService;
+
     public function __construct(
         NphParticipantSummaryService $participantSummaryService,
         ReviewService $reviewService,
         SiteService $siteService,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        NphParticipantReviewService $nphParticipantReviewService
     ) {
         parent::__construct($em);
         $this->participantSummaryService = $participantSummaryService;
         $this->reviewService = $reviewService;
         $this->siteService = $siteService;
+        $this->nphParticipantReviewService = $nphParticipantReviewService;
     }
 
     /**
@@ -85,39 +90,18 @@ class NphReviewController extends BaseController
         $samples = $this->em->getRepository(NphOrder::class)->getOrdersByDateRange($site, $startDate, $endDate);
         $sampleCounts = $this->em->getRepository(NphOrder::class)->getSampleCollectionStatsByDate($site, $startDate, $endDate);
 
-        $count = 0;
-        $rowCounts = [];
-        foreach (array_keys($samples) as $key) {
-            if (!array_key_exists($samples[$key]['participantId'], $rowCounts)) {
-                $rowCounts[$samples[$key]['participantId']]['participantRow'] = 0;
-            }
-            if (!array_key_exists('module' . $samples[$key]['module'], $rowCounts[$samples[$key]['participantId']])) {
-                $rowCounts[$samples[$key]['participantId']]['module' . $samples[$key]['module']] = 0;
-            }
-            $rowCounts[$samples[$key]['participantId']]['participantRow'] += $samples[$key]['createdCount'] + 1;
-            $rowCounts[$samples[$key]['participantId']]['module' . $samples[$key]['module']] += $samples[$key]['createdCount'] + 1;
-            if ($count <= 5) {
-                $samples[$key]['participant'] = $this->participantSummaryService->getParticipantById($samples[$key]['participantId']);
-            }
-            $samples[$key]['email'] = explode(',', $samples[$key]['email']);
-            $samples[$key]['sampleId'] = explode(',', $samples[$key]['sampleId']);
-            $samples[$key]['sampleCode'] = explode(',', $samples[$key]['sampleCode']);
-            $samples[$key]['createdTs'] = explode(',', $samples[$key]['createdTs']);
-            $samples[$key]['collectedTs'] = explode(',', $samples[$key]['collectedTs']);
-            $samples[$key]['finalizedTs'] = explode(',', $samples[$key]['finalizedTs']);
-            $count++;
-        }
+        $todaysSamples = $this->nphParticipantReviewService->getTodaysSamples($samples);
 
         return $this->render('/program/nph/review/today.html.twig', [
             'controller_name' => 'NphReviewController',
             'todayFilterForm' => $todayFilterForm->createView(),
             'displayMessage' => $displayMessage,
-            'samples' => $samples,
+            'samples' => $todaysSamples['samples'],
             'timezone' => $this->getSecurityUser()->getTimeZone(),
             'collectedCount' => $sampleCounts[0]['collectedCount'],
             'finalizedCount' => $sampleCounts[0]['finalizedCount'],
             'createdCount' => $sampleCounts[0]['createdCount'],
-            'rowCounts' => $rowCounts
+            'rowCounts' => $todaysSamples['rowCounts']
         ]);
     }
 

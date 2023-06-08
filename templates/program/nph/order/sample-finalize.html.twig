@@ -11,7 +11,7 @@
     {% if sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
-            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_start(sampleModifyForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
@@ -33,12 +33,11 @@
     <div class="row">
         <div class="col-sm-5">
             {% if biobankView %}
-                {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
-                    path('nph_biobank_samples_aliquot') } }) }}
+                {{ form_start(sampleIdForm, { attr: { action: path('nph_biobank_samples_aliquot') } }) }}
             {% else %}
-                {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
-                    path('nph_samples_aliquot') } }) }}
+                {{ form_start(sampleIdForm, { attr: { action: path('nph_samples_aliquot') } }) }}
             {% endif %}
+            {{ form_widget(sampleIdForm) }}
             <p>
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
@@ -99,7 +98,7 @@
                     {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
                 {% endif %}
                 <div class="panel-body">
-                    {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+                    {{ form_start(sampleFinalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit'} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
                             has-error{% endif %}">
@@ -298,6 +297,7 @@
             </div>
         </div>
     </div>
+    {% include 'program/nph/order/partials/sample-finalize-confirmation-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
