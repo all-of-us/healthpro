@@ -10,7 +10,9 @@
         </div>
         <div class="col-sm-3 offset-sm-5">
             <span data-href="{{ path('notifications_mark_read') }}" id="notifications_mark_all_read"
-                  data-notifications-count="{{ notifications_count }}" class="text-info" role="button">Mark all as read</span>
+                  data-notifications-count="{{ notifications_count }}" class="text-primary" role="button">
+                Mark all as read
+            </span>
         </div>
     </div>
     <hr>
@@ -26,7 +28,7 @@
                     <p>
                         <strong>
                             <a data-href="{{ path('notification_details', {id: notification.id}) }}"
-                               class="notification-title">
+                               class="notification-title text-decoration-none">
                                 {{ notification.title }}
                             </a>
                         </strong>
@@ -39,8 +41,8 @@
                 </div>
             </div>
             {% if notification.url %}
-                <div class="text-right">
-                    <a href="{{ notification.url }}" target="_blank">View New Feature <i class="fa fa-arrow-right"></i></a>
+                <div class="text-end">
+                    <a class="text-decoration-none" href="{{ notification.url }}" target="_blank">View New Feature <i class="fa fa-arrow-right"></i></a>
                 </div>
             {% endif %}
             <hr>
