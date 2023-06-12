@@ -37,7 +37,7 @@ class NphOrderType extends AbstractType
                             new Constraints\Type('string'),
                             new Constraints\Regex([
                                 'pattern' => '/^KIT-[0-9]{8}$/',
-                                'message' => 'Please enter a valid KIT ID. Format should be KIT-10000000 (KIT-8 digits)'
+                                'message' => 'Please enter a valid KIT ID. Format should include the prefix KIT- (Found on label on front of stool kit box).'
                             ]),
                             new Constraints\Callback(function ($value, $context) {
                                 $formData = $context->getRoot()->getData();
@@ -64,7 +64,7 @@ class NphOrderType extends AbstractType
                             new Constraints\Type('string'),
                             new Constraints\Regex([
                                 'pattern' => '/^[0-9]{11}$/',
-                                'message' => 'Please enter a valid collection tube barcode.Format should be 10000000000 (11 digits).'
+                                'message' => 'Stool tube barcode ID invalid.  Please enter a valid stool tube barcode ID.'
                             ]),
                             new Constraints\Callback(function ($value, $context) {
                                 $formData = $context->getRoot()->getData();
