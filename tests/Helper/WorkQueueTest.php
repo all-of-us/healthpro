@@ -171,7 +171,9 @@ class WorkQueueTest extends TestCase
             'Patient Status: Unknown',
             'Core Participant Minus PM Date',
             'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent'
+            'Date of EHR Re-Consent',
+            'Health Data Stream Sharing Status',
+            'Health Data Stream Sharing Date',
         ], $exportHeaders);
     }
 
@@ -386,8 +388,10 @@ class WorkQueueTest extends TestCase
 
                 ]
         ];
-        $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'],
-            WorkQueue::$filterDateFieldLabels);
+        $filterLabelOptionPairs['labels'] = array_merge(
+            $filterLabelOptionPairs['labels'],
+            WorkQueue::$filterDateFieldLabels
+        );
         $advancedFilters = WorkQueue::$consentAdvanceFilters;
         $this->assertSame($filterLabelOptionPairs, WorkQueue::getFilterLabelOptionPairs($advancedFilters));
     }
@@ -405,12 +409,12 @@ class WorkQueueTest extends TestCase
         return [
             [
                 [
-                    (object)[
+                    (object) [
                         'incentiveId' => 1,
                         'cancelled' => false,
                         'dateGiven' => '2022-10-19T00:00:00Z'
                     ],
-                    (object)[
+                    (object) [
                         'incentiveId' => 2,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-20T00:00:00Z'
@@ -420,17 +424,17 @@ class WorkQueueTest extends TestCase
             ],
             [
                 [
-                    (object)[
+                    (object) [
                         'incentiveId' => 1,
                         'cancelled' => false,
                         'dateGiven' => '2022-10-12T00:00:00Z'
                     ],
-                    (object)[
+                    (object) [
                         'incentiveId' => 2,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-19T00:00:00Z'
                     ],
-                    (object)[
+                    (object) [
                         'incentiveId' => 3,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-20T00:00:00Z'
@@ -440,7 +444,7 @@ class WorkQueueTest extends TestCase
             ],
             [
                 [
-                    (object)[
+                    (object) [
                         'incentiveId' => 1,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-12T00:00:00Z'
@@ -451,4 +455,26 @@ class WorkQueueTest extends TestCase
         ];
     }
 
+    public function testGetHealthDataSharingStatus(): void
+    {
+        $dateTime = new \DateTime('now');
+        $time = $dateTime->format('D M d, Y G:i');
+        $dateTime->setTimezone(new \DateTimeZone('America/Chicago'));
+        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)', WorkQueue::getHealthDataSharingStatus(null, null, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-check text-success" aria-hidden="true"></i> ' . $dateTime->format('n/j/Y g:i a') . ' (Ever Shared) ', WorkQueue::getHealthDataSharingStatus('EVER_SHARED', $time, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-check-double text-success" aria-hidden="true"></i> ' . $dateTime->format('n/j/Y g:i a') . ' (Currently Sharing) ', WorkQueue::getHealthDataSharingStatus('CURRENTLY_SHARING', $time, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)', WorkQueue::getHealthDataSharingStatus('NEVER_SHARED', null, 'America/Chicago'));
+    }
+
+    public function testCsvHealthDataSharingStatus(): void
+    {
+        $dateTime = new \DateTime('now');
+        $time = $dateTime->format('D M d, Y G:i');
+        $dateTime->setTimezone(new \DateTimeZone('America/Chicago'));
+        $this->assertSame(0, WorkQueue::csvHealthDataSharingStatus(null, 'healthDataSharingStatus', false, 'America/Chicago'));
+        $this->assertSame(1, WorkQueue::csvHealthDataSharingStatus('EVER_SHARED', 'healthDataSharingStatus', false, 'America/Chicago'));
+        $this->assertSame(2, WorkQueue::csvHealthDataSharingStatus('CURRENTLY_SHARING', 'healthDataSharingStatus', false, 'America/Chicago'));
+        $this->assertSame($dateTime->format('n/j/Y g:i a'), WorkQueue::csvHealthDataSharingStatus($time, 'healthDataSharingStatus', true, 'America/Chicago'));
+        $this->assertSame('', WorkQueue::csvHealthDataSharingStatus(null, 'healthDataSharingStatus', true, 'America/Chicago'));
+    }
 }
