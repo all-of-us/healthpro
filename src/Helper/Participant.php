@@ -41,11 +41,11 @@ class Participant
     public $participantIncentiveDateGiven;
     public $isAIAN;
     public $nphWithdrawal = false;
-    public $nphWithdrawalAuthored = "";
+    public $nphWithdrawalAuthored = '';
     public $nphDeactivation = false;
-    public $nphDeactivationAuthored = "";
+    public $nphDeactivationAuthored = '';
     public $consentForNphModule1 = false;
-    public $consentForNphModule1Authored = "";
+    public $consentForNphModule1Authored = '';
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -434,7 +434,7 @@ class Participant
         if (isset($participant->consentForNphModule1)) {
             $this->consentForNphModule1 = $participant->consentForNphModule1;
         }
-        
+
         if (isset($participant->consentForNphModule1Authored)) {
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
         }
