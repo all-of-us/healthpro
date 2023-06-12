@@ -54,7 +54,7 @@ class NphSampleFinalizeType extends NphOrderForm
                             new Constraints\Type('string'),
                             new Constraints\Regex([
                                 'pattern' => "/^{$barcodePattern}$/",
-                                'message' => $this->getBarcodeErrorMessage($aliquot)
+                                'message' => $aliquot['barcodeErrorMessage']
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
