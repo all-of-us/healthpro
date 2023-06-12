@@ -528,6 +528,10 @@ class WorkQueueService
                         $participant->{$columnDef['otherField']}
                     );
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                } elseif (isset($columnDef['ancillaryStudy'])) {
+                    foreach ($columnDef['csvNames'] as $fieldKey => $fieldName) {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant, $fieldKey, $userTimezone);
+                    }
                 } elseif (isset($columnDef['csvNames'])) {
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field);
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field, true, $userTimezone);

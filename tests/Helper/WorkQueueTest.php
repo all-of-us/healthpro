@@ -199,7 +199,8 @@ class WorkQueueTest extends TestCase
                 'retentionType' => 'Retention Status',
                 'retentionEligibleStatus' => 'Retention Eligible',
                 'participantOrigin' => 'Participant Origination',
-                'enrollmentSite' => 'Enrollment Site'
+                'enrollmentSite' => 'Enrollment Site',
+                'NphStudyStatus' => 'Nutrition For Precision Health'
             ],
             'options' =>
                 [
@@ -374,6 +375,15 @@ class WorkQueueTest extends TestCase
                             '' => 'View All',
                             'UNSET' => 'Unpaired',
                         ],
+                    'NphStudyStatus' =>
+                    [
+                        '' => 'View All',
+                        'NOT_CONSENTED' => 'Not Consented',
+                        'MODULE_1_CONSENTED' => 'Module 1 Consented',
+                        'DEACTIVATED' => 'Deactivated',
+                        'WITHDRAWN' => 'Withdrawn'
+                    ]
+
                 ]
         ];
         $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'],

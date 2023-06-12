@@ -1236,14 +1236,22 @@ class WorkQueue
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
         ],
-        'NphStudyStatus' => [
+        'NPHConsent' => [
             'name' => 'NPH Module 1 Consent',
             'group' => 'ancillaryStudies',
-            'rdrField' => 'genderIdentity',
             'columnToggle' => true,
             'method' => 'getNphStudyStatus',
             'ancillaryStudy' => true,
             'displayTime' => true,
+            'csvNames' => [
+                'nphWithdrawal' => 'NPH Withdrawal Status',
+                'nphWithdrawalAuthored' => 'NPH Withdrawal Date',
+                'nphDeactivation' => 'NPH Deactivation Status',
+                'nphDeactivationAuthored' =>'NPH Deactivation Time',
+                'consentForNphModule1' => 'NPH Module 1 Consent Status',
+                'consentForNphModule1Authored' => 'NPH Module 1 Consent Date',
+            ],
+            'csvMethod' => 'getCsvNphStudyStatus',
         ],
     ];
 
@@ -1335,7 +1343,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'NphStudyStatus'
+        'NPHConsent'
     ];
 
     public static $columnGroups = [
@@ -1492,7 +1500,8 @@ class WorkQueue
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
-        'LifeFunctioning'
+        'LifeFunctioning',
+        'NPHConsent'
     ];
 
     public static $sortColumns = [
@@ -2917,8 +2926,12 @@ class WorkQueue
         return self::HTML_DANGER;
     }
 
-    public static function getCsvNphStudyStatus(Participant $participant, string $userTimezone, bool $displayTime = false): string
+    public static function getCsvNphStudyStatus(Participant $participant,string $fieldKey, string $userTimezone): int|string
     {
+        if (str_contains($fieldKey, 'Authored')) {
+            return self::dateFromString($participant->$fieldKey, $userTimezone);
+        }
 
+        return $participant->$fieldKey ? 1 : 0;
     }
 }
