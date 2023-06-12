@@ -132,6 +132,18 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_delete' => true,
                     'data' => $tsData,
                 ]);
+                if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
+                    foreach ($aliquot['metadataFields'] as $metadataField) {
+                        $builder->add("{$aliquotCode}{$metadataField['identifier']}", $metadataField['entryType'], [
+                            'label' => $metadataField['label'],
+                            'required' => false,
+                            'attr' => [
+                                'placeholder' => $metadataField['placeholder'] ?? '',
+                                'class' => $metadataField['class'] ?? '',
+                            ]
+                        ]);
+                    }
+                }
 
                 $volumeConstraints = [
                     new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
@@ -227,7 +239,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'nphSample' => null,
             'disableMetadataFields' => null,
             'disableStoolCollectedTs' => null,
-            'orderCreatedTs' => null
+            'orderCreatedTs' => null,
+            'module' => null
         ]);
     }
 

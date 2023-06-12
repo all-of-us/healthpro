@@ -49,7 +49,52 @@
       "temperature": "Refrigerated",
       "specimen": "Saliva",
       "type": "saliva",
-      "identifier": "Saliva"
+      "identifier": "Saliva",
+      "aliquots": {
+        "SALIVAA1": {
+          "identifier": "SA1-U",
+          "container": "5mL Matrix tube (no glycerol)",
+          "description": "5mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 2.4,
+          "units": "mL",
+          "barcodeLength" : 10,
+          "barcodePrefix": "MC",
+          "minVolume": 0,
+          "maxVolume": 4,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 4000,
+          "addNew": false,
+          "collectMetadata": false
+        },
+        "SALIVAA2": {
+          "identifier": "SA2-U",
+          "container": "5mL Matrix tube (w/glycerol)",
+          "description": "5mL Matrix tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 2,
+          "units": "mL",
+          "barcodeLength" : 10,
+          "barcodePrefix": "MC",
+          "minVolume": 0,
+          "maxVolume": 4,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 4000,
+          "addNew": false,
+          "collectMetadata": true,
+          "metadataFields": [
+            {
+              "identifier": "glycerolAdditiveVolume",
+              "name": "glycerol additive volume",
+              "type": "number",
+              "label": "Calculated Volume for Glycerol Additive Sample",
+              "units": "μL",
+              "entryType": "Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType",
+              "required": true
+            }
+          ]
+        }
+      }
     },
     "urineDlw": {
       "label": "Urine DLW",
