@@ -60,7 +60,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 $condition = $aliquot['expectedVolume'] ? ($formData["{$aliquotCode}AliquotTs"][$key] ||
                                     $formData["{$aliquotCode}Volume"][$key]) : $formData["{$aliquotCode}AliquotTs"][$key];
                                 if ($condition && empty($value)) {
-                                    $context->buildViolation('Barcode is required')->addViolation();
+                                    $context->buildViolation('Aliquot barcode is required')->addViolation();
                                 }
                             }),
                             new Constraints\Callback(function ($value, $context) use ($aliquot, $aliquotCode) {
@@ -112,7 +112,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 $condition = $aliquot['expectedVolume'] ? ($formData[$aliquotCode][$key] ||
                                     $formData["{$aliquotCode}Volume"][$key]) : $formData[$aliquotCode][$key];
                                 if ($condition && empty($value)) {
-                                    $context->buildViolation('Time is required')->addViolation();
+                                    $context->buildViolation('Aliquot time is required')->addViolation();
                                 }
                                 if (!empty($formData["{$sample}CollectedTs"]) && !empty($value)) {
                                     if ($value <= $formData["{$sample}CollectedTs"]) {
