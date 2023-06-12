@@ -40,6 +40,12 @@ class Participant
     public $enrollmentSiteSuffix;
     public $participantIncentiveDateGiven;
     public $isAIAN;
+    public $nphWithdrawal = false;
+    public $nphWithdrawalAuthored = "";
+    public $nphDeactivation = false;
+    public $nphDeactivationAuthored = "";
+    public $consentForNphModule1 = false;
+    public $consentForNphModule1Authored = "";
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -407,6 +413,30 @@ class Participant
 
         if (isset($participant->aian)) {
             $this->isAIAN = $participant->aian;
+        }
+
+        if (isset($participant->nphWithdrawal)) {
+            $this->nphWithdrawal = $participant->nphWithdrawal;
+        }
+
+        if (isset($participant->nphWithdrawalAuthored)) {
+            $this->nphWithdrawalAuthored = $participant->nphWithdrawalAuthored;
+        }
+
+        if (isset($participant->nphDeactivation)) {
+            $this->nphDeactivation = $participant->nphDeactivation;
+        }
+
+        if (isset($participant->nphDeactivationAuthored)) {
+            $this->nphDeactivationAuthored = $participant->nphDeactivationAuthored;
+        }
+
+        if (isset($participant->consentForNphModule1)) {
+            $this->consentForNphModule1 = $participant->consentForNphModule1;
+        }
+        
+        if (isset($participant->consentForNphModule1Authored)) {
+            $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
         }
     }
 
