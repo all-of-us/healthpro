@@ -1247,7 +1247,7 @@ class WorkQueue
                 'nphWithdrawal' => 'NPH Withdrawal Status',
                 'nphWithdrawalAuthored' => 'NPH Withdrawal Date',
                 'nphDeactivation' => 'NPH Deactivation Status',
-                'nphDeactivationAuthored' =>'NPH Deactivation Time',
+                'nphDeactivationAuthored' => 'NPH Deactivation Time',
                 'consentForNphModule1' => 'NPH Module 1 Consent Status',
                 'consentForNphModule1Authored' => 'NPH Module 1 Consent Date',
             ],
@@ -2926,7 +2926,7 @@ class WorkQueue
         return self::HTML_DANGER;
     }
 
-    public static function getCsvNphStudyStatus(Participant $participant,string $fieldKey, string $userTimezone): int|string
+    public static function getCsvNphStudyStatus(Participant $participant, string $fieldKey, string $userTimezone): int|string
     {
         if (str_contains($fieldKey, 'Authored')) {
             return self::dateFromString($participant->$fieldKey, $userTimezone);
