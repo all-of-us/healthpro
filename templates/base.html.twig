@@ -1,3 +1,4 @@
+{% set bootstrapVersion = bootstrapVersion|default(3) %}
 {% set isTraining = isStable %}
 {% set roleNavs = {
     admin: {
@@ -43,7 +44,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-{% include LoadProgramTemplate('navbar.html.twig') %}
+{% include LoadProgramTemplate(bootstrapVersion == 5 ? 'navbar-bs5.html.twig' : 'navbar.html.twig') %}
 {% if isTraining %}
     <div class="navbar-warning alert alert-warning">
         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -74,42 +75,7 @@
 </div>
 
 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-    <div class="modal fade" id="siteModal" tabindex="-1" role="dialog" aria-labelledby="siteModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form method="POST" action="{{ path('site_select') }}">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="siteModalLabel">Current site</h4>
-                    </div>
-                    <div class="modal-body">
-                        {% set sites = isCurrentProgramHpo() ? app.user.sites : app.user.nphSites %}
-                        {% if sites|length == 0 and app.user.awardees|length == 0 %}
-                            <span class="text-danger">You do not belong to any HPO sites!</span>
-                        {% else %}
-                            <select class="form-control" name="site">
-                                {% for site in sites %}
-                                    <option value="{{ site.email }}"{{ (app.session.get('site') and app.session.get('site').email == site.email) ? ' selected' : ''}} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
-                                {% endfor %}
-                                {% if isCurrentProgramHpo() %}
-                                    {% for awardee in app.user.awardees %}
-                                        <option value="{{ awardee.email }}"{{ (app.session.get('awardee') and app.session.get('awardee').email == awardee.email) ? ' selected' : ''}} >{{ awardee.name }}</option>
-                                    {% endfor %}
-                                {% endif %}
-                            </select>
-                        {% endif %}
-                    </div>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token('siteSelect') }}"/>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        {% if app.user.sites|length > 0 or app.user.awardees|length > 0 %}
-                            <button type="submit" class="btn btn-primary">Switch</button>
-                        {% endif %}
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% include bootstrapVersion == 5 ? 'partials/modals/site-select-bs5.html.twig' : 'partials/modals/site-select.html.twig' %}
     <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -130,10 +96,11 @@
     </div>
 </div>
 
-<div id="is-xs" class="visible-xs"></div>
+{#The hidden-* and visible-* classes no longer exist in Bootstrap 5 so using display classes accordingly#}
+<div id="is-xs" class="visible-xs d-block d-sm-none"></div>
 {% include 'base-body.html.twig' %}
 
-{{ encore_entry_script_tags('app') }}
+{{ encore_entry_script_tags(bootstrapVersion == 5 ? 'app5' : 'app') }}
 
 {% block pagejs %}{% endblock %}
 </body>
