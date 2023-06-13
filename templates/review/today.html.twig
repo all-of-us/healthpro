@@ -21,6 +21,12 @@
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
+    <div class="text-right">
+        <button data-href="" class="btn btn-xs btn-default export">
+            <i class="fa fa-download" aria-hidden="true"></i> Export
+        </button>
+    </div>
+    <br>
     <table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
         <thead>
         <tr>
@@ -171,4 +177,5 @@
 {% block pagejs %}
     {{ encore_entry_script_tags('today') }}
     {{ encore_entry_script_tags('review') }}
+    {{ encore_entry_script_tags('export-warning-modal') }}
 {% endblock %}
