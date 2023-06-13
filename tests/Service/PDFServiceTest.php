@@ -31,7 +31,7 @@ class PDFServiceTest extends ServiceTestCase
     public function testBatchPDF(): void
     {
         $pdfService = static::getContainer()->get(PDFService::class);
-        $participant = $this->testSetup->generateParticipant();
+        $participant = $this->testSetup->generateNphParticipant();
         $nphOrder = $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
         $orderSummary = $this->nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participant->id, $nphOrder->getModule(), $nphOrder->getVisitType());
         $pdf = $pdfService->batchPDF($orderSummary['order'], $participant, $nphOrder->getModule(), $nphOrder->getVisitType());

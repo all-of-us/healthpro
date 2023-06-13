@@ -2974,13 +2974,13 @@ class WorkQueue
     public static function getNphStudyStatus(Participant $participant, string $userTimezone, bool $displayTime = false): string
     {
         if ($participant->nphWithdrawal) {
-            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphWithdrawalAuthored, $userTimezone, $displayTime);
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphWithdrawalAuthored, $userTimezone, $displayTime) . ' (Withdrawn)';
         } elseif ($participant->nphDeactivation) {
-            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphDeactivationAuthored, $userTimezone, $displayTime);
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphDeactivationAuthored, $userTimezone, $displayTime) . ' (Deactivated)';
         } elseif ($participant->consentForNphModule1) {
-            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->consentForNphModule1Authored, $userTimezone, $displayTime);
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->consentForNphModule1Authored, $userTimezone, $displayTime) . ' Module 1 (Consented)';
         }
-        return self::HTML_DANGER;
+        return self::HTML_DANGER . ' (Not Consented)';
     }
 
     public static function getCsvNphStudyStatus(Participant $participant, string $fieldKey, string $userTimezone): int|string
