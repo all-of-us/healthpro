@@ -79,7 +79,8 @@ $(document).ready(function () {
         const link = document.createElement("a");
         link.href = `data:text/csv;charset=utf-8,${encodeURI(csvContent)}`;
         link.target = "_blank";
-        link.download = "TodaysParticipants.csv";
+        const currentDate = new Date().toISOString().split('T')[0];
+        link.download = `TodaysParticipants_${currentDate}.csv`;
         link.click();
     };
 
