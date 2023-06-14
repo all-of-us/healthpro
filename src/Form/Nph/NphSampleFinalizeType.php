@@ -11,8 +11,6 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleFinalizeType extends NphOrderForm
 {
-    private const BARCODE_PREFIX_MC = 'MC';
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $sample = $options['sample'];
@@ -54,7 +52,7 @@ class NphSampleFinalizeType extends NphOrderForm
                             new Constraints\Type('string'),
                             new Constraints\Regex([
                                 'pattern' => "/^{$barcodePattern}$/",
-                                'message' => $this->getBarcodeErrorMessage($aliquot)
+                                'message' => $aliquot['barcodeErrorMessage']
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
                                 $formData = $context->getRoot()->getData();
@@ -62,7 +60,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 $condition = $aliquot['expectedVolume'] ? ($formData["{$aliquotCode}AliquotTs"][$key] ||
                                     $formData["{$aliquotCode}Volume"][$key]) : $formData["{$aliquotCode}AliquotTs"][$key];
                                 if ($condition && empty($value)) {
-                                    $context->buildViolation('Barcode is required')->addViolation();
+                                    $context->buildViolation('Aliquot barcode is required')->addViolation();
                                 }
                             }),
                             new Constraints\Callback(function ($value, $context) use ($aliquot, $aliquotCode) {
@@ -114,7 +112,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 $condition = $aliquot['expectedVolume'] ? ($formData[$aliquotCode][$key] ||
                                     $formData["{$aliquotCode}Volume"][$key]) : $formData[$aliquotCode][$key];
                                 if ($condition && empty($value)) {
-                                    $context->buildViolation('Time is required')->addViolation();
+                                    $context->buildViolation('Aliquot time is required')->addViolation();
                                 }
                                 if (!empty($formData["{$sample}CollectedTs"]) && !empty($value)) {
                                     if ($value <= $formData["{$sample}CollectedTs"]) {
@@ -165,7 +163,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     ]);
                 }
                 if (isset($aliquot['maxVolume'])) {
-                    $errorMessage = "Please verify the volume is correct. This aliquot should contain {$aliquot['maxVolume']} {$aliquot['units']} Only.";
+                    $errorMessage = "Please verify the volume is correct.  This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.";
                     $volumeConstraints[] = new Constraints\LessThanOrEqual([
                         'value' => $aliquot['maxVolume'],
                         'message' => $errorMessage
@@ -257,20 +255,5 @@ class NphSampleFinalizeType extends NphOrderForm
             $volumeAttributes['data-warning-max-volume'] = $aliquot['warningMaxVolume'];
         }
         return $volumeAttributes;
-    }
-
-    private function getBarcodeErrorMessage(array $aliquot): string
-    {
-        switch ($aliquot['barcodeLength']) {
-            case 10:
-                if (isset($aliquot['barcodePrefix']) && $aliquot['barcodePrefix'] === self::BARCODE_PREFIX_MC) {
-                    return 'Please enter a valid aliquot barcode. Format should be MC1000000000 (MC + 10 digits).';
-                }
-                return 'Please enter a valid aliquot barcode. Format should be 1000000000 (10 digits).';
-            case 11:
-                return 'Please enter a valid aliquot barcode. Format should be 10000000000 (11 digits).';
-            default:
-                return 'Please enter a valid aliquot barcode.';
-        }
     }
 }
