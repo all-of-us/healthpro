@@ -276,6 +276,12 @@ class WorkQueueServiceTest extends ServiceTestCase
             '9/22/2022 3:00 pm',
             0,
             '',
+            0,
+            '',
+            0,
+            '',
+            0,
+            '',
         ], $row);
     }
 

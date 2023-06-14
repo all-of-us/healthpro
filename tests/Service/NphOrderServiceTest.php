@@ -418,7 +418,7 @@ class NphOrderServiceTest extends ServiceTestCase
     {
         $orderSummary = $this->service->getParticipantOrderSummary('P0000000001');
         $this->assertSame(['order' => [], 'sampleCount' => 0, 'sampleStatusCount' => []], $orderSummary);
-        $participant = $this->testSetup->generateParticipant();
+        $participant = $this->testSetup->generateNphParticipant();
         $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
         $orderSummary = $this->service->getParticipantOrderSummary($participant->id);
         $this->assertIsArray($orderSummary);
@@ -429,7 +429,7 @@ class NphOrderServiceTest extends ServiceTestCase
 
     public function testGetParticipantOrderSummaryByVisitAndModule(): void
     {
-        $participant = $this->testSetup->generateParticipant();
+        $participant = $this->testSetup->generateNphParticipant();
         $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
         $orderSummary = $this->service->getParticipantOrderSummaryByModuleAndVisit($participant->id, '1', 'LMT');
         $this->assertIsArray($orderSummary);
