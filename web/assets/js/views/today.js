@@ -84,7 +84,15 @@ $(document).ready(function () {
         link.click();
     };
 
-    $('#export_btn').on('click', function() {
-        generateCSV();
+    $('#export_btn').on('click', function () {
+        new PmiConfirmModal({
+            title: "Attention",
+            msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
+            isHTML: true,
+            onTrue: function () {
+                generateCSV();
+            },
+            btnTextTrue: "Accept"
+        });
     });
 });
