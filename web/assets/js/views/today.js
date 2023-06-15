@@ -26,6 +26,15 @@ $(document).ready(function () {
         return value;
     };
 
+    const checkCellData = cells => cells.map(cell => {
+        const cellContent = cell.textContent.trim();
+        if (cell.getAttribute('data-column-type') === 'on_site') {
+            const cellSpan = cell.querySelector('span[data-on-site-date]');
+            return cellSpan ? cellSpan.getAttribute('data-on-site-date') : '';
+        }
+        return cellContent;
+    });
+
     const generateCSV = () => {
         const csv = [];
         const headerRow = [
@@ -66,9 +75,9 @@ $(document).ready(function () {
             }
             rowDataEntry.push(participantId, escapeCSVValue(participantName));
             if (cells[0].hasAttribute('data-participant-id')) {
-                rowDataEntry.push(...cells.slice(2).map(cell => cell.textContent.trim()));
+                rowDataEntry.push(...checkCellData(cells.slice(2)));
             } else {
-                rowDataEntry.push(...cells.map(cell => cell.textContent.trim()));
+                rowDataEntry.push(...checkCellData(cells));
             }
             rowData.push(rowDataEntry.join(","));
             csv.push(rowData.join(","));
