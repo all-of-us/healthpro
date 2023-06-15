@@ -17,13 +17,15 @@ $(document).ready(function () {
             } else {
                 td.text(missingName);
             }
-        }).fail(function () {
-            td.html("<em>Error loading name</em>");
-        }).always(function () {
-            namesLoaded++;
-            if (namesLoaded === $(".load-name").length) {
-                $("#export_btn").prop("disabled", false);
-            }
-        });
+        })
+            .fail(function () {
+                td.html("<em>Error loading name</em>");
+            })
+            .always(function () {
+                namesLoaded++;
+                if (namesLoaded === $(".load-name").length) {
+                    $("#export_btn").prop("disabled", false);
+                }
+            });
     });
 });
