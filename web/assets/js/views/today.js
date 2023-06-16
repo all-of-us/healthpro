@@ -41,8 +41,8 @@ $(document).ready(function () {
         const headerRow = [
             "Participant ID",
             "Name",
-            "ID Verification Status",
-            "Incentive Status",
+            "ID Verification Date",
+            "Incentive Date",
             "PM Status",
             "PM Created",
             "PM Finalized",
