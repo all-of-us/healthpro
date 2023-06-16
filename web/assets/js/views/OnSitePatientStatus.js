@@ -56,6 +56,7 @@ $(document).ready(function () {
             var pageDropDown = $(".page-drop-down select");
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
+            generateSiteOptions(table.ajax.json());
         }
     });
 
@@ -107,4 +108,13 @@ $(document).ready(function () {
         clearInvalidFields();
         formSelector.submit();
     });
+
+    function generateSiteOptions(tableData) {
+        let siteList = [];
+        for (let i = 0; i < table.column(3).data().length; i++) {
+            if (siteList[table.column(3).data()[i]] === undefined) {
+                siteList.push(table.column(3).data()[i]);
+            }
+        }
+    }
 });
