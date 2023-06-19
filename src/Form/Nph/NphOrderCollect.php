@@ -38,7 +38,7 @@ class NphOrderCollect extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_URINE) {
-            $this->addUrineMetadataFields($builder, $options['disableMetadataFields']);
+            $this->addUrineMetadataFields($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
         }
 
         if ($orderType === NphOrder::TYPE_STOOL) {
@@ -64,7 +64,7 @@ class NphOrderCollect extends NphOrderForm
                     'readonly' => $options['disableStoolCollectedTs']
                 ]
             ]);
-            $this->addStoolMetadataFields($builder, $options['disableMetadataFields']);
+            $this->addStoolMetadataFields($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
         }
 
         // Placeholder field for displaying select at least one sample error message

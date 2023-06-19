@@ -35,7 +35,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class NphOrderController extends BaseController
 {
-    private $siteService;
+    private SiteService $siteService;
 
     public function __construct(EntityManagerInterface $em, SiteService $siteService)
     {
@@ -58,6 +58,9 @@ class NphOrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        if (!$participant->dob) {
+            throw $this->createAccessDeniedException('DOB has not been provided. The participant must complete “The Basics” survey that captures their DOB to unlock order generation.');
+        }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $timePointSamples = $nphOrderService->getTimePointSamples();
@@ -67,7 +70,9 @@ class NphOrderController extends BaseController
             NphOrderType::class,
             $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
-                $nphOrderService->getSamplesByType('stool')]
+                $nphOrderService->getSamplesByType('stool'),
+                'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
+                'module' => $module]
         );
         $showPreview = false;
         $oderForm->handleRequest($request);
@@ -218,7 +223,8 @@ class NphOrderController extends BaseController
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
-            'sampleIdForm' => $sampleIdForm->createView()
+            'sampleIdForm' => $sampleIdForm->createView(),
+            'biobankView' => false
         ]);
     }
 
@@ -264,7 +270,8 @@ class NphOrderController extends BaseController
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
                 $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' =>
                 $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
-                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()
+                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(),
+                'module' => $order->getModule()
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
@@ -341,7 +348,8 @@ class NphOrderController extends BaseController
             'sampleData' => $sampleData,
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
             'modifyType' => $modifyType ?? '',
-            'revertForm' => $this->createForm(NphSampleRevertType::class)->createView()
+            'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
+            'biobankView' => false,
         ]);
     }
 
@@ -357,7 +365,7 @@ class NphOrderController extends BaseController
         return $this->render(
             'program/nph/order/label-print.html.twig',
             ['participant' => $participant,
-             'orderSummary' => $orderInfo['order'],
+                'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
                 'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],

@@ -85,8 +85,8 @@
                                 <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
                             {% elseif nphSample.finalizedTs is not empty %}
                                 <p class="text-success"><i class="fa fa-check-circle"></i>
-                                    {{ nphSample.modifyType == constant('EDITED', nphSample) ? 'Edited and Finalized' : 'Aliquoted and Finalized' }}
-                                    {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</p>
+                                    {{ macros.displayCollectAliquotStatus(nphSample) }}
+                                </p>
                             {% endif %}
                         </td>
                         {% if orderCollectForm[nphSample.sampleId ~ 'CollectedTs'] is defined %}

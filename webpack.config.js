@@ -21,6 +21,7 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './web/assets/js/app.js')
+    .addEntry('app5', './web/assets/js/app-bs5.js')
     .addEntry('login', './web/assets/js/views/Login.js')
     .addEntry('workqueue', './web/assets/js/views/workqueue.js')
     .addEntry('workqueue-consents', './web/assets/js/views/WorkQueueConsents.js')
@@ -69,6 +70,7 @@ Encore
     .addEntry('nph-sample-finalize', './web/assets/js/views/NphSampleFinalize.js')
     .addEntry('nph-order-modify', './web/assets/js/views/NphOrderModify.js')
     .addEntry('nph-review', './web/assets/js/views/NphReview.js')
+    .addEntry('nph-biobank-review', './web/assets/js/views/NphBiobankReview.js')
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

@@ -1,6 +1,79 @@
-{% extends 'base.html.twig' %}
+{% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
+{% macro module3SalivaGlycerolDisplay(aliquotCode, aliquot, form, i, disabled) %}
+    {{ _self.displayAliquotRow(aliquotCode, aliquot, form, i, disabled, true) }}
+    {% if aliquot['collectMetadata'] is defined and aliquot['collectMetadata'] == true %}
+        {% for metadataField in aliquot['metadataFields'] %}
+            <tr>
+                <td colspan="1">
+                    <p style="font-weight: bold;">{{ metadataField['label'] }}</p><span>(1ml = 1000uL)</span>
+                </td>
+                <td colspan="1">
+                    <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
+                    {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'style': 'width: 30%; float: left; top: 20px; position: relative'}}) }}
+                    <span style="top: 25px; position: relative">{{ aliquot['units'] }}</span>
+                    <span style="top: 25px; left: 10px; position: relative">+</span>
+                    <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
+                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'style': 'width: 30%; float: right; position: relative; right: 20px; top: -5px'}}) }}
+                    <span style="top: 5px; position: relative; left: 130px">μl</span>
+                </td>
+                <td>
+                    <span style="top: 25px; position: relative">=</span>
+                    <span style="position: relative">Total Volume</span>
+                    <span style="position: relative; left: 20px; top: 5px" id="totalVol">#</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="has-error">
+                    {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+{% macro displayAliquotRow(aliquotCode, aliquot, form, i, disabled, skipVolume = false) %}
+    {% set aliquotId = form[aliquotCode][i].vars.data %}
+    <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
+        <td {% if not form[aliquotCode][i].vars.valid %}
+            class="has-error"{% endif %}>
+            {{ form_widget(form[aliquotCode][i], {
+                'attr':{'readonly':disabled}}) }}
+            {{ form_errors(form[aliquotCode][i]) }}
+        </td>
+        <td {% if not form[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
+            class="has-error"{% endif %} style="position: relative;">
+            {{ form_widget(form[aliquotCode ~ 'AliquotTs'][i]) }}
+            {{ form_errors(form[aliquotCode ~ 'AliquotTs'][i]) }}
+        </td>
+        {% if not skipVolume %}
+            {{ _self.displayVolumeTD(aliquotCode, aliquot, form, i) }}
+        {% endif %}
+        {% if form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
+            <td class="row">
+                <div class="col-md-6">
+                    {{ form_widget(form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_widget(form['restore_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
+                </div>
+            </td>
+        {% endif %}
+    </tr>
+{% endmacro %}
+{% macro displayVolumeTD(aliquotCode, aliquot, form, i, style) %}
+<td {% if not form[aliquotCode ~ 'Volume'][i].vars.valid %}
+    class="has-error"{% endif %}>
+    {{ form_widget(form[aliquotCode ~ 'Volume'][i]) }}
+    {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
+    <span class="text-warning aliquot-volume-warning" style="display: none">
+        Please verify the volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).
+    </span>
+</td>
+<td class="aliquot volume nopadleft" style="position: relative">
+    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
+</td>
+{% endmacro %}
 {% block body %}
     {% set order = sample.nphOrder %}
     {% set sampleCode =  sample.sampleCode %}
@@ -11,15 +84,20 @@
     {% if sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
-            {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+            {{ form_start(sampleModifyForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
                 <button type="submit" class="btn btn-primary">
                     Unlock Sample
                 </button>
-                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
+                {% if biobankView %}
+                    <a href="{{ path('nph_biobank_participant', { biobankId: participant.biobankid }) }}"
+                       class="btn btn-default">Exit</a>
+                {% else %}
+                    <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                       class="btn btn-default">Exit</a>
+                {% endif %}
             </p>
             {{ form_end(sampleModifyForm) }}
             <hr>
@@ -27,8 +105,11 @@
     {% endif %}
     <div class="row">
         <div class="col-sm-5">
-            {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit', action:
-                path('nph_samples_aliquot') } }) }}
+            {% if biobankView %}
+                {{ form_start(sampleIdForm, { attr: { action: path('nph_biobank_samples_aliquot') } }) }}
+            {% else %}
+                {{ form_start(sampleIdForm, { attr: { action: path('nph_samples_aliquot') } }) }}
+            {% endif %}
             {{ form_widget(sampleIdForm) }}
             <p>
                 <button type="submit" class="btn btn-primary">Go</button>
@@ -67,34 +148,30 @@
         <div class="col-sm-7">
             {% if sample.rdrId and sample.finalizedTs %}
                 <div class="alert alert-success well-sm">
+                    {% if biobankView %}
+                        <i class="fa fa-exclamation-circle"></i>
+                        <strong class="warning-text">
+                            Finalized
+                            by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
+                            on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
+                        </strong>
+                    {% else %}
                     <strong>
                         Finalized
-                        by {{ sample.finalizedUser.email|default('Unknown') }}
+                        by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                         on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                     </strong>
+                    {% endif %}
                 </div>
             {% endif %}
             <div class="panel panel-default">
-                <div class="panel-heading clearfix">
-                    <div class="col-sm-5">
-                        <strong>Name</strong> {{ participant.lastName }}, {{ participant.firstName }} {{ participant
-                        .middleName }} <br>
-                        <strong>Participant ID</strong> {{ participant.id }} <br>
-                        <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
-                        <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
-                        <strong>DOB</strong> {{ participant.dob ? participant.dob|date('n/j/Y') : '--' }} <br>
-                    </div>
-                    <div class="col-sm-7 text-right">
-                        <strong class="text-primary">
-                            Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }}
-                            | {{ samples[sampleCode]}}
-                        </strong><br>
-                        <strong>Order ID</strong> {{ sample.nphOrder.orderId }}<br>
-                        <strong>Collection Sample ID</strong> {{ sample.sampleId }}
-                    </div>
-                </div>
+                {% if biobankView %}
+                    {% include 'program/nph/order/partials/sample-finalize-participant-details-biobank.html.twig' %}
+                {% else %}
+                    {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
+                {% endif %}
                 <div class="panel-body">
-                    {{ form_start(sampleFinalizeForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+                    {{ form_start(sampleFinalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit'} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
                             has-error{% endif %}">
@@ -117,13 +194,15 @@
                         </span>
                         </label>
                         <div class="row">
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {% if not sampleFinalizeForm['urineColor'].vars.valid %} has-error{% endif %}">
                                 {{ form_label(sampleFinalizeForm['urineColor']) }}
                                 {{ form_widget(sampleFinalizeForm['urineColor']) }}
+                                {{ form_errors(sampleFinalizeForm['urineColor']) }}
                             </div>
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {% if not sampleFinalizeForm['urineClarity'].vars.valid %} has-error{% endif %}">
                                 {{ form_label(sampleFinalizeForm['urineClarity']) }}
                                 {{ form_widget(sampleFinalizeForm['urineClarity']) }}
+                                {{ form_errors(sampleFinalizeForm['urineClarity']) }}
                             </div>
                         </div>
                         <hr>
@@ -135,13 +214,15 @@
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                         </label>
-                        <div class="form-group">
+                        <div class="form-group {% if not sampleFinalizeForm['bowelType'].vars.valid %} has-error{% endif %}">
                             {{ form_label(sampleFinalizeForm['bowelType']) }}
                             {{ form_widget(sampleFinalizeForm['bowelType']) }}
+                            {{ form_errors(sampleFinalizeForm['bowelType']) }}
                         </div>
-                        <div class="form-group">
+                        <div class="form-group {% if not sampleFinalizeForm['bowelQuality'].vars.valid %} has-error{% endif %}">
                             {{ form_label(sampleFinalizeForm['bowelQuality']) }}
                             {{ form_widget(sampleFinalizeForm['bowelQuality']) }}
+                            {{ form_errors(sampleFinalizeForm['bowelQuality']) }}
                         </div>
                         <span class="text-warning">
                             <i class="fa fa-exclamation-triangle"></i>
@@ -186,7 +267,7 @@
                                     {% for i in range(0, aliquotCount - 1) %}
                                         {% if sampleFinalizeForm[aliquotCode][i] is defined %}
                                             {% set aliquotId = sampleFinalizeForm[aliquotCode][i].vars.data %}
-                                            {% set disabled = sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined ? true: false %}
+                                            {% set disabled = sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined ? true : false %}
                                             {% if sample.nphAliquotsStatus[sampleFinalizeForm[aliquotCode][i]
                                             .vars.data] is defined %}
                                                 <tr>
@@ -196,40 +277,11 @@
                                                     </td>
                                                 </tr>
                                             {% endif %}
-                                            <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
-                                                <td {% if not sampleFinalizeForm[aliquotCode][i].vars.valid %}
-                                                    class="has-error"{% endif %}>
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode][i], {
-                                                        'attr':{'readonly':disabled}}) }}
-                                                    {{ form_errors(sampleFinalizeForm[aliquotCode][i]) }}
-                                                </td>
-                                                <td {% if not sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
-                                                        class="has-error"{% endif %} style="position: relative;">
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
-                                                    {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
-                                                </td>
-                                                <td {% if not sampleFinalizeForm[aliquotCode ~ 'Volume'][i].vars.valid %}
-                                                    class="has-error"{% endif %}>
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
-                                                    {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
-                                                    <span class="text-warning aliquot-volume-warning" style="display: none">
-                                                        Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)'
-                                                    </span>
-                                                </td>
-                                                <td class="aliquot volume nopadleft" style="position: relative">
-                                                    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
-                                                </td>
-                                                {% if sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
-                                                    <td class="row">
-                                                        <div class="col-md-6">
-                                                            {{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            {{ form_widget(sampleFinalizeForm['restore_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
-                                                        </div>
-                                                    </td>
-                                                {% endif %}
-                                            </tr>
+                                            {% if aliquotCode == 'SALIVAA2' %}
+                                                {{ _self.module3SalivaGlycerolDisplay(aliquotCode, aliquot, sampleFinalizeForm, i, disabled) }}
+                                            {% else %}
+                                                {{ _self.displayAliquotRow(aliquotCode, aliquot, sampleFinalizeForm, i, disabled) }}
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                     {% if not sample.disabled and (aliquot['addNew'] or sample.unlocked) %}
@@ -262,10 +314,17 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if sample.disabled %} disabled {% endif %} formnovalidate>
+                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or sample.disabled %}
+                                    disabled
+                                {% endif %}
+                                formnovalidate>
                             Mark as Finalized
                         </button>
-                        <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% if biobankView %}
+                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% else %}
+                            <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                        {% endif %}
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
                     {% if sample.modifyType == 'unlock' %}
@@ -279,6 +338,7 @@
             </div>
         </div>
     </div>
+    {% include 'program/nph/order/partials/sample-finalize-confirmation-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}

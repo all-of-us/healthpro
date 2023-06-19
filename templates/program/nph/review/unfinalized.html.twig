@@ -26,7 +26,7 @@
                         <a href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}">{{ sample.participant.lastName }}, {{ sample.participant.firstName }}</a>
                     </td>
                 {% else %}
-                    <td data-participant-id="{{ sample.participantId }}" data-href="{{ path('participant', { id: sample.participantId }) }}" class="load-name">
+                    <td data-participant-id="{{ sample.participantId }}" data-href="{{ path('nph_participant_summary', { participantId: sample.participantId }) }}" class="load-name">
                         <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
                         <span class="sr-only">Loading...</span>
                     </td>

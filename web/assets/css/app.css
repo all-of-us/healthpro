@@ -94,6 +94,9 @@ label.label-normal {
     margin-top: -17px;
     text-align: right;
 }
+.single-subtitle {
+    margin-top: -6px;
+}
 .navbar-brand img {
     margin-top: -10px;
     margin-right: 5px;
@@ -407,6 +410,9 @@ label.label-normal {
 .multiheader-consent, .col-consent {
     background-color: #efd;
 }
+.multiheader-ancillary {
+    background-color: #d3e9fc;
+}
 .dataTables_processing {
     z-index: 1000;
     color: #fff;
@@ -648,6 +654,9 @@ table.table-samples td {
 .custom-text-muted {
     color: #dadada;
 }
+.submission-label {
+    margin-right: 10px;
+}
 
 /* Help */
 .help-footer {
@@ -751,7 +760,7 @@ table.table-samples td {
   color: white;
   background-color: red;
   border-radius: 50%;
-  font-size: 1.5rem;
+  font-size: 1rem;
   top: -0.5rem;
   right: 0.5rem;
   padding: 0.5rem;
@@ -860,4 +869,15 @@ table.table-samples td {
 
 .stool-samples-box-2 {
     background-color: #fef6a6;
+}
+
+.nph-finalize-modal-header {
+    background-color: #459500;
+    color: #FFFFFF;
+}
+
+/* NPH Participant details */
+
+.no-dob-banner {
+    display: inline-block;
 }

@@ -151,4 +151,64 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getTodaysBiobankOrders(string $timezone): array
+    {
+        $startDate = new \DateTime('today', new \DateTimeZone($timezone));
+        $endDate = new \DateTime('tomorrow', new \DateTimeZone($timezone));
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
+            ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate')
+            ->setParameters(['startDate' => $startDate, 'endDate' => $endDate])
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getUnfinalizedBiobankSamples(): array
+    {
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('ns.finalizedTs is NULL')
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getUnlockedBiobankSamples(): array
+    {
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('ns.modifyType = :modifyType')
+            ->setParameter('modifyType', NphSample::UNLOCK)
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getRecentlyModifiedBiobankSamples(string $timezone): array
+    {
+        $endDate = new \DateTime('-7 days', new \DateTimeZone($timezone));
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.modifiedTs, ns.modifiedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('ns.modifyType is not NULL')
+            ->andWhere('ns.modifiedTs >= :endDate')
+            ->setParameter('endDate', $endDate)
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

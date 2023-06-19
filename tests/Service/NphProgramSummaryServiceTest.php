@@ -73,7 +73,7 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
     public function testCombineProgramAndOrderSummary()
     {
         $programSummary = $this->service->getProgramSummary();
-        $nphOrder = $this->testSetup->generateNPHOrder($this->testSetup->generateParticipant(), $this->userService->getUserEntity(), $this->siteService);
+        $nphOrder = $this->testSetup->generateNPHOrder($this->testSetup->generateNphParticipant(), $this->userService->getUserEntity(), $this->siteService);
         $orderSummary = $this->nphOrderService->getParticipantOrderSummary($nphOrder->getParticipantId());
         $combinedSummary = $this->service->combineOrderSummaryWithProgramSummary($orderSummary, $programSummary);
         $this->assertIsArray($combinedSummary);

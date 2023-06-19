@@ -19,6 +19,7 @@ class WorkQueue
     public const HTML_WARNING = '<i class="fa fa-question text-warning" aria-hidden="true"></i>';
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
     public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
+    public const HTML_SUCCESS_DOUBLE = '<i class="fa fa-check-double text-success" aria-hidden="true"></i>';
 
     public static $columnsDef = [
         'lastName' => [
@@ -408,6 +409,24 @@ class WorkQueue
             'visible' => false,
             'csvFormatDate' => true,
             'group' => 'metrics'
+        ],
+        'healthDataStream' => [
+            'name' => 'Health Data Stream',
+            'rdrField' => 'healthDataStreamSharingStatusV3_1',
+            'sortField' => 'healthDataStreamSharingStatusV3_1',
+            'method' => 'getHealthDataSharingStatus',
+            'htmlClass' => 'text-center',
+            'rdrDateField' => 'healthDataStreamSharingStatusV3_1Time',
+            'toggleColumn' => true,
+            'displayTime' => true,
+            'visible' => false,
+            'params' => 3,
+            'group' => 'metrics',
+            'csvNames' => [
+                'Health Data Stream Sharing Status',
+                'Health Data Stream Sharing Date'
+            ],
+            'csvMethod' => 'csvHealthDataSharingStatus'
         ],
         'patientStatusYes' => [
             'name' => 'Yes',
@@ -1235,7 +1254,24 @@ class WorkQueue
             'name' => 'Date of EHR Re-Consent',
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
-        ]
+        ],
+        'NPHConsent' => [
+            'name' => 'NPH Module 1 Consent',
+            'group' => 'ancillaryStudies',
+            'columnToggle' => true,
+            'method' => 'getNphStudyStatus',
+            'ancillaryStudy' => true,
+            'displayTime' => true,
+            'csvNames' => [
+                'nphWithdrawal' => 'NPH Withdrawal Status',
+                'nphWithdrawalAuthored' => 'NPH Withdrawal Date',
+                'nphDeactivation' => 'NPH Deactivation Status',
+                'nphDeactivationAuthored' => 'NPH Deactivation Time',
+                'consentForNphModule1' => 'NPH Module 1 Consent Status',
+                'consentForNphModule1Authored' => 'NPH Module 1 Consent Date',
+            ],
+            'csvMethod' => 'getCsvNphStudyStatus',
+        ],
     ];
 
     public static $columns = [
@@ -1264,6 +1300,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStream',
         'patientStatusYes',
         'patientStatusNo',
         'patientStatusNoAccess',
@@ -1326,6 +1363,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
+        'NPHConsent'
     ];
 
     public static $columnGroups = [
@@ -1336,7 +1374,8 @@ class WorkQueue
         'contact' => 'Contact',
         'surveys' => 'PPI Surveys',
         'enrollment' => 'In Person Enrollment',
-        'demographics' => 'Demographics'
+        'demographics' => 'Demographics',
+        'ancillaryStudies' => 'Ancillary Studies'
     ];
 
     public static $consentColumns = [
@@ -1481,7 +1520,9 @@ class WorkQueue
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
-        'LifeFunctioning'
+        'LifeFunctioning',
+        'healthDataStream',
+        'NPHConsent'
     ];
 
     public static $sortColumns = [
@@ -1512,6 +1553,7 @@ class WorkQueue
         'retentionType',
         'isEhrDataAvailable',
         'latestEhrReceiptTime',
+        'healthDataStreamSharingStatusV3_1Time',
         'patientStatus',
         'patientStatus',
         'patientStatus',
@@ -1574,6 +1616,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
+        'NphStudyStatus'
     ];
 
     public static $consentSortColumns = [
@@ -1735,7 +1778,8 @@ class WorkQueue
                 'Yes' => 'yes',
                 'No' => 'no'
             ]
-        ]
+        ],
+
     ];
 
     public static $consentFilters = [
@@ -2078,6 +2122,18 @@ class WorkQueue
                     'Unpaired' => 'UNSET'
                 ]
             ],
+        ],
+        'Ancillary Studies' => [
+            'NphStudyStatus' => [
+                'label' => 'Nutrition For Precision Health',
+                'options' => [
+                    'View All' => '',
+                    'Not Consented' => 'NOT_CONSENTED',
+                    'Module 1 Consented' => 'MODULE_1_CONSENTED',
+                    'Deactivated' => 'DEACTIVATED',
+                    'Withdrawn' => 'WITHDRAWN'
+                ]
+            ],
         ]
     ];
 
@@ -2104,7 +2160,8 @@ class WorkQueue
         'Demographics' => 'fa-globe',
         'EHR' => 'fa-laptop-medical',
         'Retention' => 'fa-check-double',
-        'Pairing' => 'fa-building'
+        'Pairing' => 'fa-building',
+        'Ancillary Studies' => 'fa-microscope'
     ];
 
     //These are currently not working in the RDR
@@ -2277,7 +2334,8 @@ class WorkQueue
             'gRoRConsent',
             'primaryLanguage',
             'isEhrDataAvailable',
-            'latestEhrReceiptTime'
+            'latestEhrReceiptTime',
+            'healthDataStream'
         ],
         'contact' => [
             'participantId',
@@ -2609,6 +2667,19 @@ class WorkQueue
         }
     }
 
+    public static function getHealthDataSharingStatus(string|null $value, string|null $time, string $userTimezone): string
+    {
+        switch ($value) {
+            case 'EVER_SHARED':
+                return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone) . ' (Ever Shared) ';
+            case 'CURRENTLY_SHARING':
+                return self::HTML_SUCCESS_DOUBLE . ' ' . self::dateFromString($time, $userTimezone) . ' (Currently Sharing) ';
+            case 'NEVER_SHARED':
+            default:
+                return self::HTML_DANGER . ' (Never Shared)';
+        }
+    }
+
     public static function getEhrAvailableStatus($value)
     {
         if ($value) {
@@ -2713,6 +2784,26 @@ class WorkQueue
             return self::dateFromString($authoredDate, $userTimezone);
         }
         return !$displayDate ? 0 : '';
+    }
+
+    public static function csvHealthDataSharingStatus(string|null $healthDataSharingStatus, string $type, bool $displayDate = false, string $userTimezone = null): string|int
+    {
+        if ($displayDate === false) {
+            switch ($healthDataSharingStatus) {
+                case 'EVER_SHARED':
+                    return 1;
+                case 'CURRENTLY_SHARING':
+                    return 2;
+                case 'NEVER_SHARED':
+                default:
+                    return 0;
+            }
+        } else {
+            if (!is_null($healthDataSharingStatus)) {
+                return self::dateFromString($healthDataSharingStatus, $userTimezone);
+            }
+            return '';
+        }
     }
 
     public static function hasDateFields($params)
@@ -2878,5 +2969,26 @@ class WorkQueue
             return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
         }
         return self::HTML_DANGER;
+    }
+
+    public static function getNphStudyStatus(Participant $participant, string $userTimezone, bool $displayTime = false): string
+    {
+        if ($participant->nphWithdrawal) {
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphWithdrawalAuthored, $userTimezone, $displayTime) . ' (Withdrawn)';
+        } elseif ($participant->nphDeactivation) {
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphDeactivationAuthored, $userTimezone, $displayTime) . ' (Deactivated)';
+        } elseif ($participant->consentForNphModule1) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->consentForNphModule1Authored, $userTimezone, $displayTime) . ' Module 1 (Consented)';
+        }
+        return self::HTML_DANGER . ' (Not Consented)';
+    }
+
+    public static function getCsvNphStudyStatus(Participant $participant, string $fieldKey, string $userTimezone): int|string
+    {
+        if (str_contains($fieldKey, 'Authored')) {
+            return self::dateFromString($participant->$fieldKey, $userTimezone);
+        }
+
+        return $participant->$fieldKey ? 1 : 0;
     }
 }

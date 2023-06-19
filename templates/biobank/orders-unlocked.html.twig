@@ -41,19 +41,19 @@
                     <a href="{{ path('biobank_participant', { biobankId: order.biobank_id }) }}">{{ order.biobank_id }}</a>
                 </td>
                 <td data-order="{{ order.created_ts }}">
-                    {{ macros.displayDate(order, 'created_ts') }}
+                    {{ macros.displayDateAndTimezone(order, 'created') }}
                 </td>
                 <td>
                     {{ macros.displaySite(order.created_site_name, order.site) }}
                 </td>
                 <td data-order="{{ order.collected_ts }}">
-                    {{ macros.displayDate(order, 'collected_ts') }}
+                    {{ macros.displayDateAndTimezone(order, 'collected') }}
                 </td>
                 <td>
                     {{ macros.displaySite(order.collected_site_name, order.collected_site) }}
                 </td>
                 <td data-order="{{ order.processed_ts }}">
-                    {{ order.type != 'saliva' ? macros.displayDate(order, 'processed_ts') : '--' }}
+                    {{ order.type != 'saliva' ? macros.displayDateAndTimezone(order, 'processed') : '--' }}
                 </td>
                 <td>
                     {{ order.type != 'saliva' ? macros.displaySite(order.processed_site_name, order.processed_site) : '--' }}

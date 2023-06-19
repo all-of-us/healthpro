@@ -117,7 +117,7 @@ class NphParticipantSummaryService
 
     private function getParticipantByIdQuery(string $participantId): string
     {
-        return " 
+        return "
             query {
                 participant (nphId: \"{$participantId}\") {
                     totalCount
@@ -127,9 +127,14 @@ class NphParticipantSummaryService
                             firstName
                             lastName
                             participantNphId
-                            DOB
+                            nphDateOfBirth
                             biobankId
                             nphPairedSite
+                            nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            }
                         }
                     }
                 }
@@ -149,7 +154,7 @@ class NphParticipantSummaryService
                 if ($field === 'dob') {
                     try {
                         $date = new \DateTime($params['dob']);
-                        $field = 'dateOfBirth';
+                        $field = 'nphDateOfBirth';
                         $value = $date->format('Y-m-d');
                     } catch (\Exception $e) {
                         throw new InvalidDobException();
@@ -170,7 +175,7 @@ class NphParticipantSummaryService
             }
         }
         $searchParams = implode(',', $searchParams);
-        return " 
+        return "
             query {
                 participant ({$searchParams}) {
                     totalCount
@@ -180,7 +185,7 @@ class NphParticipantSummaryService
                             firstName
                             lastName
                             participantNphId
-                            DOB
+                            nphDateOfBirth
                             biobankId
                             nphPairedSite
                         }
@@ -192,7 +197,7 @@ class NphParticipantSummaryService
 
     private function getAllParticipantsByIdQuery(string $participantId): string
     {
-        return " 
+        return "
             query {
                 participant (nphId: \"{$participantId}\") {
                     totalCount
@@ -233,7 +238,7 @@ class NphParticipantSummaryService
                                 value
                             }
                             biobankId
-                            DOB
+                            nphDateOfBirth
                             email
                             firstName
                             lastName
@@ -257,6 +262,11 @@ class NphParticipantSummaryService
                             phoneNumber
                             siteId
                             zipCode
+                            nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            }
                         }
                     }
                 }

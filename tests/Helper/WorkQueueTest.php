@@ -3,10 +3,17 @@
 namespace App\Tests\Helper;
 
 use App\Helper\WorkQueue;
-use PHPUnit\Framework\TestCase;
+use App\Tests\Service\ServiceTestCase;
+use App\Tests\testSetup;
+use Doctrine\ORM\EntityManagerInterface;
 
-class WorkQueueTest extends TestCase
+class WorkQueueTest extends ServiceTestCase
 {
+    private testSetup $testSetup;
+    public function setUp(): void
+    {
+        $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
+    }
     public function testConsentExportHeaders()
     {
         $exportHeaders = WorkQueue::getConsentExportHeaders(WorkQueue::getWorkQueueConsentColumns());
@@ -171,7 +178,9 @@ class WorkQueueTest extends TestCase
             'Patient Status: Unknown',
             'Core Participant Minus PM Date',
             'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent'
+            'Date of EHR Re-Consent',
+            'Health Data Stream Sharing Status',
+            'Health Data Stream Sharing Date',
         ], $exportHeaders);
     }
 
@@ -199,7 +208,8 @@ class WorkQueueTest extends TestCase
                 'retentionType' => 'Retention Status',
                 'retentionEligibleStatus' => 'Retention Eligible',
                 'participantOrigin' => 'Participant Origination',
-                'enrollmentSite' => 'Enrollment Site'
+                'enrollmentSite' => 'Enrollment Site',
+                'NphStudyStatus' => 'Nutrition For Precision Health'
             ],
             'options' =>
                 [
@@ -374,10 +384,21 @@ class WorkQueueTest extends TestCase
                             '' => 'View All',
                             'UNSET' => 'Unpaired',
                         ],
+                    'NphStudyStatus' =>
+                    [
+                        '' => 'View All',
+                        'NOT_CONSENTED' => 'Not Consented',
+                        'MODULE_1_CONSENTED' => 'Module 1 Consented',
+                        'DEACTIVATED' => 'Deactivated',
+                        'WITHDRAWN' => 'Withdrawn'
+                    ]
+
                 ]
         ];
-        $filterLabelOptionPairs['labels'] = array_merge($filterLabelOptionPairs['labels'],
-            WorkQueue::$filterDateFieldLabels);
+        $filterLabelOptionPairs['labels'] = array_merge(
+            $filterLabelOptionPairs['labels'],
+            WorkQueue::$filterDateFieldLabels
+        );
         $advancedFilters = WorkQueue::$consentAdvanceFilters;
         $this->assertSame($filterLabelOptionPairs, WorkQueue::getFilterLabelOptionPairs($advancedFilters));
     }
@@ -395,12 +416,12 @@ class WorkQueueTest extends TestCase
         return [
             [
                 [
-                    (object)[
+                    (object) [
                         'incentiveId' => 1,
                         'cancelled' => false,
                         'dateGiven' => '2022-10-19T00:00:00Z'
                     ],
-                    (object)[
+                    (object) [
                         'incentiveId' => 2,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-20T00:00:00Z'
@@ -410,17 +431,17 @@ class WorkQueueTest extends TestCase
             ],
             [
                 [
-                    (object)[
+                    (object) [
                         'incentiveId' => 1,
                         'cancelled' => false,
                         'dateGiven' => '2022-10-12T00:00:00Z'
                     ],
-                    (object)[
+                    (object) [
                         'incentiveId' => 2,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-19T00:00:00Z'
                     ],
-                    (object)[
+                    (object) [
                         'incentiveId' => 3,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-20T00:00:00Z'
@@ -430,7 +451,7 @@ class WorkQueueTest extends TestCase
             ],
             [
                 [
-                    (object)[
+                    (object) [
                         'incentiveId' => 1,
                         'cancelled' => true,
                         'dateGiven' => '2022-10-12T00:00:00Z'
@@ -441,4 +462,90 @@ class WorkQueueTest extends TestCase
         ];
     }
 
+    public function testGetHealthDataSharingStatus(): void
+    {
+        $dateTime = new \DateTime('now');
+        $time = $dateTime->format('D M d, Y G:i');
+        $dateTime->setTimezone(new \DateTimeZone('America/Chicago'));
+        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)', WorkQueue::getHealthDataSharingStatus(null, null, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-check text-success" aria-hidden="true"></i> ' . $dateTime->format('n/j/Y g:i a') . ' (Ever Shared) ', WorkQueue::getHealthDataSharingStatus('EVER_SHARED', $time, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-check-double text-success" aria-hidden="true"></i> ' . $dateTime->format('n/j/Y g:i a') . ' (Currently Sharing) ', WorkQueue::getHealthDataSharingStatus('CURRENTLY_SHARING', $time, 'America/Chicago'));
+        $this->assertSame('<i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)', WorkQueue::getHealthDataSharingStatus('NEVER_SHARED', null, 'America/Chicago'));
+    }
+
+    public function testCsvHealthDataSharingStatus(): void
+    {
+        $dateTime = new \DateTime('now');
+        $time = $dateTime->format('D M d, Y G:i');
+        $dateTime->setTimezone(new \DateTimeZone('America/Chicago'));
+        $this->assertSame(0, WorkQueue::csvHealthDataSharingStatus(null, 'healthDataSharingStatus', false, 'America/Chicago'));
+        $this->assertSame(1, WorkQueue::csvHealthDataSharingStatus('EVER_SHARED', 'healthDataSharingStatus', false, 'America/Chicago'));
+        $this->assertSame(2, WorkQueue::csvHealthDataSharingStatus('CURRENTLY_SHARING', 'healthDataSharingStatus', false, 'America/Chicago'));
+        $this->assertSame($dateTime->format('n/j/Y g:i a'), WorkQueue::csvHealthDataSharingStatus($time, 'healthDataSharingStatus', true, 'America/Chicago'));
+        $this->assertSame('', WorkQueue::csvHealthDataSharingStatus(null, 'healthDataSharingStatus', true, 'America/Chicago'));
+    }
+
+    public function getNphStudyStatusDataProvider(): array
+    {
+        return [
+            [
+                ['nphWithdrawal' => true, 'nphWithdrawalAuthored' => '2022-10-12T00:00:00Z'],
+                '<i class="fa fa-times text-danger" aria-hidden="true"></i> 10/11/2022 (Withdrawn)'
+            ],
+            [
+                ['nphDeactivation' => true, 'nphDeactivationAuthored' => '2022-10-12T00:00:00Z'],
+                '<i class="fa fa-times text-danger" aria-hidden="true"></i> 10/11/2022 (Deactivated)'
+            ],
+            [
+                ['consentForNphModule1' => true, 'consentForNphModule1Authored' => '2022-10-12T00:00:00Z'],
+                '<i class="fa fa-check text-success" aria-hidden="true"></i> 10/11/2022 Module 1 (Consented)'
+            ],
+            [
+                [],
+                '<i class="fa fa-times text-danger" aria-hidden="true"></i> (Not Consented)'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getNphStudyStatusDataProvider
+     */
+    public function testGetNphStudyStatus($rdrData, $expected): void
+    {
+        $participant = $this->testSetup->generateParticipant(null, null, null, null, $rdrData);
+        $this->assertSame($expected, WorkQueue::getNphStudyStatus($participant, 'America/Chicago'));
+    }
+
+    public function getCsvNphStudyStatusDataProvider(): array
+    {
+        return [
+            [
+                ['nphWithdrawal' => true, 'nphWithdrawalAuthored' => '2022-10-12T00:00:00Z'],
+                ['nphWithdrawal' => 1, 'nphWithdrawalAuthored' => '10/11/2022 7:00 pm', 'nphDeactivation' => 0, 'nphDeactivationAuthored' => '', 'consentForNphModule1' => 0, 'consentForNphModule1Authored' => '']
+            ],
+            [
+                ['nphDeactivation' => true, 'nphDeactivationAuthored' => '2022-10-12T00:00:00Z'],
+                ['nphWithdrawal' => 0, 'nphWithdrawalAuthored' => '', 'nphDeactivation' => 1, 'nphDeactivationAuthored' => '10/11/2022 7:00 pm', 'consentForNphModule1' => 0, 'consentForNphModule1Authored' => '']
+            ],
+            [
+                ['consentForNphModule1' => true, 'consentForNphModule1Authored' => '2022-10-12T00:00:00Z'],
+                ['nphWithdrawal' => 0,  'nphWithdrawalAuthored' => '', 'nphDeactivation' => 0, 'nphDeactivationAuthored' => '', 'consentForNphModule1' => 1, 'consentForNphModule1Authored' => '10/11/2022 7:00 pm']
+            ],
+            [
+                [],
+                ['nphWithdrawal' => 0, 'nphWithdrawalAuthored' => '', 'nphDeactivation' => 0, 'nphDeactivationAuthored' => '', 'consentForNphModule1' => 0, 'consentForNphModule1Authored' => '']
+            ]
+        ];
+    }
+    /**
+     * @dataProvider getCsvNphStudyStatusDataProvider
+     */
+    public function testGetCsvNphStudyStatus($rdrData, $expected): void
+    {
+        $participant = $this->testSetup->generateParticipant(null, null, null, null, $rdrData);
+        $fieldKeys = Workqueue::$columnsDef['NPHConsent']['csvNames'];
+        foreach (array_keys($fieldKeys) as $fieldKey) {
+            $this->assertSame($expected[$fieldKey], WorkQueue::getCsvNphStudyStatus($participant, $fieldKey,'America/Chicago'));
+        }
+    }
 }

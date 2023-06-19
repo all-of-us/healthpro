@@ -1,7 +1,12 @@
 $(document).ready(function () {
-    $("#sample_finalize_btn").on("click", function () {
-        let confirmMessage = "Are you sure you want to finalize this sample?";
-        return confirm(confirmMessage);
+    $("#sample_finalize_btn").on("click", function (e) {
+        e.preventDefault();
+        $("#confirmation_modal").modal("show");
+    });
+
+    $("#confirm_finalize_btn").on("click", function () {
+        $("#confirmation_modal").modal("hide");
+        $("form[name='nph_sample_finalize']").submit();
     });
 
     $(".add-aliquot-widget").click(function () {
@@ -55,11 +60,18 @@ $(document).ready(function () {
         let inputValue = $(this).val();
         let minValue = $(this).data("warning-min-volume");
         let maxValue = $(this).data("warning-max-volume");
+        if (this.id === "nph_sample_finalize_SALIVAA2Volume_0") {
+            calculateGlycerolVolume(this, $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume"));
+        }
         if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
             $(this).closest("tr").find(".aliquot-volume-warning").show();
         } else {
             $(this).closest("tr").find(".aliquot-volume-warning").hide();
         }
+    });
+
+    $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume").keyup(function () {
+        calculateGlycerolVolume($("#nph_sample_finalize_SALIVAA2Volume_0"), this);
     });
 
     $(document).on("keyup", ".aliquot-barcode", function () {
@@ -80,10 +92,16 @@ $(document).ready(function () {
             let $row = $(this).closest("tr");
             $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
             if ($row.find(".aliquot-volume").data("expected-volume")) {
-                $row.find(".aliquot-volume").prop("readonly", $(this).is(":checked"));
             }
         });
     };
+
+    function calculateGlycerolVolume(sampleVolumeField, glycerolVolumeField) {
+        let sampleVolume = $(sampleVolumeField).val() ? parseInt($(sampleVolumeField).val()) * 1000 : 0;
+        let glycerolVolume = $(glycerolVolumeField).val() ? parseInt($(glycerolVolumeField).val()) : 0;
+        let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
+        $("#totalVol").html(`${totalVolume} mL`);
+    }
 
     disableEnableAliquotFields();
 

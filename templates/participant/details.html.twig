@@ -92,7 +92,7 @@
             </ul>
             <br />
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="on_site_details">
+                <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
                     <div class="row equal-height">
                         {% if canViewOnSiteDetails %}
                             <div class="col-md-6">
@@ -438,6 +438,22 @@
                                                     {{ participant.latestEhrReceiptTime|date('m/d/Y', app.user.timezone) }}
                                                 {% endif %}
                                             </dd>
+                                            <dt>Health Data Stream</dt>
+                                            <dd>
+                                                {% if participant.healthDataStreamSharingStatusV3_1 %}
+                                                    {% if participant.healthDataStreamSharingStatusV3_1 == 'CURRENTLY_SHARING' %}
+                                                        <i class="fa fa-check-double text-success" aria-hidden="true"></i>
+                                                        {{ participant.healthDataStreamSharingStatusV3_1Time|date('m/d/Y', app.user.timezone) }} (Currently Sharing)
+                                                    {% elseif participant.healthDataStreamSharingStatusV3_1 == 'EVER_SHARED' %}
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        {{ participant.healthDataStreamSharingStatusV3_1Time|date('m/d/Y', app.user.timezone) }} (Ever Shared)
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)
+                                                    {% endif %}
+                                                {% else %}
+                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)
+                                                {% endif %}
+                                            </dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -535,6 +551,29 @@
                                                 Location: <samp>{{ siteInfo.getSiteDisplayName(participant.orderCreatedSite) }}</samp>
                                             {% endif %}
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Ancillary Studies</h3>
+                                    </div>
+                                    <div class="participant-detail-status">
+                                        <strong>Nutrition For Precision Health</strong>
+                                        {% if participant.nphWithdrawal %}
+                                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            <small>{{ participant.nphWithdrawalAuthored|date('n/j/Y g:ia', app.user.timezone) }} (withdrawn)</small>
+                                        {% elseif participant.nphDeactivation %}
+                                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            <small>{{ participant.nphDeactivationAuthored|date('n/j/Y g:ia', app.user.timezone) }}(deactivated)</small>
+                                        {% elseif participant.consentForNphModule1 %}
+                                            <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                            {% if participant.consentForNphModule1Authored %}
+                                                <small>{{ participant.consentForNphModule1Authored|date('n/j/Y g:ia', app.user.timezone) }}</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                            <small>(not consented)</small>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

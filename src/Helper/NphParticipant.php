@@ -11,12 +11,15 @@ namespace App\Helper;
  */
 class NphParticipant
 {
+    public const MODULE1_CONSENT_TISSUE = 'm1_consent_tissue';
+    public const OPTIN_PERMIT = 'PERMIT';
     public $id;
     public $cacheTime;
     public $rdrData;
     public $dob;
     public $nphPairedSiteSuffix;
-
+    public $module;
+    public $module1TissueConsentStatus;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -46,7 +49,19 @@ class NphParticipant
         return true;
     }
 
-    private function parseRdrParticipant(\stdClass $participant)
+    private function getModule1TissueConsentStatus(): bool
+    {
+        if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
+            foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
+                if ($consent->value === self::MODULE1_CONSENT_TISSUE && $consent->optIn === self::OPTIN_PERMIT) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function parseRdrParticipant(\stdClass $participant): void
     {
         if (!is_object($participant)) {
             return;
@@ -56,9 +71,9 @@ class NphParticipant
             $this->id = $participant->participantNphId;
         }
         // Set dob to DateTime object
-        if (isset($participant->DOB)) {
+        if (isset($participant->nphDateOfBirth)) {
             try {
-                $this->dob = new \DateTime($participant->DOB);
+                $this->dob = new \DateTime($participant->nphDateOfBirth);
             } catch (\Exception $e) {
                 $this->dob = null;
             }
@@ -67,10 +82,18 @@ class NphParticipant
         if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
             $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
         }
+        $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
+        $this->module = $this->getParticipantModule();
     }
 
-    private function getSiteSuffix($site)
+    private function getSiteSuffix(string $site): string
     {
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
+    }
+
+    private function getParticipantModule(): int
+    {
+        //TODO:: retrieve this from RDR participant api
+        return 1;
     }
 }

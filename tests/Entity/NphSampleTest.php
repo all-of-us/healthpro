@@ -181,4 +181,35 @@ class NphSampleTest extends NphTestCase
             [NphSample::RESTORE, false],
         ];
     }
+
+    /**
+     * @dataProvider sampleMetadataProvider
+     */
+    public function testGetSampleMetadataArray(string $sampleMetadata, array $expected)
+    {
+        $nphSample = new NphSample();
+        $nphSample->setSampleMetadata($sampleMetadata);
+        $result = $nphSample->getSampleMetadataArray();
+        $this->assertEquals($expected, $result);
+    }
+
+    public function sampleMetadataProvider(): array
+    {
+        return [
+            [
+                '{"urineColor":"1","urineClarity":"slightly_cloudy"}',
+                [
+                    'urineColor' => 'Color 1',
+                    'urineClarity' => 'Slightly Cloudy',
+                ],
+            ],
+            [
+                '{"urineColor":"2","urineClarity":"turbid"}',
+                [
+                    'urineColor' => 'Color 2',
+                    'urineClarity' => 'Turbid',
+                ],
+            ]
+        ];
+    }
 }

@@ -453,7 +453,7 @@ class OrderTest extends KernelTestCase
         $orderData = array_merge($orderData, $data);
         $collectedTs = $data['collectedTs'];
         $order = $this->createOrder($orderData);
-        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType);
+        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType, 2);
         self::assertEquals($order->getBiobankChanges(), $json);
     }
 
@@ -515,7 +515,7 @@ class OrderTest extends KernelTestCase
         if (empty($collectedTs)) {
             $order->setCollectedTs($createdTs);
         }
-        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType);
+        $order->checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, '', $centrifugeType, 2);
         self::assertEquals($order->getCollectedTs(), $result['collectedTs']);
         self::assertEquals($order->getProcessedTs(), $result['processedTs']);
         self::assertEquals($order->getFinalizedTs(), $finalizedTs);

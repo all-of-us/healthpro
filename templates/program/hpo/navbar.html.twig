@@ -7,12 +7,36 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
+                        data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
+                        <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+                    </a>
+                    {% if siteInfo.canSwitchProgram %}
+                        <ul class="dropdown-menu dropdown-menu-role navbar-program">
+                            <li>
+                                <a href="{{ path('program_select', { program: 'nph' }) }}">
+                                    <img src="{{ asset('img/nph-logo-green.svg') }}" alt="NPH logo"/>
+                                    Nutrition for Precision Health
+                                </a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </li>
+                {% if not showRoleDropdown %}
+                    <li>
+                        <a class="navbar-brand " href="{{ path('home') }}">
+                            HealthPro
+                            {% if isTraining %}
+                                <div class="navbar-brand-subtitle single-subtitle">training</div>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
             {% if showRoleDropdown %}
                 <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
-                        </a>
                         {% if siteInfo.canSwitchProgram %}
                             <ul class="dropdown-menu dropdown-menu-role navbar-program">
                                 <li>
@@ -52,7 +76,7 @@
                             {% endif %}
                             {% for key, roleNav in roleNavs|filter((roleNav, key) =>
                                 is_granted(roleNav.role) and
-                                not (key == 'biobank' and is_granted('ROLE_SCRIPPS'))
+                                not (key == 'biobank' and is_granted('ROLE_SCRIPPS')) and key != 'nph_biobank'
                                 ) %}
                                 {# Scripps and biobank roles point to the same route, so only display one if user has both roles #}
                                 <li>
@@ -69,14 +93,6 @@
                         </ul>
                     </li>
                 </ul>
-            {% else %}
-                <a class="navbar-brand" href="{{ path('home') }}">
-                    <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
-                    HealthPro
-                    {% if isTraining %}
-                        <div class="navbar-brand-subtitle">training</div>
-                    {% endif %}
-                </a>
             {% endif %}
         </div>
         <div class="collapse navbar-collapse" id="pmi-navbar-collapse">

@@ -3,6 +3,13 @@
         <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong {% if attribute(order, 'biobankFinalized') and attribute(order, type~'User') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'User') is not empty ? attribute(order, type~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, type~'Site')) }}</strong>
+            {# TODO: Replace with class constants #}
+            {% if type == 'finalized' and order.submissionTs %}
+                <h4 class="pull-right submission-label">
+                    {% set fianlizedTimezone = order.finalizedTimezoneId ? userTimezones[order.finalizedTimezoneId] : app.user.timezone  %}
+                    <span class="label label-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia T', fianlizedTimezone) }}</span>
+                </h4>
+            {% endif %}
         </div>
     {% elseif order.origin is defined and order.origin == 'careevolution' and attribute(order, type~'User') is not empty %}
         <div class="alert alert-success well-sm">
@@ -77,7 +84,8 @@
                 <th scope="col">
                     {{ type|capitalize }}
                     {% if type != 'processed' and attribute(order, type~'Ts') is not empty %}
-                        <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia', app.user.timezone) }}
+                        {% set timezone = attribute(order, type~'Timezone') ?? app.user.timezone  %}
+                        <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia T', timezone) }}
                     {% endif %}
                 </th>
             </tr>
@@ -92,7 +100,8 @@
                             {% if attribute(order, type~'Ts') %}
                                 {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
                                     <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                    {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia', app.user.timezone) }}
+                                    {% set timezone = attribute(order, type~'Timezone') ?? app.user.timezone  %}
+                                    {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia T', timezone) }}
                                 {% else %}
                                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                                 {% endif %}

@@ -1,0 +1,11 @@
+<div class="page-header">
+    <h2><i class="fa fa-list" aria-hidden="true"></i> Participant Review</h2>
+</div>
+{% set current_route = app.request.get('_route') %}
+<ul class="nav nav-tabs">
+    <li role="presentation"{% if current_route == 'nph_biobank_orders_today' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_today') }}">Today's Biobank Orders</a></li>
+    <li role="presentation"{% if current_route == 'nph_biobank_orders_unfinalized' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_unfinalized') }}">Unfinalized Samples</a></li>
+    <li role="presentation"{% if current_route == 'nph_biobank_orders_unlocked' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_unlocked') }}">Unlocked Samples</a></li>
+    <li role="presentation"{% if current_route == 'nph_biobank_orders_recently_modified' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_recently_modified') }}">Recently Modified Samples</a></li>
+</ul>
+<br />

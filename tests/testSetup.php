@@ -6,6 +6,7 @@ use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
 use App\Helper\NphParticipant;
+use App\Helper\Participant;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -18,29 +19,31 @@ class testSetup
         $this->em = $em;
     }
 
-    public function generateParticipant(string $id = null, string $firstName = null, string $lastName = null,
-        \DateTime $dateOfBirth = null): NphParticipant
-    {
+    public function generateNphParticipant(
+        string $id = null,
+        string $firstName = null,
+        string $lastName = null,
+        \DateTime $dateOfBirth = null
+    ): NphParticipant {
         if ($id === null) {
-            $id = "P0000001";
+            $id = 'P0000001';
         }
         if ($firstName === null) {
-            $firstName = "John";
+            $firstName = 'John';
         }
         if ($lastName === null) {
-            $lastName = "Doe";
+            $lastName = 'Doe';
         }
         if ($dateOfBirth === null) {
             $dateOfBirth = new \DateTime('2000-01-01');
         }
-        $participant = new NphParticipant((object)[
+        $participant = new NphParticipant((object) [
             'participantNphId' => $id,
             'DOB' => $dateOfBirth->format('y-m-d'),
             'firstName' => $firstName,
             'lastName' => $lastName
         ]);
         return $participant;
-
     }
 
     public function generateNPHOrder(NphParticipant $participant, User $user, SiteService $site): NphOrder
@@ -67,5 +70,34 @@ class testSetup
         $this->em->persist($nphSample);
         $this->em->flush();
         return $nphOrder;
+    }
+
+    public function generateParticipant(
+        string $id = null,
+        string $firstName = null,
+        string $lastName = null,
+        \DateTime $dateOfBirth = null,
+        array $rdrData = []
+    ): Participant
+    {
+        if ($id === null) {
+            $id = 'P0000000001';
+        }
+        if ($firstName === null) {
+            $firstName = 'John';
+        }
+        if ($lastName === null) {
+            $lastName = 'Doe';
+        }
+        if ($dateOfBirth === null) {
+            $dateOfBirth = new \DateTime('2000-01-01');
+        }
+        $participantInfo = array_merge($rdrData, [
+            'participantId' => $id,
+            'DOB' => $dateOfBirth->format('y-m-d'),
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+        ]);
+        return new Participant((object) $participantInfo);
     }
 }
