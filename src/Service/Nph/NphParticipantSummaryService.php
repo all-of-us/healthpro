@@ -135,6 +135,10 @@ class NphParticipantSummaryService
                                 value
                                 optIn
                             }
+                            nphEnrollmentStatus {
+                                time
+                                value
+                            }
                         }
                     }
                 }

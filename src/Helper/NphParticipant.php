@@ -91,9 +91,27 @@ class NphParticipant
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
     }
 
-    private function getParticipantModule(): int
+    private function getParticipantModule(): int|null
     {
-        //TODO:: retrieve this from RDR participant api
-        return 1;
+        $nphEnrollmentStatus = $this->rdrData->nphEnrollmentStatus ?? null;
+        if ($nphEnrollmentStatus === null) {
+            return null;
+        }
+        $moduleMap = [
+            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3,
+            '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2,
+            '/module1_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 1,
+        ];
+
+        foreach ($moduleMap as $pattern => $moduleNumber) {
+            foreach ($nphEnrollmentStatus as $status) {
+                $value = $status->value;
+                if (preg_match($pattern, $value)) {
+                    return $moduleNumber;
+                }
+            }
+        }
+
+        return null;
     }
 }
