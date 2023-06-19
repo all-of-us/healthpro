@@ -31,7 +31,9 @@
     <div class="page-header row participant-name">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
-            <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module 1</span>
+            {% if participant.module %}
+                <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module {{ participant.module }}</span>
+            {% endif %}
         </h2>
     </div>
     <div class="page-header row participant-information">
