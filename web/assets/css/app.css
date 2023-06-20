@@ -876,6 +876,16 @@ table.table-samples td {
     color: #FFFFFF;
 }
 
+.text-reminder {
+    color: #DA6900;
+}
+
+.alert-reminder {
+    background: #F0AD4E42;
+    color: #512700;
+    display:inline-block;
+}
+
 /* NPH Participant details */
 
 .no-dob-banner {
