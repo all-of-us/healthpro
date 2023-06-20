@@ -17,18 +17,22 @@
                     {% if language == 'en' %}
                         <h4>English</h4>
                     {% elseif language == 'es' %}
-                        <h4>Spanish</h4>
+                        <h4>Español</h4>
                     {% endif %}
                     <ul>
                         {% for id, document in group.documents %}
                             {% if language in document.languages %}
                                 {% if document.download is defined and document.download %}
                                     <li>
-                                        <a href="{{ path('help_sopRedirect', { id: id, language: language }) }}">{{ document.title }}</a>
+                                        <a href="{{ path('help_sopRedirect', { id: id, language: language }) }}">
+                                            {{ (language == constant('App\\Service\\HelpService::ENGLISH_LANGUAGE_CODE')) ? document.title : document[lanaguage~'_title'] }}
+                                        </a>
                                         <i class="fa fa-download" aria-hidden="true"></i></li>
                                 {% else %}
                                     <li>
-                                        <a href="{{ path('help_sopView', { id: id, language: language }) }}">{{ document.title }}</a>
+                                        <a href="{{ path('help_sopView', { id: id, language: language }) }}">
+                                            {{ (language == constant('App\\Service\\HelpService::ENGLISH_LANGUAGE_CODE')) ? document.title : document[language~'_title'] }}
+                                        </a>
                                     </li>
                                 {% endif %}
                             {% endif %}

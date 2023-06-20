@@ -88,6 +88,9 @@ class PDFService
      */
     private function renderPDF(string $name, string $sampleType, ?\DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
     {
+        $barcode = new \TCPDF2DBarcode($specimenID, 'DATAMATRIX');
+        $pngData = $barcode->getBarcodePngData(3, 3);
+        $this->mpdf->imageVars['datamatrix'] = $pngData;
         $this->mpdf->WriteHTML(
             $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
                     'PatientName' => $name,
@@ -98,7 +101,7 @@ class PDFService
                     'TimePoint' => $timePoint,
                     'SampleCode' => $sampleCode,
                     'VisitType' => $VisitType,
-                    'CollectionVolume' => $collectionVolume
+                    'CollectionVolume' => $collectionVolume,
                 ])
         );
     }

@@ -1,6 +1,79 @@
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
+{% macro module3SalivaGlycerolDisplay(aliquotCode, aliquot, form, i, disabled) %}
+    {{ _self.displayAliquotRow(aliquotCode, aliquot, form, i, disabled, true) }}
+    {% if aliquot['collectMetadata'] is defined and aliquot['collectMetadata'] == true %}
+        {% for metadataField in aliquot['metadataFields'] %}
+            <tr>
+                <td colspan="1">
+                    <p style="font-weight: bold;">{{ metadataField['label'] }}</p><span>(1ml = 1000uL)</span>
+                </td>
+                <td colspan="1">
+                    <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
+                    {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'style': 'width: 30%; float: left; top: 20px; position: relative'}}) }}
+                    <span style="top: 25px; position: relative">{{ aliquot['units'] }}</span>
+                    <span style="top: 25px; left: 10px; position: relative">+</span>
+                    <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
+                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'style': 'width: 30%; float: right; position: relative; right: 20px; top: -5px'}}) }}
+                    <span style="top: 5px; position: relative; left: 130px">μl</span>
+                </td>
+                <td>
+                    <span style="top: 25px; position: relative">=</span>
+                    <span style="position: relative">Total Volume</span>
+                    <span style="position: relative; left: 20px; top: 5px" id="totalVol">#</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="has-error">
+                    {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+{% macro displayAliquotRow(aliquotCode, aliquot, form, i, disabled, skipVolume = false) %}
+    {% set aliquotId = form[aliquotCode][i].vars.data %}
+    <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
+        <td {% if not form[aliquotCode][i].vars.valid %}
+            class="has-error"{% endif %}>
+            {{ form_widget(form[aliquotCode][i], {
+                'attr':{'readonly':disabled}}) }}
+            {{ form_errors(form[aliquotCode][i]) }}
+        </td>
+        <td {% if not form[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
+            class="has-error"{% endif %} style="position: relative;">
+            {{ form_widget(form[aliquotCode ~ 'AliquotTs'][i]) }}
+            {{ form_errors(form[aliquotCode ~ 'AliquotTs'][i]) }}
+        </td>
+        {% if not skipVolume %}
+            {{ _self.displayVolumeTD(aliquotCode, aliquot, form, i) }}
+        {% endif %}
+        {% if form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
+            <td class="row">
+                <div class="col-md-6">
+                    {{ form_widget(form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_widget(form['restore_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
+                </div>
+            </td>
+        {% endif %}
+    </tr>
+{% endmacro %}
+{% macro displayVolumeTD(aliquotCode, aliquot, form, i, style) %}
+<td {% if not form[aliquotCode ~ 'Volume'][i].vars.valid %}
+    class="has-error"{% endif %}>
+    {{ form_widget(form[aliquotCode ~ 'Volume'][i]) }}
+    {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
+    <span class="text-warning aliquot-volume-warning" style="display: none">
+        Please verify the volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).
+    </span>
+</td>
+<td class="aliquot volume nopadleft" style="position: relative">
+    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
+</td>
+{% endmacro %}
 {% block body %}
     {% set order = sample.nphOrder %}
     {% set sampleCode =  sample.sampleCode %}
@@ -204,43 +277,11 @@
                                                     </td>
                                                 </tr>
                                             {% endif %}
-                                            <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
-                                                <td {% if not sampleFinalizeForm[aliquotCode][i].vars.valid %}
-                                                    class="has-error"{% endif %}>
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode][i], {
-                                                        'attr':{'readonly':disabled}}) }}
-                                                    {{ form_errors(sampleFinalizeForm[aliquotCode][i]) }}
-                                                </td>
-                                                <td {% if not sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
-                                                        class="has-error"{% endif %} style="position: relative;">
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
-                                                    {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'AliquotTs'][i]) }}
-                                                </td>
-                                                <td {% if not sampleFinalizeForm[aliquotCode ~ 'Volume'][i].vars.valid %}
-                                                    class="has-error"{% endif %}>
-                                                    {{ form_widget(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
-                                                    {{ form_errors(sampleFinalizeForm[aliquotCode ~ 'Volume'][i]) }}
-                                                    <span class="text-warning aliquot-volume-warning" style="display: none">
-                                                        Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)'
-                                                    </span>
-                                                </td>
-                                                <td class="aliquot volume nopadleft" style="position: relative">
-                                                    <span class="aliquot-volume-units">{{ aliquot['units'] }}</span>
-                                                    {% if not sample.disabled %}
-                                                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
-                                                    {% endif %}
-                                                </td>
-                                                {% if sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
-                                                    <td class="row">
-                                                        <div class="col-md-6">
-                                                            {{ form_widget(sampleFinalizeForm['cancel_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            {{ form_widget(sampleFinalizeForm['restore_' ~ aliquotCode ~ '_' ~ aliquotId]) }}
-                                                        </div>
-                                                    </td>
-                                                {% endif %}
-                                            </tr>
+                                            {% if aliquotCode == 'SALIVAA2' %}
+                                                {{ _self.module3SalivaGlycerolDisplay(aliquotCode, aliquot, sampleFinalizeForm, i, disabled) }}
+                                            {% else %}
+                                                {{ _self.displayAliquotRow(aliquotCode, aliquot, sampleFinalizeForm, i, disabled) }}
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                     {% if not sample.disabled and (aliquot['addNew'] or sample.unlocked) %}
