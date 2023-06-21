@@ -5,7 +5,13 @@ $(document).ready(function () {
 
     let namesLoaded = 0;
 
-    $(".load-name").each(function () {
+    let loadNameSelector = $(".load-name");
+
+    if (loadNameSelector.length > 0) {
+        $("#export_btn").prop("disabled", true);
+    }
+
+    loadNameSelector.each(function () {
         const td = $(this);
         $.getJSON(nameLookupUrl + td.data("participant-id"), function (data) {
             td.empty();
