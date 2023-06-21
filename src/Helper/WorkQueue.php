@@ -2130,8 +2130,6 @@ class WorkQueue
                     'View All' => '',
                     'Not Consented' => 'NOT_CONSENTED',
                     'Module 1 Consented' => 'MODULE_1_CONSENTED',
-                    'Deactivated' => 'DEACTIVATED',
-                    'Withdrawn' => 'WITHDRAWN'
                 ]
             ],
         ]
