@@ -1256,7 +1256,7 @@ class WorkQueue
             'csvFormatDate' => true
         ],
         'NPHConsent' => [
-            'name' => 'NPH Module 1 Consent',
+            'name' => 'Nutrition for Precision Health',
             'group' => 'ancillaryStudies',
             'columnToggle' => true,
             'method' => 'getNphStudyStatus',
