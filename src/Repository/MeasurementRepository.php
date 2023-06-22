@@ -141,6 +141,7 @@ class MeasurementRepository extends ServiceEntityRepository
         }
         return $queryBuilder
             ->setParameters($queryParams)
+            ->orderBy('m.id', 'DESC')
             ->getQuery()
             ->getResult();
     }
