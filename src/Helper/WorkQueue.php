@@ -1262,6 +1262,7 @@ class WorkQueue
             'method' => 'getNphStudyStatus',
             'ancillaryStudy' => true,
             'displayTime' => true,
+            'sortField' => 'consentForNphModule1Authored',
             'csvNames' => [
                 'nphWithdrawal' => 'NPH Withdrawal Status',
                 'nphWithdrawalAuthored' => 'NPH Withdrawal Date',
@@ -1616,7 +1617,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'NphStudyStatus'
+        'consentForNphModule1Authored'
     ];
 
     public static $consentSortColumns = [
