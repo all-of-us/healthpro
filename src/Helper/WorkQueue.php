@@ -1254,7 +1254,25 @@ class WorkQueue
             'name' => 'Date of EHR Re-Consent',
             'rdrField' => 'reconsentForStudyEnrollmentAuthored',
             'csvFormatDate' => true
-        ]
+        ],
+        'NPHConsent' => [
+            'name' => 'Nutrition for Precision Health',
+            'group' => 'ancillaryStudies',
+            'columnToggle' => true,
+            'method' => 'getNphStudyStatus',
+            'ancillaryStudy' => true,
+            'displayTime' => true,
+            'sortField' => 'consentForNphModule1Authored',
+            'csvNames' => [
+                'nphWithdrawal' => 'NPH Withdrawal Status',
+                'nphWithdrawalAuthored' => 'NPH Withdrawal Date',
+                'nphDeactivation' => 'NPH Deactivation Status',
+                'nphDeactivationAuthored' => 'NPH Deactivation Time',
+                'consentForNphModule1' => 'NPH Module 1 Consent Status',
+                'consentForNphModule1Authored' => 'NPH Module 1 Consent Date',
+            ],
+            'csvMethod' => 'getCsvNphStudyStatus',
+        ],
     ];
 
     public static $columns = [
@@ -1346,6 +1364,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
+        'NPHConsent'
     ];
 
     public static $columnGroups = [
@@ -1356,7 +1375,8 @@ class WorkQueue
         'contact' => 'Contact',
         'surveys' => 'PPI Surveys',
         'enrollment' => 'In Person Enrollment',
-        'demographics' => 'Demographics'
+        'demographics' => 'Demographics',
+        'ancillaryStudies' => 'Ancillary Studies'
     ];
 
     public static $consentColumns = [
@@ -1502,7 +1522,8 @@ class WorkQueue
         'reconsentForStudyEnrollmentAuthored',
         'reconsentForElectronicHealthRecordsAuthored',
         'LifeFunctioning',
-        'healthDataStream'
+        'healthDataStream',
+        'NPHConsent'
     ];
 
     public static $sortColumns = [
@@ -1596,6 +1617,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
+        'consentForNphModule1Authored'
     ];
 
     public static $consentSortColumns = [
@@ -2101,6 +2123,16 @@ class WorkQueue
                     'Unpaired' => 'UNSET'
                 ]
             ],
+        ],
+        'Ancillary Studies' => [
+            'NphStudyStatus' => [
+                'label' => 'Nutrition For Precision Health',
+                'options' => [
+                    'View All' => '',
+                    'Not Consented' => 'NOT_CONSENTED',
+                    'Module 1 Consented' => 'MODULE_1_CONSENTED',
+                ]
+            ],
         ]
     ];
 
@@ -2127,7 +2159,8 @@ class WorkQueue
         'Demographics' => 'fa-globe',
         'EHR' => 'fa-laptop-medical',
         'Retention' => 'fa-check-double',
-        'Pairing' => 'fa-building'
+        'Pairing' => 'fa-building',
+        'Ancillary Studies' => 'fa-microscope'
     ];
 
     //These are currently not working in the RDR
@@ -2935,5 +2968,26 @@ class WorkQueue
             return self::HTML_SUCCESS . ' ' . self::dateFromString($time, $userTimezone, $displayTime);
         }
         return self::HTML_DANGER;
+    }
+
+    public static function getNphStudyStatus(Participant $participant, string $userTimezone, bool $displayTime = false): string
+    {
+        if ($participant->nphWithdrawal) {
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphWithdrawalAuthored, $userTimezone, $displayTime) . ' (Withdrawn)';
+        } elseif ($participant->nphDeactivation) {
+            return self::HTML_DANGER . ' ' . self::dateFromString($participant->nphDeactivationAuthored, $userTimezone, $displayTime) . ' (Deactivated)';
+        } elseif ($participant->consentForNphModule1) {
+            return self::HTML_SUCCESS . ' ' . self::dateFromString($participant->consentForNphModule1Authored, $userTimezone, $displayTime) . ' Module 1 (Consented)';
+        }
+        return self::HTML_DANGER . ' (Not Consented)';
+    }
+
+    public static function getCsvNphStudyStatus(Participant $participant, string $fieldKey, string $userTimezone): int|string
+    {
+        if (str_contains($fieldKey, 'Authored')) {
+            return self::dateFromString($participant->$fieldKey, $userTimezone);
+        }
+
+        return $participant->$fieldKey ? 1 : 0;
     }
 }

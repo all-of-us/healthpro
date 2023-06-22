@@ -177,6 +177,17 @@ class WorkQueueService
         if (!empty($params['EtMConsent'])) {
             $rdrParams['consentForEtM'] = $params['EtMConsent'];
         }
+        if (!empty($params['NphStudyStatus'])) {
+            if ($params['NphStudyStatus'] === 'DEACTIVATED') {
+                $rdrParams['nphDeactivation'] = 1;
+            } elseif ($params['NphStudyStatus'] === 'NOT_CONSENTED') {
+                $rdrParams['consentForNphModule1'] = 0;
+            } elseif ($params['NphStudyStatus'] === 'MODULE_1_CONSENTED') {
+                $rdrParams['consentForNphModule1'] = 1;
+            } elseif ($params['NphStudyStatus'] === 'WITHDRAWN') {
+                $rdrParams['nphWithdrawal'] = 1;
+            }
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];
@@ -371,6 +382,12 @@ class WorkQueueService
                                 );
                             }
                         }
+                    } elseif (isset($columnDef['ancillaryStudy']) && $columnDef['ancillaryStudy']) {
+                        $row[$field] = WorkQueue::{$columnDef['method']}(
+                            $participant,
+                            $userTimezone,
+                            $columnDef['displayTime']
+                        );
                     } elseif (isset($columnDef['statusText'])) {
                         $row[$field] = WorkQueue::{$columnDef['method']}(
                             $participant->{$columnDef['rdrField']},
@@ -511,6 +528,10 @@ class WorkQueueService
                         $participant->{$columnDef['otherField']}
                     );
                     $row[] = WorkQueue::dateFromString($participant->{$columnDef['rdrDateField']}, $userTimezone);
+                } elseif (isset($columnDef['ancillaryStudy'])) {
+                    foreach (array_keys($columnDef['csvNames']) as $fieldKey) {
+                        $row[] = WorkQueue::{$columnDef['csvMethod']}($participant, $fieldKey, $userTimezone);
+                    }
                 } elseif (isset($columnDef['csvNames'])) {
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field);
                     $row[] = WorkQueue::{$columnDef['csvMethod']}($participant->{$columnDef['rdrField']}, $field, true, $userTimezone);

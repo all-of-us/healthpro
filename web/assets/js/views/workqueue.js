@@ -13,6 +13,7 @@ $(document).ready(function () {
         "Patient Status": "status",
         Contact: "contact",
         Metrics: "metrics",
+        "Ancillary Studies": "ancillary",
         "Show all": "all"
     };
 
@@ -97,7 +98,8 @@ $(document).ready(function () {
                     ".col-group-demographics",
                     ".col-group-contact",
                     ".col-group-patient-status",
-                    ".col-group-metrics"
+                    ".col-group-metrics",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -112,7 +114,8 @@ $(document).ready(function () {
                     ".col-group-demographics",
                     ".col-group-contact",
                     ".col-group-patient-status",
-                    ".col-group-metrics"
+                    ".col-group-metrics",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -125,7 +128,8 @@ $(document).ready(function () {
                     ".col-group-demographics",
                     ".col-group-contact",
                     ".col-group-patient-status",
-                    ".col-group-metrics"
+                    ".col-group-metrics",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -138,7 +142,8 @@ $(document).ready(function () {
                     ".col-group-demographics",
                     ".col-group-contact",
                     ".col-group-patient-status",
-                    ".col-group-metrics"
+                    ".col-group-metrics",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -151,7 +156,8 @@ $(document).ready(function () {
                     ".col-group-ppi",
                     ".col-group-contact",
                     ".col-group-patient-status",
-                    ".col-group-metrics"
+                    ".col-group-metrics",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -170,7 +176,8 @@ $(document).ready(function () {
                     ".col-group-inperson",
                     ".col-group-ppi",
                     ".col-group-contact",
-                    ".col-group-metrics:not(.col-group-metrics-ehr)"
+                    ".col-group-metrics:not(.col-group-metrics-ehr)",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -188,7 +195,8 @@ $(document).ready(function () {
                     ".col-group-program-update",
                     ".col-group-language-primary-consent",
                     ".col-group-ehr-expire-status",
-                    ".col-group-consent"
+                    ".col-group-consent",
+                    ".col-group-ancillarystudies"
                 ]
             },
             {
@@ -201,7 +209,24 @@ $(document).ready(function () {
                     ".col-group-inperson",
                     ".col-group-ppi",
                     ".col-group-patient-status",
-                    ".col-group-contact"
+                    ".col-group-contact",
+                    ".col-group-ancillarystudies"
+                ]
+            },
+            {
+                extend: "colvisGroup",
+                text: "Ancillary Studies",
+                show: ["dateOfBirth:name", ".col-group-default", ".col-group-ancillarystudies"],
+                hide: [
+                    ".col-group-demographics",
+                    ".col-group-info:not(.col-group-default, .col-group-ehr-expire-status)",
+                    ".col-group-inperson",
+                    ".col-group-ppi",
+                    ".col-group-patient-status",
+                    ".col-group-contact",
+                    ".col-group-metrics",
+                    ".col-group-ehr-expire-status",
+                    ".col-group-consent"
                 ]
             },
             {

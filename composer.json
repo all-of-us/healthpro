@@ -47,7 +47,8 @@
         "twig/twig": "^2.12",
         "google/cloud-secret-manager": "^1.7",
         "ext-mbstring": "*",
-        "mpdf/mpdf": "^8.1"
+        "mpdf/mpdf": "^8.1",
+        "qipsius/tcpdf-bundle": "^2.0"
     },
     "config": {
         "platform": {

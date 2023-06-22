@@ -410,6 +410,9 @@ label.label-normal {
 .multiheader-consent, .col-consent {
     background-color: #efd;
 }
+.multiheader-ancillary {
+    background-color: #d3e9fc;
+}
 .dataTables_processing {
     z-index: 1000;
     color: #fff;
@@ -757,7 +760,7 @@ table.table-samples td {
   color: white;
   background-color: red;
   border-radius: 50%;
-  font-size: 1.5rem;
+  font-size: 1rem;
   top: -0.5rem;
   right: 0.5rem;
   padding: 0.5rem;

@@ -21,6 +21,12 @@
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
+    <div class="text-right">
+        <button data-href="" class="btn btn-xs btn-default export" id="export_btn">
+            <i class="fa fa-download" aria-hidden="true"></i> Export
+        </button>
+    </div>
+    <br>
     <table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
         <thead>
         <tr>
@@ -54,7 +60,7 @@
             {% for i in 0..maxCount - 1 %}
                 <tr>
                     {% if i == 0 %}
-                        <td {{ rowSpan }} class="align-middle"><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
+                        <td {{ rowSpan }} class="align-middle" data-participant-id="{{ id }}"><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
                         {% if participant.participant is defined %}
                             <td {{ rowSpan }} class="align-middle">
                                 {% if participant.participant %}
@@ -71,10 +77,10 @@
                         {% endif %}
                     {% endif %}
                     {% set idVerification = participant.idVerifications[i] is defined ? participant.idVerifications[i] : '' %}
-                    <td class="td-left-border text-center">
+                    <td class="td-left-border text-center" data-column-type="on_site">
                         {% if idVerification['created_ts'] is defined and idVerification['created_ts'] is not empty %}
                             {% set statusText = 'ID Verified ' ~ idVerification['created_ts']|date('n/j/Y g:ia', app.user.timezone) %}
-                            <span data-date-type="idVerification_created_ts">
+                            <span data-date-type="idVerification_created_ts" data-on-site-date="{{ idVerification['created_ts']|date('n/j/Y g:ia', app.user.timezone) }}">
                                 <i class="fa fa-user-check fa-lg text-success" aria-hidden="true" data-toggle="tooltip"
                                    data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
                             </span>
@@ -84,10 +90,10 @@
                         {% endif %}
                     </td>
                     {% set incentive = participant.incentives[i] is defined ? participant.incentives[i] : '' %}
-                    <td class="td-left-border text-center">
+                    <td class="td-left-border text-center" data-column-type="on_site">
                         {% if incentive['created_ts'] is defined and incentive['created_ts'] is not empty %}
                             {% set statusText = 'Incentive Received ' ~ incentive['created_ts']|date('n/j/Y g:ia', app.user.timezone) %}
-                            <span data-date-type="incentive_created_ts">
+                            <span data-date-type="incentive_created_ts" data-on-site-date="{{ incentive['created_ts']|date('n/j/Y g:ia', app.user.timezone) }}">
                                 <i class="fa fa-hand-holding-usd fa-lg text-success" aria-hidden="true"
                                    data-toggle="tooltip"
                                     data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
