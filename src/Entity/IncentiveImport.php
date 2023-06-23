@@ -32,7 +32,7 @@ class IncentiveImport
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $confirm = 0;
 
-    #[ORM\OneToMany(targetEntity: 'IncentiveImportRow', mappedBy: 'import', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: IncentiveImportRow::class, mappedBy: 'import', cascade: ['persist', 'remove'])]
     private $incentiveImportRows;
     public function __construct()
     {

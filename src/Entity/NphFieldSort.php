@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\NphFieldSortRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: NphFieldSortRepository::class)]
+#[ORM\Entity]
 class NphFieldSort
 {
     #[ORM\Id]

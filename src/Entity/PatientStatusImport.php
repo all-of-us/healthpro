@@ -32,7 +32,7 @@ class PatientStatusImport
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $importStatus = 0;
 
-    #[ORM\OneToMany(targetEntity: 'PatientStatusImportRow', mappedBy: 'import', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: PatientStatusImportRow::class, mappedBy: 'import', cascade: ['persist', 'remove'])]
     private $PatientStatusImportRows;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
