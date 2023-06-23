@@ -9,9 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/nph/admin/debug")
- */
+#[Route(path: '/nph/admin/debug')]
 class NphDebugToolsController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -19,9 +17,7 @@ class NphDebugToolsController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/participants", name="nph_admin_debug_participants")
-     */
+    #[Route(path: '/participants', name: 'nph_admin_debug_participants')]
     public function participantsAction(Request $request, NphParticipantSummaryService $nphParticipantSummaryService): Response
     {
         $participantLookupForm = $this->createForm(DebugParticipantLookupType::class, null, ['placeholder' => '10000000000000']);
@@ -39,9 +35,7 @@ class NphDebugToolsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{id}", name="nph_admin_debug_participant")
-     */
+    #[Route(path: '/participant/{id}', name: 'nph_admin_debug_participant')]
     public function participantAction($id, NphParticipantSummaryService $nphParticipantSummaryService): Response
     {
         $participant = $nphParticipantSummaryService->getAllParticipantDetailsById($id);

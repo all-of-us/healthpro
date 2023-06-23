@@ -25,9 +25,7 @@ class DefaultController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="home")
-     */
+    #[Route(path: '/', name: 'home')]
     public function index(Request $request, ContextTemplateService $contextTemplate)
     {
         $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
@@ -55,17 +53,13 @@ class DefaultController extends BaseController
         throw $this->createAccessDeniedException();
     }
 
-    /**
-     * @Route("/admin", name="admin_home")
-     */
+    #[Route(path: '/admin', name: 'admin_home')]
     public function adminIndex()
     {
         return $this->render('admin/index.html.twig');
     }
 
-    /**
-     * @Route("/program/select", name="program_select")
-     */
+    #[Route(path: '/program/select', name: 'program_select')]
     public function programSelectAction(Request $request, SiteService $siteService): Response
     {
         if (!$siteService->canSwitchProgram()) {
@@ -85,9 +79,7 @@ class DefaultController extends BaseController
         return $this->render('program-select.html.twig');
     }
 
-    /**
-     * @Route("/site/select", name="site_select")
-     */
+    #[Route(path: '/site/select', name: 'site_select')]
     public function siteSelectAction(Request $request, SiteService $siteService)
     {
         if ($request->request->has('site')) {
@@ -106,10 +98,7 @@ class DefaultController extends BaseController
         }
         return $this->render('site-select.html.twig');
     }
-    /**
-     * @Route("/keepalive", name="keep_alive")
-     * Dummy action that serves to extend the user's session.
-     */
+    #[Route(path: '/keepalive', name: 'keep_alive')]
     public function keepAliveAction(Request $request, LoggerService $loggerService)
     {
         if (!$this->isCsrfTokenValid('keepAlive', $request->request->get('csrf_token'))) {
@@ -123,9 +112,7 @@ class DefaultController extends BaseController
         return (new JsonResponse())->setData([]);
     }
 
-    /**
-     * @Route("/agree", name="agree_usage")
-     */
+    #[Route(path: '/agree', name: 'agree_usage')]
     public function agreeUsageAction(Request $request)
     {
         if (!$this->isCsrfTokenValid('agreeUsage', $request->request->get('csrf_token'))) {
@@ -135,11 +122,7 @@ class DefaultController extends BaseController
         return (new JsonResponse())->setData([]);
     }
 
-    /**
-     * @Route("/client-timeout", name="client_timeout")
-     * Handles a clientside session timeout, which might not be a true session
-     * timeout if the user is working in multiple tabs.
-     */
+    #[Route(path: '/client-timeout', name: 'client_timeout')]
     public function clientTimeoutAction(Request $request)
     {
         // if we got to this point, then the beforeCallback() has
@@ -150,9 +133,7 @@ class DefaultController extends BaseController
         return $this->redirect($this->generateUrl('home'));
     }
 
-    /**
-     * @Route("/hide-tz-warning", name="hide_tz_warning")
-     */
+    #[Route(path: '/hide-tz-warning', name: 'hide_tz_warning')]
     public function hideTZWarningAction(Request $request)
     {
         if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('hideTZWarning', $request->request->get('csrf_token')))) {
@@ -162,17 +143,13 @@ class DefaultController extends BaseController
         return (new JsonResponse())->setData([]);
     }
 
-    /**
-     * @Route("/timeout", name="timeout")
-     */
+    #[Route(path: '/timeout', name: 'timeout')]
     public function timeoutAction()
     {
         return $this->render('timeout.html.twig');
     }
 
-    /**
-     * @Route("/logout", name="logout")
-     */
+    #[Route(path: '/logout', name: 'logout')]
     public function logoutAction(Request $request, LoggerService $loggerService, SessionInterface $session, AuthService $authService)
     {
         $timeout = $request->get('timeout');
@@ -182,17 +159,13 @@ class DefaultController extends BaseController
         return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
-    /**
-     * @Route("/imports", name="imports_home")
-     */
+    #[Route(path: '/imports', name: 'imports_home')]
     public function importsIndex()
     {
         return $this->render('imports/index.html.twig');
     }
 
-    /**
-     * @Route("/notification/{id}", name="notification_details")
-     */
+    #[Route(path: '/notification/{id}', name: 'notification_details')]
     public function notificationDetails($id)
     {
         $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
@@ -202,9 +175,7 @@ class DefaultController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/notifications/mark/read", name="notifications_mark_read")
-     */
+    #[Route(path: '/notifications/mark/read', name: 'notifications_mark_read')]
     public function notificationsMarkRead(): JsonResponse
     {
         $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();

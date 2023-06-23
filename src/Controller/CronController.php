@@ -25,9 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/cron")
- */
+#[Route(path: '/cron')]
 class CronController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -35,17 +33,13 @@ class CronController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/ping-test", name="cron_ping_test")
-     */
+    #[Route(path: '/ping-test', name: 'cron_ping_test')]
     public function pingTestAction()
     {
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/deceased/{deceasedStatus}", name="cron_deceased")
-     */
+    #[Route(path: '/deceased/{deceasedStatus}', name: 'cron_deceased')]
     public function index(DeceasedNotificationService $deceasedNotificationService, $deceasedStatus): Response
     {
         $deceasedNotificationService->setDeceasedStatusType($deceasedStatus);
@@ -53,9 +47,7 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/sites", name="cron_sites")
-     */
+    #[Route(path: '/sites', name: 'cron_sites')]
     public function sitesAction(ParameterBagInterface $params, SiteSyncService $siteSyncService): Response
     {
         if (!$params->has('sites_use_rdr')) {
@@ -65,9 +57,7 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/awardees-organizations", name="cron_awardees_organizations")
-     */
+    #[Route(path: '/awardees-organizations', name: 'cron_awardees_organizations')]
     public function awardeesAndOrganizationsAction(ParameterBagInterface $params, SiteSyncService $siteSyncService): Response
     {
         if (!$params->has('sites_use_rdr')) {
@@ -78,9 +68,7 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/sites-email-sync", name="cron_sites_email")
-     */
+    #[Route(path: '/sites-email-sync', name: 'cron_sites_email')]
     public function sitesEmailSync(KernelInterface $kernel): Response
     {
         $application = new Application($kernel);
@@ -95,45 +83,35 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/ehr-withdrawal", name="cron_ehr_withdrawal")
-     */
+    #[Route(path: '/ehr-withdrawal', name: 'cron_ehr_withdrawal')]
     public function ehrWithdrawal(EhrWithdrawalNotificationService $ehrWithdrawalNotificationService): Response
     {
         $ehrWithdrawalNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/withdrawal", name="cron_withdrawal")
-     */
+    #[Route(path: '/withdrawal', name: 'cron_withdrawal')]
     public function withdrawalAction(WithdrawalNotificationService $withdrawalNotificationService): Response
     {
         $withdrawalNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/deactivate", name="cron_deactivate")
-     */
+    #[Route(path: '/deactivate', name: 'cron_deactivate')]
     public function deactivateAction(DeactivateNotificationService $deactivateNotificationService): Response
     {
         $deactivateNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/missing-measurements-orders", name="cron_missing_measurements_orders")
-     */
+    #[Route(path: '/missing-measurements-orders', name: 'cron_missing_measurements_orders')]
     public function missingMeasurementsOrdersAction(MissingMeasurementsAndOrdersNotificationService $missingMeasurementsAndOrdersNotificationService): Response
     {
         $missingMeasurementsAndOrdersNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/delete-cache-keys", name="cron_delete_cache_keys")
-     */
+    #[Route(path: '/delete-cache-keys', name: 'cron_delete_cache_keys')]
     public function deleteCacheKeysAction(ParameterBagInterface $params)
     {
         $cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
@@ -141,45 +119,35 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/delete-session-keys", name="cron_delete_session_keys")
-     */
+    #[Route(path: '/delete-session-keys', name: 'cron_delete_session_keys')]
     public function deleteSessionKeysAction(SessionService $sessionService)
     {
         $sessionService->deleteKeys();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/delete-unconfirmed-patient-status-import-data", name="cron_delete_unconfirmed_patient_status_import_data")
-     */
+    #[Route(path: '/delete-unconfirmed-patient-status-import-data', name: 'cron_delete_unconfirmed_patient_status_import_data')]
     public function deleteUnconfimedPatientStatusImportDataAction(PatientStatusService $patientStatusService)
     {
         $patientStatusService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/send-patient-status-rdr", name="cron_send_patient_status_rdr")
-     */
+    #[Route(path: '/send-patient-status-rdr', name: 'cron_send_patient_status_rdr')]
     public function sendPatientStatusToRdrAction(PatientStatusService $patientStatusService)
     {
         $patientStatusService->sendPatientStatusToRdr();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/resend-measurements-rdr", name="cron_resend_measurements_rdr")
-     */
+    #[Route(path: '/resend-measurements-rdr', name: 'cron_resend_measurements_rdr')]
     public function resendMeasurementsToRdrAction(MeasurementQueueService $measurementQueueService)
     {
         $measurementQueueService->resendMeasurementsToRdr();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/backfill-order-processed-time", name="backfill_order_processed_time")
-     */
+    #[Route(path: '/backfill-order-processed-time', name: 'backfill_order_processed_time')]
     public function backfillOrderProcessedTimeAction(ParameterBagInterface $params)
     {
         $limit = $params->has('backfill_order_limit') ? $params->get('backfill_order_limit') : 500;
@@ -201,45 +169,35 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/send-incentives-rdr", name="cron_send_incentives_rdr")
-     */
+    #[Route(path: '/send-incentives-rdr', name: 'cron_send_incentives_rdr')]
     public function sendIncentivesToRdrAction(IncentiveImportService $incentiveImportService)
     {
         $incentiveImportService->sendIncentivesToRdr();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/delete-unconfirmed-incentives-import-data", name="cron_delete_unconfirmed_incentives_import_data")
-     */
+    #[Route(path: '/delete-unconfirmed-incentives-import-data', name: 'cron_delete_unconfirmed_incentives_import_data')]
     public function deleteUnconfimedIncentivesImportDataAction(IncentiveImportService $incentiveImportService)
     {
         $incentiveImportService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/send-id-verifications-rdr", name="cron_send_id_verifications_rdr")
-     */
+    #[Route(path: '/send-id-verifications-rdr', name: 'cron_send_id_verifications_rdr')]
     public function sendIdVerificationsToRdrAction(IdVerificationImportService $idVerificationImportService)
     {
         $idVerificationImportService->sendIdVerificationsToRdr();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/delete-unconfirmed-id-verifications-import-data", name="cron_delete_unconfirmed_id_verifications_import_data")
-     */
+    #[Route(path: '/delete-unconfirmed-id-verifications-import-data', name: 'cron_delete_unconfirmed_id_verifications_import_data')]
     public function deleteUnconfimedIdVerificationsImportDataAction(IdVerificationImportService $idVerificationImportService)
     {
         $idVerificationImportService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/repair-hfh-participants", name="cron_repair_hfh_participants")
-     */
+    #[Route(path: '/repair-hfh-participants', name: 'cron_repair_hfh_participants')]
     public function repairHfhParticipantsAction(HFHRepairService $HFHRepairService)
     {
         $HFHRepairService->repairHFHParticipants();

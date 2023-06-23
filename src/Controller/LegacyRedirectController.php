@@ -12,9 +12,7 @@ class LegacyRedirectController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/s/{url}", requirements={"url"=".*"})
-     */
+    #[Route(path: '/s/{url}', requirements: ['url' => '.*'])]
     public function legacyRedirectAction($url)
     {
         // Use 308 response code for permanent redirect that maintains request method

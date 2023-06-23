@@ -4,27 +4,19 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\SiteSyncRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\SiteSyncRepository')]
 class SiteSync
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Site", inversedBy="siteSync", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\Site', inversedBy: 'siteSync', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
     private $site;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $adminEmailsAt;
 
     public function getId(): ?int

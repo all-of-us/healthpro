@@ -22,9 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/nph/biobank")
- */
+#[Route(path: '/nph/biobank')]
 class NphBiobankController extends BaseController
 {
     protected NphParticipantSummaryService $nphParticipantSummaryService;
@@ -43,17 +41,13 @@ class NphBiobankController extends BaseController
         $this->nphParticipantReviewService = $nphParticipantReviewService;
     }
 
-    /**
-     * @Route("/", name="nph_biobank_home")
-     */
+    #[Route(path: '/', name: 'nph_biobank_home')]
     public function indexAction(): Response
     {
         return $this->render('program/nph/biobank/index.html.twig');
     }
 
-    /**
-     * @Route("/participants", name="nph_biobank_participants")
-     */
+    #[Route(path: '/participants', name: 'nph_biobank_participants')]
     public function participantsAction(Request $request): Response
     {
         $bioBankIdPrefix = $this->params->has('nph_biobank_id_prefix') ? $this->params->get('nph_biobank_id_prefix') : null;
@@ -74,9 +68,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/orderlookup", name="nph_biobank_order_lookup")
-     */
+    #[Route(path: '/orderlookup', name: 'nph_biobank_order_lookup')]
     public function orderLookupAction(
         Request $request,
         NphParticipantSummaryService $participantSummary
@@ -110,9 +102,7 @@ class NphBiobankController extends BaseController
         );
     }
 
-    /**
-     * @Route("/review/orders/today", name="nph_biobank_orders_today")
-     */
+    #[Route(path: '/review/orders/today', name: 'nph_biobank_orders_today')]
     public function ordersTodayAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getTodaysBiobankOrders($this->getSecurityUser()->getTimeZone());
@@ -121,9 +111,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/unfinalized", name="nph_biobank_orders_unfinalized")
-     */
+    #[Route(path: '/review/orders/unfinalized', name: 'nph_biobank_orders_unfinalized')]
     public function ordersUnfinalizedAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getUnfinalizedBiobankSamples();
@@ -132,9 +120,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/unlocked", name="nph_biobank_orders_unlocked")
-     */
+    #[Route(path: '/review/orders/unlocked', name: 'nph_biobank_orders_unlocked')]
     public function ordersUnlockedAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getUnlockedBiobankSamples();
@@ -143,9 +129,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/recent/modified", name="nph_biobank_orders_recently_modified")
-     */
+    #[Route(path: '/review/orders/recent/modified', name: 'nph_biobank_orders_recently_modified')]
     public function ordersRecentlyModifiedAction(): Response
     {
         $samples = $this->em->getRepository(NphOrder::class)->getRecentlyModifiedBiobankSamples($this->getSecurityUser()->getTimeZone());
@@ -155,9 +139,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/{biobankId}", name="nph_biobank_participant")
-     */
+    #[Route(path: '/{biobankId}', name: 'nph_biobank_participant')]
     public function participantAction(
         string $biobankId,
         NphOrderService $nphOrderService,
@@ -177,9 +159,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/samples/aliquot", name="nph_biobank_samples_aliquot")
-     */
+    #[Route(path: '/samples/aliquot', name: 'nph_biobank_samples_aliquot')]
     public function sampleAliquotLookupAction(NphParticipantSummaryService $nphParticipantSummaryService, Request $request): Response
     {
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null, [
@@ -223,9 +203,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/{biobankId}/order/{orderId}/collect", name="nph_biobank_order_collect")
-     */
+    #[Route(path: '/{biobankId}/order/{orderId}/collect', name: 'nph_biobank_order_collect')]
     public function orderCollectDetailsAction(
         string $biobankId,
         string $orderId,
@@ -250,9 +228,7 @@ class NphBiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/{biobankId}/order/{orderId}/sample/{sampleId}/finalize", name="nph_biobank_sample_finalize")
-     */
+    #[Route(path: '/{biobankId}/order/{orderId}/sample/{sampleId}/finalize', name: 'nph_biobank_sample_finalize')]
     public function aliquotFinalizeAction(
         string $biobankId,
         string $orderId,

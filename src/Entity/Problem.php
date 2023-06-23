@@ -6,10 +6,8 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="problems")
- * @ORM\Entity(repositoryClass="App\Repository\ProblemRepository")
- */
+#[ORM\Table(name: 'problems')]
+#[ORM\Entity(repositoryClass: 'App\Repository\ProblemRepository')]
 class Problem
 {
     public const RELATED_BASELINE = 'related_baseline';
@@ -19,121 +17,103 @@ class Problem
 
     /**
      * @var int
-     *
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="integer", nullable=false)
      */
+    #[ORM\Column(type: 'integer', nullable: false)]
     private $userId;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=50, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private $site;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=50, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private $participantId;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=50, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $problemType;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $enrollmentSite;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $staffName;
 
     /**
      * @var ?DateTimeInterface
-     *
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $problemDate;
 
     /**
      * @var ?DateTimeInterface
-     *
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $providerAwareDate;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="text", length=65535, nullable=true)
      */
+    #[ORM\Column(type: 'text', length: 65535, nullable: true)]
     private $description;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="text", length=65535, nullable=true)
      */
+    #[ORM\Column(type: 'text', length: 65535, nullable: true)]
     private $actionTaken;
 
     /**
      * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $finalizedUserId;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=50, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $finalizedSite;
 
     /**
      * @var ?DateTimeInterface
-     *
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $finalizedTs;
 
     /**
      * @var DateTimeInterface
-     *
-     * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
+    #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $createdTs;
 
     /**
      * @var DateTimeInterface
-     *
-     * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
+    #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $updatedTs;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ProblemComment", mappedBy="problem")
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\ProblemComment', mappedBy: 'problem')]
     private $problemComments;
 
     public function __construct()

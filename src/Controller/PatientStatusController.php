@@ -29,9 +29,7 @@ class PatientStatusController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/patient/status/import", name="patientStatusImport", methods={"GET","POST"})
-     */
+    #[Route(path: '/patient/status/import', name: 'patientStatusImport', methods: ['GET', 'POST'])]
     public function patientStatusImport(
         Request $request,
         SessionInterface $session,
@@ -89,9 +87,7 @@ class PatientStatusController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/patient/status/confirmation/{id}", name="patientStatusImportConfirmation", methods={"GET", "POST"})
-     */
+    #[Route(path: '/patient/status/confirmation/{id}', name: 'patientStatusImportConfirmation', methods: ['GET', 'POST'])]
     public function patientStatusImportConfirmation(int $id, Request $request, LoggerService $loggerService)
     {
         $patientStatusImport = $this->em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getSecurityUser()->getId(), 'confirm' => 0]);
@@ -126,9 +122,7 @@ class PatientStatusController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/patient/status/import/{id}", name="patientStatusImportDetails", methods={"GET", "POST"})
-     */
+    #[Route(path: '/patient/status/import/{id}', name: 'patientStatusImportDetails', methods: ['GET', 'POST'])]
     public function patientStatusImportDetails(int $id, Request $request, PatientStatusImportService $patientStatusImportService)
     {
         $patientStatusImport = $this->em->getRepository(PatientStatusImport::class)->findOneBy(['id' => $id, 'userId' => $this->getSecurityUser()->getId(), 'confirm' => 1]);
@@ -147,10 +141,8 @@ class PatientStatusController extends BaseController
         return $this->render('patientstatus/import-details.html.twig');
     }
 
-    /**
-     * @Route("/participant/{participantId}/patient/status/{patientStatusId}", name="patientStatus")
-     * @Route("/read/participant/{participantId}/patient/status/{patientStatusId}", name="read_patientStatus")
-     */
+    #[Route(path: '/participant/{participantId}/patient/status/{patientStatusId}', name: 'patientStatus')]
+    #[Route(path: '/read/participant/{participantId}/patient/status/{patientStatusId}', name: 'read_patientStatus')]
     public function patientStatusAction(
         $participantId,
         $patientStatusId,

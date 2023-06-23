@@ -21,10 +21,8 @@ class ParticipantLookupController extends BaseController
         $this->participantSummaryService = $participantSummaryService;
     }
 
-    /**
-     * @Route("/participants", name="participants")
-     * @Route("/read/participants", name="read_participants")
-     */
+    #[Route(path: '/participants', name: 'participants')]
+    #[Route(path: '/read/participants', name: 'read_participants')]
     public function participantsAction(Request $request)
     {
         $redirectRoute = $this->isReadOnly() ? 'read_participant' : 'participant';

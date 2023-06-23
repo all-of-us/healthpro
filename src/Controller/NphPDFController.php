@@ -11,9 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class NphPDFController extends AbstractController
 {
-    /**
-     * @Route("/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}", name="nph_render_pdf")
-     */
+    #[Route(path: '/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}', name: 'nph_render_pdf')]
     public function render_pdf(
         $participantId,
         $module,
@@ -37,9 +35,7 @@ class NphPDFController extends AbstractController
         return new Response($OrderPDF, Response::HTTP_OK, ['content-type' => 'application/pdf']);
     }
 
-    /**
-     * @Route("/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}/{sampleGroup}", name="nph_render_pdf_sample_group")
-     */
+    #[Route(path: '/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}/{sampleGroup}', name: 'nph_render_pdf_sample_group')]
     public function renderPDFSampleGroup(
         $participantId,
         $module,

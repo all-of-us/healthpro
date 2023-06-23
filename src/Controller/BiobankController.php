@@ -22,9 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/biobank")
- */
+#[Route(path: '/biobank')]
 class BiobankController extends BaseController
 {
     protected $participantSummaryService;
@@ -46,17 +44,13 @@ class BiobankController extends BaseController
         $this->params = $params;
     }
 
-    /**
-     * @Route("/", name="biobank_home")
-     */
+    #[Route(path: '/', name: 'biobank_home')]
     public function indexAction(): Response
     {
         return $this->render('biobank/index.html.twig');
     }
 
-    /**
-     * @Route("/participants", name="biobank_participants")
-     */
+    #[Route(path: '/participants', name: 'biobank_participants')]
     public function participantsAction(Request $request): Response
     {
         $bioBankIdPrefix = $this->params->has('biobank_id_prefix') ? $this->params->get('biobank_id_prefix') : null;
@@ -77,9 +71,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/orders", name="biobank_orders")
-     */
+    #[Route(path: '/orders', name: 'biobank_orders')]
     public function ordersAction(Request $request): Response
     {
         $idForm = $this->createForm(OrderLookupType::class, null);
@@ -127,9 +119,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/{biobankId}/order/{orderId}", name="biobank_order")
-     */
+    #[Route(path: '/{biobankId}/order/{orderId}', name: 'biobank_order')]
     public function orderAction(string $biobankId, int $orderId, Request $request, BiobankOrderFinalizeNotificationService $biobankOrderFinalizeNotificationService): Response
     {
         $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
@@ -273,9 +263,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/{biobankId}/quanum-order/{orderId}", name="biobank_quanum_order")
-     */
+    #[Route(path: '/{biobankId}/quanum-order/{orderId}', name: 'biobank_quanum_order')]
     public function quanumOrderAction(string $biobankId, string $orderId): Response
     {
         $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
@@ -296,9 +284,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/today", name="biobank_orders_today")
-     */
+    #[Route(path: '/review/orders/today', name: 'biobank_orders_today')]
     public function ordersTodayAction(Request $request, EnvironmentService $env, ReviewService $reviewService): Response
     {
         // Get beginning of today (at midnight) in user's timezone
@@ -319,9 +305,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/quanum-orders/today", name="biobank_quanum_orders_today")
-     */
+    #[Route(path: '/review/quanum-orders/today', name: 'biobank_quanum_orders_today')]
     public function quanumOrdersTodayAction(Request $request, EnvironmentService $env): Response
     {
         // Get beginning of today (at midnight) in user's timezone
@@ -354,9 +338,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/unfinalized", name="biobank_orders_unfinalized")
-     */
+    #[Route(path: '/review/orders/unfinalized', name: 'biobank_orders_unfinalized')]
     public function ordersUnfinalizedAction(): Response
     {
         $unfinalizedOrders = $this->em->getRepository(Order::class)->getUnfinalizedOrders();
@@ -365,9 +347,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/unlocked", name="biobank_orders_unlocked")
-     */
+    #[Route(path: '/review/orders/unlocked', name: 'biobank_orders_unlocked')]
     public function ordersUnlockedAction(): Response
     {
         $unlockedOrders = $this->em->getRepository(Order::class)->getUnlockedOrders();
@@ -376,9 +356,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/review/orders/recent/modify", name="biobank_orders_recentModify")
-     */
+    #[Route(path: '/review/orders/recent/modify', name: 'biobank_orders_recentModify')]
     public function biobankOrdersRecentModifyAction(): Response
     {
         $recentModifyOrders = $this->em->getRepository(Order::class)->getRecentModifiedOrders();
@@ -387,9 +365,7 @@ class BiobankController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/{biobankId}", name="biobank_participant")
-     */
+    #[Route(path: '/{biobankId}', name: 'biobank_participant')]
     public function participantAction(string $biobankId): Response
     {
         $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);

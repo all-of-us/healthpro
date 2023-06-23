@@ -41,9 +41,7 @@ class ProblemController extends BaseController
         $this->siteService = $siteService;
     }
 
-    /**
-     * @Route("/problem/reports", name="problem_reports")
-     */
+    #[Route(path: '/problem/reports', name: 'problem_reports')]
     public function reports(Request $request, ProblemRepository $problemRepository): Response
     {
         if (!$this->isGranted('ROLE_DV_ADMIN')) {
@@ -59,9 +57,7 @@ class ProblemController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/problem/details/{problemId}", name="problem_details")
-     */
+    #[Route(path: '/problem/details/{problemId}', name: 'problem_details')]
     public function detail($problemId, Request $request, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
     {
         if (!$this->isGranted('ROLE_DV_ADMIN')) {
@@ -88,10 +84,8 @@ class ProblemController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/problem", name="problem_form_new")
-     * @Route("/participant/{participantId}/problem/{problemId}", name="problem_form")
-     */
+    #[Route(path: '/participant/{participantId}/problem', name: 'problem_form_new')]
+    #[Route(path: '/participant/{participantId}/problem/{problemId}', name: 'problem_form')]
     public function problemForm(
         string $participantId,
         Request $request,
@@ -201,9 +195,7 @@ class ProblemController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/problem/{problemId}/comment", name="problem_comment", methods={"POST"})
-     */
+    #[Route(path: '/participant/{participantId}/problem/{problemId}/comment', name: 'problem_comment', methods: ['POST'])]
     public function problemComment($participantId, $problemId, Request $request, LoggerService $loggerService, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository): Response
     {
         if (!$this->siteService->isDvType()) {

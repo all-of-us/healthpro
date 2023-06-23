@@ -6,67 +6,43 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PatientStatusImportRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\PatientStatusImportRepository')]
 class PatientStatusImport
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $fileName;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $userId;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $awardee;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdTs;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $importStatus = 0;
 
-    /**
-     * @ORM\OneToMany(targetEntity="PatientStatusImportRow", mappedBy="import", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToMany(targetEntity: 'PatientStatusImportRow', mappedBy: 'import', cascade: ['persist', 'remove'])]
     private $PatientStatusImportRows;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $confirm = 0;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="import")
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\PatientStatusHistory', mappedBy: 'import')]
     private $patientStatusHistories;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Organization")
-     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Organization')]
+    #[ORM\JoinColumn(name: 'organization', referencedColumnName: 'id')]
     private $organization;
 
     public function __construct()
