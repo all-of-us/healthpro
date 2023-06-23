@@ -876,6 +876,16 @@ table.table-samples td {
     color: #FFFFFF;
 }
 
+.expand-pdf::after {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f107";
+}
+
+.expand-pdf[aria-expanded="true"]::after {
+    content: "\f106";
+}
+
 .text-reminder {
     color: #DA6900;
 }
