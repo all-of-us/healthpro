@@ -56,7 +56,7 @@ $(document).ready(function () {
             var pageDropDown = $(".page-drop-down select");
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
-            generateSiteOptions(table.ajax.json());
+            generateSiteOptions();
         }
     });
 
@@ -109,12 +109,37 @@ $(document).ready(function () {
         formSelector.submit();
     });
 
-    function generateSiteOptions(tableData) {
+    $("#siteFilterList").on("change", "input[type=radio]", function () {
+        formSelector.submit();
+    });
+
+    $("#site_filter_reset").on("click", function () {
+        $("#siteFilterList input[type=radio]").first().prop("checked", true);
+        formSelector.submit();
+    });
+
+    function generateSiteOptions() {
         let siteList = [];
-        for (let i = 0; i < table.column(3).data().length; i++) {
-            if (siteList[table.column(3).data()[i]] === undefined) {
-                siteList.push(table.column(3).data()[i]);
+        let jsonData = table.ajax.json().data;
+        const urlParams = new URLSearchParams(window.location.search);
+        for (let i = 0; i < jsonData.length; i++) {
+            if (!siteList.includes(jsonData[i]["siteId"])) {
+                siteList.push(jsonData[i]["siteId"]);
+                $("#siteFilterList").append(
+                    `<li class="list-group-item radio">
+                        <label>
+                            <input type="radio" name="site" value="${jsonData[i]["siteId"]}" ${
+                        jsonData[i]["siteId"] === urlParams.get("site") ? "checked" : ""
+                    }>
+                            ${jsonData[i]["site"]}
+                        </label>
+                    </li>`
+                );
             }
+        }
+
+        if (urlParams.get("site") === null || urlParams.get("site") === "") {
+            $("#siteFilterList input[type=radio]").first().prop("checked", true);
         }
     }
 });

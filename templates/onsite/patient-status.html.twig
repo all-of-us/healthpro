@@ -3,7 +3,7 @@
 {% block body %}
     {% include 'onsite/partials/_page_heading.html.twig' %}
     <div class="row">
-        <div class="col-md-5 dropdown on-site-filters" id="patient_status_filters">
+        <div class="col-md-6 dropdown on-site-filters" id="patient_status_filters">
             {% set participantId = params['participantId']|default('') %}
             {% set startDate = params['startDate']|default('') %}
             {% set endDate = params['endDate']|default('') %}
@@ -69,9 +69,9 @@
                                 <div class="panel-body">
                                     <div class="form-group">
                                         <label class="control-label" for="siteFilter">Site</label>
-                                        <ul class="list-group list-options">
+                                        <ul class="list-group list-options" id="siteFilterList">
                                                 <li class="list-group-item radio">
-                                                    <label><input type="radio" name="site">View All</label>
+                                                    <label><input type="radio" name="site" value="">View All</label>
                                                 </li>
                                         </ul>
                                     </div>
@@ -85,7 +85,7 @@
         <div class="col-md-1 on-site-reset-all">
             <a href="{{ path('on_site_patient_status') }}">Reset All</a>
         </div>
-        <div class="col-md-4 col-md-offset-2">
+        <div class="col-md-3 col-md-offset-2">
             {% set exportRoute = 'on_site_patient_status_export' %}
             {% include 'onsite/partials/paging_export.html.twig' %}
         </div>

@@ -31,6 +31,7 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxParams['startDate'] = $this->getParamDate($params, 'startDate');
             $ajaxParams['endDate'] = $this->getParamDate($params, 'endDate');
             $ajaxParams['participantId'] = $params['participantId'] ?? '';
+            $ajaxParams['site'] = $params['site'] ?? '';
             $sortColumns = $onSiteDetailsReportingService::$patientStatusSortColumns;
             $ajaxParams['sortColumn'] = $sortColumns[$ajaxParams['order'][0]['column']];
             $ajaxParams['sortDir'] = $ajaxParams['order'][0]['dir'];
