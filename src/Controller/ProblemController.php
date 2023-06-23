@@ -14,7 +14,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\ProblemNotificationService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,10 +43,13 @@ class ProblemController extends BaseController
 
     /**
      * @Route("/problem/reports", name="problem_reports")
-     * IsGranted("ROLE_DV_ADMIN")
      */
     public function reports(Request $request, ProblemRepository $problemRepository): Response
     {
+        if (!$this->isGranted('ROLE_DV_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $problems = $problemRepository->getProblemsWithCommentsCount();
 
         return $this->render('problem/problem-reports.html.twig', [
@@ -59,10 +61,13 @@ class ProblemController extends BaseController
 
     /**
      * @Route("/problem/details/{problemId}", name="problem_details")
-     * IsGranted("ROLE_DV_ADMIN")
      */
     public function detail($problemId, Request $request, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
     {
+        if (!$this->isGranted('ROLE_DV_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $problem = $problemRepository->find($problemId);
         if (!$problem) {
             throw $this->createNotFoundException('Problem report not found.');
