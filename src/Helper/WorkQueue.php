@@ -1256,12 +1256,13 @@ class WorkQueue
             'csvFormatDate' => true
         ],
         'NPHConsent' => [
-            'name' => 'NPH Module 1 Consent',
+            'name' => 'Nutrition for Precision Health',
             'group' => 'ancillaryStudies',
             'columnToggle' => true,
             'method' => 'getNphStudyStatus',
             'ancillaryStudy' => true,
             'displayTime' => true,
+            'sortField' => 'consentForNphModule1Authored',
             'csvNames' => [
                 'nphWithdrawal' => 'NPH Withdrawal Status',
                 'nphWithdrawalAuthored' => 'NPH Withdrawal Date',
@@ -1616,7 +1617,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'NphStudyStatus'
+        'consentForNphModule1Authored'
     ];
 
     public static $consentSortColumns = [
@@ -2130,8 +2131,6 @@ class WorkQueue
                     'View All' => '',
                     'Not Consented' => 'NOT_CONSENTED',
                     'Module 1 Consented' => 'MODULE_1_CONSENTED',
-                    'Deactivated' => 'DEACTIVATED',
-                    'Withdrawn' => 'WITHDRAWN'
                 ]
             ],
         ]

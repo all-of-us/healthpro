@@ -568,7 +568,7 @@
                                         {% elseif participant.consentForNphModule1 %}
                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                             {% if participant.consentForNphModule1Authored %}
-                                                <small>{{ participant.consentForNphModule1Authored|date('n/j/Y g:ia', app.user.timezone) }}</small>
+                                                <small>{{ participant.consentForNphModule1Authored|date('n/j/Y g:ia', app.user.timezone) }} module 1 (consented)</small>
                                             {% endif %}
                                         {% else %}
                                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
