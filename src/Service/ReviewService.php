@@ -177,14 +177,14 @@ class ReviewService
             'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
             'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
             'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
-        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.created_ts, null, null, null, null, null, null, ' .
+        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.incentive_date_given, null, null, null, null, null, null, ' .
             'null, ' .
             'null, ' .
             'null ' .
             'FROM incentive i ' .
             'WHERE i.site = :site ' .
-            'AND i.created_ts >= :startTime ' .
-            'AND i.created_ts < :endTime ';
+            'AND i.incentive_date_given >= :startTime ' .
+            'AND i.incentive_date_given < :endTime ';
         $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
             'null, ' .
             'null, ' .
