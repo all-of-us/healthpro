@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+{% block title %} DLW Collect - {% endblock %}
+{% block body %}
+<div class="page-header">
+    <h2>
+        <i class="fa fa-medkit" aria-hidden="true"></i>
+        <small>
+            <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">
+                {{ participant.lastName }}, {{ participant.firstName }}
+            </a>
+        </small>
+    </h2>
+</div>
+    <div class="row">
+        <div class="col-md-4">
+            <div><strong>Participant ID</strong></div>
+            <div>{{ participant.id }}</div>
+        </div>
+        <div class="col-md-4">
+            <div><strong>Biobank ID</strong></div>
+            <div>{{ participant.biobankId }}</div>
+        </div>
+        <div class="col-md-4">
+            <div><strong>Site</strong></div>
+            <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+        </div>
+    </div>
+    <div class="col-sm-3 text-center">
+        <strong class="text-primary">
+            Module {{ module }} | Visit {{ visit }} | DLW
+        </strong>
+        <div><svg id="order-barcode"></svg></div>
+    </div>
+
+
+    <div class="alert bg-light well-sm margin-top-15">
+        <span class="font-bold">DLW Dosage</span>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_start(form, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+            {{ form_errors(form) }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_label(form['doseBatchId'])}}
+                    {{ form_widget(form['doseBatchId'])}}
+                    {{ form_errors(form['doseBatchId'])}}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form['actualDose']) }}
+                    {{ form_widget(form['actualDose']) }}
+                    {{ form_errors(form['actualDose']) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form['participantWeight'])}}
+                    {{ form_widget(form['participantWeight'])}}
+                    {{ form_errors(form['participantWeight'])}}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form['calculatedDosage']) }}
+                    {{ form_widget(form['calculatedDosage']) }}
+                    {{ form_errors(form['calculatedDosage']) }}
+                </div>
+            </div>
+            {{ form_rest(form) }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
+                <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                   class="btn btn-default">Exit</a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+{% endblock %}

@@ -3,13 +3,7 @@
 {% block title %} Order Collect - {% endblock %}
 {% block body %}
     {% include 'program/nph/order/partials/order-header.html.twig' %}
-    {% if dlwForm is not null %}
-        {% include 'program/nph/order/partials/dlw-fields.html.twig' %}
-    {% endif %}
     <div class="alert bg-light well-sm margin-top-15">
-        {% if dlwForm is not null %}
-            <span class="font-bold">Sample Collection</span>
-        {% else %}
         <span class="font-bold">{{ timePoints[orders[0].timepoint] }} {{ orders[0].orderType|capitalize }}</span>
         <div class="pull-right">
             <a href="{{ path('nph_order_label_print', {'participantId': orders[0].participantId, 'module': orders[0].module, 'visit': orders[0].visitType, 'sampleGroup': orders[0].nphSamples[0].sampleGroup}) }}">

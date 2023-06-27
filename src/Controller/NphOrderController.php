@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Audit\Log;
 use App\Collections\NPHOrderCollection;
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Form\DlwType;
@@ -141,12 +142,6 @@ class NphOrderController extends BaseController
             $sampleLabelsIds += $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
             $orderCollectionData += $nphOrderService->getExistingOrderCollectionData($order);
         }
-        if ($orders[0]->getOrderType() === NphOrder::TYPE_DLW) {
-            $dlwForm = $this->createForm(DlwType::class);
-            $dlwForm = $dlwForm->createView();
-        } else {
-            $dlwForm = null;
-        }
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
             $orderCollectionData,
@@ -175,7 +170,6 @@ class NphOrderController extends BaseController
             'orders' => $orders,
             'activeSamples' => $activeSamples,
             'orderCollectForm' => $oderCollectForm->createView(),
-            'dlwForm' => $dlwForm,
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
@@ -534,60 +528,33 @@ class NphOrderController extends BaseController
     }
 
     /**
-     * @Route("/participant/{participantId}/order/{orderId}/dlw/collect", name="")
+     * @Route("/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect", name="")
      */
     public function dlwSampleCollect(
         $participantId,
-        $orderId,
+        $module,
+        $visit,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
     ): Response {
-        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
-        $orders = $this->em->getRepository(NphOrder::class)->getOrdersBySampleGroup($order->getParticipantId(), $order->getNphSamples()[0]->getSampleGroup());
-        $form = $this->createForm(DlwType::class);
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
-        if (!$participant) {
-            throw $this->createNotFoundException('Participant not found.');
+        $this->em->getRepository(NphDlw::class)->findOneBy([
+
+        ]);
+        $dlwForm = $this->createForm(DlwType::class);
+        $dlwForm->handleRequest($request);
+        if ($dlwForm->isSubmitted()) {
+            $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
+            $this->addFlash('success', 'DLW Sample Created');
         }
-        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
-        $order = $this->em->getRepository(NphOrder::class)->find($orderId);
-        if (empty($order)) {
-            throw $this->createNotFoundException('Order not found.');
-        }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
-        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
-        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
-        $oderCollectForm = $this->createForm(
-            NphOrderCollect::class,
-            $orderCollectionData,
-            ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
-                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()]
-        );
-        $oderCollectForm->handleRequest($request);
-        if ($oderCollectForm->isSubmitted()) {
-            $formData = $oderCollectForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
-                $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
-            }
-            if ($oderCollectForm->isValid()) {
-                if ($nphOrderService->saveOrderCollection($formData, $order)) {
-                    $this->addFlash('success', 'Order collection saved');
-                } else {
-                    $this->addFlash('error', 'Order collection failed');
-                }
-            } else {
-                $oderCollectForm->addError(new FormError('Please correct the errors below'));
-            }
-        }
-        $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
         return $this->render('program/nph/order/dlw-collect.html.twig', [
-            'dlwForm' => $form->createView(),
-            'dlwOrders' => $orders,
+            'participant' => $participant,
+            'module' => $module,
+            'visit' => $visit,
+            'form' => $dlwForm->createView()
         ]);
     }
-
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {

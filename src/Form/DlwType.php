@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Dlw;
+use App\Entity\NphDlw;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,7 +22,7 @@ class DlwType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Dlw::class,
+            'data_class' => NphDlw::class,
         ]);
     }
 }

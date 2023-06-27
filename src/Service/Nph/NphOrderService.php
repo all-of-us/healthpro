@@ -4,6 +4,7 @@ namespace App\Service\Nph;
 
 use App\Audit\Log;
 use App\Collections\NPHOrderCollection;
+use App\Entity\NphDlw;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
@@ -756,6 +757,15 @@ class NphOrderService
             }
         }
         return $formErrors;
+    }
+
+    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit)
+    {
+        $formData->setNphParticipantId($participantId);
+        $formData->setNphModule($module);
+        $formData->setNphTimepoint($visit);
+        $this->em->persist($formData);
+        $this->em->flush();
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array
