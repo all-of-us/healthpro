@@ -11,14 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/on-site")
- */
+#[Route(path: '/on-site')]
 class OnSiteDetailsReportingController extends BaseController
 {
-    /**
-     * @Route("/patient-status", name="on_site_patient_status")
-     */
+    #[Route(path: '/patient-status', name: 'on_site_patient_status')]
     public function patientStatusAction(
         OnSiteDetailsReportingService $onSiteDetailsReportingService,
         PatientStatusRepository $patientStatusRepository,
@@ -44,9 +40,7 @@ class OnSiteDetailsReportingController extends BaseController
         return $this->render('onsite/patient-status.html.twig', ['params' => $params]);
     }
 
-    /**
-     * @Route("/patient-status-export", name="on_site_patient_status_export")
-     */
+    #[Route(path: '/patient-status-export', name: 'on_site_patient_status_export')]
     public function patientStatusExportAction(
         OnSiteDetailsReportingService $onSiteDetailsReportingService,
         PatientStatusRepository $patientStatusRepository,
@@ -88,9 +82,7 @@ class OnSiteDetailsReportingController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/incentive-tracking", name="on_site_incentive_tracking")
-     */
+    #[Route(path: '/incentive-tracking', name: 'on_site_incentive_tracking')]
     public function incentiveTrackingAction(
         OnSiteDetailsReportingService $onSiteDetailsReportingService,
         IncentiveRepository $incentiveRepository,
@@ -117,9 +109,7 @@ class OnSiteDetailsReportingController extends BaseController
         return $this->render('onsite/incentive-tracking.html.twig', ['params' => $params]);
     }
 
-    /**
-     * @Route("/incentive-tracking-export", name="on_site_incentive_tracking_export")
-     */
+    #[Route(path: '/incentive-tracking-export', name: 'on_site_incentive_tracking_export')]
     public function incentiveTrackingExportAction(
         OnSiteDetailsReportingService $onSiteDetailsReportingService,
         IncentiveRepository $incentiveRepository,
@@ -163,9 +153,7 @@ class OnSiteDetailsReportingController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/id-verification", name="on_site_id_verification")
-     */
+    #[Route(path: '/id-verification', name: 'on_site_id_verification')]
     public function idVerificationAction(
         OnSiteDetailsReportingService $onSiteDetailsReportingService,
         IdVerificationRepository $idVerificationRepository,
@@ -191,9 +179,7 @@ class OnSiteDetailsReportingController extends BaseController
         return $this->render('onsite/id-verification.html.twig', ['params' => $params]);
     }
 
-    /**
-     * @Route("/id-verification-export", name="on_site_id_verification_export")
-     */
+    #[Route(path: '/id-verification-export', name: 'on_site_id_verification_export')]
     public function idVerificationExportAction(
         OnSiteDetailsReportingService $onSiteDetailsReportingService,
         IdVerificationRepository $idVerificationRepository,

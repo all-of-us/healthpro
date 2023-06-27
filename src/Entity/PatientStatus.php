@@ -6,17 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PatientStatusRepository")
- * @ORM\Table(uniqueConstraints={
- *   @ORM\UniqueConstraint(
- *     name="participant_organization_unique",
- *     columns={"participant_id", "organization"})
- *   },
- *   indexes={
- *     @ORM\Index(name="history_id", columns={"history_id"})
- * })
- */
+#[ORM\Table]
+#[ORM\Index(name: 'history_id', columns: ['history_id'])]
+#[ORM\UniqueConstraint(name: 'participant_organization_unique', columns: ['participant_id', 'organization'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\PatientStatusRepository')]
 class PatientStatus
 {
     public const YES = 'YES';
@@ -38,36 +31,24 @@ class PatientStatus
         'Unknown' => self::UNKNOWN
     ];
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $organization;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $awardee;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\PatientStatusHistory", mappedBy="patientStatus")
-     */
+    #[ORM\OneToMany(targetEntity: 'App\Entity\PatientStatusHistory', mappedBy: 'patientStatus')]
     private $patientStatusHistories;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\PatientStatusHistory", inversedBy="patientStatusRecords", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\PatientStatusHistory', inversedBy: 'patientStatusRecords', cascade: ['persist', 'remove'])]
     private $history;
 
     public function __construct()

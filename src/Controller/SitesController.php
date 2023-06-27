@@ -16,9 +16,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/sites")
- */
+#[Route(path: '/admin/sites')]
 class SitesController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -26,9 +24,7 @@ class SitesController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="admin_sites")
-     */
+    #[Route(path: '/', name: 'admin_sites')]
     public function index(SiteRepository $siteRepository, ParameterBagInterface $params)
     {
         $sites = $siteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
@@ -39,9 +35,7 @@ class SitesController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/site/{id}", name="admin_site")
-     */
+    #[Route(path: '/site/{id}', name: 'admin_site')]
     public function edit(SiteRepository $siteRepository, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, $id = null)
     {
         $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false;
@@ -105,9 +99,7 @@ class SitesController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/site/{id}/emails", name="admin_site_emails")
-     */
+    #[Route(path: '/site/{id}/emails', name: 'admin_site_emails')]
     public function siteAdminEmails(SiteRepository $siteRepository, EnvironmentService $env, SiteSyncService $siteSyncService, int $id)
     {
         $site = $siteRepository->find($id);
@@ -146,9 +138,7 @@ class SitesController extends BaseController
         return $this->redirectToRoute('admin_sites');
     }
 
-    /**
-     * @Route("/sync", name="admin_siteSync")
-     */
+    #[Route(path: '/sync', name: 'admin_siteSync')]
     public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)
     {
         if (!$params->has('sites_use_rdr')) {

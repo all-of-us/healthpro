@@ -4,66 +4,43 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PatientStatusHistoryRepository")
- * @ORM\Table(indexes={
- *   @ORM\Index(name="patient_status_id", columns={"patient_status_id"}),
- *   @ORM\Index(name="import_id", columns={"import_id"})
- * })
- */
+#[ORM\Table]
+#[ORM\Index(name: 'patient_status_id', columns: ['patient_status_id'])]
+#[ORM\Index(name: 'import_id', columns: ['import_id'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\PatientStatusHistoryRepository')]
 class PatientStatusHistory
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $userId;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $status;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $comments;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdTs;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $rdrTs;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatus", inversedBy="patientStatusHistories")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\PatientStatus', inversedBy: 'patientStatusHistories')]
+    #[ORM\JoinColumn(nullable: false)]
     private $patientStatus;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatusImport", inversedBy="patientStatusHistories")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\PatientStatusImport', inversedBy: 'patientStatusHistories')]
     private $import;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\PatientStatus", mappedBy="history", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\PatientStatus', mappedBy: 'history', cascade: ['persist', 'remove'])]
     private $patientStatusRecords;
 
     public function getId(): ?int

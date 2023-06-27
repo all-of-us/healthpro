@@ -19,9 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/debug")
- */
+#[Route(path: '/admin/debug')]
 class DebugToolsController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -29,9 +27,7 @@ class DebugToolsController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/participants", name="admin_debug_participants")
-     */
+    #[Route(path: '/participants', name: 'admin_debug_participants')]
     public function participantsAction(Request $request, EnvironmentService $env, DebugToolsService $debugToolsService)
     {
         $participantLookupForm = $this->createForm(DebugParticipantLookupType::class);
@@ -49,9 +45,7 @@ class DebugToolsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{id}", name="admin_debug_participant")
-     */
+    #[Route(path: '/participant/{id}', name: 'admin_debug_participant')]
     public function participantAction($id, EnvironmentService $env, DebugToolsService $debugToolsService)
     {
         $participant = $debugToolsService->getParticipantById($id);
@@ -64,9 +58,7 @@ class DebugToolsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/missing/measurements", name="admin_debug_missing_measurements")
-     */
+    #[Route(path: '/missing/measurements', name: 'admin_debug_missing_measurements')]
     public function missingMeasurementsAction(Request $request, MeasurementService $measurementsService, RdrApiService $rdrApiService)
     {
         $missing = $this->em->getRepository(Measurement::class)->getMissingMeasurements();
@@ -118,9 +110,7 @@ class DebugToolsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/missing/orders", name="admin_debug_missing_orders")
-     */
+    #[Route(path: '/missing/orders', name: 'admin_debug_missing_orders')]
     public function missingOrdersAction(Request $request, OrderService $orderService, RdrApiService $rdrApiService)
     {
         $missing = $this->em->getRepository(Order::class)->getMissingOrders();
@@ -177,9 +167,7 @@ class DebugToolsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/patientstatus/{participantId}/organization/{organizationId}/json-rdr", name="admin_debug_patient_status_json_rdr")
-     */
+    #[Route(path: '/patientstatus/{participantId}/organization/{organizationId}/json-rdr', name: 'admin_debug_patient_status_json_rdr')]
     public function patientStatusRdrJsonAction($participantId, $organizationId, PatientStatusService $patientStatusService)
     {
         $object = $patientStatusService->getPatientStatus($participantId, $organizationId);
@@ -188,9 +176,7 @@ class DebugToolsController extends BaseController
         return $response;
     }
 
-    /**
-     * @Route("/patientstatus/{participantId}/organization/{organizationId}/history/json-rdr", name="admin_debug_patient_status_history_json_rdr")
-     */
+    #[Route(path: '/patientstatus/{participantId}/organization/{organizationId}/history/json-rdr', name: 'admin_debug_patient_status_history_json_rdr')]
     public function patientStatusHistoryRdrJsonAction($participantId, $organizationId, PatientStatusService $patientStatusService)
     {
         $object = $patientStatusService->getPatientStatusHistory($participantId, $organizationId);

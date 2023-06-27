@@ -23,9 +23,7 @@ class NphOrderLookupController extends AbstractController
         $this->em = $em;
     }
 
-    /**
-     * @Route("/nph/orders", name="nph_order_lookup")
-     */
+    #[Route(path: '/nph/orders', name: 'nph_order_lookup')]
     public function index(
         Request $request,
         SiteService $siteService,

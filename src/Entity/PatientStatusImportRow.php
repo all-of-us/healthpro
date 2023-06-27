@@ -4,45 +4,30 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\PatientStatusImportRowRepository")
- * @ORM\Table(name="patient_status_import_rows", indexes={
- *   @ORM\Index(name="import_id", columns={"import_id"})
- * })
- */
+#[ORM\Table(name: 'patient_status_import_rows')]
+#[ORM\Index(name: 'import_id', columns: ['import_id'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\PatientStatusImportRowRepository')]
 class PatientStatusImportRow
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $status;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $comments;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\PatientStatusImport", inversedBy="PatientStatusImportRows")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\PatientStatusImport', inversedBy: 'PatientStatusImportRows')]
+    #[ORM\JoinColumn(nullable: false)]
     private $import;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $rdrStatus = 0;
 
     public function getId(): ?int

@@ -5,62 +5,40 @@ namespace App\Entity;
 use App\Repository\NphSiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="nph_sites")
- * @ORM\Entity(repositoryClass=NphSiteRepository::class)
- */
+#[ORM\Table(name: 'nph_sites')]
+#[ORM\Entity(repositoryClass: NphSiteRepository::class)]
 class NphSite
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $status;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $googleGroup;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $organizationId;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $awardeeId;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $type;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $deleted = false;
 
-    /**
-     * @ORM\Column(type="string", length=512, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 512, nullable: true)]
     private $email;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $mayolinkAccount;
 
     public function getId(): ?int

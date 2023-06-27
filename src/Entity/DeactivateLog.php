@@ -4,49 +4,30 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\DeactivateLogRepository")
- * @ORM\Table(uniqueConstraints={
- *   @ORM\UniqueConstraint(
- *     name="participant_id",
- *     columns={"participant_id", "deactivate_ts"})
- *   },
- *   indexes={
- *     @ORM\Index(name="hpo_id", columns={"hpo_id"})
- *   })
- */
+#[ORM\Table]
+#[ORM\Index(name: 'hpo_id', columns: ['hpo_id'])]
+#[ORM\UniqueConstraint(name: 'participant_id', columns: ['participant_id', 'deactivate_ts'])]
+#[ORM\Entity(repositoryClass: 'App\Repository\DeactivateLogRepository')]
 class DeactivateLog
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
-    /**
-     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $insertTs;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $deactivateTs;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $hpoId;
 
-    /**
-     * @ORM\Column(type="string", length=2000, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 2000, nullable: true)]
     private $emailNotified;
 
     public function getId(): ?int

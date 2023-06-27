@@ -4,53 +4,35 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="orders_history")
- * @ORM\Entity(repositoryClass="App\Repository\OrderHistoryRepository")
- */
+#[ORM\Table(name: 'orders_history')]
+#[ORM\Entity(repositoryClass: 'App\Repository\OrderHistoryRepository')]
 class OrderHistory
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Order", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\Order', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
     private $order;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", cascade={"persist", "remove"})
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
     private $user;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $reason;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdTs;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $createdTimezoneId;
 
     public function getId(): ?int

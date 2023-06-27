@@ -4,57 +4,37 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="evaluations_queue")
- * @ORM\Entity(repositoryClass="App\Repository\MeasurementQueueRepository")
- */
+#[ORM\Table(name: 'evaluations_queue')]
+#[ORM\Entity(repositoryClass: 'App\Repository\MeasurementQueueRepository')]
 class MeasurementQueue
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $evaluationId;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $evaluationParentId;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $oldRdrId;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $newRdrId;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $fhirVersion;
 
-    /**
-     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $queuedTs;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $sentTs;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $attemptedTs;
 
     public function getId(): ?int
