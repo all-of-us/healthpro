@@ -21,9 +21,7 @@ class IncentiveImportController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/incentive/import", name="incentiveImport", methods={"GET","POST"})
-     */
+    #[Route(path: '/incentive/import', name: 'incentiveImport', methods: ['GET', 'POST'])]
     public function incentiveImport(
         Request $request,
         IncentiveImportService $incentiveImportService
@@ -53,9 +51,7 @@ class IncentiveImportController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/incentive/confirmation/{id}", name="incentiveImportConfirmation", methods={"GET", "POST"})
-     */
+    #[Route(path: '/incentive/confirmation/{id}', name: 'incentiveImportConfirmation', methods: ['GET', 'POST'])]
     public function incentiveImportConfirmation(int $id, Request $request, LoggerService $loggerService)
     {
         $incentiveImport = $this->em->getRepository(IncentiveImport::class)->findOneBy(['id' => $id, 'user' => $this->getUserEntity(), 'confirm' => 0]);
@@ -88,9 +84,7 @@ class IncentiveImportController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/incentive/import/{id}", name="incentiveImportDetails", methods={"GET", "POST"})
-     */
+    #[Route(path: '/incentive/import/{id}', name: 'incentiveImportDetails', methods: ['GET', 'POST'])]
     public function incentiveImportDetails(int $id, Request $request, IncentiveImportService $incentiveImportService)
     {
         $incentiveImport = $this->em->getRepository(IncentiveImport::class)->findOneBy([

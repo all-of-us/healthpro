@@ -50,10 +50,8 @@ class MeasurementsController extends BaseController
         $this->helpService = $helpService;
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}", name="measurement", defaults={"measurementId": null})
-     * @Route("/read/participant/{participantId}/measurements/{measurementId}", name="read_measurement", methods={"GET"})
-     */
+    #[Route(path: '/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
+    #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}', name: 'read_measurement', methods: ['GET'])]
     public function measurementsAction($participantId, $measurementId, Request $request)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
@@ -265,9 +263,7 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/modify/{type}", name="measurement_modify", defaults={"measurementId": null})
-     */
+    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/modify/{type}', name: 'measurement_modify', defaults: ['measurementId' => null])]
     public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
@@ -338,9 +334,7 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/revert", name="measurement_revert")
-     */
+    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/revert', name: 'measurement_revert')]
     public function measurementRevertAction($participantId, $measurementId, Request $request)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
@@ -369,10 +363,8 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/summary", name="measurement_summary")
-     * @Route("/read/participant/{participantId}/measurements/{measurementId}/summary", name="read_measurement_summary")
-     */
+    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/summary', name: 'measurement_summary')]
+    #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}/summary', name: 'read_measurement_summary')]
     public function measurementsSummaryAction($participantId, $measurementId)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
@@ -399,9 +391,7 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/blood/donor/check", name="measurement_blood_donor_check")
-     */
+    #[Route(path: '/participant/{participantId}/measurements/blood/donor/check', name: 'measurement_blood_donor_check')]
     public function measurementBloodDonorCheckAction($participantId, Request $request)
     {
         if (!$this->measurementService->requireBloodDonorCheck()) {
@@ -434,10 +424,7 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/fhir", name="measurement_fhir")
-     * For debugging generated FHIR bundle - only allowed for admins or in local dev
-     */
+    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/fhir', name: 'measurement_fhir')]
     public function measurementFhirAction($participantId, $measurementId, Request $request, EnvironmentService $env)
     {
         $isTest = $request->query->has('test');
@@ -484,10 +471,7 @@ class MeasurementsController extends BaseController
         return $response;
     }
 
-    /**
-     * @Route("/participant/{participantId}/measurements/{measurementId}/rdr", name="measurement_rdr")
-     * For debugging evaluation object pushed to RDR - only allowed for admins or in local dev
-     */
+    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/rdr', name: 'measurement_rdr')]
     public function measurementRdrAction($participantId, $measurementId, EnvironmentService $env)
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {

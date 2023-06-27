@@ -6,51 +6,33 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class IdVerificationImport
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $file_name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User')]
     private $user;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $site;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdTs;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $importStatus = 0;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $confirm = 0;
 
-    /**
-     * @ORM\OneToMany(targetEntity=IdVerificationImportRow::class, mappedBy="import")
-     */
+    #[ORM\OneToMany(targetEntity: IdVerificationImportRow::class, mappedBy: 'import')]
     private $idVerificationImportRows;
     public function __construct()
     {

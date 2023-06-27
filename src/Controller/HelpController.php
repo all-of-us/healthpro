@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/help")
- */
+#[Route(path: '/help')]
 class HelpController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -20,26 +18,20 @@ class HelpController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="help_home")
-     */
+    #[Route(path: '/', name: 'help_home')]
     public function index()
     {
         return $this->render('help/index.html.twig');
     }
 
-    /**
-     * @Route("/videos", name="help_videos")
-     */
+    #[Route(path: '/videos', name: 'help_videos')]
     public function videosAction(SessionInterface $session)
     {
         $id = $session->get('orderType') === 'dv' ? 'biobank-dv' : 'biobank-hpo';
         return $this->redirectToRoute('help_videosPlaylist', ['id' => $id]);
     }
 
-    /**
-     * @Route("/videos/{id}", name="help_videosPlaylist")
-     */
+    #[Route(path: '/videos/{id}', name: 'help_videosPlaylist')]
     public function videosPlaylistAction($id, Request $request, HelpService $helpService)
     {
         if (!array_key_exists($id, $helpService::$videoPlaylists)) {
@@ -58,17 +50,13 @@ class HelpController extends BaseController
         return $this->render('help/videos.html.twig', $parameters);
     }
 
-    /**
-     * @Route("/faq", name="help_faq")
-     */
+    #[Route(path: '/faq', name: 'help_faq')]
     public function faqAction(HelpService $helpService)
     {
         return $this->render('help/faq.html.twig', ['faqs' => $helpService::$faqs]);
     }
 
-    /**
-     * @Route("/sop", name="help_sop")
-     */
+    #[Route(path: '/sop', name: 'help_sop')]
     public function sopAction(HelpService $helpService)
     {
         return $this->render('help/sop.html.twig', [
@@ -78,9 +66,7 @@ class HelpController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/sop/{id}/{language}", name="help_sopView")
-     */
+    #[Route(path: '/sop/{id}/{language}', name: 'help_sopView')]
     public function sopViewAction($id, $language, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);
@@ -98,9 +84,7 @@ class HelpController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/sop/file/{id}/{language}", name="help_sopFile")
-     */
+    #[Route(path: '/sop/file/{id}/{language}', name: 'help_sopFile')]
     public function sopFileAction($id, $language, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);
@@ -133,9 +117,7 @@ class HelpController extends BaseController
         }
     }
 
-    /**
-     * @Route("/sop/redirect/{id}", name="help_sopRedirect")
-     */
+    #[Route(path: '/sop/redirect/{id}', name: 'help_sopRedirect')]
     public function sopRedirectAction($id, HelpService $helpService)
     {
         $document = $helpService->getDocumentInfo($id);

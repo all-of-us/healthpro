@@ -5,65 +5,42 @@ namespace App\Entity;
 use App\Repository\NphAliquotRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=NphAliquotRepository::class)
- * @ORM\Table(name="nph_aliquots", uniqueConstraints={
- *   @ORM\UniqueConstraint(name="aliquot_id", columns={"aliquot_id"})
- * })
- */
+#[ORM\Table(name: 'nph_aliquots')]
+#[ORM\UniqueConstraint(name: 'aliquot_id', columns: ['aliquot_id'])]
+#[ORM\Entity(repositoryClass: NphAliquotRepository::class)]
 class NphAliquot
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: 'string', length: 100)]
     private $aliquotId;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=NphSample::class, inversedBy="nphAliquots")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: NphSample::class, inversedBy: 'nphAliquots')]
+    #[ORM\JoinColumn(nullable: false)]
     private $nphSample;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $aliquotTs;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: 'string', length: 100)]
     private $aliquotCode;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
+    #[ORM\Column(type: 'float', nullable: true)]
     private $volume;
 
-    /**
-     * @ORM\Column(type="string", length=10, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
     private $units;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $status;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $aliquotTimezoneId;
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
+    #[ORM\Column(type: 'json', nullable: true)]
     private $aliquotMetadata = [];
 
     public function getId(): ?int

@@ -32,9 +32,7 @@ class DeceasedReportsController extends BaseController
         $this->siteService = $siteService;
     }
 
-    /**
-     * @Route("/deceased-reports", name="deceased_reports_index")
-     */
+    #[Route(path: '/deceased-reports', name: 'deceased_reports_index')]
     public function participantObservationIndex(Request $request, DeceasedReportsService $deceasedReportsService)
     {
         $statusFilter = $request->query->get('status', 'preliminary');
@@ -50,10 +48,8 @@ class DeceasedReportsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/deceased-reports/{participantId}/{reportId}", name="deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"})
-     * @Route("/read/deceased-reports/{participantId}/{reportId}", name="read_deceased_report_review", requirements={"participantId"="P\d+","reportId"="\d+"}, methods={"GET"})
-     */
+    #[Route(path: '/deceased-reports/{participantId}/{reportId}', name: 'deceased_report_review', requirements: ['participantId' => 'P\d+', 'reportId' => '\d+'])]
+    #[Route(path: '/read/deceased-reports/{participantId}/{reportId}', name: 'read_deceased_report_review', requirements: ['participantId' => 'P\d+', 'reportId' => '\d+'], methods: ['GET'])]
     public function deceasedReportReview(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId, $reportId)
     {
         $organizationId = $this->siteService->getSiteOrganization();
@@ -91,10 +87,8 @@ class DeceasedReportsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/deceased-reports/{participantId}/new", name="deceased_report_new", requirements={"participantId"="P\d+"})
-     * @Route("/read/deceased-reports/{participantId}/new", name="read_deceased_report_new", requirements={"participantId"="P\d+"})
-     */
+    #[Route(path: '/deceased-reports/{participantId}/new', name: 'deceased_report_new', requirements: ['participantId' => 'P\d+'])]
+    #[Route(path: '/read/deceased-reports/{participantId}/new', name: 'read_deceased_report_new', requirements: ['participantId' => 'P\d+'])]
     public function deceasedReportNew(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
         $organizationId = $this->siteService->getSiteOrganization();
@@ -148,10 +142,8 @@ class DeceasedReportsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/deceased-reports/{participantId}/history", name="deceased_report_history", requirements={"participantId"="P\d+"})
-     * @Route("/read/deceased-reports/{participantId}/history", name="read_deceased_report_history", requirements={"participantId"="P\d+"})
-     */
+    #[Route(path: '/deceased-reports/{participantId}/history', name: 'deceased_report_history', requirements: ['participantId' => 'P\d+'])]
+    #[Route(path: '/read/deceased-reports/{participantId}/history', name: 'read_deceased_report_history', requirements: ['participantId' => 'P\d+'])]
     public function deceasedReporthHistory(Request $request, ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
         $participant = $participantSummaryService->getParticipantById($participantId);
@@ -168,9 +160,7 @@ class DeceasedReportsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/deceased-reports/stats", name="deceased_report_stats")
-     */
+    #[Route(path: '/deceased-reports/stats', name: 'deceased_report_stats')]
     public function getStats(DeceasedReportsService $deceasedReportsService)
     {
         $organizationId = $this->siteService->getSiteOrganization();
@@ -191,9 +181,7 @@ class DeceasedReportsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/read/deceased-reports/{participantId}/check", name="read_deceased_report_check", requirements={"participantId"="P\d+"})
-     */
+    #[Route(path: '/read/deceased-reports/{participantId}/check', name: 'read_deceased_report_check', requirements: ['participantId' => 'P\d+'])]
     public function deceasedReportCheck(ParticipantSummaryService $participantSummaryService, DeceasedReportsService $deceasedReportsService, $participantId)
     {
         $participant = $participantSummaryService->getParticipantById($participantId);

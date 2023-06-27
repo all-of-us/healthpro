@@ -4,35 +4,25 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="missing_notifications_log")
- * @ORM\Entity(repositoryClass="App\Repository\MissingNotificationLogRepository")
- */
+#[ORM\Table(name: 'missing_notifications_log')]
+#[ORM\Entity(repositoryClass: 'App\Repository\MissingNotificationLogRepository')]
 class MissingNotificationLog
 {
     public const MEASUREMENT_TYPE = 'measurement';
     public const ORDER_TYPE = 'order';
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $recordId;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $type;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $insertTs;
 
     public function getId(): ?int

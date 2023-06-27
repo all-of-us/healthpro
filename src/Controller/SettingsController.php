@@ -7,9 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/settings")
- */
+#[Route(path: '/settings')]
 class SettingsController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -17,9 +15,7 @@ class SettingsController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="settings")
-     */
+    #[Route(path: '/', name: 'settings')]
     public function settings(Request $request)
     {
         $user = $this->getUserEntity();

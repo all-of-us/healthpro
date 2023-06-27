@@ -28,6 +28,7 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
         $this->assertEquals('06-24-2022', $ajaxData[1]['created']);
         $this->assertEquals('test2@example.com', $ajaxData[1]['user']);
         $this->assertEquals('No', $ajaxData[1]['patientStatus']);
+        $this->assertEquals('testsite', $ajaxData[0]['siteId']);
     }
 
     private function getPatientStatusData(): array
@@ -42,6 +43,7 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
                 'status' => 'YES',
                 'comments' => 'test1',
                 'importId' => 1,
+                'siteId' => 'testsite'
             ],
             [
                 'createdTs' => $now,
@@ -51,6 +53,7 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
                 'status' => 'NO',
                 'comments' => 'test2',
                 'importId' => 2,
+                'siteId' => 'testsite'
             ]
         ];
     }

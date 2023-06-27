@@ -30,9 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/nph")
- */
+#[Route(path: '/nph')]
 class NphOrderController extends BaseController
 {
     private SiteService $siteService;
@@ -43,9 +41,7 @@ class NphOrderController extends BaseController
         $this->siteService = $siteService;
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}", name="nph_generate_oder")
-     */
+    #[Route(path: '/participant/{participantId}/order/module/{module}/visit/{visit}', name: 'nph_generate_oder')]
     public function generateOrderAction(
         $participantId,
         $module,
@@ -116,9 +112,7 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/collect", name="nph_order_collect")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'nph_order_collect')]
     public function orderCollectAction(
         $participantId,
         $orderId,
@@ -188,9 +182,7 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/samples/aliquot", name="nph_samples_aliquot")
-     */
+    #[Route(path: '/samples/aliquot', name: 'nph_samples_aliquot')]
     public function sampleAliquotLookupAction(
         Request $request,
         NphParticipantSummaryService $nphParticipantSummaryService
@@ -228,9 +220,7 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/finalize", name="nph_sample_finalize")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/sample/{sampleId}/finalize', name: 'nph_sample_finalize')]
     public function sampleFinalizeAction(
         $participantId,
         $orderId,
@@ -353,9 +343,7 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint/{sampleGroup}", name="nph_order_label_print")
-     */
+    #[Route(path: '/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint/{sampleGroup}', name: 'nph_order_label_print')]
     public function orderSummary($participantId, $module, $visit, $sampleGroup, NphParticipantSummaryService $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
@@ -374,9 +362,7 @@ class NphOrderController extends BaseController
         );
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/samples/modify/{type}", name="nph_samples_modify")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/samples/modify/{type}', name: 'nph_samples_modify')]
     public function sampleModifyAction(
         $participantId,
         string $orderId,
@@ -441,10 +427,7 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/json-response", name="nph_order_json")
-     * For debugging generated JSON representation - only allowed for admins or in local dev
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/sample/{sampleId}/json-response', name: 'nph_order_json')]
     public function nphOrderJsonAction(
         string $participantId,
         string $orderId,
@@ -471,9 +454,7 @@ class NphOrderController extends BaseController
         return $response;
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/sample/{sampleId}/revert", name="nph_sample_revert", methods={"POST"})
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/sample/{sampleId}/revert', name: 'nph_sample_revert', methods: ['POST'])]
     public function sampleRevertAction(
         string $participantId,
         string $orderId,
@@ -525,9 +506,7 @@ class NphOrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/aliquot/instructions/file/{id}", name="aliquot_instructions_file")
-     */
+    #[Route(path: '/aliquot/instructions/file/{id}', name: 'aliquot_instructions_file')]
     public function aliquotInstructions($id, HelpService $helpService)
     {
         $document = Samples::$aliquotDocuments[$id] ?? null;

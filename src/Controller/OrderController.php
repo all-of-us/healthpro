@@ -66,9 +66,7 @@ class OrderController extends BaseController
         return $order;
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/check", name="order_check")
-     */
+    #[Route(path: '/participant/{participantId}/order/check', name: 'order_check')]
     public function orderCheck($participantId, RequestStack $requestStack): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
@@ -84,9 +82,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/create", name="order_create")
-     */
+    #[Route(path: '/participant/{participantId}/order/create', name: 'order_create')]
     public function orderCreateAction($participantId, Request $request, SessionInterface $session)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
@@ -190,10 +186,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/print/labels", name="order_print_labels")
-     * @Route("/read/participant/{participantId}/order/{orderId}/print/labels", name="read_order_print_labels")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/print/labels', name: 'order_print_labels')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/print/labels', name: 'read_order_print_labels')]
     public function orderPrintLabelsAction($participantId, $orderId): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -221,10 +215,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/labels/pdf", name="order_labels_pdf")
-     * @Route("/read/participant/{participantId}/order/{orderId}/labels/pdf", name="read_order_labels_pdf")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/labels/pdf', name: 'order_labels_pdf')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/labels/pdf', name: 'read_order_labels_pdf')]
     public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -246,10 +238,8 @@ class OrderController extends BaseController
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/collect", name="order_collect")
-     * @Route("/read/participant/{participantId}/order/{orderId}/collect", name="read_order_collect", methods={"GET"})
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/collect', name: 'read_order_collect', methods: ['GET'])]
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -313,10 +303,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/process", name="order_process")
-     * @Route("/read/participant/{participantId}/order/{orderId}/process", name="read_order_process", methods={"GET"})
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/process', name: 'order_process')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/process', name: 'read_order_process', methods: ['GET'])]
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -409,11 +397,9 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/finalize", name="order_finalize")
-     * @Route("/read/participant/{participantId}/order/{orderId}/finalize", name="read_order_finalize", methods={"GET"})
-     */
     // @ToDo - Replace SessionInterface with Symfony\Component\HttpFoundation\Session
+    #[Route(path: '/participant/{participantId}/order/{orderId}/finalize', name: 'order_finalize')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/finalize', name: 'read_order_finalize', methods: ['GET'])]
     public function orderFinalizeAction($participantId, $orderId, Request $request, Session $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -549,10 +535,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/print/requisition", name="order_print_requisition")
-     * @Route("/read/participant/{participantId}/order/{orderId}/print/requisition", name="read_order_print_requisition")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/print/requisition', name: 'order_print_requisition')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/print/requisition', name: 'read_order_print_requisition')]
     public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -578,10 +562,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/requisition/pdf", name="order_requisition_pdf")
-     * @Route("/read/participant/{participantId}/order/{orderId}/requisition/pdf", name="read_order_requisition_pdf")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'order_requisition_pdf')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'read_order_requisition_pdf')]
     public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -602,9 +584,7 @@ class OrderController extends BaseController
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/modify/{type}", name="order_modify")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/modify/{type}', name: 'order_modify')]
     public function orderModifyAction($participantId, $orderId, $type, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -674,9 +654,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/revert", name="order_revert")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/revert', name: 'order_revert')]
     public function orderRevertAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -699,10 +677,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/json-response", name="order_json")
-     * For debugging generated JSON representation - only allowed for admins or in local dev
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/json-response', name: 'order_json')]
     public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
@@ -723,10 +698,8 @@ class OrderController extends BaseController
         return $response;
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}", name="order")
-     * @Route("/read/participant/{participantId}/order/{orderId}", name="read_order")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}', name: 'order')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}', name: 'read_order')]
     public function orderAction($participantId, $orderId)
     {
         $orderRepository = $this->em->getRepository(Order::class);
@@ -743,10 +716,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/order/{orderId}/biobank/summary", name="biobank_summary")
-     * @Route("/read/participant/{participantId}/order/{orderId}/biobank/summary", name="read_biobank_summary")
-     */
+    #[Route(path: '/participant/{participantId}/order/{orderId}/biobank/summary', name: 'biobank_summary')]
+    #[Route(path: '/read/participant/{participantId}/order/{orderId}/biobank/summary', name: 'read_biobank_summary')]
     public function biobankSummaryAction($participantId, $orderId)
     {
         $order = $this->loadOrder($participantId, $orderId);

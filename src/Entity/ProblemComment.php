@@ -8,60 +8,52 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * ProblemComments
- *
- * @ORM\Table(name="problem_comments", indexes={@ORM\Index(name="problem_id", columns={"problem_id"})})
- * @ORM\Entity
  */
+#[ORM\Table(name: 'problem_comments')]
+#[ORM\Index(name: 'problem_id', columns: ['problem_id'])]
+#[ORM\Entity]
 class ProblemComment
 {
     /**
      * @var int
-     *
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="integer", nullable=false)
      */
+    #[ORM\Column(type: 'integer', nullable: false)]
     private $userId;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", length=50, nullable=false)
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private $site;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $staffName;
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="text", length=65535, nullable=true)
      */
+    #[ORM\Column(type: 'text', length: 65535, nullable: true)]
     private $comment;
 
     /**
      * @var DateTimeInterface
-     *
-     * @ORM\Column(type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
      */
+    #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $createdTs;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Problem", inversedBy="problemComments")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Problem', inversedBy: 'problemComments')]
+    #[ORM\JoinColumn(nullable: false)]
     private $problem;
 
     public function __construct()

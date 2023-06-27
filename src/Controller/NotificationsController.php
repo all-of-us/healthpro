@@ -7,9 +7,7 @@ use App\Repository\WithdrawalLogRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/notifications")
- */
+#[Route(path: '/admin/notifications')]
 class NotificationsController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -17,9 +15,7 @@ class NotificationsController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="admin_notifications")
-     */
+    #[Route(path: '/', name: 'admin_notifications')]
     public function index(WithdrawalLogRepository $withdrawalLogRepository, DeactivateLogRepository $deactivateLogRepository)
     {
         $withdrawalNotifications = $withdrawalLogRepository->getWithdrawalNotifications();

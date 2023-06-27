@@ -4,23 +4,18 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="organizations")
- * @ORM\Entity(repositoryClass="App\Repository\OrganizationRepository")
- */
+#[ORM\Table(name: 'organizations')]
+#[ORM\Entity(repositoryClass: 'App\Repository\OrganizationRepository')]
 class Organization
 {
-    /**
-     * @ORM\Id()
-     * @ORM\Column(type="string", length=80)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'string', length: 80)]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: false)]
     private $name;
 
     public function getId(): ?string

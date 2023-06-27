@@ -12,9 +12,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/notices")
- */
+#[Route(path: '/admin/notices')]
 class NoticeController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -22,9 +20,7 @@ class NoticeController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="admin_notices")
-     */
+    #[Route(path: '/', name: 'admin_notices')]
     public function index(NoticeRepository $noticeRepository)
     {
         $notices = $noticeRepository->findBy([], ['id' => 'asc']);
@@ -33,9 +29,7 @@ class NoticeController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/notice/{id}", name="admin_notice")
-     */
+    #[Route(path: '/notice/{id}', name: 'admin_notice')]
     public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id = null)
     {
         if ($id) {

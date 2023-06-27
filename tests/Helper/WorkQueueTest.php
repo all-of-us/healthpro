@@ -389,8 +389,6 @@ class WorkQueueTest extends ServiceTestCase
                         '' => 'View All',
                         'NOT_CONSENTED' => 'Not Consented',
                         'MODULE_1_CONSENTED' => 'Module 1 Consented',
-                        'DEACTIVATED' => 'Deactivated',
-                        'WITHDRAWN' => 'Withdrawn'
                     ]
 
                 ]
