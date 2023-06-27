@@ -6,9 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/read")
- */
+#[Route(path: '/read')]
 class ReadOnlyController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -16,9 +14,7 @@ class ReadOnlyController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="read_home")
-     */
+    #[Route(path: '/', name: 'read_home')]
     public function indexAction(): Response
     {
         return $this->render('readonly/index.html.twig');

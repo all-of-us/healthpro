@@ -24,9 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/workqueue")
- */
+#[Route(path: '/workqueue')]
 class WorkQueueController extends BaseController
 {
     protected $requestStack;
@@ -48,10 +46,8 @@ class WorkQueueController extends BaseController
         $this->displayParticipantConsentsTab = $params->has('feature.participantconsentsworkqueue') ? $params->get('feature.participantconsentsworkqueue') : false;
     }
 
-    /**
-     * @Route("/", name="workqueue_index")
-     * @Route("/customized-view/{viewId}", name="workqueue_customized_view")
-     */
+    #[Route(path: '/', name: 'workqueue_index')]
+    #[Route(path: '/customized-view/{viewId}', name: 'workqueue_customized_view')]
     public function index(): Response
     {
         $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
@@ -67,10 +63,8 @@ class WorkQueueController extends BaseController
         return $this->redirectToRoute('workqueue_main');
     }
 
-    /**
-     * @Route("/main", name="workqueue_main")
-     * @Route("/customized-view/{viewId}", name="workqueue_customized_view")
-     */
+    #[Route(path: '/main', name: 'workqueue_main')]
+    #[Route(path: '/customized-view/{viewId}', name: 'workqueue_customized_view')]
     public function mainAction(Request $request, $viewId = null): Response
     {
         if ($viewId) {
@@ -220,9 +214,7 @@ class WorkQueueController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/export", name="workqueue_export")
-     */
+    #[Route(path: '/export', name: 'workqueue_export')]
     public function exportAction(Request $request, LoggerService $loggerService)
     {
         if (!$this->workQueueService->canExport()) {
@@ -318,9 +310,7 @@ class WorkQueueController extends BaseController
     }
 
 
-    /**
-     * @Route("/participant/{id}", name="workqueue_participant")
-     */
+    #[Route(path: '/participant/{id}', name: 'workqueue_participant')]
     public function participantAction(
         $id,
         Request $request,
@@ -380,9 +370,7 @@ class WorkQueueController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/consents", name="workqueue_consents")
-     */
+    #[Route(path: '/consents', name: 'workqueue_consents')]
     public function consentsAction(Request $request)
     {
         if (!$this->displayParticipantConsentsTab) {
@@ -525,9 +513,7 @@ class WorkQueueController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/consent/columns", name="workqueue_consent_columns")
-     */
+    #[Route(path: '/consent/columns', name: 'workqueue_consent_columns')]
     public function consentColumnsAction(Request $request)
     {
         if (!$this->displayParticipantConsentsTab) {
@@ -554,9 +540,7 @@ class WorkQueueController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/columns", name="workqueue_columns")
-     */
+    #[Route(path: '/columns', name: 'workqueue_columns')]
     public function columnsAction(Request $request)
     {
         $columns = $request->query->has('columnType') ? 'workQueueViewColumns' : 'workQueueColumns';
@@ -585,9 +569,7 @@ class WorkQueueController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/participant/{id}/consent-histories/{type}", name="workqueue_consent_histories")
-     */
+    #[Route(path: '/participant/{id}/consent-histories/{type}', name: 'workqueue_consent_histories')]
     public function consentHistories($id, $type, ParticipantSummaryService $participantSummaryService)
     {
         $participant = $participantSummaryService->getParticipantById($id);
@@ -598,9 +580,7 @@ class WorkQueueController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/view/delete", name="workqueue_view_delete", methods={"POST"})
-     */
+    #[Route(path: '/view/delete', name: 'workqueue_view_delete', methods: ['POST'])]
     public function workQueueViewDeleteAction(Request $request): Response
     {
         $workQueueViewDeleteForm = $this->createForm(WorkQueueViewDeleteType::class);
@@ -630,9 +610,7 @@ class WorkQueueController extends BaseController
         return $this->redirectToRoute($route);
     }
 
-    /**
-     * @Route("/view/update", name="workqueue_view_update", methods={"POST"})
-     */
+    #[Route(path: '/view/update', name: 'workqueue_view_update', methods: ['POST'])]
     public function workQueueViewUpdateAction(Request $request): Response
     {
         $workQueueViewUpdateForm = $this->createForm(WorkQueueViewUpdateType::class);
@@ -656,9 +634,7 @@ class WorkQueueController extends BaseController
         return $this->redirect('workqueue_main');
     }
 
-    /**
-     * @Route("/view/{id}", name="workqueue_view", defaults={"id": null})
-     */
+    #[Route(path: '/view/{id}', name: 'workqueue_view', defaults: ['id' => null])]
     public function workQueueViewAction($id, Request $request): Response
     {
         if ($id) {
@@ -707,9 +683,7 @@ class WorkQueueController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/view/change/default/{id}", name="workqueue_view_change_default")
-     */
+    #[Route(path: '/view/change/default/{id}', name: 'workqueue_view_change_default')]
     public function workQueueViewChangeDefaultAction($id, Request $request): Response
     {
         $workQueueView = $this->em->getRepository(WorkqueueView::class)->findOneBy([
@@ -735,9 +709,7 @@ class WorkQueueController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /**
-     * @Route("/view/check/name/{id}", name="workqueue_view_check_name", defaults={"id": null})
-     */
+    #[Route(path: '/view/check/name/{id}', name: 'workqueue_view_check_name', defaults: ['id' => null])]
     public function workQueueViewCheckNameAction($id, Request $request): Response
     {
         $workQueueView = $this->em->getRepository(WorkqueueView::class)

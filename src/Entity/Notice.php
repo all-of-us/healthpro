@@ -4,47 +4,31 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\NoticeRepository")
- * @ORM\Table(name="notices")
- */
+#[ORM\Table(name: 'notices')]
+#[ORM\Entity(repositoryClass: 'App\Repository\NoticeRepository')]
 class Notice
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\GeneratedValue()
-     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @ORM\Column(name="url", type="string", length=255, nullable=false)
-     */
+    #[ORM\Column(name: 'url', type: 'string', length: 255, nullable: false)]
     private $url;
 
-    /**
-     * @ORM\Column(name="message", type="text", length=65535, nullable=false)
-     */
+    #[ORM\Column(name: 'message', type: 'text', length: 65535, nullable: false)]
     private $message;
 
-    /**
-     * @ORM\Column(name="full_page", type="boolean", nullable=false)
-     */
+    #[ORM\Column(name: 'full_page', type: 'boolean', nullable: false)]
     private $fullPage = false;
 
-    /**
-     * @ORM\Column(name="start_ts", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'start_ts', type: 'datetime', nullable: true)]
     private $startTs;
 
-    /**
-     * @ORM\Column(name="end_ts", type="datetime", nullable=true)
-     */
+    #[ORM\Column(name: 'end_ts', type: 'datetime', nullable: true)]
     private $endTs;
 
-    /**
-     * @ORM\Column(name="status", type="boolean", nullable=false)
-     */
+    #[ORM\Column(name: 'status', type: 'boolean', nullable: false)]
     private $status = false;
 
     public function getId(): ?int

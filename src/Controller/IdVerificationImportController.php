@@ -21,9 +21,7 @@ class IdVerificationImportController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/id-verification/import", name="idVerificationImport", methods={"GET","POST"})
-     */
+    #[Route(path: '/id-verification/import', name: 'idVerificationImport', methods: ['GET', 'POST'])]
     public function idVerificationImport(
         Request $request,
         IdVerificationImportService $idVerificationImportService
@@ -53,9 +51,7 @@ class IdVerificationImportController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/id-verification/confirmation/{id}", name="idVerificationImportConfirmation", methods={"GET", "POST"})
-     */
+    #[Route(path: '/id-verification/confirmation/{id}', name: 'idVerificationImportConfirmation', methods: ['GET', 'POST'])]
     public function idVerificationImportConfirmation(int $id, Request $request, LoggerService $loggerService)
     {
         $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->findOneBy(['id' => $id, 'user' => $this->getUserEntity(), 'confirm' => 0]);
@@ -88,9 +84,7 @@ class IdVerificationImportController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/id-verification/import/{id}", name="idVerificationImportDetails", methods={"GET", "POST"})
-     */
+    #[Route(path: '/id-verification/import/{id}', name: 'idVerificationImportDetails', methods: ['GET', 'POST'])]
     public function idVerificationImportDetails(int $id, Request $request, IdVerificationImportService $idVerificationImportService)
     {
         $idVerificationImport = $this->em->getRepository(IdVerificationImport::class)->findOneBy([

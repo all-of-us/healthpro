@@ -21,9 +21,7 @@ class AuthController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/login", name="login")
-     */
+    #[Route(path: '/login', name: 'login')]
     public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session, ParameterBagInterface $params)
     {
         if ($this->getUser()) {
@@ -65,17 +63,13 @@ class AuthController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/login/start", name="login_start")
-     */
+    #[Route(path: '/login/start', name: 'login_start')]
     public function loginStart(AuthService $auth)
     {
         return $this->redirect($auth->getAuthUrl());
     }
 
-    /**
-     * @Route("/login/callback", name="login_callback")
-     */
+    #[Route(path: '/login/callback', name: 'login_callback')]
     public function loginCallback()
     {
         // This never gets executed as it's handled by guard authenticator

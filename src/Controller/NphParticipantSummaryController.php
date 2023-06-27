@@ -16,14 +16,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/nph/participant")
- */
+#[Route(path: '/nph/participant')]
 class NphParticipantSummaryController extends AbstractController
 {
-    /**
-     * @Route("/{participantId}", name="nph_participant_summary")
-     */
+    #[Route(path: '/{participantId}', name: 'nph_participant_summary')]
     public function index(
         $participantId,
         Request $request,

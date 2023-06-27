@@ -15,9 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/access/manage")
- */
+#[Route(path: '/access/manage')]
 class AccessManagementController extends BaseController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
@@ -39,25 +37,19 @@ class AccessManagementController extends BaseController
         $this->contextTemplate = $contextTemplate;
     }
 
-    /**
-     * @Route("/dashboard", name="access_manage_dashboard")
-     */
+    #[Route(path: '/dashboard', name: 'access_manage_dashboard')]
     public function index()
     {
         return $this->render('accessmanagement/dashboard.html.twig');
     }
 
-    /**
-     * @Route("/user/groups", name="access_manage_user_groups")
-     */
+    #[Route(path: '/user/groups', name: 'access_manage_user_groups')]
     public function userGroups()
     {
         return $this->render($this->contextTemplate->GetProgramTemplate('accessmanagement/groups.html.twig'));
     }
 
-    /**
-     * @Route("/user/group/{groupId}", name="access_manage_user_group")
-     */
+    #[Route(path: '/user/group/{groupId}', name: 'access_manage_user_group')]
     public function userGroup($groupId): Response
     {
         if ($this->contextTemplate->isCurrentProgramHpo()) {
@@ -81,9 +73,7 @@ class AccessManagementController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/user/group/{groupId}/member", name="access_manage_user_group_member")
-     */
+    #[Route(path: '/user/group/{groupId}/member', name: 'access_manage_user_group_member')]
     public function member($groupId, Request $request)
     {
         if ($this->contextTemplate->isCurrentProgramHpo()) {
@@ -135,9 +125,7 @@ class AccessManagementController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/user/group/{groupId}/member/{memberId}/remove", name="access_manage_user_group_remove_member")
-     */
+    #[Route(path: '/user/group/{groupId}/member/{memberId}/remove', name: 'access_manage_user_group_remove_member')]
     public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
     {
         if ($this->contextTemplate->isCurrentProgramHpo()) {

@@ -1,12 +1,12 @@
 <div class="collapse navbar-collapse advanced-filters" id="navbar-collapse-1">
     <ul class="nav navbar-nav">
         {% for label, subAdvancedFilters in advancedFilters %}
-            <li class="dropdown filter-group" id="filter_{{ label }}_group">
-                <button href="#" class="dropdown-toggle btn btn-default advanced-filter-btn" id="filter_{{ label }}_btn" data-toggle="dropdown">
+            <li class="dropdown filter-group" id="filter_{{ label|replace({" ": '_'}) }}_group">
+                <button href="#" class="dropdown-toggle btn btn-default advanced-filter-btn" id="filter_{{ label|replace({" ": '_'}) }}_btn" data-toggle="dropdown">
                     <i class="fa {{ filterIcons[label] }}" aria-hidden="true"></i> {{ label }} <b class="caret"></b>
                 </button>
                 <ul class="dropdown-menu">
-                    <small class="pull-right filter-reset"><a class="filter-sub-group-reset" data-group-id="filter_{{ label }}_group">Reset</a></small>
+                    <small class="pull-right filter-reset"><a class="filter-sub-group-reset" data-group-id="filter_{{ label|replace({" ": '_'}) }}_group">Reset</a></small>
                     {% for name, advancedFilter in subAdvancedFilters %}
                         <li class="dropdown dropdown-submenu" id="{{ name }}_submenu"><a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ advancedFilter.label }}</a>
                             <ul class="dropdown-menu" id="filter-sub-group">

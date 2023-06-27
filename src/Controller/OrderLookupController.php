@@ -18,10 +18,8 @@ class OrderLookupController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/orders", name="orders")
-     * @Route("/read/orders", name="read_orders")
-     */
+    #[Route(path: '/orders', name: 'orders')]
+    #[Route(path: '/read/orders', name: 'read_orders')]
     public function ordersAction(
         Request $request,
         SiteService $siteService,

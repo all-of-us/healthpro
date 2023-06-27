@@ -134,7 +134,10 @@
                     {% else %}
                         <p><strong>Instructions for Stool Kit</strong></p>
                     {% endif %}
-                    <div>
+                    <a role="button" class="expand-pdf" data-toggle="collapse" data-target="#aliquot_instructions" aria-expanded="true" aria-controls="aliquot_instructions">
+                        Aliquot PDF
+                    </a>
+                    <div class="collapse in" id="aliquot_instructions">
                         <div class="text-right">
                             <a class="pull-right" href="{{ path('aliquot_instructions_file', { id: order.orderType }) }}" target="_blank">
                                 <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download

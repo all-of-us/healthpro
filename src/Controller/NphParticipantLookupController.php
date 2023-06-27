@@ -23,9 +23,7 @@ class NphParticipantLookupController extends BaseController
         $this->nphParticipantSummaryService = $nphParticipantSummaryService;
     }
 
-    /**
-     * @Route("/nph/participants", name="nph_participants")
-     */
+    #[Route(path: '/nph/participants', name: 'nph_participants')]
     public function participantsAction(Request $request)
     {
         $idForm = $this->createForm(ParticipantLookupIdType::class, null, ['placeholder' => '10000000000000']);

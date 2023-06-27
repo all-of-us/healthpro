@@ -4,49 +4,30 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\WithdrawalLogRepository")
- * @ORM\Table(indexes={
- *   @ORM\Index(
- *     columns={"hpo_id"},
- *     name="hpo_id"),
- *   @ORM\Index(
- *     columns={"participant_id"},
- *     name="participant_id")
- * })
- */
+#[ORM\Table]
+#[ORM\Index(columns: ['hpo_id'], name: 'hpo_id')]
+#[ORM\Index(columns: ['participant_id'], name: 'participant_id')]
+#[ORM\Entity(repositoryClass: 'App\Repository\WithdrawalLogRepository')]
 class WithdrawalLog
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $insertTs;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $withdrawalTs;
 
-    /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $hpoId;
 
-    /**
-     * @ORM\Column(type="string", length=2000, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 2000, nullable: true)]
     private $emailNotified;
 
     public function getId(): ?int
