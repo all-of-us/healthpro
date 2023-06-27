@@ -45,7 +45,7 @@ class NphParticipantTest extends TestCase
             ],
             'no_match' => [
                 [(object)['value' => 'invalid_status']],
-                null,
+                1,
             ],
             'multiple_statuses_match' => [
                 [

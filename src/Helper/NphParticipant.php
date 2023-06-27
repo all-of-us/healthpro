@@ -91,11 +91,11 @@ class NphParticipant
         return str_replace(\App\Security\User::SITE_NPH_PREFIX, '', $site);
     }
 
-    private function getParticipantModule(): int|null
+    private function getParticipantModule(): int
     {
         $nphEnrollmentStatus = $this->rdrData->nphEnrollmentStatus ?? null;
         if ($nphEnrollmentStatus === null) {
-            return null;
+            return 1;
         }
         $moduleMap = [
             '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3,
@@ -112,6 +112,6 @@ class NphParticipant
             }
         }
 
-        return null;
+        return 1;
     }
 }
