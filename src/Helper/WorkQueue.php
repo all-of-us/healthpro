@@ -1273,6 +1273,38 @@ class WorkQueue
             ],
             'csvMethod' => 'getCsvNphStudyStatus',
         ],
+        'EmotionalHealth' => [
+            'name' => 'Emotional Health Hx and Well-being',
+            'csvNames' => [
+                'Emotional Health History and Well-being PPI Survey Complete',
+                'Emotional Health History and Well-being PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeing',
+            'sortField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
+            'rdrDateField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ],
+        'BehavioralHealth' => [
+            'name' => 'Emotional Health Hx and Well-being',
+            'csvNames' => [
+                'Behavioral Health and Personality Survey Complete',
+                'Behavioral Health and Personality Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnBehavioralHealthAndPersonality',
+            'sortField' => 'questionnaireOnBehavioralHealthAndPersonalityAuthored',
+            'rdrDateField' => 'questionnaireOnBehavioralHealthAndPersonalityAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ]
     ];
 
     public static $columns = [
@@ -1326,6 +1358,8 @@ class WorkQueue
         'HealthcareAccess',
         'SocialDeterminantsOfHealth',
         'LifeFunctioning',
+        'EmotionalHealth',
+        'BehavioralHealth',
         'CopeMay',
         'CopeJune',
         'CopeJuly',
@@ -1474,6 +1508,8 @@ class WorkQueue
         'MedicalHistory',
         'FamilyHealth',
         'HealthcareAccess',
+        'EmotionalHealth',
+        'BehavioralHealth',
         'CopeMay',
         'CopeJune',
         'CopeJuly',
@@ -1579,6 +1615,8 @@ class WorkQueue
         'questionnaireOnHealthcareAccessAuthored',
         'questionnaireOnSocialDeterminantsOfHealthAuthored',
         'questionnaireOnLifeFunctioningAuthored',
+        'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
+        'questionnaireOnBehavioralHealthAndPersonalityAuthored',
         'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJulyAuthored',
@@ -2219,6 +2257,8 @@ class WorkQueue
         'HealthcareAccess' => 'Access',
         'SocialDeterminantsOfHealth' => 'SDOH',
         'LifeFunctioning' => 'Life Functioning',
+        'EmotionalHealthHistoryAndWellBeing' => 'Emotional Health Hx',
+        'BehavioralHealthHistoryAndWellBeing' => 'Behavioral Health Hx',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
