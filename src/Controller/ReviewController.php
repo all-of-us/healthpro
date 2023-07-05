@@ -86,10 +86,8 @@ class ReviewController extends BaseController
 
         // Get MySQL date/time string in UTC
         $startDate->setTimezone(new DateTimezone('UTC'));
-        $startDate = $startDate->format('Y-m-d H:i:s');
 
         $endDate->setTimezone(new DateTimezone('UTC'));
-        $endDate = $endDate->format('Y-m-d H:i:s');
 
         $participants = $this->reviewService->getTodayParticipants($startDate, $endDate, $site);
 

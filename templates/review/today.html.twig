@@ -92,8 +92,8 @@
                     {% set incentive = participant.incentives[i] is defined ? participant.incentives[i] : '' %}
                     <td class="td-left-border text-center" data-column-type="on_site">
                         {% if incentive['created_ts'] is defined and incentive['created_ts'] is not empty %}
-                            {% set statusText = 'Incentive Received ' ~ incentive['created_ts']|date('n/j/Y g:ia', app.user.timezone) %}
-                            <span data-date-type="incentive_created_ts" data-on-site-date="{{ incentive['created_ts']|date('n/j/Y g:ia', app.user.timezone) }}">
+                            {% set statusText = 'Incentive Received ' ~ incentive['created_ts']|date('m/d/Y') %}
+                            <span data-date-type="incentive_created_ts" data-on-site-date="{{ incentive['created_ts']|date('m/d/Y') }}">
                                 <i class="fa fa-hand-holding-usd fa-lg text-success" aria-hidden="true"
                                    data-toggle="tooltip"
                                     data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
