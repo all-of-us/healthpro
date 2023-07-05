@@ -148,8 +148,11 @@ class ReviewService
         }
     }
 
-    protected function getTodayRows($startTime, $endTime, $site)
+    protected function getTodayRows($startDate, $endDate, $site)
     {
+        $startTime = $startDate->format('Y-m-d H:i:s');
+        $incentiveStartTime = $startDate->format('Y-m-d');
+        $endTime = $endDate->format('Y-m-d H:i:s');
         $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, o.type as order_type, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
             'oh.type as h_type, ' .
@@ -183,7 +186,7 @@ class ReviewService
             'null ' .
             'FROM incentive i ' .
             'WHERE i.site = :site ' .
-            'AND i.incentive_date_given >= :startTime ' .
+            'AND i.incentive_date_given >= :incentiveStartTime ' .
             'AND i.incentive_date_given < :endTime ';
         $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
             'null, ' .
@@ -197,6 +200,7 @@ class ReviewService
 
         return $this->em->getConnection()->fetchAll($query, [
             'startTime' => $startTime,
+            'incentiveStartTime' => $incentiveStartTime,
             'endTime' => $endTime,
             'site' => $site
         ]);
