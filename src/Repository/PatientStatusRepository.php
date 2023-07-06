@@ -178,6 +178,22 @@ class PatientStatusRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getOnsitePatientStatusSites($awardee)
+    {
+        $queryBuilder = $this->createQueryBuilder('ps')
+            ->select('s.name as siteName, s.siteId')
+            ->leftJoin('ps.history', 'psh')
+            ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin(Site::class, 's', Join::WITH, 'psh.site = s.siteId')
+            ->leftJoin('psh.import', 'psi')
+            ->where('ps.awardee =:awardee')
+            ->groupBy('s.name, s.siteId');
+        $queryBuilder->setParameter('awardee', $awardee);
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getOnsitePatientStatusesCount($awardee, $params): int
     {
         $queryBuilder = $this->createQueryBuilder('ps')
