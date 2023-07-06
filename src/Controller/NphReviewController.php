@@ -42,9 +42,7 @@ class NphReviewController extends BaseController
         $this->nphParticipantReviewService = $nphParticipantReviewService;
     }
 
-    /**
-     * @Route("/nph/review", name="nph_review_today")
-     */
+    #[Route(path: '/nph/review', name: 'nph_review_today')]
     public function index(Request $request): Response
     {
         $site = $this->siteService->getSiteId();
@@ -105,9 +103,7 @@ class NphReviewController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/nph/participantname/lookup", name="nph_review_participant_lookup")
-     */
+    #[Route(path: '/nph/participantname/lookup', name: 'nph_review_participant_lookup')]
     public function getParticipantName(Request $request)
     {
         $id = trim($request->query->get('id'));
@@ -128,9 +124,7 @@ class NphReviewController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/nph/review/unfinalized", name="nph_review_unfinalized")
-     */
+    #[Route(path: '/nph/review/unfinalized', name: 'nph_review_unfinalized')]
     public function unfinalizedOrders()
     {
         $site = $this->siteService->getSiteId();
@@ -156,9 +150,7 @@ class NphReviewController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/nph/review/recentlymodified", name="nph_review_recently_modified")
-     */
+    #[Route(path: '/nph/review/recentlymodified', name: 'nph_review_recently_modified')]
     public function recentlyModifiedOrders()
     {
         $site = $this->siteService->getSiteId();

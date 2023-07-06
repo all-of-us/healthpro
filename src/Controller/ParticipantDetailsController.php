@@ -48,10 +48,8 @@ class ParticipantDetailsController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/participant/{id}", name="participant")
-     * @Route("/read/participant/{id}", name="read_participant", methods={"GET"})
-     */
+    #[Route(path: '/participant/{id}', name: 'participant')]
+    #[Route(path: '/read/participant/{id}', name: 'read_participant', methods: ['GET'])]
     public function participantDetailsAction(
         $id,
         Request $request,
@@ -256,9 +254,7 @@ class ParticipantDetailsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{id}/consent/{consentType}", name="participant_consent")
-     */
+    #[Route(path: '/participant/{id}/consent/{consentType}', name: 'participant_consent')]
     public function participantConsent(
         string $id,
         string $consentType,
@@ -294,9 +290,7 @@ class ParticipantDetailsController extends BaseController
         return $response;
     }
 
-    /**
-     * @Route("/participant/{id}/incentive/{incentiveId}", name="participant_incentive", defaults={"incentiveId": null})
-     */
+    #[Route(path: '/participant/{id}/incentive/{incentiveId}', name: 'participant_incentive', defaults: ['incentiveId' => null])]
     public function participantIncentiveAction(
         $id,
         $incentiveId,
@@ -341,17 +335,13 @@ class ParticipantDetailsController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/ajax/search/giftcard-prefill", name="search_gift_card_prefill")
-     */
+    #[Route(path: '/ajax/search/giftcard-prefill', name: 'search_gift_card_prefill')]
     public function giftCardFillAction(): JsonResponse
     {
         return $this->json(Incentive::$giftCardTypes);
     }
 
-    /**
-     * @Route("/ajax/search/giftcard/{query}", name="search_giftcard")
-     */
+    #[Route(path: '/ajax/search/giftcard/{query}', name: 'search_giftcard')]
     public function giftCardAction(Request $request): JsonResponse
     {
         $query = $request->get('query');

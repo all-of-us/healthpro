@@ -82,6 +82,7 @@ class OnSiteDetailsReportingService
             $row['patientStatus'] = array_search($patientStatus['status'], PatientStatus::$onSitePatientStatus);
             $row['notes'] = $patientStatus['comments'];
             $row['importId'] = $patientStatus['importId'] ? 'Yes' : 'No';
+            $row['siteId'] = $patientStatus['siteId'];
             array_push($rows, $row);
         }
         return $rows;

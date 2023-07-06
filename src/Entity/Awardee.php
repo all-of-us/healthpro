@@ -4,23 +4,18 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Table(name="awardees")
- * @ORM\Entity(repositoryClass="App\Repository\AwardeeRepository")
- */
+#[ORM\Table(name: 'awardees')]
+#[ORM\Entity(repositoryClass: 'App\Repository\AwardeeRepository')]
 class Awardee
 {
-    /**
-     * @ORM\Id()
-     * @ORM\Column(type="string", length=20)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'string', length: 20)]
     private $id;
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: false)]
     private $name;
 
     public function getId(): ?string

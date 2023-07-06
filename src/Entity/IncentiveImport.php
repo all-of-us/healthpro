@@ -6,51 +6,33 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class IncentiveImport
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $fileName;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User")
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
     private $user;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $createdTs;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $importStatus = 0;
 
-    /**
-     * @ORM\Column(type="smallint", options={"default":0})
-     */
+    #[ORM\Column(type: 'smallint', options: ['default' => 0])]
     private $confirm = 0;
 
-    /**
-     * @ORM\OneToMany(targetEntity="IncentiveImportRow", mappedBy="import", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToMany(targetEntity: IncentiveImportRow::class, mappedBy: 'import', cascade: ['persist', 'remove'])]
     private $incentiveImportRows;
     public function __construct()
     {

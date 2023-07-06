@@ -11,9 +11,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/feature-notifications")
- */
+#[Route(path: '/admin/feature-notifications')]
 class FeatureNotificationController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -21,9 +19,7 @@ class FeatureNotificationController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="admin_feature_notifications")
-     */
+    #[Route(path: '/', name: 'admin_feature_notifications')]
     public function index()
     {
         $featureNotifications = $this->em->getRepository(FeatureNotification::class)->findAll();
@@ -33,9 +29,7 @@ class FeatureNotificationController extends BaseController
     }
 
 
-    /**
-     * @Route("/notification/{id}", name="admin_feature_notification")
-     */
+    #[Route(path: '/notification/{id}', name: 'admin_feature_notification')]
     public function edit(LoggerService $loggerService, Request $request, $id = null)
     {
         if ($id) {

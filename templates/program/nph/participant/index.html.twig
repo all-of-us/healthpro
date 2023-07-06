@@ -31,7 +31,9 @@
     <div class="page-header row participant-name">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
-            <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module 1</span>
+            {% if participant.module %}
+                <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module {{ participant.module }}</span>
+            {% endif %}
         </h2>
     </div>
     <div class="page-header row participant-information">
@@ -52,111 +54,117 @@
             </a>
         </div>
     {% endif %}
-    <div class="col-md-12" role="tabpanel">
-        <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber <= participant.module %}
-                {% if loop.first %}
-                    {% set tabActive = 'active' %}
-                {% else %}
-                    {% set tabActive = '' %}
-                {% endif %}
-                <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
-                        Module {{ moduleNumber }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="col-sm-2 participant-activity-div">
-        <ul class="nav nav-pills">
-            <li role="presentation" class="participant-activity active" ><a>Collections</a></li>
-        </ul>
-    </div>
-    <div class="col-sm-10 participant-modules">
-        {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
-            {% for moduleNumber, module in programSummaryAndOrderInfo %}
-            {% if loop.first %}
-                {% set modulePanelDisplay = '' %}
-            {% else %}
-                {% set modulePanelDisplay = 'hidden' %}
-            {% endif %}
-            <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
-                <div>
-                    <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
-                    {% if participant.module1TissueConsentStatus %}
-                        <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
+    {% if participant.module %}
+        <div class="col-md-12" role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist">
+                {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber <= participant.module %}
+                    {% if loop.first %}
+                        {% set tabActive = 'active' %}
                     {% else %}
-                        <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
+                        {% set tabActive = '' %}
                     {% endif %}
-                </div>
-                {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                    {% if VisitCode != 'sampleStatusCount' %}
-                        <div>
-                            <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
-                                 role="button" style="font-weight: bold">Visit {{ visit['visitDisplayName'] }}<span class="caret"
-                                                                                          style="float: right; margin: 9px 0;"></span></div>
-                            <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
-                                {% if participant.dob %}
-                                    <a class="btn btn-primary" role="button"
-                                       href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                        <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
-                                    </a>
-                                {% else %}
-                                    <span class="alert alert-danger no-dob-banner">
-                                        <i class="text-danger fa fa-exclamation-circle"></i>
-                                        DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
-                                    </span>
-                                {% endif %}
-                                {% set displayedOrderIDS = [] %}
-                                {% set displayedTimePointHeaders = [] %}
-                                {% for timepointCode, timepoint in visit['visitInfo'] %}
-                                    {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
-                                        {% if sampleInfo['numberSamples'] is not empty %}
-                                            {% for sampleCode, sample in sampleInfo %}
-                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] %}
-                                                    {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
-                                                        {% if timepointCode not in displayedTimePointHeaders %}
-                                                            {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
-                                                            <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
-                                                        {% endif %}
-                                                        {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
-                                                        <div class="well well-sm order-row">
-                                                            <div class="clearfix">
-                                                            <div class="col-sm-2">{{ sample[orderid]['createDate'] }}</div>
-                                                            <div class="col-sm-3"><a
-                                                                    href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
-                                                                    ID: {{ orderid }}</a></div>
-                                                            <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
-                                                            {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
-                                                            {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
-                                                            {% if not loop.first %}
-                                                                <div class="col-sm-9"></div>
-                                                            {% endif %}
-                                                            <div class="col-sm-3 float-right">({{ sampleStatusCount }}
-                                                                / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
-                                                            </div>
-                                                            {% endfor %}
-                                                                </div>
-                                                        </div>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                                {% if displayedOrderIDS is empty %}
-                                    <h4>No Orders Generated</h4>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
+                    <li role="presentation" class="participant-module {{ tabActive }}" data-moduleNumber="{{ moduleNumber }}"><a>NPH
+                            Module {{ moduleNumber }}</a></li>
                 {% endfor %}
-            </div>
-        {% endfor %}
-        {% else %}
-            <p class="alert alert-danger">
-                Biospecimen collections are not available because this participant is paired with another site.
-            </p>
-        {% endif %}
-    </div>
+            </ul>
+        </div>
+        <div class="col-sm-2 participant-activity-div">
+            <ul class="nav nav-pills">
+                <li role="presentation" class="participant-activity active" ><a>Collections</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-10 participant-modules">
+            {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
+                {% for moduleNumber, module in programSummaryAndOrderInfo %}
+                {% if loop.first %}
+                    {% set modulePanelDisplay = '' %}
+                {% else %}
+                    {% set modulePanelDisplay = 'hidden' %}
+                {% endif %}
+                <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
+                    <div>
+                        <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
+                        {% if participant.module1TissueConsentStatus %}
+                            <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
+                        {% else %}
+                            <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
+                        {% endif %}
+                    </div>
+                    {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
+                        {% if VisitCode != 'sampleStatusCount' %}
+                            <div>
+                                <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
+                                     role="button" style="font-weight: bold">Visit {{ visit['visitDisplayName'] }}<span class="caret"
+                                                                                              style="float: right; margin: 9px 0;"></span></div>
+                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
+                                    {% if participant.dob %}
+                                        <a class="btn btn-primary" role="button"
+                                           href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                            <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
+                                        </a>
+                                    {% else %}
+                                        <span class="alert alert-danger no-dob-banner">
+                                            <i class="text-danger fa fa-exclamation-circle"></i>
+                                            DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
+                                        </span>
+                                    {% endif %}
+                                    {% set displayedOrderIDS = [] %}
+                                    {% set displayedTimePointHeaders = [] %}
+                                    {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                        {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                            {% if sampleInfo['numberSamples'] is not empty %}
+                                                {% for sampleCode, sample in sampleInfo %}
+                                                    {% for orderid, numberSamples in sampleInfo['numberSamples'] %}
+                                                        {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
+                                                            {% if timepointCode not in displayedTimePointHeaders %}
+                                                                {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
+                                                                <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+                                                            {% endif %}
+                                                            {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
+                                                            <div class="well well-sm order-row">
+                                                                <div class="clearfix">
+                                                                <div class="col-sm-2">{{ sample[orderid]['createDate'] }}</div>
+                                                                <div class="col-sm-3"><a
+                                                                        href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
+                                                                        ID: {{ orderid }}</a></div>
+                                                                <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
+                                                                {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
+                                                                {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
+                                                                {% if not loop.first %}
+                                                                    <div class="col-sm-9"></div>
+                                                                {% endif %}
+                                                                <div class="col-sm-3 float-right">({{ sampleStatusCount }}
+                                                                    / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
+                                                                </div>
+                                                                {% endfor %}
+                                                                    </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% if displayedOrderIDS is empty %}
+                                        <h4>No Orders Generated</h4>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            {% else %}
+                <p class="alert alert-danger">
+                    Biospecimen collections are not available because this participant is paired with another site.
+                </p>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="col-md-12">
+            <br><p class="alert alert-danger">Participant did not consented.</p>
+        </div>
+    {% endif %}
     {% endif %}
 {% endblock %}
 {% block pagejs %}

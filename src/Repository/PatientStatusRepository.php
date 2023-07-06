@@ -131,7 +131,7 @@ class PatientStatusRepository extends ServiceEntityRepository
     public function getOnsitePatientStatuses($awardee, $params): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
-            ->select('ps.participantId, s.name as siteName, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
+            ->select('ps.participantId, s.name as siteName, s.siteId, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
             ->leftJoin('ps.history', 'psh')
             ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
             ->leftJoin(Site::class, 's', Join::WITH, 'psh.site = s.siteId')
@@ -161,6 +161,11 @@ class PatientStatusRepository extends ServiceEntityRepository
             $queryBuilder->orderBy('psh.createdTs', 'DESC');
         }
 
+        if (!empty($params['site'])) {
+            $queryBuilder->andWhere('s.siteId = :site')
+                ->setParameter('site', $params['site']);
+        }
+
         if (isset($params['start'])) {
             return $queryBuilder
                 ->getQuery()
@@ -168,6 +173,22 @@ class PatientStatusRepository extends ServiceEntityRepository
                 ->setMaxResults($params['length'])
                 ->getResult();
         }
+        return $queryBuilder
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getOnsitePatientStatusSites($awardee)
+    {
+        $queryBuilder = $this->createQueryBuilder('ps')
+            ->select('s.name as siteName, s.siteId')
+            ->leftJoin('ps.history', 'psh')
+            ->leftJoin(User::class, 'u', Join::WITH, 'psh.userId = u.id')
+            ->leftJoin(Site::class, 's', Join::WITH, 'psh.site = s.siteId')
+            ->leftJoin('psh.import', 'psi')
+            ->where('ps.awardee =:awardee')
+            ->groupBy('s.name, s.siteId');
+        $queryBuilder->setParameter('awardee', $awardee);
         return $queryBuilder
             ->getQuery()
             ->getResult();

@@ -19,7 +19,6 @@ class PatientStatusRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->em = static::$container->get(EntityManagerInterface::class);
         $this->repo = static::$container->get(PatientStatusRepository::class);
-
     }
 
     /**
@@ -34,7 +33,6 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $patientStatuses = $this->repo->getOnsitePatientStatuses('PS_AWARDEE_TEST', $params);
         $this->assertEquals($resultCount, count($patientStatuses));
         $this->assertEquals($resultParticipantId, $patientStatuses[0]['participantId']);
-
     }
 
     public function paginationDataProvider()
@@ -92,6 +90,13 @@ class PatientStatusRepositoryTest extends KernelTestCase
             ['P000000003'],
             ['P000000004']
         ];
+    }
+
+    public function testGetOnsitePatientStatusSites(): void
+    {
+        $this->createPatientStatus();
+        $sites = $this->repo->getOnsitePatientStatusSites('PS_AWARDEE_TEST');
+        $this->assertCount(1, $sites);
     }
 
     /**

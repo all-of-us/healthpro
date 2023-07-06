@@ -14,7 +14,6 @@ use App\Service\ParticipantSummaryService;
 use App\Service\ProblemNotificationService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,12 +41,13 @@ class ProblemController extends BaseController
         $this->siteService = $siteService;
     }
 
-    /**
-     * @Route("/problem/reports", name="problem_reports")
-     * IsGranted("ROLE_DV_ADMIN")
-     */
+    #[Route(path: '/problem/reports', name: 'problem_reports')]
     public function reports(Request $request, ProblemRepository $problemRepository): Response
     {
+        if (!$this->isGranted('ROLE_DV_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $problems = $problemRepository->getProblemsWithCommentsCount();
 
         return $this->render('problem/problem-reports.html.twig', [
@@ -57,12 +57,13 @@ class ProblemController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/problem/details/{problemId}", name="problem_details")
-     * IsGranted("ROLE_DV_ADMIN")
-     */
+    #[Route(path: '/problem/details/{problemId}', name: 'problem_details')]
     public function detail($problemId, Request $request, ProblemRepository $problemRepository, ProblemCommentRepository $problemCommentRepository): Response
     {
+        if (!$this->isGranted('ROLE_DV_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $problem = $problemRepository->find($problemId);
         if (!$problem) {
             throw $this->createNotFoundException('Problem report not found.');
@@ -83,10 +84,8 @@ class ProblemController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/problem", name="problem_form_new")
-     * @Route("/participant/{participantId}/problem/{problemId}", name="problem_form")
-     */
+    #[Route(path: '/participant/{participantId}/problem', name: 'problem_form_new')]
+    #[Route(path: '/participant/{participantId}/problem/{problemId}', name: 'problem_form')]
     public function problemForm(
         string $participantId,
         Request $request,
@@ -196,9 +195,7 @@ class ProblemController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/participant/{participantId}/problem/{problemId}/comment", name="problem_comment", methods={"POST"})
-     */
+    #[Route(path: '/participant/{participantId}/problem/{problemId}/comment', name: 'problem_comment', methods: ['POST'])]
     public function problemComment($participantId, $problemId, Request $request, LoggerService $loggerService, ParticipantSummaryService $participantSummaryService, ProblemRepository $problemRepository): Response
     {
         if (!$this->siteService->isDvType()) {

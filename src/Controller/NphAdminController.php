@@ -12,9 +12,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/nph/admin")
- */
+#[Route(path: '/nph/admin')]
 class NphAdminController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -22,17 +20,13 @@ class NphAdminController extends BaseController
         parent::__construct($em);
     }
 
-    /**
-     * @Route("/", name="nph_admin_home")
-     */
+    #[Route(path: '/', name: 'nph_admin_home')]
     public function index()
     {
         return $this->render('program/nph/admin/index.html.twig');
     }
 
-    /**
-     * @Route("/sites", name="nph_admin_sites")
-     */
+    #[Route(path: '/sites', name: 'nph_admin_sites')]
     public function sitesAction(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params)
     {
         $sites = $nphSiteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
@@ -43,9 +37,7 @@ class NphAdminController extends BaseController
         ]);
     }
 
-    /**
-     * @Route("/sites/site/{id}", name="nph_admin_site")
-     */
+    #[Route(path: '/sites/site/{id}', name: 'nph_admin_site')]
     public function edit(
         NphSiteRepository $nphSiteRepository,
         LoggerService $loggerService,

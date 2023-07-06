@@ -56,6 +56,7 @@ $(document).ready(function () {
             var pageDropDown = $(".page-drop-down select");
             pageDropDown.html(dropDownHtml);
             pageDropDown.val(pageInfo.page);
+            generateSiteOptions();
         }
     });
 
@@ -107,4 +108,35 @@ $(document).ready(function () {
         clearInvalidFields();
         formSelector.submit();
     });
+
+    $("#siteFilterList").on("change", "input[type=radio]", function () {
+        formSelector.submit();
+    });
+
+    $("#site_filter_reset").on("click", function () {
+        $("#siteFilterList input[type=radio]").first().prop("checked", true);
+        formSelector.submit();
+    });
+
+    function generateSiteOptions() {
+        let siteList = [];
+        let jsonData = table.ajax.json().possibleSites;
+        const urlParams = new URLSearchParams(window.location.search);
+        for (let i = 0; i < jsonData.length; i++) {
+            $("#siteFilterList").append(
+                `<li class="list-group-item radio">
+                        <label>
+                            <input type="radio" name="site" value="${jsonData[i]["siteId"]}" ${
+                    jsonData[i]["siteId"] === urlParams.get("site") ? "checked" : ""
+                }>
+                            ${jsonData[i]["siteName"]}
+                        </label>
+                    </li>`
+            );
+        }
+
+        if (urlParams.get("site") === null || urlParams.get("site") === "") {
+            $("#siteFilterList input[type=radio]").first().prop("checked", true);
+        }
+    }
 });

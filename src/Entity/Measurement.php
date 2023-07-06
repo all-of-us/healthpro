@@ -9,14 +9,9 @@ use App\Model\Measurement\Fhir;
 use Doctrine\ORM\Mapping as ORM;
 use stdClass;
 
-/**
- * @ORM\Table(name="evaluations", indexes={
- *   @ORM\Index(
- *     columns={"participant_id"},
- *     name="participant_id")
- *   })
- * @ORM\Entity(repositoryClass="App\Repository\MeasurementRepository")
- */
+#[ORM\Table(name: 'evaluations')]
+#[ORM\Index(columns: ['participant_id'], name: 'participant_id')]
+#[ORM\Entity(repositoryClass: 'App\Repository\MeasurementRepository')]
 class Measurement
 {
     public const CURRENT_VERSION = '0.3.3';
@@ -86,81 +81,51 @@ class Measurement
 
     private $schema;
 
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User")
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
     private $user;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $rdrId;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $parentId;
 
-    /**
-     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $createdTs;
 
-    /**
-     * @ORM\Column(type="datetime", options={"default": "CURRENT_TIMESTAMP"})
-     */
+    #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $updatedTs;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User")
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
     private $finalizedUser;
 
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $finalizedSite;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $finalizedTs;
 
-    /**
-     * @ORM\Column(type="string", nullable=false, length=10)
-     */
+    #[ORM\Column(type: 'string', nullable: false, length: 10)]
     private $version;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $fhirVersion;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $data;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\MeasurementHistory", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToOne(targetEntity: 'App\Entity\MeasurementHistory', cascade: ['persist', 'remove'])]
     private $history;
 
     public function getId(): ?int

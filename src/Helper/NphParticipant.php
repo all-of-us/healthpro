@@ -93,7 +93,25 @@ class NphParticipant
 
     private function getParticipantModule(): int
     {
-        //TODO:: retrieve this from RDR participant api
+        $nphEnrollmentStatus = $this->rdrData->nphEnrollmentStatus ?? null;
+        if ($nphEnrollmentStatus === null) {
+            return 1;
+        }
+        $moduleMap = [
+            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3,
+            '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2,
+            '/module1_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 1,
+        ];
+
+        foreach ($moduleMap as $pattern => $moduleNumber) {
+            foreach ($nphEnrollmentStatus as $status) {
+                $value = $status->value;
+                if (preg_match($pattern, $value)) {
+                    return $moduleNumber;
+                }
+            }
+        }
+
         return 1;
     }
 }
