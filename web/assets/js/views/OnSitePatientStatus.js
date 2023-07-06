@@ -120,22 +120,19 @@ $(document).ready(function () {
 
     function generateSiteOptions() {
         let siteList = [];
-        let jsonData = table.ajax.json().data;
+        let jsonData = table.ajax.json().possibleSites;
         const urlParams = new URLSearchParams(window.location.search);
         for (let i = 0; i < jsonData.length; i++) {
-            if (!siteList.includes(jsonData[i]["siteId"])) {
-                siteList.push(jsonData[i]["siteId"]);
-                $("#siteFilterList").append(
-                    `<li class="list-group-item radio">
+            $("#siteFilterList").append(
+                `<li class="list-group-item radio">
                         <label>
                             <input type="radio" name="site" value="${jsonData[i]["siteId"]}" ${
-                        jsonData[i]["siteId"] === urlParams.get("site") ? "checked" : ""
-                    }>
-                            ${jsonData[i]["site"]}
+                    jsonData[i]["siteId"] === urlParams.get("site") ? "checked" : ""
+                }>
+                            ${jsonData[i]["siteName"]}
                         </label>
                     </li>`
-                );
-            }
+            );
         }
 
         if (urlParams.get("site") === null || urlParams.get("site") === "") {

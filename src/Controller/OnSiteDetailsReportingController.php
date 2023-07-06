@@ -35,6 +35,7 @@ class OnSiteDetailsReportingController extends BaseController
             $ajaxData = [];
             $ajaxData['data'] = $onSiteDetailsReportingService->getPatientStatusAjaxData($patientStatuses);
             $ajaxData['recordsTotal'] = $ajaxData['recordsFiltered'] = $patientStatusRepository->getOnsitePatientStatusesCount($siteService->getSiteAwardee(), $ajaxParams);
+            $ajaxData['possibleSites'] = $patientStatusRepository->getOnsitePatientStatusSites($siteService->getSiteAwardee());
             return $this->json($ajaxData);
         }
         return $this->render('onsite/patient-status.html.twig', ['params' => $params]);
