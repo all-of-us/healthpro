@@ -83,6 +83,7 @@ $(document).ready(function () {
             let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
             aliquotTsSelector.focus();
             aliquotTsSelector.blur();
+            $(this).closest("tr").find(".aliquot-volume").focus();
         }
     });
 
