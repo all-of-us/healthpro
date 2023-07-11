@@ -96,17 +96,7 @@
                                 <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                      role="button" style="font-weight: bold">
                                     Visit {{ visit['visitDisplayName'] }}
-                                    <span class="visit-diet">
-                                        {% if visit['visitDiet'] in participant.module2DietStatus['discontinued'] %}
-                                            <span class="text-discontinue"><i class="fa fa-minus-circle"></i> Diet Discontinued</span>
-                                        {% elseif visit['visitDiet'] in participant.module2DietStatus['completed'] %}
-                                            <span class="text-success"><i class="fa fa-check"></i> Diet Completed</span>
-                                        {% elseif visit['visitDiet'] in participant.module2DietStatus['started'] %}
-                                            <span class="text-primary"><i class="fa fa-arrow-circle-left"></i> Diet Assigned</span>
-                                        {% else %}
-                                            <span class="text-danger"><i class="fa fa-times"></i> Diet Not Assigned</span>
-                                        {% endif %}
-                                    </span>
+                                    {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                     <span class="caret" style="float: right; margin: 9px 0;"></span>
                                 </div>
                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
