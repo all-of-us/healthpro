@@ -128,22 +128,11 @@ class NphParticipant
 
     private function getModuleDietStatus($nphModuleDietStatus): array
     {
-        $dietStatus = [
-            'started' => [],
-            'completed' => [],
-            'discontinued' => []
-        ];
-        $dietStatusMap = [
-            self::DIET_STARTED,
-            self::DIET_COMPLETED,
-            self::DIET_DISCONTINUED
-        ];
-
+        $dietStatus = [];
         foreach ($nphModuleDietStatus as $diet) {
             foreach ($diet['dietStatus'] as $status) {
-                $statusType = $status['status'];
-                if (in_array($statusType, $dietStatusMap)) {
-                    $dietStatus[$statusType][] = $diet['dietName'];
+                if ($status['current']) {
+                    $dietStatus[$diet['dietName']] = $status['status'];
                 }
             }
         }
