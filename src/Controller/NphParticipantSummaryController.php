@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphDlw;
 use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/nph/participant')]
-class NphParticipantSummaryController extends AbstractController
+class NphParticipantSummaryController extends BaseController
 {
     #[Route(path: '/{participantId}', name: 'nph_participant_summary')]
     public function index(
@@ -67,13 +68,16 @@ class NphParticipantSummaryController extends AbstractController
                 'site' => $participant->nphPairedSiteSuffix
             ]);
         }
+        $dlwCollection = $this->em->getRepository(NphDlw::class)->findBy(['NphParticipant' => $participantId]);
+        $dlwSummary = $nphOrderService->generateDlwSummary($dlwCollection);
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
-            'cacheEnabled' => $cacheEnabled
+            'cacheEnabled' => $cacheEnabled,
+            'dlwSummary' => $dlwSummary
         ]);
     }
 }
