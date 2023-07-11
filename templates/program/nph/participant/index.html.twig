@@ -92,6 +92,8 @@
                     </div>
                     {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                         {% if VisitCode != 'sampleStatusCount' %}
+                            {% set visitDiet = visit['visitDiet'] %}
+                            {% set participantDietStatus =  participant.module2DietStatus[visitDiet] is defined ? participant.module2DietStatus[visitDiet] : '' %}
                             <div>
                                 <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                      role="button" style="font-weight: bold">
@@ -101,10 +103,12 @@
                                 </div>
                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
                                     {% if participant.dob %}
-                                        <a class="btn btn-primary" role="button"
-                                           href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                            <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
-                                        </a>
+                                        {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
+                                            <a class="btn btn-primary" role="button"
+                                               href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
+                                            </a>
+                                        {% endif %}
                                     {% else %}
                                         <span class="alert alert-danger no-dob-banner">
                                             <i class="text-danger fa fa-exclamation-circle"></i>

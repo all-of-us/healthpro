@@ -122,7 +122,7 @@ class NphParticipant
 
     private function getModule2DietStatus(): array
     {
-        $nphModule2DietStatus = $this->rdrData->nphModule2DietStatus ? json_decode($this->rdrData->nphModule2DietStatus, true) : [];
+        $nphModule2DietStatus = isset($this->rdrData->nphModule2DietStatus) ? json_decode($this->rdrData->nphModule2DietStatus, true) : [];
         return $this->getModuleDietStatus($nphModule2DietStatus);
     }
 
