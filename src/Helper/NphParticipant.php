@@ -13,6 +13,9 @@ class NphParticipant
 {
     public const MODULE1_CONSENT_TISSUE = 'm1_consent_tissue';
     public const OPTIN_PERMIT = 'PERMIT';
+    public const DIET_STARTED = 'started';
+    public const DIET_COMPLETED = 'completed';
+    public const DIET_DISCONTINUED = 'discontinued';
     public $id;
     public $cacheTime;
     public $rdrData;
@@ -20,6 +23,7 @@ class NphParticipant
     public $nphPairedSiteSuffix;
     public $module;
     public $module1TissueConsentStatus;
+    public array $module2DietStatus;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -84,6 +88,7 @@ class NphParticipant
         }
         $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
         $this->module = $this->getParticipantModule();
+        $this->module2DietStatus = $this->getModule2DietStatus();
     }
 
     private function getSiteSuffix(string $site): string
@@ -113,5 +118,35 @@ class NphParticipant
         }
 
         return 1;
+    }
+
+    private function getModule2DietStatus(): array
+    {
+        $nphModule2DietStatus = $this->rdrData->nphModule2DietStatus ? json_decode($this->rdrData->nphModule2DietStatus, true) : [];
+        return $this->getModuleDietStatus($nphModule2DietStatus);
+    }
+
+    private function getModuleDietStatus($nphModuleDietStatus): array
+    {
+        $dietStatus = [
+            'started' => [],
+            'completed' => [],
+            'discontinued' => []
+        ];
+        $dietStatusMap = [
+            self::DIET_STARTED,
+            self::DIET_COMPLETED,
+            self::DIET_DISCONTINUED
+        ];
+
+        foreach ($nphModuleDietStatus as $diet) {
+            foreach ($diet['dietStatus'] as $status) {
+                $statusType = $status['status'];
+                if (in_array($statusType, $dietStatusMap)) {
+                    $dietStatus[$statusType][] = $diet['dietName'];
+                }
+            }
+        }
+        return $dietStatus;
     }
 }
