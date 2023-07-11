@@ -105,6 +105,24 @@
                                         DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
                                     </span>
                                 {% endif %}
+                                {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
+                                    {% if dlwSummary[moduleNumber][VisitCode] %}
+                                        <div class="dlw-collect-bg col-md-5 well well-sm right-float">
+                                            <a class="btn dlw-collect-button" role="button"
+                                               href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                Enter DLW Dosage
+                                            </a>
+                                            <span class="right-float dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                                        </div>
+
+                                    {% endif %}
+                                {% elseif moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
+                                    <a class="btn dlw-collect-button float-end" role="button" style="float: right"
+                                       href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                        Enter DLW Dosage
+                                    </a>
+                                    <span class="right-float dlw-collect-text">Not Completed</span>
+                                {% endif %}
                                 {% set displayedOrderIDS = [] %}
                                 {% set displayedTimePointHeaders = [] %}
                                 {% for timepointCode, timepoint in visit['visitInfo'] %}

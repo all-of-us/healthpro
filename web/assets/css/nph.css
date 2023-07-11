@@ -140,3 +140,19 @@ div.order-row {
 .warning-text {
     color: #df4633;
 }
+.dlw-collect-bg {
+    background-color: #fde8ca;
+}
+.dlw-collect-button {
+    background-color: #ff8813;
+    color: white;
+}
+.right-float {
+    float: right;
+}
+.dlw-collect-text {
+    margin-top: 8px;
+}
+.margin-top-30 {
+    margin-top: 30px;
+}
