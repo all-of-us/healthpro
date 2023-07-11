@@ -26,6 +26,15 @@ class Module2 extends Samples
         'PurpleDSMT' => 'DSMT'
     ];
 
+    private static array $visitDietMapper = [
+        'OrangeDiet' => 'ORANGE',
+        'OrangeDSMT' => 'ORANGE',
+        'BlueDiet' => 'BLUE',
+        'BlueDSMT' => 'BLUE',
+        'PurpleDiet' => 'PURPLE',
+        'PurpleDSMT' => 'PURPLE'
+    ];
+
     public function __construct($visit)
     {
         if (!in_array($visit, array_keys(self::$visitTypes))) {
@@ -40,5 +49,10 @@ class Module2 extends Samples
     public static function getVisitTypes(): array
     {
         return self::$visitTypes;
+    }
+
+    public static function getVisitDiet($visitType): string
+    {
+        return self::$visitDietMapper[$visitType];
     }
 }

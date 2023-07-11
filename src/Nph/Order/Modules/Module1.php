@@ -12,6 +12,10 @@ class Module1 extends Samples
         'LMT' => 'LMT'
     ];
 
+    private static array $visitDietMapper = [
+        'LMT' => 'LMT'
+    ];
+
     public function __construct($visit)
     {
         parent::__construct(self::$module, $visit);
@@ -23,5 +27,10 @@ class Module1 extends Samples
     public static function getVisitTypes(): array
     {
         return self::$visitTypes;
+    }
+
+    public static function getVisitDiet($visitType): string
+    {
+        return self::$visitDietMapper[$visitType];
     }
 }
