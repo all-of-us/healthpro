@@ -57,6 +57,10 @@ class NphOrderController extends BaseController
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
+        $visitDiet = $nphOrderService->getVisitDiet();
+        if (!isset($participant->{'module' . $module . 'DietStatus'}[$visitDiet])) {
+            throw $this->createNotFoundException('Orders cannot be generated for this diet.');
+        }
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $ordersData = $nphOrderService->getExistingOrdersData();

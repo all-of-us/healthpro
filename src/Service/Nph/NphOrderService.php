@@ -63,6 +63,11 @@ class NphOrderService
         $this->site = $this->siteService->getSiteId();
     }
 
+    public function getVisitDiet(): string
+    {
+        return $this->moduleObj->getVisitDiet($this->visit);
+    }
+
     public function getTimePointSamples(): array
     {
         return $this->moduleObj->getTimePointSamples();
