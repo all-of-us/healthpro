@@ -156,3 +156,8 @@ div.order-row {
 .margin-top-30 {
     margin-top: 30px;
 }
+.clickable {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #337ab7;
+}

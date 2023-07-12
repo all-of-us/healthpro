@@ -54,7 +54,7 @@
     {% endif %}
     <div class="col-md-12" role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber <= participant.module %}
+            {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber <= 3 %}
                 {% if loop.first %}
                     {% set tabActive = 'active' %}
                 {% else %}
@@ -117,11 +117,13 @@
 
                                     {% endif %}
                                 {% elseif moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
-                                    <a class="btn dlw-collect-button float-end" role="button" style="float: right"
+                                    <div class="dlw-collect-bg col-md-5 well well-sm right-float">
+                                    <a class="btn dlw-collect-button" role="button"
                                        href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                         Enter DLW Dosage
                                     </a>
-                                    <span class="right-float dlw-collect-text">Not Completed</span>
+                                    <span class="right-float dlw-collect-text">Not Completed </span>
+                                </div>
                                 {% endif %}
                                 {% set displayedOrderIDS = [] %}
                                 {% set displayedTimePointHeaders = [] %}
