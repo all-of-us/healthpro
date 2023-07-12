@@ -23,7 +23,9 @@ class NphParticipant
     public $nphPairedSiteSuffix;
     public $module;
     public $module1TissueConsentStatus;
+    public array $module1DietStatus;
     public array $module2DietStatus;
+    public array $module3DietStatus;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -88,7 +90,9 @@ class NphParticipant
         }
         $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
         $this->module = $this->getParticipantModule();
-        $this->module2DietStatus = $this->getModule2DietStatus();
+        $this->module1DietStatus = ['LMT' => 'started'];
+        $this->module2DietStatus = $this->getModuleDietStatus(2);
+        $this->module3DietStatus = $this->getModuleDietStatus(3);
     }
 
     private function getSiteSuffix(string $site): string
@@ -120,15 +124,11 @@ class NphParticipant
         return 1;
     }
 
-    private function getModule2DietStatus(): array
-    {
-        $nphModule2DietStatus = isset($this->rdrData->nphModule2DietStatus) ? json_decode($this->rdrData->nphModule2DietStatus, true) : [];
-        return $this->getModuleDietStatus($nphModule2DietStatus);
-    }
-
-    private function getModuleDietStatus($nphModuleDietStatus): array
+    private function getModuleDietStatus(int $module): array
     {
         $dietStatus = [];
+        $dietStatusField = 'nphModule' . $module . 'DietStatus';
+        $nphModuleDietStatus = isset($this->rdrData->{$dietStatusField}) ? json_decode($this->rdrData->{$dietStatusField}, true) : [];
         foreach ($nphModuleDietStatus as $diet) {
             foreach ($diet['dietStatus'] as $status) {
                 if ($status['current']) {
