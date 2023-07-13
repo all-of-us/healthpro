@@ -57,8 +57,7 @@ class NphOrderController extends BaseController
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
-        $visitDiet = $nphOrderService->getVisitDiet();
-        if (!isset($participant->{'module' . $module . 'DietStatus'}[$visitDiet])) {
+        if (!$nphOrderService->isDietStarted($participant->{'module' . $module . 'DietStatus'})) {
             throw $this->createNotFoundException('Orders cannot be generated for this diet.');
         }
         $timePointSamples = $nphOrderService->getTimePointSamples();
@@ -239,12 +238,14 @@ class NphOrderController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
+        $isDietStarted = $nphOrderService->isDietStarted($participant->{'module' . $order->getModule() . 'DietStatus'});
+        $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStarted);
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
-                $sample->isDisabled(), 'nphSample' => $sample, 'disableMetadataFields' =>
+                $isFormDisabled, 'nphSample' => $sample, 'disableMetadataFields' =>
                 $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
                 $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(),
                 'module' => $order->getModule()
@@ -326,6 +327,7 @@ class NphOrderController extends BaseController
             'modifyType' => $modifyType ?? '',
             'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
             'biobankView' => false,
+            'isFormDisabled' => $isFormDisabled
         ]);
     }
 

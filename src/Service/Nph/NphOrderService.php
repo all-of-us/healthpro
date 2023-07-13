@@ -9,6 +9,7 @@ use App\Entity\NphSample;
 use App\Entity\NphSite;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
+use App\Helper\NphParticipant;
 use App\Service\LoggerService;
 use App\Service\RdrApiService;
 use App\Service\SiteService;
@@ -758,6 +759,15 @@ class NphOrderService
             }
         }
         return $formErrors;
+    }
+
+    public function isDietStarted(array $moduleDietStatus): bool
+    {
+        $visitDiet = $this->getVisitDiet();
+        if (!isset($moduleDietStatus[$visitDiet])) {
+            return false;
+        }
+        return $moduleDietStatus[$visitDiet] === NphParticipant::DIET_STARTED;
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array
