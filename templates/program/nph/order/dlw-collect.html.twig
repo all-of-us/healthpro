@@ -3,7 +3,7 @@
 {% block body %}
 <div class="page-header">
     <h2>
-        <i class="fa fa-medkit" aria-hidden="true"></i>
+        DLW Dosage
         <small>
             <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}">
                 {{ participant.lastName }}, {{ participant.firstName }}
@@ -12,29 +12,40 @@
     </h2>
 </div>
     <div class="row">
-        <div class="col-md-4">
-            <div><strong>Participant ID</strong></div>
-            <div>{{ participant.id }}</div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4">
+                    <div><strong>Name</strong></div>
+                    <div>{{ participant.lastName }}, {{ participant.firstName }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div><strong>Participant ID</strong></div>
+                    <div>{{ participant.id }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div><strong>Biobank ID</strong></div>
+                    <div>{{ participant.biobankId }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div><strong>DOB</strong></div>
+                    <div>{{ participant.dob|date('n/j/Y') }}</div>
+                </div>
+                <div class="col-md-4">
+                    <div><strong>Site</strong></div>
+                    <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <div><strong>Biobank ID</strong></div>
-            <div>{{ participant.biobankId }}</div>
-        </div>
-        <div class="col-md-4">
-            <div><strong>Site</strong></div>
-            <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+        <div class="col-md-6">
+                <strong class="text-primary right-float">
+                    Module {{ module }} | Visit {{ visit }} | DLW
+                </strong>
         </div>
     </div>
     <div class="row">
 
         <div class="alert bg-light well-sm margin-top-15">
             <span class="font-bold">DLW Dosage</span>
-        </div>
-        <div class="col-sm-3 text-center">
-            <strong class="text-primary">
-                Module {{ module }} | Visit {{ visit }} | DLW
-            </strong>
-            <div><svg id="order-barcode"></svg></div>
         </div>
     </div>
     <div class="row">

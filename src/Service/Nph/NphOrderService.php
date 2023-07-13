@@ -4,6 +4,7 @@ namespace App\Service\Nph;
 
 use App\Audit\Log;
 use App\Entity\NphAliquot;
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\NphSite;

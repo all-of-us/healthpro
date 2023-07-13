@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Form\DlwType;
 use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
@@ -13,7 +15,6 @@ use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
 use App\HttpClient;
 use App\Nph\Order\Samples;
-use App\Repository\NphDlwRepository;
 use App\Service\EnvironmentService;
 use App\Service\HelpService;
 use App\Service\LoggerService;
@@ -533,17 +534,19 @@ class NphOrderController extends BaseController
             'visit' => $visit,
             'module' => $module
         ]);
+        $disabled = (bool) $dlwObject;
         $dlwForm = $this->createForm(DlwType::class, $dlwObject);
         $dlwForm->handleRequest($request);
         if ($dlwForm->isSubmitted()) {
             $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
-            $this->addFlash('success', 'DLW Sample Created');
+            $this->addFlash('success', 'Saved by ' . $this->getUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
+            $disabled = true;
         }
         return $this->render('program/nph/order/dlw-collect.html.twig', [
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
-            'disabled' => (bool)$dlwObject,
+            'disabled' => $disabled,
             'form' => $dlwForm->createView()
         ]);
     }
