@@ -73,16 +73,13 @@ class DlwType extends AbstractType
         ]);
     }
 
-    private function getNumDecimalPlaces($num): int {
-        if ((int)$num == $num)
-        {
+    private function getNumDecimalPlaces($num): int
+    {
+        if ((int) $num == $num) {
             return 0;
-        }
-        else if (! is_numeric($num))
-        {
+        } elseif (!is_numeric($num)) {
             return 0;
         }
         return strlen($num) - strrpos($num, '.') - 1;
     }
-
 }
