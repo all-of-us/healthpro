@@ -218,6 +218,10 @@ class PatientStatusRepository extends ServiceEntityRepository
                 ->setParameter('endDate', $params['endDate']->modify('+1 day'));
         }
         $queryBuilder->setParameter('awardee', $awardee);
+        if (!empty($params['site'])) {
+            $queryBuilder->andWhere('s.siteId = :site')
+                ->setParameter('site', $params['site']);
+        }
 
         return $queryBuilder
             ->getQuery()
