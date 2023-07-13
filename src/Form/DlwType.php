@@ -59,7 +59,7 @@ class DlwType extends AbstractType
                 'model_timezone' => 'UTC',
                 'label' => 'Dose Date/Time',
                 'attr' => ['class' => 'order-ts'],
-                'constrains' => new NotBlank(['message' => 'Dose date/time required.'])
+                'constraints' => new NotBlank(['message' => 'Dose date/time required.'])
             ])
             ->add('calculatedDose', null, ['attr' => ['readonly' => true], 'mapped' => false])
         ;
@@ -74,15 +74,15 @@ class DlwType extends AbstractType
     }
 
     private function getNumDecimalPlaces($num): int {
-        if ((int)$value == $value)
+        if ((int)$num == $num)
         {
             return 0;
         }
-        else if (! is_numeric($value))
+        else if (! is_numeric($num))
         {
             return 0;
         }
-        return strlen($value) - strrpos($value, '.') - 1;
+        return strlen($num) - strrpos($num, '.') - 1;
     }
 
 }
