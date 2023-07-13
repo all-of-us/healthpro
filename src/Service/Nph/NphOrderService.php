@@ -757,11 +757,20 @@ class NphOrderService
 
     public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit)
     {
-        $formData->setNphParticipantId($participantId);
-        $formData->setNphModule($module);
-        $formData->setNphTimepoint($visit);
+        $formData->setNphParticipant($participantId);
+        $formData->setModule($module);
+        $formData->setVisit($visit);
         $this->em->persist($formData);
         $this->em->flush();
+    }
+
+    public function generateDlwSummary(array $dlwRepository): array
+    {
+        $dlwSummary = [];
+        foreach ($dlwRepository as $dlw) {
+            $dlwSummary[$dlw->getModule()][$dlw->getVisit()] = $dlw->getDoseAdministered();
+        }
+        return $dlwSummary;
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array

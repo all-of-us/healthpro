@@ -13,6 +13,7 @@ use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
 use App\HttpClient;
 use App\Nph\Order\Samples;
+use App\Repository\NphDlwRepository;
 use App\Service\EnvironmentService;
 use App\Service\HelpService;
 use App\Service\LoggerService;
@@ -515,6 +516,37 @@ class NphOrderController extends BaseController
         }
     }
 
+    /**
+     * @Route("/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect", name="nph_dlw_collect")
+     */
+    public function dlwSampleCollect(
+        $participantId,
+        $module,
+        $visit,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        Request $request
+    ): Response {
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        $dlwObject = $this->em->getRepository(NphDlw::class)->findOneBy([
+            'NphParticipant' => $participantId,
+            'visit' => $visit,
+            'module' => $module
+        ]);
+        $dlwForm = $this->createForm(DlwType::class, $dlwObject);
+        $dlwForm->handleRequest($request);
+        if ($dlwForm->isSubmitted()) {
+            $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
+            $this->addFlash('success', 'DLW Sample Created');
+        }
+        return $this->render('program/nph/order/dlw-collect.html.twig', [
+            'participant' => $participant,
+            'module' => $module,
+            'visit' => $visit,
+            'disabled' => (bool)$dlwObject,
+            'form' => $dlwForm->createView()
+        ]);
+    }
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {

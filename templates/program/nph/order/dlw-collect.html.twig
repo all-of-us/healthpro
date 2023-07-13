@@ -41,29 +41,42 @@
             {{ form_start(form, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(form) }}
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     {{ form_label(form['doseBatchId'])}}
-                    {{ form_widget(form['doseBatchId'])}}
+                    <div class="input-group">
+                        <span class="input-group-addon">NPHDLW</span>
+                        {{ form_widget(form['doseBatchId'], {attr: {readonly: disabled}})}}
+                    </div>
                     {{ form_errors(form['doseBatchId'])}}
                 </div>
-                <div class="col-md-6">
-                    {{ form_label(form['actualDose']) }}
-                    {{ form_widget(form['actualDose']) }}
-                    {{ form_errors(form['actualDose']) }}
-                </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     {{ form_label(form['participantWeight'])}}
-                    {{ form_widget(form['participantWeight'])}}
+                    {{ form_widget(form['participantWeight'], {attr: {readonly: disabled}})}}
                     {{ form_errors(form['participantWeight'])}}
                 </div>
-                <div class="col-md-6">
-                    {{ form_label(form['calculatedDosage']) }}
-                    {{ form_widget(form['calculatedDosage']) }}
-                    {{ form_errors(form['calculatedDosage']) }}
+                <div class="col-md-1">
+                    <p style="margin-top: 2em; font-weight: bold">X 1.5 = </p>
+                </div>
+                <div class="col-md-4">
+                    {{ form_label(form['calculatedDose']) }}
+                    {{ form_widget(form['calculatedDose'], {attr: {readonly: disabled}}) }}
+                    {{ form_errors(form['calculatedDose']) }}
+                </div>
+            </div>
+            <div class="row margin-top-30">
+                <div class="col-md-4">
+                    {{ form_label(form['actualDose']) }}
+                    {{ form_widget(form['actualDose'], {attr: {readonly: disabled}}) }}
+                    {{ form_errors(form['actualDose']) }}
+                </div>
+                <div class="col-md-4">
+                    {{ form_label(form['doseAdministered']) }}
+                    {{ form_widget(form['doseAdministered'], {attr: {readonly: disabled}}) }}
+                    {{ form_errors(form['doseAdministered']) }}
                 </div>
             </div>
             {{ form_rest(form) }}
-            <div class="form-group">
+            <div class="form-group margin-top-15">
                 <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
                    class="btn btn-default">Exit</a>
@@ -71,5 +84,8 @@
             {{ form_end(form) }}
         </div>
     </div>
-
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-dlw') }}
+    {{ encore_entry_script_tags('nph-order') }}
 {% endblock %}
