@@ -258,12 +258,13 @@ class NphBiobankController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
+        $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $sample->isDisabled() : true;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
-                $order->getOrderType() === 'stool' ? $sample->isDisabled() : true, 'nphSample' => $sample, 'disableMetadataFields' =>
+                $isFormDisabled, 'nphSample' => $sample, 'disableMetadataFields' =>
                 $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
                 $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()
             ]
@@ -343,7 +344,8 @@ class NphBiobankController extends BaseController
             'sampleModifyForm' => isset($nphSampleModifyForm) ? $nphSampleModifyForm->createView() : '',
             'modifyType' => $modifyType ?? '',
             'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
-            'biobankView' => true
+            'biobankView' => true,
+            'isFormDisabled' => $isFormDisabled
         ]);
     }
 }

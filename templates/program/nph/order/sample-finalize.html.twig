@@ -166,6 +166,15 @@
                     </strong>
                     {% endif %}
                 </div>
+            {% else %}
+                {% set moduleDietStatus = 'module' ~ order.module ~ 'DietStatus' %}
+                {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
+                {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED') or (not biobankView and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED')) %}
+                    <div class="alert alert-warning well-sm">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        This diet has been {{ participantDietStatus}} and samples can no longer be finalized. Canceling and editing are still permissible.
+                    </div>
+                {% endif %}
             {% endif %}
             <div class="panel panel-default">
                 {% if biobankView %}
