@@ -755,6 +755,15 @@ class NphOrderService
         return $formErrors;
     }
 
+    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit)
+    {
+        $formData->setNphParticipantId($participantId);
+        $formData->setNphModule($module);
+        $formData->setNphTimepoint($visit);
+        $this->em->persist($formData);
+        $this->em->flush();
+    }
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
