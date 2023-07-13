@@ -539,7 +539,7 @@ class NphOrderController extends BaseController
         $dlwForm->handleRequest($request);
         if ($dlwForm->isSubmitted()) {
             $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
-            $this->addFlash('success', 'Saved by ' . $this->getUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
+            $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
             $disabled = true;
         }
         return $this->render('program/nph/order/dlw-collect.html.twig', [

@@ -15,32 +15,32 @@ class NphDlw
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $NphParticipant = null;
+    private string $NphParticipant = '';
 
     #[ORM\Column(length: 10)]
-    private ?string $module = null;
+    private string $module = '';
 
     #[ORM\Column(length: 50)]
-    private ?string $visit = null;
+    private string $visit = '';
 
     #[ORM\Column(length: 100)]
-    private ?string $doseBatchId = null;
+    private string $doseBatchId = '';
 
     #[ORM\Column]
-    private ?float $actualDose = null;
+    private float $actualDose = 0.0;
 
     #[ORM\Column]
-    private ?float $participantWeight = null;
+    private float $participantWeight = 0.0;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $doseAdministered = null;
+    private \DateTimeInterface $doseAdministered;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getNphParticipant(): ?string
+    public function getNphParticipant(): string
     {
         return $this->NphParticipant;
     }
@@ -52,7 +52,7 @@ class NphDlw
         return $this;
     }
 
-    public function getModule(): ?string
+    public function getModule(): string
     {
         return $this->module;
     }
@@ -64,7 +64,7 @@ class NphDlw
         return $this;
     }
 
-    public function getVisit(): ?string
+    public function getVisit(): string
     {
         return $this->visit;
     }
@@ -76,7 +76,7 @@ class NphDlw
         return $this;
     }
 
-    public function getDoseBatchId(): ?string
+    public function getDoseBatchId(): string
     {
         return $this->doseBatchId;
     }
@@ -100,7 +100,7 @@ class NphDlw
         return $this;
     }
 
-    public function getParticipantWeight(): ?float
+    public function getParticipantWeight(): float
     {
         return $this->participantWeight;
     }
@@ -112,7 +112,7 @@ class NphDlw
         return $this;
     }
 
-    public function getDoseAdministered(): ?\DateTimeInterface
+    public function getDoseAdministered(): \DateTimeInterface
     {
         return $this->doseAdministered;
     }
