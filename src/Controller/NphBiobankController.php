@@ -258,7 +258,9 @@ class NphBiobankController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $sample->isDisabled() : true;
+        $isDietStartedOrCompleted = $nphOrderService->isDietStartedOrCompleted($participant->{'module' . $order->getModule() . 'DietStatus'});
+        $isSampleDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStartedOrCompleted);
+        $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $isSampleDisabled : true;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
@@ -345,7 +347,8 @@ class NphBiobankController extends BaseController
             'modifyType' => $modifyType ?? '',
             'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
             'biobankView' => true,
-            'isFormDisabled' => $isFormDisabled
+            'isFormDisabled' => $isFormDisabled,
+            'visitDiet' => $nphOrderService->getVisitDiet()
         ]);
     }
 }

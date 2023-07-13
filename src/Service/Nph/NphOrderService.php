@@ -770,6 +770,15 @@ class NphOrderService
         return $moduleDietStatus[$visitDiet] === NphParticipant::DIET_STARTED;
     }
 
+    public function isDietStartedOrCompleted(array $moduleDietStatus): bool
+    {
+        $visitDiet = $this->getVisitDiet();
+        if (!isset($moduleDietStatus[$visitDiet])) {
+            return false;
+        }
+        return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
+    }
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
