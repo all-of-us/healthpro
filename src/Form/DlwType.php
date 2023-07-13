@@ -39,14 +39,17 @@ class DlwType extends AbstractType
                     if ($value < 0 || $value == null) {
                         $context->buildViolation('Participant weight required.')
                             ->addViolation();
+                        return false;
                     }
                     if ($value > 907) {
                         $context->buildViolation('Please verify the measurement is correct. Value should be less than 907 kg.')
                             ->addViolation();
+                        return  false;
                     }
                     if ($this->getNumDecimalPlaces($value) > 1) {
                         $context->buildViolation('Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.')
                             ->addViolation();
+                        return false;
                     }
                 }),
                 'scale' => 5,
