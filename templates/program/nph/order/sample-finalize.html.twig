@@ -149,33 +149,7 @@
             </div>
         </div>
         <div class="col-sm-7">
-            {% if sample.rdrId and sample.finalizedTs %}
-                <div class="alert alert-success well-sm">
-                    {% if biobankView %}
-                        <i class="fa fa-exclamation-circle"></i>
-                        <strong class="warning-text">
-                            Finalized
-                            by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
-                            on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
-                        </strong>
-                    {% else %}
-                    <strong>
-                        Finalized
-                        by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
-                        on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
-                    </strong>
-                    {% endif %}
-                </div>
-            {% else %}
-                {% set moduleDietStatus = 'module' ~ order.module ~ 'DietStatus' %}
-                {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
-                {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED') or (not biobankView and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED')) %}
-                    <div class="alert alert-warning well-sm">
-                        <i class="fa fa-exclamation-triangle"></i>
-                        This diet has been {{ participantDietStatus}} and samples can no longer be finalized. Canceling and editing are still permissible.
-                    </div>
-                {% endif %}
-            {% endif %}
+            {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
             <div class="panel panel-default">
                 {% if biobankView %}
                     {% include 'program/nph/order/partials/sample-finalize-participant-details-biobank.html.twig' %}
