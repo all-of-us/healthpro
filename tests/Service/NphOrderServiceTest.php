@@ -59,10 +59,11 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($this->module1Data['bloodSamples'], $this->service->getSamplesByType('blood'));
         $this->assertSame($this->module1Data['nailSamples'], $this->service->getSamplesByType('nail'));
 
-        $this->service->loadModules(2, 'OrangeDSMT', 'P0000000002', 'T20000000');
+        $this->service->loadModules(2, 'OrangeDSMT', 'P0000000001', 'T10000000');
         $this->assertSame($this->module2Data['timePointSamples'], $this->service->getTimePointSamples());
         $this->assertSame($this->module2Data['timePoints'], $this->service->getTimePoints());
         $this->assertSame($this->module2Data['samples'], $this->service->getSamples());
+        $this->assertSame('ORANGE', $this->service->getVisitDiet());
 
         $this->assertSame($this->module2Data['stoolSamples'], $this->service->getSamplesByType('stool'));
         $this->assertSame($this->module2Data['bloodSamples'], $this->service->getSamplesByType('blood'));
