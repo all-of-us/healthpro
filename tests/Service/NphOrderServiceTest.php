@@ -3,6 +3,7 @@
 namespace App\Tests\Service;
 
 use App\Entity\NphOrder;
+use App\Helper\NphParticipant;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\RdrApiService;
@@ -652,6 +653,62 @@ class NphOrderServiceTest extends ServiceTestCase
             [
                 ['stoolKit' => 'KIT-00000004', 'ST1' => '00000000003', 'ST2' => '00000000003'],
                 [['field' => 'checkAll', 'message' => 'Please enter unique Stool Tube IDs']]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dietStartedDataProvider
+     */
+    public function testIsDietStarted(array $moduleDietStatus, bool $expectedResult): void
+    {
+        $this->service->loadModules(2, 'OrangeDiet', 'P0000000010', 'T10000000');
+        $actualResult = $this->service->isDietStarted($moduleDietStatus);
+        $this->assertEquals($expectedResult, $actualResult);
+    }
+
+    public function dietStartedDataProvider(): array
+    {
+        return [
+            [
+                ['ORANGE' => NphParticipant::DIET_STARTED],
+                true,
+            ],
+            [
+                ['ORANGE' => NphParticipant::DIET_COMPLETED],
+                false,
+            ],
+            [
+                ['ORANGE' => NphParticipant::DIET_DISCONTINUED],
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dietStartedOrCompletedDataProvider
+     */
+    public function testIsDietStartedOrCompleted(array $moduleDietStatus, bool $expectedResult): void
+    {
+        $this->service->loadModules(2, 'OrangeDiet', 'P0000000010', 'T10000000');
+        $actualResult = $this->service->isDietStartedOrCompleted($moduleDietStatus);
+        $this->assertEquals($expectedResult, $actualResult);
+    }
+
+    public function dietStartedOrCompletedDataProvider(): array
+    {
+        return [
+            [
+                ['ORANGE' => NphParticipant::DIET_STARTED],
+                true,
+            ],
+            [
+                ['ORANGE' => NphParticipant::DIET_COMPLETED],
+                true,
+            ],
+            [
+                ['ORANGE' => NphParticipant::DIET_DISCONTINUED],
+                false,
             ],
         ];
     }
