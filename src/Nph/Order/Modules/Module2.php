@@ -51,7 +51,7 @@ class Module2 extends Samples
         return self::$visitTypes;
     }
 
-    public static function getVisitDiet($visitType): string
+    public static function getVisitDiet(string $visitType): string
     {
         return self::$visitDietMapper[$visitType];
     }
