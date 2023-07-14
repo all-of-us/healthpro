@@ -21,7 +21,7 @@ class Module2 extends Samples
         'OrangeDiet' => 'Diet',
         'OrangeDSMT' => 'DSMT',
         'BlueDiet' => 'Diet',
-        'BlueDSMT' => 'LMT',
+        'BlueDSMT' => 'DSMT',
         'PurpleDiet' => 'Diet',
         'PurpleDSMT' => 'DSMT'
     ];
