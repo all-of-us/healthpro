@@ -18,6 +18,7 @@ class NphOrderServiceTest extends ServiceTestCase
     protected $service;
     protected $em;
     protected $module1Data;
+    protected array $module2Data;
     protected testSetup $testSetup;
 
     public function setUp(): void
@@ -42,6 +43,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
+        // Module 2
+        $this->module2Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_2.json'), true);
     }
 
     public function testLoadModules(): void
@@ -55,6 +58,14 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($this->module1Data['stoolSamples'], $this->service->getSamplesByType('stool'));
         $this->assertSame($this->module1Data['bloodSamples'], $this->service->getSamplesByType('blood'));
         $this->assertSame($this->module1Data['nailSamples'], $this->service->getSamplesByType('nail'));
+
+        $this->service->loadModules(2, 'OrangeDSMT', 'P0000000002', 'T20000000');
+        $this->assertSame($this->module2Data['timePointSamples'], $this->service->getTimePointSamples());
+        $this->assertSame($this->module2Data['timePoints'], $this->service->getTimePoints());
+        $this->assertSame($this->module2Data['samples'], $this->service->getSamples());
+
+        $this->assertSame($this->module2Data['stoolSamples'], $this->service->getSamplesByType('stool'));
+        $this->assertSame($this->module2Data['bloodSamples'], $this->service->getSamplesByType('blood'));
     }
 
     /**
