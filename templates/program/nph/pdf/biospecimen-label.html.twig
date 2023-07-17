@@ -2,29 +2,29 @@
     <div align="left" style="width: 65%; float: left">{{ PatientName }}</div>
     <div align="left" style="float: right; width: 35%">{{ dob }}</div>
 </div>
-{% if 'DLW' in VisitType  %}
-<div style="height: 15%; font-size: 20px; margin-bottom: 5px" align="center">
-    <div align="left" style="width: 5%; float: left;">M{{ ModuleNum }}</div>
-    <div align="center" style="width: 55%; float: right">{{ TimePoint }}</div>
-    <div align="right" style="width: 35%; float: right">{{ VisitType }}</div>
+<div style="height: 40%; margin-top: 15px">
+    <div style="margin-bottom: 10px; margin-left: 25px; width: 25%; float: left">
+        <img src="var:datamatrix"/>
+    </div>
+    <div style="height: 15%; width: 45%; font-size: 20px; margin-bottom: 0; margin-left: 0; justify-content: right; float: left; margin-top: 5px">
+        <div>{{ SpecimenID }}</div>
+        <div style="font-size: 20px; font-weight: bold;">{{ SampleCode }}</div>
+    </div>
 </div>
+{% if 'DLW' in VisitType  %}
+    <div style="height: 15%; font-size: 20px; margin-bottom: 5px" align="center">
+        <div align="left" style="width: 5%; float: left;">M{{ ModuleNum }}</div>
+        <div align="center" style="width: 55%; float: right">{{ TimePoint }}</div>
+        <div align="right" style="width: 35%; float: right">{{ VisitType }}</div>
+    </div>
 {% else %}
     <div style="height: 15%; font-size: 20px; margin-bottom: 5px" align="center">
         <div align="left" style="width: 10%; float: left;">M{{ ModuleNum }}</div>
-        <div align="center" style="width: 45%; float: right">{{ TimePoint }}</div>
-        <div align="right" style="width: 45%; float: right">{{ VisitType }}</div>
+        <div align="right" style="width: 45%; float: left">{{ VisitType }}</div>
+        <div align="center" style="width: 45%; float: left">{{ TimePoint }}</div>
     </div>
 {% endif %}
-<div align="center" style="margin-bottom: 10px;">
-    <barcode style="float: left; width: 60%" code="{{ SpecimenID }}" size="2.5" height="0.55" type="I25"/>
-</div>
-<div style="height: 15%; width: 100%; font-size: 20px; margin-bottom: 5px">
-    <div align="center" >{{ SpecimenID }}</div>
-</div>
-<div style="position: absolute; left: 40px; bottom: 44px">
-    <img src="var:datamatrix"/>
-</div>
 <div>
-    <div align="left" style="font-size: 20px; height: 15%; width: 100%; float: left">Date/Time:________________</div>
+    <div align="left" style="font-size: 20px; height: 15%; width: 100%; float: left">Date/Time:__________________</div>
 </div>
-<div align="right" style="width: 100%; justify-content: right;position: absolute; font-size: 20px; font-weight: bold; left: 270px; bottom: 15px;">{{ SampleCode }}</div>
+

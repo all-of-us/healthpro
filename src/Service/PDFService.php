@@ -18,6 +18,10 @@ class PDFService
 
     public function __construct(Environment $twig)
     {
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
         $this->mpdf = new Mpdf([
             'orientation' => 'L',
             'format' => [60.96, 101.6],
@@ -25,8 +29,17 @@ class PDFService
             'margin_right' => 5,
             'margin_top' => 5,
             'margin_bottom' => 2,
-            'tempDir' => '/tmp'
-        ]);
+            'tempDir' => '/tmp',
+            'default_font' => 'notomono',
+            'fontDir' => array_merge($fontDirs, [
+                __DIR__ . '/../../web/assets/fonts',
+            ]),
+            'fontdata' => $fontData + [
+                'notomono' => [
+                    'R' => 'NotoMono-Regular.ttf',
+                ],
+                ],
+            ]);
         $this->twig = $twig;
     }
 
@@ -39,18 +52,18 @@ class PDFService
                     foreach ($sampleInfo[$sampleCode] as $sample) {
                         try {
                             $participantFullName = $participant->firstName . ' ' . $participant->lastName;
-                            if (strlen($participantFullName) > 20) {
+                            if (strlen($participantFullName) > 18) {
                                 $participantFullName = substr(
                                     $participant->firstName[0] . '. ' . $participant->lastName,
                                     0,
-                                    20
+                                    18
                                 );
                             }
                             $sampleId = $sample['sampleId'];
                             if ($sampleType === 'stool' && $stoolPrinted === false) {
                                 $sample['identifier'] = 'ST-KIT';
                                 $sampleId = $sample['orderId'];
-                                $sampleId = preg_replace('/KIT-?/', '', $sampleId);
+                                //$sampleId = preg_replace('/KIT-?/', '', $sampleId);
                                 $stoolPrinted = true;
                             } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
                                 continue;
@@ -89,7 +102,7 @@ class PDFService
     private function renderPDF(string $name, string $sampleType, ?\DateTime $DOB, string $specimenID, string $moduleNum, string $timePoint, string $sampleCode, string $VisitType, string $collectionVolume): void
     {
         $barcode = new \TCPDF2DBarcode($specimenID, 'DATAMATRIX');
-        $pngData = $barcode->getBarcodePngData(3, 3);
+        $pngData = $barcode->getBarcodePngData(5, 5);
         $this->mpdf->imageVars['datamatrix'] = $pngData;
         $this->mpdf->WriteHTML(
             $this->twig->render('program/nph/pdf/biospecimen-label.html.twig', [
