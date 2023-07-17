@@ -128,11 +128,11 @@ class NphParticipant
     {
         $dietStatus = [];
         $dietStatusField = 'nphModule' . $module . 'DietStatus';
-        $nphModuleDietStatus = isset($this->rdrData->{$dietStatusField}) ? json_decode($this->rdrData->{$dietStatusField}, true) : [];
+        $nphModuleDietStatus = $this->rdrData->{$dietStatusField} ?? [];
         foreach ($nphModuleDietStatus as $diet) {
-            foreach ($diet['dietStatus'] as $status) {
-                if ($status['current']) {
-                    $dietStatus[$diet['dietName']] = $status['status'];
+            foreach ($diet->dietStatus as $status) {
+                if ($status->current) {
+                    $dietStatus[$diet->dietName] = $status->status;
                 }
             }
         }

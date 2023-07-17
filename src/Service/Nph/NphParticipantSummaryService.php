@@ -138,6 +138,22 @@ class NphParticipantSummaryService
                             nphEnrollmentStatus {
                                 time
                                 value
+                            },
+                            nphModule2DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphModule3DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
                             }
                         }
                     }
@@ -270,6 +286,22 @@ class NphParticipantSummaryService
                                 time
                                 value
                                 optIn
+                            },
+                            nphModule2DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphModule3DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
                             }
                         }
                     }
