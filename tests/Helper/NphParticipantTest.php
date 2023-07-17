@@ -74,86 +74,83 @@ class NphParticipantTest extends TestCase
     {
         return [
             'Completed Diet Status' => [
-                'dietStatusData' =>
-                    '[
-                        {
-                            "dietName": "ORANGE",
-                            "dietStatus": [
-                            {
-                                "current": false,
-                                "status": "started",
-                                "time": "2023-01-01 12:01:00"
-                            }
-                          ]
-                        },
-                        {
-                            "dietName": "ORANGE",
-                            "dietStatus": [
-                            {
-                                "current": true,
-                                "status": "completed",
-                                "time": "2023-01-01 12:01:00"
-                            }
-                          ]
-                        }
-                    ]',
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => true,
+                                'status' => 'completed',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
                 'module' => 2,
                 'expected' => ['ORANGE' => 'completed']
             ],
             'Discontinued Diet Status' => [
-                'dietStatusData' =>
-                    '[
-                        {
-                            "dietName": "ORANGE",
-                            "dietStatus": [
-                            {
-                                "current": false,
-                                "status": "started",
-                                "time": "2023-01-01 12:01:00"
-                            }
-                          ]
-                        },
-                        {
-                            "dietName": "ORANGE",
-                            "dietStatus": [
-                            {
-                                "current": false,
-                                "status": "completed",
-                                "time": "2023-01-01 12:01:00"
-                            }
-                          ]
-                        },
-                        {
-                            "dietName": "ORANGE",
-                            "dietStatus": [
-                            {
-                                "current": true,
-                                "status": "discontinued",
-                                "time": "2023-01-01 12:01:00"
-                            }
-                          ]
-                        }
-                    ]',
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'completed',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => true,
+                                'status' => 'discontinued',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
                 'module' => 2,
                 'expected' => ['ORANGE' => 'discontinued']
             ],
             'Started Diet Status' => [
-                'dietStatusData' =>
-                    '[
-                        {
-                            "dietName": "ORANGE",
-                            "dietStatus": [
-                            {
-                                "current": true,
-                                "status": "started",
-                                "time": "2023-01-01 12:01:00"
-                            }
-                          ]
-                        }
-                    ]',
-                'module' => 3,
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => true,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
+                'module' => 2,
                 'expected' => ['ORANGE' => 'started']
-            ]
+            ],
         ];
     }
 }
