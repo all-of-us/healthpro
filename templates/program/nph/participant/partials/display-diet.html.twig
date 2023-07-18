@@ -1,0 +1,13 @@
+{% if moduleNumber in [2, 3] %}
+<span class="visit-diet">
+    {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED') %}
+        <span class="text-discontinue"><i class="fa fa-minus-circle"></i> Diet Discontinued</span>
+    {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED') %}
+        <span class="text-success"><i class="fa fa-check"></i> Diet Completed</span>
+    {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
+        <span class="text-primary"><i class="fa fa-arrow-circle-left"></i> Diet Assigned</span>
+    {% else %}
+        <span class="text-danger"><i class="fa fa-times"></i> Diet Not Assigned</span>
+    {% endif %}
+</span>
+{% endif %}

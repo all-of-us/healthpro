@@ -56,4 +56,101 @@ class NphParticipantTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider moduleDietStatusProvider
+     */
+    public function testGetModuleDietStatus($nphModuleDietStatus, $module, $expected)
+    {
+        $nphModuleDietStatusField = "nphModule{$module}DietStatus";
+        $participant = new NphParticipant((object)[
+            $nphModuleDietStatusField => $nphModuleDietStatus
+        ]);
+        $moduleDietStatusField = "module{$module}DietStatus";
+        $this->assertEquals($expected, $participant->{$moduleDietStatusField});
+    }
+
+    public function moduleDietStatusProvider(): array
+    {
+        return [
+            'Completed Diet Status' => [
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => true,
+                                'status' => 'completed',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
+                'module' => 2,
+                'expected' => ['ORANGE' => 'completed']
+            ],
+            'Discontinued Diet Status' => [
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'completed',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => true,
+                                'status' => 'discontinued',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
+                'module' => 2,
+                'expected' => ['ORANGE' => 'discontinued']
+            ],
+            'Started Diet Status' => [
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => true,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
+                'module' => 2,
+                'expected' => ['ORANGE' => 'started']
+            ],
+        ];
+    }
 }

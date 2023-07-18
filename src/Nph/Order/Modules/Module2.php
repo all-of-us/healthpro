@@ -21,9 +21,18 @@ class Module2 extends Samples
         'OrangeDiet' => 'Diet',
         'OrangeDSMT' => 'DSMT',
         'BlueDiet' => 'Diet',
-        'BlueDSMT' => 'LMT',
+        'BlueDSMT' => 'DSMT',
         'PurpleDiet' => 'Diet',
         'PurpleDSMT' => 'DSMT'
+    ];
+
+    private static array $visitDietMapper = [
+        'OrangeDiet' => 'ORANGE',
+        'OrangeDSMT' => 'ORANGE',
+        'BlueDiet' => 'BLUE',
+        'BlueDSMT' => 'BLUE',
+        'PurpleDiet' => 'PURPLE',
+        'PurpleDSMT' => 'PURPLE'
     ];
 
     public function __construct($visit)
@@ -40,5 +49,10 @@ class Module2 extends Samples
     public static function getVisitTypes(): array
     {
         return self::$visitTypes;
+    }
+
+    public static function getVisitDiet(string $visitType): string
+    {
+        return self::$visitDietMapper[$visitType];
     }
 }
