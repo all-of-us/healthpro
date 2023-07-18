@@ -766,13 +766,14 @@ class NphOrderService
         return $formErrors;
     }
 
-    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit)
+    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit): NphDlw
     {
         $formData->setNphParticipant($participantId);
         $formData->setModule($module);
         $formData->setVisit($visit);
         $this->em->persist($formData);
         $this->em->flush();
+        return $formData;
     }
 
     public function generateDlwSummary(array $dlwRepository): array
