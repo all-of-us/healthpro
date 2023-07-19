@@ -4,6 +4,8 @@
         <span class="text-discontinue"><i class="fa fa-minus-circle"></i> Diet Discontinued</span>
     {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED') %}
         <span class="text-success"><i class="fa fa-check"></i> Diet Completed</span>
+    {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_INCOMPLETE') %}
+        <span class="text-discontinue"><i class="fa fa-stop-circle"></i> Diet Incomplete</span>
     {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
         <span class="text-primary"><i class="fa fa-arrow-circle-left"></i> Diet Assigned</span>
     {% else %}
