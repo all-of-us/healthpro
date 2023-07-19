@@ -700,6 +700,38 @@ class WorkQueue
             'visible' => false,
             'group' => 'surveys'
         ],
+        'EmotionalHealth' => [
+            'name' => 'Emotional Health Hx and Well-being',
+            'csvNames' => [
+                'Emotional Health History and Well-being PPI Survey Complete',
+                'Emotional Health History and Well-being PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeing',
+            'sortField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
+            'rdrDateField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ],
+        'BehavioralHealth' => [
+            'name' => 'Behavioral Health and Personality”',
+            'csvNames' => [
+                'Behavioral Health and Personality Survey Complete',
+                'Behavioral Health and Personality Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnBehavioralHealthAndPersonality',
+            'sortField' => 'questionnaireOnBehavioralHealthAndPersonalityAuthored',
+            'rdrDateField' => 'questionnaireOnBehavioralHealthAndPersonalityAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ],
         'CopeMay' => [
             'name' => 'COPE May',
             'csvNames' => [
@@ -1272,38 +1304,6 @@ class WorkQueue
                 'consentForNphModule1Authored' => 'NPH Module 1 Consent Date',
             ],
             'csvMethod' => 'getCsvNphStudyStatus',
-        ],
-        'EmotionalHealth' => [
-            'name' => 'Emotional Health Hx and Well-being',
-            'csvNames' => [
-                'Emotional Health History and Well-being PPI Survey Complete',
-                'Emotional Health History and Well-being PPI Survey Completion Date'
-            ],
-            'rdrField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeing',
-            'sortField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
-            'rdrDateField' => 'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
-            'method' => 'displaySurveyStatus',
-            'params' => 3,
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'visible' => false,
-            'group' => 'surveys'
-        ],
-        'BehavioralHealth' => [
-            'name' => 'Emotional Health Hx and Well-being',
-            'csvNames' => [
-                'Behavioral Health and Personality Survey Complete',
-                'Behavioral Health and Personality Survey Completion Date'
-            ],
-            'rdrField' => 'questionnaireOnBehavioralHealthAndPersonality',
-            'sortField' => 'questionnaireOnBehavioralHealthAndPersonalityAuthored',
-            'rdrDateField' => 'questionnaireOnBehavioralHealthAndPersonalityAuthored',
-            'method' => 'displaySurveyStatus',
-            'params' => 3,
-            'htmlClass' => 'text-center',
-            'toggleColumn' => true,
-            'visible' => false,
-            'group' => 'surveys'
         ]
     ];
 
@@ -2257,8 +2257,8 @@ class WorkQueue
         'HealthcareAccess' => 'Access',
         'SocialDeterminantsOfHealth' => 'SDOH',
         'LifeFunctioning' => 'Life Functioning',
-        'EmotionalHealthHistoryAndWellBeing' => 'Emotional Health Hx',
-        'BehavioralHealthHistoryAndWellBeing' => 'Behavioral Health Hx',
+        'EmotionalHealthHistoryAndWellBeing' => 'Emotional Health Hx and Well-being',
+        'BehavioralHealthAndPersonality' => 'Behavioral Health and Personality',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
