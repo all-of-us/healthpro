@@ -82,14 +82,9 @@ class NphParticipantTest extends TestCase
                                 'current' => false,
                                 'status' => 'started',
                                 'time' => '2023-01-01 12:01:00'
-                            ]
-                        ]
-                    ],
-                    (object) [
-                        'dietName' => 'ORANGE',
-                        'dietStatus' => [
+                            ],
                             (object) [
-                                'current' => true,
+                                'current' => false,
                                 'status' => 'completed',
                                 'time' => '2023-01-01 12:01:00'
                             ]
@@ -102,7 +97,7 @@ class NphParticipantTest extends TestCase
             'Discontinued Diet Status' => [
                 'dietStatusData' => [
                     (object) [
-                        'dietName' => 'ORANGE',
+                        'dietName' => 'BLUE',
                         'dietStatus' => [
                             (object) [
                                 'current' => false,
@@ -112,7 +107,7 @@ class NphParticipantTest extends TestCase
                         ]
                     ],
                     (object) [
-                        'dietName' => 'ORANGE',
+                        'dietName' => 'PURPLE',
                         'dietStatus' => [
                             (object) [
                                 'current' => false,
@@ -133,7 +128,7 @@ class NphParticipantTest extends TestCase
                     ]
                 ],
                 'module' => 2,
-                'expected' => ['ORANGE' => 'discontinued']
+                'expected' => ['BLUE' => 'started', 'PURPLE' => 'completed', 'ORANGE' => 'discontinued']
             ],
             'Started Diet Status' => [
                 'dietStatusData' => [
@@ -150,6 +145,42 @@ class NphParticipantTest extends TestCase
                 ],
                 'module' => 2,
                 'expected' => ['ORANGE' => 'started']
+            ],
+            'Incomplete Diet Status' => [
+                'dietStatusData' => [
+                    (object) [
+                        'dietName' => 'BLUE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ],
+                    (object) [
+                        'dietName' => 'ORANGE',
+                        'dietStatus' => [
+                            (object) [
+                                'current' => false,
+                                'status' => 'started',
+                                'time' => '2023-01-01 12:01:00'
+                            ],
+                            (object) [
+                                'current' => false,
+                                'status' => 'discontinued',
+                                'time' => '2023-01-01 12:01:00'
+                            ],
+                            (object) [
+                                'current' => false,
+                                'status' => 'continued',
+                                'time' => '2023-01-01 12:01:00'
+                            ]
+                        ]
+                    ]
+                ],
+                'module' => 2,
+                'expected' => ['BLUE' => 'started', 'ORANGE' => 'incomplete']
             ],
         ];
     }
