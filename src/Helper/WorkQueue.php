@@ -717,7 +717,7 @@ class WorkQueue
             'group' => 'surveys'
         ],
         'BehavioralHealth' => [
-            'name' => 'Behavioral Health and Personality”',
+            'name' => 'Behavioral Health and Personality',
             'csvNames' => [
                 'Behavioral Health and Personality Survey Complete',
                 'Behavioral Health and Personality Survey Completion Date'
