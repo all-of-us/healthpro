@@ -9,6 +9,7 @@ use App\Entity\NphSample;
 use App\Entity\NphSite;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
+use App\Helper\NphParticipant;
 use App\Service\LoggerService;
 use App\Service\RdrApiService;
 use App\Service\SiteService;
@@ -61,6 +62,11 @@ class NphOrderService
 
         $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
         $this->site = $this->siteService->getSiteId();
+    }
+
+    public function getVisitDiet(): string
+    {
+        return $this->moduleObj->getVisitDiet($this->visit);
     }
 
     public function getTimePointSamples(): array
@@ -630,7 +636,7 @@ class NphOrderService
         $createdTs->setTimezone(new \DateTimeZone('UTC'));
         $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
         $obj->module = $order->getModule();
-        $obj->visitType = $order->getVisitType();
+        $obj->visitType = $this->getVisitTypes()[$order->getVisitType()];
         // Handle RDR specific timepoint needs
         if ($this->getRdrTimePoints() && isset($this->getRdrTimePoints()[$order->getTimepoint()])) {
             $rdrTimePoint = $this->getRdrTimePoints()[$order->getTimepoint()];
@@ -753,6 +759,24 @@ class NphOrderService
             }
         }
         return $formErrors;
+    }
+
+    public function isDietStarted(array $moduleDietStatus): bool
+    {
+        $visitDiet = $this->getVisitDiet();
+        if (!isset($moduleDietStatus[$visitDiet])) {
+            return false;
+        }
+        return $moduleDietStatus[$visitDiet] === NphParticipant::DIET_STARTED;
+    }
+
+    public function isDietStartedOrCompleted(array $moduleDietStatus): bool
+    {
+        $visitDiet = $this->getVisitDiet();
+        if (!isset($moduleDietStatus[$visitDiet])) {
+            return false;
+        }
+        return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array

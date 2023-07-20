@@ -13,6 +13,10 @@ class NphParticipant
 {
     public const MODULE1_CONSENT_TISSUE = 'm1_consent_tissue';
     public const OPTIN_PERMIT = 'PERMIT';
+    public const DIET_STARTED = 'started';
+    public const DIET_COMPLETED = 'completed';
+    public const DIET_DISCONTINUED = 'discontinued';
+    public const DIET_CONTINUED = 'continued';
     public $id;
     public $cacheTime;
     public $rdrData;
@@ -20,6 +24,9 @@ class NphParticipant
     public $nphPairedSiteSuffix;
     public $module;
     public $module1TissueConsentStatus;
+    public array $module1DietStatus;
+    public array $module2DietStatus;
+    public array $module3DietStatus;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -84,6 +91,9 @@ class NphParticipant
         }
         $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
         $this->module = $this->getParticipantModule();
+        $this->module1DietStatus = ['LMT' => 'started'];
+        $this->module2DietStatus = $this->getModuleDietStatus(2);
+        $this->module3DietStatus = $this->getModuleDietStatus(3);
     }
 
     private function getSiteSuffix(string $site): string
@@ -113,5 +123,26 @@ class NphParticipant
         }
 
         return 1;
+    }
+
+    private function getModuleDietStatus(int $module): array
+    {
+        $dietStatus = [];
+        $dietStatusField = 'nphModule' . $module . 'DietStatus';
+        $nphModuleDietStatus = $this->rdrData->{$dietStatusField} ?? [];
+        foreach ($nphModuleDietStatus as $diet) {
+            $dietStatuses = array_column($diet->dietStatus, 'status');
+            if (in_array(self::DIET_COMPLETED, $dietStatuses)) {
+                $dietStatus[$diet->dietName] = self::DIET_COMPLETED;
+            } elseif (in_array(self::DIET_DISCONTINUED, $dietStatuses) && !in_array(self::DIET_CONTINUED, $dietStatuses)) {
+                $dietStatus[$diet->dietName] = self::DIET_DISCONTINUED;
+            } elseif (in_array(self::DIET_CONTINUED, $dietStatuses) && !in_array(self::DIET_DISCONTINUED, $dietStatuses)) {
+                // setting this to started as continued status is not yet defined
+                $dietStatus[$diet->dietName] = self::DIET_STARTED;
+            } elseif (in_array(self::DIET_STARTED, $dietStatuses)) {
+                $dietStatus[$diet->dietName] = self::DIET_STARTED;
+            }
+        }
+        return $dietStatus;
     }
 }

@@ -92,16 +92,31 @@
                     </div>
                     {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                         {% if VisitCode != 'sampleStatusCount' %}
+                            {% set visitDiet = visit['visitDiet'] %}
+                            {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietStatus' %}
+                            {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
                             <div>
                                 <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
-                                     role="button" style="font-weight: bold">Visit {{ visit['visitDisplayName'] }}<span class="caret"
-                                                                                              style="float: right; margin: 9px 0;"></span></div>
+                                     role="button" style="font-weight: bold">
+                                    Visit {{ visit['visitDisplayName'] }}
+                                    {% include 'program/nph/participant/partials/display-diet.html.twig' %}
+                                    <span class="caret" style="float: right; margin: 9px 0;"></span>
+                                </div>
                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
                                     {% if participant.dob %}
-                                        <a class="btn btn-primary" role="button"
-                                           href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                            <span class="glyphicon glyphicon-plus-sign"></span> Generate Orders and Print Labels
-                                        </a>
+                                        <br>
+                                        {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
+                                            <a class="btn btn-primary" role="button"
+                                               href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                <i class="glyphicon glyphicon-plus-sign"></i> Generate Orders and Print Labels
+                                            </a>
+                                        {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED') %}
+                                            This diet has been discontinued. New orders cannot be generated for this diet. Canceling and editing are still permissible.
+                                        {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED') %}
+                                            This diet has been completed and orders can no longer be generated. Cancelling and editing are still permissible.
+                                        {% else %}
+                                            This diet is not yet assigned to the participant. Orders cannot be generated until the diet is assigned.
+                                        {% endif %}
                                     {% else %}
                                         <span class="alert alert-danger no-dob-banner">
                                             <i class="text-danger fa fa-exclamation-circle"></i>
@@ -145,7 +160,7 @@
                                             {% endif %}
                                         {% endfor %}
                                     {% endfor %}
-                                    {% if displayedOrderIDS is empty %}
+                                    {% if displayedOrderIDS is empty and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
                                         <h4>No Orders Generated</h4>
                                     {% endif %}
                                 </div>
