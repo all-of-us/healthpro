@@ -27,6 +27,7 @@ class NphParticipant
     public array $module1DietStatus;
     public array $module2DietStatus;
     public array $module3DietStatus;
+    public string $biobankId = '';
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -88,6 +89,9 @@ class NphParticipant
         // Get NPH site suffix
         if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
             $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
+        }
+        if (!empty($participant->biobankId)) {
+            $this->biobankId = $participant->biobankId;
         }
         $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
         $this->module = $this->getParticipantModule();
