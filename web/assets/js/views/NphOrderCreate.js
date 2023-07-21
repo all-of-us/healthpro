@@ -109,7 +109,10 @@ $(document).ready(function () {
 
     disableEnableStoolFields();
 
-    $(".stool-checkbox, #timepoint_preLMT, #nph_order_checkAll").on("change", disableEnableStoolFields);
+    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on(
+        "change",
+        disableEnableStoolFields
+    );
 
     if (
         $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length

@@ -138,6 +138,22 @@ class NphParticipantSummaryService
                             nphEnrollmentStatus {
                                 time
                                 value
+                            },
+                            nphModule2DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphModule3DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
                             }
                         }
                     }
@@ -270,6 +286,43 @@ class NphParticipantSummaryService
                                 time
                                 value
                                 optIn
+                            },
+                            nphModule2DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphModule3DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphBiospecimens {
+                                orderID
+                                visitID
+                                studyID
+                                specimenCode
+                                timepointID
+                                volume
+                                volumeUOM
+                                orderedSampleStatus
+                                clientID
+                                collectionDateUTC
+                                processingDateUTC
+                                finalizedDateUTC
+                                sampleID
+                                kitID
+                                biobankStatus {
+                                    limsID
+                                    biobankModified
+                                    status
+                                }
                             }
                         }
                     }

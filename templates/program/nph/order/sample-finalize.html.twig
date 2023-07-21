@@ -149,24 +149,7 @@
             </div>
         </div>
         <div class="col-sm-7">
-            {% if sample.rdrId and sample.finalizedTs %}
-                <div class="alert alert-success well-sm">
-                    {% if biobankView %}
-                        <i class="fa fa-exclamation-circle"></i>
-                        <strong class="warning-text">
-                            Finalized
-                            by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
-                            on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
-                        </strong>
-                    {% else %}
-                    <strong>
-                        Finalized
-                        by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
-                        on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
-                    </strong>
-                    {% endif %}
-                </div>
-            {% endif %}
+            {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
             <div class="panel panel-default">
                 {% if biobankView %}
                     {% include 'program/nph/order/partials/sample-finalize-participant-details-biobank.html.twig' %}
@@ -317,7 +300,7 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or sample.disabled %}
+                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or isFormDisabled %}
                                     disabled
                                 {% endif %}
                                 formnovalidate>
