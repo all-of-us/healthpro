@@ -20,14 +20,21 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 
 class DefaultController extends BaseController
 {
+    private const HPO_HOME_ROUTE = 'home';
+
     public function __construct(EntityManagerInterface $em)
     {
         parent::__construct($em);
     }
 
     #[Route(path: '/', name: 'home')]
+    #[Route(path: '/nph', name: 'nph_home')]
     public function index(Request $request, ContextTemplateService $contextTemplate)
     {
+        $program = $request->getSession()->get('program');
+        if ($program === User::PROGRAM_NPH && $request->attributes->get('_route') === self::HPO_HOME_ROUTE) {
+            return $this->redirectToRoute('nph_home');
+        }
         $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
         if ($checkTimeZone && !$this->getSecurityUser()->getTimezone()) {
             $this->addFlash('error', 'Please select your current time zone');
@@ -43,7 +50,7 @@ class DefaultController extends BaseController
         } elseif ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('admin_home');
         } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_NPH_BIOBANK')) {
-            if ($request->getSession()->get('program') === User::PROGRAM_NPH) {
+            if ($program === User::PROGRAM_NPH) {
                 return $this->redirectToRoute('nph_biobank_home');
             }
             return $this->redirectToRoute('biobank_home');
@@ -71,7 +78,7 @@ class DefaultController extends BaseController
                 $request->getSession()->set('program', $program);
                 $siteService->resetUserRoles();
                 if ($siteService->autoSwitchSite()) {
-                    return $this->redirectToRoute('home');
+                    return $this->redirectToRoute($this->getHomeRedirectRoute($request->getSession()->get('program')));
                 }
                 return $this->redirectToRoute('site_select');
             }
@@ -92,7 +99,7 @@ class DefaultController extends BaseController
                 return $this->render('site-select.html.twig', ['siteEmail' => $siteId]);
             }
             if ($siteService->switchSite($siteId)) {
-                return $this->redirectToRoute('home');
+                return $this->redirectToRoute($this->getHomeRedirectRoute($request->getSession()->get('program')));
             }
             throw $this->createAccessDeniedException();
         }
@@ -200,5 +207,10 @@ class DefaultController extends BaseController
             $this->em->persist($featureNotificationUserMap);
             $this->em->flush();
         }
+    }
+
+    private function getHomeRedirectRoute(string $program): string
+    {
+        return $program === User::PROGRAM_NPH ? 'nph_home' : 'home';
     }
 }
