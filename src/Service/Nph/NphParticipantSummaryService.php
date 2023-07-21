@@ -23,7 +23,7 @@ class NphParticipantSummaryService
         $this->params = $params;
     }
 
-    public function getParticipantById(string $participantId, string $refresh = null)
+    public function getParticipantById(string $participantId, string $refresh = null): NphParticipant|false
     {
         if (!preg_match('/^\w+$/', $participantId)) {
             return false;

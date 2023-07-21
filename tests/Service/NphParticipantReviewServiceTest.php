@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Helper\NphParticipant;
 use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
 
@@ -12,7 +13,7 @@ class NphParticipantReviewServiceTest extends ServiceTestCase
     public function setup(): void
     {
         $mockNphParticipantSummaryService = $this->createMock(NphParticipantSummaryService::class);
-        $mockNphParticipantSummaryService->method('getParticipantById')->willReturn([]);
+        $mockNphParticipantSummaryService->method('getParticipantById')->willReturn(new NphParticipant());
         $this->service = new NphParticipantReviewService($mockNphParticipantSummaryService);
     }
 
@@ -66,7 +67,7 @@ class NphParticipantReviewServiceTest extends ServiceTestCase
                             'createdTs' => ['2023-05-30 10:00:00', '2023-05-30 11:00:00'],
                             'collectedTs' => ['2023-05-30 10:30:00', '2023-05-30 11:30:00'],
                             'finalizedTs' => ['2023-05-30 11:00:00', '2023-05-30 12:00:00'],
-                            'participant' => []
+                            'participant' => new NphParticipant()
                         ],
                         [
                             'participantId' => 2,
@@ -78,7 +79,7 @@ class NphParticipantReviewServiceTest extends ServiceTestCase
                             'createdTs' => ['2023-05-30 12:00:00'],
                             'collectedTs' => ['2023-05-30 12:30:00'],
                             'finalizedTs' => ['2023-05-30 13:00:00'],
-                            'participant' => []
+                            'participant' => new NphParticipant()
                         ],
                     ],
                     'rowCounts' => [
