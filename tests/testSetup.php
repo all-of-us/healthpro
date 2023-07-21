@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\User;
@@ -9,6 +10,7 @@ use App\Helper\NphParticipant;
 use App\Helper\Participant;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
+use Google\Type\Date;
 
 class testSetup
 {
@@ -99,5 +101,48 @@ class testSetup
             'lastName' => $lastName,
         ]);
         return new Participant((object) $participantInfo);
+    }
+
+    public function generateNphDlw(
+        string $participantId = null,
+        string $module = null,
+        string $visit = null,
+        \DateTime $doseAdministered = null,
+        float $actualDose = null,
+        float $participantWeight = null,
+        string $doseBatchId = null): NphDlw
+    {
+        if ($participantId === null) {
+            $participantId = 'P0000000001';
+        }
+        if ($module === null) {
+            $module = '3';
+        }
+        if ($visit === null) {
+            $visit = 'OrangeDiet';
+        }
+        if ($doseAdministered === null) {
+            $doseAdministered = new \DateTime('2000-01-01');
+        }
+        if ($participantWeight === null) {
+            $participantWeight = 100.2;
+        }
+        if ($doseBatchId === null) {
+            $doseBatchId = 'B0000000001';
+        }
+        if ($actualDose === null) {
+            $actualDose = 15.5;
+        }
+        $dlw = new NphDlw();
+        $dlw->setDoseAdministered($doseAdministered);
+        $dlw->setModule($module);
+        $dlw->setVisit($visit);
+        $dlw->setParticipantWeight($participantWeight);
+        $dlw->setActualDose($actualDose);
+        $dlw->setNphParticipant($participantId);
+        $dlw->setDoseBatchId($doseBatchId);
+        $this->em->persist($dlw);
+        $this->em->flush();
+        return $dlw;
     }
 }

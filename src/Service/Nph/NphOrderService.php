@@ -4,6 +4,7 @@ namespace App\Service\Nph;
 
 use App\Audit\Log;
 use App\Entity\NphAliquot;
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\NphSite;
@@ -650,6 +651,16 @@ class NphOrderService
         $samplesMetadata = $this->getSamplesMetadata($order);
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
+        if ($order->getModule() === '3' && $order->getVisitType() === $order::TYPE_DLW) {
+            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitType' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
+            $obj['dlwdose'] = [
+              'batchid' => $dlwInfo->getBatchId(),
+              'participantweight' => $dlwInfo->getParticipantWeight(),
+              'dose' => $dlwInfo->getActualDose(),
+              'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
+                'dosetime' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
+            ];
+        }
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
         }
@@ -777,6 +788,25 @@ class NphOrderService
             return false;
         }
         return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
+    }
+
+    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit): NphDlw
+    {
+        $formData->setNphParticipant($participantId);
+        $formData->setModule($module);
+        $formData->setVisit($visit);
+        $this->em->persist($formData);
+        $this->em->flush();
+        return $formData;
+    }
+
+    public function generateDlwSummary(array $dlwRepository): array
+    {
+        $dlwSummary = [];
+        foreach ($dlwRepository as $dlw) {
+            $dlwSummary[$dlw->getModule()][$dlw->getVisit()] = $dlw->getDoseAdministered();
+        }
+        return $dlwSummary;
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array

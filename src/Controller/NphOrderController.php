@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Form\DlwType;
 use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
@@ -522,6 +524,39 @@ class NphOrderController extends BaseController
         }
     }
 
+    /**
+     * @Route("/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect", name="nph_dlw_collect")
+     */
+    public function dlwSampleCollect(
+        $participantId,
+        $module,
+        $visit,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        Request $request
+    ): Response {
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        $dlwObject = $this->em->getRepository(NphDlw::class)->findOneBy([
+            'NphParticipant' => $participantId,
+            'visit' => $visit,
+            'module' => $module
+        ]);
+        $disabled = (bool) $dlwObject;
+        $dlwForm = $this->createForm(DlwType::class, $dlwObject);
+        $dlwForm->handleRequest($request);
+        if ($dlwForm->isSubmitted()) {
+            $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
+            $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
+            $disabled = true;
+        }
+        return $this->render('program/nph/order/dlw-collect.html.twig', [
+            'participant' => $participant,
+            'module' => $module,
+            'visit' => $visit,
+            'disabled' => $disabled,
+            'form' => $dlwForm->createView()
+        ]);
+    }
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {

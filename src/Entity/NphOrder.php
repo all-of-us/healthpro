@@ -17,6 +17,7 @@ class NphOrder
     public const TYPE_STOOL = 'stool';
     public const TYPE_URINE = 'urine';
     public const TYPE_NAIL = 'nail';
+    public const TYPE_DLW = 'urineDlw';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
