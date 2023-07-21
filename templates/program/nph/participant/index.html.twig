@@ -57,8 +57,8 @@
     {% if participant.module %}
         <div class="col-md-12" role="tabpanel">
             <ul class="nav nav-tabs" role="tablist">
-                {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber <= participant.module %}
-                    {% if loop.first %}
+                {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                    {% if participant.module == moduleNumber%}
                         {% set tabActive = 'active' %}
                     {% else %}
                         {% set tabActive = '' %}
@@ -75,8 +75,8 @@
         </div>
         <div class="col-sm-10 participant-modules">
             {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
-                {% for moduleNumber, module in programSummaryAndOrderInfo %}
-                {% if loop.first %}
+                {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                {% if participant.module == moduleNumber or participant.module %}
                     {% set modulePanelDisplay = '' %}
                 {% else %}
                     {% set modulePanelDisplay = 'hidden' %}
