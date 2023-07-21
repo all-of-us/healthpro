@@ -114,6 +114,8 @@
                                             This diet has been discontinued. New orders cannot be generated for this diet. Canceling and editing are still permissible.
                                         {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED') %}
                                             This diet has been completed and orders can no longer be generated. Cancelling and editing are still permissible.
+                                        {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_INCOMPLETE') %}
+                                            This participant has not completed this diet but has moved on to the next step. New orders cannot be generated for this diet. Canceling and editing are still permissible.
                                         {% else %}
                                             This diet is not yet assigned to the participant. Orders cannot be generated until the diet is assigned.
                                         {% endif %}
