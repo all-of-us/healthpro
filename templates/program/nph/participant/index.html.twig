@@ -104,7 +104,7 @@
                                     {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                     <span class="caret" style="float: right; margin: 9px 0;"></span>
                                 </div>
-                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
+                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} in {% endif %}">
                                     {% if participant.dob %}
                                         <br>
                                         {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
