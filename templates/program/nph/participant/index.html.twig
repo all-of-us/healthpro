@@ -76,7 +76,7 @@
         <div class="col-sm-10 participant-modules">
             {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
                 {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
-                {% if participant.module == moduleNumber or participant.module %}
+                {% if participant.module == moduleNumber %}
                     {% set modulePanelDisplay = '' %}
                 {% else %}
                     {% set modulePanelDisplay = 'hidden' %}
