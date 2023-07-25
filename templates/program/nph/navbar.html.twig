@@ -9,7 +9,7 @@
             </button>
             <ul class="nav navbar-nav">
                 <li class="dropdown">
-                    <a class="navbar-brand dropdown-toggle" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
+                    <a class="navbar-brand dropdown-toggle" href="{{ path('nph_home') }}" {% if siteInfo.canSwitchProgram %}
                         data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
                         <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
                     </a>
@@ -26,7 +26,7 @@
                 </li>
                 {% if not showRoleDropdown %}
                     <li>
-                        <a class="navbar-brand " href="{{ path('home') }}">
+                        <a class="navbar-brand " href="{{ path('nph_home') }}">
                             NPH
                             {% if isTraining %}
                                 <div class="navbar-brand-subtitle single-subtitle">training</div>
@@ -38,7 +38,7 @@
             {% if showRoleDropdown %}
                 <ul class="nav navbar-nav navbar-nav-role">
                     <li class="dropdown">
-                        <a class="navbar-brand dropdown-toggle" href="{# TODO: Path to NPH Home #}" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <a class="navbar-brand dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             NPH
                             {% if currentRoleNav and roleNavs[currentRoleNav] is defined %}
                                 <span class="navbar-brand-role">{{ roleNavs[currentRoleNav].title }}</span>
@@ -51,7 +51,7 @@
                         <ul class="dropdown-menu dropdown-menu-role">
                             {% if is_granted('ROLE_NPH_USER') %}
                                 <li>
-                                    <a href="{{path('home')}}">
+                                    <a href="{{path('nph_home')}}">
                                         <i class="fas fa-arrow-circle-right"></i>
                                         {% if not currentRoleNav %}
                                             <strong>Nutrition for Precision Health</strong>
@@ -146,7 +146,7 @@
                     {% endif %}
 
                     <li class="dropdown">
-                        <a href="{# TODO: NPH Settings #}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ path('settings') }}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
                             <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
