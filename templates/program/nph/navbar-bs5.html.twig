@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-inverse{% if isTraining %} navbar-warning-below{% else %} navbar {% endif %}">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ path('home') }}" {% if siteInfo.canSwitchProgram %}
+        <a class="navbar-brand" href="{{ path('nph_home') }}" {% if siteInfo.canSwitchProgram %}
             data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
             <img src="{{ asset('img/nph-logo-transparent-background.svg') }}" alt="NPH Logo"/>
         </a>
@@ -34,7 +34,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         {% if is_granted('ROLE_NPH_USER') %}
                             <li>
-                                <a href="{{path('home')}}" class="dropdown-item">
+                                <a href="{{path('nph_home')}}" class="dropdown-item">
                                     <i class="fas fa-arrow-circle-right"></i>
                                     {% if not currentRoleNav %}
                                         <strong>Nutrition for Precision Health</strong>
