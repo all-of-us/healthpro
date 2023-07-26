@@ -19,6 +19,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
+                {% if not showRoleDropdown %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('nph_home') }}">
+                            NPH
+                            {% if isTraining %}
+                                <div class="navbar-brand-subtitle single-subtitle">training</div>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
                 {% if showRoleDropdown %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown">
