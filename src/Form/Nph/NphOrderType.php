@@ -128,7 +128,7 @@ class NphOrderType extends AbstractType
     {
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
-                if ($timePoint === NphSample::PRE_LMT) {
+                if (in_array($timePoint, NphSample::STOOL_TIMEPOINTS)) {
                     foreach ($samples as $sample) {
                         if ($sample === NphSample::SAMPLE_STOOL) {
                             return true;
