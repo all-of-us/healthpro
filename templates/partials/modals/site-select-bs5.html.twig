@@ -26,7 +26,8 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token('siteSelect') }}"/>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    {% if app.user.sites|length > 0 or app.user.awardees|length > 0 %}
+                    {% set userSites = app.session.get('program') == constant('App\\Entity\\User::PROGRAM_NPH') ? app.user.nphSites : app.user.sites %}
+                    {% if userSites|length > 0 or app.user.awardees|length > 0 %}
                         <button type="submit" class="btn btn-primary">Switch</button>
                     {% endif %}
                 </div>
