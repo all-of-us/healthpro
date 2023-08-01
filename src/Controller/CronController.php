@@ -206,7 +206,7 @@ class CronController extends BaseController
     }
 
     #[Route(path: '/biobank-nightly-report', name: 'cron_biobank_nightly_report')]
-    public function biobonkNightlyReport(BiobankNightlyReportService $biobankNightlyReportService)
+    public function biobonkNightlyReport(BiobankNightlyReportService $biobankNightlyReportService): Response
     {
         $biobankNightlyReportService->generateNightlyReport();
         return $this->json(['success' => true]);

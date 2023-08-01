@@ -25,6 +25,21 @@ class BiobankNightlyReportService
 
     public function generateNightlyReport(): void
     {
+        $nightlyReportCsvData = $this->getNightlyReportCsvData();
+
+        // Create a temporary stream to hold the CSV data
+        $tempStream = fopen('php://temp', 'w');
+        foreach ($nightlyReportCsvData as $row) {
+            fputcsv($tempStream, $row);
+        }
+
+        // Upload the CSV data to the bucket
+        $fileName = 'nightly-report-' . date('Ymd-His') . '.csv';
+        $this->gcsBucketService->uploadFile(self::BUCKET_NAME, $tempStream, $fileName);
+    }
+
+    private function getNightlyReportCsvData(): array
+    {
         $orders = $this->em->getRepository(Order::class)->getNightlyReportOrders();
         $csvData = [];
         $csvData[] = ['BiobankID', 'Order Number', 'WEB Order Number', 'ML #', 'Collection DateTime', 'Finalization DateTime'];
@@ -36,15 +51,6 @@ class BiobankNightlyReportService
             $csvData[] = [$order['biobankId'], $order['orderId'], $order['rdrId'], $order['mayolinkAccount'],
                 $collectedTs->format('Y-m-d H:i:s'), $finalizedTs->format('Y-m-d H:i:s')];
         }
-
-        // Create a temporary stream to hold the CSV data
-        $tempStream = fopen('php://temp', 'w');
-        foreach ($csvData as $row) {
-            fputcsv($tempStream, $row);
-        }
-
-        // Upload the CSV data to the bucket
-        $fileName = 'nightly-report-' . date('Ymd-His') . '.csv';
-        $this->gcsBucketService->uploadFile(self::BUCKET_NAME, $tempStream, $fileName);
+        return $csvData;
     }
 }
