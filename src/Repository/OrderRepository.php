@@ -279,7 +279,7 @@ class OrderRepository extends ServiceEntityRepository
     public function getNightlyReportOrders(): array
     {
         return $this->createQueryBuilder('o')
-            ->select('o.biobankId', 'o.orderId', 'o.rdrId', 'o.finalizedTs', 's.mayolinkAccount')
+            ->select('o.biobankId', 'o.orderId', 'o.rdrId', 'o.collectedTs', 'o.finalizedTs', 's.mayolinkAccount')
             ->leftJoin(Site::class, 's', Join::WITH, 'o.finalizedSite = s.siteId')
             ->where('o.rdrId is not null')
             ->andWhere('o.finalizedTs >= :finalizedTs')

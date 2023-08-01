@@ -25,10 +25,10 @@ class BiobankNightlyReportService
     {
         $orders = $this->em->getRepository(Order::class)->getNightlyReportOrders();
         $csvData = [];
-        $csvData[] = ['BiobankID', 'Order Number', 'WEB Order Number', 'ML #', 'Collection DateTime'];
+        $csvData[] = ['BiobankID', 'Order Number', 'WEB Order Number', 'ML #', 'Collection DateTime', 'Finalization DateTime'];
         foreach ($orders as $order) {
             $csvData[] = [$order['biobankId'], $order['orderId'], $order['rdrId'], $order['mayolinkAccount'],
-                $order['finalizedTs']->format('Y-m-d H:i:s')];
+                $order['collectedTs']->format('Y-m-d H:i:s'), $order['finalizedTs']->format('Y-m-d H:i:s')];
         }
 
         // Create a temporary stream to hold the CSV data
