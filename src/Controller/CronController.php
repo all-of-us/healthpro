@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
+use App\Service\BiobankNightlyReportService;
 use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
@@ -201,6 +202,13 @@ class CronController extends BaseController
     public function repairHfhParticipantsAction(HFHRepairService $HFHRepairService)
     {
         $HFHRepairService->repairHFHParticipants();
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/biobank-nightly-report', name: 'cron_biobank_nightly_report')]
+    public function biobonkNightlyReport(BiobankNightlyReportService $biobankNightlyReportService)
+    {
+        $biobankNightlyReportService->generateNightlyReport();
         return $this->json(['success' => true]);
     }
 }

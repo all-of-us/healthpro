@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Google\Cloud\Storage\StorageClient;
 use Google\Cloud\Storage\StorageObject;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -35,5 +36,13 @@ class GcsBucketService
         $bucket = $this->storageClient->bucket($bucket);
         $object = $bucket->object($path);
         return $object;
+    }
+
+    public function uploadFile(string $bucket, mixed $stream, string $destinationBlobName): void
+    {
+        $bucket = $this->storageClient->bucket($bucket);
+        $bucket->upload($stream, [
+            'name' => $destinationBlobName
+        ]);
     }
 }
