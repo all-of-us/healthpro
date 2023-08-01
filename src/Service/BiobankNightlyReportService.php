@@ -9,17 +9,21 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BiobankNightlyReportService
 {
-    private const BUCKET_NAME = 'aou-biobank-nightly-report';
+    private const BUCKET_NAME_STABLE = 'healthpro-stable-biobank-nightly-report';
+    private const BUCKET_NAME_PROD = 'healthpro-prod-biobank-nightly-report';
 
     protected EntityManagerInterface $em;
     protected GcsBucketService $gcsBucketService;
+    protected EnvironmentService $env;
 
     public function __construct(
         EntityManagerInterface $em,
-        GcsBucketService $gcsBucketService
+        GcsBucketService $gcsBucketService,
+        EnvironmentService $env
     ) {
         $this->em = $em;
         $this->gcsBucketService = $gcsBucketService;
+        $this->env = $env;
 
     }
 
@@ -35,7 +39,8 @@ class BiobankNightlyReportService
 
         // Upload the CSV data to the bucket
         $fileName = 'nightly-report-' . date('Ymd-His') . '.csv';
-        $this->gcsBucketService->uploadFile(self::BUCKET_NAME, $tempStream, $fileName);
+        $bucketName = $this->env->isProd() ? self::BUCKET_NAME_PROD : self::BUCKET_NAME_STABLE;
+        $this->gcsBucketService->uploadFile($bucketName, $tempStream, $fileName);
     }
 
     private function getNightlyReportCsvData(): array
