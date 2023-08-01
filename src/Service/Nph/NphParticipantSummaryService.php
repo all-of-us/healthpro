@@ -302,27 +302,6 @@ class NphParticipantSummaryService
                                     status
                                     current
                                 }
-                            },
-                            nphBiospecimens {
-                                orderID
-                                visitID
-                                studyID
-                                specimenCode
-                                timepointID
-                                volume
-                                volumeUOM
-                                orderedSampleStatus
-                                clientID
-                                collectionDateUTC
-                                processingDateUTC
-                                finalizedDateUTC
-                                sampleID
-                                kitID
-                                biobankStatus {
-                                    limsID
-                                    biobankModified
-                                    status
-                                }
                             }
                         }
                     }
