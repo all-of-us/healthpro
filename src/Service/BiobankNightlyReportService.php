@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BiobankNightlyReportService
 {
+    private const BUCKET_NAME = 'aou-biobank-nightly-report';
+
     protected EntityManagerInterface $em;
     protected GcsBucketService $gcsBucketService;
 
@@ -27,8 +29,12 @@ class BiobankNightlyReportService
         $csvData = [];
         $csvData[] = ['BiobankID', 'Order Number', 'WEB Order Number', 'ML #', 'Collection DateTime', 'Finalization DateTime'];
         foreach ($orders as $order) {
+            $collectedTs = $order['collectedTs'];
+            $collectedTs->setTimezone(new \DateTimeZone('America/Chicago'));
+            $finalizedTs = $order['finalizedTs'];
+            $finalizedTs->setTimezone(new \DateTimeZone('America/Chicago'));
             $csvData[] = [$order['biobankId'], $order['orderId'], $order['rdrId'], $order['mayolinkAccount'],
-                $order['collectedTs']->format('Y-m-d H:i:s'), $order['finalizedTs']->format('Y-m-d H:i:s')];
+                $collectedTs->format('Y-m-d H:i:s'), $finalizedTs->format('Y-m-d H:i:s')];
         }
 
         // Create a temporary stream to hold the CSV data
@@ -39,6 +45,6 @@ class BiobankNightlyReportService
 
         // Upload the CSV data to the bucket
         $fileName = 'nightly-report-' . date('Ymd-His') . '.csv';
-        $this->gcsBucketService->uploadFile('aou-biobank-nightly-report', $tempStream, $fileName);
+        $this->gcsBucketService->uploadFile(self::BUCKET_NAME, $tempStream, $fileName);
     }
 }
