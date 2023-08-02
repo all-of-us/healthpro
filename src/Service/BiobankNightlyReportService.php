@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use App\Audit\Log;
-use App\Entity\IdVerification;
 use App\Entity\Order;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -24,7 +22,6 @@ class BiobankNightlyReportService
         $this->em = $em;
         $this->gcsBucketService = $gcsBucketService;
         $this->env = $env;
-
     }
 
     public function generateNightlyReport(): void
