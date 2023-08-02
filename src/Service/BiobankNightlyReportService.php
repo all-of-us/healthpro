@@ -9,8 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BiobankNightlyReportService
 {
-    private const BUCKET_NAME_STABLE = 'healthpro-stable-biobank-nightly-report';
-    private const BUCKET_NAME_PROD = 'healthpro-prod-biobank-nightly-report';
+    public const BUCKET_NAME_STABLE = 'healthpro-stable-biobank-nightly-report';
+    public const BUCKET_NAME_PROD = 'healthpro-prod-biobank-nightly-report';
 
     protected EntityManagerInterface $em;
     protected GcsBucketService $gcsBucketService;
