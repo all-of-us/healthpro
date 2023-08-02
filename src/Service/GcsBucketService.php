@@ -4,14 +4,13 @@ namespace App\Service;
 
 use Google\Cloud\Storage\StorageClient;
 use Google\Cloud\Storage\StorageObject;
-use Psr\Http\Message\StreamInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class GcsBucketService
 {
-    protected $storageClient;
-    protected $config = [];
+    protected StorageClient $storageClient;
+    protected array $config = [];
 
     public function __construct(EnvironmentService $environment, KernelInterface $appKernel, ParameterBagInterface $params)
     {
@@ -38,11 +37,17 @@ class GcsBucketService
         return $object;
     }
 
-    public function uploadFile(string $bucket, mixed $stream, string $destinationBlobName): void
+    public function uploadFile(string $bucket, mixed $stream, string $destinationBlobName): bool
     {
-        $bucket = $this->storageClient->bucket($bucket);
-        $bucket->upload($stream, [
-            'name' => $destinationBlobName
-        ]);
+        try {
+            $bucket = $this->storageClient->bucket($bucket);
+            $bucket->upload($stream, [
+                'name' => $destinationBlobName
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return false;
+        }
     }
 }
