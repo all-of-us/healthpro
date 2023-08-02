@@ -13,6 +13,7 @@ class JiraService
     private const SOURCE_PROJECT_KEY = 'HPRO';
     private const DESTINATION_PROJECT_KEY = 'PD';
     private const DESTINATION_ISSUE_TYPE_ID = '10000'; // 10000 = story
+    private const DESTINATION_ISSUE_TYPE_RELEASE = '10102'; // 10102 = release
 
     private $client;
 
@@ -66,7 +67,7 @@ class JiraService
                 'key' => self::DESTINATION_PROJECT_KEY
             ],
             'issuetype' => [
-                'id' => self::DESTINATION_ISSUE_TYPE_ID
+                'id' => self::DESTINATION_ISSUE_TYPE_RELEASE
             ]
         ];
         if ($componentId) {
