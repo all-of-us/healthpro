@@ -23,7 +23,7 @@ class NphParticipantSummaryService
         $this->params = $params;
     }
 
-    public function getParticipantById(string $participantId, string $refresh = null)
+    public function getParticipantById(string $participantId, string $refresh = null): NphParticipant|false
     {
         if (!preg_match('/^\w+$/', $participantId)) {
             return false;
@@ -208,6 +208,27 @@ class NphParticipantSummaryService
                             nphDateOfBirth
                             biobankId
                             nphPairedSite
+                            nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule2DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphModule3DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            }
                         }
                     }
                 }
@@ -301,27 +322,6 @@ class NphParticipantSummaryService
                                     time
                                     status
                                     current
-                                }
-                            },
-                            nphBiospecimens {
-                                orderID
-                                visitID
-                                studyID
-                                specimenCode
-                                timepointID
-                                volume
-                                volumeUOM
-                                orderedSampleStatus
-                                clientID
-                                collectionDateUTC
-                                processingDateUTC
-                                finalizedDateUTC
-                                sampleID
-                                kitID
-                                biobankStatus {
-                                    limsID
-                                    biobankModified
-                                    status
                                 }
                             }
                         }

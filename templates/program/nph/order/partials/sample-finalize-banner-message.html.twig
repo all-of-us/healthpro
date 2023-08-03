@@ -18,12 +18,18 @@
 {% else %}
     {% set moduleDietStatus = 'module' ~ order.module ~ 'DietStatus' %}
     {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
-    {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED') or (not biobankView and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED')) %}
-        <div class="alert alert-warning well-sm">
-            <i class="fa fa-exclamation-triangle"></i>
-            <strong>
-                This diet has been {{ participantDietStatus}} and samples can no longer be finalized. Canceling and editing are still permissible.
-            </strong>
-        </div>
+    {% if (participantDietStatus in [constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED'), constant('App\\Helper\\NphParticipant::DIET_INCOMPLETE')]) or (not biobankView and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED')) %}
+        {% if not biobankView or (biobankView and order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) %}
+            <div class="alert alert-warning well-sm">
+                <i class="fa fa-exclamation-triangle"></i>
+                <strong>
+                    {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_INCOMPLETE') %}
+                        This participant has not completed this diet but has moved on to the next step. Samples can no longer be finalized. Canceling and editing are still permissible.
+                    {% else %}
+                        This diet has been {{ participantDietStatus}} and samples can no longer be finalized. Canceling and editing are still permissible.
+                    {% endif %}
+                </strong>
+            </div>
+        {% endif %}
     {% endif %}
 {% endif %}

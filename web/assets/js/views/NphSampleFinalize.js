@@ -36,7 +36,8 @@ $(document).ready(function () {
                 "</td>" +
                 "<td style='position: relative'><span style='position: absolute; bottom: 7px; left: 0;'>" +
                 aliquotUnits +
-                "</span></td>"
+                '</span><i class="fa fa-eraser text-danger clear-aliquot-widget"\' +\n' +
+                '                \' style="position: absolute; bottom: 10px; left: 33px; font-size: 22px" role="button"></i></td>'
         );
 
         $(".aliquots-row-" + aliquotId)
@@ -82,6 +83,7 @@ $(document).ready(function () {
         if (regex.test(barcode)) {
             let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
             aliquotTsSelector.focus();
+            aliquotTsSelector.data("DateTimePicker").date(new Date());
             aliquotTsSelector.blur();
             $(this).closest("tr").find(".aliquot-volume").focus();
         }

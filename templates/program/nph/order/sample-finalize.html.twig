@@ -1,8 +1,8 @@
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
-{% macro module3SalivaGlycerolDisplay(aliquotCode, aliquot, form, i, disabled) %}
-    {{ _self.displayAliquotRow(aliquotCode, aliquot, form, i, disabled, true) }}
+{% macro module3SalivaGlycerolDisplay(aliquotCode, aliquot, sample, form, i, disabled) %}
+    {{ _self.displayAliquotRow(aliquotCode, aliquot, sample, form, i, disabled, true) }}
     {% if aliquot['collectMetadata'] is defined and aliquot['collectMetadata'] == true %}
         {% for metadataField in aliquot['metadataFields'] %}
             <tr>
@@ -32,7 +32,7 @@
         {% endfor %}
     {% endif %}
 {% endmacro %}
-{% macro displayAliquotRow(aliquotCode, aliquot, form, i, disabled, skipVolume = false) %}
+{% macro displayAliquotRow(aliquotCode, aliquot, sample, form, i, disabled, skipVolume = false) %}
     {% set aliquotId = form[aliquotCode][i].vars.data %}
     <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
         <td {% if not form[aliquotCode][i].vars.valid %}
@@ -47,7 +47,7 @@
             {{ form_errors(form[aliquotCode ~ 'AliquotTs'][i]) }}
         </td>
         {% if not skipVolume %}
-            {{ _self.displayVolumeTD(aliquotCode, aliquot, form, i) }}
+            {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i) }}
         {% endif %}
         {% if form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
             <td class="row">
@@ -61,7 +61,7 @@
         {% endif %}
     </tr>
 {% endmacro %}
-{% macro displayVolumeTD(aliquotCode, aliquot, form, i, style) %}
+{% macro displayVolumeTD(aliquotCode, aliquot, sample, form, i, style) %}
 <td {% if not form[aliquotCode ~ 'Volume'][i].vars.valid %}
     class="has-error"{% endif %}>
     {{ form_widget(form[aliquotCode ~ 'Volume'][i]) }}
@@ -72,7 +72,11 @@
 </td>
 <td class="aliquot volume nopadleft" style="position: relative">
     <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
+    {% if not sample.disabled %}
+        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
+    {% endif %}
 </td>
+
 {% endmacro %}
 {% block body %}
     {% set order = sample.nphOrder %}
@@ -264,9 +268,9 @@
                                                 </tr>
                                             {% endif %}
                                             {% if aliquotCode == 'SALIVAA2' %}
-                                                {{ _self.module3SalivaGlycerolDisplay(aliquotCode, aliquot, sampleFinalizeForm, i, disabled) }}
+                                                {{ _self.module3SalivaGlycerolDisplay(aliquotCode, aliquot, sample, sampleFinalizeForm, i, disabled) }}
                                             {% else %}
-                                                {{ _self.displayAliquotRow(aliquotCode, aliquot, sampleFinalizeForm, i, disabled) }}
+                                                {{ _self.displayAliquotRow(aliquotCode, aliquot, sample, sampleFinalizeForm, i, disabled) }}
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}

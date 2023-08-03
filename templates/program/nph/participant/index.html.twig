@@ -57,8 +57,8 @@
     {% if participant.module %}
         <div class="col-md-12" role="tabpanel">
             <ul class="nav nav-tabs" role="tablist">
-                {% for moduleNumber, module in programSummaryAndOrderInfo if moduleNumber <= participant.module %}
-                    {% if loop.first %}
+                {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                    {% if participant.module == moduleNumber%}
                         {% set tabActive = 'active' %}
                     {% else %}
                         {% set tabActive = '' %}
@@ -75,8 +75,8 @@
         </div>
         <div class="col-sm-10 participant-modules">
             {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
-                {% for moduleNumber, module in programSummaryAndOrderInfo %}
-                {% if loop.first %}
+                {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                {% if participant.module == moduleNumber %}
                     {% set modulePanelDisplay = '' %}
                 {% else %}
                     {% set modulePanelDisplay = 'hidden' %}
@@ -84,10 +84,12 @@
                 <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                     <div>
                         <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
-                        {% if participant.module1TissueConsentStatus %}
-                            <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
-                        {% else %}
-                            <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
+                        {% if moduleNumber == 1 %}
+                            {% if participant.module1TissueConsentStatus %}
+                                <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
+                            {% else %}
+                                <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
+                            {% endif %}
                         {% endif %}
                     </div>
                     {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
@@ -102,7 +104,7 @@
                                     {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                     <span class="caret" style="float: right; margin: 9px 0;"></span>
                                 </div>
-                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
+                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} in {% endif %}">
                                     {% if participant.dob %}
                                         <br>
                                         {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
@@ -114,6 +116,8 @@
                                             This diet has been discontinued. New orders cannot be generated for this diet. Canceling and editing are still permissible.
                                         {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED') %}
                                             This diet has been completed and orders can no longer be generated. Cancelling and editing are still permissible.
+                                        {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_INCOMPLETE') %}
+                                            This participant has not completed this diet but has moved on to the next step. New orders cannot be generated for this diet. Canceling and editing are still permissible.
                                         {% else %}
                                             This diet is not yet assigned to the participant. Orders cannot be generated until the diet is assigned.
                                         {% endif %}
@@ -123,6 +127,26 @@
                                             DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
                                         </span>
                                     {% endif %}
+                                {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
+                                    {% if dlwSummary[moduleNumber][VisitCode] %}
+                                        <div class="dlw-collect-bg col-md-5 well well-sm right-float">
+                                            <a class="btn dlw-collect-button" role="button"
+                                               href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                Enter DLW Dosage
+                                            </a>
+                                            <span class="right-float dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                                        </div>
+
+                                    {% endif %}
+                                {% elseif moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
+                                    <div class="dlw-collect-bg col-md-5 well well-sm right-float">
+                                    <a class="btn dlw-collect-button" role="button"
+                                       href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                        Enter DLW Dosage
+                                    </a>
+                                    <span class="right-float dlw-collect-text">Not Completed </span>
+                                </div>
+                                {% endif %}
                                     {% set displayedOrderIDS = [] %}
                                     {% set displayedTimePointHeaders = [] %}
                                     {% for timepointCode, timepoint in visit['visitInfo'] %}

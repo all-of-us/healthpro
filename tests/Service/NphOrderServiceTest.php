@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Helper\NphParticipant;
 use App\Service\LoggerService;
@@ -723,6 +724,41 @@ class NphOrderServiceTest extends ServiceTestCase
                 false,
             ],
         ];
+    }
+
+    public function saveDlwCollectionDataProvider(): array
+    {
+        return [
+            ['P0000000003', 1, 'OrangeDiet', [
+                'actualDose' => 100.0,
+                'participantWeight' => 120.1,
+                'collectionDate' => new \DateTime(),
+            ]],
+        ];
+    }
+
+    /**
+     * @dataProvider saveDlwCollectionDataProvider
+     */
+    public function testSaveDlwCollection($participantId, $module, $visit, $formData)
+    {
+        $dlw = new NphDlw();
+        $dlw->setActualDose($formData['actualDose']);
+        $dlw->setParticipantWeight($formData['participantWeight']);
+        $dlw->setDoseAdministered($formData['collectionDate']);
+        $savedDlw = $this->service->saveDlwCollection($dlw, $participantId, $module, $visit);
+        $this->assertSame($dlw->getActualDose(), $savedDlw->getActualDose());
+        $this->assertSame($dlw->getParticipantWeight(), $savedDlw->getParticipantWeight());
+    }
+
+    public function testGenerateDlwSummary()
+    {
+        $dlw = $this->testSetup->generateNphDlw();
+        $dlwRepository = $this->em->getRepository(NphDlw::class)->findOneBy(['id' => $dlw->getId()]);
+        $dlwSummary = $this->service->generateDlwSummary([$dlwRepository]);
+        $this->arrayHasKey($dlw->getModule(), $dlwSummary);
+        $this->arrayHasKey($dlw->getVisit(), $dlwSummary[$dlw->getModule()]);
+        $this->assertSame($dlw->getDoseAdministered(), $dlwSummary[$dlw->getModule()][$dlw->getVisit()]);
     }
 
     private function getGuzzleResponse($data): Response

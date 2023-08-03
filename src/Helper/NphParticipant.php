@@ -17,6 +17,7 @@ class NphParticipant
     public const DIET_COMPLETED = 'completed';
     public const DIET_DISCONTINUED = 'discontinued';
     public const DIET_CONTINUED = 'continued';
+    public const DIET_INCOMPLETE = 'incomplete';
     public $id;
     public $cacheTime;
     public $rdrData;
@@ -27,6 +28,7 @@ class NphParticipant
     public array $module1DietStatus;
     public array $module2DietStatus;
     public array $module3DietStatus;
+    public string $biobankId = '';
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -89,6 +91,9 @@ class NphParticipant
         if (!empty($participant->nphPairedSite) && $participant->nphPairedSite !== 'UNSET') {
             $this->nphPairedSiteSuffix = $this->getSiteSuffix($participant->nphPairedSite);
         }
+        if (!empty($participant->biobankId)) {
+            $this->biobankId = $participant->biobankId;
+        }
         $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
         $this->module = $this->getParticipantModule();
         $this->module1DietStatus = ['LMT' => 'started'];
@@ -136,11 +141,17 @@ class NphParticipant
                 $dietStatus[$diet->dietName] = self::DIET_COMPLETED;
             } elseif (in_array(self::DIET_DISCONTINUED, $dietStatuses) && !in_array(self::DIET_CONTINUED, $dietStatuses)) {
                 $dietStatus[$diet->dietName] = self::DIET_DISCONTINUED;
-            } elseif (in_array(self::DIET_CONTINUED, $dietStatuses) && !in_array(self::DIET_DISCONTINUED, $dietStatuses)) {
-                // setting this to started as continued status is not yet defined
-                $dietStatus[$diet->dietName] = self::DIET_STARTED;
-            } elseif (in_array(self::DIET_STARTED, $dietStatuses)) {
-                $dietStatus[$diet->dietName] = self::DIET_STARTED;
+            } else {
+                $key = array_search(self::DIET_CONTINUED, $dietStatuses);
+                if ($key !== false) {
+                    if ($diet->dietStatus[$key]->current) {
+                        $dietStatus[$diet->dietName] = self::DIET_STARTED;
+                    } else {
+                        $dietStatus[$diet->dietName] = self::DIET_INCOMPLETE;
+                    }
+                } elseif (in_array(self::DIET_STARTED, $dietStatuses)) {
+                    $dietStatus[$diet->dietName] = self::DIET_STARTED;
+                }
             }
         }
         return $dietStatus;
