@@ -208,6 +208,27 @@ class NphParticipantSummaryService
                             nphDateOfBirth
                             biobankId
                             nphPairedSite
+                            nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule2DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            },
+                            nphModule3DietStatus {
+                                dietName
+                                dietStatus {
+                                    time
+                                    status
+                                    current
+                                }
+                            }
                         }
                     }
                 }
