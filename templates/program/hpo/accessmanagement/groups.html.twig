@@ -30,12 +30,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            $('table').DataTable({
-                order: [[0, 'asc']],
-                pageLength: 25
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('hpo-access-management') }}
 {% endblock %}

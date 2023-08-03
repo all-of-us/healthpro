@@ -49,15 +49,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            $('table').DataTable({
-                order: [[0, 'asc']],
-                pageLength: 25,
-                columnDefs: [
-                    {targets: 2, orderable: false}
-                ]
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('access-group-management') }}
 {% endblock %}

@@ -90,12 +90,5 @@
     </table>
 {% endblock %}
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            $('table').DataTable({
-                order: [[$('.col-modified').index(), 'desc']],
-                pageLength: 25
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('biobank-order-recent-modify') }}
 {% endblock %}
