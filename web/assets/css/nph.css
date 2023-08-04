@@ -161,6 +161,9 @@ div.order-row {
 }
 .clickable {
     cursor: pointer;
+}
+.clickable_underline {
+    cursor: pointer;
     text-decoration: underline;
     color: #337ab7;
 }
