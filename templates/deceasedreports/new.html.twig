@@ -30,7 +30,7 @@
     <hr />
     {% endif %}
 
-    {{ form_start(form) }}
+    {{ form_start(form, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
     <div class="row">
       <div class="col-sm-4">
         {{ form_row(form.reportMechanism) }}
