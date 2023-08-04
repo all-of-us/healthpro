@@ -57,7 +57,7 @@
                 </thead>
                 <tbody>
                 {% for index, nphSample in order.nphSamples %}
-                    {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
+                    {% if nphSample.modifyType in [constant('CANCEL', nphSample), constant('UNLOCK', nphSample)] %}
                         <tr>
                             <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
                         </tr>
