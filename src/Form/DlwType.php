@@ -51,6 +51,7 @@ class DlwType extends AbstractType
                             ->addViolation();
                         return false;
                     }
+                    return true;
                 }),
                 'scale' => 5,
             ])
