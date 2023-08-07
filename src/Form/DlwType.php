@@ -25,6 +25,7 @@ class DlwType extends AbstractType
                     'max' => (10 ** 8) - 1,
                     'notInRangeMessage' => 'Dose Batch ID invalid, Please enter a valid dose batch ID   ',
                 ]),
+                'required' => true,
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('actualDose', NumberType::class, [
