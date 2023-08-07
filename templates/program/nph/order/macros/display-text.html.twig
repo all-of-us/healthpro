@@ -12,6 +12,7 @@
             <strong>
                 Unlocked for editing by {{ _self.displayModifiedInfo(obj, displayTimezone) }}
             </strong>
+            <p><strong>Reason:</strong> {{ obj.modifyReasonDisplayText }}</p>
         </div>
     {% endif %}
 {% endmacro %}
