@@ -541,13 +541,18 @@ class NphOrderController extends BaseController
             'visit' => $visit,
             'module' => $module
         ]);
-        $disabled = (bool) $dlwObject;
         $dlwForm = $this->createForm(DlwType::class, $dlwObject);
         $dlwForm->handleRequest($request);
         if ($dlwForm->isSubmitted()) {
-            $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
-            $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
-            $disabled = true;
+            if ($dlwForm->isValid()) {
+                $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
+                $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
+                $disabled = true;
+            } else {
+                $disabled = false;
+            }
+        } else {
+            $disabled = (bool) $dlwObject;
         }
         return $this->render('program/nph/order/dlw-collect.html.twig', [
             'participant' => $participant,

@@ -539,6 +539,13 @@ class NphSample
                 'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
                 'units' => self::RDR_MICROLITER_UNITS[$aliquot->getUnits()] ?? $aliquot->getUnits()
             ];
+            $metadata = $aliquot->getAliquotMetadata();
+            if (isset($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'])) {
+                $aliquotsData['glycerolAdditiveVolume'] =
+                    ['units' => 'uL',
+                    'volume' => $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume']
+                ];
+            }
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();
             }
