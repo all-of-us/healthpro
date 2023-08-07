@@ -10,22 +10,23 @@
       "type": "blood",
       "identifier": "SST4",
       "aliquots": {
-          "SSTS1U": {
-            "identifier": "SSTS1-U",
-            "container": "1.4mL Matrix tube",
-            "description": "1.4mL Matrix tube",
-            "expectedAliquots": 3,
-            "expectedVolume": 500,
-            "units": "mL",
-            "barcodeLength" : 11,
-            "minVolume": 0,
-            "maxVolume": 500,
-            "warningMinVolume": 100,
-            "warningMaxVolume": 500,
-            "addNew": false,
-            "collectMetadata": false,
-            "required": true
-            }
+        "SSTS1U": {
+          "identifier": "SSTS1-U",
+          "container": "1.4mL Matrix tube",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 3,
+          "expectedVolume": 500,
+          "units": "mL",
+          "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 500,
+          "addNew": false,
+          "collectMetadata": false,
+          "required": true
+          }
       }
     },
     "LiH4": {
@@ -38,20 +39,21 @@
       "identifier": "LiH4",
       "aliquots": {
         "LiHP1U": {
-            "identifier": "LiHP1-U",
-            "container": "1.4mL Matrix tube",
-            "description": "1.4mL Matrix tube",
-            "expectedAliquots": 3,
-            "expectedVolume": 500,
-            "units": "uL",
-            "barcodeLength" : 11,
-            "minVolume": 0,
-            "maxVolume": 500,
-            "warningMinVolume": 100,
-            "warningMaxVolume": 500,
-            "addNew": false,
-            "collectMetadata": false,
-            "required": true
+          "identifier": "LiHP1-U",
+          "container": "1.4mL Matrix tube",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 3,
+          "expectedVolume": 500,
+          "units": "uL",
+          "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 500,
+          "addNew": false,
+          "collectMetadata": false,
+          "required": true
         }
       }
     },
@@ -64,20 +66,21 @@
       "identifier": "EDTA4",
       "aliquots": {
         "EDTAP1U": {
-            "identifier": "EDTAP1-U",
-            "container": "1.4mL Matrix tube",
-            "description": "1.4mL Matrix tube",
-            "expectedAliquots": 3,
-            "expectedVolume": 500,
-            "units": "uL",
-            "barcodeLength" : 11,
-            "minVolume": 0,
-            "maxVolume": 500,
-            "warningMinVolume": 100,
-            "warningMaxVolume": 500,
-            "addNew": false,
-            "collectMetadata": false,
-            "required": true
+          "identifier": "EDTAP1-U",
+          "container": "1.4mL Matrix tube",
+          "description": "1.4mL Matrix tube",
+          "expectedAliquots": 3,
+          "expectedVolume": 500,
+          "units": "uL",
+          "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
+          "minVolume": 0,
+          "maxVolume": 500,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 500,
+          "addNew": false,
+          "collectMetadata": false,
+          "required": true
         }
       }
     },
@@ -97,6 +100,7 @@
             "expectedVolume": 500,
             "units": "uL",
             "barcodeLength" : 11,
+            "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
             "minVolume": 0,
             "maxVolume": 500,
             "warningMinVolume": 100,
@@ -123,6 +127,7 @@
           "expectedVolume": 1000,
           "units": "uL",
           "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
           "minVolume": 500,
           "maxVolume": 1000,
           "warningMinVolume": 100,
@@ -131,19 +136,20 @@
           "collectMetadata": false
         },
         "RU2L": {
-            "identifier": "RU2-L",
-            "container": "6mL Urine Aliquot Tube",
-            "description": "6mL Urine Aliquot Tube",
-            "expectedAliquots": 1,
-            "expectedVolume": 5,
-            "units": "mL",
-            "barcodeLength" : 11,
-            "minVolume": 1,
-            "maxVolume": 10,
-            "warningMinVolume": 5,
-            "warningMaxVolume": 10,
-            "addNew": false,
-            "collectMetadata": false
+          "identifier": "RU2-L",
+          "container": "6mL Urine Aliquot Tube",
+          "description": "6mL Urine Aliquot Tube",
+          "expectedAliquots": 1,
+          "expectedVolume": 5,
+          "units": "mL",
+          "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 6mL urine aliquot tube barcode ID.",
+          "minVolume": 1,
+          "maxVolume": 10,
+          "warningMinVolume": 5,
+          "warningMaxVolume": 10,
+          "addNew": false,
+          "collectMetadata": false
         }
       }
     },
@@ -218,6 +224,7 @@
           "expectedVolume": 8,
           "units": "mL",
           "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 10mL urine aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 10,
           "warningMinVolume": 5,
@@ -284,6 +291,7 @@
           "expectedVolume": 1000,
           "units": "uL",
           "barcodeLength" : 11,
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 2,
           "warningMinVolume": 500,
