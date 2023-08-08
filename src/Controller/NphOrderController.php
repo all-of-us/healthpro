@@ -524,9 +524,7 @@ class NphOrderController extends BaseController
         }
     }
 
-    /**
-     * @Route("/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect", name="nph_dlw_collect")
-     */
+    #[Route(path: "/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect", name: "nph_dlw_collect")]
     public function dlwSampleCollect(
         $participantId,
         $module,
@@ -541,12 +539,13 @@ class NphOrderController extends BaseController
             'visit' => $visit,
             'module' => $module
         ]);
-        $dlwForm = $this->createForm(DlwType::class, $dlwObject);
+        $dlwForm = $this->createForm(DlwType::class, $dlwObject, ['timezone' => $this->getSecurityUser()->getTimezone()]);
         $dlwForm->handleRequest($request);
         if ($dlwForm->isSubmitted()) {
             if ($dlwForm->isValid()) {
                 $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
-                $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . date('m-d-Y h:i a'));
+                $timestamp = new \DateTime('now', new \DateTimeZone($this->getSecurityUser()->getTimezone()));
+                $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . $timestamp->format('m-d-Y h:i a'));
                 $disabled = true;
             } else {
                 $disabled = false;
