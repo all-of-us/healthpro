@@ -32,7 +32,7 @@ class DefaultController extends BaseController
     public function index(Request $request, ContextTemplateService $contextTemplate)
     {
         $program = $request->getSession()->get('program');
-        if ($this->isGranted('ROLE_NPH_USER') && $program === User::PROGRAM_NPH && $request->attributes->get('_route') === self::HPO_HOME_ROUTE) {
+        if ($program === User::PROGRAM_NPH && $request->attributes->get('_route') === self::HPO_HOME_ROUTE) {
             return $this->redirectToRoute('nph_home');
         }
         $checkTimeZone = $this->isGranted('ROLE_USER') || $this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_AWARDEE') || $this->isGranted('ROLE_DV_ADMIN') || $this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_AWARDEE_SCRIPPS');
