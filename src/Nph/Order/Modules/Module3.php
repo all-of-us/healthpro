@@ -26,16 +26,16 @@ class Module3 extends Samples
     private static $visitTypeMapper = [
         'OrangeDiet' => '3Diet',
         'OrangeDLW' => 'DLW',
-        'OrangeDSMT' => 'DSMT',
-        'OrangeLMT' => 'LMT',
+        'OrangeDSMT' => '3DSMT',
+        'OrangeLMT' => '3LMT',
         'BlueDiet' => '3Diet',
         'BlueDLW' => 'DLW',
-        'BlueDSMT' => 'DSMT',
-        'BlueLMT' => 'LMT',
+        'BlueDSMT' => '3DSMT',
+        'BlueLMT' => '3LMT',
         'PurpleDiet' => '3Diet',
         'PurpleDLW' => 'DLW',
-        'PurpleDSMT' => 'DSMT',
-        'PurpleLMT' => 'LMT',
+        'PurpleDSMT' => '3DSMT',
+        'PurpleLMT' => '3LMT',
     ];
 
     private static array $visitDietMapper = [
