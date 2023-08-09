@@ -21,8 +21,9 @@ security:
         - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
-        - { path: ^/nph($|\/)(biobank($|\/)|$), roles: ROLE_NPH_BIOBANK }
-        - { path: ^/nph($|\/)(admin($|\/).*), roles: ROLE_NPH_ADMIN }
+        - { path: ^/nph($|\/)$, roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK, ROLE_NPH_ADMIN] }
+        - { path: ^/nph/biobank($|\/), roles: ROLE_NPH_BIOBANK }
+        - { path: ^/nph/admin($|\/).*, roles: ROLE_NPH_ADMIN }
         - { path: ^/nph($|\/).*, roles: ROLE_NPH_USER }
         - { path: ^/problem($|\/).*, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/settings($|\/), roles: [ROLE_USER, ROLE_NPH_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS, ROLE_READ_ONLY] }
