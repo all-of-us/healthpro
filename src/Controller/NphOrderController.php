@@ -524,7 +524,7 @@ class NphOrderController extends BaseController
         }
     }
 
-    #[Route(path: "/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect", name: "nph_dlw_collect")]
+    #[Route(path: '/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect', name: 'nph_dlw_collect')]
     public function dlwSampleCollect(
         $participantId,
         $module,
