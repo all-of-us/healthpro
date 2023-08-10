@@ -25,6 +25,7 @@ class DlwType extends AbstractType
                     'max' => (10 ** 8) - 1,
                     'notInRangeMessage' => 'Dose Batch ID invalid, Please enter a valid dose batch ID   ',
                 ]),
+                'required' => true,
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('actualDose', NumberType::class, [
@@ -51,8 +52,9 @@ class DlwType extends AbstractType
                             ->addViolation();
                         return false;
                     }
+                    return true;
                 }),
-                'scale' => 5,
+                'scale' => 1,
             ])
             ->add('doseAdministered', DateTimeType::class, [
                 'format' => 'M/d/yyyy h:mm a',
@@ -62,6 +64,7 @@ class DlwType extends AbstractType
                 'model_timezone' => 'UTC',
                 'label' => 'Dose Date/Time',
                 'attr' => ['class' => 'order-ts'],
+                'view_timezone' => $options['timezone'],
                 'constraints' => new NotBlank(['message' => 'Dose date/time required.'])
             ])
             ->add('calculatedDose', null, ['attr' => ['readonly' => true], 'mapped' => false])
@@ -73,6 +76,7 @@ class DlwType extends AbstractType
         $resolver->setDefaults([
             'data_class' => NphDlw::class,
             'allow_extra_fields' => true,
+            'timezone' => 'UTC',
         ]);
     }
 

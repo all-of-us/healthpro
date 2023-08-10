@@ -65,7 +65,7 @@
                     {{ form_label(form['participantWeight'])}}
                     {{ form_widget(form['participantWeight'], {attr: {readonly: disabled}})}}
                     {{ form_errors(form['participantWeight'])}}
-                    <span class="clickable" id="enter_pound">Enter weight in pounds</span>
+                    <span class="clickable_underline" id="enter_pound">Enter weight in pounds</span>
                 </div>
                 <div class="col-md-1">
                     <p style="margin-top: 2em; font-weight: bold">X 1.5 = </p>
@@ -93,10 +93,10 @@
                 {% if disabled %}
                     <button type="button" class="btn btn-primary" id="form_edit" formnovalidate>Edit</button>
                 {% else %}
-                    <button type="submit" class="btn btn-primary" id="form_submit" formnovalidate>Save</button>
+                    <button type="submit" class="btn btn-primary" id="form_submit">Save</button>
                 {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
+                   class="btn btn-default">Return to Participant</a>
             </div>
             {{ form_end(form) }}
         </div>
