@@ -1,14 +1,15 @@
+{% form_theme patientStatusForm 'bootstrap_5_layout.html.twig' %}
 <div class="col-md-6">
     {% if canViewPatientStatus %}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h3>
+        <div class="card">
+            <div class="card-header">
+                <h6>Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h6>
             </div>
             {% import 'macros/display-text.html.twig' as macros %}
             {{ macros.displayFlashMessage('patient-status') }}
-            <div class="panel-body">
+            <div class="card-body">
                 {% if orgPatientStatusData is empty %}
-                    <p class="text-danger">Please complete the patient status information for your organization. User should have access to EHR system information for verification.</p>
+                    <small class="text-danger">Please complete the patient status information for your organization. User should have access to EHR system information for verification.</small>
                 {% endif %}
                 <div id="patient-status-data-box">
                     {% if orgPatientStatusData is not empty %}

@@ -1,18 +1,19 @@
+{% form_theme incentiveForm 'bootstrap_5_layout.html.twig' %}
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}"
+<div class="card incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}"
      data-has-incentives="{{ incentives is defined and incentives ? 1 : 0 }}">
-    <div class="panel-heading">
-        <h3 class="panel-title">
+    <div class="card-header">
+        <h6>
             {% if type is defined and type == 'edit' %}
                 <i class="fa fa-edit" aria-hidden="true"></i> Edit Incentive
             {% else %}
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Incentive
             {% endif %}
-        </h3>
+        </h6>
     </div>
     {% import 'macros/display-text.html.twig' as macros %}
     {{ macros.displayFlashMessage('incentive') }}
-    <div class="panel-body">
+    <div class="card-body">
         <div id="incentives-data-box">
             {% if incentives is defined and incentives is not empty %}
                 {% set incentive = incentives[0] %}
@@ -86,9 +87,9 @@
             {% if not readOnlyView %}
                 <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
                 {% if type is defined and type == 'edit' %}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
                 {% else %}
-                    <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+                    <button type="button" class="btn btn-light" id="incentive_cancel">Cancel</button>
                 {% endif %}
             {% endif %}
             {{ form_end(incentiveForm) }}

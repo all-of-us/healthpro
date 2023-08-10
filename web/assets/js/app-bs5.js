@@ -36,6 +36,7 @@ require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
 require("datatables.net-buttons-bs/css/buttons.bootstrap.css");
 require("bootstrap-toggle/css/bootstrap-toggle.css");
 require("../css/app.css");
+require("../css/bs5.css");
 
 require("./global.js");
 require("./bs5.js");

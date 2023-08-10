@@ -28,7 +28,7 @@
         </div>
     {% else %}
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <div class="card participant-details-card">
                     <div class="card-body">
                         <div class="page-header">
@@ -41,7 +41,7 @@
                             <div class="text-center">
                                 <small>
                                     Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
-                                    <a href="{{ path(routePrefix ~ 'participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px" class="btn btn-primary btn-sm"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
+                                    <a href="{{ path(routePrefix ~ 'participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px" class="btn btn-primary btn-xs"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
                                 </small>
                             </div>
                             <br>
@@ -54,31 +54,37 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-8">
-                <div role="tabpanel">
+            <div class="col-sm-9">
+                <div>
+                    {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
+                        <div class="btn-group float-end">
+                            {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
+                            <a class="btn btn-light btn-small" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
+                        </div>
+                    {% endif %}
                     <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active">
-                            <a href="#on_site_details" aria-controls="on_site_details" role="tab" data-toggle="tab">On-Site Details</a>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" href="#on_site_details" data-bs-target="#on_site_details" role="tab" data-bs-toggle="tab">On-Site Details</button>
                         </li>
-                        <li role="presentation">
-                            <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" href="#inperson" data-bs-target="#inperson" role="tab" data-bs-toggle="tab">In-Person Enrollment</button>
                         </li>
                         {% if canViewDetails %}
-                            <li role="presentation">
-                                <a href="#overview" aria-controls="tab" role="tab" data-toggle="tab">Participant Overview</a>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" href="#overview" data-bs-target="#overview" role="tab" data-bs-toggle="tab">Participant Overview</button>
                             </li>
-                            <li role="presentation">
-                                <a href="#activities" aria-controls="tab" role="tab" data-toggle="tab">Participant Activities</a>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" href="#activities" data-bs-target="#activities" role="tab" data-bs-toggle="tab">Participant Activities</button>
                             </li>
                         {% else %}
                             {% for tab in ['Participant Overview', 'Participant Activities'] %}
-                                <li role="presentation" class="disabled">
-                                    <a href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-toggle="tooltip" data-placement="bottom">{{ tab }}</a>
+                                <li class="nav-item disabled" role="presentation">
+                                    <button class="nav-link" href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-bs-toggle="tooltip" data-placement="bottom">{{ tab }}</button>
                                 </li>
                             {% endfor %}
                         {% endif %}
                     </ul>
-                    <br />
+                    <br>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
                             <div class="row equal-height">
@@ -205,11 +211,11 @@
                                                     <dd>{{ participant.recontactMethod|default('--') }}</dd>
                                                     <dt>Address</dt>
                                                     <dd>{{ participant.getAddress(true)|default('--')|nl2br }}</dd>
-                                                    <dt>Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip"><span class="sr-only">What is Email?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-bs-toggle="tooltip"><span class="sr-only">What is Email?</span><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>{{ participant.email|default('--') }}</dd>
-                                                    <dt>Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Login Phone <span title="This is the verified SMS number used during registration" data-bs-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>{{ participant.loginPhoneNumber|default('--') }}</dd>
-                                                    <dt>Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Contact Phone <span title="This is the phone number provided after consent" data-bs-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>{{ participant.phoneNumber|default('--') }}</dd>
                                                 </dl>
                                             </div>
@@ -343,14 +349,14 @@
                                                 </div>
                                                 <hr />
                                                 <dl class="dl-horizontal dl-horizontal-lg samples-received">
-                                                    <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>
                                                         {% if participant.numBaselineSamplesArrived >= 7 %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% endif %}
                                                         {{ participant.numBaselineSamplesArrived }}
                                                     </dd>
-                                                    <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>
                                                         {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -493,14 +499,14 @@
                                                 </div>
                                                 <hr />
                                                 <dl class="dl-horizontal dl-horizontal-lg samples-received">
-                                                    <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>
                                                         {% if participant.numBaselineSamplesArrived >= 7 %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% endif %}
                                                         {{ participant.numBaselineSamplesArrived }}
                                                     </dd>
-                                                    <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
                                                     <dd>
                                                         {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -570,12 +576,6 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
-                    <div class="btn-group pull-right">
-                        {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
-                        <a class="btn btn-default" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
-                    </div>
-                {% endif %}
                 {% if participant.activityStatus == 'deactivated' %}
                     {% include 'partials/participant-deactivated-status-notice.html.twig' %}
                 {% endif %}
