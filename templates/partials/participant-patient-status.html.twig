@@ -14,11 +14,11 @@
                 <div id="patient-status-data-box">
                     {% if orgPatientStatusData is not empty %}
                         <div>
-                            <dl class="dl-horizontal">
-                                <dt>Status</dt>
-                                <dd>{{ orgPatientStatusData.display_status }}</dd>
-                                <dt>Comments</dt>
-                                <dd>{{ orgPatientStatusData.comments }}</dd>
+                            <dl class="row">
+                                <dt class="col-sm-3">Status</dt>
+                                <dd class="col-sm-9">{{ orgPatientStatusData.display_status }}</dd>
+                                <dt class="col-sm-3">Comments</dt>
+                                <dd class="col-sm-9">{{ orgPatientStatusData.comments }}</dd>
                             </dl>
                         </div>
                         {% if not readOnlyView %}

@@ -15,15 +15,15 @@
         <div id="id-verification-data-box">
             {% if idVerifications is not empty %}
                 {% set idVerification = idVerifications[0] %}
-                <dl class="dl-horizontal">
-                    <dt>Verified</dt>
-                    <dd>
+                <dl class="row">
+                    <dt class="col-sm-3">Verified</dt>
+                    <dd class="col-sm-9">
                         {{ idVerification.verifiedTime|date('H:i:s') == '00:00:00' ? idVerification.verifiedTime|date('n/j/Y') : idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}
                     </dd>
-                    <dt>Verification Type</dt>
-                    <dd>{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
-                    <dt>Visit Type</dt>
-                    <dd>{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                    <dt class="col-sm-3">Verification Type</dt>
+                    <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
+                    <dt class="col-sm-3">Visit Type</dt>
+                    <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
                 </dl>
                 {% if not readOnlyView %}
                     <div class="text-center">
@@ -60,19 +60,19 @@
                 <div id="idVerification" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         {% for idVerification in idVerifications %}
-                            <dl class="dl-horizontal">
-                                <dt>Verified</dt>
-                                <dd>
+                            <dl class="row">
+                                <dt class="col-sm-3">Verified</dt>
+                                <dd class="col-sm-9">
                                     {{ idVerification.verifiedTime|date('H:i:s') == '00:00:00' ? idVerification.verifiedTime|date('n/j/Y') : idVerification.verifiedTime|date('n/j/Y g:ia', app.user.timezone) }}
                                 </dd>
-                                <dt>User</dt>
-                                <dd>{{ idVerification.userEmail }}</dd>
-                                <dt>Site</dt>
-                                <dd>{{ idVerification.siteName }}</dd>
-                                <dt>Verification Type</dt>
-                                <dd>{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
-                                <dt>Visit Type</dt>
-                                <dd>{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                                <dt class="col-sm-3">User</dt>
+                                <dd class="col-sm-9">{{ idVerification.userEmail }}</dd>
+                                <dt class="col-sm-3">Site</dt>
+                                <dd class="col-sm-9">{{ idVerification.siteName }}</dd>
+                                <dt class="col-sm-3">Verification Type</dt>
+                                <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
+                                <dt class="col-sm-3">Visit Type</dt>
+                                <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
                             </dl>
                             <hr/>
                         {% endfor %}
