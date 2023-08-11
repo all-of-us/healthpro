@@ -1,7 +1,7 @@
 {% form_theme idVerificationForm 'bootstrap_5_layout.html.twig' %}
 {% import 'macros/display-text.html.twig' as macros %}
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="card h-100 id-verification" id="id_verification" data-has-id-verifications="{{ idVerifications ? 1 : 0 }}">
+<div class="card id-verification" id="id_verification" data-has-id-verifications="{{ idVerifications ? 1 : 0 }}">
     <div class="card-header">
         <h6>
             <i class="fa fa-id-card" aria-hidden="true"></i> ID Verification

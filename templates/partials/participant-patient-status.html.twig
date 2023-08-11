@@ -1,7 +1,7 @@
 {% form_theme patientStatusForm 'bootstrap_5_layout.html.twig' %}
-<div class="col-md-6 mb-4">
+<div class="col-md-6 h-100 mb-4">
     {% if canViewPatientStatus %}
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header">
                 <h6>Patient Status: {{ app.session.get('siteOrganizationDisplayName') }}</h6>
             </div>
