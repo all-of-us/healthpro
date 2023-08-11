@@ -1,6 +1,7 @@
 {% set bootstrapVersion = 5 %}
 {% extends 'render-base.html.twig' %}
 {% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
     {% set hasOrgPatientStatusData = orgPatientStatusData ? 1 : 0 %}
@@ -87,19 +88,19 @@
                     <br>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
-                            <div class="row equal-height">
+                            <div class="row">
                                 {% if canViewOnSiteDetails %}
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 mb-4">
                                         {% include 'partials/participant-id-verification.html.twig' %}
                                     </div>
                                     {% if not isDVType %}
                                         {% include 'partials/participant-patient-status.html.twig' %}
                                     {% endif %}
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 mb-4">
                                         {% include 'partials/participant-incentive.html.twig' %}
                                     </div>
                                 {% else %}
-                                    <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                                    <div class="col-sm-8 mb-4 col-sm-push-2 col-lg-6 col-lg-push-3">
                                         {% include 'partials/participant-notice.html.twig' %}
                                     </div>
                                 {% endif %}
