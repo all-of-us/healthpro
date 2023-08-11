@@ -51,13 +51,13 @@
         <div class="panel-group verification-history view-details" id="verification" role="tablist" aria-multiselectable="true">
             <div>
                 <div class="panel-heading bg-secondary text-white view-history-dropdown" role="tab" id="headingOne">
-                    <div role="button" data-toggle="collapse" data-parent="#verification"
-                         href="#idVerification" aria-expanded="true" aria-controls="idVerification">
+                    <div role="button" data-bs-toggle="collapse" data-parent="#verification"
+                         data-bs-target="#idVerification" aria-expanded="true" aria-controls="idVerification">
                         View ID Verification History
                         <span class="badge badge-light">{{ idVerifications|length }}</span>
                     </div>
                 </div>
-                <div id="idVerification" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div id="idVerification" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
                     <div class="panel-body">
                         {% for idVerification in idVerifications %}
                             <dl class="row">

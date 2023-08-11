@@ -99,17 +99,17 @@
         <div class="panel-group view-details" id="accordion" role="tablist" aria-multiselectable="true">
         <div>
             <div class="panel-heading bg-secondary text-white view-history-dropdown" role="tab" id="headingOne">
-                <div role="button" data-toggle="collapse" data-parent="#accordion"
-                     href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <div role="button" data-bs-toggle="collapse" data-parent="#accordion"
+                     data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                     View Incentive History
                     <span class="badge badge-light">{{ incentives|length }}</span>
                 </div>
             </div>
-            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div id="collapseOne" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
                         {% if not readOnlyView  and incentive.site == siteInfo.siteId %}
-                            <div class="pull-right incentive-modify">
+                            <div class="float-end incentive-modify">
                                 <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                                 <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
                             </div>
