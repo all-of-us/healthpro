@@ -115,39 +115,39 @@
                             </div>
                         {% endif %}
                         <dl class="row">
-                            <dt class="col-sm-4">Date Created</dt>
-                            <dd class="col-sm-8">
+                            <dt class="col-sm-5">Date Created</dt>
+                            <dd class="col-sm-7">
                                 {{ incentive.createdTs|date('n/j/Y g:ia', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}
                                 {% if incentive.import %}
                                     <span class="label label-primary">Imported</span>
                                 {% endif %}
                             </dd>
-                            <dt class="col-sm-4">User</dt>
-                            <dd class="col-sm-8">{{ incentive.user ? incentive.user.email : '' }}</dd>
-                            <dt class="col-sm-4">Site</dt>
-                            <dd class="col-sm-8">{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
-                            <dt class="col-sm-4">Date of Service</dt>
-                            <dd class="col-sm-8">{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
-                            <dt class="col-sm-4">Incentive Occurrence</dt>
-                            <dd class="col-sm-8">{{ incentive.incentiveOccurrenceDisplayName }}</dd>
+                            <dt class="col-sm-5">User</dt>
+                            <dd class="col-sm-7">{{ incentive.user ? incentive.user.email : '' }}</dd>
+                            <dt class="col-sm-5">Site</dt>
+                            <dd class="col-sm-7">{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
+                            <dt class="col-sm-5">Date of Service</dt>
+                            <dd class="col-sm-7">{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
+                            <dt class="col-sm-5">Incentive Occurrence</dt>
+                            <dd class="col-sm-7">{{ incentive.incentiveOccurrenceDisplayName }}</dd>
                             {% if incentive.otherIncentiveOccurrence %}
-                                <dt>Other Incentive Occurrence</dt>
-                                <dd class="col-sm-8">{{ incentive.otherIncentiveOccurrence }}</dd>
+                                <dt class="col-sm-5">Other Incentive Occurrence</dt>
+                                <dd class="col-sm-7">{{ incentive.otherIncentiveOccurrence }}</dd>
                             {% endif %}
-                            <dt class="col-sm-4">Incentive Type</dt>
-                            <dd class="col-sm-8">
+                            <dt class="col-sm-5">Incentive Type</dt>
+                            <dd class="col-sm-7">
                                 {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
                             </dd>
                             {% if incentive.otherIncentiveType %}
-                                <dt class="col-sm-4">Other Incentive Type</dt>
-                                <dd class="col-sm-8">{{ incentive.otherIncentiveType }}</dd>
+                                <dt class="col-sm-5">Other Incentive Type</dt>
+                                <dd class="col-sm-7">{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
-                            <dt class="col-sm-4">Incentive Amount</dt>
-                            <dd class="col-sm-8">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
-                            <dt class="col-sm-4">Notes</dt>
-                            <dd class="col-sm-8">{{ incentive.notes }}</dd>
-                            <dt class="col-sm-4">Declined</dt>
-                            <dd class="col-sm-8">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
+                            <dt class="col-sm-5">Incentive Amount</dt>
+                            <dd class="col-sm-7">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                            <dt class="col-sm-5">Notes</dt>
+                            <dd class="col-sm-7">{{ incentive.notes }}</dd>
+                            <dt class="col-sm-5">Declined</dt>
+                            <dd class="col-sm-7">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                         </dl>
                         <hr/>
                     {% endfor %}
