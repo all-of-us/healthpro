@@ -1,7 +1,7 @@
 {% set bootstrapVersion = 5 %}
 {% extends 'render-base.html.twig' %}
 {% block title %}Participant {{ participant.id }} - {% endblock %}
-{% block bodycontainer %}container-fluid{% endblock %}
+{% block bodycontainer %}container-fluid px-5{% endblock %}
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
     {% set hasOrgPatientStatusData = orgPatientStatusData ? 1 : 0 %}

@@ -28,8 +28,9 @@ $(document).ready(function () {
     $(".toggle-id-verification-help-text").on("click", function () {
         let id = $(this).data("id");
         let html = $("#" + id).html();
-        $("#helpModal .modal-body").html(html);
-        $("#helpModal").modal();
+        $("#helpModalBs5 .modal-body").html(html);
+        let modal = new bootstrap5.Modal(document.getElementById('helpModalBs5'));
+        modal.show();
     });
 
     if (hasIdVerifications) {
