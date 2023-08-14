@@ -81,8 +81,8 @@
                             </li>
                         {% else %}
                             {% for tab in ['Participant Overview', 'Participant Activities'] %}
-                                <li class="nav-item disabled" role="presentation">
-                                    <button class="nav-link" href="#" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-bs-toggle="tooltip" data-placement="bottom">{{ tab }}</button>
+                                <li class="nav-item" role="presentation" title="Details not available because participant is either withdrawn, unpaired, or paired with another enrollment site" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                    <button class="nav-link disabled" href="#">{{ tab }}</button>
                                 </li>
                             {% endfor %}
                         {% endif %}
