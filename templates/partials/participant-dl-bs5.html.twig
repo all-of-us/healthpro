@@ -18,7 +18,7 @@
         {% endif %}
     </dd>
     {% if app.session.get('siteType') == 'dv' or is_granted('ROLE_AWARDEE_SCRIPPS') %}
-        <dt>Participant Origination</dt>
+        <dt class="col-sm-5">Participant Origination</dt>
         <dd class="col-sm-7">{{ participant.participantOrigin|default('--') }}</dd>
     {% endif %}
     <dt class="col-sm-5">Paired Awardee</dt>
