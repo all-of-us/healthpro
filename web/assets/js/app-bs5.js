@@ -2,7 +2,7 @@ const $ = require("jquery");
 // Global jQuery since we still have page scripts that rely on jQuery being available as $
 window.$ = $;
 
-window.bootstrap5 = require("bootstrap5");
+window.bootstrap = require("bootstrap5");
 require("backbone/backbone.js");
 require("eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js");
 require("parsleyjs/dist/parsley.js");
