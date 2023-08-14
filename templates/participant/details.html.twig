@@ -141,11 +141,11 @@
                             <div role="tabpanel" class="tab-pane" id="overview">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Consent</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>Consent</h5>
                                             </div>
-                                            <div class="panel-body">
+                                            <div class="card-body">
                                                 <dl class="dl-vertical">
                                                     <dt>Consent Cohort</dt>
                                                     <dd>{{ participant.consentCohortText }}</dd>
@@ -182,11 +182,11 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Demographics</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>Demographics</h5>
                                             </div>
-                                            <div class="panel-body">
+                                            <div class="card-body">
                                                 <dl class="dl-vertical">
                                                     <dt>Age</dt>
                                                     <dd>{{ participant.getAge()|default('--') }}</dd>
@@ -204,11 +204,11 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Contact</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>Contact</h5>
                                             </div>
-                                            <div class="panel-body">
+                                            <div class="card-body">
                                                 <dl class="dl-vertical">
                                                     <dt>Contact Method</dt>
                                                     <dd>{{ participant.recontactMethod|default('--') }}</dd>
@@ -223,33 +223,33 @@
                                                 </dl>
                                             </div>
                                         </div>
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">PPI Survey Completion</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>PPI Survey Completion</h5>
                                             </div>
-                                            <div class="panel-body">
-                                                <dl class="dl-horizontal">
-                                                    <dt>Required Complete?</dt>
-                                                    <dd>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-6">Required Complete?</dt>
+                                                    <dd class="col-sm-6">
                                                         {% if participant.numCompletedBaselinePPIModules == 3 %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% else %}
                                                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                                                         {% endif %}
                                                     </dd>
-                                                    <dt>Number Complete</dt>
-                                                    <dd>{{ participant.numCompletedPPIModules }}</dd>
+                                                    <dt class="col-sm-6">Number Complete</dt>
+                                                    <dd class="col-sm-6">{{ participant.numCompletedPPIModules }}</dd>
                                                 </dl>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">In-Person Enrollment</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>In-Person Enrollment</h5>
                                             </div>
-                                            <div class="panel-body">
+                                            <div class="card-body">
                                                 <div class="text-center">
                                                     <div class="participant-detail-status">
                                                         <strong>Paired Awardee</strong>
@@ -351,16 +351,16 @@
                                                     {% endif %}
                                                 </div>
                                                 <hr />
-                                                <dl class="dl-horizontal dl-horizontal-lg samples-received">
-                                                    <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
-                                                    <dd>
+                                                <dl class="row samples-received">
+                                                    <dt class="col-sm-8">Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dd class="col-sm-4">
                                                         {% if participant.numBaselineSamplesArrived >= 7 %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% endif %}
                                                         {{ participant.numBaselineSamplesArrived }}
                                                     </dd>
-                                                    <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
-                                                    <dd>
+                                                    <dt class="col-sm-8">Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dd class="col-sm-4">
                                                         {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% else %}
@@ -376,22 +376,22 @@
                             <div role="tabpanel" class="tab-pane" id="activities">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">PPI Survey Completion</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>PPI Survey Completion</h5>
                                             </div>
-                                            <div class="panel-body">
-                                                <dl class="dl-horizontal">
-                                                    <dt>Required Complete?</dt>
-                                                    <dd>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-4">Required Complete?</dt>
+                                                    <dd class="col-sm-8">
                                                         {% if participant.numCompletedBaselinePPIModules == 3 %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% else %}
                                                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                                                         {% endif %}
                                                     </dd>
-                                                    <dt>Number Complete</dt>
-                                                    <dd>{{ participant.numCompletedPPIModules }}</dd>
+                                                    <dt class="col-sm-4">Number Complete</dt>
+                                                    <dd class="col-sm-8">{{ participant.numCompletedPPIModules }}</dd>
                                                 </dl>
                                                 <div class="text-center">
                                                     {% for field, label in surveys %}
@@ -411,32 +411,32 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Retention and EHR Metrics</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>Retention and EHR Metrics</h5>
                                             </div>
-                                            <div class="panel-body">
-                                                <dl class="dl-horizontal dl-horizontal-lg">
-                                                    <dt>Retention Eligible</dt>
-                                                    <dd>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-5">Retention Eligible</dt>
+                                                    <dd class="col-sm-7">
                                                         {{ macros.displayRetentionEligibleStatus(participant.retentionEligibleStatus, participant.retentionEligibleTime) }}
                                                     </dd>
-                                                    <dt>Retention Status</dt>
-                                                    <dd>
+                                                    <dt class="col-sm-5">Retention Status</dt>
+                                                    <dd class="col-sm-7">
                                                         {{ macros.displayRetentionType(participant.retentionType) }}
                                                     </dd>
-                                                    <dt>EHR Transfer Status</dt>
-                                                    <dd>
+                                                    <dt class="col-sm-5">EHR Transfer Status</dt>
+                                                    <dd class="col-sm-7">
                                                         {{ macros.displayEhrTransferStatus(participant.isEhrDataAvailable) }}
                                                     </dd>
-                                                    <dt>Most Recent EHR Receipt</dt>
-                                                    <dd>
+                                                    <dt class="col-sm-5">Most Recent EHR Receipt</dt>
+                                                    <dd class="col-sm-7">
                                                         {% if participant.latestEhrReceiptTime %}
                                                             {{ participant.latestEhrReceiptTime|date('m/d/Y', app.user.timezone) }}
                                                         {% endif %}
                                                     </dd>
-                                                    <dt>Health Data Stream</dt>
-                                                    <dd>
+                                                    <dt class="col-sm-5">Health Data Stream</dt>
+                                                    <dd class="col-sm-7">
                                                         {% if participant.healthDataStreamSharingStatusV3_1 %}
                                                             {% if participant.healthDataStreamSharingStatusV3_1 == 'CURRENTLY_SHARING' %}
                                                                 <i class="fa fa-check-double text-success" aria-hidden="true"></i>
@@ -457,11 +457,11 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Physical Measurements and Biospecimens</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>Physical Measurements and Biospecimens</h5>
                                             </div>
-                                            <div class="panel-body">
+                                            <div class="card-body">
                                                 <div class="row text-center">
                                                     <div class="col-sm-6">
                                                         <div class="participant-detail-status">
@@ -501,16 +501,16 @@
                                                     </div>
                                                 </div>
                                                 <hr />
-                                                <dl class="dl-horizontal dl-horizontal-lg samples-received">
-                                                    <dt>Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
-                                                    <dd>
+                                                <dl class="row samples-received">
+                                                    <dt class="col-sm-5">Baseline Samples Received <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction. " data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dd class="col-sm-7">
                                                         {% if participant.numBaselineSamplesArrived >= 7 %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% endif %}
                                                         {{ participant.numBaselineSamplesArrived }}
                                                     </dd>
-                                                    <dt>Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
-                                                    <dd>
+                                                    <dt class="col-sm-5">Samples to Isolate DNA? <span title="This is a count of all biospecimens received by the Biobank from which DNA could be extracted. This includes EDTA tube samples and saliva samples." data-bs-toggle="tooltip"><i class="fa fa-question-circle text-info"></i></span></dt>
+                                                    <dd class="col-sm-7">
                                                         {% if participant.samplesToIsolateDNA == 'RECEIVED' %}
                                                             <i class="fa fa-check text-success" aria-hidden="true"></i>
                                                         {% else %}
@@ -550,9 +550,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading">
-                                                <h3 class="panel-title">Ancillary Studies</h3>
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <h5>Ancillary Studies</h5>
                                             </div>
                                             <div class="participant-detail-status">
                                                 <strong>Nutrition For Precision Health</strong>
