@@ -22,7 +22,7 @@
                         <div class="float-end">
                             {{ form_start(agreeForm) }}
                             {{ form_widget(agreeForm.Acknowledge) }}
-                            <a href="{{ path(cancelRoute) }}" class="btn btn-light">Cancel</a>
+                            <a href="{{ path(cancelRoute) }}" class="btn btn-outline-secondary">Cancel</a>
                             {{ form_end(agreeForm) }}
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                     {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
                         <div class="btn-group float-end">
                             {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
-                            <a class="btn btn-light btn-small" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
+                            <a class="btn btn-outline-secondary btn-small" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
                         </div>
                     {% endif %}
                     <ul class="nav nav-tabs" role="tablist">
