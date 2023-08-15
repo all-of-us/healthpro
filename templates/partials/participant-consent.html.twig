@@ -12,14 +12,14 @@
     </li>
     {% if siteInfo.isDVType == 'dv' %}
         <li class="list-group-item">
-            <strong>DV-only EHR Sharing</strong> <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
             {{ macros.displayConsentStatus('DV-only EHR Sharing', participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}
+            <span title="Direct Volunteer participants are not asked to consent to share EHR data, but are asked if they would be willing to in the future." data-toggle="tooltip"><span class="sr-only">What is DV EHR Sharing</span><i class="fa fa-question-circle text-info"></i></span>
         </li>
     {% endif %}
     {% if siteInfo.displayCaborConsent %}
         <li class="list-group-item">
-            <strong>CABoR Consent</strong> <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
             {{ macros.displayConsentStatus('CABoR Consent', participant.consentForCABoR, participant.consentForCABoRAuthored) }}
+            <span title="California Research Subjects' Bill of Rights is required for participants only by enrollment sites in California" data-toggle="tooltip"><span class="sr-only">What is CABoR?</span><i class="fa fa-question-circle text-info"></i></span>
         </li>
     {% endif %}
     {% if displayPatientStatusBlock %}
