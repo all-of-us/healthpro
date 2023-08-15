@@ -5,10 +5,15 @@ $(document).ready(function () {
     $("#incentive_create form").parsley();
 
     var setIncentiveDateGiven = function () {
-        $(".incentive-date-given").pmiDateTimePicker({
-            format: "MM/DD/YYYY",
-            maxDate: new Date().setHours(23, 59, 59, 999),
-            useCurrent: false
+        const incentiveDatePickerElements = document.querySelectorAll('.incentive-date-given');
+        incentiveDatePickerElements.forEach(element => {
+            const maxDate = new Date();
+            maxDate.setHours(23, 59, 59, 999);
+            bs5DateTimepicker(element, {
+                format: "MM/dd/yyyy",
+                maxDate: maxDate,
+                clock: false
+            });
         });
     };
 
