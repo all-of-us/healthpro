@@ -128,7 +128,7 @@
           "units": "μL",
           "barcodeLength" : 10,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
-          "minVolume": 500,
+          "minVolume": 0,
           "maxVolume": 1000,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 1,
