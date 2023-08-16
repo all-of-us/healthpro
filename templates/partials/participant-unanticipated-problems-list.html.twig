@@ -12,7 +12,7 @@
                     <div id="problem-overflow">
                 {% endif %}
                 {% if readOnly is defined %}
-                    <div class="btn btn-block btn-lg btn-default btn-readonly">
+                    <div class="btn btn-block btn-lg border w-100 btn-readonly">
                 {% else %}
                     <a href="{{ path('problem_form', { participantId: participant.id, problemId: problem.id }) }}" class="btn btn-block btn-lg border w-100">
                 {% endif %}

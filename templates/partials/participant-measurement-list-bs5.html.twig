@@ -12,7 +12,7 @@
                     <div id="evaluation-overflow">
                 {% endif %}
                 {% if readOnly is defined %}
-                    <div class="btn btn-block btn-lg btn-readonly">
+                    <div class="btn btn-block btn-lg border w-100 btn-readonly">
                 {% else %}
                     {% set measurementRoute = readOnlyView ? 'read_measurement' : 'measurement' %}
                     <a href="{{ path(measurementRoute, { participantId: participant.id, measurementId: measurement.id }) }}" class="btn btn-block btn-lg border text-dark w-100 {% if evalId is defined and measurement.id == evalId %} btn-warning {% else %} {% endif %}">
