@@ -29,7 +29,7 @@
           }
       }
     },
-    "LiH4": {
+    "LIH4": {
       "label": "4 mL Li Hep",
       "color": "Green and gray",
       "temperature": "Refrigerated",
@@ -38,7 +38,7 @@
       "collectionVolume": "4 mL",
       "identifier": "LiH4",
       "aliquots": {
-        "LiHP1U": {
+        "LIHP1U": {
           "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
@@ -111,7 +111,7 @@
         }
       }
     },
-    "urine": {
+    "URINE": {
       "label": "Spot Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
@@ -208,7 +208,7 @@
         }
       }
     },
-    "urineDlw": {
+    "URINEDLW": {
       "label": "Urine DLW",
       "color": "Yellow",
       "temperature": "Refrigerated",
@@ -249,7 +249,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST1"
+      "identifier": "ST1-K"
     },
     "ST2": {
       "label": "95% Ethanol Tube 2",
@@ -257,7 +257,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST2"
+      "identifier": "ST2-K"
     },
     "ST3": {
       "label": "DNA/RNA Shield Tube 1",
@@ -265,7 +265,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST3"
+      "identifier": "ST3-K"
     },
     "ST4": {
       "label": "DNA/RNA Shield Tube 2",
@@ -273,15 +273,15 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST4"
+      "identifier": "ST4-K"
     },
-    "TU1": {
+    "URINE24": {
       "label": "24 Hour Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "24 Hour Urine",
       "type": "24urine",
-      "identifier": "TU1",
+      "identifier": "Urine24",
       "aliquots": {
         "TU1U": {
           "identifier": "TU1-U",
