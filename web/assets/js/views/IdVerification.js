@@ -29,7 +29,7 @@ $(document).ready(function () {
         let id = $(this).data("id");
         let html = $("#" + id).html();
         $("#helpModalBs5 .modal-body").html(html);
-        let modal = new bootstrap.Modal(document.getElementById('helpModalBs5'));
+        let modal = new bootstrap.Modal(document.getElementById("helpModalBs5"));
         modal.show();
     });
 

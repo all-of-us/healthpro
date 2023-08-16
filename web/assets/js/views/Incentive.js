@@ -5,8 +5,8 @@ $(document).ready(function () {
     $("#incentive_create form").parsley();
 
     var setIncentiveDateGiven = function () {
-        const incentiveDatePickerElements = document.querySelectorAll('.incentive-date-given');
-        incentiveDatePickerElements.forEach(element => {
+        const incentiveDatePickerElements = document.querySelectorAll(".incentive-date-given");
+        incentiveDatePickerElements.forEach((element) => {
             const maxDate = new Date();
             maxDate.setHours(23, 59, 59, 999);
             bs5DateTimepicker(element, {
