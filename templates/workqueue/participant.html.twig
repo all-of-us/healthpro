@@ -6,6 +6,7 @@
             <small>{{ participant.shortId }}</small>
         </h2>
     </div>
+    <div class="display-none" id="participantId" data-participant-id="{{ participant.id|json_encode|raw }}"></div>
 
     <div class="row">
         <div class="col-sm-6">

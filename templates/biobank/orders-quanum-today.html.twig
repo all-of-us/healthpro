@@ -16,7 +16,12 @@
     </div>
     {% include 'biobank/partials/participant-review-tabs.html.twig' %}
     <br/>
-    <table class="table table-striped table-bordered table-small" id="table-today">
+    {% if is_granted('ROLE_SCRIPPS') %}
+        {% set orderCol = 4 %}
+    {% else %}
+        {% set orderCol = 3 %}
+    {% endif %}
+    <table class="table table-striped table-bordered table-small dataTable" id="table-today" data-table-order-column="{{ orderCol }}">
         <thead>
         <tr>
             {% if is_granted('ROLE_SCRIPPS') %}
@@ -79,5 +84,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('biobank-quanum-today') }}
+    {{ encore_entry_script_tags('datatable') }}
 {% endblock %}

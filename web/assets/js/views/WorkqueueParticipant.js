@@ -1,24 +1,24 @@
 $(document).ready(function () {
     if ($("#participant-barcode").length === 1) {
-        JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
+        JsBarcode("#participant-barcode", JSON.parse($("#participantId").data("participant-id")), {
             width: 2,
-                height: 50,
-                displayValue: true
+            height: 50,
+            displayValue: true
         });
     }
-    $('#order-overflow-show').on('click', function (e) {
+    $("#order-overflow-show").on("click", function (e) {
         $(this).hide();
-        $('#order-overflow').show();
+        $("#order-overflow").show();
         e.preventDefault();
     });
-    $('#evaluation-overflow-show').on('click', function (e) {
+    $("#evaluation-overflow-show").on("click", function (e) {
         $(this).hide();
-        $('#evaluation-overflow').show();
+        $("#evaluation-overflow").show();
         e.preventDefault();
     });
-    $('#problem-overflow-show').on('click', function (e) {
+    $("#problem-overflow-show").on("click", function (e) {
         $(this).hide();
-        $('#problem-overflow').show();
+        $("#problem-overflow").show();
         e.preventDefault();
     });
 });
