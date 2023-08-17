@@ -60,7 +60,7 @@
     </dl>
 
     {% if not readOnlyView and app.user.email != report.submittedBy and report.reportStatus == 'preliminary' %}
-    {{ form_start(form) }}
+    {{ form_start(form, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
     
     {{ form_row(form.reportStatus) }}
     <div class="denial_reason">

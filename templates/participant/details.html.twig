@@ -27,15 +27,12 @@
         </div>
     {% else %}
         <div class="page-header">
-            <h2>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small></h2>
+            <h2>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small><i class="fa fa-sm fa-barcode clickable" data-toggle="modal" data-target="#participant-barcode-modal" id="participant-barcode-icon"></i></h2>
         </div>
 
         <div class="row">
             <div class="col-sm-6">
                 {% include 'partials/participant-dl.html.twig' %}
-            </div>
-            <div class="col-sm-6 text-center">
-                <svg id="participant-barcode"></svg>
             </div>
         </div>
         {% if cacheEnabled %}
@@ -593,6 +590,7 @@
         {% endif %}
     {% endif %}
     </div>
+    {% include 'partials/modals/participant-barcode.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}

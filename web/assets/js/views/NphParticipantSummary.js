@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    JsBarcode("#participantBarcode", $("#participantBarcode").data("id"), {
+    JsBarcode("#participant-barcode", $("#participant-info").data("id"), {
         width: 2,
         height: 50,
         displayValue: true

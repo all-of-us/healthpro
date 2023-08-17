@@ -417,6 +417,7 @@ class WorkQueue
             'method' => 'getHealthDataSharingStatus',
             'htmlClass' => 'text-center',
             'rdrDateField' => 'healthDataStreamSharingStatusV3_1Time',
+            'orderable' => false,
             'toggleColumn' => true,
             'displayTime' => true,
             'visible' => false,

@@ -4,8 +4,10 @@ namespace App\Repository;
 
 use App\Entity\MissingNotificationLog;
 use App\Entity\Order;
+use App\Entity\Site;
 use App\Service\ReviewService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -272,5 +274,19 @@ class OrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+    }
+
+    public function getNightlyReportOrders(): array
+    {
+        return $this->createQueryBuilder('o')
+            ->select('o.biobankId', 'o.orderId', 'o.rdrId', 'o.collectedTs', 'o.finalizedTs', 's.mayolinkAccount')
+            ->leftJoin(Site::class, 's', Join::WITH, 'o.finalizedSite = s.siteId')
+            ->where('o.rdrId is not null')
+            ->andWhere('o.finalizedTs >= :finalizedTs')
+            ->setParameter('finalizedTs', (new \DateTime('-1 day'))->format('Y-m-d H:i:s'))
+            ->orderBy('o.finalizedTs', 'DESC')
+            ->addOrderBy('o.id', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }
