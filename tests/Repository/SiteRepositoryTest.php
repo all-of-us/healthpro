@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Service;
+namespace App\Tests\Repository;
 
 use App\Entity\Site;
 use App\Repository\SiteRepository;
@@ -66,5 +66,13 @@ class SiteRepositoryTest extends KernelTestCase
             }
         }
         $this->assertTrue($found);
+    }
+
+    public function testIncreaseGroupConcatMaxLength(): void
+    {
+        $this->repo->increaseGroupConcatMaxLength();
+        $sql = "SELECT @@group_concat_max_len AS group_concat_max_len";
+        $result = $this->em->getConnection()->executeQuery($sql)->fetchOne();
+        $this->assertSame(100000, $result);
     }
 }
