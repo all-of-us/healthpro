@@ -109,7 +109,7 @@ class SiteRepository extends ServiceEntityRepository
     public function increaseGroupConcatMaxLength(): void
     {
         $newMaxLength = 100000;
-        $sql = "SET SESSION group_concat_max_len = " . $newMaxLength;
+        $sql = 'SET SESSION group_concat_max_len = ' . $newMaxLength;
         try {
             $connection = $this->getEntityManager()->getConnection();
             $connection->executeStatement($sql);
