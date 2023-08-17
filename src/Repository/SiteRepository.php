@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Site;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -103,5 +104,17 @@ class SiteRepository extends ServiceEntityRepository
         return $qb->getQuery()
             ->getResult()
         ;
+    }
+
+    public function increaseGroupConcatMaxLength(): void
+    {
+        $newMaxLength = 100000;
+        $sql = "SET SESSION group_concat_max_len = " . $newMaxLength;
+        try {
+            $connection = $this->getEntityManager()->getConnection();
+            $connection->executeStatement($sql);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 }
