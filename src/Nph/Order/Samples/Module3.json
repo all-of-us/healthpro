@@ -16,20 +16,20 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 500,
-          "units": "uL",
+          "units": "μL",
           "barcodeLength" : 10,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 500,
-          "warningMinVolume": 100,
-          "warningMaxVolume": 800,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
           "addNew": false,
           "collectMetadata": false,
           "required": true
           }
       }
     },
-    "LiH4": {
+    "LIH4": {
       "label": "4 mL Li Hep",
       "color": "Green and gray",
       "temperature": "Refrigerated",
@@ -38,19 +38,19 @@
       "collectionVolume": "4 mL",
       "identifier": "LiH4",
       "aliquots": {
-        "LiHP1U": {
+        "LIHP1U": {
           "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 500,
-          "units": "uL",
+          "units": "μL",
           "barcodeLength" : 10,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 500,
-          "warningMinVolume": 100,
-          "warningMaxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
           "addNew": false,
           "collectMetadata": false,
           "required": true
@@ -71,13 +71,13 @@
           "description": "1.4mL Matrix tube",
           "expectedAliquots": 3,
           "expectedVolume": 500,
-          "units": "uL",
+          "units": "μL",
           "barcodeLength" : 10,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 500,
-          "warningMinVolume": 100,
-          "warningMaxVolume": 500,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 0.5,
           "addNew": false,
           "collectMetadata": false,
           "required": true
@@ -98,20 +98,20 @@
             "description": "1.4mL Matrix tube",
             "expectedAliquots": 3,
             "expectedVolume": 500,
-            "units": "uL",
+            "units": "μL",
             "barcodeLength" : 10,
             "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
             "minVolume": 0,
             "maxVolume": 500,
-            "warningMinVolume": 0,
-            "warningMaxVolume": 500,
+            "warningMinVolume": 0.1,
+            "warningMaxVolume": 0.5,
             "addNew": false,
             "collectMetadata": false,
             "required": true
         }
       }
     },
-    "urine": {
+    "URINE": {
       "label": "Spot Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
@@ -125,13 +125,13 @@
           "description": "1.4 mL Matrix tube",
           "expectedAliquots": 7,
           "expectedVolume": 1000,
-          "units": "uL",
+          "units": "μL",
           "barcodeLength" : 10,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
-          "minVolume": 500,
+          "minVolume": 0,
           "maxVolume": 1000,
-          "warningMinVolume": 0,
-          "warningMaxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1,
           "addNew": false,
           "collectMetadata": false
         },
@@ -141,13 +141,13 @@
           "description": "6mL Urine Aliquot Tube",
           "expectedAliquots": 1,
           "expectedVolume": 5,
-          "units": "uL",
+          "units": "mL",
           "barcodeLength" : 11,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 6mL urine aliquot tube barcode ID.",
-          "minVolume": 100,
-          "maxVolume": 5000,
-          "warningMinVolume": 5,
-          "warningMaxVolume": 10,
+          "minVolume": 0,
+          "maxVolume": 5,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 5000,
           "addNew": false,
           "collectMetadata": false
         }
@@ -208,7 +208,7 @@
         }
       }
     },
-    "urineDlw": {
+    "URINEDLW": {
       "label": "Urine DLW",
       "color": "Yellow",
       "temperature": "Refrigerated",
@@ -226,9 +226,9 @@
           "barcodeLength" : 11,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 10mL urine aliquot tube barcode ID.",
           "minVolume": 0,
-          "maxVolume": 10,
-          "warningMinVolume": 5,
-          "warningMaxVolume": 10,
+          "maxVolume": 8,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 8000,
           "addNew": false,
           "collectMetadata": false
         }
@@ -249,7 +249,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST1"
+      "identifier": "ST1-K"
     },
     "ST2": {
       "label": "95% Ethanol Tube 2",
@@ -257,7 +257,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST2"
+      "identifier": "ST2-K"
     },
     "ST3": {
       "label": "DNA/RNA Shield Tube 1",
@@ -265,7 +265,7 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST3"
+      "identifier": "ST3-K"
     },
     "ST4": {
       "label": "DNA/RNA Shield Tube 2",
@@ -273,15 +273,15 @@
       "temperature": "Refrigerated",
       "specimen": "Stool",
       "type": "stool",
-      "identifier": "ST4"
+      "identifier": "ST4-K"
     },
-    "TU1": {
+    "URINE24": {
       "label": "24 Hour Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "24 Hour Urine",
       "type": "24urine",
-      "identifier": "TU1",
+      "identifier": "Urine24",
       "aliquots": {
         "TU1U": {
           "identifier": "TU1-U",
@@ -289,13 +289,13 @@
           "description": "1.4mL Matrix Tube",
           "expectedAliquots": 10,
           "expectedVolume": 1000,
-          "units": "uL",
+          "units": "μL",
           "barcodeLength" : 10,
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
-          "maxVolume": 2,
-          "warningMinVolume": 500,
-          "warningMaxVolume": 1200,
+          "maxVolume": 1000,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 1,
           "addNew": false,
           "collectMetadata": false
         }

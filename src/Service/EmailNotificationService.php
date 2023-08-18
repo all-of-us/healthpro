@@ -43,6 +43,7 @@ abstract class EmailNotificationService
 
     public function sendEmails()
     {
+        $this->siteRepository->increaseGroupConcatMaxLength();
         $results = $this->getResults();
         foreach ($results as $result) {
             $participants = $this->getParticipants($result['id'], $result['last']);

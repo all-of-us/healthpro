@@ -31,10 +31,10 @@
     <div class="page-header row participant-name" id="participant-info" data-id="{{ participant.id }}">
         <h2>
             {{ participant.lastName }}, {{ participant.firstName }}
+            <i class="fa fa-sm fa-barcode clickable" data-toggle="modal" data-target="#participant-barcode-modal" id="participant-barcode-icon"></i>
             {% if participant.module %}
                 <span class="label label-warning nph-module-badge nph-module-1" style="font-size: small">NPH Module {{ participant.module }}</span>
             {% endif %}
-            <i class="fa fa-barcode clickable" data-toggle="modal" data-target="#participant-barcode-modal" id="participant-barcode-icon"></i>
         </h2>
     </div>
     <div class="page-header row participant-information">
