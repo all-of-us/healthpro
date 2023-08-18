@@ -24,24 +24,25 @@
                     <div id="evaluation-overflow">
                 {% endif %}
                 {% if readOnly is defined %}
-                    <div class="btn btn-block btn-lg border w-100 btn-readonly">
+                    <div class="text-start btn btn-block btn-lg border w-100 btn-readonly">
                 {% else %}
                     {% set measurementRoute = readOnlyView ? 'read_measurement' : 'measurement' %}
-                    <a href="{{ path(measurementRoute, { participantId: participant.id, measurementId: measurement.id }) }}" class="btn btn-block btn-lg border text-dark w-100 {% if evalId is defined and measurement.id == evalId %} btn-warning {% else %} {% endif %}">
+                    <a href="{{ path(measurementRoute, { participantId: participant.id, measurementId: measurement.id }) }}" class="text-start btn btn-block btn-lg border text-dark w-100 {% if evalId is defined and measurement.id == evalId %} btn-warning {% else %} {% endif %}">
                 {% endif %}
-                {{ measurement.createdTs|date('D n/j/Y', app.user.timezone) }}<br />
+                <strong class="fs-6 text-muted">{{ measurement.createdTs|date('D n/j/Y', app.user.timezone) }}</strong><br>
                 <small class="text-muted">
+                    <small class="fs-xs">Status</small><br>
                     {% set historyType = measurement.history.type is defined ? measurement.history.type : '' %}
                     {% if historyType == 'cancel' %}
-                        <span class="badge bg-danger">Cancelled</span> {{ measurement.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        <span class="badge bg-danger">Cancelled</span> <span class="fs-sm">{{ measurement.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
                     {% elseif measurement.rdrId is empty and measurement.parentId is empty %}
-                        <span class="badge bg-secondary">Saved &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        <span class="badge bg-secondary">Saved &amp; Unfinalized</span> <span class="fs-sm">{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
                     {% elseif measurement.rdrId and measurement.parentId %}
-                        <span class="badge bg-success">Edited &amp; Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        <span class="badge bg-success">Edited &amp; Finalized</span> <span class="fs-sm">{{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
                     {% elseif measurement.rdrId %}
-                        <span class="badge bg-success">Finalized</span> {{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        <span class="badge bg-success">Finalized</span> <span class="fs-sm">{{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
                     {% elseif measurement.parentId and measurement.rdrId is empty %}
-                        <span class="badge bg-warning">Edited &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                        <span class="badge bg-warning">Edited &amp; Unfinalized</span> <span class="fs-sm">{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
                     {% endif %}
                 </small>
                 {% if readOnly is defined %}
