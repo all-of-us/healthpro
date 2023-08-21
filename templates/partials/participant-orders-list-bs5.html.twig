@@ -26,7 +26,7 @@
     </div>
     <div class="card-body in-person-card">
         {% if (readOnly is defined or biobankView is defined or participant.isSuspended or participant.editExistingOnly) and orders|length == 0 %}
-            <small class="text-warning">No Records Found</small>
+            <small class="text-secondary">No Records Found</small>
         {% else %}
             {% for order in orders %}
                 {% if type is not defined and loop.index == 6 %}
@@ -47,24 +47,24 @@
                             <small class="fs-xs">Status</small><br>
                             {% set historyType = order.history.type is defined ? order.history.type : '' %}
                             {% if historyType == 'cancel' %}
-                                <span class="badge bg-danger">Cancelled</span> <span class="fs-sm">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
+                                <span class="badge bg-danger">Cancelled</span> <span class="fs-sm d-block d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
                             {% elseif not order.finalizedTs and not order.version %}
                                 <span class="badge bg-danger">Expired</span>
                             {% elseif historyType == 'unlock' %}
-                                <span class="badge bg-primary">Unlocked for editing</span> <span class="fs-sm">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
+                                <span class="badge bg-primary">Unlocked for editing</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
                             {% elseif historyType == 'edit' %}
-                                <span class="badge bg-success">Edited &amp; Finalized</span> <span class="fs-sm">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
+                                <span class="badge bg-success">Edited &amp; Finalized</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
                             {% elseif order.finalizedTs and order.rdrId %}
                                 {% if order.biobankFinalized %}
                                     <span class="badge bg-warning">Biobank Finalized</span>
                                 {% else %}
                                     <span class="badge bg-success">Finalized</span>
                                 {% endif %}
-                                <span class="fs-sm">{{ _self.displayDateTime(order, 'finalized', isBiobankView) }}</span>
+                                <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'finalized', isBiobankView) }}</span>
                             {% elseif order.processedTs %}
-                                <span class="badge bg-info">Processed</span> <span class="fs-sm">{{ _self.displayDateTime(order, 'processed', isBiobankView) }}</span>
+                                <span class="badge bg-info">Processed</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'processed', isBiobankView) }}</span>
                             {% elseif order.collectedTs %}
-                                <span class="badge bg-secondary">Collected</span> <span class="fs-sm">{{ _self.displayDateTime(order, 'collected', isBiobankView) }}</span>
+                                <span class="badge bg-secondary">Collected</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'collected', isBiobankView) }}</span>
                             {% endif %}
                         </small>
                     </div>
