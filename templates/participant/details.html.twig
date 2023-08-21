@@ -59,6 +59,13 @@
             </div>
             <div class="col-sm-9">
                 <div>
+                    {% if participant.activityStatus == 'deactivated' %}
+                        {% include 'partials/participant-deactivated-status-notice.html.twig' %}
+                    {% endif %}
+
+                    {% if participant.deceasedStatus == 'PENDING' or participant.deceasedStatus == 'APPROVED' %}
+                        {% include 'partials/deceased-participant-notice.html.twig' %}
+                    {% endif %}
                     {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
                         <div class="btn-group float-end">
                             {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
@@ -579,13 +586,6 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if participant.activityStatus == 'deactivated' %}
-                    {% include 'partials/participant-deactivated-status-notice.html.twig' %}
-                {% endif %}
-
-                {% if participant.deceasedStatus == 'PENDING' or participant.deceasedStatus == 'APPROVED' %}
-                    {% include 'partials/deceased-participant-notice.html.twig' %}
-                {% endif %}
 
                 {% if canViewPatientStatus %}
                     {# Patient status history modal window #}
