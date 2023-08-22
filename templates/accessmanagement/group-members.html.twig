@@ -15,7 +15,7 @@
         <a href="{{ resetPasswordUrl }}" target="_blank" class="btn btn-primary">Reset Password <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
     </div>
     <br/><br/><br/>
-    <table class="table table-striped table-hover table-bordered">
+    <table class="table table-striped table-hover table-bordered dataTable" data-table-page-length="25" data-table-order-column="0" data-table-order="asc" data-table-column-defs="{'targets': 2, 'orderable': 'false'}"a>
         <thead>
         <tr>
             <th>Pmi-Ops Credentials</th>
@@ -49,15 +49,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            $('table').DataTable({
-                order: [[0, 'asc']],
-                pageLength: 25,
-                columnDefs: [
-                    {targets: 2, orderable: false}
-                ]
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('datatable') }}
 {% endblock %}

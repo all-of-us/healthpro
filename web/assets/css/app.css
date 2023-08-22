@@ -914,3 +914,7 @@ table.table-samples td {
     font-weight: normal;
     font-style: italic;
 }
+
+.display-none {
+    display: none;
+}
