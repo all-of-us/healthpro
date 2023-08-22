@@ -6,6 +6,7 @@
             <small>{{ participant.shortId }}</small>
         </h2>
     </div>
+    <div class="display-none" id="participantId" data-participant-id="{{ participant.id|json_encode|raw }}"></div>
 
     <div class="row">
         <div class="col-sm-6">
@@ -51,30 +52,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            if ($("#participant-barcode").length === 1) {
-                JsBarcode("#participant-barcode", {{ participant.id|json_encode|raw }}, {
-                    width: 2,
-                    height: 50,
-                    displayValue: true
-                });
-            }
-            $('#order-overflow-show').on('click', function (e) {
-                $(this).hide();
-                $('#order-overflow').show();
-                e.preventDefault();
-            });
-            $('#evaluation-overflow-show').on('click', function (e) {
-                $(this).hide();
-                $('#evaluation-overflow').show();
-                e.preventDefault();
-            });
-            $('#problem-overflow-show').on('click', function (e) {
-                $(this).hide();
-                $('#problem-overflow').show();
-                e.preventDefault();
-            });
-        });
-    </script>
+    {{ encore_entry_script_tags('workqueue-participant') }}
 {% endblock %}
