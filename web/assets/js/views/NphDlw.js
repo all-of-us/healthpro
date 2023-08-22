@@ -1,8 +1,6 @@
 $(document).ready(function () {
     $("input#dlw_participantWeight").on("change", function () {
-        let weight = $(this).val();
-        let dosage = weight * 1.5;
-        $("input#dlw_calculatedDose").val(dosage.toFixed(0));
+        calculateDose();
     });
 
     $("#enter_pound").on("click", function () {
@@ -27,4 +25,12 @@ $(document).ready(function () {
             '<button type="submit" class="btn btn-primary" id="form_submit" formnovalidate>Save</button>'
         );
     });
+
+    function calculateDose() {
+        let weight = $("input#dlw_participantWeight").val();
+        let dosage = weight * 1.5;
+        $("input#dlw_calculatedDose").val(dosage.toFixed(0));
+    }
+
+    calculateDose();
 });

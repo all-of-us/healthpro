@@ -15,15 +15,16 @@ use Symfony\Component\Validator\Constraints\Range;
 
 class DlwType extends AbstractType
 {
+    private const DOSE_BATCH_ID_DIGITS = 8;
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('doseBatchId', TextType::class, [
                 'label' => 'Dose Batch ID',
                 'constraints' => new Range([
-                    'min' => 10 ** (8 - 1),
-                    'max' => (10 ** 8) - 1,
-                    'notInRangeMessage' => 'Dose Batch ID invalid, Please enter a valid dose batch ID   ',
+                    'min' => 10 ** ($this::DOSE_BATCH_ID_DIGITS - 1),
+                    'max' => (10 ** $this::DOSE_BATCH_ID_DIGITS) - 1,
+                    'notInRangeMessage' => 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . $this::DOSE_BATCH_ID_DIGITS . ' digits).',
                 ]),
                 'required' => true,
                 'attr' => ['class' => 'form-control'],
@@ -36,8 +37,9 @@ class DlwType extends AbstractType
             ->add('participantWeight', NumberType::class, [
                 'required' => true,
                 'label' => 'Participant Weight (kg)*',
+                'empty_data' => 0,
                 'constraints' => new Callback(function ($value, $context) {
-                    if ($value < 0 || $value == null) {
+                    if ($value < 0 || $value === null) {
                         $context->buildViolation('Participant weight required.')
                             ->addViolation();
                         return false;

@@ -518,6 +518,17 @@ class NphOrderService
                 }
             }
         }
+        if ($order->getOrderType() === NphOrder::TYPE_MODULE_3_SALIVA) {
+            foreach ($order->getNphSamples() as $nphSample) {
+               foreach ($nphSample->getNphAliquots() as $aliquot) {
+                    if (!empty($aliquot->getAliquotMetadata())) {
+                        foreach ($aliquot->getAliquotMetadata() as $metadataKey => $metadataValue) {
+                            $sampleData[$metadataKey][] = $metadataValue;
+                        }
+                    }
+               }
+            }
+        }
         $aliquots = $sample->getNphAliquots();
         foreach ($aliquots as $aliquot) {
             $sampleData[$aliquot->getAliquotCode()][] = $aliquot->getAliquotId();
@@ -795,6 +806,8 @@ class NphOrderService
         $formData->setNphParticipant($participantId);
         $formData->setModule($module);
         $formData->setVisit($visit);
+        $formData->setModifiedTimezoneId($this->getTimezoneid());
+        $formData->setModifiedTs(new DateTime());
         $this->em->persist($formData);
         $this->em->flush();
         return $formData;
@@ -804,7 +817,7 @@ class NphOrderService
     {
         $dlwSummary = [];
         foreach ($dlwRepository as $dlw) {
-            $dlwSummary[$dlw->getModule()][$dlw->getVisit()] = $dlw->getDoseAdministered();
+            $dlwSummary[$dlw->getModule()][$dlw->getVisit()] = $dlw->getModifiedTs();
         }
         return $dlwSummary;
     }
@@ -840,7 +853,7 @@ class NphOrderService
                     'sampleStatus' => $sampleStatus,
                     'sampleCollectionVolume' => $sampleCollectionVolume,
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
-                    'sampleTypeDisplayName' => ucwords($module->getSampleType($sample->getSampleCode())),
+                    'sampleTypeDisplayName' => $module->getSampleTypeDisplayName($sample->getSampleCode()),
                     'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
                     'visitDisplayName' => $visitTypes[$order->getVisitType()],
                     'sampleGroup' => $sample->getSampleGroup(),

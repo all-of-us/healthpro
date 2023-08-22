@@ -35,6 +35,12 @@ class NphDlw
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $doseAdministered;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $modifiedTs = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $ModifiedTimezoneId = null;
+
     public function getId(): int
     {
         return $this->id;
@@ -120,6 +126,30 @@ class NphDlw
     public function setDoseAdministered(\DateTimeInterface $doseAdministered): static
     {
         $this->doseAdministered = $doseAdministered;
+
+        return $this;
+    }
+
+    public function getModifiedTs(): ?\DateTime
+    {
+        return $this->modifiedTs;
+    }
+
+    public function setModifiedTs(?\DateTime $modifiedTs): self
+    {
+        $this->modifiedTs = $modifiedTs;
+
+        return $this;
+    }
+
+    public function getModifiedTimezoneId(): ?int
+    {
+        return $this->ModifiedTimezoneId;
+    }
+
+    public function setModifiedTimezoneId(?int $ModifiedTimezoneId): static
+    {
+        $this->ModifiedTimezoneId = $ModifiedTimezoneId;
 
         return $this;
     }
