@@ -59,6 +59,12 @@
             </div>
             <div class="col-sm-9">
                 <div>
+                    {% if participant.activityStatus == 'deactivated' %}
+                        {% include 'partials/participant-deactivated-status-notice.html.twig' %}
+                    {% endif %}
+                    {% if participant.deceasedStatus == 'PENDING' or participant.deceasedStatus == 'APPROVED' %}
+                        {% include 'partials/deceased-participant-notice.html.twig' %}
+                    {% endif %}
                     {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
                         <div class="btn-group float-end">
                             {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
@@ -103,7 +109,7 @@
                                     </div>
                                 {% else %}
                                     <div class="col-sm-8 h-100 mb-4 col-sm-push-2 col-lg-6 col-lg-push-3">
-                                        {% include 'partials/participant-notice.html.twig' %}
+                                        {% include 'partials/participant-notice-bs5.html.twig' %}
                                     </div>
                                 {% endif %}
                             </div>
@@ -112,8 +118,8 @@
                             {% if canEdit and not siteInfo.isTestSite %}
                                 <div class="row">
                                     {% if participant.editExistingOnly %}
-                                        <div class="col-sm-12">
-                                            {% include 'partials/participant-notice.html.twig' %}
+                                        <div>
+                                            {% include 'partials/participant-notice-bs5.html.twig' %}
                                         </div>
                                     {% endif %}
                                     <div class="col-sm-6 {{ isDVType and not readOnlyView ? 'col-lg-4' : 'col-lg-6' }}">
@@ -132,7 +138,7 @@
                             {% else %}
                                 <div class="row">
                                     <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
-                                        {% include 'partials/participant-notice.html.twig' %}
+                                        {% include 'partials/participant-notice-bs5.html.twig' %}
                                     </div>
                                 </div>
                             {% endif %}
@@ -579,13 +585,6 @@
                         {% endif %}
                     </div>
                 </div>
-                {% if participant.activityStatus == 'deactivated' %}
-                    {% include 'partials/participant-deactivated-status-notice.html.twig' %}
-                {% endif %}
-
-                {% if participant.deceasedStatus == 'PENDING' or participant.deceasedStatus == 'APPROVED' %}
-                    {% include 'partials/deceased-participant-notice.html.twig' %}
-                {% endif %}
 
                 {% if canViewPatientStatus %}
                     {# Patient status history modal window #}

@@ -24,3 +24,11 @@
 .in-person-card .btn-block:hover {
     background-color: #e6e6e6;
 }
+
+.fs-xs {
+    font-size: 0.75rem;
+}
+
+.fs-sm {
+    font-size: 0.875rem;
+}

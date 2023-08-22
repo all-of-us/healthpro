@@ -19,52 +19,61 @@
 
 <div class="card">
     <div class="card-header">
+        {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView %}
+            <a href="{{ path('order_check', { participantId: participant.id }) }}" class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank Order</a>
+        {% endif %}
         <h5 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h5>
     </div>
     <div class="card-body in-person-card">
         {% if (readOnly is defined or biobankView is defined or participant.isSuspended or participant.editExistingOnly) and orders|length == 0 %}
-            <small class="text-warning">No Records Found</small>
+            <small class="text-secondary">No Records Found</small>
         {% else %}
             {% for order in orders %}
                 {% if type is not defined and loop.index == 6 %}
                     <div id="order-overflow">
                 {% endif %}
                 {% if order.origin is defined and order.origin == 'careevolution' %}
-                    <a href="{{ path('biobank_quanum_order', { biobankId: participant.biobankId, orderId: order.rdrId }) }}" class="btn btn-block btn-lg border w-100 {% if orderId is defined and order.id == orderId %} btn-warning {% else %}  {% endif %}">
+                    <a href="{{ path('biobank_quanum_order', { biobankId: participant.biobankId, orderId: order.rdrId }) }}" class="text-start btn btn-block btn-lg border w-100 {% if orderId is defined and order.id == orderId %} btn-warning {% else %}  {% endif %}">
                 {% elseif biobankView is defined %}
-                    <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="btn btn-block btn-lg border w-100 {% if orderId is defined and order.id == orderId %} btn-warning {% else %} {% endif %}">
+                    <a href="{{ path('biobank_order', { biobankId: participant.biobankId, orderId: order.id }) }}" class="text-start btn btn-block btn-lg border w-100 {% if orderId is defined and order.id == orderId %} btn-warning {% else %} {% endif %}">
                 {% else %}
                     {% set orderRoute = readOnlyView ? 'read_order' : 'order' %}
-                    <a href="{{ path(orderRoute, { participantId: participant.id, orderId: order.id }) }}" class="btn btn-block btn-lg border w-100  {% if orderId is defined and order.id == orderId %} btn-warning {% else %} {% endif %}">
+                    <a href="{{ path(orderRoute, { participantId: participant.id, orderId: order.id }) }}" class="text-start btn btn-block btn-lg border w-100  {% if orderId is defined and order.id == orderId %} btn-warning {% else %} {% endif %}">
                 {% endif %}
-                {{ order.createdTs|date('D n/j/Y', app.user.timezone) }}
-                <small class="text-muted"><strong>{{ order.orderId }}</strong></small>
-                <br/>
-                <small class="text-muted">
-                    {% set historyType = order.history.type is defined ? order.history.type : '' %}
-                    {% if historyType == 'cancel' %}
-                        <span class="badge bg-danger">Cancelled</span> {{ _self.displayDateTime(order.history, 'created', isBiobankView) }}
-                    {% elseif not order.finalizedTs and not order.version %}
-                        <span class="badge bg-danger">Expired</span>
-                    {% elseif historyType == 'unlock' %}
-                        <span class="badge bg-primary">Unlocked for editing</span> {{ _self.displayDateTime(order.history, 'created', isBiobankView) }}
-                    {% elseif historyType == 'edit' %}
-                        <span class="badge bg-success">Edited &amp; Finalized</span> {{ _self.displayDateTime(order.history, 'created', isBiobankView) }}
-                    {% elseif order.finalizedTs and order.rdrId %}
-                        {% if order.biobankFinalized %}
-                            <span class="badge bg-warning">Biobank Finalized</span>
-                        {% else %}
-                            <span class="badge bg-success">Finalized</span>
-                        {% endif %}
-                        {{ _self.displayDateTime(order, 'finalized', isBiobankView) }}
-                    {% elseif order.processedTs %}
-                        <span class="badge bg-info">Processed</span> {{ _self.displayDateTime(order, 'processed', isBiobankView) }}
-                    {% elseif order.collectedTs %}
-                        <span class="badge bg-secondary">Collected</span> {{ _self.displayDateTime(order, 'collected', isBiobankView) }}
-                    {% endif %}
-                </small>
-                {% if order.collectedTs %} <br/> {% endif %}
-                <small>Order Type: {{ order.orderTypeDisplayText }}</small>
+                <div class="row">
+                    <div class="col-sm-6 border-end">
+                        <strong class="fs-6 text-muted">{{ order.createdTs|date('D n/j/Y', app.user.timezone) }}</strong><br>
+                        <small class="text-muted">
+                            <small class="fs-xs">Status</small><br>
+                            {% set historyType = order.history.type is defined ? order.history.type : '' %}
+                            {% if historyType == 'cancel' %}
+                                <span class="badge bg-danger">Cancelled</span> <span class="fs-sm d-block d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
+                            {% elseif not order.finalizedTs and not order.version %}
+                                <span class="badge bg-danger">Expired</span>
+                            {% elseif historyType == 'unlock' %}
+                                <span class="badge bg-primary">Unlocked for editing</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
+                            {% elseif historyType == 'edit' %}
+                                <span class="badge bg-success">Edited &amp; Finalized</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
+                            {% elseif order.finalizedTs and order.rdrId %}
+                                {% if order.biobankFinalized %}
+                                    <span class="badge bg-warning">Biobank Finalized</span>
+                                {% else %}
+                                    <span class="badge bg-success">Finalized</span>
+                                {% endif %}
+                                <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'finalized', isBiobankView) }}</span>
+                            {% elseif order.processedTs %}
+                                <span class="badge bg-info">Processed</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'processed', isBiobankView) }}</span>
+                            {% elseif order.collectedTs %}
+                                <span class="badge bg-secondary">Collected</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'collected', isBiobankView) }}</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="col-sm-6 text-muted">
+                        <small class="fs-sm"><strong>Order ID: {{ order.orderId }}</strong></small><br>
+                        <small class="fs-xs">Order Type</small><br>
+                        <small class="fs-sm">{{ order.orderTypeDisplayText }}</small>
+                    </div>
+                </div>
                 </a>
             {% endfor %}
             {% if type is not defined and orders|length > 5 %}
@@ -72,9 +81,6 @@
                 <a href="#" class="btn btn-block btn-lg border w-100" id="order-overflow-show">
                     <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
                 </a>
-            {% endif %}
-            {% if type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView %}
-                <a href="{{ path('order_check', { participantId: participant.id }) }}" class="btn btn-block btn-lg border w-100"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Order</a>
             {% endif %}
         {% endif %}
     </div>
