@@ -60,7 +60,7 @@
         {% if not skipVolume %}
             {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i) }}
         {% elseif skipVolume and sample.unlocked %}
-            <td></td><td></td>
+            <td colspan="2"><i class="fa fa-eraser text-danger clear-aliquot-widget" style="font-size: 22px" role="button"></i></td>
         {% endif %}
         {% if form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
             <td class="row">
