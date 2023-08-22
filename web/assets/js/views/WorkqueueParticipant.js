@@ -1,6 +1,7 @@
 $(document).ready(function () {
+    let participantInfo = $("#participant_info");
     if ($("#participant-barcode").length === 1) {
-        JsBarcode("#participant-barcode", JSON.parse($("#participantId").data("participant-id")), {
+        JsBarcode("#participant-barcode", participantInfo.data("participant-id"), {
             width: 2,
             height: 50,
             displayValue: true
