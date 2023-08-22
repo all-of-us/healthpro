@@ -96,7 +96,7 @@
             "identifier": "P800P1-U",
             "container": "1.4mL Matrix tube",
             "description": "1.4mL Matrix tube",
-            "expectedAliquots": 3,
+            "expectedAliquots": 2,
             "expectedVolume": 500,
             "units": "μL",
             "barcodeLength" : 10,
@@ -153,24 +153,25 @@
         }
       }
     },
-    "saliva": {
+    "SALIVA": {
       "label": "Saliva",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Saliva",
-      "type": "saliva",
+      "type": "saliva3",
+      "typeDisplayName": "Saliva",
       "identifier": "Saliva",
       "aliquots": {
         "SALIVAA1": {
           "identifier": "SA1-U",
-          "container": "5mL Matrix tube (no glycerol)",
-          "description": "5mL Matrix tube",
+          "container": "4mL Matrix tube (no glycerol)",
+          "description": "4mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 2.4,
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
-          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 4,
           "warningMinVolume": 100,
@@ -180,14 +181,14 @@
         },
         "SALIVAA2": {
           "identifier": "SA2-U",
-          "container": "5mL Matrix tube (w/glycerol)",
-          "description": "5mL Matrix tube",
+          "container": "2.5mL Matrix tube (w/glycerol)",
+          "description": "2.5mL Matrix tube",
           "expectedAliquots": 1,
           "expectedVolume": 2,
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
-          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 1.4mL matrix aliquot tube barcode ID.",
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 2.5mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 4,
           "warningMinVolume": 100,
@@ -214,6 +215,7 @@
       "temperature": "Refrigerated",
       "specimen": "Urine DLW",
       "type": "urineDlw",
+      "typeDisplayName": "Urine DLW",
       "identifier": "UrineDLW",
       "aliquots": {
         "RU3L": {
@@ -281,6 +283,7 @@
       "temperature": "Refrigerated",
       "specimen": "24 Hour Urine",
       "type": "24urine",
+      "typeDisplayName": "24 Hour Urine",
       "identifier": "Urine24",
       "aliquots": {
         "TU1U": {
