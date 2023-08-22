@@ -110,7 +110,9 @@ class testSetup
         \DateTime $doseAdministered = null,
         float $actualDose = null,
         float $participantWeight = null,
-        string $doseBatchId = null): NphDlw
+        string $doseBatchId = null,
+        \DateTime $dateModified = null,
+        int $modifiedTimezoneId = null): NphDlw
     {
         if ($participantId === null) {
             $participantId = 'P0000000001';
@@ -133,6 +135,12 @@ class testSetup
         if ($actualDose === null) {
             $actualDose = 15.5;
         }
+        if ($dateModified === null) {
+            $dateModified = new \DateTime('2000-01-01');
+        }
+        if ($modifiedTimezoneId === null) {
+            $modifiedTimezoneId = 3;
+        }
         $dlw = new NphDlw();
         $dlw->setDoseAdministered($doseAdministered);
         $dlw->setModule($module);
@@ -141,6 +149,8 @@ class testSetup
         $dlw->setActualDose($actualDose);
         $dlw->setNphParticipant($participantId);
         $dlw->setDoseBatchId($doseBatchId);
+        $dlw->setModifiedTs($dateModified);
+        $dlw->setModifiedTimezoneId($modifiedTimezoneId);
         $this->em->persist($dlw);
         $this->em->flush();
         return $dlw;
