@@ -18,7 +18,7 @@ final class Version20230818143032 extends AbstractMigration
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE nph_dlw ADD modified_ts DATETIME null, ADD modified_timezone_id INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE nph_dlw ADD modified_ts DATETIME NOT NULL, ADD modified_timezone_id INT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
