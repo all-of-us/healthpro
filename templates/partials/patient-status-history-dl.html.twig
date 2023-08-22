@@ -1,20 +1,20 @@
 {% for key, field in orgPatientStatusHistoryData %}
-      <dl class="dl-horizontal">
-          <dt>Status</dt>
-          <dd>{{ field.display_status }}</dd>
-          <dt>User</dt>
-          <dd>{{ field.user_email }}</dd>
-          <dt>Site</dt>
-          <dd>{{ field.site_name }}</dd>
-          <dt>Date</dt>
-          <dd>
+      <dl class="row">
+          <dt class="col-sm-3">Status</dt>
+          <dd class="col-sm-9">{{ field.display_status }}</dd>
+          <dt class="col-sm-3">User</dt>
+          <dd class="col-sm-9">{{ field.user_email }}</dd>
+          <dt class="col-sm-3">Site</dt>
+          <dd class="col-sm-9">{{ field.site_name }}</dd>
+          <dt class="col-sm-3">Date</dt>
+          <dd class="col-sm-9">
               {{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}
               {% if field.import_id %}
                   <span class="label label-primary">Imported</span>
               {% endif %}
           </dd>
-          <dt>Comments</dt>
-          <dd>{{ field.comments }}</dd>
+          <dt class="col-sm-3">Comments</dt>
+          <dd class="col-sm-9">{{ field.comments }}</dd>
       </dl>
       {% if not loop.last %}
           <hr>

@@ -21,3 +21,13 @@
 .clickable {
     cursor: pointer;
 }
+
+.page-header h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #363272;
+}
+
+.participant-details-card {
+    background-color: #f8f9fa;
+}

@@ -1,51 +1,52 @@
+{% form_theme incentiveForm 'bootstrap_5_layout.html.twig' %}
 {% set readOnlyView = readOnlyView|default(false) %}
-<div class="panel panel-default incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}"
+<div class="card incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}"
      data-has-incentives="{{ incentives is defined and incentives ? 1 : 0 }}">
-    <div class="panel-heading">
-        <h3 class="panel-title">
+    <div class="card-header">
+        <h6>
             {% if type is defined and type == 'edit' %}
                 <i class="fa fa-edit" aria-hidden="true"></i> Edit Incentive
             {% else %}
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Incentive
             {% endif %}
-        </h3>
+        </h6>
     </div>
     {% import 'macros/display-text.html.twig' as macros %}
     {{ macros.displayFlashMessage('incentive') }}
-    <div class="panel-body">
+    <div class="card-body">
         <div id="incentives-data-box">
             {% if incentives is defined and incentives is not empty %}
                 {% set incentive = incentives[0] %}
-                <dl class="dl-horizontal">
-                    <dt>Date Created</dt>
-                    <dd>
+                <dl class="row">
+                    <dt class="col-sm-4">Date Created</dt>
+                    <dd class="col-sm-8">
                         {{ incentive.createdTs|date('n/j/Y g:ia', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}
                         {% if incentive.import %}
                             <span class="label label-primary">Imported</span>
                         {% endif %}
                     </dd>
-                    <dt>Date of Service</dt>
-                    <dd>{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
-                    <dt>Incentive Occurrence</dt>
-                    <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
+                    <dt class="col-sm-4">Date of Service</dt>
+                    <dd class="col-sm-8">{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
+                    <dt class="col-sm-4">Incentive Occurrence</dt>
+                    <dd class="col-sm-8">{{ incentive.incentiveOccurrenceDisplayName }}</dd>
                     {% if incentive.otherIncentiveOccurrence %}
-                        <dt>Other Incentive Occurrence</dt>
-                        <dd>{{ incentive.otherIncentiveOccurrence }}</dd>
+                        <dt class="col-sm-4">Other Incentive Occurrence</dt>
+                        <dd class="col-sm-8">{{ incentive.otherIncentiveOccurrence }}</dd>
                     {% endif %}
-                    <dt>Incentive Type</dt>
-                    <dd>
+                    <dt class="col-sm-4">Incentive Type</dt>
+                    <dd class="col-sm-8">
                         {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
                     </dd>
                     {% if incentive.otherIncentiveType %}
-                        <dt>Other Incentive Type</dt>
-                        <dd>{{ incentive.otherIncentiveType }}</dd>
+                        <dt class="col-sm-4">Other Incentive Type</dt>
+                        <dd class="col-sm-8">{{ incentive.otherIncentiveType }}</dd>
                     {% endif %}
-                    <dt>Incentive Amount</dt>
-                    <dd>{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
-                    <dt>Notes</dt>
-                    <dd>{{ incentive.notes }}</dd>
-                    <dt>Declined</dt>
-                    <dd>{{ incentive.declined ? 'Yes' : 'No' }}</dd>
+                    <dt class="col-sm-4">Incentive Amount</dt>
+                    <dd class="col-sm-8">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                    <dt class="col-sm-4">Notes</dt>
+                    <dd class="col-sm-8">{{ incentive.notes }}</dd>
+                    <dt class="col-sm-4">Declined</dt>
+                    <dd class="col-sm-8">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                 </dl>
                 {% if not readOnlyView %}
                     <div class="text-center">
@@ -86,9 +87,9 @@
             {% if not readOnlyView %}
                 <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
                 {% if type is defined and type == 'edit' %}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                 {% else %}
-                    <button type="button" class="btn btn-default" id="incentive_cancel">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" id="incentive_cancel">Cancel</button>
                 {% endif %}
             {% endif %}
             {{ form_end(incentiveForm) }}
@@ -98,55 +99,55 @@
         <div class="panel-group view-details" id="accordion" role="tablist" aria-multiselectable="true">
         <div>
             <div class="panel-heading bg-secondary text-white view-history-dropdown" role="tab" id="headingOne">
-                <div role="button" data-toggle="collapse" data-parent="#accordion"
-                     href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <div role="button" data-bs-toggle="collapse" data-parent="#accordion"
+                     data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                     View Incentive History
                     <span class="badge badge-light">{{ incentives|length }}</span>
                 </div>
             </div>
-            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div id="collapseOne" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
                         {% if not readOnlyView  and incentive.site == siteInfo.siteId %}
-                            <div class="pull-right incentive-modify">
+                            <div class="float-end incentive-modify">
                                 <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                                 <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
                             </div>
                         {% endif %}
-                        <dl class="dl-horizontal">
-                            <dt>Date Created</dt>
-                            <dd>
+                        <dl class="row">
+                            <dt class="col-sm-5">Date Created</dt>
+                            <dd class="col-sm-7">
                                 {{ incentive.createdTs|date('n/j/Y g:ia', app.user.timezone) }} {{ incentive.amendedTs ? '(Amended)' : '' }}
                                 {% if incentive.import %}
                                     <span class="label label-primary">Imported</span>
                                 {% endif %}
                             </dd>
-                            <dt>User</dt>
-                            <dd>{{ incentive.user ? incentive.user.email : '' }}</dd>
-                            <dt>Site</dt>
-                            <dd>{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
-                            <dt>Date of Service</dt>
-                            <dd>{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
-                            <dt>Incentive Occurrence</dt>
-                            <dd>{{ incentive.incentiveOccurrenceDisplayName }}</dd>
+                            <dt class="col-sm-5">User</dt>
+                            <dd class="col-sm-7">{{ incentive.user ? incentive.user.email : '' }}</dd>
+                            <dt class="col-sm-5">Site</dt>
+                            <dd class="col-sm-7">{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
+                            <dt class="col-sm-5">Date of Service</dt>
+                            <dd class="col-sm-7">{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
+                            <dt class="col-sm-5">Incentive Occurrence</dt>
+                            <dd class="col-sm-7">{{ incentive.incentiveOccurrenceDisplayName }}</dd>
                             {% if incentive.otherIncentiveOccurrence %}
-                                <dt>Other Incentive Occurrence</dt>
-                                <dd>{{ incentive.otherIncentiveOccurrence }}</dd>
+                                <dt class="col-sm-5">Other Incentive Occurrence</dt>
+                                <dd class="col-sm-7">{{ incentive.otherIncentiveOccurrence }}</dd>
                             {% endif %}
-                            <dt>Incentive Type</dt>
-                            <dd>
+                            <dt class="col-sm-5">Incentive Type</dt>
+                            <dd class="col-sm-7">
                                 {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
                             </dd>
                             {% if incentive.otherIncentiveType %}
-                                <dt>Other Incentive Type</dt>
-                                <dd>{{ incentive.otherIncentiveType }}</dd>
+                                <dt class="col-sm-5">Other Incentive Type</dt>
+                                <dd class="col-sm-7">{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
-                            <dt>Incentive Amount</dt>
-                            <dd>{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
-                            <dt>Notes</dt>
-                            <dd>{{ incentive.notes }}</dd>
-                            <dt>Declined</dt>
-                            <dd>{{ incentive.declined ? 'Yes' : 'No' }}</dd>
+                            <dt class="col-sm-5">Incentive Amount</dt>
+                            <dd class="col-sm-7">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                            <dt class="col-sm-5">Notes</dt>
+                            <dd class="col-sm-7">{{ incentive.notes }}</dd>
+                            <dt class="col-sm-5">Declined</dt>
+                            <dd class="col-sm-7">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                         </dl>
                         <hr/>
                     {% endfor %}
@@ -162,7 +163,7 @@
         <div class="modal-content">
             <div class="modal-body">Are you sure you want to amend this incentive occurrence?</div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Go Back</button>
                 <a class="btn btn-primary incentive-ok" id="incentive_amend_ok" data-loading-text="Loading..." data-href="">Ok</a>
             </div>
         </div>
@@ -176,7 +177,7 @@
                 <div class="modal-body">Are you sure you want to remove this incentive occurrence?</div>
                 <div class="modal-footer">
                     {{ form_start(incentiveDeleteForm) }}
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Go Back</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Go Back</button>
                         <button type="submit" class="btn btn-primary">Ok</button>
                     {{ form_end(incentiveDeleteForm) }}
                 </div>

@@ -1,54 +1,54 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block title %}Participant {{ participant.id }} - {% endblock %}
+{% block bodycontainer %}container-fluid px-5{% endblock %}
 {% block body %}
-    <div class="page-header">
-        <h2>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }}
-            <small>{{ participant.shortId }}</small>
-        </h2>
+<div class="row">
+    <div class="col-sm-3 participant-details-col">
+        <div class="card participant-details-card">
+            <div class="card-body">
+                <div class="page-header">
+                    <h3>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small><i class="fa fa-barcode fa-xs clickable" data-bs-toggle="modal" data-bs-target="#participant-barcode-modal" id="participant-barcode-icon"></i></h3>
+                </div>
+                <hr>
+                {% include 'partials/participant-dl-bs5.html.twig' %}
+                <hr>
+                {% if cacheEnabled %}
+                    <div class="text-center">
+                        <small>
+                            Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
+                            <a href="{{ path('workqueue_participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px" class="btn btn-primary btn-xs"><i class="fa fa-refresh" aria-hidden="true"></i> Refresh</a>
+                        </small>
+                    </div>
+                    <br>
+                {% endif %}
+                {% include 'partials/participant-consent.html.twig' %}
+            </div>
+        </div>
     </div>
-    <div class="display-none" id="participantId" data-participant-id="{{ participant.id|json_encode|raw }}"></div>
-
-    <div class="row">
-        <div class="col-sm-6">
-            {% include 'partials/participant-dl.html.twig' %}
-        </div>
-        <div class="col-sm-6 text-center">
-            <svg id="participant-barcode"></svg>
-        </div>
+    <div class="col-sm-9">
+        {% if participant.status and not siteInfo.isTestSite %}
+            <div class="row">
+                <div class="col-sm-6 col-lg-4">
+                    {% include 'partials/participant-measurement-list-bs5.html.twig' %}
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    {% include 'partials/participant-orders-list-bs5.html.twig' %}
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
+                    {% include 'partials/participant-notice.html.twig' %}
+                </div>
+            </div>
+        {% endif %}
     </div>
-
-    {% if cacheEnabled %}
-        <div class="row">
-            <div class="col-sm-12 text-center">
-                <small>
-                    Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}
-                    <a href="{{ path('workqueue_participant', { id: participant.id, refresh: 1 }) }}" style="margin-left: 6px"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</a>
-                </small>
-            </div>
-        </div>
-    {% endif %}
-
-    {% include 'partials/participant-consent.html.twig' %}
-
-    {% if participant.status and not siteInfo.isTestSite %}
-        <div class="row">
-            <div class="col-sm-6 col-lg-4">
-                {% include 'partials/participant-measurement-list.html.twig' %}
-            </div>
-            <div class="col-sm-6 col-lg-4">
-                {% include 'partials/participant-orders-list.html.twig' %}
-            </div>
-            <div class="col-sm-6 col-lg-4">
-                {% include 'partials/participant-unanticipated-problems-list.html.twig' %}
-            </div>
-        </div>
-    {% else %}
-        <div class="row">
-            <div class="col-sm-8 col-sm-push-2 col-lg-6 col-lg-push-3">
-                {% include 'partials/participant-notice.html.twig' %}
-            </div>
-        </div>
-    {% endif %}
+</div>
+{% include 'partials/modals/participant-barcode.html.twig' %}
 {% endblock %}
 
 {% block pagejs %}
