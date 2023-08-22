@@ -520,13 +520,13 @@ class NphOrderService
         }
         if ($order->getOrderType() === NphOrder::TYPE_MODULE_3_SALIVA) {
             foreach ($order->getNphSamples() as $nphSample) {
-               foreach ($nphSample->getNphAliquots() as $aliquot) {
+                foreach ($nphSample->getNphAliquots() as $aliquot) {
                     if (!empty($aliquot->getAliquotMetadata())) {
                         foreach ($aliquot->getAliquotMetadata() as $metadataKey => $metadataValue) {
                             $sampleData[$metadataKey][] = $metadataValue;
                         }
                     }
-               }
+                }
             }
         }
         $aliquots = $sample->getNphAliquots();

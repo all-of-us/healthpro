@@ -139,7 +139,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'placeholder' => $metadataField['placeholder'] ?? '',
                                 'class' => $metadataField['class'] ?? '',
                             ],
-                            'data' => $formData[$aliquotCode.$metadataField['identifier']][0] ?? null,
+                            'data' => $formData[$aliquotCode . $metadataField['identifier']][0] ?? null,
                         ]);
                     }
                 }
