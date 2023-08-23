@@ -24,83 +24,105 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentStatus(value, time) %}
+{% macro displayConsentStatus(type, value, time) %}
     {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
     {% if value == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Consented Yes)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Consented Yes)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NO_CONSENT' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Refused Consent)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Refused Consent)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NOT_SURE' %}
         <i class="fa fa-question text-warning" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Responded Not Sure)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Responded Not Sure)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_INVALID' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Invalid)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Invalid)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        (Consent Not Completed) <br/>
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Consent Not Completed)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% endif %}
 {% endmacro %}
 
 {% macro displayEHRConsentStatus(value, time, ehrExpireStatus = '', ehrExpireDate = '') %}
+    {% set type= 'EHR Consent' %}
     {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
     {% if ehrExpireStatus == 'EXPIRED' %}
         <i class="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Expired on {{ ehrExpireDate ? ehrExpireDate|date('n/j/Y', app.user.timezone) }})
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Expired on {{ ehrExpireDate ? ehrExpireDate|date('n/j/Y', app.user.timezone) }})">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Consented Yes)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Consented Yes)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NO_CONSENT' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Refused Consent)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Refused Consent)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NOT_SURE' %}
         <i class="fa fa-question text-warning" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Responded Not Sure)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Responded Not Sure)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_INVALID' %}
         <i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i>
-        {{ time }} <br/>
-        <span title="An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review." data-toggle="tooltip" data-container="body">(Invalid)</span>
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Invalid) An error has been identified with this EHR Consent and a ticket has been submitted to PTSC for review.">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NOT_VALIDATED' %}
         <i class="fa fa-sync text-warning" aria-hidden="true"></i>
-        {{ time }} <br/>
-        <span title="The EHR Consent has been submitted and is currently undergoing validation. This process could take up to 24hrs to process." data-toggle="tooltip" data-container="body">(Processing)</span>
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Processing) The EHR Consent has been submitted and is currently undergoing validation. This process could take up to 24hrs to process.">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        (Consent Not Completed) <br/>
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Consent Not Completed)">
+            <strong>{{ type }}</strong>
+        </span>
     {% endif %}
 {% endmacro %}
 
 {% macro displayGenomicsConsentStatus(value, time) %}
+    {% set type= 'gRoR Consent' %}
     {% set time = time ? time|date('n/j/Y', app.user.timezone) %}
     {% if value == 'SUBMITTED' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Consented Yes)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Consented Yes)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NO_CONSENT' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Refused Consent)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Refused Consent)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_NOT_SURE' %}
         <i class="fa fa-check text-success" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Responded Not Sure)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Responded Not Sure)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% elseif value == 'SUBMITTED_INVALID' %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        {{ time }} <br/>
-        (Invalid)
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Invalid)">
+            <strong>{{ type }}</strong> {{ time }}
+        </span>
     {% else %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
-        (Consent Not Completed) <br/>
+        <span role="button" data-bs-toggle="tooltip" data-bs-placement="top" title="(Consent Not Completed)">
+            <strong>{{ type }}</strong>
+        </span>
     {% endif %}
 {% endmacro %}
 

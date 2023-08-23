@@ -173,3 +173,14 @@ div.order-row {
 .navbar-inverse .navbar-toggler {
     background-color: #FFFFFF;
 }
+
+.visit-diet-details:after {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    float: right;
+    content: "\f106";
+}
+
+.visit-diet-details.collapsed:after {
+    content: "\f107";
+}

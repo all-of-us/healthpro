@@ -103,11 +103,10 @@
                                 {% set dlwDiet = false %}
                             {% endif %}
                             <div class="row">
-                                <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
+                                <div class="col-md-12 well-sm well visit-diet-details {% if participantDietStatus != constant('App\\Helper\\NphParticipant::DIET_STARTED') %} collapsed {% endif %}" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                      role="button" style="font-weight: bold">
                                     Visit {{ visit['visitDisplayName'] }}
                                     {% include 'program/nph/participant/partials/display-diet.html.twig' %}
-                                    <span class="caret" style="float: right; margin: 9px 0;"></span>
                                 </div>
                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} in {% endif %}">
                                     <div class="row">
