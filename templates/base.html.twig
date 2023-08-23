@@ -37,6 +37,7 @@
     {% set showRoleDropdown = showRoleDropdown or is_granted(roleNav.role) %}
 {% endfor %}
 {% set currentRoleNav = currentRoleNav|default(false) %}
+{% set isActiveSite = app.session.get('siteEntity') ? app.session.get('siteEntity').status : 0 %}
 <!doctype html>
 <html lang="en">
 <head>

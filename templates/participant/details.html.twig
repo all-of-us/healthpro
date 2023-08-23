@@ -59,7 +59,6 @@
             </div>
             <div class="col-sm-9">
                 <div>
-                    {% set siteEntity = app.session.get('siteEntity') %}
                     {% if participant.activityStatus == 'deactivated' %}
                         {% include 'partials/participant-deactivated-status-notice.html.twig' %}
                     {% endif %}
@@ -97,7 +96,7 @@
                     <br>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
-                            {% if not siteEntity.status %}
+                            {% if not isActiveSite %}
                                 {{ macros.displayInactiveSiteBanner('on_site') }}
                             {% endif %}
                             <div class="row">
@@ -119,7 +118,7 @@
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="inperson">
-                            {% if not siteEntity.status %}
+                            {% if not isActiveSite %}
                                 {{ macros.displayInactiveSiteBanner('in_person') }}
                             {% endif %}
                             {% if canEdit and not siteInfo.isTestSite %}
