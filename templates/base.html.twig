@@ -38,8 +38,8 @@
 {% endfor %}
 {% set currentRoleNav = currentRoleNav|default(false) %}
 {% set isActiveSite = app.session.get('siteEntity') ? app.session.get('siteEntity').status : 0 %}
-{% set readOnlyView = readOnlyView|default(false) %}
-{% set displayInactiveSiteBanner = not readOnlyView and not isActiveSite  %}
+{% set readOnlyRoute = app.request.attributes.get('_route') matches '/^read_/' %}
+{% set displayInactiveSiteBanner = not readOnlyRoute and not isActiveSite  %}
 <!doctype html>
 <html lang="en">
 <head>

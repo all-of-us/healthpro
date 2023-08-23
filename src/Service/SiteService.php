@@ -446,8 +446,9 @@ class SiteService
         return $user && in_array('ROLE_BIOBANK', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles());
     }
 
-    public function isActiveSite($siteId): bool
+    public function isActiveSite($siteId = null): bool
     {
+        $siteId = $siteId ?: $this->getSiteId();
         return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
     }
 }
