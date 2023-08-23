@@ -30,7 +30,7 @@
             </h2>
         </div>
         {% include 'partials/participant-dl.html.twig' %}
-        {% if not isActiveSite %}
+        {% if displayInactiveSiteBanner %}
             {{ macros.displayInactiveSiteBanner('pmb', 3) }}
         {% endif %}
         {% if measurement.id and measurement.history and measurement.history.type == 'cancel' %}

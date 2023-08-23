@@ -79,7 +79,7 @@
         {% set steps = steps|filter((label,step) => step != 'process') %}
     {% endif %}
 {% endif %}
-{% if not isActiveSite %}
+{% if displayInactiveSiteBanner %}
     {{ macros.displayInactiveSiteBanner('pmb', 3) }}
 {% endif %}
 {% set stepNeedDetails = ['collect', 'process', 'finalize'] %}

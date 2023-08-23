@@ -96,7 +96,7 @@
                     <br>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
-                            {% if not isActiveSite %}
+                            {% if displayInactiveSiteBanner %}
                                 {{ macros.displayInactiveSiteBanner('on_site') }}
                             {% endif %}
                             <div class="row">
@@ -118,7 +118,7 @@
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="inperson">
-                            {% if not isActiveSite %}
+                            {% if displayInactiveSiteBanner %}
                                 {{ macros.displayInactiveSiteBanner('in_person') }}
                             {% endif %}
                             {% if canEdit and not siteInfo.isTestSite %}
