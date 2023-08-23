@@ -4,12 +4,17 @@
 {% macro module3SalivaGlycerolDisplay(aliquotCode, aliquot, sample, form, i, disabled) %}
     {{ _self.displayAliquotRow(aliquotCode, aliquot, sample, form, i, disabled, true) }}
     {% if aliquot['collectMetadata'] is defined and aliquot['collectMetadata'] == true %}
+        {% if sample.unlocked %}
+            {% set colspan = 2 %}
+        {% else %}
+            {% set colspan = 1 %}
+        {% endif %}
         {% for metadataField in aliquot['metadataFields'] %}
             <tr>
                 <td colspan="1">
                     <p style="font-weight: bold;">{{ metadataField['label'] }}</p><span>(1ml = 1000uL)</span>
                 </td>
-                <td colspan="1">
+                <td colspan="{{ colspan }}">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
                     {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'style': 'width: 30%; float: left; top: 20px; position: relative'}}) }}
                     <span style="top: 25px; position: relative">{{ aliquot['units'] }}</span>
@@ -18,10 +23,16 @@
                     {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'style': 'width: 30%; float: right; position: relative; right: 20px; top: -5px'}}) }}
                     <span style="top: 5px; position: relative; left: 130px">μl</span>
                 </td>
-                <td>
+                <td colspan="{{ colspan }}">
                     <span style="top: 25px; position: relative">=</span>
                     <span style="position: relative">Total Volume</span>
                     <span style="position: relative; left: 20px; top: 5px" id="totalVol">#</span>
+                </td>
+                <td class="aliquot volume nopadleft" style="position: relative">
+                    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
+                    {% if not sample.disabled and not sample.unlocked %}
+                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
+                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -48,6 +59,8 @@
         </td>
         {% if not skipVolume %}
             {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i) }}
+        {% elseif skipVolume and sample.unlocked %}
+            <td colspan="2"><i class="fa fa-eraser text-danger clear-aliquot-widget" style="font-size: 22px" role="button"></i></td>
         {% endif %}
         {% if form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
             <td class="row">

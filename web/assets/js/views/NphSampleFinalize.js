@@ -107,6 +107,7 @@ $(document).ready(function () {
     }
 
     disableEnableAliquotFields();
+    $(".aliquot-volume").trigger("keyup");
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
 });

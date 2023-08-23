@@ -13,7 +13,7 @@ class Visit3Diet extends TimePoints
     ];
 
     protected $timePointSampleTypes = [
-        'day0' => ['urine', 'saliva', 'blood'],
+        'day0' => ['urine', 'saliva3', 'blood'],
         'day2' => ['24urine'],
         'day12' => ['24urine']
     ];
