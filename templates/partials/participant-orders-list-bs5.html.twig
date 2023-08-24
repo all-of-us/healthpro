@@ -25,7 +25,7 @@
         <h5 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h5>
     </div>
     <div class="card-body in-person-card">
-        {% if (readOnly is defined or biobankView is defined or participant.isSuspended or participant.editExistingOnly) and orders|length == 0 %}
+        {% if orders|length == 0 %}
             <small class="text-secondary">No Records Found</small>
         {% else %}
             {% for order in orders %}

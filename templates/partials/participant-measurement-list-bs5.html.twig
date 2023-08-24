@@ -10,7 +10,7 @@
         <h5 class="panel-title"><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h5>
     </div>
     <div class="card-body in-person-card">
-        {% if (readOnly is defined or participant.activityStatus == 'deactivated' or participant.editExistingOnly) and measurements|length == 0 %}
+        {% if measurements|length == 0 %}
             <small class="text-secondary">No Records Found</small>
         {% else %}
             {% for measurement in measurements %}
