@@ -95,7 +95,7 @@
                     </ul>
                     <br>
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
+                        <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView or not isActiveSite }}">
                             {% if displayInactiveSiteBanner %}
                                 {{ macros.displayInactiveSiteBanner('on_site') }}
                             {% endif %}
