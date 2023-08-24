@@ -8,6 +8,9 @@ class Module1 extends Samples
 {
     private static $module = 1;
 
+    public const SAMPLE_CONSENT_TYPE_HAIR = ['HAIR'];
+    public const SAMPLE_CONSENT_TYPE_NAIL = ['NAILL', 'NAILB'];
+
     private static $visitTypes = [
         'LMT' => 'LMT'
     ];
