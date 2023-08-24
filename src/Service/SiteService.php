@@ -389,6 +389,12 @@ class SiteService
         $this->tokenStorage->setToken($token);
     }
 
+    public function isActiveSite($siteId = null): bool
+    {
+        $siteId = $siteId ?: $this->getSiteId();
+        return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
+    }
+
     protected function setNewRoles($user)
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
@@ -444,11 +450,5 @@ class SiteService
     {
         $user = $this->userService->getUser();
         return $user && in_array('ROLE_BIOBANK', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles());
-    }
-
-    public function isActiveSite($siteId = null): bool
-    {
-        $siteId = $siteId ?: $this->getSiteId();
-        return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
     }
 }
