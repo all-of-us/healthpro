@@ -3,7 +3,7 @@
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
     {% set participantRoute = readOnlyView ? 'read_participant' : 'participant' %}
-    <div id="physicalEvaluation" data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}" data-warnings="{{ warnings|json_encode|escape('html_attr') }}" data-conversions="{{ conversions|json_encode|escape('html_attr') }}" data-finalized="{{ (measurement and measurement.finalizedTs) or readOnlyView ? 1 : 0 }}">
+    <div id="physicalEvaluation" data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}" data-warnings="{{ warnings|json_encode|escape('html_attr') }}" data-conversions="{{ conversions|json_encode|escape('html_attr') }}" data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
@@ -96,7 +96,7 @@
             </div>
         {% endif %}
 
-        {% if (not measurement or not measurement.rdrId) and not readOnlyView %}
+        {% if (not measurement or not measurement.rdrId) and not readOnlyView and not inactiveSiteFormDisabled %}
             <div id="evaluationAffixSave">
                 {% if not measurement or not measurement.finalizedTs %}
                     <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
@@ -120,7 +120,7 @@
         {% else %}
             <p>
                 <a href="{{ path(participantRoute, { id: participant.id }) }}" class="btn btn-default">Cancel</a>
-                {% if not readOnlyView %}
+                {% if not readOnlyView and not inactiveSiteFormDisabled %}
                     {% if not measurement or not measurement.finalizedTs %}
                         <button type="submit" class="btn btn-primary" name="save">Save</button>
                     {% endif %}

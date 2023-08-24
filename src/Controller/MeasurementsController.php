@@ -86,7 +86,7 @@ class MeasurementsController extends BaseController
         $showAutoModification = false;
         $measurementsForm = $this->get('form.factory')->createNamed('form', MeasurementType::class, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
-            'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() ? true : false
+            'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() || $this->measurementService->inactiveSiteFormDisabled()
         ]);
         $measurementsForm->handleRequest($request);
         if ($measurementsForm->isSubmitted()) {
@@ -260,6 +260,7 @@ class MeasurementsController extends BaseController
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
             'readOnlyView' => $this->isReadOnly(),
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
+            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled()
         ]);
     }
 
