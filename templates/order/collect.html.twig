@@ -36,7 +36,7 @@
     </div>
 
     {{ form_rest(collectForm) }}
-    {% if not order.formDisabled and not readOnlyView %}
+    {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
         <p>
             <button type="submit" class="btn btn-primary" name="save">
                 {% if order.collectedTs %}
