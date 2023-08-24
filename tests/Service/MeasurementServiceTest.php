@@ -66,14 +66,6 @@ class MeasurementServiceTest extends ServiceTestCase
      */
     public function testInactiveSiteFormDisabled($parentId, $isActiveSite, $expectedResult): void
     {
-        $this->id = uniqid();
-        $site = 'hpo-site-test' . $this->id;
-        $hybridSite = 'hpo-site-test' . SiteType::DV_HYBRID . $this->id;
-        $this->login('test@example.com', [$site, $hybridSite]);
-        // Regular site
-        $this->createSite();
-        $this->siteService->switchSite($site . '@' . self::GROUP_DOMAIN);
-
         $mockSiteService = $this->createMock(SiteService::class);
         $mockSiteService->method('isActiveSite')->willReturn($isActiveSite);
 
@@ -87,9 +79,16 @@ class MeasurementServiceTest extends ServiceTestCase
             static::getContainer()->get(LoggerService::class),
         );
 
-        $measurement = new Measurement();
-        $measurement->setParentId($parentId);
-        $measurementService->load($measurement, null);
+        $measurementMock = $this->getMockBuilder(Measurement::class)
+            ->getMock();
+
+        $measurementMock->expects($this->any())
+            ->method('getParentId')
+            ->willReturn($parentId);
+
+        $reflection = new \ReflectionClass($measurementService);
+        $property = $reflection->getProperty('measurement');
+        $property->setValue($measurementService, $measurementMock);
 
         $result = $measurementService->inactiveSiteFormDisabled();
         $this->assertSame($expectedResult, $result);

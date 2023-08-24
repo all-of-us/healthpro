@@ -30,7 +30,7 @@ class OrderServiceTest extends ServiceTestCase
             static::getContainer()->get(RdrApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),
-            static::getContainer()->get(MayolinkOrderService::class),
+            $this->createMock(MayolinkOrderService::class),
             static::getContainer()->get(UserService::class),
             $mockSiteService,
             static::getContainer()->get(LoggerService::class),
