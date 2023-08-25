@@ -13,6 +13,9 @@ class NphParticipant
 {
     public const MODULE1_CONSENT_TISSUE = 'm1_consent_tissue';
     public const OPTIN_PERMIT = 'PERMIT';
+    public const OPTIN_HAIR = 'PERMIT2';
+    public const OPTIN_NAIL = 'PERMIT3';
+    public const OPTIN_DENY = 'DENY';
     public const DIET_STARTED = 'started';
     public const DIET_COMPLETED = 'completed';
     public const DIET_DISCONTINUED = 'discontinued';
@@ -58,16 +61,22 @@ class NphParticipant
         return true;
     }
 
-    private function getModule1TissueConsentStatus(): bool
+    private function getModule1TissueConsentStatus(): string
     {
+        $latestDate = null;
+        $consentStatus = null;
         if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
             foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
-                if ($consent->value === self::MODULE1_CONSENT_TISSUE && $consent->optIn === self::OPTIN_PERMIT) {
-                    return true;
+                if ($consent->value === self::MODULE1_CONSENT_TISSUE) {
+                    $consentDate = new \DateTime($consent->time);
+                    if ($latestDate === null || $consentDate > $latestDate) {
+                        $latestDate = $consentDate;
+                        $consentStatus = $consent->optIn;
+                    }
                 }
             }
         }
-        return false;
+        return $consentStatus ?? self::OPTIN_DENY;
     }
 
     private function parseRdrParticipant(\stdClass $participant): void

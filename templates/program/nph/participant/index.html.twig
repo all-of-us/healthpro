@@ -82,13 +82,7 @@
                 <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                     <div class="row">
                         <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
-                        {% if moduleNumber == 1 %}
-                            {% if participant.module1TissueConsentStatus %}
-                                <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
-                            {% else %}
-                                <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
-                            {% endif %}
-                        {% endif %}
+                        {% include 'program/nph/participant/partials/hair-nail-optin-badge.html.twig' %}
                     </div>
                     {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                         {% if VisitCode != 'sampleStatusCount' %}
