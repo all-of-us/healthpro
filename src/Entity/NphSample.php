@@ -546,6 +546,7 @@ class NphSample
                     ['units' => 'uL',
                     'volume' => $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume']
                 ];
+                $aliquotsData['volume'] += ($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'] / 1000);
             }
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();
