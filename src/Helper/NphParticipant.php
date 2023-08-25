@@ -76,7 +76,7 @@ class NphParticipant
                 }
             }
         }
-        return $consentStatus;
+        return $consentStatus ?? self::OPTIN_DENY;
     }
 
     private function parseRdrParticipant(\stdClass $participant): void
