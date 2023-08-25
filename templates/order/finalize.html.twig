@@ -24,7 +24,7 @@
         {% if order.type == 'saliva' %}
             {{ form_widget(finalizeForm.finalizedSamples) }}
         {% else %}
-            {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled ? false : true, samplesInfo, version) }}
+            {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled or inactiveSiteFormDisabled ? false : true, samplesInfo, version) }}
         {% endif %}
         {{ form_errors(finalizeForm.finalizedSamples) }}
         {% if finalizeForm.sampleShippingMethod is defined %}
@@ -86,7 +86,7 @@
         {{ form_errors(finalizeForm.finalizedNotes) }}
     </div>
     {{ form_rest(finalizeForm) }}
-    {% if not order.disabled and not readOnlyView %}
+    {% if not order.disabled and not readOnlyView and not inactiveSiteFormDisabled  %}
         <p>
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized

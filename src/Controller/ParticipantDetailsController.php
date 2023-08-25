@@ -128,6 +128,8 @@ class ParticipantDetailsController extends BaseController
             }
         }
 
+        $isReadOnlyAndInactiveSite = $this->isReadOnly() || !$siteService->isActiveSite();
+
         // Check if patient status is allowed for this participant
         if ($patientStatusService->hasAccess($participant)) {
             // Patient Status
@@ -136,7 +138,7 @@ class ParticipantDetailsController extends BaseController
             // Determine if comment field is required
             $isCommentRequired = !empty($orgPatientStatusData) ? true : false;
             // Get patient status form
-            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired, 'disabled' => $this->isReadOnly()]);
+            $patientStatusForm = $this->createForm(PatientStatusType::class, null, ['require_comment' => $isCommentRequired, 'disabled' => $isReadOnlyAndInactiveSite]);
             $patientStatusForm->handleRequest($request);
             if ($patientStatusForm->isSubmitted()) {
                 $patientStatus = $this->em->getRepository(PatientStatus::class)->findOneBy([
@@ -175,10 +177,10 @@ class ParticipantDetailsController extends BaseController
         }
 
         // Incentive Form
-        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $isReadOnlyAndInactiveSite]);
 
         // Id Verification Form
-        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $isReadOnlyAndInactiveSite]);
         $idVerificationForm->handleRequest($request);
         if ($idVerificationForm->isSubmitted()) {
             if ($idVerificationForm->isValid()) {

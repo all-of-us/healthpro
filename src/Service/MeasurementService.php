@@ -252,6 +252,14 @@ class MeasurementService
         return $this->rdrApiService->getLastError();
     }
 
+    public function inactiveSiteFormDisabled(): bool
+    {
+        if ($this->measurement->getParentId()) {
+            return false;
+        }
+        return !$this->siteService->isActiveSite();
+    }
+
     protected function getMeasurementUserSiteData($user, $site)
     {
         return [

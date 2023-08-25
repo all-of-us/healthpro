@@ -65,7 +65,7 @@
                     {% if participant.deceasedStatus == 'PENDING' or participant.deceasedStatus == 'APPROVED' %}
                         {% include 'partials/deceased-participant-notice.html.twig' %}
                     {% endif %}
-                    {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
+                    {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' and isActiveSite %}
                         <div class="btn-group float-end">
                             {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
                             <a class="btn btn-outline-secondary btn-small" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
@@ -95,7 +95,10 @@
                     </ul>
                     <br>
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView }}">
+                        <div role="tabpanel" class="tab-pane active" id="on_site_details" data-read-only-view="{{ readOnlyView or not isActiveSite }}">
+                            {% if displayInactiveSiteBanner %}
+                                {{ macros.displayInactiveSiteBanner('on_site') }}
+                            {% endif %}
                             <div class="row">
                                 {% if canViewOnSiteDetails %}
                                     <div class="col-md-6 h-100 mb-4">
@@ -115,6 +118,9 @@
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="inperson">
+                            {% if displayInactiveSiteBanner %}
+                                {{ macros.displayInactiveSiteBanner('in_person') }}
+                            {% endif %}
                             {% if canEdit and not siteInfo.isTestSite %}
                                 <div class="row">
                                     {% if participant.editExistingOnly %}

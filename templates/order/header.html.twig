@@ -1,3 +1,4 @@
+{% import 'macros/display-text.html.twig' as macros %}
 {% set routePrefix = readOnlyView ? 'read_' : '' %}
 {% if order.expired %}
     <div class="alert alert-danger custom-alert">
@@ -77,6 +78,9 @@
     {% if order.type == 'saliva' %}
         {% set steps = steps|filter((label,step) => step != 'process') %}
     {% endif %}
+{% endif %}
+{% if displayInactiveSiteBanner %}
+    {{ macros.displayInactiveSiteBanner('pmb', 3) }}
 {% endif %}
 {% set stepNeedDetails = ['collect', 'process', 'finalize'] %}
 {% if active in stepNeedDetails %}

@@ -258,7 +258,7 @@ class OrderController extends BaseController
             'em' => $this->em,
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly()
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
         ]);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
@@ -299,7 +299,8 @@ class OrderController extends BaseController
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
 
@@ -322,7 +323,7 @@ class OrderController extends BaseController
             'em' => $this->em,
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly()
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
         ]);
         $processForm->handleRequest($request);
         if ($processForm->isSubmitted()) {
@@ -393,7 +394,8 @@ class OrderController extends BaseController
             'version' => $order->getVersion(),
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
 
@@ -417,7 +419,7 @@ class OrderController extends BaseController
             'em' => $this->em,
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly()
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
         ]);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
@@ -531,7 +533,8 @@ class OrderController extends BaseController
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'showUnfinalizeMsg' => $showUnfinalizeMsg,
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
 

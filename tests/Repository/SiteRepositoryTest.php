@@ -75,4 +75,31 @@ class SiteRepositoryTest extends KernelTestCase
         $result = $this->em->getConnection()->executeQuery($sql)->fetchOne();
         $this->assertSame(100000, $result);
     }
+
+    /**
+     * @dataProvider siteStatusProvider
+     */
+    public function testActiveSiteCount($siteId, $status, $expectedResult): void
+    {
+        $awardeeId = 'TEST_AWARDEE_' . $siteId;
+        $siteId = 'test-'  . $siteId;
+        $site = new Site();
+        $site->setStatus($status)
+            ->setName('Test Site ' . $siteId)
+            ->setAwardeeId($awardeeId)
+            ->setSiteId($siteId)
+            ->setGoogleGroup($siteId)
+            ->setWorkqueueDownload('');
+        $this->em->persist($site);
+        $this->em->flush();
+        $this->assertSame($expectedResult, $this->repo->getActiveSiteCount($siteId));
+    }
+
+    public function siteStatusProvider(): array
+    {
+        return [
+            'Active site' => ['test-site12345', 1, 1],
+            'Inactive site' => ['test2-site12345', 0, 0],
+        ];
+    }
 }

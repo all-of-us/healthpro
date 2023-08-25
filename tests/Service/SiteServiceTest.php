@@ -5,6 +5,7 @@ namespace App\Tests\Service;
 use App\Entity\NphSite;
 use App\Entity\Site;
 use App\Entity\User;
+use App\Repository\SiteRepository;
 use App\Service\EnvironmentService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -159,6 +160,46 @@ class SiteServiceTest extends ServiceTestCase
             'nph valid mayolink account number and site email' => [User::PROGRAM_NPH, '123456789', 'nph-site-test', 'nph-site-test', true],
             'nph no mayolink account number and with site email' => [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test', false],
             'nph no mayolink account number and with invalid site email' => [User::PROGRAM_NPH, null, 'nph-site-test', 'nph-site-test-2', false]
+        ];
+    }
+
+    /**
+     * @dataProvider siteStatusProvider
+     */
+    public function testIsActiveSite($activeSiteCount, $expectedResult): void
+    {
+        $siteId = 'test-123456'; // Replace with an actual site ID
+
+        $repositoryMock = $this->createMock(SiteRepository::class);
+        $repositoryMock->expects($this->once())
+            ->method('getActiveSiteCount')
+            ->with($siteId)
+            ->willReturn($activeSiteCount);
+
+        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
+        $entityManagerMock->expects($this->once())
+            ->method('getRepository')
+            ->with(Site::class)
+            ->willReturn($repositoryMock);
+
+        $siteService = new SiteService(
+            static::getContainer()->get(ParameterBagInterface::class),
+            static::getContainer()->get(RequestStack::class),
+            $entityManagerMock,
+            static::getContainer()->get(UserService::class),
+            static::getContainer()->get(EnvironmentService::class),
+            static::getContainer()->get(TokenStorageInterface::class),
+        );
+
+        $result = $siteService->isActiveSite($siteId);
+        $this->assertSame($expectedResult, $result);
+    }
+
+    public function siteStatusProvider(): array
+    {
+        return [
+            'Active site' => [1, true],
+            'Inactive site' => [0, false],
         ];
     }
 }

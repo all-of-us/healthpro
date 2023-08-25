@@ -48,7 +48,7 @@
                     <dt class="col-sm-4">Declined</dt>
                     <dd class="col-sm-8">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                 </dl>
-                {% if not readOnlyView %}
+                {% if not readOnlyView and isActiveSite %}
                     <div class="text-center">
                         <button class="btn btn-primary btn-sm btn-incentive-add-new">Add New</button>
                     </div>
@@ -84,7 +84,7 @@
             </div>
             {{ form_row(incentiveForm.declined, { 'id': incentiveId is defined ? 'incentive_edit_declined' : 'incentive_create_declined' }) }}
             {{ form_rest(incentiveForm) }}
-            {% if not readOnlyView %}
+            {% if not readOnlyView and isActiveSite %}
                 <button type="submit" id="incentive_submit" class="btn btn-primary">Submit</button>
                 {% if type is defined and type == 'edit' %}
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -108,7 +108,7 @@
             <div id="collapseOne" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
-                        {% if not readOnlyView  and incentive.site == siteInfo.siteId %}
+                        {% if not readOnlyView and isActiveSite and incentive.site == siteInfo.siteId %}
                             <div class="float-end incentive-modify">
                                 <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                                 <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>

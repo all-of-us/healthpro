@@ -20,7 +20,7 @@
         {% if order.type == 'saliva' %}
             {{ form_widget(collectForm.collectedSamples) }}
         {% else %}
-            {{ samples.form_widget(collectForm.collectedSamples, order.formDisabled ? false : true, samplesInfo, version) }}
+            {{ samples.form_widget(collectForm.collectedSamples, order.formDisabled or inactiveSiteFormDisabled ? false : true, samplesInfo, version) }}
         {% endif %}
         {{ form_errors(collectForm.collectedSamples) }}
     </div>
@@ -36,7 +36,7 @@
     </div>
 
     {{ form_rest(collectForm) }}
-    {% if not order.formDisabled and not readOnlyView %}
+    {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
         <p>
             <button type="submit" class="btn btn-primary" name="save">
                 {% if order.collectedTs %}

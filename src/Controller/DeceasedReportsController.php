@@ -96,6 +96,9 @@ class DeceasedReportsController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        if (!$this->siteService->isActiveSite()) {
+            throw $this->createAccessDeniedException();
+        }
         if ($participant->withdrawalStatus !== 'NOT_WITHDRAWN') {
             $this->addFlash('error', 'Cannot create Deceased Report on withdrawn participant.');
             return $this->redirectToRoute('participant', ['id' => $participantId]);

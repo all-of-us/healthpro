@@ -21,7 +21,7 @@
                                 <dd class="col-sm-9">{{ orgPatientStatusData.comments }}</dd>
                             </dl>
                         </div>
-                        {% if not readOnlyView %}
+                        {% if not readOnlyView and isActiveSite %}
                             <div align="center">
                                 <button class="btn btn-primary btn-sm btn-patient-status-update">Update</button>
                             </div>
@@ -36,7 +36,7 @@
                         <small class="text-warning">User must enter a reason for updating previous organization status.</small>
                         <br><br>
                     {% endif %}
-                    {% if not readOnlyView %}
+                    {% if not readOnlyView and isActiveSite %}
                         <button type="submit" class="btn btn-primary">Submit</button>
                     {% endif %}
                     {% if orgPatientStatusData is not empty %}
