@@ -19,7 +19,7 @@ class NphOrderType extends AbstractType
         'disabled' => true,
         'class' => 'sample-disabled sample-disabled-colored',
         'checked' => false
-    ]
+    ];
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
