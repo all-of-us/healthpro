@@ -32,3 +32,20 @@
 .fs-sm {
     font-size: 0.875rem;
 }
+
+.scroll-header {
+    position: relative;
+}
+
+.scroll-header {
+    width: 100%;
+    border-bottom: 1px solid #000;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+}
+
+.scroll-header span {
+    background:#fff;
+    padding:0 10px;
+    margin-left: 30px;
+}
