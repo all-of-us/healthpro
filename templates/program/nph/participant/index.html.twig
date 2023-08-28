@@ -80,7 +80,7 @@
                     {% set modulePanelDisplay = 'hidden' %}
                 {% endif %}
                 <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
-                    <div class="row">
+                    <div>
                         <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
                         {% include 'program/nph/participant/partials/hair-nail-optin-badge.html.twig' %}
                     </div>
@@ -96,19 +96,20 @@
                                 {% set textDivSize = 'col-md-12' %}
                                 {% set dlwDiet = false %}
                             {% endif %}
-                            <div class="row">
+                            <div>
                                 <div class="col-md-12 well-sm well visit-diet-details {% if participantDietStatus != constant('App\\Helper\\NphParticipant::DIET_STARTED') %} collapsed {% endif %}" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                      role="button" style="font-weight: bold">
                                     Visit {{ visit['visitDisplayName'] }}
                                     {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                 </div>
                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} in {% endif %}">
-                                    <div class="row">
+                                    <div>
                                      {% if participant.dob %}
                                         <br>
+                                         <div class="col-md-12">
                                         <div class="{{ textDivSize }}">
                                         {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
-                                            <a class="btn btn-primary" role="button"
+                                            <a class="btn btn-primary generate-orders-button" role="button"
                                                href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                 <i class="glyphicon glyphicon-plus-sign"></i> Generate Orders and Print Labels
                                             </a>
@@ -149,6 +150,7 @@
                                         </span>
                                 </div>
                                     {% endif %}
+                                         </div>
                                 </div>
                                     {% set displayedOrderIDS = [] %}
                                     {% set displayedTimePointHeaders = [] %}

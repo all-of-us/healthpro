@@ -173,6 +173,10 @@ div.order-row {
 .navbar-inverse .navbar-toggler {
     background-color: #FFFFFF;
 }
+.generate-orders-button {
+    margin-bottom: 15px;
+    margin-top: 10px;
+}
 
 .visit-diet-details:after {
     font-family: "Font Awesome 5 Free";
