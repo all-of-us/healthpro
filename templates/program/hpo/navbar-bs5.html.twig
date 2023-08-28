@@ -110,6 +110,7 @@
                                 <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
                                     {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
+                                    {% if isCurrentProgramHpo() and not siteInfo.activeSite(app.session.get('site').id) %} (Inactive) {% endif %}
                                 </a>
                             </li>
                         {% endif %}

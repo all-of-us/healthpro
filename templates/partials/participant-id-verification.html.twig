@@ -25,7 +25,7 @@
                     <dt class="col-sm-3">Visit Type</dt>
                     <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
                 </dl>
-                {% if not readOnlyView and isActiveSite %}
+                {% if not readOnlyView %}
                     <div class="text-center">
                         <button class="btn btn-primary btn-sm btn-id-verification-add-new">Add New</button>
                     </div>
@@ -36,7 +36,7 @@
             {{ form_start(idVerificationForm, { attr: { class: 'disable-enter prevent-resubmit id-verification-form', id: 'id_verification_form' } }) }}
             {{ form_errors(idVerificationForm) }}
             {{ form_rest(idVerificationForm) }}
-            {% if not readOnlyView and isActiveSite %}
+            {% if not readOnlyView %}
                 <button type="submit" id="id_verification_submit" class="btn btn-primary">Submit</button>
                 {% if type is defined and type == 'edit' %}
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
