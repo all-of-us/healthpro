@@ -918,3 +918,7 @@ table.table-samples td {
 .display-none {
     display: none;
 }
+
+.participant-details-card {
+    background-color: #f8f9fa;
+}
