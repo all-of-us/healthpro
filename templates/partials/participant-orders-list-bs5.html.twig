@@ -22,7 +22,7 @@
         {% if isActiveSite and type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView %}
             <a href="{{ path('order_check', { participantId: participant.id }) }}" class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank Order</a>
         {% endif %}
-        <h5 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h5>
+        <h6><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h6>
     </div>
     <div class="card-body in-person-card">
         {% if orders|length == 0 %}
