@@ -22,11 +22,11 @@
              style="height: 450px; overflow-y: scroll;">
             <div id="scrollspyHeading1">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>Consents</span></h6>
-            <div class="participant-detail-new-status text-start">
+            <div class="participant-detail-new-status text-start big-status-box">
                 <strong class="d-block">Primary Consent</strong>
                 {{ macros.displayFirstConsentPanelStatus(participant, 'reconsentForStudyEnrollmentAuthored', 'reconsentForStudyEnrollmentFilePath', 'consentForStudyEnrollment', showConsentPDFs) }}
             </div>
-            <div class="participant-detail-new-status text-start">
+            <div class="participant-detail-new-status text-start big-status-box">
                 <strong class="d-block">EHR Consent</strong>
                 {{ macros.displayFirstConsentPanelStatus(participant, 'reconsentForElectronicHealthRecordsAuthored', 'reconsentForElectronicHealthRecordsFilePath', 'consentForElectronicHealthRecords', showConsentPDFs, 'ehr') }}
                 {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
@@ -35,7 +35,7 @@
                     (Active)
                 {% endif %}
             </div>
-            <div class="participant-detail-new-status text-start">
+            <div class="participant-detail-new-status text-start big-status-box">
                 <strong class="d-block">gRoR Consent</strong>
                 {{ macros.displayConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}
             </div>

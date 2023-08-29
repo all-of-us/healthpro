@@ -339,16 +339,6 @@ label.label-normal {
     font-size: 20px;
 }
 
-.participant-detail-new-status {
-    display: inline-block;
-    margin: 15px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 3px;
-    text-align: center;
-    min-width: 250px;
-}
-
 .view-history-dropdown {
     padding: 6px 8px;
     border-radius: 3px;
