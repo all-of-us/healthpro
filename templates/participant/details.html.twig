@@ -68,7 +68,7 @@
                     {% if participant.activityStatus != 'deactivated' and participant.activityStatus != 'withdrawn' %}
                         <div class="btn-group float-end">
                             {% set deceasedReportRoute = readOnlyView ? 'read_deceased_report_check' : 'deceased_report_new' %}
-                            <a class="btn btn-outline-secondary btn-small" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
+                            <a class="btn btn-outline-secondary btn-sm" href="{{ path(deceasedReportRoute, {participantId: participant.participantId}) }}"><i class="fa fa-hourglass-o"></i> Report Deceased Participant</a>
                         </div>
                     {% endif %}
                     <ul class="nav nav-tabs" role="tablist">
@@ -158,7 +158,7 @@
                                     <div class="col-md-6">
                                         <div class="card mb-4">
                                             <div class="card-header">
-                                                <h5>PPI Survey Completion</h5>
+                                                <h6>PPI Survey Completion</h6>
                                             </div>
                                             <div class="card-body">
                                                 <dl class="row">
@@ -193,7 +193,7 @@
 
                                         <div class="card mb-4">
                                             <div class="card-header">
-                                                <h5>Retention and EHR Metrics</h5>
+                                                <h6>Retention and EHR Metrics</h6>
                                             </div>
                                             <div class="card-body">
                                                 <dl class="row">
@@ -239,7 +239,7 @@
                                     <div class="col-md-6">
                                         <div class="card mb-4">
                                             <div class="card-header">
-                                                <h5>Physical Measurements and Biospecimens</h5>
+                                                <h6>Physical Measurements and Biospecimens</h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row text-center">
@@ -332,25 +332,27 @@
                                         </div>
                                         <div class="card mb-4">
                                             <div class="card-header">
-                                                <h5>Ancillary Studies</h5>
+                                                <h6>Ancillary Studies</h6>
                                             </div>
-                                            <div class="participant-detail-status">
-                                                <strong>Nutrition For Precision Health</strong>
-                                                {% if participant.nphWithdrawal %}
-                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                    <small>{{ participant.nphWithdrawalAuthored|date('n/j/Y g:ia', app.user.timezone) }} (withdrawn)</small>
-                                                {% elseif participant.nphDeactivation %}
-                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                    <small>{{ participant.nphDeactivationAuthored|date('n/j/Y g:ia', app.user.timezone) }}(deactivated)</small>
-                                                {% elseif participant.consentForNphModule1 %}
-                                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                                    {% if participant.consentForNphModule1Authored %}
-                                                        <small>{{ participant.consentForNphModule1Authored|date('n/j/Y g:ia', app.user.timezone) }} module 1 (consented)</small>
+                                            <div class="text-center">
+                                                <div class="participant-detail-status w-50">
+                                                    <strong>Nutrition For Precision Health</strong>
+                                                    {% if participant.nphWithdrawal %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        <small>{{ participant.nphWithdrawalAuthored|date('n/j/Y g:ia', app.user.timezone) }} (withdrawn)</small>
+                                                    {% elseif participant.nphDeactivation %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        <small>{{ participant.nphDeactivationAuthored|date('n/j/Y g:ia', app.user.timezone) }}(deactivated)</small>
+                                                    {% elseif participant.consentForNphModule1 %}
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        {% if participant.consentForNphModule1Authored %}
+                                                            <small>{{ participant.consentForNphModule1Authored|date('n/j/Y g:ia', app.user.timezone) }} module 1 (consented)</small>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        <small>(not consented)</small>
                                                     {% endif %}
-                                                {% else %}
-                                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                    <small>(not consented)</small>
-                                                {% endif %}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

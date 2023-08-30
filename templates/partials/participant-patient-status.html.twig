@@ -37,10 +37,10 @@
                         <br><br>
                     {% endif %}
                     {% if not readOnlyView %}
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Submit</button>
                     {% endif %}
                     {% if orgPatientStatusData is not empty %}
-                        <button type="button" class="btn btn-default btn-patient-status-cancel">Cancel</button>
+                        <button type="button" class="btn btn-default btn-sm btn-patient-status-cancel">Cancel</button>
                     {% endif %}
                     {{ form_end(patientStatusForm) }}
                 </div>
