@@ -1,7 +1,7 @@
 {% import 'macros/display-text.html.twig' as macros %}
 <div class="row">
-    <div class="col-sm-12" style="position: relative;">
-        <nav id="navbar-participant-overview" class="navbar bg-light px-3 mb-3">
+    <div class="col-sm-12 position-relative">
+        <nav id="navbar-participant-activities" class="navbar bg-light px-3 mb-3">
             <ul class="nav nav-pills">
                 <li class="nav-item">
                     <a class="nav-link" href="#scrollspyPPI">PPI Survey Completion</a>
@@ -17,7 +17,7 @@
                 </li>
             </ul>
         </nav>
-        <div data-bs-spy="scroll" data-bs-target="#navbar-participant-overview" data-bs-root-margin="0px 0px -40%"
+        <div data-bs-spy="scroll" data-bs-target="#navbar-participant-activities" data-bs-root-margin="0px 0px -40%"
              data-bs-smooth-scroll="true" class="scrollspy-participant-overview p-3 rounded-2" tabindex="0">
             <div id="scrollspyPPI">&nbsp;</div>
             <div class="row">
@@ -175,7 +175,7 @@
             </div>
             <div id="scrollspyAncillary">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>Ancillary Studies</span></h6>
-            <div class="participant-detail-new-status text-start">
+            <div class="participant-detail-new-status text-start end-status-box">
                 <strong class="d-block">Nutrition For Precision Health</strong>
                 {% if participant.nphWithdrawal %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
