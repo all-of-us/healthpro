@@ -134,10 +134,10 @@ $(document).ready(function () {
     });
 
     $("input:checkbox").on("change", function () {
-        let allSamplesChecked = $(".timepoint-samples :checkbox:not(:checked)").length === 0;
+        let allSamplesChecked = $(".timepoint-samples :checkbox:not(:checked):not(:disabled)").length === 0;
         $("#nph_order_checkAll").prop("checked", allSamplesChecked);
         $(".timepoint-samples").each(function () {
-            let timePointsChecked = $(this).find(":checkbox:not(:checked)").length === 0;
+            let timePointsChecked = $(this).find(":checkbox:not(:checked):not(:disabled)").length === 0;
             $(this).parent().find(".timepointCheckAll").prop("checked", timePointsChecked);
         });
     });
