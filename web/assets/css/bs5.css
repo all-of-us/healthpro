@@ -33,6 +33,11 @@
     font-size: 0.875rem;
 }
 
+.scrollspy-participant-overview {
+    height: 550px;
+    overflow-y: scroll;
+}
+
 .scroll-header {
     position: relative;
 }

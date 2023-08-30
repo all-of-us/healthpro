@@ -1,26 +1,25 @@
 {% import 'macros/display-text.html.twig' as macros %}
 <div class="row">
     <div class="col-sm-12" style="position: relative;">
-        <nav id="navbar-example2" class="navbar bg-light px-3 mb-3">
+        <nav id="navbar-participant-overview" class="navbar bg-light px-3 mb-3">
             <ul class="nav nav-pills">
                 <li class="nav-item">
-                    <a class="nav-link" href="#scrollspyHeading1">Consents</a>
+                    <a class="nav-link" href="#scrollspyConsents">Consents</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#scrollspyHeading2">In-Person Enrollment</a>
+                    <a class="nav-link" href="#scrollspyInPerson">In-Person Enrollment</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#scrollspyHeading3">Contact</a>
+                    <a class="nav-link" href="#scrollspyContact">Contact</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#scrollspyHeading4">Demographics</a>
+                    <a class="nav-link" href="#scrollspyDemographics">Demographics</a>
                 </li>
             </ul>
         </nav>
-        <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-root-margin="0px 0px -40%"
-             data-bs-smooth-scroll="true" class="scrollspy-example p-3 rounded-2" tabindex="0"
-             style="height: 450px; overflow-y: scroll;">
-            <div id="scrollspyHeading1">&nbsp;</div>
+        <div data-bs-spy="scroll" data-bs-target="#navbar-participant-overview" data-bs-root-margin="0px 0px -40%"
+             data-bs-smooth-scroll="true" class="scrollspy-participant-overview p-3 rounded-2" tabindex="0">
+            <div id="scrollspyConsents">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>Consents</span></h6>
             <div class="participant-detail-new-status text-start big-status-box">
                 <strong class="d-block">Primary Consent</strong>
@@ -67,7 +66,7 @@
                     {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}
                 </div>
             {% endfor %}
-            <div id="scrollspyHeading2">&nbsp;</div>
+            <div id="scrollspyInPerson">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>In-Person Enrollment</span></h6>
             <div class="participant-detail-new-status text-start">
                 <strong class="d-block">Paired Awardee</strong>
@@ -108,7 +107,7 @@
                     <i class="fa fa-times text-danger" aria-hidden="true"></i>
                 {% endif %}
             </div>
-            <div id="scrollspyHeading3">&nbsp;</div>
+            <div id="scrollspyContact">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>Contact</span></h6>
             <div class="participant-detail-new-status text-start">
                 <strong class="d-block">Contact Method</strong>
@@ -140,7 +139,7 @@
                 <strong class="d-block">Contact Phone</strong>
                 {{ participant.loginPhoneNumber|default('--') }}
             </div>
-            <div id="scrollspyHeading4">&nbsp;</div>
+            <div id="scrollspyDemographics">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>Demographics</span></h6>
             <div class="participant-detail-new-status text-start">
                 <strong class="d-block">Age</strong>
