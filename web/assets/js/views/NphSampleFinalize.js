@@ -107,6 +107,10 @@ $(document).ready(function () {
     }
 
     disableEnableAliquotFields();
+    calculateGlycerolVolume(
+        $("#nph_sample_finalize_SALIVAA2Volume_0"),
+        $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume")
+    );
     $(".aliquot-volume").trigger("keyup");
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);

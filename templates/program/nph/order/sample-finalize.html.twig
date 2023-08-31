@@ -16,17 +16,21 @@
                 </td>
                 <td colspan="{{ colspan }}">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
-                    {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'style': 'width: 30%; float: left; top: 20px; position: relative'}}) }}
-                    <span style="top: 25px; position: relative">{{ aliquot['units'] }}</span>
+                    <div class="input-group" style="width: 45%; float: left; top: 20px; position: relative">
+                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control',}}) }}
+                        <span class="input-group-addon">{{ aliquot['units'] }}</span>
+                    </div>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
                     <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
-                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'style': 'width: 30%; float: right; position: relative; right: 20px; top: -5px'}}) }}
-                    <span style="top: 5px; position: relative; left: 130px">μl</span>
+                    <div class="input-group" style="width: 45%; float: right; position: relative; top: -5px">
+                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'class': 'form-control'}}) }}
+                    <span class="input-group-addon">μl</span>
+                    </div>
                 </td>
                 <td colspan="{{ colspan }}">
                     <span style="top: 25px; position: relative">=</span>
                     <span style="position: relative">Total Volume</span>
-                    <span style="position: relative; left: 20px; top: 5px" id="totalVol">#</span>
+                    <span style="position: relative; top: 25px" id="totalVol">#</span>
                 </td>
                 <td class="aliquot volume nopadleft" style="position: relative">
                     <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
