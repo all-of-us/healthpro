@@ -35,7 +35,12 @@
                 <div class="card participant-details-card">
                     <div class="card-body">
                         <div class="page-header">
-                            <h3>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small><i class="fa fa-barcode fa-xs clickable" data-bs-toggle="modal" data-bs-target="#participant-barcode-modal" id="participant-barcode-icon"></i></h3>
+                            <h3>
+                                {% if participant.isPediatric %}
+                                    <i class="fa fa-child child-icon"></i>
+                                {% endif %}
+                                {{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <small>{{ participant.shortId }}</small><i class="fa fa-barcode fa-xs clickable" data-bs-toggle="modal" data-bs-target="#participant-barcode-modal" id="participant-barcode-icon"></i>
+                            </h3>
                         </div>
                         <hr>
                         {% include 'partials/participant-dl-bs5.html.twig' %}
