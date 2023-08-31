@@ -3,6 +3,8 @@
 namespace App\Form\Nph;
 
 use App\Entity\NphSample;
+use App\Helper\NphParticipant;
+use App\Nph\Order\Modules\Module1;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,6 +15,11 @@ class NphOrderType extends AbstractType
 {
     private const STOOL_ST1 = 'ST1';
     private const TISSUE_CONSENT_SAMPLES = ['HAIR', 'NAILB', 'NAILL'];
+    private const CONSENT_DISABLE_SAMPLE_ATTR = [
+        'disabled' => true,
+        'class' => 'sample-disabled sample-disabled-colored',
+        'checked' => false
+    ];
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -90,11 +97,24 @@ class NphOrderType extends AbstractType
                         $attr['disabled'] = true;
                         $attr['class'] = 'sample-disabled';
                         $attr['checked'] = true;
-                    } elseif ($options['module'] === '1' && $options['module1tissueCollectConsent'] === false
-                        && in_array($val, self::TISSUE_CONSENT_SAMPLES)) {
-                        $attr['disabled'] = true;
-                        $attr['class'] = 'sample-disabled sample-disabled-colored';
-                        $attr['checked'] = false;
+                    } elseif ($options['module'] === '1' && in_array($val, self::TISSUE_CONSENT_SAMPLES)) {
+                        switch ($options['module1tissueCollectConsent']) {
+                            case NphParticipant::OPTIN_DENY:
+                                $attr = self::CONSENT_DISABLE_SAMPLE_ATTR;
+                                break;
+                            case NphParticipant::OPTIN_HAIR:
+                                if (in_array($val, Module1::SAMPLE_CONSENT_TYPE_NAIL)) {
+                                    $attr = self::CONSENT_DISABLE_SAMPLE_ATTR;
+                                }
+                                break;
+                            case NphParticipant::OPTIN_NAIL:
+                                if (in_array($val, Module1::SAMPLE_CONSENT_TYPE_HAIR)) {
+                                    $attr = self::CONSENT_DISABLE_SAMPLE_ATTR;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     return $attr;
                 }

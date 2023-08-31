@@ -754,6 +754,14 @@ class OrderService
         return $this->order;
     }
 
+    public function inactiveSiteFormDisabled(): bool
+    {
+        if ($this->order->getStatus() === Order::ORDER_UNLOCK) {
+            return false;
+        }
+        return !$this->siteService->isActiveSite();
+    }
+
     protected function getOrderParams($fields)
     {
         $params = [];

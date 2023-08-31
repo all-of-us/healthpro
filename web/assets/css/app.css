@@ -1,3 +1,6 @@
+body {
+    font-size: 14px;
+}
 .page-header {
     margin-top: 0;
     padding-bottom: 5px;
@@ -9,6 +12,7 @@
     color: #363272;
     font-weight: 700;
 }
+
 a {
     cursor: pointer;
 }
@@ -909,4 +913,8 @@ table.table-samples td {
 .visit-diet {
     font-weight: normal;
     font-style: italic;
+}
+
+.display-none {
+    display: none;
 }

@@ -92,10 +92,5 @@
     </div>
 {% endblock %}
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            // Switch tab to active step
-            $(".nav-tabs a[href='#{{ currentStep }}']").tab('show');
-        });
-    </script>
+    {{ encore_entry_script_tags('biobank-order-quanum') }}
 {% endblock %}

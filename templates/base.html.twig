@@ -37,6 +37,9 @@
     {% set showRoleDropdown = showRoleDropdown or is_granted(roleNav.role) %}
 {% endfor %}
 {% set currentRoleNav = currentRoleNav|default(false) %}
+{% set isActiveSite = app.session.get('siteEntity') ? app.session.get('siteEntity').status : 0 %}
+{% set readOnlyRoute = app.request.attributes.get('_route') starts with 'read_' %}
+{% set displayInactiveSiteBanner = not readOnlyRoute and not isActiveSite  %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -60,17 +63,37 @@
             </div>
         {% endfor %}
     {% endif %}
-    <div id="flash-notices">
-        {% for flashMessage in app.session.flashbag.get('error') %}
-            <div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
-        {% endfor %}
-        {% for flashMessage in app.session.flashbag.get('notice') %}
-            <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
-        {% endfor %}
-        {% for flashMessage in app.session.flashbag.get('success') %}
-            <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
-        {% endfor %}
-    </div>
+    {% if bootstrapVersion == 5 %}
+        <div>
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <div class="alert alert-info alert-dismissible fade show text-center" role="alert">
+                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('success') %}
+                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div id="flash-notices">
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('success') %}
+                <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% block body %}{% endblock %}
 </div>
@@ -84,6 +107,17 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="helpModalBs5">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

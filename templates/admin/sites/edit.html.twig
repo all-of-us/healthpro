@@ -26,9 +26,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $('.confirm').on('click', function () {
-            return confirm('Are you sure you want to delete the site?');
-        });
-    </script>
+    {{ encore_entry_script_tags('admin-edit-site') }}
 {% endblock %}

@@ -19,6 +19,7 @@ $container->loadFromExtension('twig', [
         'confluenceResources' => HelpService::$confluenceResources,
         'feedback_url' => HelpService::getFeedbackUrl(),
         'report_technical_issue_url' => HelpService::getReportTechnicalIssueUrl(),
-        'userTimezones' => User::$timezones
+        'userTimezones' => User::$timezones,
+        'inactiveSiteFormDisabled' => 0
     ],
 ]);

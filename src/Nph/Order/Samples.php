@@ -13,7 +13,7 @@ class Samples
             'title' => 'HPRO Spot Urine Aliquoting Instructions',
             'filename' => 'HPRO Spot Urine Aliquoting Instructions.pdf'
         ],
-        'urine24' => [
+        '24urine' => [
             'title' => 'HPRO 24 Hour Urine Aliquoting Instructions',
             'filename' => 'HPRO 24 Hour Urine Aliquoting Instructions.pdf'
         ],
@@ -93,6 +93,20 @@ class Samples
         foreach ($samplesInfo as $sampleCode => $sample) {
             if ($sampleIdentifier === $sampleCode) {
                 return $sample['type'];
+            }
+        }
+        return '';
+    }
+
+    public function getSampleTypeDisplayName($sampleIdentifier): string
+    {
+        $samplesInfo = $this->getSamplesInformation();
+        foreach ($samplesInfo as $sampleCode => $sample) {
+            if ($sampleIdentifier === $sampleCode) {
+                if (isset($sample['typeDisplayName'])) {
+                    return $sample['typeDisplayName'];
+                }
+                return ucwords($sample['type']);
             }
         }
         return '';

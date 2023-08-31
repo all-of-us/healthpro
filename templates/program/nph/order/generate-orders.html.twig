@@ -42,11 +42,23 @@
                             <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
                             {{ form_label(orderForm[timePoint]) }}
                         </div>
-                        {% if module == 1 and constant('App\\Entity\\NphSample::SAMPLE_STOOL') in orderSamples|keys and participant.module1TissueConsentStatus == false %}
-                            <div id="hair-nail-warning" class="navbar-warning alert alert-warning">
-                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                The participant has <u>not</u> opted into hair and nail collections.
-                            </div>
+                        {% if module == 1 and constant('App\\Entity\\NphSample::SAMPLE_STOOL') in orderSamples|keys %}
+                            {% if participant.module1TissueConsentStatus == constant('OPTIN_DENY', participant) %}
+                                <div id="hair-nail-warning" class="navbar-warning alert alert-warning">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    The participant has <u>not</u> opted into hair and nail collections.
+                                </div>
+                            {% elseif participant.module1TissueConsentStatus == constant('OPTIN_NAIL', participant) %}
+                                <div id="hair-nail-warning" class="navbar-warning alert alert-warning">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    The participant has opted into <u>nail collection only.</u>
+                                </div>
+                            {% elseif participant.module1TissueConsentStatus == constant('OPTIN_HAIR', participant) %}
+                                <div id="hair-nail-warning" class="navbar-warning alert alert-warning">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    The participant has opted into <u>hair collection only.</u>
+                                </div>
+                            {% endif %}
                         {% endif %}
                         <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
                              data-timepoint="{{ timePoint }}">

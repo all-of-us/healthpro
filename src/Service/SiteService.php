@@ -389,6 +389,12 @@ class SiteService
         $this->tokenStorage->setToken($token);
     }
 
+    public function isActiveSite($siteId = null): bool
+    {
+        $siteId = $siteId ?: $this->getSiteId();
+        return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
+    }
+
     protected function setNewRoles($user)
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));

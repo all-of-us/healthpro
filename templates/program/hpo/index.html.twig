@@ -28,7 +28,7 @@
                 </a>
             </div>
             <div class="col-sm-6 col-md-4">
-                <a href="{{ path('on_site_incentive_tracking') }}" class="btn btn-lg btn-block border w-100 text-dark">
+                <a href="{{ path('on_site_id_verification') }}" class="btn btn-lg btn-block border w-100 text-dark">
                     <i class="fa fa-clipboard-list" aria-hidden="true"></i>
                     On-Site Details Reporting
                     <div class="description">Audit and report on ID Verification, Incentive Tracking, and Patient Status.</div>
@@ -91,20 +91,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    <script>
-        $(document).ready(function () {
-            // Add badge for count of Deceased Participant Reports for review
-            if ($('#deceased_report_block').length) {
-                var deceasedReportCount = 0;
-                $.ajax({
-                    url: '/deceased-reports/stats'
-                }).done(function (data) {
-                    deceasedReportCount = data.pending
-                    if (deceasedReportCount > 0) {
-                        $('#deceased_report_block > a').prepend($('<div class="welcome-page-badge">' + deceasedReportCount +'</div>'));
-                    }
-                })
-            }
-        })
-    </script>
+    {{ encore_entry_script_tags('program-hpo') }}
 {% endblock %}

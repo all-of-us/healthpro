@@ -117,4 +117,16 @@ class SiteRepository extends ServiceEntityRepository
             error_log($e->getMessage());
         }
     }
+
+    public function getActiveSiteCount($siteId): int
+    {
+        return $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->where('s.status = :status')
+            ->andWhere('s.googleGroup = :googleGroup')
+            ->setParameter('status', 1)
+            ->setParameter('googleGroup', $siteId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

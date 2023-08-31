@@ -136,6 +136,7 @@
                             <li>
                                 <a href="#" data-toggle="modal" data-target="#siteModal" title="Current site">
                                     <i class="fa fa-hospital-o" aria-hidden="true"></i>
+                                    {% if isCurrentProgramHpo() and not siteInfo.activeSite(app.session.get('site').id) %} (Inactive) {% endif %}
                                     {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
                                 </a>
                             </li>

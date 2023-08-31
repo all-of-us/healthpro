@@ -80,15 +80,9 @@
                     {% set modulePanelDisplay = 'hidden' %}
                 {% endif %}
                 <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
-                    <div>
+                    <div class="row">
                         <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
-                        {% if moduleNumber == 1 %}
-                            {% if participant.module1TissueConsentStatus %}
-                                <span title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" class="label label-success hair-nail-optin"><i class="glyphicon glyphicon-ok"></i> Hair & Nail Opt-In</span>
-                            {% else %}
-                                <span title="The participant has <u>not</u> opted into hair and nail collections"  data-html="true" data-toggle="tooltip" data-container="body" class="label label-danger hair-nail-optin"><i class="glyphicon glyphicon-remove"></i> Hair & Nail Opt-In</span>
-                            {% endif %}
-                        {% endif %}
+                        {% include 'program/nph/participant/partials/hair-nail-optin-badge.html.twig' %}
                     </div>
                     {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                         {% if VisitCode != 'sampleStatusCount' %}
@@ -102,15 +96,14 @@
                                 {% set textDivSize = 'col-md-12' %}
                                 {% set dlwDiet = false %}
                             {% endif %}
-                            <div>
-                                <div class="col-md-12 well-sm well" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
+                            <div class="row">
+                                <div class="col-md-12 well-sm well visit-diet-details {% if participantDietStatus != constant('App\\Helper\\NphParticipant::DIET_STARTED') %} collapsed {% endif %}" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                      role="button" style="font-weight: bold">
                                     Visit {{ visit['visitDisplayName'] }}
                                     {% include 'program/nph/participant/partials/display-diet.html.twig' %}
-                                    <span class="caret" style="float: right; margin: 9px 0;"></span>
                                 </div>
                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} in {% endif %}">
-                                    <div>
+                                    <div class="row">
                                      {% if participant.dob %}
                                         <br>
                                         <div class="{{ textDivSize }}">
@@ -129,6 +122,25 @@
                                             This diet is not yet assigned to the participant. Orders cannot be generated until the diet is assigned.
                                         {% endif %}
                                         </div>
+                                         {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
+                                             {% if dlwSummary[moduleNumber][VisitCode] %}
+                                                 <div class="dlw-collect-bg col-md-5 well well-sm right-float">
+                                                     <a class="btn dlw-collect-button" role="button"
+                                                        href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                         Enter DLW Dosage
+                                                     </a>
+                                                     <span class="right-float dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                                                 </div>
+                                             {% endif %}
+                                         {% elseif dlwDiet %}
+                                             <div class="dlw-collect-bg col-md-5 well well-sm right-float">
+                                                 <a class="btn dlw-collect-button" role="button"
+                                                    href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                     Enter DLW Dosage
+                                                 </a>
+                                                 <span class="right-float dlw-collect-text">Not Completed </span>
+                                             </div>
+                                         {% endif %}
                                     {% else %}
                                 <div class="{{ textDivSize }}">
                                         <span class="alert alert-danger no-dob-banner">
@@ -137,25 +149,6 @@
                                         </span>
                                 </div>
                                     {% endif %}
-                                {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
-                                    {% if dlwSummary[moduleNumber][VisitCode] %}
-                                        <div class="dlw-collect-bg col-md-5 well well-sm right-float">
-                                            <a class="btn dlw-collect-button" role="button"
-                                               href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                                Enter DLW Dosage
-                                            </a>
-                                            <span class="right-float dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
-                                        </div>
-                                    {% endif %}
-                                {% elseif dlwDiet %}
-                                    <div class="dlw-collect-bg col-md-5 well well-sm right-float">
-                                    <a class="btn dlw-collect-button" role="button"
-                                       href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                        Enter DLW Dosage
-                                    </a>
-                                    <span class="right-float dlw-collect-text">Not Completed </span>
-                                </div>
-                                {% endif %}
                                 </div>
                                     {% set displayedOrderIDS = [] %}
                                     {% set displayedTimePointHeaders = [] %}
@@ -167,7 +160,11 @@
                                                         {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
                                                             {% if timepointCode not in displayedTimePointHeaders %}
                                                                 {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
-                                                                <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+                                                                <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+                                                                    </div>
+                                                                </div>
                                                             {% endif %}
                                                             {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
                                                             <div class="well well-sm order-row">

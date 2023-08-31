@@ -1,29 +1,29 @@
 <div class="panel-group view-details" id="accordion_org_patient_status_details" role="tablist" aria-multiselectable="true">
     <div class="panel-heading bg-warning-new view-history-dropdown" role="tab">
-        <div role="button" data-toggle="collapse" data-parent="#accordion_org_patient_status_detaiils"
-             href="#collapse_org_patient_status_details" aria-expanded="true" aria-controls="collapseOne">
+        <div role="button" data-bs-toggle="collapse" data-parent="#accordion_org_patient_status_detaiils"
+             data-bs-target="#collapse_org_patient_status_details" aria-expanded="true" aria-controls="collapseOne">
             View Patient Status Details: Other Organizations
             <span class="badge badge-light">{{ awardeePatientStatusData|length }}</span>
         </div>
     </div>
-    <div id="collapse_org_patient_status_details" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+    <div id="collapse_org_patient_status_details" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
         <div class="panel-body">
             {% for field in awardeePatientStatusData %}
-                <dl class="dl-horizontal">
-                    <dt>Awardee</dt>
-                    <dd>{{ field.awardee_name|default(field.awardee) }}</dd>
-                    <dt>Organization</dt>
-                    <dd>{{ field.organization_name|default(field.organization) }}</dd>
-                    <dt>Status</dt>
-                    <dd>{{ field.display_status }}</dd>
-                    <dt>User</dt>
-                    <dd>{{ field.user_email }}</dd>
-                    <dt>Site</dt>
-                    <dd>{{ field.site_name|default(field.site) }}</dd>
-                    <dt>Date</dt>
-                    <dd>{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</dd>
-                    <dt></dt>
-                    <dd>
+                <dl class="row">
+                    <dt class="col-sm-3">Awardee</dt>
+                    <dd class="col-sm-9">{{ field.awardee_name|default(field.awardee) }}</dd>
+                    <dt class="col-sm-3">Organization</dt>
+                    <dd class="col-sm-9">{{ field.organization_name|default(field.organization) }}</dd>
+                    <dt class="col-sm-3">Status</dt>
+                    <dd class="col-sm-9">{{ field.display_status }}</dd>
+                    <dt class="col-sm-3">User</dt>
+                    <dd class="col-sm-9">{{ field.user_email }}</dd>
+                    <dt class="col-sm-3">Site</dt>
+                    <dd class="col-sm-9">{{ field.site_name|default(field.site) }}</dd>
+                    <dt class="col-sm-3">Date</dt>
+                    <dd class="col-sm-9">{{ field.created_ts|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+                    <dt class="col-sm-3"></dt>
+                    <dd class="col-sm-9">
                         <small>
                             <a data-href="{{ path('patientStatus', { participantId: participant.id, patientStatusId: field.ps_id }) }}" class="patient-status-details">View History</a>
                         </small>
