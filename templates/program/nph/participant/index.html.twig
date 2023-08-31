@@ -133,7 +133,7 @@
                                                      <span class="right-float dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
                                                  </div>
                                              {% endif %}
-                                         {% elseif dlwDiet %}
+                                         {% elseif dlwDiet and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
                                              <div class="dlw-collect-bg col-md-5 well well-sm right-float">
                                                  <a class="btn dlw-collect-button" role="button"
                                                     href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
