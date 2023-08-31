@@ -381,11 +381,11 @@ class NphOrder
         return $metadata;
     }
 
-    public function getOrderTypeDisplayName(): string {
+    public function getOrderTypeDisplayName(): string
+    {
         if (isset($this::TYPE_DISPLAY_OVERRIDE[$this->getOrderType()])) {
             return $this::TYPE_DISPLAY_OVERRIDE[$this->getOrderType()];
-        } else {
-            return ucfirst($this->getOrderType());
         }
+        return ucfirst($this->getOrderType());
     }
 }
