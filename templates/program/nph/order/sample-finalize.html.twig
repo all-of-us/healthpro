@@ -42,6 +42,7 @@
             <tr>
                 <td colspan="3" class="has-error">
                     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
+                    {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume']) }}
                 </td>
             </tr>
         {% endfor %}
