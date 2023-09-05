@@ -46,7 +46,7 @@
     {% else %}
         {% set labelClass = 'label-default' %}
     {% endif %}
-    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
+    <span><span class="label {{ labelClass }}">{{ status }}</span></span>
 {% endmacro %}
 
 {% macro displayDateAndTimezone(time, timezoneId) %}

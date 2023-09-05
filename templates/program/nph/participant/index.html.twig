@@ -104,19 +104,19 @@
                                         {% set textDivSize = 'col-md-12' %}
                                         {% set dlwDiet = false %}
                                     {% endif %}
-                                    <div class="row">
-                                        <div class="col-md-12 well-sm well visit-diet-details {% if participantDietStatus != constant('App\\Helper\\NphParticipant::DIET_STARTED') %} collapsed {% endif %}" data-toggle="collapse" data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
+                                        <div class="card">
+                                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                              role="button" style="font-weight: bold">
                                             Visit {{ visit['visitDisplayName'] }}
                                             {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                         </div>
-                                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} in {% endif %}">
+                                        <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
                                             <div class="row">
                                                 {% if participant.dob %}
                                                     <br>
                                                     <div class="{{ textDivSize }}">
                                                         {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
-                                                            <a class="btn btn-primary" role="button"
+                                                            <a class="btn btn-primary btn-sm" role="button"
                                                                href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                 <i class="glyphicon glyphicon-plus-sign"></i> Generate Orders and Print Labels
                                                             </a>
@@ -175,23 +175,25 @@
                                                                         </div>
                                                                     {% endif %}
                                                                     {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
-                                                                    <div class="well well-sm order-row">
+                                                                    <div class="card">
+                                                                        <div class="card-header">
                                                                         <div class="clearfix">
-                                                                            <div class="col-sm-2">{{ sample[orderid]['createDate'] }}</div>
-                                                                            <div class="col-sm-3"><a
+                                                                            <span>{{ sample[orderid]['createDate'] }}</span>
+                                                                            <span><a
                                                                                     href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
-                                                                                    ID: {{ orderid }}</a></div>
-                                                                            <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
+                                                                                    ID: {{ orderid }}</a></span>
+                                                                            <span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span>
                                                                             {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
                                                                             {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                                 {% if not loop.first %}
-                                                                                    <div class="col-sm-9"></div>
+                                                                                    <span></span>
                                                                                 {% endif %}
-                                                                                <div class="col-sm-3 float-right">({{ sampleStatusCount }}
+                                                                                <span class="float-right">({{ sampleStatusCount }}
                                                                                     / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
-                                                                                </div>
+                                                                                </span>
                                                                             {% endfor %}
                                                                         </div>
+                                                                    </div>
                                                                     </div>
                                                                 {% endif %}
                                                             {% endfor %}
