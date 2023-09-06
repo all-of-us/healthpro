@@ -54,7 +54,7 @@ $(document).ready(function () {
     });
 
     $(document).on("click", ".clear-aliquot-widget", function () {
-        $(this).closest("tr").find("input").val("");
+        $(this).closest("tr").find("input:not(:read-only)").val("");
     });
 
     $(".aliquot-volume").keyup(function () {

@@ -2,6 +2,15 @@
 {% block title %} DLW Collect - {% endblock %}
 {% block body %}
 <div class="page-header">
+    {% if disabled %}
+    <div class="alert alert-success well-sm">
+        <strong>
+            Finalized
+            by {{ dlwInfo.User.email|default('Unknown') }}
+            on {{ dlwInfo.modifiedTs|date('n/j/Y g:ia', app.user.timezone) }}
+        </strong>
+    </div>
+    {% endif %}
     <h2>
         DLW Dosage
         <small>

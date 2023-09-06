@@ -41,6 +41,10 @@ class NphDlw
     #[ORM\Column(nullable: true)]
     private ?int $ModifiedTimezoneId = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $User = null;
+
     public function getId(): int
     {
         return $this->id;
@@ -150,6 +154,18 @@ class NphDlw
     public function setModifiedTimezoneId(?int $ModifiedTimezoneId): static
     {
         $this->ModifiedTimezoneId = $ModifiedTimezoneId;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): static
+    {
+        $this->User = $User;
 
         return $this;
     }
