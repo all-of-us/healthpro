@@ -8,6 +8,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: WeightForLength0To23MonthsRepository::class)]
 class WeightForLength0To23Months
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\Column]
     private ?int $sex = null;
 
@@ -23,6 +28,10 @@ class WeightForLength0To23Months
     #[ORM\Column]
     private ?float $S = null;
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function getSex(): ?int
     {
