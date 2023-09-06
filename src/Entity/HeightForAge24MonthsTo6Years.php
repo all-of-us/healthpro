@@ -17,7 +17,7 @@ class HeightForAge24MonthsTo6Years
     private ?int $sex = null;
 
     #[ORM\Column]
-    private ?int $month = null;
+    private ?float $month = null;
 
     #[ORM\Column]
     private ?float $L = null;
@@ -45,12 +45,12 @@ class HeightForAge24MonthsTo6Years
         return $this;
     }
 
-    public function getMonth(): ?int
+    public function getMonth(): ?float
     {
         return $this->month;
     }
 
-    public function setMonth(int $month): self
+    public function setMonth(float $month): self
     {
         $this->month = $month;
 
