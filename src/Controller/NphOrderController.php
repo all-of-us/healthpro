@@ -543,9 +543,7 @@ class NphOrderController extends BaseController
         $dlwForm->handleRequest($request);
         if ($dlwForm->isSubmitted()) {
             if ($dlwForm->isValid()) {
-                $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
-                $timestamp = new \DateTime('now', new \DateTimeZone($this->getSecurityUser()->getTimezone()));
-                $this->addFlash('success', 'Saved by ' . $this->getSecurityUser()->getEmail() . ' on ' . $timestamp->format('m-d-Y h:i a'));
+                $dlwObject = $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
                 $disabled = true;
             } else {
                 $disabled = false;
