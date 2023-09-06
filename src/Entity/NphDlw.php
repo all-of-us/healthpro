@@ -43,7 +43,7 @@ class NphDlw
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $User = null;
+    private User $User;
 
     public function getId(): int
     {
