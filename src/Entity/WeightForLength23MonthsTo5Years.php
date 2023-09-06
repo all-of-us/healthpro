@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\WeightForLength0To23MonthsRepository;
+use App\Repository\WeightForLength23MonthsTo5YearsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: WeightForLength0To23MonthsRepository::class)]
-class WeightForLength0To23Months
+#[ORM\Entity(repositoryClass: WeightForLength23MonthsTo5YearsRepository::class)]
+class WeightForLength23MonthsTo5Years
 {
     #[ORM\Column]
     private ?int $sex = null;
@@ -22,7 +22,6 @@ class WeightForLength0To23Months
 
     #[ORM\Column]
     private ?float $S = null;
-
 
     public function getSex(): ?int
     {
