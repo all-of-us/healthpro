@@ -28,11 +28,13 @@
                     </div>
                 </td>
                 <td colspan="{{ colspan }}">
-                    <span style="top: 25px; position: relative">=</span>
-                    <span style="position: relative">Total Volume</span>
-                    <span style="position: relative; top: 25px" id="totalVol">#</span>
+                    <label style="position: relative; display: block; font-weight: normal">Total Volume</label>
+                    <div class="input-group">
+                        <input type="text" id="totalVol" class="form-control">
+                        <span class="input-group-addon">mL</span>
+                    </div>
+                    </div>
                 </td>
-                <td class="aliquot volume nopadleft" style="position: relative">
                     <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
                     {% if not sample.disabled and not sample.unlocked %}
                         <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>

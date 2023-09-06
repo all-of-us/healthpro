@@ -103,7 +103,7 @@ $(document).ready(function () {
         let sampleVolume = $(sampleVolumeField).val() ? parseInt($(sampleVolumeField).val()) * 1000 : 0;
         let glycerolVolume = $(glycerolVolumeField).val() ? parseInt($(glycerolVolumeField).val()) : 0;
         let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
-        $("#totalVol").html(`${totalVolume} mL`);
+        $("#totalVol").val(`${totalVolume}`);
     }
 
     disableEnableAliquotFields();
