@@ -9,8 +9,8 @@ use App\Entity\User;
 use App\Helper\NphParticipant;
 use App\Helper\Participant;
 use App\Service\SiteService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
-use Google\Type\Date;
 
 class testSetup
 {
@@ -80,8 +80,7 @@ class testSetup
         string $lastName = null,
         \DateTime $dateOfBirth = null,
         array $rdrData = []
-    ): Participant
-    {
+    ): Participant {
         if ($id === null) {
             $id = 'P0000000001';
         }
@@ -104,6 +103,7 @@ class testSetup
     }
 
     public function generateNphDlw(
+        User $user,
         string $participantId = null,
         string $module = null,
         string $visit = null,
@@ -112,7 +112,8 @@ class testSetup
         float $participantWeight = null,
         string $doseBatchId = null,
         \DateTime $dateModified = null,
-        int $modifiedTimezoneId = null): NphDlw
+        int $modifiedTimezoneId = null,
+    ): NphDlw
     {
         if ($participantId === null) {
             $participantId = 'P0000000001';
@@ -151,6 +152,7 @@ class testSetup
         $dlw->setDoseBatchId($doseBatchId);
         $dlw->setModifiedTs($dateModified);
         $dlw->setModifiedTimezoneId($modifiedTimezoneId);
+        $dlw->setUser($user);
         $this->em->persist($dlw);
         $this->em->flush();
         return $dlw;

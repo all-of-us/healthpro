@@ -558,6 +558,7 @@ class NphOrderController extends BaseController
             'module' => $module,
             'visit' => $visit,
             'disabled' => $disabled,
+            'dlwInfo' => $dlwObject,
             'form' => $dlwForm->createView()
         ]);
     }
