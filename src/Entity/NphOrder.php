@@ -20,8 +20,12 @@ class NphOrder
     public const TYPE_DLW = 'urineDlw';
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
     private const TYPE_DISPLAY_OVERRIDE = [
-        '24urine' => '24 Hour Urine',
-        'urineDlw' => 'Urine DLW',
+        3 => [
+            'urine' => 'Spot Urine',
+            '24urine' => '24 Hour Urine',
+            'urineDlw' => 'Urine DLW',
+            'saliva3' => 'Saliva',
+        ],
     ];
 
     #[ORM\Id]
@@ -383,8 +387,8 @@ class NphOrder
 
     public function getOrderTypeDisplayName(): string
     {
-        if (isset($this::TYPE_DISPLAY_OVERRIDE[$this->getOrderType()])) {
-            return $this::TYPE_DISPLAY_OVERRIDE[$this->getOrderType()];
+        if (isset($this::TYPE_DISPLAY_OVERRIDE[$this->getModule()][$this->getOrderType()])) {
+            return $this::TYPE_DISPLAY_OVERRIDE[$this->getModule()][$this->getOrderType()];
         }
         return ucfirst($this->getOrderType());
     }

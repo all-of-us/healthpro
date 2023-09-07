@@ -117,6 +117,7 @@
       "temperature": "Refrigerated",
       "specimen": "Urine",
       "type": "urine",
+      "typeDisplayName": "Spot Urine",
       "identifier": "UrineS",
       "aliquots": {
         "RU1U": {
@@ -171,7 +172,7 @@
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
-          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 5mL matrix aliquot tube barcode ID.",
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 4mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 4,
           "warningMinVolume": 100,
@@ -188,7 +189,7 @@
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
-          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 5mL matrix aliquot tube barcode ID.",
+          "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 2.5mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 2.4,
           "warningMinVolume": 100,
