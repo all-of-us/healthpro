@@ -62,7 +62,7 @@
             {{ form_start(form, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(form) }}
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['doseBatchId'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['doseBatchId'])}}
                     <div class="input-group">
                         <span class="input-group-addon">NPHDLW</span>
@@ -70,7 +70,7 @@
                     </div>
                     {{ form_errors(form['doseBatchId'])}}
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 {% if not form['participantWeight'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['participantWeight'])}}
                     {{ form_widget(form['participantWeight'], {attr: {readonly: disabled}})}}
                     {{ form_errors(form['participantWeight'])}}
@@ -79,19 +79,19 @@
                 <div class="col-md-1">
                     <p style="margin-top: 2em; font-weight: bold">X 1.5 = </p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['calculatedDose'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['calculatedDose']) }}
                     {{ form_widget(form['calculatedDose'], {attr: {readonly: disabled}}) }}
                     {{ form_errors(form['calculatedDose']) }}
                 </div>
             </div>
             <div class="row margin-top-30">
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['actualDose'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['actualDose']) }}
                     {{ form_widget(form['actualDose'], {attr: {readonly: disabled}}) }}
                     {{ form_errors(form['actualDose']) }}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['doseAdministered'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['doseAdministered']) }}
                     {{ form_widget(form['doseAdministered'], {attr: {readonly: disabled}}) }}
                     {{ form_errors(form['doseAdministered']) }}
