@@ -14,19 +14,19 @@ class HeadCircumferenceForAge0To36Months
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $sex = null;
+    private int $sex;
 
     #[ORM\Column]
-    private ?float $month = null;
+    private float $month;
 
     #[ORM\Column]
-    private ?float $L = null;
+    private float $L;
 
     #[ORM\Column]
-    private ?float $M = null;
+    private float $M;
 
     #[ORM\Column]
-    private ?float $S = null;
+    private float $S;
 
     public function getId(): ?int
     {

@@ -14,19 +14,19 @@ class WeightForLength0To23Months
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $sex = null;
+    private int $sex;
 
     #[ORM\Column]
-    private ?float $length = null;
+    private float $length;
 
     #[ORM\Column]
-    private ?float $L = null;
+    private float $L;
 
     #[ORM\Column]
-    private ?float $M = null;
+    private float $M;
 
     #[ORM\Column]
-    private ?float $S = null;
+    private float $S;
 
     public function getId(): ?int
     {

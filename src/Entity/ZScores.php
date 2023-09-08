@@ -14,37 +14,37 @@ class ZScores
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?float $Z = null;
+    private float $Z;
 
     #[ORM\Column]
-    private ?float $Z_0 = null;
+    private float $Z_0;
 
     #[ORM\Column]
-    private ?float $Z_01 = null;
+    private float $Z_01;
 
     #[ORM\Column]
-    private ?float $Z_02 = null;
+    private float $Z_02;
 
     #[ORM\Column]
-    private ?float $Z_03 = null;
+    private float $Z_03;
 
     #[ORM\Column]
-    private ?float $Z_04 = null;
+    private float $Z_04;
 
     #[ORM\Column]
-    private ?float $Z_05 = null;
+    private float $Z_05;
 
     #[ORM\Column]
-    private ?float $Z_06 = null;
+    private float $Z_06;
 
     #[ORM\Column]
-    private ?float $Z_07 = null;
+    private float $Z_07;
 
     #[ORM\Column]
-    private ?float $Z_08 = null;
+    private float $Z_08;
 
     #[ORM\Column]
-    private ?float $Z_09 = null;
+    private float $Z_09;
 
     public function getId(): ?int
     {
