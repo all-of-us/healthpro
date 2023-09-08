@@ -29,14 +29,14 @@
                 </td>
                 <td colspan="{{ colspan }}">
                     <label style="position: relative; display: block; font-weight: normal">Total Volume</label>
-                    <div class="input-group">
+                    <div class="input-group" style="float: right; position: relative; top: -5px">
                         <input type="text" id="totalVol" class="form-control">
                         <span class="input-group-addon">mL</span>
                     </div>
-                    </div>
                 </td>
+                <td style="position: relative">
                     {% if not sample.disabled and not sample.unlocked %}
-                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
+                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-metadata-eraser" role="button"></i>
                     {% endif %}
                 </td>
             </tr>
