@@ -180,7 +180,12 @@
                     {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
                 {% endif %}
                 <div class="panel-body">
-                    {{ form_start(sampleFinalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit'} }) }}
+                    {% if isFormDisabled %}
+                        {% set formClasses = 'disable-enter prevent-resumbit' %}
+                    {% else  %}
+                        {% set formClasses = 'warn-unsaved disable-enter prevent-resubmit' %}
+                    {% endif %}
+                    {{ form_start(sampleFinalizeForm, { attr: { class: formClasses} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
                             has-error{% endif %}">

@@ -164,10 +164,10 @@
       "aliquots": {
         "SALIVAA1": {
           "identifier": "SA1-U",
-          "container": "4mL Matrix tube (no glycerol)",
-          "description": "4mL Matrix tube",
+          "container": "5mL Matrix tube (no glycerol)",
+          "description": "5mL Matrix tube",
           "expectedAliquots": 1,
-          "expectedVolume": 2.4,
+          "expectedVolume": 4,
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
@@ -181,10 +181,10 @@
         },
         "SALIVAA2": {
           "identifier": "SA2-U",
-          "container": "2.5mL Matrix tube (w/glycerol)",
-          "description": "2.5mL Matrix tube",
+          "container": "5mL Matrix tube (w/glycerol)",
+          "description": "5mL Matrix tube",
           "expectedAliquots": 1,
-          "expectedVolume": 2,
+          "expectedVolume": 2.5,
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
