@@ -715,15 +715,13 @@ class Measurement
             $denominator = $L * $S;
             if ($denominator != 0) {
                 return round($numerator / $denominator, 2);
-            } else {
-                throw new Exception("Division by zero error");
             }
+            throw new Exception('Division by zero error');
         } else {
             if ($S != 0) {
                 return round(log($X / $M) / $S, 2);
-            } else {
-                throw new Exception("Division by zero error");
             }
+            throw new Exception('Division by zero error');
         }
     }
 
