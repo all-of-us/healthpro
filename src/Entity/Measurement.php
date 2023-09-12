@@ -714,13 +714,13 @@ class Measurement
             $numerator = pow($X / $M, $L) - 1;
             $denominator = $L * $S;
             if ($denominator != 0) {
-                return $numerator / $denominator;
+                return round($numerator / $denominator, 2);
             } else {
                 throw new Exception("Division by zero error");
             }
         } else {
             if ($S != 0) {
-                return log($X / $M) / $S;
+                return round(log($X / $M) / $S, 2);
             } else {
                 throw new Exception("Division by zero error");
             }

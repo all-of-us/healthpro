@@ -4,11 +4,22 @@ namespace App\Tests\Entity;
 
 use App\Entity\Measurement;
 use App\Entity\User;
+use App\Entity\ZScores;
 use App\Exception\MissingSchemaException;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class MeasurementTest extends TestCase
+class MeasurementTest extends KernelTestCase
 {
+    private EntityManagerInterface $em;
+
+    public function setup(): void
+    {
+        self::bootKernel();
+        $this->em = static::$container->get(EntityManagerInterface::class);
+
+    }
     protected function getUser()
     {
         $user = new User;
@@ -170,5 +181,57 @@ class MeasurementTest extends TestCase
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
         $this->assertJsonStringEqualsJsonString(file_get_contents(dirname(__DIR__) . '/' . $filename), $json);
+    }
+
+    /**
+     * @dataProvider calculateZScoreDataProvider
+     */
+    public function testCalculateZScore(float $X, float $L, float $M, float $S, float $expectedResult): void
+    {
+        $measurement = new Measurement();
+        $result = $measurement->calculateZScore($X, $L, $M, $S);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function calculateZScoreDataProvider(): array
+    {
+        return [
+            [10, 2, 5, 3, 0.5],
+            [10, 0, 5, 3, 0.23],
+            [10, 3, 5, 3, 0.78]
+        ];
+    }
+
+    /**
+     * @dataProvider calculatePercentileDataProvider
+     */
+    public function testCalculatePercentile(float $z, ?float $expectedPercentile): void
+    {
+        $zScores = $this->em->getRepository(ZScores::class)->findAll();
+        $measurement = new Measurement();
+        $percentile = $measurement->calculatePercentile($z, $zScores);
+        $this->assertEquals($expectedPercentile, $percentile);
+    }
+
+    public function calculatePercentileDataProvider(): array
+    {
+        return [
+            [-3.9, 0.005],
+            [-2.0, 2.275],
+            [-1.5, 6.681],
+            [-1.0, 15.866],
+            [-0.5, 30.854],
+            [0.0, 50.0],
+            [0.5, 69.146],
+            [1.0, 84.134],
+            [1.5, 93.319],
+            [2.0, 97.725],
+            [2.5, 99.379],
+            [3.0, 99.865],
+            [3.5, 99.977],
+            [-3.93, 0.004],
+            [3.93, 99.996],
+            [4, null]
+        ];
     }
 }
