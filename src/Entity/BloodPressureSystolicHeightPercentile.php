@@ -14,34 +14,34 @@ class BloodPressureSystolicHeightPercentile
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $sex = null;
+    private int $sex;
 
     #[ORM\Column]
-    private ?int $ageYear = null;
+    private int $ageYear;
 
     #[ORM\Column]
-    private ?int $bpCentile = null;
+    private int $bpCentile;
 
     #[ORM\Column]
-    private ?int $heightPer5 = null;
+    private int $heightPer5;
 
     #[ORM\Column]
-    private ?int $heightPer10 = null;
+    private int $heightPer10;
 
     #[ORM\Column]
-    private ?int $heightPer25 = null;
+    private int $heightPer25;
 
     #[ORM\Column]
-    private ?int $heightPer50 = null;
+    private int $heightPer50;
 
     #[ORM\Column]
-    private ?int $heightPer75 = null;
+    private int $heightPer75;
 
     #[ORM\Column]
-    private ?int $heightPer90 = null;
+    private int $heightPer90;
 
     #[ORM\Column]
-    private ?int $heightPer95 = null;
+    private int $heightPer95;
 
     public function getId(): ?int
     {

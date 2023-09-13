@@ -14,19 +14,19 @@ class HeartRateAge
     private ?int $id = null;
 
     #[ORM\Column(length: 10)]
-    private ?string $ageType = null;
+    private string $ageType;
 
     #[ORM\Column]
-    private ?int $startAge = null;
+    private int $startAge;
 
     #[ORM\Column]
-    private ?int $endAge = null;
+    private int $endAge;
 
     #[ORM\Column]
-    private ?int $centile1 = null;
+    private int $centile1;
 
     #[ORM\Column]
-    private ?int $centile99 = null;
+    private int $centile99;
 
     public function getId(): ?int
     {
