@@ -2,6 +2,15 @@
 {% block title %} DLW Collect - {% endblock %}
 {% block body %}
 <div class="page-header">
+    {% if disabled %}
+    <div class="alert alert-success well-sm">
+        <strong>
+            Finalized
+            by {{ dlwInfo.User.email|default('Unknown') }}
+            on {{ dlwInfo.modifiedTs|date('n/j/Y g:ia', app.user.timezone) }}
+        </strong>
+    </div>
+    {% endif %}
     <h2>
         DLW Dosage
         <small>
@@ -53,7 +62,7 @@
             {{ form_start(form, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
             {{ form_errors(form) }}
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['doseBatchId'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['doseBatchId'])}}
                     <div class="input-group">
                         <span class="input-group-addon">NPHDLW</span>
@@ -61,7 +70,7 @@
                     </div>
                     {{ form_errors(form['doseBatchId'])}}
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 {% if not form['participantWeight'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['participantWeight'])}}
                     {{ form_widget(form['participantWeight'], {attr: {readonly: disabled}})}}
                     {{ form_errors(form['participantWeight'])}}
@@ -70,19 +79,19 @@
                 <div class="col-md-1">
                     <p style="margin-top: 2em; font-weight: bold">X 1.5 = </p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['calculatedDose'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['calculatedDose']) }}
                     {{ form_widget(form['calculatedDose'], {attr: {readonly: disabled}}) }}
                     {{ form_errors(form['calculatedDose']) }}
                 </div>
             </div>
             <div class="row margin-top-30">
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['actualDose'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['actualDose']) }}
                     {{ form_widget(form['actualDose'], {attr: {readonly: disabled}}) }}
                     {{ form_errors(form['actualDose']) }}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 {% if not form['doseAdministered'].vars.valid%}has-error{% endif %}">
                     {{ form_label(form['doseAdministered']) }}
                     {{ form_widget(form['doseAdministered'], {attr: {readonly: disabled}}) }}
                     {{ form_errors(form['doseAdministered']) }}
@@ -91,7 +100,7 @@
             {{ form_rest(form) }}
             <div class="form-group margin-top-15">
                 {% if disabled %}
-                    <button type="button" class="btn btn-primary" id="form_edit" formnovalidate>Edit</button>
+                    <button type="button" class="btn btn-warning" id="form_edit" formnovalidate>Edit</button>
                 {% else %}
                     <button type="submit" class="btn btn-primary" id="form_submit">Save</button>
                 {% endif %}

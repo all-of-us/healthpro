@@ -49,6 +49,8 @@ class NphOrderService
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
         $this->rdrApiService = $rdrApiService;
+        $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
+        $this->site = $this->siteService->getSiteId();
     }
 
     public function loadModules(string $module, string $visit, string $participantId, string $biobankId): void
@@ -60,9 +62,6 @@ class NphOrderService
         $this->visit = $visit;
         $this->participantId = $participantId;
         $this->biobankId = $biobankId;
-
-        $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
-        $this->site = $this->siteService->getSiteId();
     }
 
     public function getVisitDiet(): string
@@ -808,6 +807,7 @@ class NphOrderService
         $formData->setVisit($visit);
         $formData->setModifiedTimezoneId($this->getTimezoneid());
         $formData->setModifiedTs(new DateTime());
+        $formData->setUser($this->user);
         $this->em->persist($formData);
         $this->em->flush();
         return $formData;

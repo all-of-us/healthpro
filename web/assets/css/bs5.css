@@ -36,3 +36,43 @@
 .child-icon {
     color: #7927FF;
 }
+
+.scrollspy-participant-overview {
+    height: 550px;
+    overflow-y: scroll;
+}
+
+.scroll-header {
+    position: relative;
+}
+
+.scroll-header {
+    width: 100%;
+    border-bottom: 1px solid #000;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+}
+
+.scroll-header span {
+    background:#fff;
+    padding:0 10px;
+    margin-left: 30px;
+}
+
+.participant-detail-new-status {
+    display: inline-block;
+    margin: 15px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 3px;
+    text-align: center;
+    min-width: 250px;
+}
+
+.big-status-box {
+    min-width: 300px;
+}
+
+.end-status-box {
+    margin-bottom: 6rem;
+}

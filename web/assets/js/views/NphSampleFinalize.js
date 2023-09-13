@@ -54,7 +54,7 @@ $(document).ready(function () {
     });
 
     $(document).on("click", ".clear-aliquot-widget", function () {
-        $(this).closest("tr").find("input").val("");
+        $(this).closest("tr").find("input:not(:read-only)").val("");
     });
 
     $(".aliquot-volume").keyup(function () {
@@ -103,10 +103,14 @@ $(document).ready(function () {
         let sampleVolume = $(sampleVolumeField).val() ? parseInt($(sampleVolumeField).val()) * 1000 : 0;
         let glycerolVolume = $(glycerolVolumeField).val() ? parseInt($(glycerolVolumeField).val()) : 0;
         let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
-        $("#totalVol").html(`${totalVolume} mL`);
+        $("#totalVol").val(`${totalVolume}`);
     }
 
     disableEnableAliquotFields();
+    calculateGlycerolVolume(
+        $("#nph_sample_finalize_SALIVAA2Volume_0"),
+        $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume")
+    );
     $(".aliquot-volume").trigger("keyup");
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
