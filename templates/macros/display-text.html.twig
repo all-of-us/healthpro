@@ -176,7 +176,7 @@
         {% endif %}
         {% if firstTime %}
             {{ _self.displayConsent(firstTime, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) }}
-            {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>
+            {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }}
         {% endif %}
     {% else %}
         (not completed)
