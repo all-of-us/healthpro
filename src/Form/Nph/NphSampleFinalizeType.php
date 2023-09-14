@@ -135,26 +135,39 @@ class NphSampleFinalizeType extends NphOrderForm
                         if ($metadataField['identifier'] === 'glycerolAdditiveVolume') {
                             $metadataConstraints = [
                                 new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $metadataField) {
+                                    $key = intval($context->getObject()->getName());
                                     $formData = $context->getRoot()->getData();
-                                    $totalVolume = $formData["{$aliquotCode}Volume"][0] + ($formData[$aliquotCode . $metadataField['identifier']] / 1000);
+                                    $glycerolVolume = $formData[$aliquotCode . $metadataField['identifier']][$key];
+                                    $totalVolume = $formData["{$aliquotCode}Volume"][$key] + ($glycerolVolume / 1000);
                                     if ($totalVolume > $aliquot['maxVolume']) {
                                         $context->buildViolation("{$metadataField['label']} cannot be entered.  This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.")->addViolation();
                                     }
                                     if ($totalVolume < $aliquot['minVolume']) {
                                         $context->buildViolation("{$metadataField['label']} cannot be entered.  This aliquot should contain a minimum of {$aliquot['minVolume']} {$aliquot['units']}.")->addViolation();
                                     }
+                                    if ($glycerolVolume <= 0) {
+                                        $context->buildViolation("{$metadataField['label']} volume must be greater than 0")->addViolation();
+                                    }
+                                    if ($glycerolVolume >= 0.1 && $glycerolVolume <= 0.4) {
+                                        $context->buildViolation('Glycerol Volume Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)')->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
+                                    }
                                 })
                             ];
                         }
-                        $builder->add("{$aliquotCode}{$metadataField['identifier']}", $metadataField['entryType'], [
-                            'label' => $metadataField['label'],
-                            'required' => false,
-                            'attr' => [
-                                'placeholder' => $metadataField['placeholder'] ?? '',
-                                'class' => $metadataField['class'] ?? '',
+                        $builder->add("{$aliquotCode}{$metadataField['identifier']}", Type\CollectionType::class, [
+                            'entry_type' => Type\TextType::class,
+                            'entry_options' => [
+                                'label' => $metadataField['label'],
+                                'required' => false,
+                                'attr' => [
+                                    'placeholder' => $metadataField['placeholder'] ?? '',
+                                    'class' => $metadataField['class'] ?? '',
+                                ],
+                                'constraints' => $metadataConstraints ?? [],
                             ],
-                            'data' => $formData[$aliquotCode . $metadataField['identifier']][0] ?? null,
-                            'constraints' => $metadataConstraints ?? []
+                            'allow_add' => true,
+                            'allow_delete' => true,
+                            'data' => $formData[$aliquotCode . $metadataField['identifier']] ?? [],
                         ]);
                     }
                 }

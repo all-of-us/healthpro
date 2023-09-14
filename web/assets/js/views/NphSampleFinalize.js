@@ -10,7 +10,80 @@ $(document).ready(function () {
     });
 
     $(".add-aliquot-widget").click(function () {
-        let list = $($(this).attr("data-list-selector"));
+        if ($(this).data("aliquot-code") === "SALIVAA2") {
+            addGlycerolAliquotRow(this);
+        } else {
+            addNormalAliquotRow(this);
+        }
+    });
+
+    $(document).on("click", ".delete-aliquot-widget", function () {
+        $(this).closest("tr").remove();
+    });
+
+    $(document).on("click", ".clear-aliquot-widget", function () {
+        $(this).closest("tr").find("input:not(:read-only)").val("");
+    });
+
+    $(document).on("click");
+
+    $(".aliquot-volume").keyup(function () {
+        let inputValue = $(this).val();
+        let minValue = $(this).data("warning-min-volume");
+        let maxValue = $(this).data("warning-max-volume");
+        if (this.id === "nph_sample_finalize_SALIVAA2Volume_0") {
+            calculateGlycerolVolume(this, $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume"));
+        }
+        if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
+            if ($(this).data("warning-target")) {
+                $("#" + $(this).data("warning-target")).show();
+            }
+            $(this).closest("tr").find(".aliquot-volume-warning").show();
+        } else {
+            if ($(this).data("warning-target")) {
+                $("#" + $(this).data("warning-target")).hide();
+            }
+            $(this).closest("tr").find(".aliquot-volume-warning").hide();
+        }
+    });
+
+    $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume").keyup(function () {
+        calculateGlycerolVolume($("#nph_sample_finalize_SALIVAA2Volume_0"), this);
+    });
+
+    $(document).on("keyup", ".aliquot-barcode", function () {
+        let barcode = $(this).val();
+        let expectedBarcodeLength = $(this).data("barcode-length");
+        let expectedBarcodePrefix = $(this).data("barcode-prefix");
+        let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
+        if (regex.test(barcode)) {
+            let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
+            aliquotTsSelector.focus();
+            aliquotTsSelector.data("DateTimePicker").date(new Date());
+            aliquotTsSelector.blur();
+            $(this).closest("tr").find(".aliquot-volume").focus();
+        }
+    });
+
+    let disableEnableAliquotFields = function () {
+        let $checkboxes = $(".sample-modify-checkbox:checkbox:enabled");
+        $checkboxes.each(function () {
+            let $row = $(this).closest("tr");
+            $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
+            if ($row.find(".aliquot-volume").data("expected-volume")) {
+            }
+        });
+    };
+
+    function calculateGlycerolVolume(sampleVolumeField, glycerolVolumeField) {
+        let sampleVolume = $(sampleVolumeField).val() ? parseFloat($(sampleVolumeField).val()) * 1000 : 0;
+        let glycerolVolume = $(glycerolVolumeField).val() ? parseFloat($(glycerolVolumeField).val()) : 0;
+        let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
+        $("#totalVol").val(`${totalVolume}`);
+    }
+
+    function addNormalAliquotRow(element) {
+        let list = $($(element).attr("data-list-selector"));
         let aliquotId = list.data("aliquot-id");
         let aliquotUnits = list.data("aliquot-units");
         let counter = list.data("widget-counter");
@@ -47,63 +120,36 @@ $(document).ready(function () {
         $(".order-ts").pmiDateTimePicker({
             maxDate: new Date().setHours(23, 59, 59, 999)
         });
-    });
+    }
 
-    $(document).on("click", ".delete-aliquot-widget", function () {
-        $(this).closest("tr").remove();
-    });
-
-    $(document).on("click", ".clear-aliquot-widget", function () {
-        $(this).closest("tr").find("input:not(:read-only)").val("");
-    });
-
-    $(".aliquot-volume").keyup(function () {
-        let inputValue = $(this).val();
-        let minValue = $(this).data("warning-min-volume");
-        let maxValue = $(this).data("warning-max-volume");
-        if (this.id === "nph_sample_finalize_SALIVAA2Volume_0") {
-            calculateGlycerolVolume(this, $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume"));
-        }
-        if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
-            $(this).closest("tr").find(".aliquot-volume-warning").show();
-        } else {
-            $(this).closest("tr").find(".aliquot-volume-warning").hide();
-        }
-    });
-
-    $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume").keyup(function () {
-        calculateGlycerolVolume($("#nph_sample_finalize_SALIVAA2Volume_0"), this);
-    });
-
-    $(document).on("keyup", ".aliquot-barcode", function () {
-        let barcode = $(this).val();
-        let expectedBarcodeLength = $(this).data("barcode-length");
-        let expectedBarcodePrefix = $(this).data("barcode-prefix");
-        let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
-        if (regex.test(barcode)) {
-            let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
-            aliquotTsSelector.focus();
-            aliquotTsSelector.data("DateTimePicker").date(new Date());
-            aliquotTsSelector.blur();
-            $(this).closest("tr").find(".aliquot-volume").focus();
-        }
-    });
-
-    let disableEnableAliquotFields = function () {
-        let $checkboxes = $(".sample-modify-checkbox:checkbox:enabled");
-        $checkboxes.each(function () {
-            let $row = $(this).closest("tr");
-            $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
-            if ($row.find(".aliquot-volume").data("expected-volume")) {
-            }
+    function addGlycerolAliquotRow(element) {
+        let list = $($(element).attr("data-list-selector"));
+        let aliquotId = list.data("aliquot-id");
+        let aliquotUnits = list.data("aliquot-units");
+        let counter = list.data("widget-counter");
+        let aliquotCode = $(element).data("aliquot-code");
+        let rows = $(".duplicate-target-" + aliquotCode).clone();
+        rows.each(function () {
+            let barcodeName = `nph_sample_finalize[SALIVAA2][${counter}]`;
+            let tsName = `nph_sample_finalize[SALIVAA2AliquotTs][${counter}]`;
+            let volumeName = `nph_sample_finalize[SALIVAA2Volume][${counter}]`;
+            let glycerolVolumeName = `nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][${counter}]`;
+            $(this).removeClass("duplicate-target-" + aliquotCode);
+            $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr("name", barcodeName);
+            $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr("name", tsName);
+            $(this).find("[name='nph_sample_finalize[SALIVAA2Volume][0]']").attr("name", volumeName);
+            $(this)
+                .find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']")
+                .attr("name", glycerolVolumeName);
+            $(this).find("input").val("");
+            $(this).find("input:not(#totalVol)").attr("readonly", false);
         });
-    };
-
-    function calculateGlycerolVolume(sampleVolumeField, glycerolVolumeField) {
-        let sampleVolume = $(sampleVolumeField).val() ? parseInt($(sampleVolumeField).val()) * 1000 : 0;
-        let glycerolVolume = $(glycerolVolumeField).val() ? parseInt($(glycerolVolumeField).val()) : 0;
-        let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
-        $("#totalVol").val(`${totalVolume}`);
+        counter++;
+        list.data("widget-counter", counter);
+        $(element).closest("tr").before(rows);
+        $(".order-ts").pmiDateTimePicker({
+            maxDate: new Date().setHours(23, 59, 59, 999)
+        });
     }
 
     disableEnableAliquotFields();

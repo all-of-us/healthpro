@@ -185,7 +185,7 @@
           "container": "5mL Matrix tube (w/glycerol)",
           "description": "5mL Matrix tube",
           "expectedAliquots": 1,
-          "expectedVolume": 2.5,
+          "expectedVolume": 2.4,
           "units": "mL",
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
@@ -194,7 +194,7 @@
           "maxVolume": 2.4,
           "warningMinVolume": 100,
           "warningMaxVolume": 2400,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": true,
           "metadataFields": [
             {
