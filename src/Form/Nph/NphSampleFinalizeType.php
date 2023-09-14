@@ -131,6 +131,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'data' => $tsData,
                 ]);
                 if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
+                    $aliquotMetadataCount = 0;
                     foreach ($aliquot['metadataFields'] as $metadataField) {
                         if ($metadataField['identifier'] === 'glycerolAdditiveVolume') {
                             $metadataConstraints = [
@@ -153,6 +154,8 @@ class NphSampleFinalizeType extends NphOrderForm
                                     }
                                 })
                             ];
+                            $metadataValue[] = $formData["{$aliquotCode}GlycerolAdditiveVolume"][$aliquotMetadataCount] ?? null;
+                            $aliquotMetadataCount++;
                         }
                         $builder->add("{$aliquotCode}{$metadataField['identifier']}", Type\CollectionType::class, [
                             'entry_type' => Type\TextType::class,
@@ -163,11 +166,12 @@ class NphSampleFinalizeType extends NphOrderForm
                                     'placeholder' => $metadataField['placeholder'] ?? '',
                                     'class' => $metadataField['class'] ?? '',
                                 ],
+                                'data' => $formData[$aliquotCode . $metadataField['identifier']][0] ?? null,
                                 'constraints' => $metadataConstraints ?? [],
                             ],
                             'allow_add' => true,
                             'allow_delete' => true,
-                            'data' => $formData[$aliquotCode . $metadataField['identifier']] ?? [],
+                            'data' => $metadataValue,
                         ]);
                     }
                 }

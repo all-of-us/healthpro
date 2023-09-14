@@ -22,8 +22,8 @@
                     </div>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
                     <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
-                    <div class="input-group {% if not form[aliquotCode~metadataField['identifier']].vars.valid%}has-error{% endif %}" style="width: 45%; float: right; position: relative; top: -5px">
-                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group {% if not form[aliquotCode~metadataField['identifier']][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: right; position: relative; top: -5px">
+                    {{ form_widget(form[aliquotCode~metadataField['identifier']][i], {'attr': {'class': 'form-control'}}) }}
                     <span class="input-group-addon">μl</span>
                     </div>
                 </td>
@@ -42,7 +42,7 @@
             <tr>
                 <td colspan="3" class="has-error">
                     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
-                    {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume']) }}
+                    {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume'][i]) }}
                     <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target" style="display: none">
                     Please verify the volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).
                     </span>
