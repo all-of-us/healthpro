@@ -25,8 +25,6 @@ $(document).ready(function () {
         $(this).closest("tr").find("input:not(:read-only)").val("");
     });
 
-    $(document).on("click");
-
     $(".aliquot-volume").keyup(function () {
         let inputValue = $(this).val();
         let minValue = $(this).data("warning-min-volume");
