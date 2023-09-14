@@ -166,7 +166,6 @@ class NphSampleFinalizeType extends NphOrderForm
                                     'placeholder' => $metadataField['placeholder'] ?? '',
                                     'class' => $metadataField['class'] ?? '',
                                 ],
-                                'data' => $formData[$aliquotCode . $metadataField['identifier']][0] ?? null,
                                 'constraints' => $metadataConstraints ?? [],
                             ],
                             'allow_add' => true,
