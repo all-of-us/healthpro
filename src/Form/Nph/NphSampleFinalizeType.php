@@ -154,6 +154,8 @@ class NphSampleFinalizeType extends NphOrderForm
                                 })
                             ];
                             $metadataValue = $formData["{$aliquotCode}GlycerolAdditiveVolume"] ?? [null];
+                        } else {
+                            $metadataValue = [null];
                         }
                         $builder->add("{$aliquotCode}{$metadataField['identifier']}", Type\CollectionType::class, [
                             'entry_type' => Type\TextType::class,
