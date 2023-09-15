@@ -17,14 +17,14 @@
                 <td colspan="{{ colspan }}">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
                     <div class="input-group {% if not form[aliquotCode ~ 'Volume'][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: left; top: 20px; position: relative">
-                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control aliquot-volume glycerol-volume sample', 'data-warning-target': aliquotCode ~ '-warning-target'}}) }}
+                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control aliquot-volume glycerol-volume sample', 'data-warning-target': aliquotCode ~ '-warning-target' ~ i}) }}
                         <span class="input-group-addon">{{ aliquot['units'] }}</span>
                     </div>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
                     <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
                     <div class="input-group {% if not form[aliquotCode~metadataField['identifier']][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: right; position: relative; top: -5px">
                     {{ form_widget(form[aliquotCode~metadataField['identifier']][i], {'attr': {'class': 'form-control glycerol-volume aliquot-volume additive',
-                        'data-warning-target': aliquotCode ~ '-warning-target-glycerol', 'data-warning-max-volume': metadataField['warningMaxVolume'], 'data-warning-min-volume': metadataField['warningMinVolume']}}) }}
+                        'data-warning-target': aliquotCode ~ '-warning-target-glycerol' ~ i, 'data-warning-max-volume': metadataField['warningMaxVolume'], 'data-warning-min-volume': metadataField['warningMinVolume']}}) }}
                     <span class="input-group-addon">μl</span>
                     </div>
                 </td>
@@ -33,7 +33,7 @@
                     <span style="top: 35px; left: -5px; position: absolute">=</span>
                     <div class="input-group" style="float: left; position: relative; top: -5px; width: 65%">
                         <input type="text" readonly="readonly" id="totalVol{{ i }}" class="form-control totalVol aliquot-volume" data-warning-min-volume="{{ metadataField['warningMinTotalVolume'] }}"
-                        data-warning-max-volume="{{ metadataField['warningMaxTotalVolume'] }}" data-warning-target="{{ aliquotCode }}-warning-target-total">
+                        data-warning-max-volume="{{ metadataField['warningMaxTotalVolume'] }}" data-warning-target="{{ aliquotCode }}-warning-target-total{{ i }}">
                         <span class="input-group-addon">mL</span>
                     </div>
                     {% if sample.unlocked %}
