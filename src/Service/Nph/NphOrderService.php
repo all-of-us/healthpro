@@ -1071,7 +1071,7 @@ class NphOrderService
                             }
                         }
                         if (!empty($formData["${aliquotCode}glycerolAdditiveVolume"])) {
-                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"]]));
+                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"][$key]]));
                         }
                         $this->em->persist($nphAliquot);
                         $this->em->flush();

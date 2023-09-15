@@ -173,11 +173,11 @@
           "barcodeLength" : 10,
           "barcodePrefix": "MC",
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 4mL matrix aliquot tube barcode ID.",
-          "minVolume": 0,
+          "minVolume": 0.1,
           "maxVolume": 4,
           "warningMinVolume": 100,
           "warningMaxVolume": 4000,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false
         },
         "SALIVAA2": {
@@ -191,9 +191,9 @@
           "barcodePrefix": "MC",
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 2.5mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
-          "maxVolume": 2.4,
-          "warningMinVolume": 100,
-          "warningMaxVolume": 2400,
+          "maxVolume": 2,
+          "warningMinVolume": 0.1,
+          "warningMaxVolume": 2,
           "addNew": true,
           "collectMetadata": true,
           "metadataFields": [
@@ -203,6 +203,12 @@
               "type": "number",
               "label": "Calculated Volume for Glycerol Additive Sample",
               "units": "μL",
+              "minVolume": 0,
+              "maxVolume": 2400,
+              "warningMinVolume": 0,
+              "warningMaxVolume": 400,
+              "warningMinTotalVolume": 0.1,
+              "warningMaxTotalVolume": 2.4,
               "entryType": "Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType",
               "required": true
             }
