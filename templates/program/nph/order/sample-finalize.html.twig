@@ -17,7 +17,7 @@
                 <td colspan="{{ colspan }}">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
                     <div class="input-group {% if not form[aliquotCode ~ 'Volume'][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: left; top: 20px; position: relative">
-                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control aliquot-volume glycerol-volume sample', 'data-warning-target': aliquotCode ~ '-warning-target' ~ i}) }}
+                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control aliquot-volume glycerol-volume sample', 'data-warning-target': aliquotCode ~ '-warning-target' ~ i}}) }}
                         <span class="input-group-addon">{{ aliquot['units'] }}</span>
                     </div>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
@@ -45,13 +45,13 @@
                 <td colspan="3" class="has-error">
                     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
                     {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume'][i]) }}
-                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target" style="display: none">
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target{{ i }}" style="display: none">
                     Please verify the Saliva Volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).<br>
                     </span>
-                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol" style="display: none">
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol{{ i }}" style="display: none">
                     Please verify the Glycerol Volume unit of measurement is correct.  (Expected volume is in {{ metadataField['units'] }}).<br>
                     </span>
-                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol" style="display: none">
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol{{ i }}" style="display: none">
                     Please verify the Total Volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).<br>
                     </span>
                 </td>
