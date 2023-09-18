@@ -7,6 +7,7 @@ use App\Exception\MissingSchemaException;
 use App\Helper\Util;
 use App\Model\Measurement\Fhir;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use stdClass;
 
 #[ORM\Table(name: 'evaluations')]
@@ -702,6 +703,54 @@ class Measurement
     public function getFormVersion()
     {
         return empty($this->version) ? $this->currentVersion : $this->version;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function calculateZScore(float $X, float $L, float $M, float $S): float
+    {
+        if ($L != 0) {
+            $numerator = pow($X / $M, $L) - 1;
+            $denominator = $L * $S;
+            if ($denominator != 0) {
+                return round($numerator / $denominator, 2);
+            }
+            throw new Exception('Division by zero error');
+        } else {
+            if ($S != 0) {
+                return round(log($X / $M) / $S, 2);
+            }
+            throw new Exception('Division by zero error');
+        }
+    }
+
+    public function calculatePercentile($z, $zScores): float|null
+    {
+        $decimalPoints = [
+            'Z0' => 0.00,
+            'Z01' => 0.01,
+            'Z02' => 0.02,
+            'Z03' => 0.03,
+            'Z04' => 0.04,
+            'Z05' => 0.05,
+            'Z06' => 0.06,
+            'Z07' => 0.07,
+            'Z08' => 0.08,
+            'Z09' => 0.09
+        ];
+        foreach ($zScores as $zScore) {
+            if ($z == $zScore->getZ()) {
+                return round($zScore->getZ0() * 100, 5);
+            }
+            foreach ($decimalPoints as $index => $decimalPoint) {
+                $newZValue = $zScore->getZ() > 0 ? $zScore->getZ() + $decimalPoint : $zScore->getZ() - $decimalPoint;
+                if ($z == round($newZValue, 2)) {
+                    return round($zScore->{"get$index"}() * 100, 5);
+                }
+            }
+        }
+        return null;
     }
 
     protected function normalizeData($type = null)

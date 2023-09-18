@@ -6,6 +6,7 @@ use App\Repository\ZScoresRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ZScoresRepository::class)]
+#[ORM\Table(name: 'z_scores')]
 class ZScores
 {
     #[ORM\Id]
