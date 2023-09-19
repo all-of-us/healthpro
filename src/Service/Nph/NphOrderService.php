@@ -661,14 +661,14 @@ class NphOrderService
         $samplesMetadata = $this->getSamplesMetadata($order);
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        if ($order->getModule() === '3' && $order->getVisitType() === $order::TYPE_DLW) {
-            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitType' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
-            $obj['dlwdose'] = [
-              'batchid' => $dlwInfo->getBatchId(),
+        if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
+            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
+            $obj->dlwDose = [
+              'batchid' => $dlwInfo->getDoseBatchId(),
               'participantweight' => $dlwInfo->getParticipantWeight(),
               'dose' => $dlwInfo->getActualDose(),
               'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
-                'dosetime' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
+                'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
             ];
         }
         if ($aliquotsInfo) {
