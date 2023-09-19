@@ -79,6 +79,16 @@ $(document).ready(function () {
         let glycerolVolume = $(glycerolVolumeField).val() ? parseFloat($(glycerolVolumeField).val()) : 0;
         let totalVolume = ((sampleVolume + glycerolVolume) / 1000).toFixed(2);
         $(`#totalVol${index}`).val(`${totalVolume}`);
+        $(`#totalVol${index}`).each(function () {
+            if (
+                $(this).data("warning-max-volume") &&
+                $(this).val() > $(this).data("warning-max-volume") &&
+                $(this).parent().parent().siblings().children().hasClass("has-error") &&
+                !$(this).parent().hasClass("has-error")
+            ) {
+                $(this).parent().addClass("has-error");
+            }
+        });
     }
 
     function addNormalAliquotRow(element) {
@@ -127,7 +137,7 @@ $(document).ready(function () {
         let aliquotUnits = list.data("aliquot-units");
         let counter = list.data("widget-counter");
         let aliquotCode = $(element).data("aliquot-code");
-        let rows = $(".duplicate-target-" + aliquotCode).clone();
+        let rows = $(".duplicate-target-" + aliquotId).clone();
         rows.each(function () {
             let barcodeName = `nph_sample_finalize[SALIVAA2][${counter}]`;
             let tsName = `nph_sample_finalize[SALIVAA2AliquotTs][${counter}]`;
@@ -141,6 +151,7 @@ $(document).ready(function () {
                 .find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']")
                 .attr("name", glycerolVolumeName);
             $(this).find("input").val("");
+            $(this).find(".text-warning").hide();
             $(this).find("input:not(.totalVol)").attr("readonly", false);
         });
         counter++;
@@ -156,6 +167,7 @@ $(document).ready(function () {
         $("#nph_sample_finalize_SALIVAA2Volume_0"),
         $("#nph_sample_finalize_SALIVAA2glycerolAdditiveVolume")
     );
+
     $(".aliquot-volume").trigger("keyup");
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);

@@ -9,8 +9,13 @@
         {% else %}
             {% set colspan = 1 %}
         {% endif %}
+        {% if i == 0 %}
+            {% set firstIteration = true %}
+        {% else %}
+            {% set firstIteration = false %}
+        {% endif %}
         {% for metadataField in aliquot['metadataFields'] %}
-            <tr class="aliquots-row-{{ aliquotCode }} duplicate-target-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}" data-sample-index="{{ i }}">
+            <tr class="aliquots-row-{{ aliquotCode }}{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}" id="aliquots_{{ aliquotCode }}_{{ i }}" data-sample-index="{{ i }}">
                 <td colspan="1">
                     <p style="font-weight: bold;">{{ metadataField['label'] }}</p><span>(1ml = 1000uL)</span>
                 </td>
@@ -41,7 +46,7 @@
                     {% endif %}
                 </td>
             </tr>
-            <tr>
+            <tr class="{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}">
                 <td colspan="3" class="has-error">
                     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
                     {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume'][i]) }}
@@ -56,12 +61,18 @@
                     </span>
                 </td>
             </tr>
+            {% set firstIteration = false %}
         {% endfor %}
     {% endif %}
 {% endmacro %}
 {% macro displayAliquotRow(aliquotCode, aliquot, sample, form, i, disabled, skipVolume = false) %}
+    {% if i == 0 %}
+        {% set firstIteration = true %}
+    {% else %}
+        {% set firstIteration = false %}
+    {% endif %}
     {% set aliquotId = form[aliquotCode][i].vars.data %}
-    <tr class="aliquots-row-{{ aliquotCode }} duplicate-target-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
+    <tr class="aliquots-row-{{ aliquotCode }}{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}" id="aliquots_{{ aliquotCode }}_{{ i }}">
         <td {% if not form[aliquotCode][i].vars.valid %}
             class="has-error"{% endif %}>
             {{ form_widget(form[aliquotCode][i], {
