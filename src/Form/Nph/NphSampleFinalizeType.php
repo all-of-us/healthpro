@@ -144,14 +144,14 @@ class NphSampleFinalizeType extends NphOrderForm
                                             ->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
                                     }
                                     if ($glycerolVolume == 0) {
-                                        $context->buildViolation("Glycerol Volume Please verify the volume is correct. Volume should be greater than 0")->addViolation();
+                                        $context->buildViolation('Glycerol Volume Please verify the volume is correct. Volume should be greater than 0')->addViolation();
                                     }
                                     if ($glycerolVolume >= 0.1 && $glycerolVolume <= 0.4) {
                                         $context->buildViolation('Glycerol Volume Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)')->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
                                     }
                                     if ($totalVolume > $metadataField['warningMaxTotalVolume'] || $totalVolume < $metadataField['warningMinTotalVolume']) {
                                         $context->buildViolation("Total Volume Please verify the volume is correct this aliquot should contain {$metadataField['warningMaxTotalVolume']} {$metadataField['units']} Only.")
-                                            ->atPath($aliquotCode . $metadataField['identifier'] . "totalVol")->addViolation();
+                                            ->atPath($aliquotCode . $metadataField['identifier'] . 'totalVol')->addViolation();
                                     }
                                 })
                             ];
