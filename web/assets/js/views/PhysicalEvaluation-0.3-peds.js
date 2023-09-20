@@ -25,6 +25,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         "change .field-head-circumference input": "toggleThirdHeadCircumference",
         "change .field-hip-circumference input": "toggleThirdHipCircumference",
         "change .field-waist-circumference input": "toggleThirdWaistCircumference",
+        "change .field-heart-rate input": "toggleThirdHeartRate",
         "change .field-blood-pressure-diastolic input,  .field-blood-pressure-systolic input": "checkDiastolic",
         "click .modification-toggle a": "showModification",
         "change .modification-select select": "handleProtocolModification",
@@ -48,7 +49,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.updateConversion(e);
     },
     updateMean: function (e) {
-        var field = $(e.currentTarget).closest(".field").data("field");
+        let field = $(e.currentTarget).closest(".field").data("field");
         this.calculateMean(field);
     },
     triggerEqualize: function () {
@@ -57,13 +58,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }, 50);
     },
     calculateMean: function (field) {
-        var fieldSelector = ".field-" + field;
-        var secondThirdFields = ["blood-pressure-systolic", "blood-pressure-diastolic", "heart-rate"];
-        var twoClosestFields = ["hip-circumference", "waist-circumference"];
-        if ($.inArray(field, secondThirdFields) !== -1) {
-            fieldSelector = ".field-" + field + "[data-replicate=2], .field-" + field + "[data-replicate=3]";
-        }
-        var values = [];
+        let fieldSelector = ".field-" + field;
+        let values = [];
         this.$(fieldSelector)
             .find("input")
             .each(function () {
@@ -72,7 +68,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 }
             });
         if (values.length > 0) {
-            if (values.length == 3 && $.inArray(field, twoClosestFields) !== -1) {
+            if (values.length === 3) {
                 values.sort(function (a, b) {
                     return a - b;
                 });
@@ -82,25 +78,23 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                     values.shift();
                 }
             }
-            var sum = _.reduce(
+            let sum = _.reduce(
                 values,
                 function (a, b) {
                     return a + b;
                 },
                 0
             );
-            var mean = (sum / values.length).toFixed(1);
+            let mean = (sum / values.length).toFixed(1);
             this.$("#mean-" + field).html("<strong>" + mean + "</strong>");
             if (this.conversions[field]) {
-                var converted = this.convert(this.conversions[field], mean);
+                let converted = this.convert(this.conversions[field], mean);
                 this.$("#convert-" + field).html("(" + converted + ")");
             }
-            if ($.inArray(field, twoClosestFields) !== -1) {
-                var label = values.length == 3 ? "(average of three measures)" : "(average of two closest measures)";
-                this.$("#convert-" + field)
-                    .next()
-                    .html(label);
-            }
+            let label = values.length === 3 ? "(average of three measures)" : "(average of two closest measures)";
+            this.$("#convert-" + field)
+                .next()
+                .html(label);
         } else {
             this.$("#mean-" + field).text("--");
             this.$("#convert-" + field).text();
@@ -242,7 +236,15 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     toggleThirdReading: function (field) {
         let first = parseFloat(this.$("#form_" + field + "_0").val());
         let second = parseFloat(this.$("#form_" + field + "_1").val());
-        let difference = field === 'weight' ? 0.1 : 1;
+        let difference = 1;
+        switch (field) {
+            case 'weight':
+                difference = 0.1;
+                break;
+            case 'heart-rate':
+                difference = 5;
+                break;
+        }
         if (first > 0 && second > 0 && Math.abs(first - second) > difference) {
             this.$(".panel-" + field + "-3").show();
         } else {
@@ -266,6 +268,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     },
     toggleThirdWaistCircumference: function () {
         this.toggleThirdReading("waist-circumference");
+    },
+    toggleThirdHeartRate: function () {
+        this.toggleThirdReading("heart-rate");
     },
     calculateIrregularHeartRate: function () {
         var allIrregular = true;
@@ -734,6 +739,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.toggleThirdHeadCircumference();
         this.toggleThirdHipCircumference();
         this.toggleThirdWaistCircumference();
+        this.toggleThirdHeartRate();
         if (this.finalized) {
             this.$(".modification-toggle").hide();
             this.$(".alt-units-block").hide();

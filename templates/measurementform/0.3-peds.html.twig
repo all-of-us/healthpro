@@ -25,8 +25,7 @@
                                 <div class="modification-affected">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['weight'], i) }}
                                     {% if i == 2 %}
-                                        <p class="text-info">Third measurement is required when first two differ by more
-                                            than 0.1 kg</p>
+                                        <p class="text-info">Third measurement is required when first two differ by more than 0.1 kg</p>
                                     {% endif %}
                                 </div>
                                 <div class="modification-toggle text-right">
@@ -62,8 +61,7 @@
                                 <div class="modification-affected">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['height'], i) }}
                                     {% if i == 2 %}
-                                        <p class="text-info">Third measurement is required when first two differ by more
-                                            than 1.0 cm</p>
+                                        <p class="text-info">Third measurement is required when first two differ by more than 1.0 cm</p>
                                     {% endif %}
                                 </div>
                                 <div class="modification-toggle text-right">
@@ -95,7 +93,13 @@
                             {{ schema.fields['weight'].unit }}
                             <span id="convert-weight"></span>
                             <small class="text-muted">(average of two closest measures)</small>
-                            <br/>
+                        </p>
+                        <p class="lead">
+                            Height/Length
+                            <span id="mean-height"></span>
+                            {{ schema.fields['height'].unit }}
+                            <span id="convert-height"></span>
+                            <small class="text-muted">(average of two closest measures)</small>
                         </p>
                     </div>
                 </div>
@@ -111,8 +115,6 @@
                             <span id="mean-weight"></span>
                             {{ schema.fields['weight'].unit }}
                             <span id="convert-weight"></span>
-                            <small class="text-muted">(average of two closest measures)</small>
-                            <br/>
                         </p>
                     </div>
                 </div>
@@ -128,8 +130,6 @@
                             <span id="mean-weight"></span>
                             {{ schema.fields['weight'].unit }}
                             <span id="convert-weight"></span>
-                            <small class="text-muted">(average of two closest measures)</small>
-                            <br/>
                         </p>
                     </div>
                 </div>
@@ -156,8 +156,7 @@
                                 <div class="modification-affected">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference'], i) }}
                                     {% if i == 2 %}
-                                        <p class="text-info">Third measurement is required when first two differ by more
-                                            than 1 cm</p>
+                                        <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
                                     {% endif %}
                                 </div>
                                 <div class="modification-toggle text-right">
@@ -189,7 +188,6 @@
                             {{ schema.fields['head-circumference'].unit }}
                             <span id="convert-head-circumference"></span>
                             <small class="text-muted">(average of two closest measures)</small>
-                            <br/>
                         </p>
                     </div>
                 </div>
@@ -205,8 +203,6 @@
                             <span id="mean-head-circumference"></span>
                             {{ schema.fields['head-circumference'].unit }}
                             <span id="convert-head-circumference"></span>
-                            <small class="text-muted">(average of two closest measures)</small>
-                            <br/>
                         </p>
                     </div>
                 </div>
@@ -235,7 +231,7 @@
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
                 <div class="col-sm-4">
-                    <div class="panel panel-default">
+                    <div class="panel panel-default panel-heart-rate-{{ i + 1 }}">
                         <div class="panel-body">
                             <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
                             <div class="modification-block">
@@ -253,6 +249,9 @@
                                         </div>
                                     {% endif %}
                                 </div>
+                                {% if i == 2 %}
+                                    <p class="text-info">Third measurement is required when first two differ by more than 5 bpm</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -271,7 +270,7 @@
                             Heart rate:
                             <span id="mean-heart-rate"></span>
                             {{ schema.fields['heart-rate'].unit }}
-                            <small class="text-muted">(average of 2nd and 3rd measures)</small>
+                            <small class="text-muted">(average of two closest measures)</small>
                             <div id="heart-rate-warning"></div>
                             <div id="irregular-heart-rate-warning"></div>
                         </div>
@@ -288,7 +287,6 @@
                             Heart rate:
                             <span id="mean-heart-rate"></span>
                             {{ schema.fields['heart-rate'].unit }}
-                            <small class="text-muted">(average of 2nd and 3rd measures)</small>
                             <div id="heart-rate-warning"></div>
                             <div id="irregular-heart-rate-warning"></div>
                         </div>
