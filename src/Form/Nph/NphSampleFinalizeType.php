@@ -134,7 +134,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     foreach ($aliquot['metadataFields'] as $metadataField) {
                         if ($metadataField['identifier'] === 'glycerolAdditiveVolume') {
                             $metadataConstraints = [
-                                new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $metadataField) {
+                                new Constraints\Callback(function ($value, $context) use ($aliquotCode, $metadataField) {
                                     $key = intval($context->getObject()->getName());
                                     $formData = $context->getRoot()->getData();
                                     $glycerolVolume = $formData[$aliquotCode . $metadataField['identifier']][$key];
