@@ -80,27 +80,11 @@ $(document).ready(function () {
         let glycerolVolume = $(glycerolVolumeField).val() ? parseFloat($(glycerolVolumeField).val()) : 0;
         let totalVolume = sampleVolume + glycerolVolume;
         let totalVolumeRounded = (totalVolume / 1000).toFixed(2);
-        totalVolumeField.val(`${totalVolumeRounded}`);
-        $(`#totalVol${index}`).each(function () {
-            if (
-                $(this).data("warning-max-volume") &&
-                totalVolume > $(this).data("warning-max-volume") &&
-                $(this).parent().parent().siblings().children().hasClass("has-error") &&
-                !$(this).parent().hasClass("has-error")
-            ) {
-                $(this).parent().addClass("has-error");
-                $(this)
-                    .parent()
-                    .parent()
-                    .parent()
-                    .next()
-                    .find("li")
-                    .append(
-                        `<li><span class="glyphicon glyphicon-exclamation-sign"></span> Please verify the total volume is correct.  This aliquot should contain a maximum of 2.4 mL.</li>`
-                    );
-                $(this).trigger("keyup");
-            }
-        });
+        if (totalVolume > totalVolumeField.data("warning-max-volume")) {
+            totalVolumeField.val("");
+        } else {
+            totalVolumeField.val(`${totalVolumeRounded}`);
+        }
     }
 
     function addNormalAliquotRow(element) {
