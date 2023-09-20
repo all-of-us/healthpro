@@ -41,7 +41,7 @@
                         data-warning-max-volume="{{ metadataField['warningMaxTotalVolume'] }}" data-warning-target="{{ aliquotCode }}-warning-target-total{{ i }}">
                         <span class="input-group-addon">mL</span>
                     </div>
-                    {% if sample.unlocked %}
+                    {% if not sample.disabled %}
                     <i class="fa fa-eraser text-danger clear-aliquot-widget sample-metadata-eraser" style="font-size: 22px" role="button"></i>
                     {% endif %}
                 </td>
