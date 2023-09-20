@@ -87,6 +87,16 @@ $(document).ready(function () {
                 !$(this).parent().hasClass("has-error")
             ) {
                 $(this).parent().addClass("has-error");
+                $(this)
+                    .parent()
+                    .parent()
+                    .parent()
+                    .next()
+                    .find("li")
+                    .append(
+                        `<li><span class="glyphicon glyphicon-exclamation-sign"></span> Please verify the total volume is correct.  This aliquot should contain a maximum of 2.4 mL.</li>`
+                    );
+                $(this).trigger("keyup");
             }
         });
     }
@@ -143,6 +153,9 @@ $(document).ready(function () {
             let tsName = `nph_sample_finalize[SALIVAA2AliquotTs][${counter}]`;
             let volumeName = `nph_sample_finalize[SALIVAA2Volume][${counter}]`;
             let glycerolVolumeName = `nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][${counter}]`;
+            let targetName = `SALIVAA2-warning-target${counter}`;
+            let glycerolTarget = `SALIVAA2-warning-target-glycerol${counter}`;
+            let totalTarget = `SALIVAA2-warning-target-total${counter}`;
             $(this).removeClass("duplicate-target-" + aliquotCode);
             $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr("name", barcodeName);
             $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr("name", tsName);
@@ -150,8 +163,14 @@ $(document).ready(function () {
             $(this)
                 .find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']")
                 .attr("name", glycerolVolumeName);
+            $(this).find("#SALIVAA2-warning-target0").attr("id", targetName);
+            $(this).find("#SALIVAA2-warning-target-glycerol0").attr("id", glycerolTarget);
+            $(this).find("#SALIVAA2-warning-target-total0").attr("id", totalTarget);
+            $(this).find("");
             $(this).find("input").val("");
             $(this).find(".text-warning").hide();
+            $(this).find(".help-block").remove();
+            $(this).find(".has-error").removeClass("has-error");
             $(this).find("input:not(.totalVol)").attr("readonly", false);
         });
         counter++;
