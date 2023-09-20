@@ -138,20 +138,12 @@ class NphSampleFinalizeType extends NphOrderForm
                                     $key = intval($context->getObject()->getName());
                                     $formData = $context->getRoot()->getData();
                                     $glycerolVolume = $formData[$aliquotCode . $metadataField['identifier']][$key];
-                                    $totalVolume = $formData["{$aliquotCode}Volume"][$key] + ($glycerolVolume / 1000);
-                                    if ($totalVolume > $metadataField['warningMaxTotalVolume'] || $totalVolume < $metadataField['warningMinTotalVolume']) {
-                                        $context->buildViolation("Glycerol Volume Please verify the volume is correct this aliquot should contain {$metadataField['warningMaxVolume']} {$metadataField['units']} Only.")
-                                            ->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
-                                    }
-                                    if ($glycerolVolume == 0) {
-                                        $context->buildViolation('Glycerol Volume Please verify the volume is correct. Volume should be greater than 0')->addViolation();
-                                    }
-                                    if ($glycerolVolume > $metadataField['warningMinVolume'] && $glycerolVolume <= $metadataField['warningMaxVolume']) {
-                                        $context->buildViolation('Glycerol Volume Please verify the unit of measurement is correct. (For reference 1mL = 1000uL)')->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
-                                    }
-                                    if ($totalVolume > $metadataField['warningMaxTotalVolume'] || $totalVolume < $metadataField['warningMinTotalVolume']) {
-                                        $context->buildViolation("Total Volume Please verify the volume is correct this aliquot should contain {$metadataField['warningMaxTotalVolume']} {$metadataField['units']} Only.")
-                                            ->atPath($aliquotCode . $metadataField['identifier'] . 'totalVol')->addViolation();
+                                    if (isset($formData[$aliquotCode][$key])) {
+                                        if ($glycerolVolume == 0) {
+                                            $context->buildViolation('Glycerol Volume Please verify the volume is correct. Volume should be greater than 0')->addViolation();
+                                        } elseif ($glycerolVolume > $metadataField['maxVolume']) {
+                                            $context->buildViolation("Glycerol Volume Please verify the volume is correct. This aliquot should contain a maximum of {$metadataField['maxVolume']} {$metadataField['units']}.")->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
+                                        }
                                     }
                                 })
                             ];

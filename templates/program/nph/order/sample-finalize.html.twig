@@ -41,7 +41,7 @@
                         data-warning-max-volume="{{ metadataField['warningMaxTotalVolume'] }}" data-warning-target="{{ aliquotCode }}-warning-target-total{{ i }}">
                         <span class="input-group-addon">mL</span>
                     </div>
-                    {% if sample.unlocked %}
+                    {% if not sample.disabled %}
                     <i class="fa fa-eraser text-danger clear-aliquot-widget sample-metadata-eraser" style="font-size: 22px" role="button"></i>
                     {% endif %}
                 </td>
@@ -56,7 +56,7 @@
                     <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol{{ i }}" style="display: none">
                     Please verify the Glycerol Volume unit of measurement is correct.  (Expected volume is in {{ metadataField['units'] }}).<br>
                     </span>
-                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol{{ i }}" style="display: none">
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-total{{ i }}" style="display: none">
                     Please verify the Total Volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).<br>
                     </span>
                 </td>
