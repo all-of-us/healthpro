@@ -1,6 +1,6 @@
 {
   "version": "0.3.3-peds-1",
-  "template": "0.3-peds-1",
+  "template": "0.3-peds",
   "description": "Pediatric participants 0 to 2 years old",
   "fields": [
     {
