@@ -192,8 +192,8 @@
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 2.5mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 2,
-          "warningMinVolume": 0.1,
-          "warningMaxVolume": 0.4,
+          "warningMinVolume": 100,
+          "warningMaxVolume": 2000,
           "addNew": true,
           "collectMetadata": true,
           "metadataFields": [
@@ -205,10 +205,11 @@
               "units": "μL",
               "minVolume": 0,
               "maxVolume": 400,
-              "warningMinVolume": 0,
+              "warningMinVolume": 0.1,
               "warningMaxVolume": 0.4,
               "warningMinTotalVolume": 100,
               "warningMaxTotalVolume": 2400,
+              "maxTotalVolume": 2.4,
               "entryType": "Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType",
               "required": true
             }
