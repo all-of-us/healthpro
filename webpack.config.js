@@ -33,6 +33,7 @@ Encore
     .addEntry("workqueue-views", "./web/assets/js/views/WorkQueueViews.js")
     .addEntry("export-warning-modal", "./web/assets/js/views/ExportWarningModal.js")
     .addEntry("order-check", "./web/assets/js/views/OrderSafetyChecks.js")
+    .addEntry("order-check-pediatric", "./web/assets/js/views/PediatricOrderSafetyChecks.js")
     .addEntry("order-create", "./web/assets/js/views/CreateOrder.js")
     .addEntry("order-sub", "./web/assets/js/views/OrderSubPage.js")
     .addEntry("order-finalize", "./web/assets/js/views/FinalizeOrder.js")

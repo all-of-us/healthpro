@@ -68,7 +68,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/check', name: 'order_check')]
-    public function orderCheck($participantId, RequestStack $requestStack, MeasurementRepository $measurementRepository): Response
+    public function orderCheck($participantId, RequestStack $requestStack): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -731,8 +731,9 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/pediatric/weight', name: 'order_check_pediatric_weight')]
-    public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementRepository $measurementRepository): Response
+    public function orderCheckWeight($participantId, RequestStack $requestStack, MeasurementRepository $measurementRepository): Response
     {
+        #TODO: Update this function after Shyams physical measurement code is added.
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -749,4 +750,20 @@ class OrderController extends BaseController
             'measurementData' => $measurementData
         ]);
     }
+
+    #[Route(path: '/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
+    public function orderCheckPediatric($participantId, RequestStack $requestStack): Response {
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        return $this->render('order/check-pediatric.html.twig', [
+            'participant' => $participant,
+            'siteType' => $requestStack->getSession()->get('siteType'),
+        ]);
+    }
+
 }

@@ -26,7 +26,7 @@
 
     <h3>Has your child had a blood transfusion in the past 6 months?</h3>
     <!--TODO: change form endpoint to pediatric order creation-->
-    <form method="post" action="{{ path('order_create_pediatric', { participantId: participant.id }) }}" id="safety-checks" class="prevent-resubmit">
+    <form method="post" action="{# TODO: Pediatric order create link #}" id="safety-checks" class="prevent-resubmit">
         <div class="radio">
             <label><input type="radio" name="donate" value="yes" data-show-target="#transfusion-qn" data-hide-target="#bd-qn"/> Yes</label>
         </div>
@@ -37,7 +37,7 @@
             <div id="transfusion-qn" style="display: none">
                 <h3>Please select the specific type of blood transfusion:</h3>
                 <div class="checkbox">
-                    <label><input type="checkbox" name="transfusion_wb" value="whole" data-vis-toggle="#order-info-text" data-warning-text="#info-text-1"/> Whole blood transfusion</label>
+                    <label><input type="checkbox" name="transfusion_wb" value="whole" data-vis-toggle="#order-info-text" data-warning-text="#info-text-1,#continue"/> Whole blood transfusion</label>
                 </div>
                 <div class="checkbox">
                     <label><input type="checkbox" name="transfusion_rbc" value="red" data-vis-toggle="#rbc-qn"/> Red Blood Cells (RBC)</label>
@@ -52,7 +52,7 @@
                     <label><input type="radio" name="rbc_qn" value="yes" data-hide-target="#order-info-text,#info-text-2"/> Yes</label>
                 </div>
                 <div class="radio">
-                    <label><input type="radio" name="rbc_qn" value="no" data-show-target="#order-info-text,#info-text-2"/> No</label>
+                    <label><input type="radio" name="rbc_qn" value="no" data-show-target="#order-info-text,#info-text-2,#continue"/> No</label>
                 </div>
             </div>
             <div id="bd-qn" style="display: none">
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div style="display:none;" id="syncope-qn">
-                <h3>Has the participant ever felt dizzy, nauseous, or lost consciousness when having blood drawn?</h3>
+                <h3>Has your child had any problems with a blood draw, like becoming pale or other bad reactions?/h3>
                 <div class="radio">
                     <label><input type="radio" name="syncope" value="yes" data-show-target="syncope-sub-qn"/> Yes</label>
                 </div>
@@ -93,6 +93,9 @@
             <span id="info-text-2" style="display: none">
                 Participants may not have blood drawn if they have received RBC transfusion in the past 2 months. If the participant can provide adult samples, saliva and urine collection is permissible and can be initiated by selecting Continue.<br>
             </span>
+            <span id="info-text-3" style="display: none">
+                Caution! In order to minimize risk to participants, those who experience syncope should be offered saliva and urine collections as an alternative. Please select whether the participant would like to continue with a full Biobank order or a modified order with urine only and a saliva order.
+            </span>
         </div>
         <div id="continue" style="display:none;">
             <br/>
@@ -107,5 +110,5 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('pediatric-order-check') }}
+    {{ encore_entry_script_tags('order-check-pediatric') }}
 {% endblock %}
