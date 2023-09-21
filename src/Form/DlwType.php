@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -33,6 +34,11 @@ class DlwType extends AbstractType
                 'label' => 'Actual Dose (g)*',
                 'required' => true,
                 'scale' => 1,
+                'empty_data' => 0,
+                'constraints' => new GreaterThan([
+                    'value' => 0,
+                    'message' => 'Dose must be greater than 0.'
+                ])
             ])
             ->add('participantWeight', NumberType::class, [
                 'required' => true,
@@ -42,19 +48,19 @@ class DlwType extends AbstractType
                     if ($value < 0 || $value === null) {
                         $context->buildViolation('Participant weight required.')
                             ->addViolation();
-                        return false;
+                    }
+                    if ($value == 0) {
+                        $context->buildViolation('Please verify the measurement is correct. Value should be greater than 0 kg.')
+                            ->addViolation();
                     }
                     if ($value > 907) {
                         $context->buildViolation('Please verify the measurement is correct. Value should be less than 907 kg.')
                             ->addViolation();
-                        return  false;
                     }
                     if ($this->getNumDecimalPlaces($value) > 1) {
                         $context->buildViolation('Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.')
                             ->addViolation();
-                        return false;
                     }
-                    return true;
                 }),
                 'scale' => 1,
             ])

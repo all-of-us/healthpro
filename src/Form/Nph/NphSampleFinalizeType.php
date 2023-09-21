@@ -132,6 +132,20 @@ class NphSampleFinalizeType extends NphOrderForm
                 ]);
                 if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
                     foreach ($aliquot['metadataFields'] as $metadataField) {
+                        if ($metadataField['identifier'] === 'glycerolAdditiveVolume') {
+                            $metadataConstraints = [
+                                new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $metadataField) {
+                                    $formData = $context->getRoot()->getData();
+                                    $totalVolume = $formData["{$aliquotCode}Volume"][0] + ($formData[$aliquotCode . $metadataField['identifier']] / 1000);
+                                    if ($totalVolume > $aliquot['maxVolume']) {
+                                        $context->buildViolation("{$metadataField['label']} cannot be entered.  This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.")->addViolation();
+                                    }
+                                    if ($totalVolume < $aliquot['minVolume']) {
+                                        $context->buildViolation("{$metadataField['label']} cannot be entered.  This aliquot should contain a minimum of {$aliquot['minVolume']} {$aliquot['units']}.")->addViolation();
+                                    }
+                                })
+                            ];
+                        }
                         $builder->add("{$aliquotCode}{$metadataField['identifier']}", $metadataField['entryType'], [
                             'label' => $metadataField['label'],
                             'required' => false,
@@ -140,9 +154,11 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'class' => $metadataField['class'] ?? '',
                             ],
                             'data' => $formData[$aliquotCode . $metadataField['identifier']][0] ?? null,
+                            'constraints' => $metadataConstraints ?? []
                         ]);
                     }
                 }
+
 
                 $volumeConstraints = [
                     new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {

@@ -134,6 +134,12 @@ div.order-row {
     left: 33px;
     font-size: 22px
 }
+.sample-metadata-eraser {
+    position: absolute;
+    bottom: 20px;
+    left: 33px;
+    font-size: 22px
+}
 .aliquot-volume-units {
     position: absolute;
     bottom: 7px;
@@ -178,6 +184,10 @@ div.order-row {
 }
 .navbar-inverse .navbar-toggler {
     background-color: #FFFFFF;
+}
+.generate-orders-button {
+    margin-bottom: 15px;
+    margin-top: 10px;
 }
 
 .visit-diet-details:after {

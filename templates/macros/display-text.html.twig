@@ -176,7 +176,7 @@
         {% endif %}
         {% if firstTime %}
             {{ _self.displayConsent(firstTime, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) }}
-            {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }} <br>
+            {{ type == 'primary' ? '(first agreed to participate)' : '(first agreed to share EHR)' }}
         {% endif %}
     {% else %}
         (not completed)
@@ -276,7 +276,7 @@
     {% if bootstrapVersion == 3 %}
         <div class="panel panel-danger">
             <div class="panel-heading">
-                <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h3>
+                <h6 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h6>
             </div>
             <div class="panel-body">
                 {{ message }}
@@ -285,7 +285,7 @@
     {% else %}
         <div class="card border-danger-subtle mb-4">
             <div class="card-header bg-danger-subtle">
-                <h5 class="text-danger"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h5>
+                <h6 class="text-danger"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h6>
             </div>
             <div class="card-body">
                 {{ message }}

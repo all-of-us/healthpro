@@ -16,7 +16,10 @@
                     <select class="form-control" name="site">
                         {% set sites = isCurrentProgramHpo() ? app.user.sites : app.user.nphSites %}
                         {% for site in sites %}
-                            <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : '' }} >{{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}</option>
+                            <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : '' }} >
+                                {% if isCurrentProgramHpo() and not siteInfo.activeSite(site.id) %} (Inactive) {% endif %}
+                                {{ attribute(app.session.get('userSiteDisplayNames'), site.id)|default(site.name) }}
+                            </option>
                         {% endfor %}
                         {% if isCurrentProgramHpo() %}
                             {% for awardee in app.user.awardees %}

@@ -16,28 +16,34 @@
                 </td>
                 <td colspan="{{ colspan }}">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
-                    {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'style': 'width: 30%; float: left; top: 20px; position: relative'}}) }}
-                    <span style="top: 25px; position: relative">{{ aliquot['units'] }}</span>
+                    <div class="input-group" style="width: 45%; float: left; top: 20px; position: relative">
+                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control',}}) }}
+                        <span class="input-group-addon">{{ aliquot['units'] }}</span>
+                    </div>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
                     <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
-                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'style': 'width: 30%; float: right; position: relative; right: 20px; top: -5px'}}) }}
-                    <span style="top: 5px; position: relative; left: 130px">μl</span>
+                    <div class="input-group" style="width: 45%; float: right; position: relative; top: -5px">
+                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'class': 'form-control'}}) }}
+                    <span class="input-group-addon">μl</span>
+                    </div>
                 </td>
                 <td colspan="{{ colspan }}">
-                    <span style="top: 25px; position: relative">=</span>
-                    <span style="position: relative">Total Volume</span>
-                    <span style="position: relative; left: 20px; top: 5px" id="totalVol">#</span>
+                    <label style="position: relative; display: block; font-weight: normal">Total Volume</label>
+                    <div class="input-group" style="float: right; position: relative; top: -5px">
+                        <input type="text" id="totalVol" class="form-control">
+                        <span class="input-group-addon">mL</span>
+                    </div>
                 </td>
-                <td class="aliquot volume nopadleft" style="position: relative">
-                    <span style="position: absolute; bottom: 7px; left: 0;">{{ aliquot['units'] }}</span>
+                <td style="position: relative">
                     {% if not sample.disabled and not sample.unlocked %}
-                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-finalize-eraser" role="button"></i>
+                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-metadata-eraser" role="button"></i>
                     {% endif %}
                 </td>
             </tr>
             <tr>
                 <td colspan="3" class="has-error">
                     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
+                    {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume']) }}
                 </td>
             </tr>
         {% endfor %}
@@ -174,7 +180,12 @@
                     {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
                 {% endif %}
                 <div class="panel-body">
-                    {{ form_start(sampleFinalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit'} }) }}
+                    {% if isFormDisabled %}
+                        {% set formClasses = 'disable-enter prevent-resumbit' %}
+                    {% else  %}
+                        {% set formClasses = 'warn-unsaved disable-enter prevent-resubmit' %}
+                    {% endif %}
+                    {{ form_start(sampleFinalizeForm, { attr: { class: formClasses} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
                             has-error{% endif %}">

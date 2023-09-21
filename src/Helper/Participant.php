@@ -46,6 +46,7 @@ class Participant
     public $nphDeactivationAuthored = '';
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
+    public bool $isPediatric = false;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
