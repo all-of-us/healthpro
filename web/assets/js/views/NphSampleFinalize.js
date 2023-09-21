@@ -134,6 +134,7 @@ $(document).ready(function () {
         let counter = list.data("widget-counter");
         let aliquotCode = $(element).data("aliquot-code");
         let rows = $(".duplicate-target-" + aliquotId).clone();
+        $(rows).find('input[type="checkbox"]').remove();
         rows.each(function () {
             let barcodeName = `nph_sample_finalize[SALIVAA2][${counter}]`;
             let tsName = `nph_sample_finalize[SALIVAA2AliquotTs][${counter}]`;
