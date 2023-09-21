@@ -192,6 +192,7 @@
           "barcodeErrorMessage": "Aliquot barcode ID invalid. Please enter a valid 5mL matrix aliquot tube barcode ID.",
           "minVolume": 0,
           "maxVolume": 2,
+          "errorMessageVolumePrefix": "Saliva Volume:",
           "warningMinVolume": 100,
           "warningMaxVolume": 2000,
           "addNew": true,
