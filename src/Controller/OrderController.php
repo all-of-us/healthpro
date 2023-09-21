@@ -9,6 +9,7 @@ use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
 use App\Form\OrderType;
+use App\Repository\MeasurementRepository;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
@@ -67,7 +68,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/check', name: 'order_check')]
-    public function orderCheck($participantId, RequestStack $requestStack): Response
+    public function orderCheck($participantId, RequestStack $requestStack, MeasurementRepository $measurementRepository): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -78,7 +79,7 @@ class OrderController extends BaseController
         }
         return $this->render('order/check.html.twig', [
             'participant' => $participant,
-            'siteType' => $requestStack->getSession()->get('siteType')
+            'siteType' => $requestStack->getSession()->get('siteType'),
         ]);
     }
 
@@ -726,6 +727,26 @@ class OrderController extends BaseController
         $order = $this->loadOrder($participantId, $orderId);
         return $this->render('biobank/summary.html.twig', [
             'biobankChanges' => $order->getBiobankChangesDetails($this->getSecurityUser()->getTimezone())
+        ]);
+    }
+
+    #[Route(path: '/participant/{participantId}/order/pediatric/weight', name: 'order_check_pediatric_weight')]
+    public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementRepository $measurementRepository): Response
+    {
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        $measurement = $measurementRepository->getMostRecentMeasurementWithoutParentId($participant->id);
+        $measurementData = json_decode($measurement->getData());
+        return $this->render('order/pediatric/weight.html.twig', [
+            'participant' => $participant,
+            'siteType' => $requestStack->getSession()->get('siteType'),
+            'weightMeasurement' => $measurement,
+            'measurementData' => $measurementData
         ]);
     }
 }
