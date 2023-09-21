@@ -38,4 +38,11 @@ class ZScoresRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getChartsData(): ?array
+    {
+        return $this->createQueryBuilder('z')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

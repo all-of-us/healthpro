@@ -28,6 +28,7 @@ class Participant
     public $evaluationFinalizedSite;
     public $orderCreatedSite;
     public $age;
+    public $ageInMonths;
     public $patientStatus;
     public $isCoreParticipant = false;
     public $isCoreMinusPMParticipant = false;
@@ -154,6 +155,20 @@ class Participant
         return $this->dob
             ->diff(new \DateTime())
             ->y;
+    }
+
+    public function getAgeInMonths(): ?int
+    {
+        if (!$this->dob) {
+            return null;
+        }
+        $now = new \DateTime();
+        $diff = $now->diff($this->dob);
+
+        $yearsInMonths = $diff->y * 12;
+        $months = $diff->m;
+
+        return $yearsInMonths + $months;
     }
 
     public function checkIdentifiers($notes)
@@ -367,6 +382,8 @@ class Participant
 
         //Set age
         $this->age = $this->getAge();
+        //$this->ageInMonths = $this->getAgeInMonths();
+        $this->ageInMonths = 10;
 
         // Remove site prefix
         if (!empty($participant->clinicPhysicalMeasurementsFinalizedSite) && $participant->clinicPhysicalMeasurementsFinalizedSite !== 'UNSET') {

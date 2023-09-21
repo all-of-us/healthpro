@@ -111,10 +111,10 @@
                     </div>
                     <div class="panel-body">
                         <p class="lead">
-                            Weight
-                            <span id="mean-weight"></span>
-                            {{ schema.fields['weight'].unit }}
-                            <span id="convert-weight"></span>
+                            Weight <span id="percentile-weight"></span> percentile
+                        </p>
+                        <p class="lead">
+                            Height/Length <span id="percentile-height"></span> percentile
                         </p>
                     </div>
                 </div>
@@ -126,10 +126,7 @@
                     </div>
                     <div class="panel-body">
                         <p class="lead">
-                            Weight-for-length
-                            <span id="mean-weight"></span>
-                            {{ schema.fields['weight'].unit }}
-                            <span id="convert-weight"></span>
+                            Weight-for-Length <span id="percentile-weight-for-length"></span> percentile
                         </p>
                     </div>
                 </div>
@@ -199,10 +196,7 @@
                     </div>
                     <div class="panel-body">
                         <p class="lead">
-                            Head Circumference:
-                            <span id="mean-head-circumference"></span>
-                            {{ schema.fields['head-circumference'].unit }}
-                            <span id="convert-head-circumference"></span>
+                            Weight-for-Length <span id="percentile-head-circumference"></span> percentile
                         </p>
                     </div>
                 </div>
@@ -271,22 +265,6 @@
                             <span id="mean-heart-rate"></span>
                             {{ schema.fields['heart-rate'].unit }}
                             <small class="text-muted">(average of two closest measures)</small>
-                            <div id="heart-rate-warning"></div>
-                            <div id="irregular-heart-rate-warning"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Growth Percentile</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="lead bp-warnings">
-                            Heart rate:
-                            <span id="mean-heart-rate"></span>
-                            {{ schema.fields['heart-rate'].unit }}
                             <div id="heart-rate-warning"></div>
                             <div id="irregular-heart-rate-warning"></div>
                         </div>

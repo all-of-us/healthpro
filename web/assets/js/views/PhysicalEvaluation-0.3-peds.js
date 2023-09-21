@@ -8,8 +8,8 @@ const _ = require("underscore");
 
 PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     events: {
-        "change .replicate input": "updateMean",
-        "keyup .replicate input": "updateMean",
+        "change .replicate input[type='text']": "updateMean",
+        "keyup .replicate input[type='text']": "updateMean",
         "change input, select": "inputChange",
         "keyup input": "inputKeyup",
         "keyup #form_height, #form_weight": "calculateBmi",
@@ -86,6 +86,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 0
             );
             let mean = (sum / values.length).toFixed(1);
+            if ($.inArray(field, this.percentileFields) !== -1 && mean) {
+                this.calculatePercentile(field, parseFloat(mean));
+            }
             this.$("#mean-" + field).html("<strong>" + mean + "</strong>");
             if (this.conversions[field]) {
                 let converted = this.convert(this.conversions[field], mean);
@@ -98,8 +101,74 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         } else {
             this.$("#mean-" + field).text("--");
             this.$("#convert-" + field).text();
+            this.$("#percentile-" + field).text("--");
         }
     },
+    calculatePercentile: function (field, X) {
+        const ageInMonths = this.ageInMonths;
+        const lmsValues = [];
+        // Weight/Height for age
+        let ageCharts;
+        if (field === 'weight') {
+            ageCharts = this.wightForAgeCharts;
+        } else if (field === 'height') {
+            ageCharts = this.heightForAgeCharts;
+        }
+        ageCharts.forEach(item => {
+            if (item.month === ageInMonths) {
+                lmsValues["L"] = item.L;
+                lmsValues["M"] = item.M;
+                lmsValues["S"] = item.S;
+            }
+        });
+        const zScore = this.getZScore(X, lmsValues);
+        console.log('zscore', zScore);
+        this.$("#percentile-" + field).text(this.getPercentile(zScore))
+    },
+    getZScore: function (X, lmsValues) {
+        const L = parseFloat(lmsValues["L"]);
+        const M = parseFloat(lmsValues["M"]);
+        const S = parseFloat(lmsValues["S"]);
+        if (L !== 0) {
+            const numerator = Math.pow(X / M, L) - 1;
+            const denominator = L * S;
+            if (denominator !== 0) {
+                return parseFloat((numerator / denominator).toFixed(2));
+            }
+        } else {
+            if (S !== 0) {
+                return parseFloat((Math.log(X / M) / S).toFixed(2));
+            }
+        }
+    },
+    getPercentile: function(z) {
+        const zScores = this.zScoreCharts;
+        const decimalPoints = {
+            'Z_0': 0.00,
+            'Z_01': 0.01,
+            'Z_02': 0.02,
+            'Z_03': 0.03,
+            'Z_04': 0.04,
+            'Z_05': 0.05,
+            'Z_06': 0.06,
+            'Z_07': 0.07,
+            'Z_08': 0.08,
+            'Z_09': 0.09
+        };
+        for (const zScore of zScores) {
+            if (z === zScore["Z"]) {
+                return (zScore["Z_0"] * 100).toFixed(2) + "th";
+            }
+            for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
+                const newZValue = zScore["Z"] > 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
+                if (z === parseFloat(newZValue.toFixed(2))) {
+                    return (zScore[index] * 100).toFixed(2) + "th";
+                }
+            }
+        }
+        return "--";
+    },
+
     calculateBmi: function () {
         var height = parseFloat(this.$("#form_height").val());
         var weight = parseFloat(this.$("#form_weight").val());
@@ -694,8 +763,14 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
+        this.ageInMonths = obj.ageInMonths;
+        this.wightForAgeCharts = obj.wightForAgeCharts;
+        this.heightForAgeCharts = obj.heightForAgeCharts;
+        this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
         this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];
+        this.meanFields = ["weight", "height", "heart-rate", "hip-circumference", "waist-circumference", "head-circumference"];
+        this.percentileFields = ["weight", "height", "head-circumference"];
         this.render();
     },
     render: function () {
@@ -706,7 +781,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.$(".replicate .field").each(function () {
             var field = $(this).data("field");
             if (!processedReplicates[field]) {
-                self.calculateMean(field);
+                if ($.inArray(field, self.meanFields) !== -1) {
+                    self.calculateMean(field);
+                }
                 self.displayConsecutiveWarning(field);
                 processedReplicates[field] = true;
             }

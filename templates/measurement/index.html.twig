@@ -3,7 +3,15 @@
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
     {% set participantRoute = readOnlyView ? 'read_participant' : 'participant' %}
-    <div id="physicalEvaluation" data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}" data-warnings="{{ warnings|json_encode|escape('html_attr') }}" data-conversions="{{ conversions|json_encode|escape('html_attr') }}" data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}">
+    <div id="physicalEvaluation"
+         data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}"
+         data-warnings="{{ warnings|json_encode|escape('html_attr') }}"
+         data-conversions="{{ conversions|json_encode|escape('html_attr') }}"
+         data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}"
+         data-age-in-months="{{ participant.ageInMonths }}"
+         data-weight-for-age-charts="{{ weightForAgeCharts|json_encode }}"
+         data-height-for-age-charts="{{ heightForAgeCharts|json_encode }}"
+         data-z-score-charts="{{ zScoreCharts|json_encode }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>

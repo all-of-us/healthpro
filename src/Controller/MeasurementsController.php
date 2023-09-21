@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\HeightForAge0To23Months;
 use App\Entity\Measurement;
 use App\Entity\User;
+use App\Entity\WeightForAge0To23Months;
+use App\Entity\ZScores;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
@@ -260,7 +263,10 @@ class MeasurementsController extends BaseController
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
             'readOnlyView' => $this->isReadOnly(),
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
-            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled()
+            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
+            'weightForAgeCharts' => $this->em->getRepository(WeightForAge0To23Months::class)->getChartsData(1),
+            'heightForAgeCharts' => $this->em->getRepository(HeightForAge0To23Months::class)->getChartsData(1),
+            'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
         ]);
     }
 
