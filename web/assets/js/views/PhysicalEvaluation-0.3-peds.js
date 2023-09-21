@@ -109,12 +109,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         const lmsValues = [];
         // Weight/Height for age
         let ageCharts;
-        if (field === 'weight') {
+        if (field === "weight") {
             ageCharts = this.wightForAgeCharts;
-        } else if (field === 'height') {
+        } else if (field === "height") {
             ageCharts = this.heightForAgeCharts;
         }
-        ageCharts.forEach(item => {
+        ageCharts.forEach((item) => {
             if (item.month === ageInMonths) {
                 lmsValues["L"] = item.L;
                 lmsValues["M"] = item.M;
@@ -122,8 +122,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
         });
         const zScore = this.getZScore(X, lmsValues);
-        console.log('zscore', zScore);
-        this.$("#percentile-" + field).text(this.getPercentile(zScore))
+        console.log("zscore", zScore);
+        this.$("#percentile-" + field).text(this.getPercentile(zScore));
     },
     getZScore: function (X, lmsValues) {
         const L = parseFloat(lmsValues["L"]);
@@ -141,19 +141,19 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
         }
     },
-    getPercentile: function(z) {
+    getPercentile: function (z) {
         const zScores = this.zScoreCharts;
         const decimalPoints = {
-            'Z_0': 0.00,
-            'Z_01': 0.01,
-            'Z_02': 0.02,
-            'Z_03': 0.03,
-            'Z_04': 0.04,
-            'Z_05': 0.05,
-            'Z_06': 0.06,
-            'Z_07': 0.07,
-            'Z_08': 0.08,
-            'Z_09': 0.09
+            Z_0: 0.0,
+            Z_01: 0.01,
+            Z_02: 0.02,
+            Z_03: 0.03,
+            Z_04: 0.04,
+            Z_05: 0.05,
+            Z_06: 0.06,
+            Z_07: 0.07,
+            Z_08: 0.08,
+            Z_09: 0.09
         };
         for (const zScore of zScores) {
             if (z === zScore["Z"]) {
@@ -307,10 +307,10 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         let second = parseFloat(this.$("#form_" + field + "_1").val());
         let difference = 1;
         switch (field) {
-            case 'weight':
+            case "weight":
                 difference = 0.1;
                 break;
-            case 'heart-rate':
+            case "heart-rate":
                 difference = 5;
                 break;
         }
@@ -537,8 +537,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 }
                 self.$("#" + field + "-warning").html(
                     '<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' +
-                    warning.message +
-                    "</div>"
+                        warning.message +
+                        "</div>"
                 );
                 return false; // only show first (highest priority) warning
             }
@@ -769,7 +769,14 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
         this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];
-        this.meanFields = ["weight", "height", "heart-rate", "hip-circumference", "waist-circumference", "head-circumference"];
+        this.meanFields = [
+            "weight",
+            "height",
+            "heart-rate",
+            "hip-circumference",
+            "waist-circumference",
+            "head-circumference"
+        ];
         this.percentileFields = ["weight", "height", "head-circumference"];
         this.render();
     },
