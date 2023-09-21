@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\HeadCircumferenceForAge0To36Months;
 use App\Entity\HeightForAge0To23Months;
 use App\Entity\Measurement;
 use App\Entity\User;
 use App\Entity\WeightForAge0To23Months;
+use App\Entity\WeightForLength0To23Months;
 use App\Entity\ZScores;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
@@ -265,7 +267,9 @@ class MeasurementsController extends BaseController
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
             'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
             'weightForAgeCharts' => $this->em->getRepository(WeightForAge0To23Months::class)->getChartsData(1),
+            'weightForLengthCharts' => $this->em->getRepository(WeightForLength0To23Months::class)->getChartsData(1),
             'heightForAgeCharts' => $this->em->getRepository(HeightForAge0To23Months::class)->getChartsData(1),
+            'headCircumferenceForAgeCharts' => $this->em->getRepository(HeadCircumferenceForAge0To36Months::class)->getChartsData(1),
             'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
         ]);
     }

@@ -8,8 +8,10 @@ $(document).ready(function () {
         conversions: measurement.data("conversions"),
         finalized: measurement.data("finalized"),
         ageInMonths: measurement.data("age-in-months"),
-        wightForAgeCharts: measurement.data("weight-for-age-charts"),
+        weightForAgeCharts: measurement.data("weight-for-age-charts"),
+        weightForLengthCharts: measurement.data("weight-for-length-charts"),
         heightForAgeCharts: measurement.data("height-for-age-charts"),
+        headCircumferenceForAgeCharts: measurement.data("head-circumference-for-age-charts"),
         zScoreCharts: measurement.data("z-score-charts")
     });
     $("#evaluationAffixSave")

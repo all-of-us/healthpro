@@ -86,8 +86,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 0
             );
             let mean = (sum / values.length).toFixed(1);
-            if ($.inArray(field, this.percentileFields) !== -1 && mean) {
-                this.calculatePercentile(field, parseFloat(mean));
+            if (this.percentileFields.hasOwnProperty(field) && mean) {
+                let percentileField = this.percentileFields[field];
+                console.log(percentileField);
+                percentileField.forEach(item => {
+                    this.calculatePercentile(item, parseFloat(mean));
+                });
             }
             this.$("#mean-" + field).html("<strong>" + mean + "</strong>");
             if (this.conversions[field]) {
@@ -107,15 +111,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     calculatePercentile: function (field, X) {
         const ageInMonths = this.ageInMonths;
         const lmsValues = [];
-        // Weight/Height for age
-        let ageCharts;
-        if (field === "weight") {
-            ageCharts = this.wightForAgeCharts;
-        } else if (field === "height") {
-            ageCharts = this.heightForAgeCharts;
-        }
-        ageCharts.forEach((item) => {
-            if (item.month === ageInMonths) {
+        let charts = this.growthCharts[field];
+        charts.forEach((item) => {
+            if (Math.round(item.month) === ageInMonths) {
                 lmsValues["L"] = item.L;
                 lmsValues["M"] = item.M;
                 lmsValues["S"] = item.S;
@@ -123,7 +121,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         });
         const zScore = this.getZScore(X, lmsValues);
         console.log("zscore", zScore);
-        this.$("#percentile-" + field).text(this.getPercentile(zScore));
+        const percentile = this.getPercentile(zScore);
+        console.log("percentile", percentile)
+        this.$("#percentile-" + field).text(percentile);
     },
     getZScore: function (X, lmsValues) {
         const L = parseFloat(lmsValues["L"]);
@@ -764,8 +764,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
         this.ageInMonths = obj.ageInMonths;
-        this.wightForAgeCharts = obj.wightForAgeCharts;
-        this.heightForAgeCharts = obj.heightForAgeCharts;
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
         this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];
@@ -777,7 +775,17 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             "waist-circumference",
             "head-circumference"
         ];
-        this.percentileFields = ["weight", "height", "head-circumference"];
+        this.percentileFields = {
+            "weight": ["weight-for-age"],
+            "height": ["height-for-age"],
+            "head-circumference": ["head-circumference-for-age"]
+        };
+        this.growthCharts = {
+            "weight-for-age": obj.weightForAgeCharts,
+            "weight-for-length": obj.weightForLengthCharts,
+            "height-for-age": obj.heightForAgeCharts,
+            "head-circumference-for-age": obj.headCircumferenceForAgeCharts,
+        };
         this.render();
     },
     render: function () {
