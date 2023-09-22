@@ -64,6 +64,9 @@ class MeasurementsController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $type = $request->query->get('type');
+        if ($participant->isPediatric && $participant->pediatricMeasurementsVersionType) {
+            $type = $participant->pediatricMeasurementsVersionType;
+        }
         if (!$this->measurementService->canEdit(
             $measurementId,
             $participant

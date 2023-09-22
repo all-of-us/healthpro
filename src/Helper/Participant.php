@@ -47,7 +47,8 @@ class Participant
     public $nphDeactivationAuthored = '';
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
-    public bool $isPediatric = false;
+    public bool $isPediatric = true;
+    public string $pediatricMeasurementsVersionType;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -68,6 +69,13 @@ class Participant
     private static $deceasedStatusValues = [
         'PENDING',
         'APPROVED'
+    ];
+
+    private static array $pediatricAgeRangeMeasurementVersions = [
+        'peds-1' => [0,23],
+        'peds-2' => [24, 35],
+        'peds-3' => [36, 59],
+        'peds-4' => [60, 83],
     ];
 
     public function __construct($rdrParticipant = null)
@@ -382,8 +390,7 @@ class Participant
 
         //Set age
         $this->age = $this->getAge();
-        //$this->ageInMonths = $this->getAgeInMonths();
-        $this->ageInMonths = 10;
+        $this->ageInMonths = $this->getAgeInMonths();
 
         // Remove site prefix
         if (!empty($participant->clinicPhysicalMeasurementsFinalizedSite) && $participant->clinicPhysicalMeasurementsFinalizedSite !== 'UNSET') {
@@ -455,6 +462,18 @@ class Participant
 
         if (isset($participant->consentForNphModule1Authored)) {
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
+        }
+
+        if ($this->isPediatric) {
+            $measurementVersionType = '';
+            foreach (self::$pediatricAgeRangeMeasurementVersions as $key => $range) {
+                list($start, $end) = $range;
+                if ($this->getAgeInMonths() >= $start && $this->getAgeInMonths() <= $end) {
+                    $measurementVersionType = $key;
+                    break;
+                }
+            }
+            $this->pediatricMeasurementsVersionType = $measurementVersionType;
         }
     }
 
