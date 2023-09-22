@@ -30,7 +30,7 @@
                     <div class="input-group {% if not form[aliquotCode~metadataField['identifier']][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: right; position: relative; top: -5px">
                     {{ form_widget(form[aliquotCode~metadataField['identifier']][i], {'attr': {'class': 'form-control glycerol-volume aliquot-volume additive',
                         'data-warning-target': aliquotCode ~ '-warning-target-glycerol' ~ i, 'data-warning-max-volume': metadataField['warningMaxVolume'], 'data-warning-min-volume': metadataField['warningMinVolume']}}) }}
-                    <span class="input-group-addon">μl</span>
+                    <span class="input-group-addon">{{ metadataField['units'] }}</span>
                     </div>
                 </td>
                 <td colspan="2" style="position: relative">
