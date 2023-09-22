@@ -86,13 +86,19 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 0
             );
             let mean = (sum / values.length).toFixed(1);
+            const meanElement = this.$("#mean-" + field);
+            meanElement.html("<strong>" + mean + "</strong>");
+            meanElement.attr("data-mean", mean);
             if (this.percentileFields.hasOwnProperty(field) && mean) {
-                let percentileField = this.percentileFields[field];
-                percentileField.forEach(item => {
-                    this.calculatePercentile(item, parseFloat(mean));
+                let percentileFields = this.percentileFields[field];
+                percentileFields.forEach((percentileField) => {
+                    if (percentileField === "weight-for-length") {
+                        this.calculateWeightForLengthPercentile();
+                    } else {
+                        this.calculatePercentile(percentileField, parseFloat(mean));
+                    }
                 });
             }
-            this.$("#mean-" + field).html("<strong>" + mean + "</strong>");
             if (this.conversions[field]) {
                 let converted = this.convert(this.conversions[field], mean);
                 this.$("#convert-" + field).html("(" + converted + ")");
@@ -121,8 +127,28 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         const zScore = this.getZScore(X, lmsValues);
         console.log("zscore", zScore);
         const percentile = this.getPercentile(zScore);
-        console.log("percentile", percentile)
+        console.log("percentile", percentile);
         this.$("#percentile-" + field).html("<strong>" + percentile + "</strong>th");
+    },
+    calculateWeightForLengthPercentile: function () {
+        let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
+        let avgLength = parseFloat($("#mean-height").attr("data-mean"));
+        if (avgWeight && avgLength) {
+            const lmsValues = [];
+            let charts = this.growthCharts["weight-for-length"];
+            charts.forEach((item) => {
+                if (item.length === avgLength) {
+                    lmsValues["L"] = item.L;
+                    lmsValues["M"] = item.M;
+                    lmsValues["S"] = item.S;
+                }
+            });
+            const zScore = this.getZScore(avgWeight, lmsValues);
+            console.log("zscore", zScore);
+            const percentile = this.getPercentile(zScore);
+            console.log("percentile", percentile);
+            this.$("#percentile-weight-for-length").html("<strong>" + percentile + "</strong>th");
+        }
     },
     getZScore: function (X, lmsValues) {
         const L = parseFloat(lmsValues["L"]);
@@ -775,15 +801,15 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             "head-circumference"
         ];
         this.percentileFields = {
-            "weight": ["weight-for-age"],
-            "height": ["height-for-age"],
+            weight: ["weight-for-age", "weight-for-length"],
+            height: ["height-for-age", "weight-for-length"],
             "head-circumference": ["head-circumference-for-age"]
         };
         this.growthCharts = {
             "weight-for-age": obj.weightForAgeCharts,
             "weight-for-length": obj.weightForLengthCharts,
             "height-for-age": obj.heightForAgeCharts,
-            "head-circumference-for-age": obj.headCircumferenceForAgeCharts,
+            "head-circumference-for-age": obj.headCircumferenceForAgeCharts
         };
         this.render();
     },
