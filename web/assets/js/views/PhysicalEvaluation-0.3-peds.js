@@ -88,7 +88,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             let mean = (sum / values.length).toFixed(1);
             if (this.percentileFields.hasOwnProperty(field) && mean) {
                 let percentileField = this.percentileFields[field];
-                console.log(percentileField);
                 percentileField.forEach(item => {
                     this.calculatePercentile(item, parseFloat(mean));
                 });
@@ -123,7 +122,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         console.log("zscore", zScore);
         const percentile = this.getPercentile(zScore);
         console.log("percentile", percentile)
-        this.$("#percentile-" + field).text(percentile);
+        this.$("#percentile-" + field).html("<strong>" + percentile + "</strong>th");
     },
     getZScore: function (X, lmsValues) {
         const L = parseFloat(lmsValues["L"]);
@@ -157,12 +156,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         };
         for (const zScore of zScores) {
             if (z === zScore["Z"]) {
-                return (zScore["Z_0"] * 100).toFixed(2) + "th";
+                return Math.round(zScore["Z_0"] * 100);
             }
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
                 const newZValue = zScore["Z"] > 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
-                    return (zScore[index] * 100).toFixed(2) + "th";
+                    return Math.round(zScore[index] * 100);
                 }
             }
         }
