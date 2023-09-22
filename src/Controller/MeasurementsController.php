@@ -3,12 +3,8 @@
 namespace App\Controller;
 
 use App\Audit\Log;
-use App\Entity\HeadCircumferenceForAge0To36Months;
-use App\Entity\HeightForAge0To23Months;
 use App\Entity\Measurement;
 use App\Entity\User;
-use App\Entity\WeightForAge0To23Months;
-use App\Entity\WeightForLength0To23Months;
 use App\Entity\ZScores;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
@@ -254,6 +250,7 @@ class MeasurementsController extends BaseController
                 $showAutoModification = $measurement->canAutoModify();
             }
         }
+        $growthCharts = $measurement->getGrowthChartsByAge($participant->ageInMonths);
         return $this->render('measurement/index.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
@@ -269,11 +266,11 @@ class MeasurementsController extends BaseController
             'readOnlyView' => $this->isReadOnly(),
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
             'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
-            'weightForAgeCharts' => $this->em->getRepository(WeightForAge0To23Months::class)->getChartsData(1),
-            'weightForLengthCharts' => $this->em->getRepository(WeightForLength0To23Months::class)->getChartsData(1),
-            'heightForAgeCharts' => $this->em->getRepository(HeightForAge0To23Months::class)->getChartsData(1),
-            'headCircumferenceForAgeCharts' => $this->em->getRepository(HeadCircumferenceForAge0To36Months::class)->getChartsData(1),
-            'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
+            'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'zScoreCharts' => $participant->isPediatric ? $this->em->getRepository(ZScores::class)->getChartsData() : []
         ]);
     }
 

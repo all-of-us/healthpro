@@ -47,6 +47,7 @@ class Participant
     public $nphDeactivationAuthored = '';
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
+    public int $sexAtBirth;
     public bool $isPediatric = true;
     public string $pediatricMeasurementsVersionType;
 
@@ -72,7 +73,7 @@ class Participant
     ];
 
     private static array $pediatricAgeRangeMeasurementVersions = [
-        'peds-1' => [0,23],
+        'peds-1' => [0, 23],
         'peds-2' => [24, 35],
         'peds-3' => [36, 59],
         'peds-4' => [60, 83],
@@ -368,6 +369,12 @@ class Participant
                 $this->gender = 'U';
                 break;
         }
+
+        $this->sexAtBirth = match ($participant->sex ?? null) {
+            'SexAtBirth_Male' => 1,
+            'SexAtBirth_Female' => 2,
+            default => 0,
+        };
 
         // Set dob to DateTime object
         if (isset($participant->dateOfBirth)) {

@@ -753,6 +753,40 @@ class Measurement
         return null;
     }
 
+    public function getGrowthChartsByAge($ageInMonths): array
+    {
+        $growChartsByAge = [
+            'weightForAgeCharts' => [
+                WeightForAge0To23Months::class => [0, 23],
+                WeightForAge24MonthsAndUp::class => [24, 36]
+            ],
+            'heightForAgeCharts' => [
+                HeightForAge0To23Months::class => [0, 23],
+                HeightForAge24MonthsTo6Years::class => [24, 72]
+            ],
+            'headCircumferenceForAgeCharts' => [
+                HeadCircumferenceForAge0To36Months::class => [0, 36]
+            ],
+            'weightForLengthCharts' => [
+                WeightForLength0To23Months::class => [0, 23],
+                WeightForLength23MonthsTo5Years::class => [24, 60]
+            ],
+        ];
+        $selectedCharts = [];
+        foreach (array_keys($growChartsByAge) as $chartType) {
+            $selectedCharts[$chartType] = null;
+        }
+        foreach ($growChartsByAge as $chartType => $ageRanges) {
+            foreach ($ageRanges as $chartClass => $range) {
+                list($start, $end) = $range;
+                if ($ageInMonths >= $start && $ageInMonths <= $end) {
+                    $selectedCharts[$chartType] = $chartClass;
+                }
+            }
+        }
+        return $selectedCharts;
+    }
+
     protected function normalizeData($type = null)
     {
         foreach ($this->fieldData as $key => $value) {
