@@ -140,7 +140,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                     $glycerolVolume = $formData[$aliquotCode . $metadataField['identifier']][$key];
                                     if (isset($formData[$aliquotCode][$key])) {
                                         if ($glycerolVolume == 0) {
-                                            $context->buildViolation('Glycerol Volume: Please verify the volume is correct. Volume should be greater than 0')->addViolation();
+                                            $context->buildViolation('Glycerol Volume: Volume must be greater than 0')->addViolation();
                                         } elseif ($glycerolVolume > $metadataField['maxVolume']) {
                                             $context->buildViolation("Glycerol Volume: Please verify the volume is correct. This aliquot should contain a maximum of {$metadataField['maxVolume']} {$metadataField['units']}.")->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
                                         }
