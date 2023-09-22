@@ -139,7 +139,9 @@ class NphSampleFinalizeType extends NphOrderForm
                                     $formData = $context->getRoot()->getData();
                                     $glycerolVolume = $formData[$aliquotCode . $metadataField['identifier']][$key];
                                     if (isset($formData[$aliquotCode][$key])) {
-                                        if ($glycerolVolume == 0) {
+                                        if ($glycerolVolume === null) {
+                                            $context->buildViolation('Glycerol Volume: Volume is required')->addViolation();
+                                        } elseif ($glycerolVolume === 0) {
                                             $context->buildViolation('Glycerol Volume: Volume must be greater than 0')->addViolation();
                                         } elseif ($glycerolVolume > $metadataField['maxVolume']) {
                                             $context->buildViolation("Glycerol Volume: Please verify the volume is correct. This aliquot should contain a maximum of {$metadataField['maxVolume']} {$metadataField['units']}.")->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
@@ -176,9 +178,17 @@ class NphSampleFinalizeType extends NphOrderForm
                         $key = intval($context->getObject()->getName());
                         if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
                             && $value === null) {
-                            $context->buildViolation('Volume is required')->addViolation();
+                            $errorMessage = 'Volume is required';
+                            if (isset($aliquot['errorMessageVolumePrefix'])) {
+                                $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+                            }
+                            $context->buildViolation($errorMessage)->addViolation();
                         }
                         if ($aliquot['expectedVolume'] === null && !empty($value)) {
+                            $errorMessage = 'Volume should not be entered';
+                            if (isset($aliquot['errorMessageVolumePrefix'])) {
+                                $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+                            }
                             $context->buildViolation('Volume should not be entered')->addViolation();
                         }
                     })
