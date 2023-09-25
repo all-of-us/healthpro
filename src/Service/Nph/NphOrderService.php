@@ -663,13 +663,15 @@ class NphOrderService
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
             $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
-            $obj->dlwDose = [
-              'batchid' => $dlwInfo->getDoseBatchId(),
-              'participantweight' => $dlwInfo->getParticipantWeight(),
-              'dose' => $dlwInfo->getActualDose(),
-              'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
-                'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
-            ];
+            if ($dlwInfo) {
+                $obj->dlwDose = [
+                    'batchid' => $dlwInfo->getDoseBatchId(),
+                    'participantweight' => $dlwInfo->getParticipantWeight(),
+                    'dose' => $dlwInfo->getActualDose(),
+                    'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
+                    'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
+                ];
+            }
         }
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
