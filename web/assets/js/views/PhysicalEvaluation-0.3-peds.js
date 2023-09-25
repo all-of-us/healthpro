@@ -12,8 +12,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         "keyup .replicate input[type='text']": "updateMean",
         "change input, select": "inputChange",
         "keyup input": "inputKeyup",
-        "keyup #form_height, #form_weight": "calculateBmi",
-        "change #form_height, #form_weight": "calculateBmi",
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
@@ -51,6 +49,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     updateMean: function (e) {
         let field = $(e.currentTarget).closest(".field").data("field");
         this.calculateMean(field);
+        if (field === 'weight' || field === 'height') {
+            this.calculateBmi();
+        }
     },
     triggerEqualize: function () {
         window.setTimeout(function () {
@@ -197,15 +198,11 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     },
 
     calculateBmi: function () {
-        var height = parseFloat(this.$("#form_height").val());
-        var weight = parseFloat(this.$("#form_weight").val());
+        let height = parseFloat(this.$("#mean-height").attr('data-mean'));
+        let weight = parseFloat(this.$("#mean-weight").attr('data-mean'));
         this.$("#bmi-warning").text("");
-        if (this.rendered || (height && weight)) {
-            this.$("#form_height").parsley().validate();
-            this.$("#form_weight").parsley().validate();
-        }
         if (height && weight) {
-            var bmi = weight / ((height / 100) * (height / 100));
+            let bmi = weight / ((height / 100) * (height / 100));
             bmi = bmi.toFixed(1);
             this.$("#bmi").html("<strong>" + bmi + "</strong>");
             if (bmi < 15 || bmi > 50) {
