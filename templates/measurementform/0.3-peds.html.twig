@@ -116,12 +116,34 @@
                         <p class="lead">
                             Height/Length <span id="percentile-height-for-age">--</span> percentile
                         </p>
-                        <p class="lead">
-                            Weight-for-Length <span id="percentile-weight-for-length">--</span> percentile
-                        </p>
+                        {% if schema.displayWeightForLength == true %}
+                            <p class="lead">
+                                Weight-for-Length <span id="percentile-weight-for-length">--</span> percentile
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
+            {% if schema.displayBmi is defined and schema.displayBmi == true %}
+                <div class="col-sm-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                BMI
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p class="lead">
+                                BMI <span id="bmi">--</span>
+                            </p>
+                            <p class="lead">
+                                BMI Percentile <span id="percentile-height-for-age">--</span> percentile
+                            </p>
+                            <div id="bmi-warning" class="metric-warnings text-warning"></div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

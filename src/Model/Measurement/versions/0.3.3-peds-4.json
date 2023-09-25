@@ -1,7 +1,7 @@
 {
-  "version": "0.3.3-peds-1",
+  "version": "0.3.3-peds-4",
   "template": "0.3-peds",
-  "description": "Pediatric participants 0 to 2 years (0 to 23 months) old",
+  "description": "Pediatric participants 5 to 7 years (60 to 83 months) old",
   "fields": [
     {
       "name": "wheelchair",
@@ -201,8 +201,8 @@
       "type": "text"
     },
     {
-      "name": "head-circumference",
-      "label": "Head Circumference",
+      "name": "waist-circumference",
+      "label": "Waist Circumference",
       "unit": "cm",
       "alternateunits": true,
       "decimals": 1,
@@ -217,50 +217,174 @@
       ],
       "convert": "in",
       "help": {
-        "image": "head.png"
+        "image": "waist.png"
       }
     },
     {
-      "name": "head-circumference-protocol-modification",
-      "label": "Modification to Head Circumference Protocol",
+      "name": "waist-circumference-location",
+      "label": "Waist Circumference Location",
+      "options": {
+        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
+        "Umbilicus": "umbilicus"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "waist-circumference-protocol-modification",
+      "label": "Modification to Waist Circumference Protocol",
       "replicates": 3,
-      "max": 120,
       "options": {
         "None": "",
-        "Head is more than measuring device": "head-circumference-out-of-range",
-        "Hair Style": "hair-style",
+        "Waist is more than waist measuring device range": "waist-circumference-out-of-range",
+        "Clothing not removed": "clothing-not-removed",
+        "Colostomy bag": "colostomy-bag",
         "Parental refusal": "parental-refusal",
         "Child dissenting behavior": "child-dissenting-behavior",
         "Other": "other"
       },
+      "help": {
+        "caption": "Help text placeholder."
+      },
       "warnings": [
         {
-          "val": "head-circumference-out-of-range",
-          "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"head Circumference\" field."
+          "val": "waist-circumference-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the device in the \"waist circumference\" field"
         },
         {
-          "val": "hair-style",
-          "message": "Deviation successfully captured. Head circumference may be inaccurate due to hair style."
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "colostomy-bag",
+          "message": "Deviation successfully captured."
         },
         {
           "val": "parental-refusal",
-          "message": "Deviation successfully captured. Do not measure the head circumference of the participant."
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
         },
         {
           "val": "child-dissenting-behavior",
-          "message": "Deviation successfully captured. Do not measure the head circumference of the participant."
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
         },
         {
           "val": "other",
-          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+          "message": "Please specify reason for protocol deviation."
         }
       ]
     },
     {
-      "name": "head-circumference-protocol-modification-notes",
+      "name": "waist-circumference-protocol-modification-notes",
       "label": "Reason",
       "replicates": 3,
       "type": "text"
+    },
+    {
+      "name": "blood-pressure-position",
+      "label": "Blood Pressure Position",
+      "options": {
+        "Sitting": "sitting",
+        "Standing": "standing",
+        "Laying": "laying"
+      }
+    },
+    {
+      "name": "blood-pressure-location",
+      "label": "Blood Pressure Location",
+      "options": ["Right arm", "Left arm"],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-systolic",
+      "label": "Systolic",
+      "unit": "mmHg",
+      "replicates": 3,
+      "max": 300,
+      "warnings": [
+        {
+          "max": 200,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 180,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "min": 100,
+          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 200,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "max": 180,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "min": 100,
+          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-diastolic",
+      "label": "Diastolic",
+      "unit": "mmHg",
+      "replicates": 3,
+      "max": 300,
+      "compare": {
+        "type": "less-than",
+        "field": "blood-pressure-systolic",
+        "message": "Diastolic pressure must be less than systolic pressure"
+      },
+      "warnings": [
+        {
+          "max": 120,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 110,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "min": 60,
+          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 120,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "max": 110,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "min": 60,
+          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
     },
     {
       "name": "heart-rate-position",
@@ -364,6 +488,12 @@
       "type": "text"
     },
     {
+      "name": "manual-blood-pressure",
+      "label": "Blood pressure measured manually",
+      "type": "checkbox",
+      "replicates": 3
+    },
+    {
       "name": "manual-heart-rate",
       "label": "Heart rate measured manually",
       "type": "checkbox",
@@ -375,5 +505,6 @@
       "type": "textarea"
     }
   ],
-  "displayWeightForLength": true
+  "displayBmi": true,
+  "displayWeightForLength": false
 }

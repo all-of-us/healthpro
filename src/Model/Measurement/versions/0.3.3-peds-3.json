@@ -504,5 +504,6 @@
       "label": "Additional Notes",
       "type": "textarea"
     }
-  ]
+  ],
+  "displayWeightForLength": true
 }
