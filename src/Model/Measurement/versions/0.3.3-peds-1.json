@@ -322,6 +322,47 @@
       }
     },
     {
+      "name": "blood-pressure-protocol-modification",
+      "label": "Modification to Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Crying": "crying",
+        "Urgent/emergent event": "emergency",
+        "Other": "other"
+      },
+      "warnings": [
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "crying",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation."
+        }
+      ]
+    },
+    {
+      "name": "blood-pressure-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
       "name": "manual-heart-rate",
       "label": "Heart rate measured manually",
       "type": "checkbox",

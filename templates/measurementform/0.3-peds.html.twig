@@ -228,6 +228,10 @@
                                     <a class="small">Add protocol modification</a>
                                 </div>
                                 <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
+                                    </div>
                                     {% if schema.fields['manual-heart-rate'] is defined %}
                                         <div class="modification-manual">
                                             {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-heart-rate'], i) }}
