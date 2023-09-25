@@ -26,7 +26,12 @@
                 {% else %}
                     New Physical Measurements
                 {% endif %}
-                <small><a href="{{ path(participantRoute, { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+                <small>
+                    <a href="{{ path(participantRoute, { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a>
+                    {% if participant.isPediatric %}
+                        <i class="fa fa-child child-icon" title="Pediatric Participant" data-toggle="tooltip"></i>
+                    {% endif %}
+                </small>
                 {% if measurement.id and not readOnlyView%}
                     {% if measurement.rdrId and (measurement.history is empty or measurement.history.type != 'cancel') %}
                         <button type="submit" class="btn btn-sm btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
