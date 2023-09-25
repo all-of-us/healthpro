@@ -18,6 +18,7 @@ use App\Service\UserService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
+use function PHPUnit\Framework\isNull;
 
 class NphOrderService
 {
@@ -663,13 +664,15 @@ class NphOrderService
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
             $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
-            $obj->dlwDose = [
-              'batchid' => $dlwInfo->getDoseBatchId(),
-              'participantweight' => $dlwInfo->getParticipantWeight(),
-              'dose' => $dlwInfo->getActualDose(),
-              'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
-                'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
-            ];
+            if (!is_null($dlwInfo) && !empty($dlwInfo)) {
+                $obj->dlwDose = [
+                    'batchid' => $dlwInfo->getDoseBatchId(),
+                    'participantweight' => $dlwInfo->getParticipantWeight(),
+                    'dose' => $dlwInfo->getActualDose(),
+                    'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
+                    'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
+                ];
+            }
         }
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
