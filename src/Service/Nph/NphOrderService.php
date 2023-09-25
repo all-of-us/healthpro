@@ -663,7 +663,7 @@ class NphOrderService
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
             $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
-            if (!is_null($dlwInfo) && !empty($dlwInfo)) {
+            if ($dlwInfo) {
                 $obj->dlwDose = [
                     'batchid' => $dlwInfo->getDoseBatchId(),
                     'participantweight' => $dlwInfo->getParticipantWeight(),
