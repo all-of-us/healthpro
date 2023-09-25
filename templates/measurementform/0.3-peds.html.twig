@@ -171,8 +171,8 @@
             </div>
             <hr>
         {% endif %}
-        {% if schema.fields['waist-circumference-protocol-modification'] is defined %}
-            <h4>Waist</h4>
+        {% if schema.fields['waist-circumference'] is defined %}
+            <h4>Waist Circumference</h4>
             <div class="well">
                 <div class="row">
                     <div class="col-sm-4">
@@ -217,7 +217,7 @@
                         <h3 class="panel-title">Average</h3>
                     </div>
                     <div class="panel-body">
-                        {% if schema.fields['head-circumference-protocol-modification'] is defined %}
+                        {% if schema.fields['head-circumference'] is defined %}
                             <p class="lead">
                                 Head Circumference:
                                 <span id="mean-head-circumference"></span>
@@ -226,7 +226,7 @@
                                 <small class="text-muted">(average of two closest measures)</small>
                             </p>
                         {% endif %}
-                        {% if schema.fields['waist-circumference-protocol-modification'] is defined %}
+                        {% if schema.fields['waist-circumference'] is defined %}
                             <p class="lead">
                                 Waist Circumference:
                                 <span id="mean-waist-circumference"></span>
@@ -238,7 +238,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
+            {% if schema.fields['head-circumference'] is defined %}
+                <div class="col-sm-4">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Growth Percentile</h3>
@@ -257,6 +258,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
 
     </div>
@@ -264,18 +266,29 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
-            Heart Rate
+            Heart Rate {% if schema.fields['blood-pressure-position'] is defined %} and Blood Pressure {% endif %}
         </h3>
     </div>
     <div class="panel-body">
+        <h4>Heart Rate {% if schema.fields['blood-pressure-position'] is defined %} and Blood Pressure {% endif %}</h4>
         <div class="well">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     {{ metrics.form_row(measurementForm, schema.fields['heart-rate-position']) }}
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     {{ metrics.form_row(measurementForm, schema.fields['heart-rate-method']) }}
                 </div>
+                {% if schema.fields['blood-pressure-position'] is defined %}
+                    <div class="col-sm-3">
+                        {{ metrics.form_row(measurementForm, schema.fields['blood-pressure-position']) }}
+                    </div>
+                {% endif %}
+                {% if schema.fields['blood-pressure-location'] is defined %}
+                    <div class="col-sm-3">
+                        {{ metrics.form_row(measurementForm, schema.fields['blood-pressure-location']) }}
+                    </div>
+                {% endif %}
             </div>
         </div>
         <div class="row replicate row-equal-height">
@@ -286,6 +299,12 @@
                             <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
                             <div class="modification-block">
                                 <div class="modification-affected">
+                                    {% if schema.fields['blood-pressure-systolic'] is defined %}
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-systolic'], i) }}
+                                    {% endif %}
+                                    {% if schema.fields['blood-pressure-diastolic'] is defined %}
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-diastolic'], i) }}
+                                    {% endif %}
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['heart-rate'], i) }}
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['irregular-heart-rate'], i) }}
                                 </div>
@@ -299,6 +318,9 @@
                                     </div>
                                     {% if schema.fields['manual-heart-rate'] is defined %}
                                         <div class="modification-manual">
+                                            {% if schema.fields['manual-blood-pressure'] is defined %}
+                                                {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-blood-pressure'], i) }}
+                                            {% endif %}
                                             {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-heart-rate'], i) }}
                                         </div>
                                     {% endif %}
@@ -325,6 +347,17 @@
                             <span id="mean-heart-rate"></span>
                             {{ schema.fields['heart-rate'].unit }}
                             <small class="text-muted">(average of two closest measures)</small>
+                            {% if schema.fields['blood-pressure-location'] is defined %}
+                                <br/>
+                                Blood pressure:
+                                <span id="mean-blood-pressure-systolic">--</span>
+                                /
+                                <span id="mean-blood-pressure-diastolic">--</span>
+                                {{ schema.fields['blood-pressure-systolic'].unit }}
+                                <small class="text-muted">(average of two closest measures)</small>
+                                <div id="blood-pressure-systolic-warning"></div>
+                                <div id="blood-pressure-diastolic-warning"></div>
+                            {% endif %}
                             <div id="heart-rate-warning"></div>
                             <div id="irregular-heart-rate-warning"></div>
                         </div>
