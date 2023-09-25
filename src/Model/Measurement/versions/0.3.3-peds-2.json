@@ -1,7 +1,7 @@
 {
-  "version": "0.3.3-peds-1",
+  "version": "0.3.3-peds-2",
   "template": "0.3-peds",
-  "description": "Pediatric participants 0 to 2 years (0 to 23 months) old",
+  "description": "Pediatric participants 2 to 3 years (24 to 35 months) old",
   "fields": [
     {
       "name": "wheelchair",
@@ -258,6 +258,86 @@
     },
     {
       "name": "head-circumference-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "waist-circumference",
+      "label": "Waist Circumference",
+      "unit": "cm",
+      "alternateunits": true,
+      "decimals": 1,
+      "replicates": 3,
+      "max": 300,
+      "warnings": [
+        {
+          "min": 50,
+          "max": 150,
+          "message": "Please verify that this circumference is correct"
+        }
+      ],
+      "convert": "in",
+      "help": {
+        "image": "waist.png"
+      }
+    },
+    {
+      "name": "waist-circumference-location",
+      "label": "Waist Circumference Location",
+      "options": {
+        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
+        "Umbilicus": "umbilicus"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "waist-circumference-protocol-modification",
+      "label": "Modification to Waist Circumference Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Waist is more than waist measuring device range": "waist-circumference-out-of-range",
+        "Clothing not removed": "clothing-not-removed",
+        "Colostomy bag": "colostomy-bag",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "waist-circumference-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the device in the \"waist circumference\" field"
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "colostomy-bag",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation."
+        }
+      ]
+    },
+    {
+      "name": "waist-circumference-protocol-modification-notes",
       "label": "Reason",
       "replicates": 3,
       "type": "text"
