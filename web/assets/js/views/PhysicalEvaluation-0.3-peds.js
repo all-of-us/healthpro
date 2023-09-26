@@ -49,7 +49,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     updateMean: function (e) {
         let field = $(e.currentTarget).closest(".field").data("field");
         this.calculateMean(field);
-        if (field === 'weight' || field === 'height') {
+        if (field === "weight" || field === "height") {
             this.calculateBmi();
         }
     },
@@ -198,13 +198,16 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     },
 
     calculateBmi: function () {
-        let height = parseFloat(this.$("#mean-height").attr('data-mean'));
-        let weight = parseFloat(this.$("#mean-weight").attr('data-mean'));
+        let height = parseFloat(this.$("#mean-height").attr("data-mean"));
+        let weight = parseFloat(this.$("#mean-weight").attr("data-mean"));
         this.$("#bmi-warning").text("");
         if (height && weight) {
             let bmi = weight / ((height / 100) * (height / 100));
             bmi = bmi.toFixed(1);
-            this.$("#bmi").html("<strong>" + bmi + "</strong>");
+            const bmiElement = this.$("#bmi");
+            bmiElement.html("<strong>" + bmi + "</strong>");
+            bmiElement.attr("data-bmi", bmi);
+            this.calculatePercentile("bmi-for-age", parseFloat(bmi));
             if (bmi < 15 || bmi > 50) {
                 this.$("#bmi-warning").text("Please verify that the height and weight are correct");
             }
@@ -808,7 +811,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             "weight-for-age": obj.weightForAgeCharts,
             "weight-for-length": obj.weightForLengthCharts,
             "height-for-age": obj.heightForAgeCharts,
-            "head-circumference-for-age": obj.headCircumferenceForAgeCharts
+            "head-circumference-for-age": obj.headCircumferenceForAgeCharts,
+            "bmi-for-age": obj.bmiForAgeCharts
         };
         this.render();
     },

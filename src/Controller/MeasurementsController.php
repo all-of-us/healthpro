@@ -270,6 +270,7 @@ class MeasurementsController extends BaseController
             'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [],
             'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
             'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
             'zScoreCharts' => $participant->isPediatric ? $this->em->getRepository(ZScores::class)->getChartsData() : []
         ]);
     }

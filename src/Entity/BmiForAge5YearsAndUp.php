@@ -6,6 +6,7 @@ use App\Repository\BmiForAge5YearsAndUpRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BmiForAge5YearsAndUpRepository::class)]
+#[ORM\Table(name: 'bmi_for_age_5years_and_up')]
 class BmiForAge5YearsAndUp
 {
     #[ORM\Id]

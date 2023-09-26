@@ -771,6 +771,9 @@ class Measurement
                 WeightForLength0To23Months::class => [0, 23],
                 WeightForLength23MonthsTo5Years::class => [24, 60]
             ],
+            'bmiForAgeCharts' => [
+                BmiForAge5YearsAndUp::class => [24, 240]
+            ],
         ];
         $selectedCharts = [];
         foreach (array_keys($growChartsByAge) as $chartType) {

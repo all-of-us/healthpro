@@ -12,6 +12,7 @@ $(document).ready(function () {
         weightForLengthCharts: measurement.data("weight-for-length-charts"),
         heightForAgeCharts: measurement.data("height-for-age-charts"),
         headCircumferenceForAgeCharts: measurement.data("head-circumference-for-age-charts"),
+        bmiForAgeCharts: measurement.data("bmi-for-age-charts"),
         zScoreCharts: measurement.data("z-score-charts")
     });
     $("#evaluationAffixSave")
