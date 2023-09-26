@@ -772,7 +772,7 @@ class Measurement
                 WeightForLength23MonthsTo5Years::class => [24, 60]
             ],
             'bmiForAgeCharts' => [
-                BmiForAge5YearsAndUp::class => [24, 240]
+                BmiForAge5YearsAndUp::class => [60, 240]
             ],
         ];
         $selectedCharts = [];
