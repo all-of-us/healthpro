@@ -758,7 +758,7 @@ class Measurement
         $growChartsByAge = [
             'weightForAgeCharts' => [
                 WeightForAge0To23Months::class => [0, 23],
-                WeightForAge24MonthsAndUp::class => [24, 36]
+                WeightForAge24MonthsAndUp::class => [24, 240]
             ],
             'heightForAgeCharts' => [
                 HeightForAge0To23Months::class => [0, 23],

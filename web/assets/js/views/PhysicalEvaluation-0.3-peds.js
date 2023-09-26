@@ -1,11 +1,5 @@
 const _ = require("underscore");
 
-/**
- * Physical evaluation form view
- */
-
-/* eslint security/detect-object-injection: "off" */
-
 PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     events: {
         "change .replicate input[type='text']": "updateMean",
@@ -38,7 +32,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.displayWarning(e);
         this.updateConversion(e);
 
-        var field = $(e.currentTarget).closest(".field").data("field");
+        let field = $(e.currentTarget).closest(".field").data("field");
         this.displayConsecutiveWarning(field, e);
 
         this.triggerEqualize();
@@ -125,11 +119,11 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 lmsValues["S"] = item.S;
             }
         });
-        console.log("lms", lmsValues);
+        console.log(field, "lms", lmsValues);
         const zScore = this.getZScore(X, lmsValues);
-        console.log("zscore", zScore);
+        console.log(field, "zscore", zScore);
         const percentile = this.getPercentile(zScore);
-        console.log("percentile", percentile);
+        console.log(field, "percentile", percentile);
         this.$("#percentile-" + field).html("<strong>" + percentile + "</strong>th");
     },
     calculateWeightForLengthPercentile: function () {
@@ -216,7 +210,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     calculateCuff: function () {
-        var circumference = parseFloat(this.$("#form_blood-pressure-arm-circumference").val());
+        let circumference = parseFloat(this.$("#form_blood-pressure-arm-circumference").val());
         if (!circumference || circumference < 22 || circumference > 52) {
             this.$("#cuff-size").text("--");
         } else if (circumference < 27) {
@@ -230,9 +224,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     handlePregnantOrWheelchair: function () {
-        var isPregnant = this.$("#form_pregnant").val() == 1;
-        var isWheelchairUser = this.$("#form_wheelchair").val() == 1;
-        var self = this;
+        let isPregnant = this.$("#form_pregnant").val() == 1;
+        let isWheelchairUser = this.$("#form_wheelchair").val() == 1;
+        let self = this;
         if (isPregnant || isWheelchairUser) {
             this.$("#panel-hip-waist input").each(function () {
                 $(this).valChange("");
@@ -286,7 +280,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     handleHeightProtocol: function () {
-        var selected = this.$("#form_height-protocol-modification").val();
+        let selected = this.$("#form_height-protocol-modification").val();
         if (selected === "refusal" || selected === "pandemic") {
             this.$("#form_height").valChange("").attr("disabled", true);
             this.$(".field-height").next(".alt-units-block").hide();
@@ -304,7 +298,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     handleWeightProtocol: function () {
-        var selected = this.$("#form_weight-protocol-modification").val();
+        let selected = this.$("#form_weight-protocol-modification").val();
         if (selected === "cannot-balance-on-scale" || selected === "refusal" || selected === "pandemic") {
             this.$("#form_weight, #form_weight-prepregnancy").each(function () {
                 $(this).valChange("").attr("disabled", true);
@@ -369,7 +363,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.toggleThirdReading("heart-rate");
     },
     calculateIrregularHeartRate: function () {
-        var allIrregular = true;
+        let allIrregular = true;
         this.$(".field-irregular-heart-rate input").each(function () {
             if (!$(this).prop("checked")) {
                 allIrregular = false;
@@ -395,14 +389,14 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     checkDiastolic: function (e) {
-        var replicate = $(e.currentTarget).closest(".form-group").data("replicate");
-        var systolic = parseFloat(
+        let replicate = $(e.currentTarget).closest(".form-group").data("replicate");
+        let systolic = parseFloat(
             this.$(".field-blood-pressure-systolic[data-replicate=" + replicate + "] input").val()
         );
-        var diastolic = parseFloat(
+        let diastolic = parseFloat(
             this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "] input").val()
         );
-        var container = this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "]").closest(
+        let container = this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "]").closest(
             ".form-group"
         );
         container.find(".diastolic-warning").remove();
@@ -415,7 +409,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     clearServerErrors: function (e) {
-        var field = $(e.currentTarget).closest(".field");
+        let field = $(e.currentTarget).closest(".field");
         field.find("span.help-block ul li").remove();
     },
     kgToLb: function (kg) {
@@ -435,8 +429,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             case "in":
                 return this.cmToIn(val) + " in";
             case "ftin":
-                var inches = this.cmToIn(val);
-                var feet = Math.floor(inches / 12);
+                let inches = this.cmToIn(val);
+                let feet = Math.floor(inches / 12);
                 inches = (inches % 12).toFixed();
                 return feet + "ft " + inches + "in";
             case "lb":
@@ -490,19 +484,19 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         );
     },
     displayWarnings: function () {
-        var self = this;
+        let self = this;
         _.each(this.warnings, function (warnings, field) {
             this.$(".field-" + field)
                 .find("input, select")
                 .each(function () {
-                    var input = $(this);
-                    var field = input.closest(".field").data("field");
-                    var container = input.closest(".form-group");
+                    let input = $(this);
+                    let field = input.closest(".field").data("field");
+                    let container = input.closest(".form-group");
                     container.find(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
-                    var val = input.val();
+                    let val = input.val();
                     $.each(warnings, function (key, warning) {
                         if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                             container.append($('<div class="metric-warnings text-warning">').text(warning.message));
@@ -513,7 +507,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         });
     },
     displayConsecutiveWarning: function (field, e) {
-        var self = this;
+        let self = this;
         if (this.$(".field-" + field).closest(".replicate").length === 0) {
             // ignore non-replicate fields
             return;
@@ -526,17 +520,17 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.$("#" + field + "-warning").text("");
 
         // get all replicate field values
-        var values = [];
+        let values = [];
         this.$(".field-" + field + " input").each(function () {
             values.push($(this).val());
         });
-        var warned = false;
+        let warned = false;
         $.each(this.warnings[field], function (key, warning) {
             if (!warning.consecutive) {
                 return false;
             }
-            var consecutiveConditionsMet = 0;
-            var isConsecutive = false;
+            let consecutiveConditionsMet = 0;
+            let isConsecutive = false;
             $.each(values, function (k, val) {
                 if (self.warningConditionMet(warning, val)) {
                     consecutiveConditionsMet++;
@@ -549,7 +543,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             });
             if (isConsecutive) {
                 if (e && self.rendered) {
-                    var input = $(e.currentTarget);
+                    let input = $(e.currentTarget);
                     new PmiConfirmModal({
                         msg: warning.message,
                         isHTML: true,
@@ -572,17 +566,17 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         });
     },
     displayWarning: function (e) {
-        var self = this;
-        var input = $(e.currentTarget);
-        var field = input.closest(".field").data("field");
-        var container = input.closest(".form-group");
+        let self = this;
+        let input = $(e.currentTarget);
+        let field = input.closest(".field").data("field");
+        let container = input.closest(".form-group");
         container.find(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
-        var val = input.val();
+        let val = input.val();
         if (this.warnings[field]) {
-            var warned = false;
+            let warned = false;
             $.each(this.warnings[field], function (key, warning) {
                 if (!warning.consecutive && self.warningConditionMet(warning, val)) {
                     if (warning.alert) {
@@ -605,13 +599,13 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
     },
     handleProtocolModification: function (e) {
-        var block = $(e.currentTarget).closest(".modification-block");
+        let block = $(e.currentTarget).closest(".modification-block");
         this.handleProtocolModificationBlock(block);
     },
     handleProtocolModificationBlock: function (block) {
-        var modification = block.find(".modification-select select").val();
-        var manualMeasurement = block.find(".modification-manual input:checkbox").is(":checked");
-        var self = this;
+        let modification = block.find(".modification-select select").val();
+        let manualMeasurement = block.find(".modification-manual input:checkbox").is(":checked");
+        let self = this;
         if (modification === "" && manualMeasurement === false) {
             block.find(".modification-select").hide();
             block.find(".modification-toggle").show();
@@ -652,23 +646,23 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         block.find(".modification-select").show();
     },
     showModification: function (e) {
-        var block = $(e.currentTarget).closest(".modification-block");
+        let block = $(e.currentTarget).closest(".modification-block");
         this.showModificationBlock(block);
         this.triggerEqualize();
     },
     showModifications: function () {
-        var self = this;
+        let self = this;
         this.$(".modification-block").each(function () {
             self.handleProtocolModificationBlock($(this));
         });
     },
     autofillProtocolModification: function (e) {
-        var self = this;
-        var reason = $(e.currentTarget).data("reason");
+        let self = this;
+        let reason = $(e.currentTarget).data("reason");
         this.$(".modification-block").each(function () {
-            var modification = $(this).find(".modification-select select").val();
+            let modification = $(this).find(".modification-select select").val();
             if (!modification) {
-                var needsModification = false;
+                let needsModification = false;
                 $(this)
                     .find(".modification-affected input[type=text]:visible")
                     .each(function () {
@@ -691,14 +685,14 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         self.handleWeightProtocol();
     },
     enableAltUnits: function (e) {
-        var block = $(e.currentTarget).closest(".alt-units-block");
+        let block = $(e.currentTarget).closest(".alt-units-block");
         block.find(".alt-units-field").show();
         block.find(".alt-units-toggle").hide();
         block.prev().find("input").attr("readonly", true);
         this.triggerEqualize();
     },
     cancelAltUnits: function (e) {
-        var block = $(e.currentTarget).closest(".alt-units-block");
+        let block = $(e.currentTarget).closest(".alt-units-block");
         block.find(".alt-units-toggle").show();
         block.find(".alt-units-field").hide();
         block.prev().find("input").attr("readonly", false);
@@ -706,11 +700,11 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.triggerEqualize();
     },
     convertAltUnits: function (e) {
-        var block = $(e.currentTarget).closest(".alt-units-field");
-        var type = block.find("label").attr("for");
-        var val;
+        let block = $(e.currentTarget).closest(".alt-units-field");
+        let type = block.find("label").attr("for");
+        let val;
         if (type == "alt-units-height") {
-            var inches = 0;
+            let inches = 0;
             if (parseFloat($("#alt-units-height-ft").val())) {
                 inches += 12 * parseFloat($("#alt-units-height-ft").val());
             }
@@ -719,7 +713,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
             val = this.inToCm(inches);
         } else {
-            var unit = block.find(".input-group-addon").text();
+            let unit = block.find(".input-group-addon").text();
             val = block.find("input").val();
             if (unit == "in") {
                 val = this.inToCm(val);
@@ -730,7 +724,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         if (isNaN(val)) {
             val = "";
         }
-        var input = block.parent().prev().find("input");
+        let input = block.parent().prev().find("input");
         input.val(val);
         if (e.type == "change") {
             block.parent().prev().find("input").trigger("change"); // trigger change even if not different
@@ -740,7 +734,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     // for parsley validator
     validateHeightWeight: function (height, weight) {
         if (height && weight) {
-            var bmi = weight / ((height / 100) * (height / 100));
+            let bmi = weight / ((height / 100) * (height / 100));
             bmi = bmi.toFixed(1);
             if (bmi < 5 || bmi > 125) {
                 return false;
@@ -752,8 +746,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         self = this;
         window.Parsley.addValidator("bmiHeight", {
             validateString: function (value, weightSelector) {
-                var height = parseFloat(value);
-                var weight = parseRequirement(weightSelector);
+                let height = parseFloat(value);
+                let weight = parseRequirement(weightSelector);
                 return self.validateHeightWeight(height, weight);
             },
             messages: {
@@ -763,8 +757,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         });
         window.Parsley.addValidator("bmiWeight", {
             validateString: function (value, heightSelector) {
-                var weight = parseFloat(value);
-                var height = parseRequirement(heightSelector);
+                let weight = parseFloat(value);
+                let height = parseRequirement(heightSelector);
                 return self.validateHeightWeight(height, weight);
             },
             messages: {
@@ -817,12 +811,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.render();
     },
     render: function () {
-        var self = this;
+        let self = this;
         self.initParsley();
 
-        var processedReplicates = {};
+        let processedReplicates = {};
         this.$(".replicate .field").each(function () {
-            var field = $(this).data("field");
+            let field = $(this).data("field");
             if (!processedReplicates[field]) {
                 if ($.inArray(field, self.meanFields) !== -1) {
                     self.calculateMean(field);
