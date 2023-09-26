@@ -119,7 +119,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         const lmsValues = [];
         let charts = this.growthCharts[field];
         charts.forEach((item) => {
-            if (Math.round(item.month) === ageInMonths) {
+            if (Math.floor(item.month) === ageInMonths) {
                 lmsValues["L"] = item.L;
                 lmsValues["M"] = item.M;
                 lmsValues["S"] = item.S;
