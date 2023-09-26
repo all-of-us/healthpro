@@ -5,7 +5,7 @@
     <div class="col-sm-3 text-center">
         <strong class="text-primary">
             Module {{ order.module }} | Visit {{ order.visitType }} | {{ timePoints[order.timepoint] }} | {{ order
-            .orderType|capitalize }}
+            .getOrderTypeDisplayName() }}
         </strong>
         <div><svg id="order-barcode"></svg></div>
     </div>

@@ -49,6 +49,8 @@ class NphOrderService
         $this->siteService = $siteService;
         $this->loggerService = $loggerService;
         $this->rdrApiService = $rdrApiService;
+        $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
+        $this->site = $this->siteService->getSiteId();
     }
 
     public function loadModules(string $module, string $visit, string $participantId, string $biobankId): void
@@ -60,9 +62,6 @@ class NphOrderService
         $this->visit = $visit;
         $this->participantId = $participantId;
         $this->biobankId = $biobankId;
-
-        $this->user = $this->em->getRepository(User::class)->find($this->userService->getUser()->getId());
-        $this->site = $this->siteService->getSiteId();
     }
 
     public function getVisitDiet(): string
@@ -662,15 +661,17 @@ class NphOrderService
         $samplesMetadata = $this->getSamplesMetadata($order);
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        if ($order->getModule() === '3' && $order->getVisitType() === $order::TYPE_DLW) {
-            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitType' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
-            $obj['dlwdose'] = [
-              'batchid' => $dlwInfo->getBatchId(),
-              'participantweight' => $dlwInfo->getParticipantWeight(),
-              'dose' => $dlwInfo->getActualDose(),
-              'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
-                'dosetime' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
-            ];
+        if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
+            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
+            if ($dlwInfo) {
+                $obj->dlwDose = [
+                    'batchid' => $dlwInfo->getDoseBatchId(),
+                    'participantweight' => $dlwInfo->getParticipantWeight(),
+                    'dose' => $dlwInfo->getActualDose(),
+                    'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
+                    'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
+                ];
+            }
         }
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
@@ -808,6 +809,7 @@ class NphOrderService
         $formData->setVisit($visit);
         $formData->setModifiedTimezoneId($this->getTimezoneid());
         $formData->setModifiedTs(new DateTime());
+        $formData->setUser($this->user);
         $this->em->persist($formData);
         $this->em->flush();
         return $formData;
@@ -1071,7 +1073,7 @@ class NphOrderService
                             }
                         }
                         if (!empty($formData["${aliquotCode}glycerolAdditiveVolume"])) {
-                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"]]));
+                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"][$key]]));
                         }
                         $this->em->persist($nphAliquot);
                         $this->em->flush();

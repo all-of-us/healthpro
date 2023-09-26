@@ -132,17 +132,45 @@ class NphSampleFinalizeType extends NphOrderForm
                 ]);
                 if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
                     foreach ($aliquot['metadataFields'] as $metadataField) {
-                        $builder->add("{$aliquotCode}{$metadataField['identifier']}", $metadataField['entryType'], [
-                            'label' => $metadataField['label'],
-                            'required' => false,
-                            'attr' => [
-                                'placeholder' => $metadataField['placeholder'] ?? '',
-                                'class' => $metadataField['class'] ?? '',
+                        if ($metadataField['identifier'] === 'glycerolAdditiveVolume') {
+                            $metadataConstraints = [
+                                new Constraints\Callback(function ($value, $context) use ($aliquotCode, $metadataField) {
+                                    $key = intval($context->getObject()->getName());
+                                    $formData = $context->getRoot()->getData();
+                                    $glycerolVolume = $formData[$aliquotCode . $metadataField['identifier']][$key];
+                                    if (isset($formData[$aliquotCode][$key])) {
+                                        if ($glycerolVolume === null) {
+                                            $context->buildViolation('Glycerol Volume: Volume is required')->addViolation();
+                                        } elseif ($glycerolVolume === 0) {
+                                            $context->buildViolation('Glycerol Volume: Volume must be greater than 0')->addViolation();
+                                        } elseif ($glycerolVolume > $metadataField['maxVolume']) {
+                                            $context->buildViolation("Glycerol Volume: Please verify the volume is correct. This aliquot should contain a maximum of {$metadataField['maxVolume']} {$metadataField['units']}.")->atPath($aliquotCode . $metadataField['identifier'])->addViolation();
+                                        }
+                                    }
+                                })
+                            ];
+                            $metadataValue = $formData["{$aliquotCode}glycerolAdditiveVolume"] ?? [null];
+                        } else {
+                            $metadataValue = [null];
+                        }
+                        $builder->add("{$aliquotCode}{$metadataField['identifier']}", Type\CollectionType::class, [
+                            'entry_type' => Type\TextType::class,
+                            'entry_options' => [
+                                'label' => $metadataField['label'],
+                                'required' => false,
+                                'attr' => [
+                                    'placeholder' => $metadataField['placeholder'] ?? '',
+                                    'class' => $metadataField['class'] ?? '',
+                                ],
+                                'constraints' => $metadataConstraints ?? [],
                             ],
-                            'data' => $formData[$aliquotCode . $metadataField['identifier']][0] ?? null,
+                            'allow_add' => true,
+                            'allow_delete' => true,
+                            'data' => $metadataValue,
                         ]);
                     }
                 }
+
 
                 $volumeConstraints = [
                     new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot) {
@@ -150,21 +178,36 @@ class NphSampleFinalizeType extends NphOrderForm
                         $key = intval($context->getObject()->getName());
                         if ($aliquot['expectedVolume'] && ($formData[$aliquotCode][$key] || $formData["{$aliquotCode}AliquotTs"][$key])
                             && $value === null) {
-                            $context->buildViolation('Volume is required')->addViolation();
+                            $errorMessage = 'Volume is required';
+                            if (isset($aliquot['errorMessageVolumePrefix'])) {
+                                $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+                            }
+                            $context->buildViolation($errorMessage)->addViolation();
                         }
                         if ($aliquot['expectedVolume'] === null && !empty($value)) {
+                            $errorMessage = 'Volume should not be entered';
+                            if (isset($aliquot['errorMessageVolumePrefix'])) {
+                                $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+                            }
                             $context->buildViolation('Volume should not be entered')->addViolation();
                         }
                     })
                 ];
                 if (isset($aliquot['minVolume'])) {
+                    $errorMessage = 'Volume must be greater than 0';
+                    if (isset($aliquot['errorMessageVolumePrefix'])) {
+                        $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+                    }
                     $volumeConstraints[] = new Constraints\GreaterThan([
                         'value' => $aliquot['minVolume'],
-                        'message' => 'Volume must be greater than 0'
+                        'message' => $errorMessage
                     ]);
                 }
                 if (isset($aliquot['maxVolume'])) {
                     $errorMessage = "Please verify the volume is correct.  This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.";
+                    if (isset($aliquot['errorMessageVolumePrefix'])) {
+                        $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+                    }
                     $volumeConstraints[] = new Constraints\LessThanOrEqual([
                         'value' => $aliquot['maxVolume'],
                         'message' => $errorMessage
