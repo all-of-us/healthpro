@@ -22,6 +22,9 @@ $(document).ready(function () {
     });
 
     $(document).on("click", ".clear-aliquot-widget", function () {
+        if ($(this).closest("tr").attr("class") && $(this).closest("tr").attr("class").includes("SALIVAA2")) {
+            $(this).closest("tr").prev().find("input:not(:read-only)").val("");
+        }
         $(this).closest("tr").find("input:not(:read-only)").val("");
     });
 
