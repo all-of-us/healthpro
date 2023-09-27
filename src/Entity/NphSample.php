@@ -528,7 +528,9 @@ class NphSample
     public function getRdrAliquotsSampleObj(array $aliquotsInfo): array
     {
         $aliquotObj = [];
+        $counter = [];
         foreach ($this->getNphAliquots() as $aliquot) {
+            $counter[$aliquot->getAliquotCode()] = isset($counter[$aliquot->getAliquotCode()]) ? $counter[$aliquot->getAliquotCode()] + 1 : 0;
             $collectedTs = $aliquot->getAliquotTs();
             $collectedTs->setTimezone(new \DateTimeZone('UTC'));
             $aliquotsData = [
@@ -546,7 +548,7 @@ class NphSample
                     ['units' => 'uL',
                     'volume' => $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume']
                 ];
-                $aliquotsData['volume'] += ($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'] / 1000);
+                $aliquotsData['volume'] += ($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'][$counter[$aliquot->getAliquotCode()]] / 1000);
             }
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();

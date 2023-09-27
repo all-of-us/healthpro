@@ -9,49 +9,70 @@
         {% else %}
             {% set colspan = 1 %}
         {% endif %}
+        {% if i == 0 %}
+            {% set firstIteration = true %}
+        {% else %}
+            {% set firstIteration = false %}
+        {% endif %}
         {% for metadataField in aliquot['metadataFields'] %}
-            <tr>
+            <tr class="aliquots-row-{{ aliquotCode }}{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}" id="aliquots_{{ aliquotCode }}_{{ i }}" data-sample-index="{{ i }}">
                 <td colspan="1">
                     <p style="font-weight: bold;">{{ metadataField['label'] }}</p><span>(1ml = 1000uL)</span>
                 </td>
                 <td colspan="{{ colspan }}">
                     <label style="position: absolute; display: block; font-weight: normal">Saliva Volume</label>
-                    <div class="input-group" style="width: 45%; float: left; top: 20px; position: relative">
-                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control',}}) }}
+                    <div class="input-group {% if not form[aliquotCode ~ 'Volume'][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: left; top: 20px; position: relative">
+                        {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr': {'class': 'form-control aliquot-volume glycerol-volume sample', 'data-warning-target': aliquotCode ~ '-warning-target' ~ i}}) }}
                         <span class="input-group-addon">{{ aliquot['units'] }}</span>
                     </div>
                     <span style="top: 25px; left: 10px; position: relative">+</span>
                     <label style="position: relative; display: block; font-weight: normal; float: right">Glycerol Volume</label>
-                    <div class="input-group" style="width: 45%; float: right; position: relative; top: -5px">
-                    {{ form_widget(form[aliquotCode~metadataField['identifier']], {'attr': {'class': 'form-control'}}) }}
-                    <span class="input-group-addon">μl</span>
+                    <div class="input-group {% if not form[aliquotCode~metadataField['identifier']][i].vars.valid%}has-error{% endif %}" style="width: 45%; float: right; position: relative; top: -5px">
+                    {{ form_widget(form[aliquotCode~metadataField['identifier']][i], {'attr': {'class': 'form-control glycerol-volume aliquot-volume additive',
+                        'data-warning-target': aliquotCode ~ '-warning-target-glycerol' ~ i, 'data-warning-max-volume': metadataField['warningMaxVolume'], 'data-warning-min-volume': metadataField['warningMinVolume']}}) }}
+                    <span class="input-group-addon">{{ metadataField['units'] }}</span>
                     </div>
                 </td>
-                <td colspan="{{ colspan }}">
+                <td colspan="2" style="position: relative">
                     <label style="position: relative; display: block; font-weight: normal">Total Volume</label>
-                    <div class="input-group" style="float: right; position: relative; top: -5px">
-                        <input type="text" id="totalVol" class="form-control">
+                    <span style="top: 35px; left: -5px; position: absolute">=</span>
+                    <div class="input-group" style="float: left; position: relative; top: -5px; width: 65%">
+                        <input type="text" readonly="readonly" id="totalVol{{ i }}" class="form-control totalVol aliquot-volume" data-warning-min-volume="{{ metadataField['warningMinTotalVolume'] }}"
+                        data-warning-max-volume="{{ metadataField['warningMaxTotalVolume'] }}" data-warning-target="{{ aliquotCode }}-warning-target-total{{ i }}">
                         <span class="input-group-addon">mL</span>
                     </div>
-                </td>
-                <td style="position: relative">
-                    {% if not sample.disabled and not sample.unlocked %}
-                        <i class="fa fa-eraser text-danger clear-aliquot-widget sample-metadata-eraser" role="button"></i>
+                    {% if not sample.disabled %}
+                    <i class="fa fa-eraser text-danger clear-aliquot-widget sample-metadata-eraser" style="font-size: 22px" role="button"></i>
                     {% endif %}
                 </td>
             </tr>
-            <tr>
+            <tr class="{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}">
                 <td colspan="3" class="has-error">
                     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
-                    {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume']) }}
+                    {{ form_errors(form[aliquotCode ~ 'glycerolAdditiveVolume'][i]) }}
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target{{ i }}" style="display: none">
+                    Please verify the Saliva Volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).<br>
+                    </span>
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-glycerol{{ i }}" style="display: none">
+                    Please verify the Glycerol Volume unit of measurement is correct.  (Expected volume is in {{ metadataField['units'] }}).<br>
+                    </span>
+                    <span class="text-warning aliquot-volume-warning" id="{{ aliquotCode }}-warning-target-total{{ i }}" style="display: none">
+                    Please verify the Total Volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).<br>
+                    </span>
                 </td>
             </tr>
+            {% set firstIteration = false %}
         {% endfor %}
     {% endif %}
 {% endmacro %}
 {% macro displayAliquotRow(aliquotCode, aliquot, sample, form, i, disabled, skipVolume = false) %}
+    {% if i == 0 %}
+        {% set firstIteration = true %}
+    {% else %}
+        {% set firstIteration = false %}
+    {% endif %}
     {% set aliquotId = form[aliquotCode][i].vars.data %}
-    <tr class="aliquots-row-{{ aliquotCode }}" id="aliquots_{{ aliquotCode }}_{{ i }}">
+    <tr class="aliquots-row-{{ aliquotCode }}{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}" id="aliquots_{{ aliquotCode }}_{{ i }}">
         <td {% if not form[aliquotCode][i].vars.valid %}
             class="has-error"{% endif %}>
             {{ form_widget(form[aliquotCode][i], {
@@ -66,7 +87,7 @@
         {% if not skipVolume %}
             {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i) }}
         {% elseif skipVolume and sample.unlocked %}
-            <td colspan="2"><i class="fa fa-eraser text-danger clear-aliquot-widget" style="font-size: 22px" role="button"></i></td>
+            <td colspan="2"></td>
         {% endif %}
         {% if form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined %}
             <td class="row">
@@ -302,7 +323,7 @@
                                         <tr>
                                             <td>
                                                 <a type="button" class="add-aliquot-widget"
-                                                   data-list-selector="#aliquots_fields_list_{{ aliquotCode }}">+ Add Line</a>
+                                                   data-list-selector="#aliquots_fields_list_{{ aliquotCode }}" data-aliquot-code="{{ aliquotCode }}">+ Add Line</a>
                                             </td>
                                         </tr>
                                     {% endif %}
