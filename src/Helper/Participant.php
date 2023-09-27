@@ -48,7 +48,7 @@ class Participant
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
     public int $sexAtBirth;
-    public bool $isPediatric = true;
+    public bool $isPediatric = false;
     public string $pediatricMeasurementsVersionType;
 
     private $disableTestAccess;
@@ -166,7 +166,7 @@ class Participant
             ->y;
     }
 
-    public function getAgeInMonths(): ?int
+    private function getAgeInMonths(): ?int
     {
         if (!$this->dob) {
             return null;
@@ -469,6 +469,10 @@ class Participant
 
         if (isset($participant->consentForNphModule1Authored)) {
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
+        }
+
+        if (isset($participant->isPediatric) && $participant->isPediatric) {
+            $this->isPediatric = true;
         }
 
         if ($this->isPediatric) {
