@@ -166,20 +166,6 @@ class Participant
             ->y;
     }
 
-    private function getAgeInMonths(): ?int
-    {
-        if (!$this->dob) {
-            return null;
-        }
-        $now = new \DateTime();
-        $diff = $now->diff($this->dob);
-
-        $yearsInMonths = $diff->y * 12;
-        $months = $diff->m;
-
-        return $yearsInMonths + $months;
-    }
-
     public function checkIdentifiers($notes)
     {
         if (empty($notes)) {
@@ -266,6 +252,20 @@ class Participant
             }
         }
         return false;
+    }
+
+    private function getAgeInMonths(): ?int
+    {
+        if (!$this->dob) {
+            return null;
+        }
+        $now = new \DateTime();
+        $diff = $now->diff($this->dob);
+
+        $yearsInMonths = $diff->y * 12;
+        $months = $diff->m;
+
+        return $yearsInMonths + $months;
     }
 
     private function parseRdrParticipant($participant)
