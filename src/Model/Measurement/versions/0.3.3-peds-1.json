@@ -29,12 +29,13 @@
       "max": 1000,
       "warnings": [
         {
-          "min": 30,
-          "message": "Please verify that this weight is correct"
+          "min": 1,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select 'Weight is less than weight measuring range' for Modification to Weight Protocol."
+
         },
         {
-          "max": 199.5,
-          "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+          "max": 18,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
         }
       ],
       "convert": "lb",
@@ -129,20 +130,20 @@
       },
       "warnings": [
         {
-          "min": 2.3,
-          "message": "Please verify that this height has been entered in centimeters, and not meters (1m = 100cm)"
+          "between": [0, 2.3],
+          "message": "Please verify that this number has been entered in centimeters, and not feet (1ft = 30.48cm)"
         },
         {
-          "between": [3, 7.5],
-          "message": "Please verify that this height has been entered in centimeters, and not feet (1ft = 30.48cm)"
+          "min": 42,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         },
         {
-          "between": [36, 89.9],
-          "message": "Please verify that this height has been entered in centimeters, and not inches (1in = 2.54cm)"
+          "between": [109, 229],
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         },
         {
           "max": 228,
-          "message": "Please verify that this height is correct."
+          "message": "Please verify that the number entered is correct."
         }
       ]
     },
@@ -210,9 +211,9 @@
       "max": 300,
       "warnings": [
         {
-          "min": 50,
-          "max": 150,
-          "message": "Please verify that this circumference is correct"
+          "min": 29,
+          "max": 56,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
       "convert": "in",
@@ -301,12 +302,9 @@
           "consecutive": 2
         },
         {
-          "max": 100,
-          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
-        },
-        {
-          "min": 60,
-          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
+          "min": 85,
+          "max": 205,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
       "help": {

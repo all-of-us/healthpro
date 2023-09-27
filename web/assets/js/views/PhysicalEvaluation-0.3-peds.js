@@ -784,7 +784,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
-        this.ageInMonths = obj.ageInMonths;
+        this.ageInMonths = parseInt(obj.ageInMonths);
+        console.log('ageInMonths', this.ageInMonths);
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
         this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];
