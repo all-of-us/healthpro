@@ -716,16 +716,15 @@ class Measurement
             if ($denominator != 0) {
                 return round($numerator / $denominator, 2);
             }
-            throw new Exception('Division by zero error');
         } else {
             if ($S != 0) {
                 return round(log($X / $M) / $S, 2);
             }
-            throw new Exception('Division by zero error');
         }
+        throw new Exception('Division by zero error');
     }
 
-    public function calculatePercentile($z, $zScores): float|null
+    public function calculatePercentile(float $z, array $zScores): float|null
     {
         $decimalPoints = [
             'Z0' => 0.00,
@@ -753,9 +752,9 @@ class Measurement
         return null;
     }
 
-    public function getGrowthChartsByAge($ageInMonths): array
+    public function getGrowthChartsByAge(int $ageInMonths): array
     {
-        $growChartsByAge = [
+        $growthChartsByAgeList = [
             'weightForAgeCharts' => [
                 WeightForAge0To23Months::class => [0, 23],
                 WeightForAge24MonthsAndUp::class => [24, 240]
@@ -775,19 +774,19 @@ class Measurement
                 BmiForAge5YearsAndUp::class => [60, 240]
             ],
         ];
-        $selectedCharts = [];
-        foreach (array_keys($growChartsByAge) as $chartType) {
-            $selectedCharts[$chartType] = null;
-        }
-        foreach ($growChartsByAge as $chartType => $ageRanges) {
+
+        $selectedGrowthCharts = array_fill_keys(array_keys($growthChartsByAgeList), null);
+
+        foreach ($growthChartsByAgeList as $growthChartType => $ageRanges) {
             foreach ($ageRanges as $chartClass => $range) {
                 list($start, $end) = $range;
                 if ($ageInMonths >= $start && $ageInMonths <= $end) {
-                    $selectedCharts[$chartType] = $chartClass;
+                    $selectedGrowthCharts[$growthChartType] = $chartClass;
                 }
             }
         }
-        return $selectedCharts;
+
+        return $selectedGrowthCharts;
     }
 
     protected function normalizeData($type = null)
