@@ -544,11 +544,16 @@ class NphSample
             ];
             $metadata = $aliquot->getAliquotMetadata();
             if (isset($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'])) {
+                if (is_array($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'])) {
+                    $glycerolVolume = $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'][$counter[$aliquot->getAliquotCode()]];
+                } else {
+                    $glycerolVolume = $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'];
+                }
                 $aliquotsData['glycerolAdditiveVolume'] =
                     ['units' => 'uL',
                     'volume' => $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume']
                 ];
-                $aliquotsData['volume'] += ($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'][$counter[$aliquot->getAliquotCode()]] / 1000);
+                $aliquotsData['volume'] += $glycerolVolume / 1000;
             }
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();
