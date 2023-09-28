@@ -477,17 +477,38 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         if (!val) {
             return false;
         }
-        let ageInMonths = this.ageInMonths;
         if (warning.hasOwnProperty('percentile')) {
             if (warning.percentile === 'heart-rate') {
-                let centileValue;
-                this.heartRateAgeCharts.forEach((item) => {
-                    if (ageInMonths > item.startAge && ageInMonths < item.endAge) {
-                        centileValue = item[warning.percentileField];
+                let maxMinValue = null;
+                for (const heartRate of this.heartRateAgeCharts) {
+                    if (this.ageInMonths > heartRate.startAge && this.ageInMonths < heartRate.endAge) {
+                        maxMinValue = heartRate[warning.percentileField];
+                        break;
                     }
-                });
-                warning[warning.percentileType] = centileValue;
+                }
+                warning[warning.percentileType] = maxMinValue;
                 return this.warningCondition(warning, val);
+            }
+            if (warning.percentile === 'bp-systolic' || warning.percentile === 'bp-diastolic') {
+                let maxValue = null;
+                let heightPercentileField = 'heightPer5';
+                let heightPercentile = $("#percentile-height-for-age");
+                if (heightPercentile) {
+                    const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
+                    heightPercentileField = "heightPer" + nearestPercentile;
+                }
+                const bpHeightPercentileCharts = warning.percentile === 'bp-systolic' ? this.bpSystolicHeightPercentileChart : this.bpDiastolicHeightPercentileChart;
+                for (const bpHeightPercentile of bpHeightPercentileCharts) {
+                    if (this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
+                        maxValue = bpHeightPercentile[heightPercentileField] + warning.addValue;
+                        break;
+                    }
+                }
+                if (maxValue > warning.maxValue) {
+                    maxValue = warning.maxValue;
+                }
+                console.log(warning.percentile, 'warningValue', maxValue);
+                return val >= maxValue
             }
         }
         if (warning.hasOwnProperty('age')) {
@@ -556,7 +577,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
             let consecutiveConditionsMet = 0;
             let isConsecutive = false;
-            console.log('values', values);
             $.each(values, function (k, val) {
                 if (self.warningConditionMet(warning, val)) {
                     consecutiveConditionsMet++;
@@ -623,6 +643,19 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 }
             });
         }
+    },
+    roundDownToNearestPercentile: function (percentile) {
+        const percentiles = [5, 10, 25, 50, 75, 90, 95];
+        let result = percentiles[0];
+
+        for (const value of percentiles) {
+            if (percentile >= value) {
+                result = value;
+            } else {
+                break;
+            }
+        }
+        return result;
     },
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
@@ -811,6 +844,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
         this.ageInMonths = parseInt(obj.ageInMonths);
+        this.ageInYears = parseInt(obj.ageInYears);
         console.log('ageInMonths', this.ageInMonths);
         this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;
         this.bpDiastolicHeightPercentileChart = obj.bpDiastolicHeightPercentileChart;

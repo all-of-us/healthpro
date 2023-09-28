@@ -8,6 +8,7 @@ $(document).ready(function () {
         conversions: measurement.data("conversions"),
         finalized: measurement.data("finalized"),
         ageInMonths: measurement.data("age-in-months"),
+        ageInYears: measurement.data("age-in-years"),
         weightForAgeCharts: measurement.data("weight-for-age-charts"),
         weightForLengthCharts: measurement.data("weight-for-length-charts"),
         heightForAgeCharts: measurement.data("height-for-age-charts"),

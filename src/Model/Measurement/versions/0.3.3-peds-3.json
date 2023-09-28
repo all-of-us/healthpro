@@ -306,22 +306,32 @@
       "max": 300,
       "warnings": [
         {
-          "max": 200,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "maxValue": 140,
+          "addValue": 30,
+          "percentile": "bp-systolic",
+          "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "max": 180,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "maxValue": 140,
+          "addValue": 12,
+          "percentile": "bp-systolic",
+          "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "min": 100,
-          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-          "alert": true,
-          "consecutive": 2
+          "maxValue": 140,
+          "addValue": 30,
+          "percentile": "bp-systolic",
+          "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
+        },
+        {
+          "maxValue": 140,
+          "addValue": 12,
+          "percentile": "bp-systolic",
+          "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
         },
         {
           "min": 88,
@@ -346,22 +356,32 @@
       },
       "warnings": [
         {
-          "max": 120,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "maxValue": 90,
+          "addValue": 30,
+          "percentile": "bp-diastolic",
+          "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "max": 110,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "maxValue": 90,
+          "addValue": 12,
+          "percentile": "bp-diastolic",
+          "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "min": 60,
-          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-          "alert": true,
-          "consecutive": 2
+          "maxValue": 90,
+          "addValue": 30,
+          "percentile": "bp-diastolic",
+          "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
+        },
+        {
+          "maxValue": 90,
+          "addValue": 12,
+          "percentile": "bp-diastolic",
+          "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
         },
         {
           "min": 45,
