@@ -103,6 +103,9 @@ class MeasurementService
         if ($type === Measurement::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
             return Measurement::BLOOD_DONOR_CURRENT_VERSION;
         }
+        if (str_starts_with($type, 'peds-')) {
+            return Measurement::CURRENT_VERSION . '-' . $type;
+        }
         if ($this->requireEhrModificationProtocol()) {
             return Measurement::EHR_CURRENT_VERSION;
         }

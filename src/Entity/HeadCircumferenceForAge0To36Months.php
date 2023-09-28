@@ -6,6 +6,7 @@ use App\Repository\HeadCircumferenceForAge0To36MonthsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HeadCircumferenceForAge0To36MonthsRepository::class)]
+#[ORM\Table(name: 'head_circumference_for_age_0_to_36months')]
 class HeadCircumferenceForAge0To36Months
 {
     #[ORM\Id]
