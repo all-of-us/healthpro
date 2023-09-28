@@ -13,6 +13,9 @@ $(document).ready(function () {
         heightForAgeCharts: measurement.data("height-for-age-charts"),
         headCircumferenceForAgeCharts: measurement.data("head-circumference-for-age-charts"),
         bmiForAgeCharts: measurement.data("bmi-for-age-charts"),
+        bpSystolicHeightPercentileChart: measurement.data("bp-systolic-height-percentile-charts"),
+        bpDiastolicHeightPercentileChart: measurement.data("bp-diastolic-height-percentile-charts"),
+        heartRateAgeCharts: measurement.data("heart-rate-age-charts"),
         zScoreCharts: measurement.data("z-score-charts")
     });
     $("#evaluationAffixSave")

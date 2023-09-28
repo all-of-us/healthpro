@@ -477,6 +477,31 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         if (!val) {
             return false;
         }
+        let ageInMonths = this.ageInMonths;
+        if (warning.hasOwnProperty('percentile')) {
+            if (warning.percentile === 'heart-rate') {
+                let centileValue;
+                this.heartRateAgeCharts.forEach((item) => {
+                    if (ageInMonths > item.startAge && ageInMonths < item.endAge) {
+                        centileValue = item[warning.percentileField];
+                    }
+                });
+                warning[warning.percentileType] = centileValue;
+                return this.warningCondition(warning, val);
+            }
+        }
+        if (warning.hasOwnProperty('age')) {
+            if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {
+                return this.warningCondition(warning, val);
+            }
+            return false;
+        }
+        if (warning.hasOwnProperty('percentile')) {
+
+        }
+        return this.warningCondition(warning, val);
+    },
+    warningCondition: function (warning, val) {
         return (
             (warning.min && val < warning.min) ||
             (warning.max && val > warning.max) ||
@@ -531,6 +556,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
             let consecutiveConditionsMet = 0;
             let isConsecutive = false;
+            console.log('values', values);
             $.each(values, function (k, val) {
                 if (self.warningConditionMet(warning, val)) {
                     consecutiveConditionsMet++;
@@ -786,6 +812,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.finalized = obj.finalized;
         this.ageInMonths = parseInt(obj.ageInMonths);
         console.log('ageInMonths', this.ageInMonths);
+        this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;
+        this.bpDiastolicHeightPercentileChart = obj.bpDiastolicHeightPercentileChart;
+        this.heartRateAgeCharts = obj.heartRateAgeCharts;
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
         this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];

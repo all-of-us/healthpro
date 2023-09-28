@@ -14,6 +14,9 @@
          data-height-for-age-charts="{{ heightForAgeCharts|json_encode }}"
          data-head-circumference-for-age-charts="{{ headCircumferenceForAgeCharts|json_encode }}"
          data-bmi-for-age-charts="{{ bmiForAgeCharts|json_encode }}"
+         data-bp-systolic-height-percentile-charts="{{ bpSystolicHeightPercentileChart|json_encode }}"
+         data-bp-diastolic-height-percentile-charts="{{ bpDiastolicHeightPercentileChart|json_encode }}"
+         data-heart-rate-age-charts="{{ heartRateAgeCharts|json_encode }}"
          data-z-score-charts="{{ zScoreCharts|json_encode }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}

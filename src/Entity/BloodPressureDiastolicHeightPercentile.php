@@ -22,25 +22,25 @@ class BloodPressureDiastolicHeightPercentile
     #[ORM\Column]
     private int $bpCentile;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_5')]
     private int $heightPer5;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_10')]
     private int $heightPer10;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_25')]
     private int $heightPer25;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_50')]
     private int $heightPer50;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_75')]
     private int $heightPer75;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_90')]
     private int $heightPer90;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'height_per_95')]
     private int $heightPer95;
 
     public function getId(): ?int

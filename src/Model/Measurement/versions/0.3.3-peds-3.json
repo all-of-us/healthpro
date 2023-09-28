@@ -30,7 +30,7 @@
       "warnings": [
         {
           "min": 7,
-          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select 'Weight is less than weight measuring range' for Modification to Weight Protocol."
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol."
 
         },
         {
@@ -400,16 +400,36 @@
       "max": 300,
       "warnings": [
         {
-          "max": 100,
-          "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "percentile": "heart-rate",
+          "percentileType": "max",
+          "percentileField": "centile99",
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "min": 60,
-          "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "percentile": "heart-rate",
+          "percentileType": "min",
+          "percentileField": "centile1",
+          "message": "Participant has very low heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
+        },
+        {
+          "percentile": "heart-rate",
+          "percentileType": "max",
+          "percentileField": "centile99",
+          "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "percentile": "heart-rate",
+          "percentileType": "min",
+          "percentileField": "centile1",
+          "message": "This value indicates very low heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "max": 175,
+          "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
         },
         {
           "min": 60,
