@@ -104,7 +104,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 .html(label);
         } else {
             meanElement.text("--");
-            meanElement.attr("data-mean", '');
+            meanElement.attr("data-mean", "");
             this.$("#convert-" + field).text();
         }
     },
@@ -637,6 +637,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         let field = input.closest(".field").data("field");
         let container = input.closest(".form-group");
         container.find(".metric-warnings").remove();
+        if (["height", "weight"].includes(field)) {
+            $("#weight-for-length-warning, #bmi-for-age-warning").text("");
+        }
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
