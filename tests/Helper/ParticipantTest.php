@@ -455,4 +455,25 @@ class ParticipantTest extends TestCase
         $this->assertSame(5.0, $participant->getPediatricWeightBreakpoint(3.1));
         $this->assertSame(9999.0, $participant->getPediatricWeightBreakpoint(29));
     }
+
+    public function testGetAgeInMonthsProvider()
+    {
+        return
+        [
+            [new Participant((object)['dateOfBirth' => '1985-01-01'])],
+            [new Participant((object)['dateOfBirth' => '1991-01-01'])],
+            [new Participant((object)['dateOfBirth' => '2003-01-01'])],
+            [new Participant((object)['dateOfBirth' => '2022-01-01'])],
+            [new Participant((object)['dateOfBirth' => '2022-05-01'])],
+        ];
+    }
+
+    /**
+     * @dataProvider testGetAgeInMonthsProvider
+     */
+    public function testGetAgeInMonths($participant)
+    {
+        $currentAgeInMonths = $participant->dob->diff(new \DateTime())->m + ($participant->dob->diff(new \DateTime())->y * 12);
+        $this->assertSame($currentAgeInMonths, $participant->getAgeInMonths());
+    }
 }
