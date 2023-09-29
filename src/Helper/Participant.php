@@ -68,6 +68,12 @@ class Participant
         'PENDING',
         'APPROVED'
     ];
+    private static $pediatricWeightBreakpoints = [
+        9999,
+        16.4,
+        5,
+        2.5
+    ];
 
     public function __construct($rdrParticipant = null)
     {
@@ -485,5 +491,16 @@ class Participant
                 $incentiveDate['year'];
         }
         return '';
+    }
+
+    public function getPediatricWeightBreakpoint(float $weight): float
+    {
+        $breakpoint = 0;
+        foreach (self::$pediatricWeightBreakpoints as $value) {
+            if ($weight < $value) {
+                $breakpoint = $value;
+            }
+        }
+        return $breakpoint;
     }
 }

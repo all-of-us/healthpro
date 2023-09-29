@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Helper\Participant;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -877,17 +878,33 @@ class Order
         return $this->currentVersion;
     }
 
-    public function loadSamplesSchema($params = [])
+    public function loadSamplesSchema($params = [], Participant $participant = null, Measurement $physicalMeasurement = null)
     {
         $this->currentVersion = $this->getVersion();
+        if ($participant) {
+            $pediatricFlag = $participant->isPediatric;
+        } else {
+            $pediatricFlag = false;
+        }
+        if ($pediatricFlag && $physicalMeasurement) {
+            $data = json_decode($physicalMeasurement->getData());
+            $weightVer = $participant->getPediatricWeightBreakpoint($data->weight);
+        }
         if (empty($this->currentVersion)) {
             if (!empty($this->getId())) {
                 // Initial orders doesn't have a version so set version for those orders
                 $this->currentVersion = self::INITIAL_VERSION;
+                if ($pediatricFlag) {
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$weightVer}";
+                }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
+                if ($pediatricFlag) {
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$weightVer}";
+                }
             }
         }
+
         $this->params = $params;
         $file = __DIR__ . "/../Order/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {

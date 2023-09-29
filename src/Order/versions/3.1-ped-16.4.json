@@ -1,0 +1,40 @@
+{
+    "version": "4",
+    "notes": "Pediatric launch samples",
+    "samplesInformation": {
+        "1ED02": {
+            "number": 1,
+            "label": "2mL EDTA",
+            "temperature": "Refrigerated",
+            "color": "Lavender",
+            "specimen": "2mL EDTA"
+        },
+        "1ED04": {
+            "number": 2,
+            "label": "4 ml EDTA",
+            "temperature": "Refrigerated",
+            "color": "Lavender",
+            "specimen": "4 mL EDTA"
+        },
+        "1UR10": {
+            "number": 3,
+            "label": "Urine 10 mL",
+            "color": "Yellow",
+            "temperature": "Refrigerated",
+            "specimen": "Urine 10 mL",
+            "labelCount": 2
+        }
+    },
+    "urineSamplesInformation": {
+
+    },
+    "salivaSamplesInformation": {
+        "1SAL2": {
+            "label": "Saliva [1SAL2]",
+            "temperature": "Refrigerated",
+            "specimen": "PMI Saliva, FDA Kit",
+            "color": "Clear"
+        }
+    },
+    "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide both the 4 mL EDTA tube and the 10 mL EDTA tube."
+}

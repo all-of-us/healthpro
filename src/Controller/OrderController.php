@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Site;
 use App\Form\OrderCreateType;
@@ -98,8 +99,9 @@ class OrderController extends BaseController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
+        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentMeasurementWithoutParent($participant->id);
         $order = new Order();
-        $this->orderService->loadSamplesSchema($order);
+        $this->orderService->loadSamplesSchema($order, $participant, $physicalMeasurement);
         $createForm = $this->createForm(OrderCreateType::class, null, [
             'orderType' => $session->get('orderType'),
             'samples' => $order->getSamples(),

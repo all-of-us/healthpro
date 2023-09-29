@@ -3,10 +3,12 @@
 namespace App\Service;
 
 use App\Audit\Log;
+use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\Site;
 use App\Entity\User;
+use App\Helper\Participant;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
@@ -26,7 +28,7 @@ class OrderService
     protected $userService;
     protected $siteService;
     protected $loggerService;
-    protected $order;
+    protected Order $order;
     protected $participant;
 
     public function __construct(
@@ -47,11 +49,11 @@ class OrderService
         $this->loggerService = $loggerService;
     }
 
-    public function loadSamplesSchema($order)
+    public function loadSamplesSchema($order, Participant $participant = null, Measurement $physicalMeasurement = null)
     {
         $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order']);
         $this->order = $order;
-        $this->order->loadSamplesSchema($params);
+        $this->order->loadSamplesSchema($params, $participant, $physicalMeasurement);
     }
 
     public function setParticipant($participant)
