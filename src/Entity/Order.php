@@ -226,6 +226,9 @@ class Order
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $submissionTs;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $ageInMonths;
+
     private $quanumCollectedUser;
 
     private $quanumProcessedUser;
@@ -876,6 +879,18 @@ class Order
     public function getCurrentVersion()
     {
         return $this->currentVersion;
+    }
+
+    public function getAgeInMonths(): int
+    {
+        return $this->ageInMonths;
+    }
+
+    public function setAgeInMonths(?int $ageInMonths): self
+    {
+        $this->ageInMonths = $ageInMonths;
+
+        return $this;
     }
 
     public function loadSamplesSchema($params = [], Participant $participant = null, Measurement $physicalMeasurement = null)
