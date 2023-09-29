@@ -204,8 +204,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             bmiElement.html("<strong>" + bmi + "</strong>");
             bmiElement.attr("data-bmi", bmi);
             this.calculatePercentile("bmi-for-age", parseFloat(bmi));
-            if (bmi < 15 || bmi > 50) {
-                this.$("#bmi-warning").text("Please verify that the height and weight are correct");
+            if (bmi < 10 || bmi > 31) {
+                this.$("#bmi-warning").text("Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height.");
             }
         } else {
             this.$("#bmi").text("--");
