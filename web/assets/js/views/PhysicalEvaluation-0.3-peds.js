@@ -653,7 +653,11 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                             btnTextFalse: "Clear value and reenter"
                         });
                     }
-                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    if (warning.hasOwnProperty('percentile') &&  warning.percentile === 'weight-for-length' || warning.percentile === 'bmi-for-age'  ) {
+                        $("#" + warning.percentile + "-warning").html(warning.message);
+                    } else {
+                        container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    }
                     return false; // only show first (highest priority) warning
                 }
             });
