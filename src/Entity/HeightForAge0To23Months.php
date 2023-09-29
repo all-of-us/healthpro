@@ -6,6 +6,7 @@ use App\Repository\HeightForAge0To23MonthsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HeightForAge0To23MonthsRepository::class)]
+#[ORM\Table(name: 'height_for_age_0_to_23_months')]
 class HeightForAge0To23Months
 {
     #[ORM\Id]

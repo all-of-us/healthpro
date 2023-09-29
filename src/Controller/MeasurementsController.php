@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\User;
+use App\Entity\ZScores;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
@@ -59,6 +60,9 @@ class MeasurementsController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $type = $request->query->get('type');
+        if ($participant->isPediatric && $participant->pediatricMeasurementsVersionType) {
+            $type = $participant->pediatricMeasurementsVersionType;
+        }
         if (!$this->measurementService->canEdit(
             $measurementId,
             $participant
@@ -246,6 +250,7 @@ class MeasurementsController extends BaseController
                 $showAutoModification = $measurement->canAutoModify();
             }
         }
+        $growthCharts = $measurement->getGrowthChartsByAge($participant->ageInMonths);
         return $this->render('measurement/index.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
@@ -260,7 +265,13 @@ class MeasurementsController extends BaseController
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
             'readOnlyView' => $this->isReadOnly(),
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
-            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled()
+            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
+            'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'zScoreCharts' => $participant->isPediatric ? $this->em->getRepository(ZScores::class)->getChartsData() : []
         ]);
     }
 

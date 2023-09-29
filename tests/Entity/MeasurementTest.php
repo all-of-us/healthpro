@@ -2,8 +2,16 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\BmiForAge5YearsAndUp;
+use App\Entity\HeadCircumferenceForAge0To36Months;
+use App\Entity\HeightForAge0To23Months;
+use App\Entity\HeightForAge24MonthsTo6Years;
 use App\Entity\Measurement;
 use App\Entity\User;
+use App\Entity\WeightForAge0To23Months;
+use App\Entity\WeightForAge24MonthsAndUp;
+use App\Entity\WeightForLength0To23Months;
+use App\Entity\WeightForLength23MonthsTo5Years;
 use App\Entity\ZScores;
 use App\Exception\MissingSchemaException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -232,6 +240,51 @@ class MeasurementTest extends KernelTestCase
             [-3.93, 0.004],
             [3.93, 99.996],
             [4, null]
+        ];
+    }
+
+
+    /**
+     * @dataProvider ageDataProvider
+     */
+    public function testGetGrowthChartsByAge(int $ageInMonths, $expectedResult)
+    {
+        $measurement = new Measurement();
+        $result = $measurement->getGrowthChartsByAge($ageInMonths);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function ageDataProvider(): array
+    {
+        return [
+            [0, [
+                'weightForAgeCharts' => WeightForAge0To23Months::class,
+                'heightForAgeCharts' => HeightForAge0To23Months::class,
+                'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
+                'weightForLengthCharts' => WeightForLength0To23Months::class,
+                'bmiForAgeCharts' => null,
+            ]],
+            [12, [
+                'weightForAgeCharts' => WeightForAge0To23Months::class,
+                'heightForAgeCharts' => HeightForAge0To23Months::class,
+                'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
+                'weightForLengthCharts' => WeightForLength0To23Months::class,
+                'bmiForAgeCharts' => null,
+            ]],
+            [25, [
+                'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
+                'heightForAgeCharts' => HeightForAge24MonthsTo6Years::class,
+                'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
+                'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
+                'bmiForAgeCharts' => null,
+            ]],
+            [60, [
+                'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
+                'heightForAgeCharts' => HeightForAge24MonthsTo6Years::class,
+                'headCircumferenceForAgeCharts' => null,
+                'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
+                'bmiForAgeCharts' => BmiForAge5YearsAndUp::class,
+            ]],
         ];
     }
 }
