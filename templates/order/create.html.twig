@@ -43,9 +43,11 @@
                                     <p>
                                         <button type="submit" name="standard" class="btn btn-primary">Create</button>
                                     </p>
+                                    {% if participant.isPediatric == false %}
                                     <p>
                                         <a href="#" id="customize-enable">Customize order</a>
                                     </p>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
