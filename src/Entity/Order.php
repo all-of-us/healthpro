@@ -886,21 +886,19 @@ class Order
         } else {
             $pediatricFlag = false;
         }
-        if ($pediatricFlag && $physicalMeasurement) {
-            $data = json_decode($physicalMeasurement->getData());
-            $weightVer = $participant->getPediatricWeightBreakpoint($data->weight);
-        }
         if (empty($this->currentVersion)) {
             if (!empty($this->getId())) {
                 // Initial orders doesn't have a version so set version for those orders
                 $this->currentVersion = self::INITIAL_VERSION;
-                if ($pediatricFlag) {
-                    $this->currentVersion = "{$this->currentVersion}-ped-{$weightVer}";
+                if ($pediatricFlag && $physicalMeasurement) {
+                    $data = json_decode($physicalMeasurement->getData());
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($data->weight)}";
                 }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
-                if ($pediatricFlag) {
-                    $this->currentVersion = "{$this->currentVersion}-ped-{$weightVer}";
+                if ($pediatricFlag && $physicalMeasurement) {
+                    $data = json_decode($physicalMeasurement->getData());
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($data->weight)}";
                 }
             }
         }
