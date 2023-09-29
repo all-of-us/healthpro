@@ -308,7 +308,7 @@
         {
           "maxValue": 140,
           "addValue": 30,
-          "percentile": "bp-systolic",
+          "customPercentile": "bp-systolic",
           "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
@@ -316,7 +316,7 @@
         {
           "maxValue": 140,
           "addValue": 12,
-          "percentile": "bp-systolic",
+          "customPercentile": "bp-systolic",
           "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
@@ -324,13 +324,13 @@
         {
           "maxValue": 140,
           "addValue": 30,
-          "percentile": "bp-systolic",
+          "customPercentile": "bp-systolic",
           "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
         },
         {
           "maxValue": 140,
           "addValue": 12,
-          "percentile": "bp-systolic",
+          "customPercentile": "bp-systolic",
           "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
         },
         {
@@ -358,7 +358,7 @@
         {
           "maxValue": 90,
           "addValue": 30,
-          "percentile": "bp-diastolic",
+          "customPercentile": "bp-diastolic",
           "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
@@ -366,7 +366,7 @@
         {
           "maxValue": 90,
           "addValue": 12,
-          "percentile": "bp-diastolic",
+          "customPercentile": "bp-diastolic",
           "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
@@ -374,13 +374,13 @@
         {
           "maxValue": 90,
           "addValue": 30,
-          "percentile": "bp-diastolic",
+          "customPercentile": "bp-diastolic",
           "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
         },
         {
           "maxValue": 90,
           "addValue": 12,
-          "percentile": "bp-diastolic",
+          "customPercentile": "bp-diastolic",
           "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
         },
         {
@@ -420,7 +420,7 @@
       "max": 300,
       "warnings": [
         {
-          "percentile": "heart-rate",
+          "customPercentile": "heart-rate",
           "percentileType": "max",
           "percentileField": "centile99",
           "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
@@ -428,7 +428,7 @@
           "consecutive": 2
         },
         {
-          "percentile": "heart-rate",
+          "customPercentile": "heart-rate",
           "percentileType": "min",
           "percentileField": "centile1",
           "message": "Participant has very low heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
@@ -436,13 +436,13 @@
           "consecutive": 2
         },
         {
-          "percentile": "heart-rate",
+          "customPercentile": "heart-rate",
           "percentileType": "max",
           "percentileField": "centile99",
           "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
         },
         {
-          "percentile": "heart-rate",
+          "customPercentile": "heart-rate",
           "percentileType": "min",
           "percentileField": "centile1",
           "message": "This value indicates very low heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."

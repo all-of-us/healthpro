@@ -120,11 +120,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
         });
         console.log(field, "lms", lmsValues);
+        const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
-        console.log(field, "zscore", zScore);
+        percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
-        console.log(field, "percentile", percentile);
-        this.$("#percentile-" + field).html("<strong>" + percentile + "</strong>th");
+        percentileElement.html("<strong>" + percentile + "</strong>th");
+        percentileElement.attr("data-percentile", percentile);
     },
     calculateWeightForLengthPercentile: function () {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
@@ -139,12 +140,13 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                     lmsValues["S"] = item.S;
                 }
             });
+            const percentileElement = this.$("#percentile-weight-for-length");
             console.log("lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
-            console.log("zscore", zScore);
+            percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
-            console.log("percentile", percentile);
-            this.$("#percentile-weight-for-length").html("<strong>" + percentile + "</strong>th");
+            percentileElement.html("<strong>" + percentile + "</strong>th");
+            percentileElement.attr("data-percentile", percentile);
         }
     },
     getZScore: function (X, lmsValues) {
@@ -477,8 +479,8 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         if (!val) {
             return false;
         }
-        if (warning.hasOwnProperty("percentile")) {
-            if (warning.percentile === "heart-rate") {
+        if (warning.hasOwnProperty("customPercentile")) {
+            if (warning.customPercentile === "heart-rate") {
                 let maxMinValue = null;
                 for (const heartRate of this.heartRateAgeCharts) {
                     if (this.ageInMonths > heartRate.startAge && this.ageInMonths < heartRate.endAge) {
@@ -489,7 +491,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 warning[warning.percentileType] = maxMinValue;
                 return this.warningCondition(warning, val);
             }
-            if (warning.percentile === "bp-systolic" || warning.percentile === "bp-diastolic") {
+            if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
                 let maxValue = null;
                 let heightPercentileField = "heightPer5";
                 let heightPercentile = $("#percentile-height-for-age");
@@ -498,7 +500,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                     heightPercentileField = "heightPer" + nearestPercentile;
                 }
                 const bpHeightPercentileCharts =
-                    warning.percentile === "bp-systolic"
+                    warning.customPercentile === "bp-systolic"
                         ? this.bpSystolicHeightPercentileChart
                         : this.bpDiastolicHeightPercentileChart;
                 for (const bpHeightPercentile of bpHeightPercentileCharts) {
@@ -510,17 +512,20 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 if (maxValue > warning.maxValue) {
                     maxValue = warning.maxValue;
                 }
-                console.log(warning.percentile, "warningValue", maxValue);
+                console.log(warning.customPercentile, "warningValue", maxValue);
                 return val >= maxValue;
             }
+        }
+        if (warning.hasOwnProperty("deviation")) {
+            let deviationField = warning.deviation;
+            let zscore = Math.abs($("#percentile-" + deviationField + "-for-age").attr('data-zscore'));
+            return zscore > warning.max;
         }
         if (warning.hasOwnProperty("age")) {
             if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {
                 return this.warningCondition(warning, val);
             }
             return false;
-        }
-        if (warning.hasOwnProperty("percentile")) {
         }
         return this.warningCondition(warning, val);
     },
