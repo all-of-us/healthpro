@@ -28,6 +28,7 @@ class Participant
     public $evaluationFinalizedSite;
     public $orderCreatedSite;
     public $age;
+    public $ageInMonths;
     public $patientStatus;
     public $isCoreParticipant = false;
     public $isCoreMinusPMParticipant = false;
@@ -46,7 +47,9 @@ class Participant
     public $nphDeactivationAuthored = '';
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
+    public int $sexAtBirth;
     public bool $isPediatric = false;
+    public string $pediatricMeasurementsVersionType;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -73,6 +76,13 @@ class Participant
         16.4,
         5,
         2.5
+    ];
+
+    private static array $pediatricAgeRangeMeasurementVersions = [
+        'peds-1' => [0, 23],
+        'peds-2' => [24, 35],
+        'peds-3' => [36, 59],
+        'peds-4' => [60, 83],
     ];
 
     public function __construct($rdrParticipant = null)
@@ -261,13 +271,15 @@ class Participant
         return $breakpoint;
     }
 
-    public function getAgeInMonths(): ?int
+    private function getAgeInMonths(): ?int
     {
-        if (!$this->dob) {
-            return null;
-        }
-        $diff = $this->dob->diff(new \DateTime());
-        return ($diff->y * 12) + $diff->m;
+        $now = new \DateTime();
+        $diff = $now->diff($this->dob);
+
+        $yearsInMonths = $diff->y * 12;
+        $months = $diff->m;
+
+        return $yearsInMonths + $months;
     }
 
     private function parseRdrParticipant($participant)
@@ -372,6 +384,12 @@ class Participant
                 break;
         }
 
+        $this->sexAtBirth = match ($participant->sex ?? null) {
+            'SexAtBirth_Male' => 1,
+            'SexAtBirth_Female' => 2,
+            default => 0,
+        };
+
         // Set dob to DateTime object
         if (isset($participant->dateOfBirth)) {
             try {
@@ -393,6 +411,7 @@ class Participant
 
         //Set age
         $this->age = $this->getAge();
+        $this->ageInMonths = $this->getAgeInMonths();
 
         // Remove site prefix
         if (!empty($participant->clinicPhysicalMeasurementsFinalizedSite) && $participant->clinicPhysicalMeasurementsFinalizedSite !== 'UNSET') {
@@ -464,6 +483,22 @@ class Participant
 
         if (isset($participant->consentForNphModule1Authored)) {
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
+        }
+
+        if (isset($participant->isPediatric) && $participant->isPediatric) {
+            $this->isPediatric = true;
+        }
+
+        if ($this->isPediatric) {
+            $measurementVersionType = '';
+            foreach (self::$pediatricAgeRangeMeasurementVersions as $key => $range) {
+                list($start, $end) = $range;
+                if ($this->getAgeInMonths() >= $start && $this->getAgeInMonths() <= $end) {
+                    $measurementVersionType = $key;
+                    break;
+                }
+            }
+            $this->pediatricMeasurementsVersionType = $measurementVersionType;
         }
     }
 

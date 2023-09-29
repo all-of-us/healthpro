@@ -1,0 +1,391 @@
+{% import 'measurementform/metrics.html.twig' as metrics %}
+
+<div class="well">
+    <div class="row">
+        <div class="col-sm-4">
+            {{ metrics.form_row(measurementForm, schema.fields['wheelchair']) }}
+        </div>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Weight and Height/Length
+        </h3>
+    </div>
+    <div class="panel-body">
+        <h4>Weight</h4>
+        <div class="row replicate row-equal-height">
+            {% for i in 0..2 %}
+                <div class="col-sm-4">
+                    <div class="panel panel-default panel-weight-{{ i + 1 }}">
+                        <div class="panel-body">
+                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <div class="modification-block">
+                                <div class="modification-affected">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['weight'], i) }}
+                                    {% if i == 2 %}
+                                        <p class="text-info">Third measurement is required when first two differ by more than 0.1 kg</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modification-toggle text-right">
+                                    <a class="small">Add protocol modification</a>
+                                </div>
+                                <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification-notes'], i) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <h4>Height/Length</h4>
+        <div class="well">
+            <div class="row">
+                <div class="col-sm-4">
+                    {{ metrics.form_row(measurementForm, schema.fields['height-or-length']) }}
+                </div>
+            </div>
+        </div>
+        <div class="row replicate row-equal-height">
+            {% for i in 0..2 %}
+                <div class="col-sm-4">
+                    <div class="panel panel-default panel-height-{{ i + 1 }}">
+                        <div class="panel-body">
+                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <div class="modification-block">
+                                <div class="modification-affected">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['height'], i) }}
+                                    {% if i == 2 %}
+                                        <p class="text-info">Third measurement is required when first two differ by more than 1.0 cm</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modification-toggle text-right">
+                                    <a class="small">Add protocol modification</a>
+                                </div>
+                                <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['height-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['height-protocol-modification-notes'], i) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Average</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="lead">
+                            Weight
+                            <span id="mean-weight"></span>
+                            {{ schema.fields['weight'].unit }}
+                            <span id="convert-weight"></span>
+                            <small class="text-muted">(average of two closest measures)</small>
+                        </p>
+                        <p class="lead">
+                            Height/Length
+                            <span id="mean-height"></span>
+                            {{ schema.fields['height'].unit }}
+                            <span id="convert-height"></span>
+                            <small class="text-muted">(average of two closest measures)</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Growth Percentile</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="lead">
+                            Weight <span id="percentile-weight-for-age">--</span> percentile
+                        </p>
+                        <p class="lead">
+                            Height/Length <span id="percentile-height-for-age">--</span> percentile
+                        </p>
+                        {% if schema.displayWeightForLength == true %}
+                            <p class="lead">
+                                Weight-for-Length <span id="percentile-weight-for-length">--</span> percentile
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if schema.displayBmi is defined and schema.displayBmi == true %}
+                <div class="col-sm-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                BMI
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p class="lead">
+                                BMI <span id="bmi">--</span>
+                            </p>
+                            <p class="lead">
+                                BMI Percentile <span id="percentile-bmi-for-age">--</span> percentile
+                            </p>
+                            <div id="bmi-warning" class="metric-warnings text-warning"></div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="panel panel-default" id="panel-hip-waist">
+    <div class="panel-heading">
+        <div class="pull-right" id="hip-waist-skip"></div>
+        <h3 class="panel-title">
+            {% if schema.fields['waist-circumference-protocol-modification'] is defined and schema.fields['head-circumference-protocol-modification'] is defined %}
+                Head and Waist Circumference
+            {% elseif schema.fields['waist-circumference-protocol-modification'] is defined  %}
+                Waist Circumference
+            {% else %}
+                Head Circumference
+            {% endif %}
+        </h3>
+    </div>
+    <div class="panel-body">
+        {% if schema.fields['head-circumference-protocol-modification'] is defined %}
+            <h4>Head Circumference</h4>
+            <div class="row replicate row-equal-height">
+                {% for i in 0..2 %}
+                    <div class="col-sm-4">
+                        <div class="panel panel-default panel-head-circumference-{{ i + 1 }}">
+                            <div class="panel-body">
+                                <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                                <div class="modification-block">
+                                    <div class="modification-affected">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference'], i) }}
+                                        {% if i == 2 %}
+                                            <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="modification-toggle text-right">
+                                        <a class="small">Add protocol modification</a>
+                                    </div>
+                                    <div class="modification-select" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference-protocol-modification'], i) }}
+                                        <div class="modification-notes" style="display:none">
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference-protocol-modification-notes'], i) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <hr>
+        {% endif %}
+        {% if schema.fields['waist-circumference'] is defined %}
+            <h4>Waist Circumference</h4>
+            <div class="well">
+                <div class="row">
+                    <div class="col-sm-4">
+                        {{ metrics.form_row(measurementForm, schema.fields['waist-circumference-location']) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row replicate row-equal-height">
+                {% for i in 0..2 %}
+                    <div class="col-sm-4">
+                        <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
+                            <div class="panel-body">
+                                <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                                <div class="modification-block">
+                                    <div class="modification-affected">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference'], i) }}
+                                        {% if i == 2 %}
+                                            <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="modification-toggle text-right">
+                                        <a class="small">Add protocol modification</a>
+                                    </div>
+                                    <div class="modification-select" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification'], i) }}
+                                        <div class="modification-notes" style="display:none">
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <hr>
+        {% endif %}
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Average</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% if schema.fields['head-circumference'] is defined %}
+                            <p class="lead">
+                                Head Circumference:
+                                <span id="mean-head-circumference"></span>
+                                {{ schema.fields['head-circumference'].unit }}
+                                <span id="convert-head-circumference"></span>
+                                <small class="text-muted">(average of two closest measures)</small>
+                            </p>
+                        {% endif %}
+                        {% if schema.fields['waist-circumference'] is defined %}
+                            <p class="lead">
+                                Waist Circumference:
+                                <span id="mean-waist-circumference"></span>
+                                {{ schema.fields['waist-circumference'].unit }}
+                                <span id="convert-waist-circumference"></span>
+                                <small class="text-muted">(average of two closest measures)</small>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if schema.fields['head-circumference'] is defined %}
+                <div class="col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Growth Percentile</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% if schema.fields['head-circumference-protocol-modification'] is defined %}
+                            <p class="lead">
+                                Head Circumference <span id="percentile-head-circumference-for-age">--</span> percentile
+                            </p>
+                        {% endif %}
+                        {% if schema.fields['waist-circumference-protocol-modification'] is defined %}
+                            <i>
+                                Pediatric waist circumference percentile is not currently captured by the program.
+                            </i>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Heart Rate {% if schema.fields['blood-pressure-position'] is defined %} and Blood Pressure {% endif %}
+        </h3>
+    </div>
+    <div class="panel-body">
+        <h4>Heart Rate {% if schema.fields['blood-pressure-position'] is defined %} and Blood Pressure {% endif %}</h4>
+        <div class="well">
+            <div class="row">
+                <div class="col-sm-3">
+                    {{ metrics.form_row(measurementForm, schema.fields['heart-rate-position']) }}
+                </div>
+                <div class="col-sm-3">
+                    {{ metrics.form_row(measurementForm, schema.fields['heart-rate-method']) }}
+                </div>
+                {% if schema.fields['blood-pressure-position'] is defined %}
+                    <div class="col-sm-3">
+                        {{ metrics.form_row(measurementForm, schema.fields['blood-pressure-position']) }}
+                    </div>
+                {% endif %}
+                {% if schema.fields['blood-pressure-location'] is defined %}
+                    <div class="col-sm-3">
+                        {{ metrics.form_row(measurementForm, schema.fields['blood-pressure-location']) }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row replicate row-equal-height">
+            {% for i in 0..2 %}
+                <div class="col-sm-4">
+                    <div class="panel panel-default panel-heart-rate-{{ i + 1 }}">
+                        <div class="panel-body">
+                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                            <div class="modification-block">
+                                <div class="modification-affected">
+                                    {% if schema.fields['blood-pressure-systolic'] is defined %}
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-systolic'], i) }}
+                                    {% endif %}
+                                    {% if schema.fields['blood-pressure-diastolic'] is defined %}
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-diastolic'], i) }}
+                                    {% endif %}
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['heart-rate'], i) }}
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['irregular-heart-rate'], i) }}
+                                </div>
+                                <div class="modification-toggle text-right">
+                                    <a class="small">Add protocol modification</a>
+                                </div>
+                                <div class="modification-select" style="display:none">
+                                    {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification'], i) }}
+                                    <div class="modification-notes" style="display:none">
+                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
+                                    </div>
+                                    {% if schema.fields['manual-heart-rate'] is defined %}
+                                        <div class="modification-manual">
+                                            {% if schema.fields['manual-blood-pressure'] is defined %}
+                                                {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-blood-pressure'], i) }}
+                                            {% endif %}
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-heart-rate'], i) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if i == 2 %}
+                                    <p class="text-info">Third measurement is required when first two differ by more than 5 bpm</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Average</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="lead bp-warnings">
+                            Heart rate:
+                            <span id="mean-heart-rate"></span>
+                            {{ schema.fields['heart-rate'].unit }}
+                            <small class="text-muted">(average of two closest measures)</small>
+                            {% if schema.fields['blood-pressure-location'] is defined %}
+                                <br/>
+                                Blood pressure:
+                                <span id="mean-blood-pressure-systolic">--</span>
+                                /
+                                <span id="mean-blood-pressure-diastolic">--</span>
+                                {{ schema.fields['blood-pressure-systolic'].unit }}
+                                <small class="text-muted">(average of two closest measures)</small>
+                                <div id="blood-pressure-systolic-warning"></div>
+                                <div id="blood-pressure-diastolic-warning"></div>
+                            {% endif %}
+                            <div id="heart-rate-warning"></div>
+                            <div id="irregular-heart-rate-warning"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

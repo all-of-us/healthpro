@@ -1,0 +1,509 @@
+{
+  "version": "0.3.3-peds-3",
+  "template": "0.3-peds",
+  "description": "Pediatric participants 3 to 5 years (36 to 59 months) old",
+  "fields": [
+    {
+      "name": "wheelchair",
+      "label": "Is participant a wheelchair user?",
+      "options": {
+        "No": false,
+        "Yes": true
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": true,
+          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair user participants."
+        }
+      ]
+    },
+    {
+      "name": "weight",
+      "label": "Weight",
+      "unit": "kg",
+      "decimals": 1,
+      "replicates": 3,
+      "max": 1000,
+      "warnings": [
+        {
+          "min": 30,
+          "message": "Please verify that this weight is correct"
+        },
+        {
+          "max": 199.5,
+          "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+        }
+      ],
+      "convert": "lb",
+      "alternateunits": true,
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "weight-protocol-modification",
+      "label": "Modification to Weight Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Weight is more than weight measuring range": "weight-out-of-range",
+        "Weight is less than weight measuring range": "weight-below-range",
+        "Can't balance on scale": "cannot-balance-on-scale",
+        "Uses a wheelchair": "uses-wheelchair",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Clothing not removed": "clothing-not-removed",
+        "Dirty diaper": "dirty-diaper",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "weight-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "weight-below-range",
+          "message": "Deviation successfully captured. Please record the minimum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "cannot-balance-on-scale",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "uses-wheelchair",
+          "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to clothing."
+        },
+        {
+          "val": "dirty-diaper",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to diaper."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+        }
+      ]
+    },
+    {
+      "name": "weight-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "height-or-length",
+      "label": "Indicate Height or Length Measurement",
+      "options": {
+        "Length": "length",
+        "Height": "height"
+      }
+    },
+    {
+      "name": "height",
+      "label": "Height/Length",
+      "unit": "cm",
+      "decimals": 1,
+      "replicates": 3,
+      "max": 300,
+      "convert": "ftin",
+      "alternateunits": true,
+      "help": {
+        "image": "height.png"
+      },
+      "warnings": [
+        {
+          "min": 2.3,
+          "message": "Please verify that this height has been entered in centimeters, and not meters (1m = 100cm)"
+        },
+        {
+          "between": [3, 7.5],
+          "message": "Please verify that this height has been entered in centimeters, and not feet (1ft = 30.48cm)"
+        },
+        {
+          "between": [36, 89.9],
+          "message": "Please verify that this height has been entered in centimeters, and not inches (1in = 2.54cm)"
+        },
+        {
+          "max": 228,
+          "message": "Please verify that this height is correct."
+        }
+      ]
+    },
+    {
+      "name": "height-protocol-modification",
+      "label": "Modification to Height/Length Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Height is more than measuring device range": "height-out-of-range",
+        "Hair style": "hair-style",
+        "Uses a wheelchair": "uses-wheelchair",
+        "Unable to stand in a straight position": "unable-to-stand-straight",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "height-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the device in centimeters in the \"Height\" field."
+        },
+        {
+          "val": "hair-style",
+          "message": "Deviation successfully captured. Height measurement may be inaccurate due to hairstyle/headgear."
+        },
+        {
+          "val": "wheelchair-user",
+          "message": "Deviation successfully captured. Please record estimated participant height in the \"Height\" field. "
+        },
+        {
+          "val": "unable-to-stand-straight",
+          "message": "Deviation successfully captured. Height measurement may be inaccurate because the participant is unable to stand in a straight position."
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the height or length of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the height or length of the participant."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+        }
+      ]
+    },
+    {
+      "name": "height-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "waist-circumference",
+      "label": "Waist Circumference",
+      "unit": "cm",
+      "alternateunits": true,
+      "decimals": 1,
+      "replicates": 3,
+      "max": 300,
+      "warnings": [
+        {
+          "min": 50,
+          "max": 150,
+          "message": "Please verify that this circumference is correct"
+        }
+      ],
+      "convert": "in",
+      "help": {
+        "image": "waist.png"
+      }
+    },
+    {
+      "name": "waist-circumference-location",
+      "label": "Waist Circumference Location",
+      "options": {
+        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
+        "Umbilicus": "umbilicus"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "waist-circumference-protocol-modification",
+      "label": "Modification to Waist Circumference Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Waist is more than waist measuring device range": "waist-circumference-out-of-range",
+        "Clothing not removed": "clothing-not-removed",
+        "Colostomy bag": "colostomy-bag",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "waist-circumference-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the device in the \"waist circumference\" field"
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "colostomy-bag",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation."
+        }
+      ]
+    },
+    {
+      "name": "waist-circumference-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "blood-pressure-position",
+      "label": "Blood Pressure Position",
+      "options": {
+        "Sitting": "sitting",
+        "Standing": "standing",
+        "Laying": "laying"
+      }
+    },
+    {
+      "name": "blood-pressure-location",
+      "label": "Blood Pressure Location",
+      "options": ["Right arm", "Left arm"],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-systolic",
+      "label": "Systolic",
+      "unit": "mmHg",
+      "replicates": 3,
+      "max": 300,
+      "warnings": [
+        {
+          "max": 200,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 180,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "min": 100,
+          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 200,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "max": 180,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "min": 100,
+          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-diastolic",
+      "label": "Diastolic",
+      "unit": "mmHg",
+      "replicates": 3,
+      "max": 300,
+      "compare": {
+        "type": "less-than",
+        "field": "blood-pressure-systolic",
+        "message": "Diastolic pressure must be less than systolic pressure"
+      },
+      "warnings": [
+        {
+          "max": 120,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 110,
+          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "min": 60,
+          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 120,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "max": 110,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+        },
+        {
+          "min": 60,
+          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "heart-rate-position",
+      "label": "Heart Rate Position",
+      "options": {
+        "Sitting": "sitting",
+        "Standing": "standing",
+        "Laying": "laying"
+      }
+    },
+    {
+      "name": "heart-rate-method",
+      "label": "Heart Rate Method",
+      "options": {
+        "Apical": "apical",
+        "Automated": "automated",
+        "Radical": "radical",
+        "Brachial": "brachial"
+      }
+    },
+    {
+      "name": "heart-rate",
+      "label": "Heart Rate",
+      "unit": "bpm",
+      "replicates": 3,
+      "max": 300,
+      "warnings": [
+        {
+          "max": 100,
+          "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "min": 60,
+          "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "max": 100,
+          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+        },
+        {
+          "min": 60,
+          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "irregular-heart-rate",
+      "label": "Irregular Heart Rate",
+      "type": "checkbox",
+      "replicates": 3,
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-protocol-modification",
+      "label": "Modification to Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Crying": "crying",
+        "Urgent/emergent event": "emergency",
+        "Other": "other"
+      },
+      "warnings": [
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "crying",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation."
+        }
+      ]
+    },
+    {
+      "name": "blood-pressure-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "manual-blood-pressure",
+      "label": "Blood pressure measured manually",
+      "type": "checkbox",
+      "replicates": 3
+    },
+    {
+      "name": "manual-heart-rate",
+      "label": "Heart rate measured manually",
+      "type": "checkbox",
+      "replicates": 3
+    },
+    {
+      "name": "notes",
+      "label": "Additional Notes",
+      "type": "textarea"
+    }
+  ],
+  "displayWeightForLength": true
+}
