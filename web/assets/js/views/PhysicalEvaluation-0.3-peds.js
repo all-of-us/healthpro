@@ -62,6 +62,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                     values.push(parseFloat($(this).val()));
                 }
             });
+        const meanElement = this.$("#mean-" + field);
         if (values.length > 0) {
             if (values.length === 3) {
                 values.sort(function (a, b) {
@@ -81,7 +82,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 0
             );
             let mean = (sum / values.length).toFixed(1);
-            const meanElement = this.$("#mean-" + field);
             meanElement.html("<strong>" + mean + "</strong>");
             meanElement.attr("data-mean", mean);
             if (this.percentileFields.hasOwnProperty(field) && mean) {
@@ -103,9 +103,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 .next()
                 .html(label);
         } else {
-            this.$("#mean-" + field).text("--");
+            meanElement.text("--");
+            meanElement.attr("data-mean", '');
             this.$("#convert-" + field).text();
-            this.$("#percentile-" + field).text("--");
         }
     },
     calculatePercentile: function (field, X) {
