@@ -503,4 +503,13 @@ class Participant
         }
         return '';
     }
+
+    public function getAgeInMonths(): ?int
+    {
+        if (!$this->dob) {
+            return null;
+        }
+        $diff = $this->dob->diff(new \DateTime());
+        return ($diff->y * 12) + $diff->m;
+    }
 }

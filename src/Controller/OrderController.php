@@ -151,6 +151,7 @@ class OrderController extends BaseController
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
                 $order->setVersion($order->getCurrentVersion());
+                $order->setAgeInMonths($participant->getAgeInMonths());
                 if ($session->get('orderType') === 'hpo') {
                     $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
                 }
