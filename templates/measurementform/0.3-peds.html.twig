@@ -113,6 +113,7 @@
                         <p class="lead">
                             Weight <span id="percentile-weight-for-age">--</span> percentile
                         </p>
+                        <div id="weight-warning" class="metric-warnings text-warning"></div>
                         <p class="lead">
                             Height/Length <span id="percentile-height-for-age">--</span> percentile
                         </p>
@@ -120,6 +121,7 @@
                             <p class="lead">
                                 Weight-for-Length <span id="percentile-weight-for-length">--</span> percentile
                             </p>
+                            <div id="weight-for-length-warning" class="metric-warnings text-warning"></div>
                         {% endif %}
                     </div>
                 </div>
@@ -139,7 +141,7 @@
                             <p class="lead">
                                 BMI Percentile <span id="percentile-bmi-for-age">--</span> percentile
                             </p>
-                            <div id="bmi-warning" class="metric-warnings text-warning"></div>
+                            <div id="bmi-for-age-warning" class="metric-warnings text-warning"></div>
                         </div>
                     </div>
                 </div>
@@ -277,6 +279,7 @@
                                 Pediatric waist circumference percentile is not currently captured by the program.
                             </i>
                         {% endif %}
+                        <div id="head-circumference-warning" class="metric-warnings text-warning"></div>
                     </div>
                 </div>
             </div>

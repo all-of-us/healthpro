@@ -29,6 +29,30 @@
       "max": 1000,
       "warnings": [
         {
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "Multiple weight measurements indicate very low weight for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "Multiple height/length and weight measurements indicate very low weight-for-stature. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "This value may indicate very low weight for age if confirmed by repeat measure."
+        },
+        {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "The height/length and weight values may indicate very low weight-for-stature if confirmed by repeat measure."
+        },
+        {
           "min": 1,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol."
 
@@ -130,6 +154,18 @@
       },
       "warnings": [
         {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "Multiple height/length and weight measurements indicate very low weight-for-stature. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "The height/length and weight values may indicate very low weight-for-stature if confirmed by repeat measure."
+        },
+        {
           "between": [0, 2.3],
           "message": "Please verify that this number has been entered in centimeters, and not feet (1ft = 30.48cm)"
         },
@@ -211,14 +247,14 @@
       "max": 300,
       "warnings": [
         {
-          "deviation": "head-circumference",
+          "deviation": "head-circumference-for-age",
           "max": 2.5,
           "message": "This value indicates very large head circumference and risk for hydrocephalus. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "deviation": "head-circumference",
+          "deviation": "head-circumference-for-age",
           "max": 2.5,
           "message": "This value may indicate very large head circumference and risk for hydrocephalus if confirmed by repeat measure."
         },
