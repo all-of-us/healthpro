@@ -205,7 +205,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             bmiElement.attr("data-bmi", bmi);
             this.calculatePercentile("bmi-for-age", parseFloat(bmi));
             if (bmi < 10 || bmi > 31) {
-                this.$("#bmi-warning").text("Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height.");
+                this.$("#bmi-warning").text(
+                    "Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height."
+                );
             }
         } else {
             this.$("#bmi").text("--");
@@ -518,12 +520,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         }
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
-            let zscore = Math.abs($("#percentile-" + deviationField).attr('data-zscore'));
+            let zscore = Math.abs($("#percentile-" + deviationField).attr("data-zscore"));
             return zscore > warning.max;
         }
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
-            let percentile = Math.round($("#percentile-" + percentileField).attr('data-percentile'));
+            let percentile = Math.round($("#percentile-" + percentileField).attr("data-percentile"));
             return percentile < warning.min;
         }
         if (warning.hasOwnProperty("age")) {
@@ -614,7 +616,10 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                         btnTextFalse: "Clear value and reenter"
                     });
                 }
-                if (warning.hasOwnProperty('percentile') &&  warning.percentile === 'weight-for-length' || warning.percentile === 'bmi-for-age'  ) {
+                if (
+                    (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-length") ||
+                    warning.percentile === "bmi-for-age"
+                ) {
                     field = warning.percentile;
                 }
                 self.$("#" + field + "-warning").html(
@@ -653,7 +658,10 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                             btnTextFalse: "Clear value and reenter"
                         });
                     }
-                    if (warning.hasOwnProperty('percentile') &&  warning.percentile === 'weight-for-length' || warning.percentile === 'bmi-for-age'  ) {
+                    if (
+                        (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-length") ||
+                        warning.percentile === "bmi-for-age"
+                    ) {
                         $("#" + warning.percentile + "-warning").html(warning.message);
                     } else {
                         container.append($('<div class="metric-warnings text-warning">').text(warning.message));
