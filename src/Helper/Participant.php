@@ -261,6 +261,15 @@ class Participant
         return $breakpoint;
     }
 
+    public function getAgeInMonths(): ?int
+    {
+        if (!$this->dob) {
+            return null;
+        }
+        $diff = $this->dob->diff(new \DateTime());
+        return ($diff->y * 12) + $diff->m;
+    }
+
     private function parseRdrParticipant($participant)
     {
         if (!is_object($participant)) {
@@ -502,14 +511,5 @@ class Participant
                 $incentiveDate['year'];
         }
         return '';
-    }
-
-    public function getAgeInMonths(): ?int
-    {
-        if (!$this->dob) {
-            return null;
-        }
-        $diff = $this->dob->diff(new \DateTime());
-        return ($diff->y * 12) + $diff->m;
     }
 }
