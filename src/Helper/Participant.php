@@ -273,6 +273,10 @@ class Participant
 
     private function getAgeInMonths(): ?int
     {
+        if (!$this->dob) {
+            return null;
+        }
+
         $now = new \DateTime();
         $diff = $now->diff($this->dob);
 
