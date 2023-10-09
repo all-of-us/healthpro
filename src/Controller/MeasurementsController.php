@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\BloodPressureDiastolicHeightPercentile;
+use App\Entity\BloodPressureSystolicHeightPercentile;
+use App\Entity\HeartRateAge;
 use App\Entity\Measurement;
 use App\Entity\User;
 use App\Entity\ZScores;
@@ -271,6 +274,9 @@ class MeasurementsController extends BaseController
             'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
             'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
             'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+            'bpSystolicHeightPercentileChart' => $participant->isPediatric ? $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData() : [],
+            'bpDiastolicHeightPercentileChart' => $participant->isPediatric ? $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData() : [],
+            'heartRateAgeCharts' => $participant->isPediatric ? $this->em->getRepository(HeartRateAge::class)->getChartsData() : [],
             'zScoreCharts' => $participant->isPediatric ? $this->em->getRepository(ZScores::class)->getChartsData() : []
         ]);
     }

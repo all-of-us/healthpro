@@ -38,4 +38,11 @@ class BloodPressureSystolicHeightPercentileRepository extends ServiceEntityRepos
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getChartsData(): ?array
+    {
+        return $this->createQueryBuilder('bshp')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

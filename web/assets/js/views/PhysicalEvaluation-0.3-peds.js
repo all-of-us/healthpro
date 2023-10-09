@@ -62,6 +62,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                     values.push(parseFloat($(this).val()));
                 }
             });
+        const meanElement = this.$("#mean-" + field);
         if (values.length > 0) {
             if (values.length === 3) {
                 values.sort(function (a, b) {
@@ -81,7 +82,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 0
             );
             let mean = (sum / values.length).toFixed(1);
-            const meanElement = this.$("#mean-" + field);
             meanElement.html("<strong>" + mean + "</strong>");
             meanElement.attr("data-mean", mean);
             if (this.percentileFields.hasOwnProperty(field) && mean) {
@@ -103,9 +103,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 .next()
                 .html(label);
         } else {
-            this.$("#mean-" + field).text("--");
+            meanElement.text("--");
+            meanElement.attr("data-mean", "");
             this.$("#convert-" + field).text();
-            this.$("#percentile-" + field).text("--");
         }
     },
     calculatePercentile: function (field, X) {
@@ -120,11 +120,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             }
         });
         console.log(field, "lms", lmsValues);
+        const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
-        console.log(field, "zscore", zScore);
+        percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
-        console.log(field, "percentile", percentile);
-        this.$("#percentile-" + field).html("<strong>" + percentile + "</strong>th");
+        percentileElement.html("<strong>" + percentile + "</strong>th");
+        percentileElement.attr("data-percentile", percentile);
     },
     calculateWeightForLengthPercentile: function () {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
@@ -139,12 +140,13 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                     lmsValues["S"] = item.S;
                 }
             });
+            const percentileElement = this.$("#percentile-weight-for-length");
             console.log("lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
-            console.log("zscore", zScore);
+            percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
-            console.log("percentile", percentile);
-            this.$("#percentile-weight-for-length").html("<strong>" + percentile + "</strong>th");
+            percentileElement.html("<strong>" + percentile + "</strong>th");
+            percentileElement.attr("data-percentile", percentile);
         }
     },
     getZScore: function (X, lmsValues) {
@@ -202,8 +204,10 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             bmiElement.html("<strong>" + bmi + "</strong>");
             bmiElement.attr("data-bmi", bmi);
             this.calculatePercentile("bmi-for-age", parseFloat(bmi));
-            if (bmi < 15 || bmi > 50) {
-                this.$("#bmi-warning").text("Please verify that the height and weight are correct");
+            if (bmi < 10 || bmi > 31) {
+                this.$("#bmi-warning").text(
+                    "Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height."
+                );
             }
         } else {
             this.$("#bmi").text("--");
@@ -477,6 +481,62 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         if (!val) {
             return false;
         }
+        if (warning.hasOwnProperty("customPercentile")) {
+            if (warning.customPercentile === "heart-rate") {
+                let maxMinValue = null;
+                for (const heartRate of this.heartRateAgeCharts) {
+                    if (this.ageInMonths > heartRate.startAge && this.ageInMonths < heartRate.endAge) {
+                        maxMinValue = heartRate[warning.percentileField];
+                        break;
+                    }
+                }
+                warning[warning.percentileType] = maxMinValue;
+                return this.warningCondition(warning, val);
+            }
+            if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
+                let maxValue = null;
+                let heightPercentileField = "heightPer5";
+                let heightPercentile = $("#percentile-height-for-age");
+                if (heightPercentile) {
+                    const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
+                    heightPercentileField = "heightPer" + nearestPercentile;
+                }
+                const bpHeightPercentileCharts =
+                    warning.customPercentile === "bp-systolic"
+                        ? this.bpSystolicHeightPercentileChart
+                        : this.bpDiastolicHeightPercentileChart;
+                for (const bpHeightPercentile of bpHeightPercentileCharts) {
+                    if (this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
+                        maxValue = bpHeightPercentile[heightPercentileField] + warning.addValue;
+                        break;
+                    }
+                }
+                if (maxValue > warning.maxValue) {
+                    maxValue = warning.maxValue;
+                }
+                console.log(warning.customPercentile, "warningValue", maxValue);
+                return val >= maxValue;
+            }
+        }
+        if (warning.hasOwnProperty("deviation")) {
+            let deviationField = warning.deviation;
+            let zscore = Math.abs($("#percentile-" + deviationField).attr("data-zscore"));
+            return zscore > warning.max;
+        }
+        if (warning.hasOwnProperty("percentile")) {
+            let percentileField = warning.percentile;
+            let percentile = Math.round($("#percentile-" + percentileField).attr("data-percentile"));
+            return percentile < warning.min;
+        }
+        if (warning.hasOwnProperty("age")) {
+            if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {
+                return this.warningCondition(warning, val);
+            }
+            return false;
+        }
+        return this.warningCondition(warning, val);
+    },
+    warningCondition: function (warning, val) {
         return (
             (warning.min && val < warning.min) ||
             (warning.max && val > warning.max) ||
@@ -556,6 +616,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                         btnTextFalse: "Clear value and reenter"
                     });
                 }
+                if (
+                    (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-length") ||
+                    warning.percentile === "bmi-for-age"
+                ) {
+                    field = warning.percentile;
+                }
                 self.$("#" + field + "-warning").html(
                     '<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> ' +
                         warning.message +
@@ -571,6 +637,9 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         let field = input.closest(".field").data("field");
         let container = input.closest(".form-group");
         container.find(".metric-warnings").remove();
+        if (["height", "weight"].includes(field)) {
+            $("#weight-for-length-warning, #bmi-for-age-warning").text("");
+        }
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
@@ -592,11 +661,31 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                             btnTextFalse: "Clear value and reenter"
                         });
                     }
-                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    if (
+                        (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-length") ||
+                        warning.percentile === "bmi-for-age"
+                    ) {
+                        $("#" + warning.percentile + "-warning").html(warning.message);
+                    } else {
+                        container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    }
                     return false; // only show first (highest priority) warning
                 }
             });
         }
+    },
+    roundDownToNearestPercentile: function (percentile) {
+        const percentiles = [5, 10, 25, 50, 75, 90, 95];
+        let result = percentiles[0];
+
+        for (const value of percentiles) {
+            if (percentile >= value) {
+                result = value;
+            } else {
+                break;
+            }
+        }
+        return result;
     },
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
@@ -784,7 +873,12 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
-        this.ageInMonths = obj.ageInMonths;
+        this.ageInMonths = parseInt(obj.ageInMonths);
+        this.ageInYears = parseInt(obj.ageInYears);
+        console.log("ageInMonths", this.ageInMonths);
+        this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;
+        this.bpDiastolicHeightPercentileChart = obj.bpDiastolicHeightPercentileChart;
+        this.heartRateAgeCharts = obj.heartRateAgeCharts;
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
         this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];
