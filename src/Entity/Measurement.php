@@ -705,6 +705,15 @@ class Measurement
         return empty($this->version) ? $this->currentVersion : $this->version;
     }
 
+    public function isPediatricForm(): bool
+    {
+        $version = $this->getSchema()->version;
+        if (str_contains($version, 'peds')) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @throws Exception
      */

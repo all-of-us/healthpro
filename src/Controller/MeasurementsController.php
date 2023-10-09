@@ -13,6 +13,7 @@ use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
+use App\Form\PediatricMeasurementType;
 use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
 use App\Service\HelpService;
@@ -91,7 +92,8 @@ class MeasurementsController extends BaseController
             }
         }
         $showAutoModification = false;
-        $measurementsForm = $this->get('form.factory')->createNamed('form', MeasurementType::class, $measurement->getFieldData(), [
+        $formType = $measurement->isPediatricForm() ? PediatricMeasurementType::class : MeasurementType::class;
+        $measurementsForm = $this->get('form.factory')->createNamed('form', $formType, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
             'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() || $this->measurementService->inactiveSiteFormDisabled()
         ]);
