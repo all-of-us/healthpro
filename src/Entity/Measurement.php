@@ -455,11 +455,15 @@ class Measurement
             $summary['bmi'] = self::calculateBmi($height, $weight);
         }
 
-        $circumferenceFields = ["hip-circumference", "waist-circumference", "head-circumference"];
+        $circumferenceFields = [
+            'hip' => 'hip-circumference',
+            'waist' => 'waist-circumference',
+            'head' => 'head-circumference'
+        ];
 
-        foreach ($circumferenceFields as $circumferenceField) {
+        foreach ($circumferenceFields as $key => $circumferenceField) {
             if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculateMean($circumferenceField)) {
-                $summary[$circumferenceField] = [
+                $summary[$key] = [
                     'cm' => $mean,
                     'in' => self::cmToIn($mean)
                 ];

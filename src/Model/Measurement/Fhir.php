@@ -150,6 +150,12 @@ class Fhir
         }
 
         // add computed means
+        if (in_array('weight-1', $metrics) || in_array('weight-2', $metrics) || in_array('weight-3', $metrics)) {
+            $metrics[] = 'weight-mean';
+        }
+        if (in_array('height-1', $metrics) || in_array('height-2', $metrics) || in_array('height-3', $metrics)) {
+            $metrics[] = 'height-mean';
+        }
         if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
             $metrics[] = 'blood-pressure-mean';
         }
@@ -161,6 +167,9 @@ class Fhir
         }
         if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
             $metrics[] = 'waist-circumference-mean';
+        }
+        if (in_array('head-circumference-1', $metrics) || in_array('head-circumference-2', $metrics) || in_array('head-circumference-3', $metrics)) {
+            $metrics[] = 'head-circumference-mean';
         }
 
         // move notes to end
@@ -1156,6 +1165,84 @@ class Fhir
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
         }
         if ($related = $this->meanProtocolModifications([1, 2, 3], 'waist-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function headcircumferencemean(): array
+    {
+        $entry = $this->simpleMetric(
+            'head-circumference-mean',
+            !empty($this->summary['head']['cm']) ? $this->summary['head']['cm'] : null,
+            'Computed head circumference, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '11111-0',
+                    'display' => 'Head circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'head-circumference-mean',
+                    'display' => 'Computed head circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'head-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function heightmean(): array
+    {
+        $entry = $this->simpleMetric(
+            'height-mean',
+            !empty($this->summary['height']['cm']) ? $this->summary['height']['cm'] : null,
+            'Computed height, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '8302-2',
+                    'display' => 'Body height',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'height-mean',
+                    'display' => 'Computed height, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'height-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    protected function weightmean(): array
+    {
+        $entry = $this->simpleMetric(
+            'weight-mean',
+            !empty($this->summary['weight']['cm']) ? $this->summary['weight']['cm'] : null,
+            'Computed weight, mean of closest two measures',
+            'kg',
+            [
+                [
+                    'code' => '29463-7',
+                    'display' => 'Body weight',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'weight-mean',
+                    'display' => 'Computed weight circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'weight-protocol-modification-')) {
             $entry['resource']['related'] = $related;
         }
         return $entry;
