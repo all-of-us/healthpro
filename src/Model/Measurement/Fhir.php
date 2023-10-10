@@ -289,7 +289,7 @@ class Fhir
             ]];
         }
         if (strpos($metric, 'circumference') !== false) {
-            if ($this->data->pregnant) {
+            if (!empty($this->data->pregnant)) {
                 $entry['resource']['related'][] = [
                     'type' => 'qualified-by',
                     'target' => [
@@ -745,6 +745,29 @@ class Fhir
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
         }
         return $entry;
+    }
+
+    protected function headcircumference(int $replicate): array
+    {
+        return $this->simpleMetric(
+            'head-circumference-' . $replicate,
+            $this->data->{'head-circumference'}[$replicate - 1],
+            self::ordinalLabel('head circumference', $replicate),
+            'cm',
+            [
+                [
+                    'code' => '11111-0',
+                    'display' => 'Head circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'head-circumference-' . $replicate,
+                    'display' => self::ordinalLabel('head circumference', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('head-circumference-source')
+        );
     }
 
     protected function getBpBodySite($location)
