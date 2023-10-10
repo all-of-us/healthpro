@@ -132,18 +132,20 @@ class Fhir
         }
 
         // check and rename blood pressure metrics
-        $diastolic = $this->data->{'blood-pressure-diastolic'};
-        $bpModification = $this->data->{'blood-pressure-protocol-modification'};
-        foreach ($metrics as $k => $metric) {
-            if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
-                continue;
-            }
-            $index = (int) $m[1] - 1;
-            if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
-                $metrics[$k] = 'blood-pressure-' . $m[1];
-            } else {
-                // remove if systolic exists but not diastolic
-                unset($metrics[$k]);
+        if (isset($this->data->{'blood-pressure-diastolic'})) {
+            $diastolic = $this->data->{'blood-pressure-diastolic'};
+            $bpModification = $this->data->{'blood-pressure-protocol-modification'};
+            foreach ($metrics as $k => $metric) {
+                if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
+                    continue;
+                }
+                $index = (int) $m[1] - 1;
+                if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
+                    $metrics[$k] = 'blood-pressure-' . $m[1];
+                } else {
+                    // remove if systolic exists but not diastolic
+                    unset($metrics[$k]);
+                }
             }
         }
 
@@ -447,12 +449,16 @@ class Fhir
         ];
     }
 
-    protected function height()
+    protected function height($replicate = null)
     {
+        $metricName = $replicate ? 'height-' . $replicate : 'height';
+        $value = $replicate ? $this->data->height[$replicate - 1] : $this->data->height;
+        $label = $replicate ? self::ordinalLabel('height', $replicate) : 'Height';
+
         return $this->simpleMetric(
-            'height',
-            $this->data->height,
-            'Height',
+            $metricName,
+            $value,
+            $label,
             'cm',
             [
                 [
@@ -470,12 +476,16 @@ class Fhir
         );
     }
 
-    protected function weight()
+    protected function weight($replicate = null)
     {
+        $metricName = $replicate ? 'weight-' . $replicate : 'weight';
+        $value = $replicate ? $this->data->weight[$replicate - 1] : $this->data->weight;
+        $label = $replicate ? self::ordinalLabel('weight', $replicate) : 'Weight';
+
         return $this->simpleMetric(
-            'weight',
-            $this->data->weight,
-            'Weight',
+            $metricName,
+            $value,
+            $label,
             'kg',
             [
                 [

@@ -387,7 +387,12 @@ class Measurement
         return $fhir->toObject();
     }
 
-    public function getSummary()
+    public function getSummary(): array
+    {
+        return $this->isPediatricForm() ? $this->getPediatricSummary() : $this->getAdultSummary();
+    }
+
+    private function getAdultSummary(): array
     {
         $summary = [];
         if ($this->fieldData->height) {
@@ -424,6 +429,52 @@ class Measurement
                 'systolic' => $systolic,
                 'diastolic' => $diastolic
             ];
+        }
+        if ($heartrate = $this->calculateMean('heart-rate')) {
+            $summary['heartrate'] = $heartrate;
+        }
+        return $summary;
+    }
+
+    private function getPediatricSummary(): array
+    {
+        $summary = [];
+        if ($height = $this->calculateMean('height')) {
+            $summary['height'] = [
+                'cm' => $height,
+                'ftin' => self::cmToFtIn($height)
+            ];
+        }
+        if ($weight = $this->calculateMean('weight')) {
+            $summary['weight'] = [
+                'kg' => $weight,
+                'lb' => self::kgToLb($weight)
+            ];
+        }
+        if ($weight && $height) {
+            $summary['bmi'] = self::calculateBmi($height, $weight);
+        }
+
+        $circumferenceFields = ["hip-circumference", "waist-circumference", "head-circumference"];
+
+        foreach ($circumferenceFields as $circumferenceField) {
+            if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculateMean($circumferenceField)) {
+                $summary[$circumferenceField] = [
+                    'cm' => $mean,
+                    'in' => self::cmToIn($mean)
+                ];
+            }
+        }
+
+        if (isset($this->fieldData->{"blood-pressure-systolic"})) {
+            $systolic = $this->calculateMean('blood-pressure-systolic');
+            $diastolic = $this->calculateMean('blood-pressure-diastolic');
+            if ($systolic && $diastolic) {
+                $summary['bloodpressure'] = [
+                    'systolic' => $systolic,
+                    'diastolic' => $diastolic
+                ];
+            }
         }
         if ($heartrate = $this->calculateMean('heart-rate')) {
             $summary['heartrate'] = $heartrate;
@@ -594,7 +645,12 @@ class Measurement
         $this->fieldData->{'height-protocol-modification'} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
-    public function getFinalizeErrors()
+    public function getFinalizeErrors(): array
+    {
+        return $this->isPediatricForm() ? $this->getPediatricFinalizeErrors() : $this->getAdultFinalizeErrors();
+    }
+
+    private function getAdultFinalizeErrors(): array
     {
         $errors = [];
 
@@ -674,6 +730,72 @@ class Measurement
         return $errors;
     }
 
+    private function getPediatricFinalizeErrors(): array
+    {
+        $errors = [];
+        foreach (self::$bloodPressureFields as $field) {
+            if (isset($this->fieldData->$field)) {
+                foreach ($this->fieldData->$field as $k => $value) {
+                    if ($k == 2) {
+                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 5) {
+                            break;
+                        }
+                    }
+                    $displayError = false;
+                    if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                }
+            }
+        }
+        foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            if (isset($this->fieldData->$field)) {
+                $displayError = false;
+                if ((!$this->fieldData->{$field . '-protocol-modification'} || $displayError) && !$this->fieldData->$field) {
+                    $errors[] = $field;
+                }
+                if ($this->fieldData->{$field . '-protocol-modification'} === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'})) {
+                    $errors[] = $field . '-protocol-modification-notes';
+                }
+            }
+        }
+        if (!$this->fieldData->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+                if (isset($this->fieldData->$field)) {
+                    foreach ($this->fieldData->$field as $k => $value) {
+                        if ($k == 2) {
+                            // not an error on the third measurement if first two aren't completed
+                            // or first two measurements are within 1 cm
+                            if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                                break;
+                            }
+                            if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
+                                break;
+                            }
+                        }
+                        $displayError = false;
+                        if ((!$this->fieldData->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
+                            $errors[] = [$field, $k];
+                        }
+                        if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
+                            $errors[] = [$field . '-protocol-modification-notes', $k];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
+
     public function getFormFieldErrorMessage($field = null, $replicate = null)
     {
         if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
@@ -708,10 +830,7 @@ class Measurement
     public function isPediatricForm(): bool
     {
         $version = $this->getSchema()->version;
-        if (str_contains($version, 'peds')) {
-            return true;
-        }
-        return false;
+        return str_contains($version, 'peds');
     }
 
     /**
