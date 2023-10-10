@@ -36,6 +36,9 @@ class IdVerification
     #[ORM\ManyToOne(targetEntity: IdVerificationImport::class)]
     private $import;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $GuardianVerified = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -133,6 +136,18 @@ class IdVerification
     public function setImport(?IdVerificationImport $import): self
     {
         $this->import = $import;
+
+        return $this;
+    }
+
+    public function isGuardianVerified(): ?bool
+    {
+        return $this->GuardianVerified;
+    }
+
+    public function setGuardianVerified(?bool $GuardianVerified): static
+    {
+        $this->GuardianVerified = $GuardianVerified;
 
         return $this;
     }

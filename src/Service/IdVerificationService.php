@@ -57,10 +57,11 @@ class IdVerificationService
         $verificationData['verifiedDate'] = $now->format('Y-m-d\TH:i:s\Z');
         $verificationData['siteGoogleGroup'] = $this->siteService->getSiteIdWithPrefix();
         $postData = $this->getRdrObject($verificationData);
-        if ($this->sendToRdr($postData)) {
+         if ($this->sendToRdr($postData)) {
             $verificationData['verifiedDate'] = $now;
             $verificationData['user'] = $this->userService->getUserEntity();
             $verificationData['site'] = $this->siteService->getSiteId();
+            $verificationData['guardianVerified'] = $verificationFormData['guardian_verified'][0] ?? false;
             $this->saveIdVerification($verificationData);
             return true;
         }
@@ -108,6 +109,7 @@ class IdVerificationService
         $idVerification->setVisitType($data['visitType']);
         $idVerification->setVerificationType($data['verificationType']);
         $idVerification->setVerifiedDate($data['verifiedDate']);
+        $idVerification->setGuardianVerified($data['guardianVerified'] ?? false);
         if (isset($data['import'])) {
             $idVerification->setImport($data['import']);
         }

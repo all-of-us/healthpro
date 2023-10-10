@@ -7,7 +7,7 @@
     {% set hasOrgPatientStatusData = orgPatientStatusData ? 1 : 0 %}
     {% set readOnlyView = readOnlyView|default(false) %}
     {% set routePrefix = readOnlyView ? 'read_' : '' %}
-    <div id="participant_info" data-participant-id="{{ participant.id }}" data-has-org-patient-status="{{ hasOrgPatientStatusData }}" data-can-view-patient-status="{{ canViewPatientStatus }}">
+    <div id="participant_info" data-participant-id="{{ participant.id }}" data-has-org-patient-status="{{ hasOrgPatientStatusData }}" data-can-view-patient-status="{{ canViewPatientStatus }}" data-pediatric="{{ participant.isPediatric }}">
     {% if hasNoParticipantAccess %}
         <div class="row justify-content-md-center">
             <div class="col-sm-8 col-lg-6">
