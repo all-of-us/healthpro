@@ -443,4 +443,16 @@ class ParticipantTest extends TestCase
         ]);
         $this->assertSame('deactivated', $participant->activityStatus);
     }
+
+    public function testGetPediatricWeightBreakpoint()
+    {
+        $participant = new Participant((object)[
+            'dateOfBirth' => '2010-01-01',
+        ]);
+        $this->assertSame(16.4, $participant->getPediatricWeightBreakpoint(8));
+        $this->assertSame(9999.0, $participant->getPediatricWeightBreakpoint(38));
+        $this->assertSame(2.5, $participant->getPediatricWeightBreakpoint(1.4));
+        $this->assertSame(5.0, $participant->getPediatricWeightBreakpoint(3.1));
+        $this->assertSame(9999.0, $participant->getPediatricWeightBreakpoint(29));
+    }
 }

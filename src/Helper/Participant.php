@@ -71,6 +71,12 @@ class Participant
         'PENDING',
         'APPROVED'
     ];
+    private static $pediatricWeightBreakpoints = [
+        9999,
+        16.4,
+        5,
+        2.5
+    ];
 
     private static array $pediatricAgeRangeMeasurementVersions = [
         'peds-1' => [0, 23],
@@ -254,11 +260,23 @@ class Participant
         return false;
     }
 
+    public function getPediatricWeightBreakpoint(float $weight): float
+    {
+        $breakpoint = 0;
+        foreach (self::$pediatricWeightBreakpoints as $value) {
+            if ($weight < $value) {
+                $breakpoint = $value;
+            }
+        }
+        return $breakpoint;
+    }
+
     private function getAgeInMonths(): ?int
     {
         if (!$this->dob) {
             return null;
         }
+
         $now = new \DateTime();
         $diff = $now->diff($this->dob);
 
