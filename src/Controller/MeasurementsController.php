@@ -84,6 +84,9 @@ class MeasurementsController extends BaseController
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
             $measurement = new Measurement();
+            if ($participant->isPediatric) {
+                $measurement->setAgeInMonths($participant->ageInMonths);
+            }
             $this->measurementService->load($measurement, $type);
             if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
                 $measurement->setFieldData((object) [

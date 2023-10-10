@@ -18,13 +18,13 @@ final class Version20231010192753 extends AbstractMigration
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE evaluations ADD COLUMN `ageInMonths` FLOAT DEFAULT NULL');
+        $this->addSql('ALTER TABLE evaluations ADD COLUMN `age_in_months` FLOAT DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE evaluations DROP COLUMN `ageInMonths`');
+        $this->addSql('ALTER TABLE evaluations DROP COLUMN `age_in_months`');
     }
 }
