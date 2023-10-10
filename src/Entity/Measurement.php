@@ -129,6 +129,9 @@ class Measurement
     #[ORM\OneToOne(targetEntity: 'App\Entity\MeasurementHistory', cascade: ['persist', 'remove'])]
     private $history;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private $ageInMonths;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -305,6 +308,18 @@ class Measurement
     public function setCurrentVersion(string $currentVersion): self
     {
         $this->currentVersion = $currentVersion;
+
+        return $this;
+    }
+
+    public function getAgeInMonths(): ?float
+    {
+        return $this->ageInMonths;
+    }
+
+    public function setAgeInMonths(float $ageInMonths): self
+    {
+        $this->ageInMonths = $ageInMonths;
 
         return $this;
     }
