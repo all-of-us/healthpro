@@ -94,6 +94,21 @@ class MeasurementsController extends BaseController
                 ]);
             }
         }
+        if ($participant->isPediatric) {
+            $growthCharts = $measurement->getGrowthChartsByAge($participant->ageInMonths);
+            $growthChartsData = [
+                'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+                'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [],
+                'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+                'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+                'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
+                'bpSystolicHeightPercentileChart' => $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData(),
+                'bpDiastolicHeightPercentileChart' => $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData(),
+                'heartRateAgeCharts' => $this->em->getRepository(HeartRateAge::class)->getChartsData(),
+                'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
+            ];
+            $measurement->setGrowthCharts($growthChartsData);
+        }
         $showAutoModification = false;
         $formType = $measurement->isPediatricForm() ? PediatricMeasurementType::class : MeasurementType::class;
         $measurementsForm = $this->get('form.factory')->createNamed('form', $formType, $measurement->getFieldData(), [
@@ -258,7 +273,6 @@ class MeasurementsController extends BaseController
                 $showAutoModification = $measurement->canAutoModify();
             }
         }
-        $growthCharts = $measurement->getGrowthChartsByAge($participant->ageInMonths);
         return $this->render('measurement/index.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
@@ -274,15 +288,15 @@ class MeasurementsController extends BaseController
             'readOnlyView' => $this->isReadOnly(),
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
             'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
-            'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-            'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [],
-            'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-            'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-            'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-            'bpSystolicHeightPercentileChart' => $participant->isPediatric ? $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData() : [],
-            'bpDiastolicHeightPercentileChart' => $participant->isPediatric ? $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData() : [],
-            'heartRateAgeCharts' => $participant->isPediatric ? $this->em->getRepository(HeartRateAge::class)->getChartsData() : [],
-            'zScoreCharts' => $participant->isPediatric ? $this->em->getRepository(ZScores::class)->getChartsData() : []
+            'weightForAgeCharts' => $growthChartsData['weightForAgeCharts'] ?? [],
+            'weightForLengthCharts' => $growthChartsData['weightForLengthCharts'] ?? [],
+            'heightForAgeCharts' =>  $growthChartsData['heightForAgeCharts'] ?? [],
+            'headCircumferenceForAgeCharts' => $growthChartsData['headCircumferenceForAgeCharts'] ?? [],
+            'bmiForAgeCharts' => $growthChartsData['bmiForAgeCharts'] ?? [],
+            'bpSystolicHeightPercentileChart' => $growthChartsData['bpSystolicHeightPercentileChart'] ?? [],
+            'bpDiastolicHeightPercentileChart' => $growthChartsData['bpDiastolicHeightPercentileChart'] ?? [],
+            'heartRateAgeCharts' => $growthChartsData['heartRateAgeCharts'] ?? [],
+            'zScoreCharts' => $growthChartsData['zScoreCharts'] ?? []
         ]);
     }
 

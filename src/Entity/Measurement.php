@@ -82,6 +82,8 @@ class Measurement
 
     private $schema;
 
+    private array $growthCharts = [];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -324,6 +326,18 @@ class Measurement
         return $this;
     }
 
+    public function getGrowthCharts(): array
+    {
+        return $this->growthCharts;
+    }
+
+    public function setGrowthCharts(array $growthCharts): self
+    {
+        $this->growthCharts = $growthCharts;
+
+        return $this;
+    }
+
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
         if (empty($this->currentVersion) && empty($this->version)) {
@@ -459,15 +473,14 @@ class Measurement
                 'cm' => $height,
                 'ftin' => self::cmToFtIn($height)
             ];
+            $summary['height-for-age-growth-percentile'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
         }
         if ($weight = $this->calculateMean('weight')) {
             $summary['weight'] = [
                 'kg' => $weight,
                 'lb' => self::kgToLb($weight)
             ];
-        }
-        if ($weight && $height) {
-            $summary['bmi'] = self::calculateBmi($height, $weight);
+            $summary['weight-for-age-growth-percentile'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
         }
 
         $circumferenceFields = [
@@ -482,6 +495,9 @@ class Measurement
                     'cm' => $mean,
                     'in' => self::cmToIn($mean)
                 ];
+                if ($key === 'head') {
+                    $summary['head-circumference-for-age-growth-percentile'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
+                }
             }
         }
 
@@ -874,25 +890,25 @@ class Measurement
     public function calculatePercentile(float $z, array $zScores): float|null
     {
         $decimalPoints = [
-            'Z0' => 0.00,
-            'Z01' => 0.01,
-            'Z02' => 0.02,
-            'Z03' => 0.03,
-            'Z04' => 0.04,
-            'Z05' => 0.05,
-            'Z06' => 0.06,
-            'Z07' => 0.07,
-            'Z08' => 0.08,
-            'Z09' => 0.09
+            'Z_0' => 0.00,
+            'Z_01' => 0.01,
+            'Z_02' => 0.02,
+            'Z_03' => 0.03,
+            'Z_04' => 0.04,
+            'Z_05' => 0.05,
+            'Z_06' => 0.06,
+            'Z_07' => 0.07,
+            'Z_08' => 0.08,
+            'Z_09' => 0.09
         ];
         foreach ($zScores as $zScore) {
-            if ($z == $zScore->getZ()) {
-                return round($zScore->getZ0() * 100, 5);
+            if ($z == $zScore['Z']) {
+                return (int)round($zScore['Z_0'] * 100, 0);
             }
             foreach ($decimalPoints as $index => $decimalPoint) {
-                $newZValue = $zScore->getZ() > 0 ? $zScore->getZ() + $decimalPoint : $zScore->getZ() - $decimalPoint;
+                $newZValue = $zScore['Z'] > 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
                 if ($z == round($newZValue, 2)) {
-                    return round($zScore->{"get$index"}() * 100, 5);
+                    return (int)round($zScore[$index] * 100, 0);
                 }
             }
         }
@@ -934,6 +950,34 @@ class Measurement
         }
 
         return $selectedGrowthCharts;
+    }
+
+    private function calculateGrowthPercentileForAge(string $type, float $X): ?float
+    {
+        $lmsValues = $this->getLMSValuesFromAge($type);
+
+        if ($lmsValues) {
+            $zScore = $this->calculateZScore($X, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
+            return $this->calculatePercentile($zScore, $this->growthCharts['zScoreCharts']);
+        }
+
+        return '';
+    }
+
+    private function getLMSValuesFromAge(string $chartType): ?array
+    {
+        $ageInMonths = $this->ageInMonths;
+        $lmsValues = [];
+        $charts = $this->growthCharts[$chartType];
+
+        foreach ($charts as $item) {
+            if (floor($item['month']) === $ageInMonths) {
+                $lmsValues['L'] = $item['L'];
+                $lmsValues['M'] = $item['M'];
+                $lmsValues['S'] = $item['S'];
+            }
+        }
+        return $lmsValues;
     }
 
     protected function normalizeData($type = null)

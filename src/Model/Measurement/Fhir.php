@@ -75,11 +75,22 @@ class Fhir
         }
     }
 
+    private function isPediatricForm(): bool
+    {
+        return str_contains($this->version, 'peds');
+    }
+
+    protected function getMetricUrns(): array
+    {
+        return $this->isPediatricForm() ? $this->getPediatricMetricUrns() : $this->getAdultMetricUrns();
+    }
+
     /*
      * Determines which metrics have values to represent and generates
      * URNs for each
      */
-    protected function getMetricUrns()
+
+    protected function getAdultMetricUrns(): array
     {
         $metrics = [];
         /** @var stdClass $field */
@@ -132,6 +143,99 @@ class Fhir
         }
 
         // check and rename blood pressure metrics
+        $diastolic = $this->data->{'blood-pressure-diastolic'};
+        $bpModification = $this->data->{'blood-pressure-protocol-modification'};
+        foreach ($metrics as $k => $metric) {
+            if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
+                continue;
+            }
+            $index = (int) $m[1] - 1;
+            if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
+                $metrics[$k] = 'blood-pressure-' . $m[1];
+            } else {
+                // remove if systolic exists but not diastolic
+                unset($metrics[$k]);
+            }
+        }
+
+        // add computed means
+        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
+            $metrics[] = 'blood-pressure-mean';
+        }
+        if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+            $metrics[] = 'heart-rate-mean';
+        }
+        if (in_array('hip-circumference-1', $metrics) || in_array('hip-circumference-2', $metrics) || in_array('hip-circumference-3', $metrics)) {
+            $metrics[] = 'hip-circumference-mean';
+        }
+        if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
+            $metrics[] = 'waist-circumference-mean';
+        }
+
+        // move notes to end
+        $notesIndex = array_search('notes', $metrics);
+        if ($notesIndex !== false) {
+            unset($metrics[$notesIndex]);
+            $metrics[] = 'notes';
+        }
+
+        $metrics = array_values($metrics);
+
+        // set urns
+        $metricUrns = [];
+        foreach ($metrics as $metric) {
+            $uuid = Util::generateUuid();
+            $metricUrns[$metric] = "urn:uuid:{$uuid}";
+        }
+        return $metricUrns;
+    }
+
+    protected function getPediatricMetricUrns(): array
+    {
+        $metrics = [];
+        foreach ($this->schema->fields as $field) {
+            if (preg_match('/^blood-pressure-/', $field->name)) {
+                if (!preg_match('/^blood-pressure-(systolic|protocol-modification)/', $field->name)) {
+                    continue;
+                }
+            }
+            $modification = '';
+            if (!preg_match('/protocol-modification/', $field->name)) {
+                switch ($field->name) {
+                    case 'blood-pressure-systolic':
+                    case 'heart-rate':
+                        $modification = 'blood-pressure-protocol-modification';
+                        break;
+                    default:
+                        $modification = $field->name . '-protocol-modification';
+                }
+            }
+
+            if (!empty($field->replicates)) {
+                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
+                    continue;
+                }
+                foreach ($this->data->{$field->name} as $i => $value) {
+                    if (empty($value) && empty($this->data->{$modification}[$i])) {
+                        continue;
+                    }
+                    $metrics[] = $field->name . '-' . ($i + 1);
+                }
+            } else {
+                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
+                    continue;
+                }
+                $metrics[] = $field->name;
+            }
+        }
+
+        if (in_array('wheelchair', $metrics)) {
+            $metrics[] = 'hip-circumference-1';
+            $metrics[] = 'hip-circumference-2';
+            $metrics[] = 'waist-circumference-1';
+            $metrics[] = 'waist-circumference-2';
+        }
+
         if (isset($this->data->{'blood-pressure-diastolic'})) {
             $diastolic = $this->data->{'blood-pressure-diastolic'};
             $bpModification = $this->data->{'blood-pressure-protocol-modification'};
@@ -143,18 +247,18 @@ class Fhir
                 if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                     $metrics[$k] = 'blood-pressure-' . $m[1];
                 } else {
-                    // remove if systolic exists but not diastolic
                     unset($metrics[$k]);
                 }
             }
         }
 
-        // add computed means
         if (in_array('weight-1', $metrics) || in_array('weight-2', $metrics) || in_array('weight-3', $metrics)) {
             $metrics[] = 'weight-mean';
+            $metrics[] = 'weight-for-age-growth-percentile';
         }
         if (in_array('height-1', $metrics) || in_array('height-2', $metrics) || in_array('height-3', $metrics)) {
             $metrics[] = 'height-mean';
+            $metrics[] = 'height-for-age-growth-percentile';
         }
         if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
             $metrics[] = 'blood-pressure-mean';
@@ -170,9 +274,9 @@ class Fhir
         }
         if (in_array('head-circumference-1', $metrics) || in_array('head-circumference-2', $metrics) || in_array('head-circumference-3', $metrics)) {
             $metrics[] = 'head-circumference-mean';
+            $metrics[] = 'head-circumference-for-age-growth-percentile';
         }
 
-        // move notes to end
         $notesIndex = array_search('notes', $metrics);
         if ($notesIndex !== false) {
             unset($metrics[$notesIndex]);
@@ -181,7 +285,6 @@ class Fhir
 
         $metrics = array_values($metrics);
 
-        // set urns
         $metricUrns = [];
         foreach ($metrics as $metric) {
             $uuid = Util::generateUuid();
@@ -772,6 +875,75 @@ class Fhir
                 [
                     'code' => 'head-circumference-' . $replicate,
                     'display' => self::ordinalLabel('head circumference', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('head-circumference-source')
+        );
+    }
+
+    protected function weightforagegrowthpercentile(): array
+    {
+        return $this->simpleMetric(
+            'weight-for-age-growth-percentile',
+            $this->summary['weight-for-age-growth-percentile'] ??  null,
+            'Weight for age growth percentile',
+            'percentile',
+            [
+                [
+                    'code' => '22222-0',
+                    'display' => 'Weight for age growth percentile',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'weight-for-age-growth-percentile',
+                    'display' => 'Weight for age growth percentile',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    protected function heightforagegrowthpercentile(): array
+    {
+        return $this->simpleMetric(
+            'height-for-age-growth-percentile',
+            $this->summary['height-for-age-growth-percentile'] ??  null,
+            'Height for age growth percentile',
+            'percentile',
+            [
+                [
+                    'code' => '33333-0',
+                    'display' => 'Height for age growth percentile',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'height-for-age-growth-percentile',
+                    'display' => 'Height for age growth percentile',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('height-source')
+        );
+    }
+
+    protected function headcircumferenceforagegrowthpercentile(): array
+    {
+        return $this->simpleMetric(
+            'head-circumference-for-age-growth-percentile',
+            $this->summary['head-circumference-for-age-growth-percentile'] ??  null,
+            'Height for age growth percentile',
+            'percentile',
+            [
+                [
+                    'code' => '33333-0',
+                    'display' => 'Head circumference for age growth percentile',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'head-circumference-for-age-growth-percentile',
+                    'display' => 'Head circumference for age growth percentile',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
