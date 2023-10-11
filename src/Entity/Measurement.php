@@ -1002,8 +1002,10 @@ class Measurement
                             break;
                         }
                     }
-                    $displayError = false;
-                    if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
+                    if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k]) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k]) && !$value) {
                         $errors[] = [$field, $k];
                     }
                 }
@@ -1016,8 +1018,7 @@ class Measurement
         }
         foreach (['height', 'weight'] as $field) {
             if (isset($this->fieldData->$field)) {
-                $displayError = false;
-                if ((!$this->fieldData->{$field . '-protocol-modification'} || $displayError) && !$this->fieldData->$field) {
+                if ((!$this->fieldData->{$field . '-protocol-modification'}) && !$this->fieldData->$field) {
                     $errors[] = $field;
                 }
                 if ($this->fieldData->{$field . '-protocol-modification'} === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'})) {
@@ -1039,8 +1040,7 @@ class Measurement
                                 break;
                             }
                         }
-                        $displayError = false;
-                        if ((!$this->fieldData->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
+                        if ((!$this->fieldData->{$field . '-protocol-modification'}[$k]) && !$value) {
                             $errors[] = [$field, $k];
                         }
                         if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
@@ -1078,7 +1078,7 @@ class Measurement
         return null;
     }
 
-    private function getLMSValuesFromAge(string $chartType): ?array
+    private function getLMSValuesFromAge(string $chartType): array
     {
         $ageInMonths = $this->ageInMonths;
         $lmsValues = [];
@@ -1094,7 +1094,7 @@ class Measurement
         return $lmsValues;
     }
 
-    private function getLMSValuesFromLength(string $chartType, float $length): ?array
+    private function getLMSValuesFromLength(string $chartType, float $length): array
     {
         $lmsValues = [];
         $charts = $this->growthCharts[$chartType];
