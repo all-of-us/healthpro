@@ -724,7 +724,7 @@ class Fhir
         }
 
         if (isset($this->data->{'heart-rate-method'})) {
-            $entry['resource']['component'][] = [$this->getPediatricComponent('heart-rate-method')];
+            $entry['resource']['component'][] = $this->getPediatricComponent('heart-rate-method');
         }
 
         return $entry;

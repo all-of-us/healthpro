@@ -6,6 +6,7 @@ use App\Entity\Measurement;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
@@ -50,14 +51,6 @@ class PediatricMeasurementType extends AbstractType
                 $attributes['data-parsley-gt'] = 0;
             }
             $form = $builder->getForm();
-            if ($options['schema']->displayBmi) {
-                $bmiConstraint = function ($value, $context) use ($form) {
-                    $bmi = round(self::calculateBmi($form->getData()->height, $form->getData()->weight), 1);
-                    if ($bmi != false && ($bmi < 5 || $bmi > 125)) {
-                        $context->buildViolation('This height/weight combination has yielded an invalid BMI')->addViolation();
-                    }
-                };
-            }
             if ($field->name === 'height') {
                 $attributes['data-parsley-bmi-height'] = '#form_weight';
                 if (isset($bmiConstraint)) {
@@ -155,15 +148,7 @@ class PediatricMeasurementType extends AbstractType
         ]);
     }
 
-    protected static function calculateBmi($height, $weight)
-    {
-        if ($height && $weight) {
-            return $weight / (($height / 100) * ($height / 100));
-        }
-        return false;
-    }
-
-    private function addDiastolicBloodPressureConstraint($form, $field)
+    private function addDiastolicBloodPressureConstraint(Form $form, \stdClass $field): array
     {
         $compareType = $field->compare->type;
         $compareField = $field->compare->field;
