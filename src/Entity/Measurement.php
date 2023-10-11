@@ -473,14 +473,14 @@ class Measurement
                 'cm' => $height,
                 'ftin' => self::cmToFtIn($height)
             ];
-            $summary['height-for-age-growth-percentile'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+            $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
         }
         if ($weight = $this->calculateMean('weight')) {
             $summary['weight'] = [
                 'kg' => $weight,
                 'lb' => self::kgToLb($weight)
             ];
-            $summary['weight-for-age-growth-percentile'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
+            $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
         }
 
         $circumferenceFields = [
@@ -496,7 +496,7 @@ class Measurement
                     'in' => self::cmToIn($mean)
                 ];
                 if ($key === 'head') {
-                    $summary['head-circumference-for-age-growth-percentile'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
+                    $summary['growth-percentile-head-circumference-for-age'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
                 }
             }
         }

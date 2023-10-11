@@ -254,11 +254,11 @@ class Fhir
 
         if (in_array('weight-1', $metrics) || in_array('weight-2', $metrics) || in_array('weight-3', $metrics)) {
             $metrics[] = 'weight-mean';
-            $metrics[] = 'weight-for-age-growth-percentile';
+            $metrics[] = 'growth-percentile-weight-for-age';
         }
         if (in_array('height-1', $metrics) || in_array('height-2', $metrics) || in_array('height-3', $metrics)) {
             $metrics[] = 'height-mean';
-            $metrics[] = 'height-for-age-growth-percentile';
+            $metrics[] = 'growth-percentile-height-for-age';
         }
         if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
             $metrics[] = 'blood-pressure-mean';
@@ -274,7 +274,7 @@ class Fhir
         }
         if (in_array('head-circumference-1', $metrics) || in_array('head-circumference-2', $metrics) || in_array('head-circumference-3', $metrics)) {
             $metrics[] = 'head-circumference-mean';
-            $metrics[] = 'head-circumference-for-age-growth-percentile';
+            $metrics[] = 'growth-percentile-head-circumference-for-age';
         }
 
         $notesIndex = array_search('notes', $metrics);
@@ -882,22 +882,22 @@ class Fhir
         );
     }
 
-    protected function weightforagegrowthpercentile(): array
+    protected function growthpercentileweightforage(): array
     {
         return $this->simpleMetric(
-            'weight-for-age-growth-percentile',
-            $this->summary['weight-for-age-growth-percentile'] ??  null,
-            'Weight for age growth percentile',
+            'growth-percentile-weight-for-age',
+            $this->summary['growth-percentile-weight-for-age'] ??  null,
+            'Computed growth percentile weight for age',
             'percentile',
             [
                 [
                     'code' => '22222-0',
-                    'display' => 'Weight for age growth percentile',
+                    'display' => 'Growth percentile weight for age',
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'weight-for-age-growth-percentile',
-                    'display' => 'Weight for age growth percentile',
+                    'code' => 'growth-percentile-weight-for-age',
+                    'display' => 'Computed growth percentile weight for age',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
@@ -905,22 +905,22 @@ class Fhir
         );
     }
 
-    protected function heightforagegrowthpercentile(): array
+    protected function growthpercentileheightforage(): array
     {
         return $this->simpleMetric(
-            'height-for-age-growth-percentile',
-            $this->summary['height-for-age-growth-percentile'] ??  null,
-            'Height for age growth percentile',
+            'growth-percentile-height-for-age',
+            $this->summary['growth-percentile-height-for-age'] ??  null,
+            'Computed growth percentile height for age',
             'percentile',
             [
                 [
                     'code' => '33333-0',
-                    'display' => 'Height for age growth percentile',
+                    'display' => 'Growth percentile height for age',
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'height-for-age-growth-percentile',
-                    'display' => 'Height for age growth percentile',
+                    'code' => 'growth-percentile-height-for-age',
+                    'display' => 'Computed growth percentile weight for age',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
@@ -928,22 +928,22 @@ class Fhir
         );
     }
 
-    protected function headcircumferenceforagegrowthpercentile(): array
+    protected function growthpercentileheadcircumferenceforage(): array
     {
         return $this->simpleMetric(
-            'head-circumference-for-age-growth-percentile',
-            $this->summary['head-circumference-for-age-growth-percentile'] ??  null,
-            'Height for age growth percentile',
+            'growth-percentile-head-circumference-for-age',
+            $this->summary['growth-percentile-head-circumference-for-age'] ??  null,
+            'Computed growth percentile head circumference for age',
             'percentile',
             [
                 [
                     'code' => '33333-0',
-                    'display' => 'Head circumference for age growth percentile',
+                    'display' => 'Growth percentile head circumference for age',
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'head-circumference-for-age-growth-percentile',
-                    'display' => 'Head circumference for age growth percentile',
+                    'code' => 'growth-percentile-head-circumference-for-age',
+                    'display' => 'Computed growth percentile head circumference for age',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
