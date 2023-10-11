@@ -473,13 +473,13 @@ class Fhir
         ];
     }
 
-    protected function height($replicate = null)
+    protected function height($replicate = null): array
     {
         $metricName = $replicate ? 'height-' . $replicate : 'height';
         $value = $replicate ? $this->data->height[$replicate - 1] : $this->data->height;
         $label = $replicate ? self::ordinalLabel('height', $replicate) : 'Height';
 
-        return $this->simpleMetric(
+        $entry = $this->simpleMetric(
             $metricName,
             $value,
             $label,
@@ -498,6 +498,12 @@ class Fhir
             ],
             $this->getEffectiveDateTime('height-source')
         );
+
+        if (isset($this->data->{'height-or-length'})) {
+            $entry['resource']['component'] = [$this->getPediatricComponent('height-or-length')];
+        }
+
+        return $entry;
     }
 
     protected function weight($replicate = null)
@@ -718,7 +724,43 @@ class Fhir
             }
         }
 
+        if (isset($this->data->{'heart-rate-position'})) {
+            $entry['resource']['component'][] = $this->getPediatricComponent('heart-rate-position');
+        }
+
+        if (isset($this->data->{'heart-rate-method'})) {
+            $entry['resource']['component'][] = [$this->getPediatricComponent('heart-rate-method')];
+        }
+
         return $entry;
+    }
+
+    private function getPediatricComponent(string $propertyName): array
+    {
+        $propertyValue = $this->data->{$propertyName};
+
+        $concept = [
+            'coding' => [[
+                'code' => $propertyValue,
+                'display' => ucfirst($propertyValue),
+                'system' => "http://terminology.pmi-ops.org/CodeSystem/{$propertyName}"
+            ]],
+            'text' => ucfirst($propertyValue)
+        ];
+
+        $component = [
+            'code' => [
+                'coding' => [[
+                    'code' => $propertyName,
+                    'display' => ucfirst($propertyName),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]],
+                'text' => ucfirst($propertyName)
+            ],
+            'valueCodeableConcept' => $concept
+        ];
+
+        return $component;
     }
 
     protected function hipcircumference($replicate)
@@ -1056,6 +1098,9 @@ class Fhir
         ];
         if (isset($this->data->{'blood-pressure-location'})) {
             $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
+        }
+        if (isset($this->data->{'blood-pressure-position'})) {
+            $entry['resource']['component'][] = [$this->getPediatricComponent('blood-pressure-position')];
         }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
