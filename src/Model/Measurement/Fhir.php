@@ -75,11 +75,6 @@ class Fhir
         }
     }
 
-    private function isPediatricForm(): bool
-    {
-        return str_contains($this->version, 'peds');
-    }
-
     /*
      * Determines which metrics have values to represent and generates
      * URNs for each
@@ -145,7 +140,7 @@ class Fhir
                 if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
                     continue;
                 }
-                $index = (int)$m[1] - 1;
+                $index = (int) $m[1] - 1;
                 if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                     $metrics[$k] = 'blood-pressure-' . $m[1];
                 } else {
@@ -735,34 +730,6 @@ class Fhir
         return $entry;
     }
 
-    private function getPediatricComponent(string $propertyName): array
-    {
-        $propertyValue = $this->data->{$propertyName};
-
-        $concept = [
-            'coding' => [[
-                'code' => $propertyValue,
-                'display' => ucfirst($propertyValue),
-                'system' => "http://terminology.pmi-ops.org/CodeSystem/{$propertyName}"
-            ]],
-            'text' => ucfirst($propertyValue)
-        ];
-
-        $component = [
-            'code' => [
-                'coding' => [[
-                    'code' => $propertyName,
-                    'display' => ucfirst($propertyName),
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]],
-                'text' => ucfirst($propertyName)
-            ],
-            'valueCodeableConcept' => $concept
-        ];
-
-        return $component;
-    }
-
     protected function hipcircumference($replicate)
     {
         return $this->simpleMetric(
@@ -811,144 +778,6 @@ class Fhir
             $entry['resource']['bodySite'] = $this->getWaistCircumferenceBodySite();
         }
         return $entry;
-    }
-
-    private function headcircumference(int $replicate): array
-    {
-        return $this->simpleMetric(
-            'head-circumference-' . $replicate,
-            $this->data->{'head-circumference'}[$replicate - 1],
-            self::ordinalLabel('head circumference', $replicate),
-            'cm',
-            [
-                [
-                    'code' => '11111-0',
-                    'display' => 'Head circumference',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'head-circumference-' . $replicate,
-                    'display' => self::ordinalLabel('head circumference', $replicate),
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('head-circumference-source')
-        );
-    }
-
-    private function growthpercentileweightforage(): array
-    {
-        return $this->simpleMetric(
-            'growth-percentile-weight-for-age',
-            $this->summary['growth-percentile-weight-for-age'] ??  null,
-            'Computed growth percentile weight for age',
-            'percentile',
-            [
-                [
-                    'code' => '22222-0',
-                    'display' => 'Growth percentile weight for age',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'growth-percentile-weight-for-age',
-                    'display' => 'Computed growth percentile weight for age',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('weight-source')
-        );
-    }
-
-    private function growthpercentileheightforage(): array
-    {
-        return $this->simpleMetric(
-            'growth-percentile-height-for-age',
-            $this->summary['growth-percentile-height-for-age'] ??  null,
-            'Computed growth percentile height for age',
-            'percentile',
-            [
-                [
-                    'code' => '33333-0',
-                    'display' => 'Growth percentile height for age',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'growth-percentile-height-for-age',
-                    'display' => 'Computed growth percentile weight for age',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('height-source')
-        );
-    }
-
-    private function growthpercentileweightforlength(): array
-    {
-        return $this->simpleMetric(
-            'growth-percentile-weight-for-length',
-            $this->summary['growth-percentile-weight-for-length'] ??  null,
-            'Computed growth percentile weight for length',
-            'percentile',
-            [
-                [
-                    'code' => '44444-0',
-                    'display' => 'Growth percentile weight for length',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'growth-percentile-weight-for-length',
-                    'display' => 'Computed growth percentile weight for length',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('weight-source')
-        );
-    }
-
-    private function growthpercentileheadcircumferenceforage(): array
-    {
-        return $this->simpleMetric(
-            'growth-percentile-head-circumference-for-age',
-            $this->summary['growth-percentile-head-circumference-for-age'] ??  null,
-            'Computed growth percentile head circumference for age',
-            'percentile',
-            [
-                [
-                    'code' => '55555-0',
-                    'display' => 'Growth percentile head circumference for age',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'growth-percentile-head-circumference-for-age',
-                    'display' => 'Computed growth percentile head circumference for age',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('head-circumference-source')
-        );
-    }
-
-    private function growthpercentilebmiforage(): array
-    {
-        return $this->simpleMetric(
-            'growth-percentile-bmi-for-age',
-            $this->summary['growth-percentile-bmi-for-age'] ??  null,
-            'Computed growth percentile bmi for age',
-            'percentile',
-            [
-                [
-                    'code' => '66666-0',
-                    'display' => 'Growth percentile bmi for age',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'growth-percentile-bmi-for-age',
-                    'display' => 'Computed growth percentile bmi for age',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('weight-source')
-        );
     }
 
     protected function getBpBodySite($location)
@@ -1345,6 +1174,224 @@ class Fhir
         return $entry;
     }
 
+    protected function notes()
+    {
+        if (!$this->data->notes) {
+            return;
+        }
+        return $this->stringMetric(
+            'notes',
+            $this->data->notes,
+            'Additional notes',
+            [[
+                'code' => 'notes',
+                'display' => 'Additional notes',
+                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+            ]]
+        );
+    }
+
+    protected function getEntry($metric)
+    {
+        if (preg_match('/^(.+)-(\d+)$/', $metric, $m)) {
+            $replicate = $m[2];
+            $method = $m[1];
+        } else {
+            $replicate = false;
+            $method = $metric;
+        }
+        $method = str_replace('-', '', $method);
+        if (method_exists($this, $method)) {
+            if ($replicate === false) {
+                return $this->$method();
+            }
+            return $this->$method($replicate);
+        }
+    }
+
+    protected function getEffectiveDateTime($field, $replicate = 1)
+    {
+        if (isset($this->data->{$field}) && $this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
+            if (is_string($this->data->{$field . '-ehr-date'})) {
+                $date = new \DateTime($this->data->{$field . '-ehr-date'});
+                return $date->format('Y-m-d\TH:i:s\Z');
+            }
+            return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
+        }
+        return $this->date;
+    }
+
+    private function isPediatricForm(): bool
+    {
+        return str_contains($this->version, 'peds');
+    }
+
+    private function getPediatricComponent(string $propertyName): array
+    {
+        $propertyValue = $this->data->{$propertyName};
+
+        $concept = [
+            'coding' => [[
+                'code' => $propertyValue,
+                'display' => ucfirst($propertyValue),
+                'system' => "http://terminology.pmi-ops.org/CodeSystem/{$propertyName}"
+            ]],
+            'text' => ucfirst($propertyValue)
+        ];
+
+        $component = [
+            'code' => [
+                'coding' => [[
+                    'code' => $propertyName,
+                    'display' => ucfirst($propertyName),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]],
+                'text' => ucfirst($propertyName)
+            ],
+            'valueCodeableConcept' => $concept
+        ];
+
+        return $component;
+    }
+
+    private function headcircumference(int $replicate): array
+    {
+        return $this->simpleMetric(
+            'head-circumference-' . $replicate,
+            $this->data->{'head-circumference'}[$replicate - 1],
+            self::ordinalLabel('head circumference', $replicate),
+            'cm',
+            [
+                [
+                    'code' => '11111-0',
+                    'display' => 'Head circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'head-circumference-' . $replicate,
+                    'display' => self::ordinalLabel('head circumference', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('head-circumference-source')
+        );
+    }
+
+    private function growthpercentileweightforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-weight-for-age',
+            $this->summary['growth-percentile-weight-for-age'] ?? null,
+            'Computed growth percentile weight for age',
+            'percentile',
+            [
+                [
+                    'code' => '22222-0',
+                    'display' => 'Growth percentile weight for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-weight-for-age',
+                    'display' => 'Computed growth percentile weight for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    private function growthpercentileheightforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-height-for-age',
+            $this->summary['growth-percentile-height-for-age'] ?? null,
+            'Computed growth percentile height for age',
+            'percentile',
+            [
+                [
+                    'code' => '33333-0',
+                    'display' => 'Growth percentile height for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-height-for-age',
+                    'display' => 'Computed growth percentile weight for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('height-source')
+        );
+    }
+
+    private function growthpercentileweightforlength(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-weight-for-length',
+            $this->summary['growth-percentile-weight-for-length'] ?? null,
+            'Computed growth percentile weight for length',
+            'percentile',
+            [
+                [
+                    'code' => '44444-0',
+                    'display' => 'Growth percentile weight for length',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-weight-for-length',
+                    'display' => 'Computed growth percentile weight for length',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    private function growthpercentileheadcircumferenceforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-head-circumference-for-age',
+            $this->summary['growth-percentile-head-circumference-for-age'] ?? null,
+            'Computed growth percentile head circumference for age',
+            'percentile',
+            [
+                [
+                    'code' => '55555-0',
+                    'display' => 'Growth percentile head circumference for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-head-circumference-for-age',
+                    'display' => 'Computed growth percentile head circumference for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('head-circumference-source')
+        );
+    }
+
+    private function growthpercentilebmiforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-bmi-for-age',
+            $this->summary['growth-percentile-bmi-for-age'] ?? null,
+            'Computed growth percentile bmi for age',
+            'percentile',
+            [
+                [
+                    'code' => '66666-0',
+                    'display' => 'Growth percentile bmi for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-bmi-for-age',
+                    'display' => 'Computed growth percentile bmi for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
     private function headcircumferencemean(): array
     {
         $entry = $this->simpleMetric(
@@ -1421,52 +1468,5 @@ class Fhir
             $entry['resource']['related'] = $related;
         }
         return $entry;
-    }
-
-    protected function notes()
-    {
-        if (!$this->data->notes) {
-            return;
-        }
-        return $this->stringMetric(
-            'notes',
-            $this->data->notes,
-            'Additional notes',
-            [[
-                'code' => 'notes',
-                'display' => 'Additional notes',
-                'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-            ]]
-        );
-    }
-
-    protected function getEntry($metric)
-    {
-        if (preg_match('/^(.+)-(\d+)$/', $metric, $m)) {
-            $replicate = $m[2];
-            $method = $m[1];
-        } else {
-            $replicate = false;
-            $method = $metric;
-        }
-        $method = str_replace('-', '', $method);
-        if (method_exists($this, $method)) {
-            if ($replicate === false) {
-                return $this->$method();
-            }
-            return $this->$method($replicate);
-        }
-    }
-
-    protected function getEffectiveDateTime($field, $replicate = 1)
-    {
-        if (isset($this->data->{$field}) && $this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
-            if (is_string($this->data->{$field . '-ehr-date'})) {
-                $date = new \DateTime($this->data->{$field . '-ehr-date'});
-                return $date->format('Y-m-d\TH:i:s\Z');
-            }
-            return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
-        }
-        return $this->date;
     }
 }

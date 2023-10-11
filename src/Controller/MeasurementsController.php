@@ -290,7 +290,7 @@ class MeasurementsController extends BaseController
             'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
             'weightForAgeCharts' => $growthChartsData['weightForAgeCharts'] ?? [],
             'weightForLengthCharts' => $growthChartsData['weightForLengthCharts'] ?? [],
-            'heightForAgeCharts' =>  $growthChartsData['heightForAgeCharts'] ?? [],
+            'heightForAgeCharts' => $growthChartsData['heightForAgeCharts'] ?? [],
             'headCircumferenceForAgeCharts' => $growthChartsData['headCircumferenceForAgeCharts'] ?? [],
             'bmiForAgeCharts' => $growthChartsData['bmiForAgeCharts'] ?? [],
             'bpSystolicHeightPercentileChart' => $growthChartsData['bpSystolicHeightPercentileChart'] ?? [],

@@ -421,108 +421,6 @@ class Measurement
         return $this->isPediatricForm() ? $this->getPediatricSummary() : $this->getAdultSummary();
     }
 
-    private function getAdultSummary(): array
-    {
-        $summary = [];
-        if ($this->fieldData->height) {
-            $summary['height'] = [
-                'cm' => $this->fieldData->height,
-                'ftin' => self::cmToFtIn($this->fieldData->height)
-            ];
-        }
-        if ($this->fieldData->weight) {
-            $summary['weight'] = [
-                'kg' => $this->fieldData->weight,
-                'lb' => self::kgToLb($this->fieldData->weight)
-            ];
-        }
-        if ($this->fieldData->weight && $this->fieldData->height) {
-            $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
-        }
-        if ($hip = $this->calculateMean('hip-circumference')) {
-            $summary['hip'] = [
-                'cm' => $hip,
-                'in' => self::cmToIn($hip)
-            ];
-        }
-        if ($waist = $this->calculateMean('waist-circumference')) {
-            $summary['waist'] = [
-                'cm' => $waist,
-                'in' => self::cmToIn($waist)
-            ];
-        }
-        $systolic = $this->calculateMean('blood-pressure-systolic');
-        $diastolic = $this->calculateMean('blood-pressure-diastolic');
-        if ($systolic && $diastolic) {
-            $summary['bloodpressure'] = [
-                'systolic' => $systolic,
-                'diastolic' => $diastolic
-            ];
-        }
-        if ($heartrate = $this->calculateMean('heart-rate')) {
-            $summary['heartrate'] = $heartrate;
-        }
-        return $summary;
-    }
-
-    private function getPediatricSummary(): array
-    {
-        $summary = [];
-        if ($height = $this->calculateMean('height')) {
-            $summary['height'] = [
-                'cm' => $height,
-                'ftin' => self::cmToFtIn($height)
-            ];
-            $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
-        }
-        if ($weight = $this->calculateMean('weight')) {
-            $summary['weight'] = [
-                'kg' => $weight,
-                'lb' => self::kgToLb($weight)
-            ];
-            $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
-        }
-        if ($weight && $height) {
-            $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
-            if ($this->schema->displayBmi) {
-                $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
-                $summary['growth-percentile-bmi-for-age'] = $this->calculateGrowthPercentileForAge('bmiForAgeCharts', $summary['bmi']);
-            }
-        }
-        $circumferenceFields = [
-            'hip' => 'hip-circumference',
-            'waist' => 'waist-circumference',
-            'head' => 'head-circumference'
-        ];
-
-        foreach ($circumferenceFields as $key => $circumferenceField) {
-            if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculateMean($circumferenceField)) {
-                $summary[$key] = [
-                    'cm' => $mean,
-                    'in' => self::cmToIn($mean)
-                ];
-                if ($key === 'head') {
-                    $summary['growth-percentile-head-circumference-for-age'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
-                }
-            }
-        }
-
-        if (isset($this->fieldData->{"blood-pressure-systolic"})) {
-            $systolic = $this->calculateMean('blood-pressure-systolic');
-            $diastolic = $this->calculateMean('blood-pressure-diastolic');
-            if ($systolic && $diastolic) {
-                $summary['bloodpressure'] = [
-                    'systolic' => $systolic,
-                    'diastolic' => $diastolic
-                ];
-            }
-        }
-        if ($heartrate = $this->calculateMean('heart-rate')) {
-            $summary['heartrate'] = $heartrate;
-        }
-        return $summary;
-    }
-
     public function canCancel()
     {
         return $this->getHistoryType() !== self::EVALUATION_CANCEL
@@ -691,6 +589,325 @@ class Measurement
         return $this->isPediatricForm() ? $this->getPediatricFinalizeErrors() : $this->getAdultFinalizeErrors();
     }
 
+    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    {
+        if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
+            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
+            (in_array($field, self::$protocolModificationNotesFields))
+        ) {
+            return 'Please complete';
+        }
+        return 'Please complete or add protocol modification.';
+    }
+
+    public function canAutoModify()
+    {
+        if ($this->isBloodDonorForm()) {
+            return false;
+        }
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $field) {
+                if ($this->fieldData->{$field} === 'ehr') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public function getFormVersion()
+    {
+        return empty($this->version) ? $this->currentVersion : $this->version;
+    }
+
+    public function isPediatricForm(): bool
+    {
+        $version = $this->getSchema()->version;
+        return str_contains($version, 'peds');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function calculateZScore(float $X, float $L, float $M, float $S): float
+    {
+        if ($L != 0) {
+            $numerator = pow($X / $M, $L) - 1;
+            $denominator = $L * $S;
+            if ($denominator != 0) {
+                return round($numerator / $denominator, 2);
+            }
+        } else {
+            if ($S != 0) {
+                return round(log($X / $M) / $S, 2);
+            }
+        }
+        throw new Exception('Division by zero error');
+    }
+
+    public function calculatePercentile(float $z, array $zScores): float|null
+    {
+        $decimalPoints = [
+            'Z_0' => 0.00,
+            'Z_01' => 0.01,
+            'Z_02' => 0.02,
+            'Z_03' => 0.03,
+            'Z_04' => 0.04,
+            'Z_05' => 0.05,
+            'Z_06' => 0.06,
+            'Z_07' => 0.07,
+            'Z_08' => 0.08,
+            'Z_09' => 0.09
+        ];
+        foreach ($zScores as $zScore) {
+            if ($z == $zScore['Z']) {
+                return (int) round($zScore['Z_0'] * 100, 0);
+            }
+            foreach ($decimalPoints as $index => $decimalPoint) {
+                $newZValue = $zScore['Z'] > 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
+                if ($z == round($newZValue, 2)) {
+                    return (int) round($zScore[$index] * 100, 0);
+                }
+            }
+        }
+        return null;
+    }
+
+    public function getGrowthChartsByAge(int $ageInMonths): array
+    {
+        $growthChartsByAgeList = [
+            'weightForAgeCharts' => [
+                WeightForAge0To23Months::class => [0, 23],
+                WeightForAge24MonthsAndUp::class => [24, 240]
+            ],
+            'heightForAgeCharts' => [
+                HeightForAge0To23Months::class => [0, 23],
+                HeightForAge24MonthsTo6Years::class => [24, 72]
+            ],
+            'headCircumferenceForAgeCharts' => [
+                HeadCircumferenceForAge0To36Months::class => [0, 36]
+            ],
+            'weightForLengthCharts' => [
+                WeightForLength0To23Months::class => [0, 23],
+                WeightForLength23MonthsTo5Years::class => [24, 60]
+            ],
+            'bmiForAgeCharts' => [
+                BmiForAge5YearsAndUp::class => [60, 240]
+            ],
+        ];
+
+        $selectedGrowthCharts = array_fill_keys(array_keys($growthChartsByAgeList), null);
+
+        foreach ($growthChartsByAgeList as $growthChartType => $ageRanges) {
+            foreach ($ageRanges as $chartClass => $range) {
+                list($start, $end) = $range;
+                if ($ageInMonths >= $start && $ageInMonths <= $end) {
+                    $selectedGrowthCharts[$growthChartType] = $chartClass;
+                }
+            }
+        }
+
+        return $selectedGrowthCharts;
+    }
+
+    protected function normalizeData($type = null)
+    {
+        foreach ($this->fieldData as $key => $value) {
+            if ($value === 0) {
+                $this->fieldData->$key = null;
+            }
+            if ($type === 'save' && !is_null($this->fieldData->$key) && in_array($key, self::$ehrProtocolDateFields)) {
+                $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
+            }
+        }
+        /** @var stdClass $field */
+        foreach ($this->schema->fields as $field) {
+            if (isset($field->replicates)) {
+                $key = $field->name;
+                if (!isset($this->fieldData->$key) || is_null($this->fieldData->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $this->fieldData->$key = $dataArray;
+                } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
+                    $dataArray = array_fill(0, $field->replicates, null);
+                    $dataArray[0] = $this->fieldData->$key;
+                    $this->fieldData->$key = $dataArray;
+                }
+            } else {
+                $key = $field->name;
+                if (!isset($this->fieldData->$key)) {
+                    $this->fieldData->$key = null;
+                }
+            }
+        }
+        if ($this->isEhrProtocolForm()) {
+            $this->addEhrProtocolModifications();
+        }
+    }
+
+    protected static function cmToFtIn($cm)
+    {
+        $inches = self::cmToIn($cm);
+        $feet = floor($inches / 12);
+        $inches = round(fmod($inches, 12));
+        return "$feet ft $inches in";
+    }
+
+    protected static function cmToIn($cm)
+    {
+        return round($cm * 0.3937, 1);
+    }
+
+    protected static function kgToLb($kg)
+    {
+        return round($kg * 2.2046, 1);
+    }
+
+    protected function calculateMean($field)
+    {
+        $secondThirdFields = [
+            'blood-pressure-systolic',
+            'blood-pressure-diastolic',
+            'heart-rate'
+        ];
+        $twoClosestFields = [
+            'hip-circumference',
+            'waist-circumference'
+        ];
+        if (in_array($field, $secondThirdFields)) {
+            $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
+        } else {
+            $values = $this->fieldData->{$field};
+        }
+        $values = array_filter($values);
+        if (count($values) > 0) {
+            if (count($values) === 3 && in_array($field, $twoClosestFields)) {
+                sort($values);
+                if ($values[1] - $values[0] < $values[2] - $values[1]) {
+                    array_pop($values);
+                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
+                    array_shift($values);
+                }
+            }
+            return array_sum($values) / count($values);
+        }
+        return null;
+    }
+
+    protected static function calculateBmi($height, $weight)
+    {
+        if ($height && $weight) {
+            return $weight / (($height / 100) * ($height / 100));
+        }
+        return false;
+    }
+
+    protected function isMinVersion($minVersion)
+    {
+        return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    private function getAdultSummary(): array
+    {
+        $summary = [];
+        if ($this->fieldData->height) {
+            $summary['height'] = [
+                'cm' => $this->fieldData->height,
+                'ftin' => self::cmToFtIn($this->fieldData->height)
+            ];
+        }
+        if ($this->fieldData->weight) {
+            $summary['weight'] = [
+                'kg' => $this->fieldData->weight,
+                'lb' => self::kgToLb($this->fieldData->weight)
+            ];
+        }
+        if ($this->fieldData->weight && $this->fieldData->height) {
+            $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
+        }
+        if ($hip = $this->calculateMean('hip-circumference')) {
+            $summary['hip'] = [
+                'cm' => $hip,
+                'in' => self::cmToIn($hip)
+            ];
+        }
+        if ($waist = $this->calculateMean('waist-circumference')) {
+            $summary['waist'] = [
+                'cm' => $waist,
+                'in' => self::cmToIn($waist)
+            ];
+        }
+        $systolic = $this->calculateMean('blood-pressure-systolic');
+        $diastolic = $this->calculateMean('blood-pressure-diastolic');
+        if ($systolic && $diastolic) {
+            $summary['bloodpressure'] = [
+                'systolic' => $systolic,
+                'diastolic' => $diastolic
+            ];
+        }
+        if ($heartrate = $this->calculateMean('heart-rate')) {
+            $summary['heartrate'] = $heartrate;
+        }
+        return $summary;
+    }
+
+    private function getPediatricSummary(): array
+    {
+        $summary = [];
+        if ($height = $this->calculateMean('height')) {
+            $summary['height'] = [
+                'cm' => $height,
+                'ftin' => self::cmToFtIn($height)
+            ];
+            $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+        }
+        if ($weight = $this->calculateMean('weight')) {
+            $summary['weight'] = [
+                'kg' => $weight,
+                'lb' => self::kgToLb($weight)
+            ];
+            $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
+        }
+        if ($weight && $height) {
+            $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
+            if ($this->schema->displayBmi) {
+                $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
+                $summary['growth-percentile-bmi-for-age'] = $this->calculateGrowthPercentileForAge('bmiForAgeCharts', $summary['bmi']);
+            }
+        }
+        $circumferenceFields = [
+            'hip' => 'hip-circumference',
+            'waist' => 'waist-circumference',
+            'head' => 'head-circumference'
+        ];
+
+        foreach ($circumferenceFields as $key => $circumferenceField) {
+            if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculateMean($circumferenceField)) {
+                $summary[$key] = [
+                    'cm' => $mean,
+                    'in' => self::cmToIn($mean)
+                ];
+                if ($key === 'head') {
+                    $summary['growth-percentile-head-circumference-for-age'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
+                }
+            }
+        }
+
+        if (isset($this->fieldData->{'blood-pressure-systolic'})) {
+            $systolic = $this->calculateMean('blood-pressure-systolic');
+            $diastolic = $this->calculateMean('blood-pressure-diastolic');
+            if ($systolic && $diastolic) {
+                $summary['bloodpressure'] = [
+                    'systolic' => $systolic,
+                    'diastolic' => $diastolic
+                ];
+            }
+        }
+        if ($heartrate = $this->calculateMean('heart-rate')) {
+            $summary['heartrate'] = $heartrate;
+        }
+        return $summary;
+    }
+
     private function getAdultFinalizeErrors(): array
     {
         $errors = [];
@@ -837,127 +1054,6 @@ class Measurement
         return $errors;
     }
 
-    public function getFormFieldErrorMessage($field = null, $replicate = null)
-    {
-        if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
-            ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
-            (in_array($field, self::$protocolModificationNotesFields))
-        ) {
-            return 'Please complete';
-        }
-        return 'Please complete or add protocol modification.';
-    }
-
-    public function canAutoModify()
-    {
-        if ($this->isBloodDonorForm()) {
-            return false;
-        }
-        if ($this->isEhrProtocolForm()) {
-            foreach (self::$measurementSourceFields as $field) {
-                if ($this->fieldData->{$field} === 'ehr') {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public function getFormVersion()
-    {
-        return empty($this->version) ? $this->currentVersion : $this->version;
-    }
-
-    public function isPediatricForm(): bool
-    {
-        $version = $this->getSchema()->version;
-        return str_contains($version, 'peds');
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function calculateZScore(float $X, float $L, float $M, float $S): float
-    {
-        if ($L != 0) {
-            $numerator = pow($X / $M, $L) - 1;
-            $denominator = $L * $S;
-            if ($denominator != 0) {
-                return round($numerator / $denominator, 2);
-            }
-        } else {
-            if ($S != 0) {
-                return round(log($X / $M) / $S, 2);
-            }
-        }
-        throw new Exception('Division by zero error');
-    }
-
-    public function calculatePercentile(float $z, array $zScores): float|null
-    {
-        $decimalPoints = [
-            'Z_0' => 0.00,
-            'Z_01' => 0.01,
-            'Z_02' => 0.02,
-            'Z_03' => 0.03,
-            'Z_04' => 0.04,
-            'Z_05' => 0.05,
-            'Z_06' => 0.06,
-            'Z_07' => 0.07,
-            'Z_08' => 0.08,
-            'Z_09' => 0.09
-        ];
-        foreach ($zScores as $zScore) {
-            if ($z == $zScore['Z']) {
-                return (int)round($zScore['Z_0'] * 100, 0);
-            }
-            foreach ($decimalPoints as $index => $decimalPoint) {
-                $newZValue = $zScore['Z'] > 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
-                if ($z == round($newZValue, 2)) {
-                    return (int)round($zScore[$index] * 100, 0);
-                }
-            }
-        }
-        return null;
-    }
-
-    public function getGrowthChartsByAge(int $ageInMonths): array
-    {
-        $growthChartsByAgeList = [
-            'weightForAgeCharts' => [
-                WeightForAge0To23Months::class => [0, 23],
-                WeightForAge24MonthsAndUp::class => [24, 240]
-            ],
-            'heightForAgeCharts' => [
-                HeightForAge0To23Months::class => [0, 23],
-                HeightForAge24MonthsTo6Years::class => [24, 72]
-            ],
-            'headCircumferenceForAgeCharts' => [
-                HeadCircumferenceForAge0To36Months::class => [0, 36]
-            ],
-            'weightForLengthCharts' => [
-                WeightForLength0To23Months::class => [0, 23],
-                WeightForLength23MonthsTo5Years::class => [24, 60]
-            ],
-            'bmiForAgeCharts' => [
-                BmiForAge5YearsAndUp::class => [60, 240]
-            ],
-        ];
-
-        $selectedGrowthCharts = array_fill_keys(array_keys($growthChartsByAgeList), null);
-
-        foreach ($growthChartsByAgeList as $growthChartType => $ageRanges) {
-            foreach ($ageRanges as $chartClass => $range) {
-                list($start, $end) = $range;
-                if ($ageInMonths >= $start && $ageInMonths <= $end) {
-                    $selectedGrowthCharts[$growthChartType] = $chartClass;
-                }
-            }
-        }
-
-        return $selectedGrowthCharts;
-    }
-
     private function calculateGrowthPercentileForAge(string $type, float $X): ?float
     {
         $lmsValues = $this->getLMSValuesFromAge($type);
@@ -1011,101 +1107,5 @@ class Measurement
             }
         }
         return $lmsValues;
-    }
-
-    protected function normalizeData($type = null)
-    {
-        foreach ($this->fieldData as $key => $value) {
-            if ($value === 0) {
-                $this->fieldData->$key = null;
-            }
-            if ($type === 'save' && !is_null($this->fieldData->$key) && in_array($key, self::$ehrProtocolDateFields)) {
-                $this->fieldData->$key = $this->fieldData->$key->format('Y-m-d');
-            }
-        }
-        /** @var stdClass $field */
-        foreach ($this->schema->fields as $field) {
-            if (isset($field->replicates)) {
-                $key = $field->name;
-                if (!isset($this->fieldData->$key) || is_null($this->fieldData->$key)) {
-                    $dataArray = array_fill(0, $field->replicates, null);
-                    $this->fieldData->$key = $dataArray;
-                } elseif (!is_null($this->fieldData->$key) && !is_array($this->fieldData->$key)) {
-                    $dataArray = array_fill(0, $field->replicates, null);
-                    $dataArray[0] = $this->fieldData->$key;
-                    $this->fieldData->$key = $dataArray;
-                }
-            } else {
-                $key = $field->name;
-                if (!isset($this->fieldData->$key)) {
-                    $this->fieldData->$key = null;
-                }
-            }
-        }
-        if ($this->isEhrProtocolForm()) {
-            $this->addEhrProtocolModifications();
-        }
-    }
-
-    protected static function cmToFtIn($cm)
-    {
-        $inches = self::cmToIn($cm);
-        $feet = floor($inches / 12);
-        $inches = round(fmod($inches, 12));
-        return "$feet ft $inches in";
-    }
-
-    protected static function cmToIn($cm)
-    {
-        return round($cm * 0.3937, 1);
-    }
-
-    protected static function kgToLb($kg)
-    {
-        return round($kg * 2.2046, 1);
-    }
-
-    protected function calculateMean($field)
-    {
-        $secondThirdFields = [
-            'blood-pressure-systolic',
-            'blood-pressure-diastolic',
-            'heart-rate'
-        ];
-        $twoClosestFields = [
-            'hip-circumference',
-            'waist-circumference'
-        ];
-        if (in_array($field, $secondThirdFields)) {
-            $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
-        } else {
-            $values = $this->fieldData->{$field};
-        }
-        $values = array_filter($values);
-        if (count($values) > 0) {
-            if (count($values) === 3 && in_array($field, $twoClosestFields)) {
-                sort($values);
-                if ($values[1] - $values[0] < $values[2] - $values[1]) {
-                    array_pop($values);
-                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
-                    array_shift($values);
-                }
-            }
-            return array_sum($values) / count($values);
-        }
-        return null;
-    }
-
-    protected static function calculateBmi($height, $weight)
-    {
-        if ($height && $weight) {
-            return $weight / (($height / 100) * ($height / 100));
-        }
-        return false;
-    }
-
-    protected function isMinVersion($minVersion)
-    {
-        return Util::versionIsAtLeast($this->version, $minVersion);
     }
 }
