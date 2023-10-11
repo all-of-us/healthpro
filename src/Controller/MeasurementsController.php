@@ -84,17 +84,17 @@ class MeasurementsController extends BaseController
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
             $measurement = new Measurement();
-            if ($participant->isPediatric) {
+            $this->measurementService->load($measurement, $type);
+            if ($measurement->isPediatricForm()) {
                 $measurement->setAgeInMonths($participant->ageInMonths);
             }
-            $this->measurementService->load($measurement, $type);
             if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
                 $measurement->setFieldData((object) [
                     'weight-protocol-modification' => 'whole-blood-donor'
                 ]);
             }
         }
-        if ($participant->isPediatric) {
+        if ($measurement->isPediatricForm()) {
             $growthCharts = $measurement->getGrowthChartsByAge($participant->ageInMonths);
             $growthChartsData = [
                 'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
