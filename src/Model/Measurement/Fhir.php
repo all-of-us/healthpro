@@ -80,17 +80,12 @@ class Fhir
         return str_contains($this->version, 'peds');
     }
 
-    protected function getMetricUrns(): array
-    {
-        return $this->isPediatricForm() ? $this->getPediatricMetricUrns() : $this->getAdultMetricUrns();
-    }
-
     /*
      * Determines which metrics have values to represent and generates
      * URNs for each
      */
 
-    protected function getAdultMetricUrns(): array
+    protected function getMetricUrns(): array
     {
         $metrics = [];
         /** @var stdClass $field */
@@ -138,104 +133,11 @@ class Fhir
             $metrics[] = 'waist-circumference-2';
         }
         // add bmi if height and weight are both included
-        if (in_array('height', $metrics) && in_array('weight', $metrics)) {
+        if (!$this->isPediatricForm() && in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
         }
 
         // check and rename blood pressure metrics
-        $diastolic = $this->data->{'blood-pressure-diastolic'};
-        $bpModification = $this->data->{'blood-pressure-protocol-modification'};
-        foreach ($metrics as $k => $metric) {
-            if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
-                continue;
-            }
-            $index = (int) $m[1] - 1;
-            if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
-                $metrics[$k] = 'blood-pressure-' . $m[1];
-            } else {
-                // remove if systolic exists but not diastolic
-                unset($metrics[$k]);
-            }
-        }
-
-        // add computed means
-        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
-            $metrics[] = 'blood-pressure-mean';
-        }
-        if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
-            $metrics[] = 'heart-rate-mean';
-        }
-        if (in_array('hip-circumference-1', $metrics) || in_array('hip-circumference-2', $metrics) || in_array('hip-circumference-3', $metrics)) {
-            $metrics[] = 'hip-circumference-mean';
-        }
-        if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
-            $metrics[] = 'waist-circumference-mean';
-        }
-
-        // move notes to end
-        $notesIndex = array_search('notes', $metrics);
-        if ($notesIndex !== false) {
-            unset($metrics[$notesIndex]);
-            $metrics[] = 'notes';
-        }
-
-        $metrics = array_values($metrics);
-
-        // set urns
-        $metricUrns = [];
-        foreach ($metrics as $metric) {
-            $uuid = Util::generateUuid();
-            $metricUrns[$metric] = "urn:uuid:{$uuid}";
-        }
-        return $metricUrns;
-    }
-
-    protected function getPediatricMetricUrns(): array
-    {
-        $metrics = [];
-        foreach ($this->schema->fields as $field) {
-            if (preg_match('/^blood-pressure-/', $field->name)) {
-                if (!preg_match('/^blood-pressure-(systolic|protocol-modification)/', $field->name)) {
-                    continue;
-                }
-            }
-            $modification = '';
-            if (!preg_match('/protocol-modification/', $field->name)) {
-                switch ($field->name) {
-                    case 'blood-pressure-systolic':
-                    case 'heart-rate':
-                        $modification = 'blood-pressure-protocol-modification';
-                        break;
-                    default:
-                        $modification = $field->name . '-protocol-modification';
-                }
-            }
-
-            if (!empty($field->replicates)) {
-                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
-                    continue;
-                }
-                foreach ($this->data->{$field->name} as $i => $value) {
-                    if (empty($value) && empty($this->data->{$modification}[$i])) {
-                        continue;
-                    }
-                    $metrics[] = $field->name . '-' . ($i + 1);
-                }
-            } else {
-                if (empty($this->data->{$field->name}) && empty($this->data->{$modification})) {
-                    continue;
-                }
-                $metrics[] = $field->name;
-            }
-        }
-
-        if (in_array('wheelchair', $metrics)) {
-            $metrics[] = 'hip-circumference-1';
-            $metrics[] = 'hip-circumference-2';
-            $metrics[] = 'waist-circumference-1';
-            $metrics[] = 'waist-circumference-2';
-        }
-
         if (isset($this->data->{'blood-pressure-diastolic'})) {
             $diastolic = $this->data->{'blood-pressure-diastolic'};
             $bpModification = $this->data->{'blood-pressure-protocol-modification'};
@@ -243,15 +145,17 @@ class Fhir
                 if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
                     continue;
                 }
-                $index = (int) $m[1] - 1;
+                $index = (int)$m[1] - 1;
                 if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
                     $metrics[$k] = 'blood-pressure-' . $m[1];
                 } else {
+                    // remove if systolic exists but not diastolic
                     unset($metrics[$k]);
                 }
             }
         }
 
+        // add computed means
         if (in_array('weight-1', $metrics) || in_array('weight-2', $metrics) || in_array('weight-3', $metrics)) {
             $metrics[] = 'weight-mean';
             $metrics[] = 'growth-percentile-weight-for-age';
@@ -277,6 +181,7 @@ class Fhir
             $metrics[] = 'growth-percentile-head-circumference-for-age';
         }
 
+        // move notes to end
         $notesIndex = array_search('notes', $metrics);
         if ($notesIndex !== false) {
             unset($metrics[$notesIndex]);
@@ -285,6 +190,7 @@ class Fhir
 
         $metrics = array_values($metrics);
 
+        // set urns
         $metricUrns = [];
         foreach ($metrics as $metric) {
             $uuid = Util::generateUuid();
