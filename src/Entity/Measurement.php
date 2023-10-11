@@ -482,7 +482,13 @@ class Measurement
             ];
             $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
         }
-
+        if ($weight && $height) {
+            $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
+            if ($this->schema->displayBmi) {
+                $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
+                $summary['growth-percentile-bmi-for-age'] = $this->calculateGrowthPercentileForAge('bmiForAgeCharts', $summary['bmi']);
+            }
+        }
         $circumferenceFields = [
             'hip' => 'hip-circumference',
             'waist' => 'waist-circumference',
@@ -961,7 +967,19 @@ class Measurement
             return $this->calculatePercentile($zScore, $this->growthCharts['zScoreCharts']);
         }
 
-        return '';
+        return null;
+    }
+
+    private function calculateGrowthPercentileForLength(string $type, float $length, float $X): ?float
+    {
+        $lmsValues = $this->getLMSValuesFromLength($type, $length);
+
+        if ($lmsValues) {
+            $zScore = $this->calculateZScore($X, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
+            return $this->calculatePercentile($zScore, $this->growthCharts['zScoreCharts']);
+        }
+
+        return null;
     }
 
     private function getLMSValuesFromAge(string $chartType): ?array
@@ -972,6 +990,21 @@ class Measurement
 
         foreach ($charts as $item) {
             if (floor($item['month']) === $ageInMonths) {
+                $lmsValues['L'] = $item['L'];
+                $lmsValues['M'] = $item['M'];
+                $lmsValues['S'] = $item['S'];
+            }
+        }
+        return $lmsValues;
+    }
+
+    private function getLMSValuesFromLength(string $chartType, float $length): ?array
+    {
+        $lmsValues = [];
+        $charts = $this->growthCharts[$chartType];
+
+        foreach ($charts as $item) {
+            if (floor($item['length']) === $length) {
                 $lmsValues['L'] = $item['L'];
                 $lmsValues['M'] = $item['M'];
                 $lmsValues['S'] = $item['S'];

@@ -164,6 +164,12 @@ class Fhir
             $metrics[] = 'height-mean';
             $metrics[] = 'growth-percentile-height-for-age';
         }
+        if (in_array('weight-mean', $metrics) && in_array('height-mean', $metrics)) {
+            $metrics[] = 'growth-percentile-weight-for-length';
+            if ($this->schema->displayBmi) {
+                $metrics[] = 'growth-percentile-bmi-for-age';
+            }
+        }
         if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
             $metrics[] = 'blood-pressure-mean';
         }
@@ -765,7 +771,7 @@ class Fhir
         return $entry;
     }
 
-    protected function headcircumference(int $replicate): array
+    private function headcircumference(int $replicate): array
     {
         return $this->simpleMetric(
             'head-circumference-' . $replicate,
@@ -788,7 +794,7 @@ class Fhir
         );
     }
 
-    protected function growthpercentileweightforage(): array
+    private function growthpercentileweightforage(): array
     {
         return $this->simpleMetric(
             'growth-percentile-weight-for-age',
@@ -811,7 +817,7 @@ class Fhir
         );
     }
 
-    protected function growthpercentileheightforage(): array
+    private function growthpercentileheightforage(): array
     {
         return $this->simpleMetric(
             'growth-percentile-height-for-age',
@@ -834,7 +840,30 @@ class Fhir
         );
     }
 
-    protected function growthpercentileheadcircumferenceforage(): array
+    private function growthpercentileweightforlength(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-weight-for-length',
+            $this->summary['growth-percentile-weight-for-length'] ??  null,
+            'Computed growth percentile weight for length',
+            'percentile',
+            [
+                [
+                    'code' => '44444-0',
+                    'display' => 'Growth percentile weight for length',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-weight-for-length',
+                    'display' => 'Computed growth percentile weight for length',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    private function growthpercentileheadcircumferenceforage(): array
     {
         return $this->simpleMetric(
             'growth-percentile-head-circumference-for-age',
@@ -843,7 +872,7 @@ class Fhir
             'percentile',
             [
                 [
-                    'code' => '33333-0',
+                    'code' => '55555-0',
                     'display' => 'Growth percentile head circumference for age',
                     'system' => 'http://loinc.org'
                 ],
@@ -854,6 +883,29 @@ class Fhir
                 ]
             ],
             $this->getEffectiveDateTime('head-circumference-source')
+        );
+    }
+
+    private function growthpercentilebmiforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-bmi-for-age',
+            $this->summary['growth-percentile-bmi-for-age'] ??  null,
+            'Computed growth percentile bmi for age',
+            'percentile',
+            [
+                [
+                    'code' => '66666-0',
+                    'display' => 'Growth percentile bmi for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-bmi-for-age',
+                    'display' => 'Computed growth percentile bmi for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
         );
     }
 
@@ -1248,7 +1300,7 @@ class Fhir
         return $entry;
     }
 
-    protected function headcircumferencemean(): array
+    private function headcircumferencemean(): array
     {
         $entry = $this->simpleMetric(
             'head-circumference-mean',
@@ -1274,7 +1326,7 @@ class Fhir
         return $entry;
     }
 
-    protected function heightmean(): array
+    private function heightmean(): array
     {
         $entry = $this->simpleMetric(
             'height-mean',
@@ -1300,7 +1352,7 @@ class Fhir
         return $entry;
     }
 
-    protected function weightmean(): array
+    private function weightmean(): array
     {
         $entry = $this->simpleMetric(
             'weight-mean',
