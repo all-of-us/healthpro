@@ -929,7 +929,7 @@ class Fhir
             $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
         }
         if (isset($this->data->{'blood-pressure-position'})) {
-            $entry['resource']['component'][] = [$this->getPediatricComponent('blood-pressure-position')];
+            $entry['resource']['component'][] = $this->getPediatricComponent('blood-pressure-position');
         }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
