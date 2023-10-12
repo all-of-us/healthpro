@@ -137,7 +137,8 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
                 'verificationType' => 'PHOTO_AND_ONE_OF_PII',
                 'visitType' => 'PMB_INITIAL_VISIT',
                 'createdTs' => $now,
-                'importId' => 1
+                'importId' => 1,
+                'guardianVerified' => false,
             ],
             [
                 'participantId' => 'P000000001',
@@ -147,7 +148,19 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
                 'verificationType' => 'TWO_OF_PII',
                 'visitType' => 'BIOSPECIMEN_REDRAW_ONLY',
                 'createdTs' => $now,
-                'importId' => 2
+                'importId' => 2,
+                'guardianVerified' => false,
+            ],
+            [
+                'participantId' => 'P000000001',
+                'siteName' => 'PS_SITE_TEST',
+                'email' => 'test2@example.com',
+                'verifiedDate' => $now,
+                'verificationType' => 'TWO_OF_PII',
+                'visitType' => 'BIOSPECIMEN_REDRAW_ONLY',
+                'createdTs' => $now,
+                'importId' => 2,
+                'guardianVerified' => true,
             ]
         ];
     }
