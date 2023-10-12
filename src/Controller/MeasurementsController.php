@@ -3,12 +3,8 @@
 namespace App\Controller;
 
 use App\Audit\Log;
-use App\Entity\BloodPressureDiastolicHeightPercentile;
-use App\Entity\BloodPressureSystolicHeightPercentile;
-use App\Entity\HeartRateAge;
 use App\Entity\Measurement;
 use App\Entity\User;
-use App\Entity\ZScores;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
@@ -78,13 +74,13 @@ class MeasurementsController extends BaseController
             if (!$measurement) {
                 throw $this->createNotFoundException('Physical Measurement not found.');
             }
-            $this->measurementService->load($measurement, $type);
+            $this->measurementService->load($measurement, $participant, $type);
             $measurement->canCancel = $measurement->canCancel();
             $measurement->canRestore = $measurement->canRestore();
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
             $measurement = new Measurement();
-            $this->measurementService->load($measurement, $type);
+            $this->measurementService->load($measurement, $participant, $type);
             if ($measurement->isPediatricForm()) {
                 $measurement->setAgeInMonths($participant->ageInMonths);
             }
@@ -95,19 +91,7 @@ class MeasurementsController extends BaseController
             }
         }
         if ($measurement->isPediatricForm()) {
-            $growthCharts = $measurement->getGrowthChartsByAge($participant->ageInMonths);
-            $growthChartsData = [
-                'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-                'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [],
-                'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-                'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-                'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [],
-                'bpSystolicHeightPercentileChart' => $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData(),
-                'bpDiastolicHeightPercentileChart' => $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData(),
-                'heartRateAgeCharts' => $this->em->getRepository(HeartRateAge::class)->getChartsData(),
-                'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
-            ];
-            $measurement->setGrowthCharts($growthChartsData);
+            $growthChartsData = $measurement->getGrowthCharts();
         }
         $showAutoModification = false;
         $formType = $measurement->isPediatricForm() ? PediatricMeasurementType::class : MeasurementType::class;
@@ -314,7 +298,7 @@ class MeasurementsController extends BaseController
         if (!$measurement) {
             throw $this->createNotFoundException('Physical Measurement not found.');
         }
-        $this->measurementService->load($measurement);
+        $this->measurementService->load($measurement, $participant);
         // Allow cancel for active and restored measurements
         // Allow restore for only cancelled measurements
         if (!in_array($type, [$measurement::EVALUATION_CANCEL, $measurement::EVALUATION_RESTORE])) {
@@ -420,7 +404,7 @@ class MeasurementsController extends BaseController
         if (!$measurement->getFinalizedTs()) {
             throw $this->createAccessDeniedException();
         }
-        $this->measurementService->load($measurement);
+        $this->measurementService->load($measurement, $participant);
         return $this->render('measurement/summary.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
@@ -483,7 +467,7 @@ class MeasurementsController extends BaseController
             $measurement->setFinalizedTs(new \DateTime('2017-01-01', new \DateTimeZone('UTC')));
             $measurement->setFinalizedUser($measurement->getUser());
         }
-        $this->measurementService->load($measurement);
+        $this->measurementService->load($measurement, $participant);
         if ($measurement->getFinalizedTs()) {
             $date = $measurement->getFinalizedTs();
         } else {
