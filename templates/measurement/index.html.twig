@@ -85,7 +85,7 @@
         {% endif %}
 
         {{ form_errors(measurementForm) }}
-        {% if showAutoModification %}
+        {% if not participant.isPediatric and showAutoModification %}
             <div class="row">
                 <div class="col-sm-6 col-sm-offset-3">
                     <div class="panel panel-danger">

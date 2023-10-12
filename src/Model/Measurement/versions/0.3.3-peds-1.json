@@ -447,5 +447,6 @@
       "type": "textarea"
     }
   ],
+  "displayBmi": false,
   "displayWeightForLength": true
 }
