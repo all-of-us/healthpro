@@ -32,6 +32,7 @@ class MeasurementQueueService
         $this->params = $params;
         $this->measurementService = $measurementService;
         $this->logger = $logger;
+        $this->participantSummaryService = $participantSummaryService;
     }
 
     public function resendMeasurementsToRdr()
