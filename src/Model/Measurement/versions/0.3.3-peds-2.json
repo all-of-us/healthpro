@@ -244,7 +244,7 @@
       "alternateunits": true,
       "decimals": 1,
       "replicates": 3,
-      "max": 300,
+      "max": 120,
       "warnings": [
         {
           "deviation": "head-circumference-for-age",
