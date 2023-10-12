@@ -57,7 +57,7 @@ class IdVerificationService
         $verificationData['verifiedDate'] = $now->format('Y-m-d\TH:i:s\Z');
         $verificationData['siteGoogleGroup'] = $this->siteService->getSiteIdWithPrefix();
         $postData = $this->getRdrObject($verificationData);
-         if ($this->sendToRdr($postData)) {
+        if ($this->sendToRdr($postData)) {
             $verificationData['verifiedDate'] = $now;
             $verificationData['user'] = $this->userService->getUserEntity();
             $verificationData['site'] = $this->siteService->getSiteId();
