@@ -664,13 +664,14 @@ class NphOrderService
         if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
             $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
             if ($dlwInfo) {
-                $obj->dlwDose = [
+                $obj->sample = array_merge($obj->sample, [
+                    'dlwDose' => [
                     'batchid' => $dlwInfo->getDoseBatchId(),
                     'participantweight' => $dlwInfo->getParticipantWeight(),
                     'dose' => $dlwInfo->getActualDose(),
                     'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
                     'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
-                ];
+                ]]);
             }
         }
         if ($aliquotsInfo) {
