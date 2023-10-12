@@ -364,7 +364,20 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.toggleThirdReading("waist-circumference");
     },
     toggleThirdHeartRate: function () {
-        this.toggleThirdReading("heart-rate");
+        const fieldsToCheck = ["heart-rate", "blood-pressure-systolic", "blood-pressure-diastolic"];
+        for (const field of fieldsToCheck) {
+            let first = parseFloat(this.$("#form_" + field + "_0").val());
+            let second = parseFloat(this.$("#form_" + field + "_1").val());
+            if (first > 0 && second > 0 && Math.abs(first - second) > 5) {
+                $(".panel-heart-rate-3").show();
+                break;
+            } else {
+                $(".panel-heart-rate-3").hide();
+                $(".panel-heart-rate-3 input, .panel-heart-rate-3 select").each(function () {
+                    $(this).valChange("");
+                });
+            }
+        }
     },
     calculateIrregularHeartRate: function () {
         let allIrregular = true;
@@ -411,6 +424,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 )
             );
         }
+        this.toggleThirdHeartRate();
     },
     clearServerErrors: function (e) {
         let field = $(e.currentTarget).closest(".field");
