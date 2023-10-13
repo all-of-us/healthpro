@@ -118,6 +118,7 @@ let viewExtension = Backbone.View.extend({
                 lmsValues["S"] = item.S;
             }
         });
+        console.log(field, "lms", lmsValues);
         const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
         percentileElement.attr("data-zscore", zScore);
@@ -139,6 +140,7 @@ let viewExtension = Backbone.View.extend({
                 }
             });
             const percentileElement = this.$("#percentile-weight-for-length");
+            console.log("lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
@@ -511,6 +513,7 @@ let viewExtension = Backbone.View.extend({
                 if (maxValue > warning.maxValue) {
                     maxValue = warning.maxValue;
                 }
+                console.log(warning.customPercentile, "warningValue", maxValue);
                 return val >= maxValue;
             }
         }
@@ -871,6 +874,7 @@ let viewExtension = Backbone.View.extend({
         this.finalized = obj.finalized;
         this.ageInMonths = parseInt(obj.ageInMonths);
         this.ageInYears = parseInt(obj.ageInYears);
+        console.log("ageInMonths", this.ageInMonths);
         this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;
         this.bpDiastolicHeightPercentileChart = obj.bpDiastolicHeightPercentileChart;
         this.heartRateAgeCharts = obj.heartRateAgeCharts;
