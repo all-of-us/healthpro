@@ -48,7 +48,7 @@ class Participant
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
     public int $sexAtBirth;
-    public bool $isPediatric = true;
+    public bool $isPediatric = false;
     public string $pediatricMeasurementsVersionType;
 
     private $disableTestAccess;
