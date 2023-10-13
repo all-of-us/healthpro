@@ -282,7 +282,6 @@ class Participant
 
         $yearsInMonths = $diff->y * 12;
         $months = $diff->m;
-        $yearsInMonths = 0;
 
         return $yearsInMonths + $months;
     }
