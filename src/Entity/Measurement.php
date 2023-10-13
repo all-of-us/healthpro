@@ -1105,7 +1105,7 @@ class Measurement
         $charts = $this->growthCharts[$chartType];
 
         foreach ($charts as $item) {
-            if (floor($item['length']) === $length) {
+            if (round($item['length']) === round($length)) {
                 $lmsValues['L'] = $item['L'];
                 $lmsValues['M'] = $item['M'];
                 $lmsValues['S'] = $item['S'];

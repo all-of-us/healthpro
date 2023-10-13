@@ -134,14 +134,14 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             const lmsValues = [];
             let charts = this.growthCharts["weight-for-length"];
             charts.forEach((item) => {
-                if (item.length === avgLength) {
+                if (Math.round(item.length) === Math.round(avgLength)) {
                     lmsValues["L"] = item.L;
                     lmsValues["M"] = item.M;
                     lmsValues["S"] = item.S;
                 }
             });
             const percentileElement = this.$("#percentile-weight-for-length");
-            console.log("lms", lmsValues);
+            console.log('weight-for-length', "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
