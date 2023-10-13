@@ -1109,5 +1109,4 @@ class Measurement
         }
         return $lmsValues;
     }
-
 }
