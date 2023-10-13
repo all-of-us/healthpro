@@ -31,10 +31,12 @@ $(document).ready(function () {
             },
             {
                 targets: [5],
-                render: function (type) {
+                render: function (type, display, row) {
                     let html = "";
                     if (type === "import") {
                         html = '<span class="label label-primary">Imported</span>';
+                    } else if (row["guardianVerified"]) {
+                        html = '<span class="label label-primary"><i class="fa fa-check"/> Guardian</span>';
                     }
                     return html;
                 }

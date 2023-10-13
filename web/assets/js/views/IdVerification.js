@@ -6,9 +6,16 @@ $(document).ready(function () {
     $("#id_verification_confirmation_0").change(function () {
         if (this.checked) {
             $(verificationFormSelector + " :input:not(:checkbox, #id_verification_cancel)").prop("disabled", false);
+            if ($("#participant_info").data("pediatric")) {
+                $("#id_verification_visit_type").val("PEDIATRIC_VISIT");
+                $("#id_verification_guardian_verified_0").attr("checked", true);
+                $("#id_verification_guardian_verified").attr("hidden", false);
+            }
         } else {
             $(verificationFormSelector + " :input:not(:checkbox, #id_verification_cancel)").prop("disabled", true);
             $(verificationFormSelector + " :input:not(:checkbox)").val("");
+            $("#id_verification_guardian_verified_0").attr("checked", false);
+            $("#id_verification_guardian_verified").attr("hidden", true);
             $(verificationFormSelector).parsley().reset();
         }
     });
