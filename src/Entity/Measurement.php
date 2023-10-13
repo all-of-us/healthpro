@@ -853,12 +853,14 @@ class Measurement
     private function getPediatricSummary(): array
     {
         $summary = [];
-        if ($height = $this->calculateMean('height')) {
-            $summary['height'] = [
-                'cm' => $height,
-                'ftin' => self::cmToFtIn($height)
-            ];
-            $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+        if (isset($this->fieldData->{'height'})) {
+            if ($height = $this->calculateMean('height')) {
+                $summary['height'] = [
+                    'cm' => $height,
+                    'ftin' => self::cmToFtIn($height)
+                ];
+                $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+            }
         }
         if ($weight = $this->calculateMean('weight')) {
             $summary['weight'] = [
@@ -867,7 +869,7 @@ class Measurement
             ];
             $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
         }
-        if ($weight && $height) {
+        if ($weight && !empty($height)) {
             $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
             if ($this->schema->displayBmi) {
                 $summary['bmi'] = self::calculateBmi($height, $weight);
@@ -902,8 +904,10 @@ class Measurement
                 ];
             }
         }
-        if ($heartrate = $this->calculateMean('heart-rate')) {
-            $summary['heartrate'] = $heartrate;
+        if (isset($this->fieldData->{'heart-rate'})) {
+            if ($heartrate = $this->calculateMean('heart-rate')) {
+                $summary['heartrate'] = $heartrate;
+            }
         }
         return $summary;
     }
@@ -1005,29 +1009,34 @@ class Measurement
                     if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k]) && !$value) {
                         $errors[] = [$field, $k];
                     }
-                    if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k]) && !$value) {
+                    if ($this->fieldData->{'blood-pressure-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
                         $errors[] = [$field, $k];
                     }
                 }
             }
         }
-        foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
-            if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
-                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
-            }
-        }
         foreach (['height', 'weight'] as $field) {
             if (isset($this->fieldData->$field)) {
-                if ((!$this->fieldData->{$field . '-protocol-modification'}) && !$this->fieldData->$field) {
-                    $errors[] = $field;
-                }
-                if ($this->fieldData->{$field . '-protocol-modification'} === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'})) {
-                    $errors[] = $field . '-protocol-modification-notes';
+                foreach ($this->fieldData->$field as $k => $value) {
+                    if ($k == 2) {
+                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
+                            break;
+                        }
+                    }
+                    if ((!$this->fieldData->{$field . '-protocol-modification'}[$k]) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
+                    }
                 }
             }
         }
         if (!$this->fieldData->wheelchair) {
-            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+            foreach (['hip-circumference', 'waist-circumference', 'head-circumference'] as $field) {
                 if (isset($this->fieldData->$field)) {
                     foreach ($this->fieldData->$field as $k => $value) {
                         if ($k == 2) {
@@ -1100,7 +1109,7 @@ class Measurement
         $charts = $this->growthCharts[$chartType];
 
         foreach ($charts as $item) {
-            if (floor($item['length']) === $length) {
+            if (round($item['length']) === round($length)) {
                 $lmsValues['L'] = $item['L'];
                 $lmsValues['M'] = $item['M'];
                 $lmsValues['S'] = $item['S'];

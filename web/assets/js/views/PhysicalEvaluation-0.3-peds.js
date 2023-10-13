@@ -133,14 +133,14 @@ let viewExtension = Backbone.View.extend({
             const lmsValues = [];
             let charts = this.growthCharts["weight-for-length"];
             charts.forEach((item) => {
-                if (item.length === avgLength) {
+                if (Math.round(item.length) === Math.round(avgLength)) {
                     lmsValues["L"] = item.L;
                     lmsValues["M"] = item.M;
                     lmsValues["S"] = item.S;
                 }
             });
             const percentileElement = this.$("#percentile-weight-for-length");
-            console.log("lms", lmsValues);
+            console.log("weight-for-length", "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
@@ -284,7 +284,7 @@ let viewExtension = Backbone.View.extend({
     },
     handleHeightProtocol: function () {
         let selected = this.$("#form_height-protocol-modification").val();
-        if (selected === "refusal" || selected === "pandemic") {
+        if (selected === "parental-refusal" || selected === "pandemic") {
             this.$("#form_height").valChange("").attr("disabled", true);
             this.$(".field-height").next(".alt-units-block").hide();
         } else {
@@ -302,7 +302,7 @@ let viewExtension = Backbone.View.extend({
     },
     handleWeightProtocol: function () {
         let selected = this.$("#form_weight-protocol-modification").val();
-        if (selected === "cannot-balance-on-scale" || selected === "refusal" || selected === "pandemic") {
+        if (selected === "cannot-balance-on-scale" || selected === "parental-refusal") {
             this.$("#form_weight, #form_weight-prepregnancy").each(function () {
                 $(this).valChange("").attr("disabled", true);
             });
@@ -363,7 +363,20 @@ let viewExtension = Backbone.View.extend({
         this.toggleThirdReading("waist-circumference");
     },
     toggleThirdHeartRate: function () {
-        this.toggleThirdReading("heart-rate");
+        const fieldsToCheck = ["heart-rate", "blood-pressure-systolic", "blood-pressure-diastolic"];
+        for (const field of fieldsToCheck) {
+            let first = parseFloat(this.$("#form_" + field + "_0").val());
+            let second = parseFloat(this.$("#form_" + field + "_1").val());
+            if (first > 0 && second > 0 && Math.abs(first - second) > 5) {
+                $(".panel-heart-rate-3").show();
+                break;
+            } else {
+                $(".panel-heart-rate-3").hide();
+                $(".panel-heart-rate-3 input, .panel-heart-rate-3 select").each(function () {
+                    $(this).valChange("");
+                });
+            }
+        }
     },
     calculateIrregularHeartRate: function () {
         let allIrregular = true;
@@ -410,6 +423,7 @@ let viewExtension = Backbone.View.extend({
                 )
             );
         }
+        this.toggleThirdHeartRate();
     },
     clearServerErrors: function (e) {
         let field = $(e.currentTarget).closest(".field");
@@ -701,7 +715,7 @@ let viewExtension = Backbone.View.extend({
             block.find(".modification-toggle").hide();
             block.find(".modification-select").show();
         }
-        if (modification === "refusal" || modification === "pandemic" || modification === "colostomy-bag") {
+        if (modification === "parental-refusal" || modification === "colostomy-bag") {
             block.find(".modification-affected input:text, .modification-affected select").each(function () {
                 $(this).valChange("").attr("disabled", true);
             });

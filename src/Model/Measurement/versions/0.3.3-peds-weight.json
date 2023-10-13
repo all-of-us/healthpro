@@ -16,7 +16,7 @@
       "warnings": [
         {
           "val": true,
-          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair user participants."
+          "message": "Please record estimated participant weight in the \"Weight\" field."
         }
       ]
     },

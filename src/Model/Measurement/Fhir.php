@@ -982,14 +982,14 @@ class Fhir
         return $this->protocolModification('waist-circumference', $replicate);
     }
 
-    protected function heightprotocolmodification()
+    protected function heightprotocolmodification($replicate = null)
     {
-        return $this->protocolModification('height');
+        return $this->protocolModification('height', $replicate);
     }
 
-    protected function weightprotocolmodification()
+    protected function weightprotocolmodification($replicate = null)
     {
-        return $this->protocolModification('weight');
+        return $this->protocolModification('weight', $replicate);
     }
 
     protected function meanProtocolModifications($replicates, $modificationMetric, $modificationMetricManual = null)
