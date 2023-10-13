@@ -1,6 +1,5 @@
 const _ = require("underscore");
-
-PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
+let viewExtension = Backbone.View.extend({
     events: {
         "change .replicate input[type='text']": "updateMean",
         "keyup .replicate input[type='text']": "updateMean",
@@ -953,3 +952,5 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         return this;
     }
 });
+PMI.views["PhysicalEvaluation-0.3-peds"] = viewExtension;
+PMI.views["PhysicalEvaluation-0.3-peds-weight"] = viewExtension;
