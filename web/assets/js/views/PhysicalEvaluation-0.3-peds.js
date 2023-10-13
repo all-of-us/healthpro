@@ -285,7 +285,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     },
     handleHeightProtocol: function () {
         let selected = this.$("#form_height-protocol-modification").val();
-        if (selected === "refusal" || selected === "pandemic") {
+        if (selected === "parental-refusal" || selected === "pandemic") {
             this.$("#form_height").valChange("").attr("disabled", true);
             this.$(".field-height").next(".alt-units-block").hide();
         } else {
@@ -303,7 +303,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
     },
     handleWeightProtocol: function () {
         let selected = this.$("#form_weight-protocol-modification").val();
-        if (selected === "cannot-balance-on-scale" || selected === "refusal" || selected === "pandemic") {
+        if (selected === "cannot-balance-on-scale" || selected === "parental-refusal") {
             this.$("#form_weight, #form_weight-prepregnancy").each(function () {
                 $(this).valChange("").attr("disabled", true);
             });
@@ -716,7 +716,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
             block.find(".modification-toggle").hide();
             block.find(".modification-select").show();
         }
-        if (modification === "refusal" || modification === "pandemic" || modification === "colostomy-bag") {
+        if (modification === "parental-refusal" || modification === "colostomy-bag") {
             block.find(".modification-affected input:text, .modification-affected select").each(function () {
                 $(this).valChange("").attr("disabled", true);
             });
