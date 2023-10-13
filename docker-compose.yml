@@ -11,6 +11,7 @@ services:
         image: mysql:5.7
         ports:
             - "53306:3306"
+            - "3306:3306"
         volumes:
             - healthpro-mysql-data:/var/lib/mysql
 
@@ -29,6 +30,7 @@ services:
             - "8080:8080"
         volumes:
             - .:/app:delegated
+            -  ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini:ro
 
 volumes:
     healthpro-mysql-data:

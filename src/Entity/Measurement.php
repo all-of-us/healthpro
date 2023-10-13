@@ -30,6 +30,8 @@ class Measurement
     public const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
     public const EVALUATION_CANCEL_STATUS = 'entered-in-error';
     public const EVALUATION_RESTORE_STATUS = 'final';
+    public const WEIGHT_CURRENT_VERSION = '0.3.3-weight';
+    public const WEIGHT = 'weight';
 
     public static $cancelReasons = [
         'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
@@ -1107,5 +1109,10 @@ class Measurement
             }
         }
         return $lmsValues;
+    }
+
+    private function isWeightOnly()
+    {
+        return str_contains($this->getVersion(), self::WEIGHT);
     }
 }

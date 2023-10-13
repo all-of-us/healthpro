@@ -48,7 +48,7 @@ class Participant
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
     public int $sexAtBirth;
-    public bool $isPediatric = false;
+    public bool $isPediatric = true;
     public string $pediatricMeasurementsVersionType;
 
     private $disableTestAccess;
@@ -282,6 +282,7 @@ class Participant
 
         $yearsInMonths = $diff->y * 12;
         $months = $diff->m;
+        $yearsInMonths = 0;
 
         return $yearsInMonths + $months;
     }

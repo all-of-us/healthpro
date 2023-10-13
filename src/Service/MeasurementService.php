@@ -117,6 +117,9 @@ class MeasurementService
         if ($this->requireEhrModificationProtocol()) {
             return Measurement::EHR_CURRENT_VERSION;
         }
+        if ($type == Measurement::WEIGHT) {
+            return Measurement::WEIGHT_CURRENT_VERSION;
+        }
         return Measurement::CURRENT_VERSION;
     }
 

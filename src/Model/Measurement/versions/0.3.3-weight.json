@@ -1,0 +1,117 @@
+{
+  "version": "0.3.3-peds-weight",
+  "template": "0.3-peds-weight",
+  "description": "Pediatric participants 3 to 5 years (36 to 59 months) old",
+  "fields": [
+    {
+      "name": "wheelchair",
+      "label": "Is participant a wheelchair user?",
+      "options": {
+        "No": false,
+        "Yes": true
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": true,
+          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair user participants."
+        }
+      ]
+    },
+    {
+      "name": "weight",
+      "label": "Weight",
+      "unit": "kg",
+      "decimals": 1,
+      "replicates": 3,
+      "max": 1000,
+      "warnings": [
+        {
+          "min": 30,
+          "message": "Please verify that this weight is correct"
+        },
+        {
+          "max": 199.5,
+          "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+        }
+      ],
+      "convert": "lb",
+      "alternateunits": true,
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "weight-protocol-modification",
+      "label": "Modification to Weight Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Weight is more than weight measuring range": "weight-out-of-range",
+        "Weight is less than weight measuring range": "weight-below-range",
+        "Can't balance on scale": "cannot-balance-on-scale",
+        "Uses a wheelchair": "uses-wheelchair",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Clothing not removed": "clothing-not-removed",
+        "Dirty diaper": "dirty-diaper",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "weight-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "weight-below-range",
+          "message": "Deviation successfully captured. Please record the minimum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "cannot-balance-on-scale",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "uses-wheelchair",
+          "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to clothing."
+        },
+        {
+          "val": "dirty-diaper",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to diaper."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+        }
+      ]
+    },
+    {
+      "name": "weight-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "notes",
+      "label": "Additional Notes",
+      "type": "textarea"
+    }
+  ],
+  "displayWeightForLength": true
+}

@@ -51,7 +51,11 @@ class MeasurementType extends AbstractType
             }
             $form = $builder->getForm();
             $bmiConstraint = function ($value, $context) use ($form) {
-                $bmi = round(self::calculateBmi($form->getData()->height, $form->getData()->weight), 1);
+                try {
+                    $bmi = round(self::calculateBmi($form->getData()->height, $form->getData()->weight), 1);
+                } catch (\ErrorException $e) {
+                    $bmi = false;
+                }
                 if ($bmi != false && ($bmi < 5 || $bmi > 125)) {
                     $context->buildViolation('This height/weight combination has yielded an invalid BMI')->addViolation();
                 }
