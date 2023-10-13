@@ -141,7 +141,7 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 }
             });
             const percentileElement = this.$("#percentile-weight-for-length");
-            console.log('weight-for-length', "lms", lmsValues);
+            console.log("weight-for-length", "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
