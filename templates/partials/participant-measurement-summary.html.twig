@@ -33,7 +33,7 @@
             {% if measurement.isPediatricForm %}
                 <tr>
                     <th>Head Circumference</th>
-                    {% if summary.head is defined %}
+                    {% if summary.head is defined and summary.head is not empty %}
                         <td>{{ summary.head.cm|number_format(1) }} cm</td>
                         <td>{{ summary.head.in|number_format(1) }} in</td>
                     {% else %}
@@ -90,7 +90,7 @@
                 <tr>
                     <th>Growth Percentile Weight for Age</th>
                     <td colspan="2">
-                        {% if summary['growth-percentile-weight-for-age'] is not empty %}
+                        {% if summary['growth-percentile-weight-for-age'] is defined and summary['growth-percentile-weight-for-age'] is not empty %}
                             {{ summary['growth-percentile-weight-for-age'] }}th percentile
                         {% else %}
                             --
@@ -100,7 +100,7 @@
                 <tr>
                     <th>Growth Percentile Height for Age</th>
                     <td colspan="2">
-                        {% if summary['growth-percentile-height-for-age'] is not empty %}
+                        {% if summary['growth-percentile-height-for-age'] is defined and summary['growth-percentile-height-for-age'] is not empty %}
                             {{ summary['growth-percentile-height-for-age'] }}th percentile
                         {% else %}
                             --
@@ -110,7 +110,7 @@
                 <tr>
                     <th>Growth percentile Weight for Length</th>
                     <td colspan="2">
-                        {% if summary['growth-percentile-weight-for-length'] is not empty %}
+                        {% if summary['growth-percentile-weight-for-length'] is defined and summary['growth-percentile-weight-for-length'] is not empty %}
                             {{ summary['growth-percentile-weight-for-length'] }}th percentile
                         {% else %}
                             --
@@ -120,7 +120,7 @@
                 <tr>
                     <th>Growth Percentile BMI for Age</th>
                     <td colspan="2">
-                        {% if summary['growth-percentile-bmi-for-age'] is not empty %}
+                        {% if summary['growth-percentile-bmi-for-age'] is defined and summary['growth-percentile-bmi-for-age'] is not empty %}
                             {{ summary['growth-percentile-bmi-for-age'] }}th percentile
                         {% else %}
                             --
