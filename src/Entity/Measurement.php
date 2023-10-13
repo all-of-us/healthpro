@@ -31,6 +31,7 @@ class Measurement
     public const EVALUATION_CANCEL_STATUS = 'entered-in-error';
     public const EVALUATION_RESTORE_STATUS = 'final';
     public const WEIGHT_CURRENT_VERSION = '0.3.3-weight';
+    public const WEIGHT = 'weight';
 
     public static $cancelReasons = [
         'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
