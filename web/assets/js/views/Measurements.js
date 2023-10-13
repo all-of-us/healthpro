@@ -1,6 +1,5 @@
 $(document).ready(function () {
     let measurement = $("#physicalEvaluation");
-    console.log(measurement.data("weight-for-age-lms"));
 
     new PMI.views["PhysicalEvaluation-" + measurement.data("schema-template")]({
         el: measurement,

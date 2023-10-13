@@ -1,6 +1,5 @@
 const _ = require("underscore");
-
-PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
+let viewExtension = Backbone.View.extend({
     events: {
         "change .replicate input[type='text']": "updateMean",
         "keyup .replicate input[type='text']": "updateMean",
@@ -119,7 +118,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 lmsValues["S"] = item.S;
             }
         });
-        console.log(field, "lms", lmsValues);
         const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
         percentileElement.attr("data-zscore", zScore);
@@ -141,7 +139,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 }
             });
             const percentileElement = this.$("#percentile-weight-for-length");
-            console.log("lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
@@ -514,7 +511,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
                 if (maxValue > warning.maxValue) {
                     maxValue = warning.maxValue;
                 }
-                console.log(warning.customPercentile, "warningValue", maxValue);
                 return val >= maxValue;
             }
         }
@@ -875,7 +871,6 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         this.finalized = obj.finalized;
         this.ageInMonths = parseInt(obj.ageInMonths);
         this.ageInYears = parseInt(obj.ageInYears);
-        console.log("ageInMonths", this.ageInMonths);
         this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;
         this.bpDiastolicHeightPercentileChart = obj.bpDiastolicHeightPercentileChart;
         this.heartRateAgeCharts = obj.heartRateAgeCharts;
@@ -953,3 +948,5 @@ PMI.views["PhysicalEvaluation-0.3-peds"] = Backbone.View.extend({
         return this;
     }
 });
+PMI.views["PhysicalEvaluation-0.3-peds"] = viewExtension;
+PMI.views["PhysicalEvaluation-0.3-peds-weight"] = viewExtension;

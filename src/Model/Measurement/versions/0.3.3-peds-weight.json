@@ -1,7 +1,7 @@
 {
   "version": "0.3.3-peds-weight",
   "template": "0.3-peds-weight",
-  "description": "Pediatric participants 3 to 5 years (36 to 59 months) old",
+  "description": "Weight only measurement form for pediatric participants.",
   "fields": [
     {
       "name": "wheelchair",
