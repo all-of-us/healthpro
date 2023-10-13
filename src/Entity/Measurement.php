@@ -853,12 +853,14 @@ class Measurement
     private function getPediatricSummary(): array
     {
         $summary = [];
-        if ($height = $this->calculateMean('height')) {
-            $summary['height'] = [
-                'cm' => $height,
-                'ftin' => self::cmToFtIn($height)
-            ];
-            $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+        if (isset($this->fieldData->{'height'})) {
+            if ($height = $this->calculateMean('height')) {
+                $summary['height'] = [
+                    'cm' => $height,
+                    'ftin' => self::cmToFtIn($height)
+                ];
+                $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+            }
         }
         if ($weight = $this->calculateMean('weight')) {
             $summary['weight'] = [
@@ -867,7 +869,7 @@ class Measurement
             ];
             $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
         }
-        if ($weight && $height) {
+        if ($weight && !empty($height)) {
             $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
             if ($this->schema->displayBmi) {
                 $summary['bmi'] = self::calculateBmi($height, $weight);
@@ -902,8 +904,10 @@ class Measurement
                 ];
             }
         }
-        if ($heartrate = $this->calculateMean('heart-rate')) {
-            $summary['heartrate'] = $heartrate;
+        if (isset($this->fieldData->{'heart-rate'})) {
+            if ($heartrate = $this->calculateMean('heart-rate')) {
+                $summary['heartrate'] = $heartrate;
+            }
         }
         return $summary;
     }
