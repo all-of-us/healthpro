@@ -739,7 +739,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/pediatric/weight', name: 'order_check_pediatric_weight')]
     public function orderCheckWeight($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
-    {  
+    {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
