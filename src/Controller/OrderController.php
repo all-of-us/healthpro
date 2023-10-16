@@ -739,8 +739,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/pediatric/weight', name: 'order_check_pediatric_weight')]
     public function orderCheckWeight($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
-    {
-        #TODO: Update this function after Shyams physical measurement code is added.
+    {  
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -764,7 +763,8 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
-    public function orderCheckPediatric($participantId, MeasurementRepository $measurementRepository, RequestStack $requestStack): Response {
+    public function orderCheckPediatric($participantId, MeasurementRepository $measurementRepository, RequestStack $requestStack): Response
+    {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -777,5 +777,4 @@ class OrderController extends BaseController
             'siteType' => $requestStack->getSession()->get('siteType')
         ]);
     }
-
 }
