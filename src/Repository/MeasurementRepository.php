@@ -146,7 +146,7 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getMostRecentMeasurementWithoutParent($participantId): Measurement
+    public function getMostRecentMeasurementWithoutParent($participantId): Measurement|null
     {
         $parentIds = $this->createQueryBuilder('m')
             ->select('m.parentId')
@@ -160,11 +160,11 @@ class MeasurementRepository extends ServiceEntityRepository
             $queryBuilder->andWhere($queryBuilder->expr()->notIn('m.id', ':parentIds'));
             $queryParams['parentIds'] = $parentIds;
         }
-        $queryBuilder->setMaxResults(1);
         return $queryBuilder
             ->setParameters($queryParams)
+            ->setMaxResults(1)
             ->orderBy('m.finalizedTs', 'DESC')
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
     }
 }

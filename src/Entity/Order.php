@@ -906,14 +906,14 @@ class Order
                 // Initial orders doesn't have a version so set version for those orders
                 $this->currentVersion = self::INITIAL_VERSION;
                 if ($pediatricFlag && $physicalMeasurement) {
-                    $data = json_decode($physicalMeasurement->getData());
-                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($data->weight)}";
+                    $summary = $physicalMeasurement->getSummary();
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
                 if ($pediatricFlag && $physicalMeasurement) {
-                    $data = json_decode($physicalMeasurement->getData());
-                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($data->weight)}";
+                    $summary = $physicalMeasurement->getSummary();
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             }
         }

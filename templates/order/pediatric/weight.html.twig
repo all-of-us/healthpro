@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+{% block title %}Order - {% endblock %}
+{% block body %}
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            New Biobank order
+            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+        </h2>
+    </div>
+
+    {% include 'partials/participant-dl.html.twig' %}
+
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#">Safety Check</a></li>
+        {% if siteType == 'dv' %}
+            {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
+        {% else %}
+            {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% endif %}
+        {% for step in steps %}
+            <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
+        {% endfor %}
+    </ul>
+    <br/>
+    {% if weightMeasurement is null %}
+    <h4>Please Confirm the participants weight is accurate prior to biospeciment collection</h4>
+        <div class="col-md-12">
+            <span class="text-danger"><i class="fas fa-exclamation-circle"></i> Weight measurement not found. Please complete and finalize a physical measurements form prior to biospecimen collection.</span>
+        </div>
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Not Found</div>
+                <div class="panel-body">
+                    <span class="center-block">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <p>
+            <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-primary">Start New Physical Measurements</a>
+        </p>
+    </div>
+    {%  elseif weightMeasurement.finalizedTs|date('U') < "-1 day"|date('U') %}
+        <h4>Please Confirm the participants weight is accurate prior to biospeciment collection</h4>
+        <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> The participant's weight measurement was taken more than 1 day ago. Please recapture the weight to proceed.</span>
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
+                    <div class="panel-body">
+                        <span class="center-block text-center">{{ measurementData.weight.kg }} Kg ({{ measurementData.weight.lb }} lbs)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <p>
+                <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+            </p>
+        </div>
+        {% else %}
+            <h4>Please Confirm the participants weight is accurate prior to biospeciment collection. Click confirm if the participants weight is accurate. Click Amend to edit the weight captured on todays
+            physical measurements form.</h4>
+            <div class="col-md-12">
+                <div class="col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
+                        <div class="panel-body">
+                            <span class="center-block text-center">{{ measurementData.weight.kg }} Kg ({{ measurementData.weight.lb }} lbs)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <p>
+                    <a href="{{ path('order_check_pediatric', {'participantId': participant.id}) }}" class="btn btn-primary">Confirm</a>
+                    <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Amend</a>
+                </p>
+            </div>
+    {% endif %}
+{% endblock %}
+
+{% block pagejs %}
+{% endblock %}
