@@ -123,6 +123,8 @@ let viewExtension = Backbone.View.extend({
         const zScore = this.getZScore(X, lmsValues);
         percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
+        console.log(field, "zscore", zScore);
+        console.log(field, "percentile", percentile);
         percentileElement.html("<strong>" + percentile + "</strong>th");
         percentileElement.attr("data-percentile", percentile);
     },
