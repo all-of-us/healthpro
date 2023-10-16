@@ -200,7 +200,7 @@ class MeasurementsController extends BaseController
                                     'showAutoModification' => 1
                                 ]);
                             }
-                            if ($measurement->isPediatricForm()) {
+                            if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm()) {
                                 return $this->redirectToRoute('order_check_pediatric_weight', [
                                     'participantId' => $participant->id
                                 ]);

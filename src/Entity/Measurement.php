@@ -626,6 +626,12 @@ class Measurement
         return str_contains($version, 'peds');
     }
 
+    public function isWeightOnlyPediatricForm(): bool
+    {
+        $version = $this->getSchema()->version;
+        return str_contains($version, 'peds-weight');
+    }
+
     /**
      * @throws Exception
      */
