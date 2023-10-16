@@ -13,9 +13,6 @@ class HeartRateAge
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 10)]
-    private string $ageType;
-
     #[ORM\Column]
     private int $startAge;
 
@@ -31,18 +28,6 @@ class HeartRateAge
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAgeType(): ?string
-    {
-        return $this->ageType;
-    }
-
-    public function setAgeType(string $ageType): self
-    {
-        $this->ageType = $ageType;
-
-        return $this;
     }
 
     public function getStartAge(): ?int

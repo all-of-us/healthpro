@@ -146,7 +146,7 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getMostRecentMeasurementWithoutParentId($participantId)
+    public function getMostRecentMeasurementWithoutParent($participantId): Measurement
     {
         $parentIds = $this->createQueryBuilder('m')
             ->select('m.parentId')

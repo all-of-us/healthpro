@@ -17,19 +17,22 @@ class MeasurementQueueService
     protected $params;
     protected $measurementService;
     protected $logger;
+    protected ParticipantSummaryService $participantSummaryService;
 
     public function __construct(
         EntityManagerInterface $em,
         LoggerService $loggerService,
         ParameterBagInterface $params,
         MeasurementService $measurementService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ParticipantSummaryService $participantSummaryService
     ) {
         $this->em = $em;
         $this->loggerService = $loggerService;
         $this->params = $params;
         $this->measurementService = $measurementService;
         $this->logger = $logger;
+        $this->participantSummaryService = $participantSummaryService;
     }
 
     public function resendMeasurementsToRdr()
@@ -42,7 +45,8 @@ class MeasurementQueueService
             if (!$measurement) {
                 continue;
             }
-            $this->measurementService->load($measurement);
+            $participant = $this->participantSummaryService->getParticipantById($measurement->getParticipantId());
+            $this->measurementService->load($measurement, $participant);
             $fhir = $measurement->getFhir($measurement->getFinalizedTs(), $measurementQueue->getOldRdrId());
             $now = new \DateTime();
             if ($rdrMeasurementId = $this->measurementService->createMeasurement($measurement->getParticipantId(), $fhir)) {

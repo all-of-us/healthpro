@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Helper\Participant;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -224,6 +225,9 @@ class Order
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $submissionTs;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $ageInMonths;
 
     private $quanumCollectedUser;
 
@@ -877,17 +881,43 @@ class Order
         return $this->currentVersion;
     }
 
-    public function loadSamplesSchema($params = [])
+    public function getAgeInMonths(): int
+    {
+        return $this->ageInMonths;
+    }
+
+    public function setAgeInMonths(?int $ageInMonths): self
+    {
+        $this->ageInMonths = $ageInMonths;
+
+        return $this;
+    }
+
+    public function loadSamplesSchema($params = [], Participant $participant = null, Measurement $physicalMeasurement = null)
     {
         $this->currentVersion = $this->getVersion();
+        if ($participant) {
+            $pediatricFlag = $participant->isPediatric;
+        } else {
+            $pediatricFlag = false;
+        }
         if (empty($this->currentVersion)) {
             if (!empty($this->getId())) {
                 // Initial orders doesn't have a version so set version for those orders
                 $this->currentVersion = self::INITIAL_VERSION;
+                if ($pediatricFlag && $physicalMeasurement) {
+                    $data = json_decode($physicalMeasurement->getData());
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($data->weight)}";
+                }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
+                if ($pediatricFlag && $physicalMeasurement) {
+                    $data = json_decode($physicalMeasurement->getData());
+                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($data->weight)}";
+                }
             }
         }
+
         $this->params = $params;
         $file = __DIR__ . "/../Order/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {

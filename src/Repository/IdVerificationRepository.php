@@ -22,8 +22,8 @@ class IdVerificationRepository extends ServiceEntityRepository
     public function getOnsiteIdVerifications($site, $params): array
     {
         $queryBuilder = $this->createQueryBuilder('idv')
-            ->select('idv.createdTs, idv.participantId, idv.verificationType, idv.visitType, 
-                u.email, idvi.id as importId');
+            ->select('idv.createdTs, idv.participantId, idv.verificationType, idv.visitType,
+                u.email, idvi.id as importId, idv.GuardianVerified as guardianVerified');
 
         $this->setQueryBuilder($queryBuilder, $params, $site);
 

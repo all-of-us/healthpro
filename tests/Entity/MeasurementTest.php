@@ -2,8 +2,16 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\BmiForAge5YearsAndUp;
+use App\Entity\HeadCircumferenceForAge0To36Months;
+use App\Entity\HeightForAge0To23Months;
+use App\Entity\HeightForAge24MonthsTo6Years;
 use App\Entity\Measurement;
 use App\Entity\User;
+use App\Entity\WeightForAge0To23Months;
+use App\Entity\WeightForAge24MonthsAndUp;
+use App\Entity\WeightForLength0To23Months;
+use App\Entity\WeightForLength23MonthsTo5Years;
 use App\Entity\ZScores;
 use App\Exception\MissingSchemaException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -207,7 +215,7 @@ class MeasurementTest extends KernelTestCase
      */
     public function testCalculatePercentile(float $z, ?float $expectedPercentile): void
     {
-        $zScores = $this->em->getRepository(ZScores::class)->findAll();
+        $zScores = $this->em->getRepository(ZScores::class)->getChartsData();
         $measurement = new Measurement();
         $percentile = $measurement->calculatePercentile($z, $zScores);
         $this->assertEquals($expectedPercentile, $percentile);
@@ -216,22 +224,67 @@ class MeasurementTest extends KernelTestCase
     public function calculatePercentileDataProvider(): array
     {
         return [
-            [-3.9, 0.005],
-            [-2.0, 2.275],
-            [-1.5, 6.681],
-            [-1.0, 15.866],
-            [-0.5, 30.854],
-            [0.0, 50.0],
-            [0.5, 69.146],
-            [1.0, 84.134],
-            [1.5, 93.319],
-            [2.0, 97.725],
-            [2.5, 99.379],
-            [3.0, 99.865],
-            [3.5, 99.977],
-            [-3.93, 0.004],
-            [3.93, 99.996],
+            [-3.9, 0],
+            [-2.0, 2],
+            [-1.5, 7],
+            [-1.0, 16],
+            [-0.5, 31],
+            [0.0, 50],
+            [0.5, 69],
+            [1.0, 84],
+            [1.5, 93],
+            [2.0, 98],
+            [2.5, 99],
+            [3.0, 100],
+            [3.5, 100],
+            [-3.93, 0],
+            [3.93, 100],
             [4, null]
+        ];
+    }
+
+
+    /**
+     * @dataProvider ageDataProvider
+     */
+    public function testGetGrowthChartsByAge(int $ageInMonths, $expectedResult)
+    {
+        $measurement = new Measurement();
+        $result = $measurement->getGrowthChartsByAge($ageInMonths);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function ageDataProvider(): array
+    {
+        return [
+            [0, [
+                'weightForAgeCharts' => WeightForAge0To23Months::class,
+                'heightForAgeCharts' => HeightForAge0To23Months::class,
+                'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
+                'weightForLengthCharts' => WeightForLength0To23Months::class,
+                'bmiForAgeCharts' => null,
+            ]],
+            [12, [
+                'weightForAgeCharts' => WeightForAge0To23Months::class,
+                'heightForAgeCharts' => HeightForAge0To23Months::class,
+                'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
+                'weightForLengthCharts' => WeightForLength0To23Months::class,
+                'bmiForAgeCharts' => null,
+            ]],
+            [25, [
+                'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
+                'heightForAgeCharts' => HeightForAge24MonthsTo6Years::class,
+                'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
+                'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
+                'bmiForAgeCharts' => null,
+            ]],
+            [60, [
+                'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
+                'heightForAgeCharts' => HeightForAge24MonthsTo6Years::class,
+                'headCircumferenceForAgeCharts' => null,
+                'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
+                'bmiForAgeCharts' => BmiForAge5YearsAndUp::class,
+            ]],
         ];
     }
 }

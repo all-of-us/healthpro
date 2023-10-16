@@ -38,4 +38,13 @@ class WeightForLength23MonthsTo5YearsRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getChartsData($sex): ?array
+    {
+        return $this->createQueryBuilder('wfl')
+            ->where('wfl.sex = :sex')
+            ->setParameter('sex', $sex)
+            ->getQuery()
+            ->getArrayResult();
+    }
 }
