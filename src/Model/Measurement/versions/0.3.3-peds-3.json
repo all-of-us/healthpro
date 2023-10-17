@@ -29,12 +29,25 @@
       "max": 1000,
       "warnings": [
         {
-          "min": 30,
-          "message": "Please verify that this weight is correct"
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "Multiple weight measurements indicate very low weight for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
         },
         {
-          "max": 199.5,
-          "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "This value may indicate very low weight for age if confirmed by repeat measure."
+        },
+        {
+          "min": 7,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol."
+
+        },
+        {
+          "max": 35,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
         }
       ],
       "convert": "lb",
@@ -129,20 +142,20 @@
       },
       "warnings": [
         {
-          "min": 2.3,
-          "message": "Please verify that this height has been entered in centimeters, and not meters (1m = 100cm)"
+          "between": [0, 2.3],
+          "message": "Please verify that this number has been entered in centimeters, and not feet (1ft = 30.48cm)"
         },
         {
-          "between": [3, 7.5],
-          "message": "Please verify that this height has been entered in centimeters, and not feet (1ft = 30.48cm)"
+          "min": 80,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         },
         {
-          "between": [36, 89.9],
-          "message": "Please verify that this height has been entered in centimeters, and not inches (1in = 2.54cm)"
+          "between": [134, 229],
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         },
         {
           "max": 228,
-          "message": "Please verify that this height is correct."
+          "message": "Please verify that the number entered is correct."
         }
       ]
     },
@@ -210,9 +223,9 @@
       "max": 300,
       "warnings": [
         {
-          "min": 50,
-          "max": 150,
-          "message": "Please verify that this circumference is correct"
+          "min": 38,
+          "max": 92,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
       "convert": "in",
@@ -305,34 +318,37 @@
       "max": 300,
       "warnings": [
         {
-          "max": 200,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "maxValue": 140,
+          "addValue": 30,
+          "customPercentile": "bp-systolic",
+          "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "max": 180,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "maxValue": 140,
+          "addValue": 12,
+          "customPercentile": "bp-systolic",
+          "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "min": 100,
-          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-          "alert": true,
-          "consecutive": 2
+          "maxValue": 140,
+          "addValue": 30,
+          "customPercentile": "bp-systolic",
+          "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
         },
         {
-          "max": 200,
-          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+          "maxValue": 140,
+          "addValue": 12,
+          "customPercentile": "bp-systolic",
+          "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
         },
         {
-          "max": 180,
-          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
-        },
-        {
-          "min": 100,
-          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+          "min": 88,
+          "max": 126,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
       "help": {
@@ -352,34 +368,37 @@
       },
       "warnings": [
         {
-          "max": 120,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for IMMEDIATE referral.",
+          "maxValue": 90,
+          "addValue": 30,
+          "customPercentile": "bp-diastolic",
+          "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "max": 110,
-          "message": "Consecutive high blood pressures indicate this participant may be experiencing a hypertensive crisis. Refer to your site's SOP for expedited referral.",
+          "maxValue": 90,
+          "addValue": 12,
+          "customPercentile": "bp-diastolic",
+          "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "min": 60,
-          "message": "Participant could be in a hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong>. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
-          "alert": true,
-          "consecutive": 2
+          "maxValue": 90,
+          "addValue": 30,
+          "customPercentile": "bp-diastolic",
+          "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
         },
         {
-          "max": 120,
-          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
+          "maxValue": 90,
+          "addValue": 12,
+          "customPercentile": "bp-diastolic",
+          "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
         },
         {
-          "max": 110,
-          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure."
-        },
-        {
-          "min": 60,
-          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+          "min": 45,
+          "max": 86,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
       "help": {
@@ -413,24 +432,41 @@
       "max": 300,
       "warnings": [
         {
-          "max": 100,
-          "message": "Participant could be at risk for hypertensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "customPercentile": "heart-rate",
+          "percentileType": "max",
+          "percentileField": "centile99",
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "min": 60,
-          "message": "Participant could be at risk for hypotensive crisis if the participant is experiencing any symptoms of <strong>hemodynamic instability</strong> or if the participant's systolic blood pressure is < 90 mmHg. Refer to your site's SOP for an emergent referral.<br /><br /><strong>Hemodynamic instability</strong> is defined to include:<br /><ol><li>Changes in mental status (reduced alertness and awareness, confusion, possible loss of consciousness)</li><li>Chest pain</li><li>Shortness of breath and/or rapid breathing</li><li>Cold, clammy skin.</li></ol>",
+          "customPercentile": "heart-rate",
+          "percentileType": "min",
+          "percentileField": "centile1",
+          "message": "Participant has very low heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
           "alert": true,
           "consecutive": 2
         },
         {
-          "max": 100,
-          "message": "This value may indicate a hypertensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability."
+          "customPercentile": "heart-rate",
+          "percentileType": "max",
+          "percentileField": "centile99",
+          "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "customPercentile": "heart-rate",
+          "percentileType": "min",
+          "percentileField": "centile1",
+          "message": "This value indicates very low heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "max": 175,
+          "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
         },
         {
           "min": 60,
-          "message": "This value may indicate a hypotensive crisis if confirmed by a consecutive measure with any symptoms of hemodynamic instability or if the participant's systolic blood pressure is < 90 mmHg."
+          "max": 140,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
       "help": {
@@ -505,5 +541,6 @@
       "type": "textarea"
     }
   ],
+  "displayBmi": false,
   "displayWeightForLength": true
 }

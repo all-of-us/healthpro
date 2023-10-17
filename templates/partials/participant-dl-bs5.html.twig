@@ -7,8 +7,23 @@
     <dd class="col-sm-7">{{ participant.biobankId }}</dd>
     <dt class="col-sm-5">DOB</dt>
     <dd class="col-sm-7">{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
-    <dt class="col-sm-5">Gender Identity</dt>
-    <dd class="col-sm-7">{{ participant.genderIdentity|default('--') }}</dd>
+    {% if participant.isPediatric %}
+        <dt class="col-sm-5">Age</dt>
+        <dd class="col-sm-7">{{ participant.ageInMonths <= 23 ? participant.ageInMonths ~ ' mo' : participant.age ~ ' y/o' }}</dd>
+        <dt class="col-sm-5">Sex</dt>
+        <dd class="col-sm-7">
+            {% if participant.sexAtBirth == 1 %}
+                Male
+            {% elseif participant.sexAtBirth == 2 %}
+                Female
+            {% else %}
+                --
+            {% endif %}
+        </dd>
+    {% else %}
+        <dt class="col-sm-5">Gender Identity</dt>
+        <dd class="col-sm-7">{{ participant.genderIdentity|default('--') }}</dd>
+    {% endif %}
     <dt class="col-sm-5">Participant Status</dt>
     <dd class="col-sm-7">{{ participant.enrollmentStatus|default('--') }}
         {% if participant.isCoreParticipant and  participant.enrollmentStatusCoreStoredSampleTime is not empty %}
@@ -26,7 +41,7 @@
     {% if measurement is defined and measurement.id %}
         <dt class="col-sm-5">Updated</dt>
         <dd class="col-sm-7">{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
-        {% if measurement.version != latestVersion %}
+        {% if not measurement.isPediatricForm and measurement.version != latestVersion %}
             <dt>Version</dt>
             <dd class="col-sm-7">{{ measurement.version }}
                 <small class="text-muted">(latest version is {{ latestVersion }})</small>

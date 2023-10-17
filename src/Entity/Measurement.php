@@ -82,6 +82,8 @@ class Measurement
 
     private $schema;
 
+    private array $growthCharts = [];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -128,6 +130,9 @@ class Measurement
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\MeasurementHistory', cascade: ['persist', 'remove'])]
     private $history;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private $ageInMonths;
 
     public function getId(): ?int
     {
@@ -309,6 +314,30 @@ class Measurement
         return $this;
     }
 
+    public function getAgeInMonths(): ?float
+    {
+        return $this->ageInMonths;
+    }
+
+    public function setAgeInMonths(float $ageInMonths): self
+    {
+        $this->ageInMonths = $ageInMonths;
+
+        return $this;
+    }
+
+    public function getGrowthCharts(): array
+    {
+        return $this->growthCharts;
+    }
+
+    public function setGrowthCharts(array $growthCharts): self
+    {
+        $this->growthCharts = $growthCharts;
+
+        return $this;
+    }
+
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
         if (empty($this->currentVersion) && empty($this->version)) {
@@ -387,48 +416,9 @@ class Measurement
         return $fhir->toObject();
     }
 
-    public function getSummary()
+    public function getSummary(): array
     {
-        $summary = [];
-        if ($this->fieldData->height) {
-            $summary['height'] = [
-                'cm' => $this->fieldData->height,
-                'ftin' => self::cmToFtIn($this->fieldData->height)
-            ];
-        }
-        if ($this->fieldData->weight) {
-            $summary['weight'] = [
-                'kg' => $this->fieldData->weight,
-                'lb' => self::kgToLb($this->fieldData->weight)
-            ];
-        }
-        if ($this->fieldData->weight && $this->fieldData->height) {
-            $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
-        }
-        if ($hip = $this->calculateMean('hip-circumference')) {
-            $summary['hip'] = [
-                'cm' => $hip,
-                'in' => self::cmToIn($hip)
-            ];
-        }
-        if ($waist = $this->calculateMean('waist-circumference')) {
-            $summary['waist'] = [
-                'cm' => $waist,
-                'in' => self::cmToIn($waist)
-            ];
-        }
-        $systolic = $this->calculateMean('blood-pressure-systolic');
-        $diastolic = $this->calculateMean('blood-pressure-diastolic');
-        if ($systolic && $diastolic) {
-            $summary['bloodpressure'] = [
-                'systolic' => $systolic,
-                'diastolic' => $diastolic
-            ];
-        }
-        if ($heartrate = $this->calculateMean('heart-rate')) {
-            $summary['heartrate'] = $heartrate;
-        }
-        return $summary;
+        return $this->isPediatricForm() ? $this->getPediatricSummary() : $this->getAdultSummary();
     }
 
     public function canCancel()
@@ -594,84 +584,9 @@ class Measurement
         $this->fieldData->{'height-protocol-modification'} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
-    public function getFinalizeErrors()
+    public function getFinalizeErrors(): array
     {
-        $errors = [];
-
-        if (!$this->isMinVersion('0.3.0')) {
-            // prior to version 0.3.0, any state is valid
-            return $errors;
-        }
-
-        // EHR protocol form
-        if ($this->isEhrProtocolForm()) {
-            foreach (self::$measurementSourceFields as $sourceField) {
-                if ($this->fieldData->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->fieldData->{$sourceField . '-ehr-date'})) {
-                    $errors[] = $sourceField . '-ehr-date';
-                }
-            }
-        }
-
-        foreach (self::$bloodPressureFields as $field) {
-            foreach ($this->fieldData->$field as $k => $value) {
-                $displayError = false;
-                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
-                if ($this->isEhrProtocolForm()) {
-                    $displayError = $k === 0 && $this->fieldData->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
-                }
-
-                if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
-                    $errors[] = [$field, $k];
-                }
-            }
-        }
-        foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
-            if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
-                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
-            }
-        }
-        foreach (['height', 'weight'] as $field) {
-            $displayError = false;
-            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
-            if ($this->isEhrProtocolForm()) {
-                $displayError = $this->fieldData->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
-            }
-            if ((!$this->fieldData->{$field . '-protocol-modification'} || $displayError) && !$this->fieldData->$field) {
-                $errors[] = $field;
-            }
-            if ($this->fieldData->{$field . '-protocol-modification'} === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'})) {
-                $errors[] = $field . '-protocol-modification-notes';
-            }
-        }
-        if (!$this->fieldData->pregnant && !$this->fieldData->wheelchair) {
-            foreach (['hip-circumference', 'waist-circumference'] as $field) {
-                foreach ($this->fieldData->$field as $k => $value) {
-                    if ($k == 2) {
-                        // not an error on the third measurement if first two aren't completed
-                        // or first two measurements are within 1 cm
-                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
-                            break;
-                        }
-                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
-                            break;
-                        }
-                    }
-                    $displayError = false;
-                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
-                    if ($this->isEhrProtocolForm()) {
-                        $displayError = $k === 0 && $this->fieldData->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
-                    }
-                    if ((!$this->fieldData->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
-                        $errors[] = [$field, $k];
-                    }
-                    if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
-                        $errors[] = [$field . '-protocol-modification-notes', $k];
-                    }
-                }
-            }
-        }
-
-        return $errors;
+        return $this->isPediatricForm() ? $this->getPediatricFinalizeErrors() : $this->getAdultFinalizeErrors();
     }
 
     public function getFormFieldErrorMessage($field = null, $replicate = null)
@@ -705,6 +620,18 @@ class Measurement
         return empty($this->version) ? $this->currentVersion : $this->version;
     }
 
+    public function isPediatricForm(): bool
+    {
+        $version = $this->getSchema()->version;
+        return str_contains($version, 'peds');
+    }
+
+    public function isWeightOnlyPediatricForm(): bool
+    {
+        $version = $this->getSchema()->version;
+        return str_contains($version, 'peds-weight');
+    }
+
     /**
      * @throws Exception
      */
@@ -716,46 +643,45 @@ class Measurement
             if ($denominator != 0) {
                 return round($numerator / $denominator, 2);
             }
-            throw new Exception('Division by zero error');
         } else {
             if ($S != 0) {
                 return round(log($X / $M) / $S, 2);
             }
-            throw new Exception('Division by zero error');
         }
+        throw new Exception('Division by zero error');
     }
 
-    public function calculatePercentile($z, $zScores): float|null
+    public function calculatePercentile(float $z, array $zScores): float|null
     {
         $decimalPoints = [
-            'Z0' => 0.00,
-            'Z01' => 0.01,
-            'Z02' => 0.02,
-            'Z03' => 0.03,
-            'Z04' => 0.04,
-            'Z05' => 0.05,
-            'Z06' => 0.06,
-            'Z07' => 0.07,
-            'Z08' => 0.08,
-            'Z09' => 0.09
+            'Z_0' => 0.00,
+            'Z_01' => 0.01,
+            'Z_02' => 0.02,
+            'Z_03' => 0.03,
+            'Z_04' => 0.04,
+            'Z_05' => 0.05,
+            'Z_06' => 0.06,
+            'Z_07' => 0.07,
+            'Z_08' => 0.08,
+            'Z_09' => 0.09
         ];
         foreach ($zScores as $zScore) {
-            if ($z == $zScore->getZ()) {
-                return round($zScore->getZ0() * 100, 5);
+            if ($z == $zScore['Z']) {
+                return (int) round($zScore['Z_0'] * 100, 0);
             }
             foreach ($decimalPoints as $index => $decimalPoint) {
-                $newZValue = $zScore->getZ() > 0 ? $zScore->getZ() + $decimalPoint : $zScore->getZ() - $decimalPoint;
+                $newZValue = $zScore['Z'] > 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
                 if ($z == round($newZValue, 2)) {
-                    return round($zScore->{"get$index"}() * 100, 5);
+                    return (int) round($zScore[$index] * 100, 0);
                 }
             }
         }
         return null;
     }
 
-    public function getGrowthChartsByAge($ageInMonths): array
+    public function getGrowthChartsByAge(int $ageInMonths): array
     {
-        $growChartsByAge = [
+        $growthChartsByAgeList = [
             'weightForAgeCharts' => [
                 WeightForAge0To23Months::class => [0, 23],
                 WeightForAge24MonthsAndUp::class => [24, 240]
@@ -775,19 +701,19 @@ class Measurement
                 BmiForAge5YearsAndUp::class => [60, 240]
             ],
         ];
-        $selectedCharts = [];
-        foreach (array_keys($growChartsByAge) as $chartType) {
-            $selectedCharts[$chartType] = null;
-        }
-        foreach ($growChartsByAge as $chartType => $ageRanges) {
+
+        $selectedGrowthCharts = array_fill_keys(array_keys($growthChartsByAgeList), null);
+
+        foreach ($growthChartsByAgeList as $growthChartType => $ageRanges) {
             foreach ($ageRanges as $chartClass => $range) {
                 list($start, $end) = $range;
                 if ($ageInMonths >= $start && $ageInMonths <= $end) {
-                    $selectedCharts[$chartType] = $chartClass;
+                    $selectedGrowthCharts[$growthChartType] = $chartClass;
                 }
             }
         }
-        return $selectedCharts;
+
+        return $selectedGrowthCharts;
     }
 
     protected function normalizeData($type = null)
@@ -884,5 +810,317 @@ class Measurement
     protected function isMinVersion($minVersion)
     {
         return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    private function getAdultSummary(): array
+    {
+        $summary = [];
+        if ($this->fieldData->height) {
+            $summary['height'] = [
+                'cm' => $this->fieldData->height,
+                'ftin' => self::cmToFtIn($this->fieldData->height)
+            ];
+        }
+        if ($this->fieldData->weight) {
+            $summary['weight'] = [
+                'kg' => $this->fieldData->weight,
+                'lb' => self::kgToLb($this->fieldData->weight)
+            ];
+        }
+        if ($this->fieldData->weight && $this->fieldData->height) {
+            $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
+        }
+        if ($hip = $this->calculateMean('hip-circumference')) {
+            $summary['hip'] = [
+                'cm' => $hip,
+                'in' => self::cmToIn($hip)
+            ];
+        }
+        if ($waist = $this->calculateMean('waist-circumference')) {
+            $summary['waist'] = [
+                'cm' => $waist,
+                'in' => self::cmToIn($waist)
+            ];
+        }
+        $systolic = $this->calculateMean('blood-pressure-systolic');
+        $diastolic = $this->calculateMean('blood-pressure-diastolic');
+        if ($systolic && $diastolic) {
+            $summary['bloodpressure'] = [
+                'systolic' => $systolic,
+                'diastolic' => $diastolic
+            ];
+        }
+        if ($heartrate = $this->calculateMean('heart-rate')) {
+            $summary['heartrate'] = $heartrate;
+        }
+        return $summary;
+    }
+
+    private function getPediatricSummary(): array
+    {
+        $summary = [];
+        if (isset($this->fieldData->{'height'})) {
+            if ($height = $this->calculateMean('height')) {
+                $summary['height'] = [
+                    'cm' => $height,
+                    'ftin' => self::cmToFtIn($height)
+                ];
+                $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+            }
+        }
+        if ($weight = $this->calculateMean('weight')) {
+            $summary['weight'] = [
+                'kg' => $weight,
+                'lb' => self::kgToLb($weight)
+            ];
+            $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
+        }
+        if ($weight && !empty($height)) {
+            $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
+            if ($this->schema->displayBmi) {
+                $summary['bmi'] = self::calculateBmi($height, $weight);
+                $summary['growth-percentile-bmi-for-age'] = $this->calculateGrowthPercentileForAge('bmiForAgeCharts', $summary['bmi']);
+            }
+        }
+        $circumferenceFields = [
+            'hip' => 'hip-circumference',
+            'waist' => 'waist-circumference',
+            'head' => 'head-circumference'
+        ];
+
+        foreach ($circumferenceFields as $key => $circumferenceField) {
+            if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculateMean($circumferenceField)) {
+                $summary[$key] = [
+                    'cm' => $mean,
+                    'in' => self::cmToIn($mean)
+                ];
+                if ($key === 'head') {
+                    $summary['growth-percentile-head-circumference-for-age'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
+                }
+            }
+        }
+
+        if (isset($this->fieldData->{'blood-pressure-systolic'})) {
+            $systolic = $this->calculateMean('blood-pressure-systolic');
+            $diastolic = $this->calculateMean('blood-pressure-diastolic');
+            if ($systolic && $diastolic) {
+                $summary['bloodpressure'] = [
+                    'systolic' => $systolic,
+                    'diastolic' => $diastolic
+                ];
+            }
+        }
+        if (isset($this->fieldData->{'heart-rate'})) {
+            if ($heartrate = $this->calculateMean('heart-rate')) {
+                $summary['heartrate'] = $heartrate;
+            }
+        }
+        return $summary;
+    }
+
+    private function getAdultFinalizeErrors(): array
+    {
+        $errors = [];
+
+        if (!$this->isMinVersion('0.3.0')) {
+            // prior to version 0.3.0, any state is valid
+            return $errors;
+        }
+
+        // EHR protocol form
+        if ($this->isEhrProtocolForm()) {
+            foreach (self::$measurementSourceFields as $sourceField) {
+                if ($this->fieldData->{$sourceField} === self::EHR_PROTOCOL_MODIFICATION && empty($this->fieldData->{$sourceField . '-ehr-date'})) {
+                    $errors[] = $sourceField . '-ehr-date';
+                }
+            }
+        }
+
+        foreach (self::$bloodPressureFields as $field) {
+            foreach ($this->fieldData->$field as $k => $value) {
+                $displayError = false;
+                // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                if ($this->isEhrProtocolForm()) {
+                    $displayError = $k === 0 && $this->fieldData->{'blood-pressure-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                }
+
+                if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k] || $displayError) && !$value) {
+                    $errors[] = [$field, $k];
+                }
+            }
+        }
+        foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
+            if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            $displayError = false;
+            // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+            if ($this->isEhrProtocolForm()) {
+                $displayError = $this->fieldData->{$field . '-protocol-modification'} === self::EHR_PROTOCOL_MODIFICATION;
+            }
+            if ((!$this->fieldData->{$field . '-protocol-modification'} || $displayError) && !$this->fieldData->$field) {
+                $errors[] = $field;
+            }
+            if ($this->fieldData->{$field . '-protocol-modification'} === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'})) {
+                $errors[] = $field . '-protocol-modification-notes';
+            }
+        }
+        if (!$this->fieldData->pregnant && !$this->fieldData->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference'] as $field) {
+                foreach ($this->fieldData->$field as $k => $value) {
+                    if ($k == 2) {
+                        // not an error on the third measurement if first two aren't completed
+                        // or first two measurements are within 1 cm
+                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
+                            break;
+                        }
+                    }
+                    $displayError = false;
+                    // For EHR protocol form display error if first reading is empty and has ehr protocol modification
+                    if ($this->isEhrProtocolForm()) {
+                        $displayError = $k === 0 && $this->fieldData->{$field . '-protocol-modification'}[$k] === self::EHR_PROTOCOL_MODIFICATION;
+                    }
+                    if ((!$this->fieldData->{$field . '-protocol-modification'}[$k] || $displayError) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    private function getPediatricFinalizeErrors(): array
+    {
+        $errors = [];
+        foreach (self::$bloodPressureFields as $field) {
+            if (isset($this->fieldData->$field)) {
+                foreach ($this->fieldData->$field as $k => $value) {
+                    if ($k == 2) {
+                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 5) {
+                            break;
+                        }
+                    }
+                    if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k]) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ($this->fieldData->{'blood-pressure-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field, $k];
+                    }
+                }
+            }
+        }
+        foreach (['height', 'weight'] as $field) {
+            if (isset($this->fieldData->$field)) {
+                foreach ($this->fieldData->$field as $k => $value) {
+                    if ($k == 2) {
+                        if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                            break;
+                        }
+                        if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
+                            break;
+                        }
+                    }
+                    if ((!$this->fieldData->{$field . '-protocol-modification'}[$k]) && !$value) {
+                        $errors[] = [$field, $k];
+                    }
+                    if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
+                        $errors[] = [$field . '-protocol-modification-notes', $k];
+                    }
+                }
+            }
+        }
+        if (!$this->fieldData->wheelchair) {
+            foreach (['hip-circumference', 'waist-circumference', 'head-circumference'] as $field) {
+                if (isset($this->fieldData->$field)) {
+                    foreach ($this->fieldData->$field as $k => $value) {
+                        if ($k == 2) {
+                            // not an error on the third measurement if first two aren't completed
+                            // or first two measurements are within 1 cm
+                            if (!$this->fieldData->{$field}[0] || !$this->fieldData->{$field}[1]) {
+                                break;
+                            }
+                            if (abs($this->fieldData->{$field}[0] - $this->fieldData->{$field}[1]) <= 1) {
+                                break;
+                            }
+                        }
+                        if ((!$this->fieldData->{$field . '-protocol-modification'}[$k]) && !$value) {
+                            $errors[] = [$field, $k];
+                        }
+                        if ($this->fieldData->{$field . '-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{$field . '-protocol-modification-notes'}[$k])) {
+                            $errors[] = [$field . '-protocol-modification-notes', $k];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    private function calculateGrowthPercentileForAge(string $type, float $X): ?float
+    {
+        $lmsValues = $this->getLMSValuesFromAge($type);
+
+        if ($lmsValues) {
+            $zScore = $this->calculateZScore($X, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
+            return $this->calculatePercentile($zScore, $this->growthCharts['zScoreCharts']);
+        }
+
+        return null;
+    }
+
+    private function calculateGrowthPercentileForLength(string $type, float $length, float $X): ?float
+    {
+        $lmsValues = $this->getLMSValuesFromLength($type, $length);
+
+        if ($lmsValues) {
+            $zScore = $this->calculateZScore($X, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
+            return $this->calculatePercentile($zScore, $this->growthCharts['zScoreCharts']);
+        }
+
+        return null;
+    }
+
+    private function getLMSValuesFromAge(string $chartType): array
+    {
+        $ageInMonths = $this->ageInMonths;
+        $lmsValues = [];
+        $charts = $this->growthCharts[$chartType];
+
+        foreach ($charts as $item) {
+            if (floor($item['month']) === $ageInMonths) {
+                $lmsValues['L'] = $item['L'];
+                $lmsValues['M'] = $item['M'];
+                $lmsValues['S'] = $item['S'];
+            }
+        }
+        return $lmsValues;
+    }
+
+    private function getLMSValuesFromLength(string $chartType, float $length): array
+    {
+        $lmsValues = [];
+        $charts = $this->growthCharts[$chartType];
+
+        foreach ($charts as $item) {
+            if (round($item['length']) === round($length)) {
+                $lmsValues['L'] = $item['L'];
+                $lmsValues['M'] = $item['M'];
+                $lmsValues['S'] = $item['S'];
+            }
+        }
+        return $lmsValues;
     }
 }

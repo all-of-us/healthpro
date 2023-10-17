@@ -160,6 +160,7 @@ class OnSiteDetailsReportingService
             } else {
                 $row['type'] = $idVerification['importId'] ? 'import' : '';
             }
+            $row['guardianVerified'] = (bool) $idVerification['guardianVerified'];
             array_push($rows, $row);
         }
         return $rows;

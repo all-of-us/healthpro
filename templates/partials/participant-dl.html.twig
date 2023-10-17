@@ -41,7 +41,7 @@
     {% if measurement is defined and measurement.id %}
         <dt>Updated</dt>
         <dd>{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
-        {% if measurement.version != latestVersion %}
+        {% if not measurement.isPediatricForm and measurement.version != latestVersion %}
             <dt>Version</dt>
             <dd>{{ measurement.version }}
                 <small class="text-muted">(latest version is {{ latestVersion }})</small>

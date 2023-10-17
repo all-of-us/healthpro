@@ -489,7 +489,7 @@ class Participant
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
         }
 
-        if (isset($participant->isPediatric) && $participant->isPediatric) {
+        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
             $this->isPediatric = true;
         }
 
