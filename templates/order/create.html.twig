@@ -17,6 +17,8 @@
         <li role="presentation" class="active"><a href="#">Create</a></li>
         {% if app.session.get('orderType')  == 'dv' %}
             {% set steps = ['Collect', 'Process', 'Finalize'] %}
+        {% elseif isPediatricOrder %}
+            {% set steps = ['Print Labels', 'Collect', 'Finalize', 'Print Requisition'] %}
         {% else %}
             {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% endif %}

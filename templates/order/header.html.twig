@@ -78,6 +78,9 @@
     {% if order.type == 'saliva' %}
         {% set steps = steps|filter((label,step) => step != 'process') %}
     {% endif %}
+    {% if isPediatricOrder %}
+        {% set steps = steps|filter((label,step) => step != 'process') %}
+    {% endif %}
 {% endif %}
 {% if displayInactiveSiteBanner %}
     {{ macros.displayInactiveSiteBanner('pmb', 3) }}
