@@ -75,10 +75,7 @@
         finalize: ['finalize', 'finalized'],
         print_requisition: ['print requisition', 'finalized']
     } %}
-    {% if order.type == 'saliva' %}
-        {% set steps = steps|filter((label,step) => step != 'process') %}
-    {% endif %}
-    {% if isPediatricOrder %}
+    {% if order.type == 'saliva' or isPediatricOrder %}
         {% set steps = steps|filter((label,step) => step != 'process') %}
     {% endif %}
 {% endif %}
