@@ -1514,6 +1514,49 @@ class Order
                 === self::ORDER_TYPE_DIVERSION);
     }
 
+    public function getPediatricBloodSamples(): array
+    {
+        $samples = [];
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_BLOOD_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function getPediatricUrineSamples(): array
+    {
+        $samples = [];
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_URINE_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function getPediatricSalivaSamples(): array
+    {
+        $samples = [];
+        foreach ($this->salivaSamples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_SALIVA_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function isPediatricOrder(): bool
+    {
+        if ($this->version) {
+            return str_contains($this->version, self::PEDIATRIC_ORDER_STRING);
+        } elseif ($this->getCurrentVersion()) {
+            return str_contains($this->getCurrentVersion(), self::PEDIATRIC_ORDER_STRING);
+        }
+        return false;
+    }
+
     protected function getSampleTime($set, $sample)
     {
         $samples = json_decode($this->{'get' . $set . 'Samples'}());
@@ -1585,44 +1628,5 @@ class Order
             return array_intersect($this->samples, $requestedArray);
         }
         return $this->samples;
-    }
-
-    public function getPediatricBloodSamples(): array {
-        $samples = [];
-        foreach ($this->samples as $sample) {
-            if (in_array($sample, self::PEDIATRIC_BLOOD_SAMPLES)) {
-                $samples[] = $sample;
-            }
-        }
-        return $samples;
-    }
-
-    public function getPediatricUrineSamples(): array {
-        $samples = [];
-        foreach ($this->samples as $sample) {
-            if (in_array($sample, self::PEDIATRIC_URINE_SAMPLES)) {
-                $samples[] = $sample;
-            }
-        }
-        return $samples;
-    }
-
-    public function getPediatricSalivaSamples(): array {
-        $samples = [];
-        foreach ($this->salivaSamples as $sample) {
-            if (in_array($sample, self::PEDIATRIC_SALIVA_SAMPLES)) {
-                $samples[] = $sample;
-            }
-        }
-        return $samples;
-    }
-
-    public function isPediatricOrder(): bool {
-        if ($this->version) {
-         return str_contains($this->version, self::PEDIATRIC_ORDER_STRING);
-        } elseif ($this->getCurrentVersion()) {
-            return str_contains($this->getCurrentVersion(), self::PEDIATRIC_ORDER_STRING);
-        }
-        return false;
     }
 }
