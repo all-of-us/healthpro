@@ -622,7 +622,7 @@ class Measurement
 
     public function isPediatricForm(): bool
     {
-        $version = $this->getSchema()->version;
+        $version = $this->getFormVersion();
         return str_contains($version, 'peds');
     }
 
