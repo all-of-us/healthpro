@@ -111,7 +111,8 @@ class OrderController extends BaseController
             'orderType' => $session->get('orderType'),
             'samples' => $order->getSamples(),
             'showBloodTubes' => $showBloodTubes,
-            'nonBloodSamples' => $order::$nonBloodSamples
+            'nonBloodSamples' => $order::$nonBloodSamples,
+            'pediatric' => $participant->isPediatric,
         ]);
         $showCustom = false;
         $createForm->handleRequest($request);
@@ -146,6 +147,15 @@ class OrderController extends BaseController
                     }
                 } elseif ($request->request->has('saliva')) {
                     $order->setType('saliva');
+                }
+                if ($participant->isPediatric) {
+                    if ($request->request->has('blood')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricBloodSamples()));
+                    } elseif ($request->request->has('urine')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricUrineSamples()));
+                    } elseif ($request->request->has('saliva')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricSalivaSamples()));
+                    }
                 }
             }
             if ($createForm->isValid()) { // @phpstan-ignore-line
@@ -191,6 +201,9 @@ class OrderController extends BaseController
             'showSalivaTubes' => $showSalivaTubes,
             'version' => $order->getVersion(),
             'salivaInstructions' => $order->getSalivaInstructions(),
+            'orderCurrentVersion' => $order->getCurrentVersion(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
+            'showPediatricBloodTubes' => count($order->getPediatricBloodSamples()) > 0,
         ]);
     }
 

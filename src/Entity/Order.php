@@ -24,6 +24,10 @@ class Order
     public const ORDER_STEP_FINALIZED = 'finalized';
     public const ORDER_TYPE_KIT = 'kit';
     public const ORDER_TYPE_DIVERSION = 'diversion';
+    public const PEDIATRIC_ORDER_STRING = 'ped';
+    public const PEDIATRIC_BLOOD_SAMPLES = ['2ED04', '2ED02', '1ED10', '1PXR2'];
+    public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
+    public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
 
@@ -907,13 +911,13 @@ class Order
                 $this->currentVersion = self::INITIAL_VERSION;
                 if ($pediatricFlag && $physicalMeasurement) {
                     $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                    $this->currentVersion = "{$this->currentVersion}-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
                 if ($pediatricFlag && $physicalMeasurement) {
                     $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = "{$this->currentVersion}-ped-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                    $this->currentVersion = "{$this->currentVersion}-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             }
         }
@@ -1508,6 +1512,49 @@ class Order
     {
         return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
                 === self::ORDER_TYPE_DIVERSION);
+    }
+
+    public function getPediatricBloodSamples(): array
+    {
+        $samples = [];
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_BLOOD_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function getPediatricUrineSamples(): array
+    {
+        $samples = [];
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_URINE_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function getPediatricSalivaSamples(): array
+    {
+        $samples = [];
+        foreach ($this->salivaSamples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_SALIVA_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function isPediatricOrder(): bool
+    {
+        if ($this->version) {
+            return str_contains($this->version, self::PEDIATRIC_ORDER_STRING);
+        } elseif ($this->getCurrentVersion()) {
+            return str_contains($this->getCurrentVersion(), self::PEDIATRIC_ORDER_STRING);
+        }
+        return false;
     }
 
     protected function getSampleTime($set, $sample)
