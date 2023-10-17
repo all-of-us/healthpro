@@ -232,7 +232,8 @@ class OrderController extends BaseController
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
             'errorMessage' => $errorMessage,
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 
@@ -321,6 +322,7 @@ class OrderController extends BaseController
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
             'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
@@ -555,7 +557,8 @@ class OrderController extends BaseController
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'showUnfinalizeMsg' => $showUnfinalizeMsg,
             'readOnlyView' => $this->isReadOnly(),
-            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
+            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 
