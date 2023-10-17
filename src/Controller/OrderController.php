@@ -148,12 +148,14 @@ class OrderController extends BaseController
                 } elseif ($request->request->has('saliva')) {
                     $order->setType('saliva');
                 }
-                if ($participant->isPediatric && $request->request->has('blood')) {
-                    $order->setRequestedSamples(json_encode($order->getPediatricBloodSamples()));
-                } elseif ($participant->isPediatric && $request->request->has('urine')) {
-                    $order->setRequestedSamples(json_encode($order->getPediatricUrineSamples()));
-                } elseif ($participant->isPediatric && $request->request->has('saliva')) {
-                    $order->setRequestedSamples(json_encode($order->getPediatricSalivaSamples()));
+                if ($participant->isPediatric) {
+                    if ($request->request->has('blood')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricBloodSamples()));
+                    } elseif ($request->request->has('urine')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricUrineSamples()));
+                    } elseif ($request->request->has('saliva')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricSalivaSamples()));
+                    }
                 }
             }
             if ($createForm->isValid()) { // @phpstan-ignore-line
