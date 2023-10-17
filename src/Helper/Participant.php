@@ -297,6 +297,10 @@ class Participant
             $this->id = $participant->participantId;
         }
 
+        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
+            $this->isPediatric = true;
+        }
+
         // Check for participants associated with TEST organization when disableTestAccess is set to true
         if (!empty($this->disableTestAccess) && $participant->hpoId === 'TEST') {
             $this->status = false;
@@ -308,7 +312,7 @@ class Participant
             $this->statusReason = 'basics';
         }
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_3') {
-            if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+            if (!$this->isPediatric && isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->editExistingOnly = true;
                 $this->statusReason = 'genomics';
@@ -319,7 +323,7 @@ class Participant
                 $this->statusReason = 'ehr-consent';
             }
         }
-        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
+        if (!$this->isPediatric && isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
             if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
@@ -336,7 +340,7 @@ class Participant
 
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_1') {
             if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
-                if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+                if (!$this->isPediatric && isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->editExistingOnly = true;
                     $this->statusReason = 'genomics';
@@ -487,10 +491,6 @@ class Participant
 
         if (isset($participant->consentForNphModule1Authored)) {
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
-        }
-
-        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
-            $this->isPediatric = true;
         }
 
         if ($this->isPediatric) {
