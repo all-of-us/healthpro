@@ -845,7 +845,7 @@ class Measurement
             ];
         }
         if ($this->fieldData->weight && $this->fieldData->height) {
-            $summary['bmi'] = self::calculateBmi($this->fieldData->height, $this->fieldData->weight);
+            $summary['bmi'] = round(self::calculateBmi($this->fieldData->height, $this->fieldData->weight), 1);
         }
         if ($hip = $this->calculateMean('hip-circumference')) {
             $summary['hip'] = [

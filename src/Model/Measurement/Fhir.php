@@ -163,7 +163,7 @@ class Fhir
             $metrics[] = 'growth-percentile-weight-for-length';
             if ($this->schema->displayBmi) {
                 $metrics[] = 'growth-percentile-bmi-for-age';
-                $metrics[] = 'pediatric-bmi';
+                $metrics[] = 'bmi';
             }
         }
         if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
@@ -604,14 +604,12 @@ class Fhir
 
     protected function bmi()
     {
-        if (!$this->data->height || !$this->data->weight) {
+        if (!isset($this->summary['bmi'])) {
             return;
         }
-        $cm = $this->data->height / 100;
-        $bmi = round($this->data->weight / ($cm * $cm), 1);
         $entry = $this->simpleMetric(
             'bmi',
-            $bmi,
+            $this->summary['bmi'],
             'Computed body mass index',
             'kg/m2',
             [
@@ -1220,44 +1218,6 @@ class Fhir
             return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
         }
         return $this->date;
-    }
-
-    private function pediatricbmi(): array
-    {
-        $entry = $this->simpleMetric(
-            'pediatric-bmi',
-            $this->summary['bmi'],
-            'Computed body mass index',
-            'kg/m2',
-            [
-                [
-                    'code' => '39156-5',
-                    'display' => 'Body mass index',
-                    'system' => 'http://loinc.org'
-                ],
-                [
-                    'code' => 'bmi',
-                    'display' => 'Computed body mass index',
-                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
-                ]
-            ],
-            $this->getEffectiveDateTime('weight-source')
-        );
-        $related = [];
-        foreach (['height-protocol-modification', 'weight-protocol-modification'] as $metric) {
-            if (array_key_exists($metric, $this->metricUrns)) {
-                $related[] = [
-                    'type' => 'qualified-by',
-                    'target' => [
-                        'reference' => $this->metricUrns[$metric]
-                    ]
-                ];
-            }
-        }
-        if ($related) {
-            $entry['resource']['related'] = $related;
-        }
-        return $entry;
     }
 
     private function isPediatricForm(): bool
