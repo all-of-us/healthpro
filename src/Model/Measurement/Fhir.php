@@ -121,6 +121,30 @@ class Fhir
             }
         }
 
+        if ($this->isPediatricForm()) {
+            if (in_array('wheelchair', $metrics)) {
+                if (isset($this->schema->fields['hip-circumference'])) {
+                    $metrics[] = 'hip-circumference-1';
+                    $metrics[] = 'hip-circumference-2';
+                }
+                if (isset($this->schema->fields['waist-circumference'])) {
+                    $metrics[] = 'waist-circumference-1';
+                    $metrics[] = 'waist-circumference-2';
+                }
+                if (isset($this->schema->fields['head-circumference'])) {
+                    $metrics[] = 'head-circumference-1';
+                    $metrics[] = 'head-circumference-2';
+                }
+            }
+        } else {
+            if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
+                $metrics[] = 'hip-circumference-1';
+                $metrics[] = 'hip-circumference-2';
+                $metrics[] = 'waist-circumference-1';
+                $metrics[] = 'waist-circumference-2';
+            }
+        }
+
         // add bmi if height and weight are both included
         if (!$this->isPediatricForm() && in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
@@ -161,20 +185,6 @@ class Fhir
             }
         }
         if ($this->isPediatricForm()) {
-            if (in_array('wheelchair', $metrics)) {
-                if (isset($this->schema->fields['hip-circumference'])) {
-                    $metrics[] = 'hip-circumference-1';
-                    $metrics[] = 'hip-circumference-2';
-                }
-                if (isset($this->schema->fields['waist-circumference'])) {
-                    $metrics[] = 'waist-circumference-1';
-                    $metrics[] = 'waist-circumference-2';
-                }
-                if (isset($this->schema->fields['head-circumference'])) {
-                    $metrics[] = 'head-circumference-1';
-                    $metrics[] = 'head-circumference-2';
-                }
-            }
             if (in_array('blood-pressure-1', $metrics) || in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
                 $metrics[] = 'blood-pressure-mean';
             }
@@ -182,12 +192,6 @@ class Fhir
                 $metrics[] = 'heart-rate-mean';
             }
         } else {
-            if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
-                $metrics[] = 'hip-circumference-1';
-                $metrics[] = 'hip-circumference-2';
-                $metrics[] = 'waist-circumference-1';
-                $metrics[] = 'waist-circumference-2';
-            }
             if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
                 $metrics[] = 'blood-pressure-mean';
             }
