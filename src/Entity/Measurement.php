@@ -787,7 +787,7 @@ class Measurement
         $values = array_filter($values);
         if (count($values) > 0) {
             if (count($values) === 3 && in_array($field, $twoClosestFields)) {
-                $this->calculateSecondThirdMean($values);
+                $this->calculateThreeValuesMean($values);
             }
             return array_sum($values) / count($values);
         }
@@ -807,7 +807,7 @@ class Measurement
         return Util::versionIsAtLeast($this->version, $minVersion);
     }
 
-    private function calculateSecondThirdMean(&$values): void
+    private function calculateThreeValuesMean(array &$values): void
     {
         sort($values);
         if ($values[1] - $values[0] < $values[2] - $values[1]) {
@@ -822,7 +822,7 @@ class Measurement
         $values = array_filter($this->fieldData->{$field});
         if (count($values) > 0) {
             if (count($values) === 3) {
-                $this->calculateSecondThirdMean($values);
+                $this->calculateThreeValuesMean($values);
             }
             return array_sum($values) / count($values);
         }
