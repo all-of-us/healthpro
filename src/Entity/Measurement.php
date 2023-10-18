@@ -878,7 +878,7 @@ class Measurement
         if ($weight && !empty($height)) {
             $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
             if ($this->schema->displayBmi) {
-                $summary['bmi'] = self::calculateBmi($height, $weight);
+                $summary['bmi'] = round(self::calculateBmi($height, $weight), 1);
                 $summary['growth-percentile-bmi-for-age'] = $this->calculateGrowthPercentileForAge('bmiForAgeCharts', $summary['bmi']);
             }
         }
