@@ -787,12 +787,7 @@ class Measurement
         $values = array_filter($values);
         if (count($values) > 0) {
             if (count($values) === 3 && in_array($field, $twoClosestFields)) {
-                sort($values);
-                if ($values[1] - $values[0] < $values[2] - $values[1]) {
-                    array_pop($values);
-                } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
-                    array_shift($values);
-                }
+                $this->calculateSecondThirdMean($values);
             }
             return array_sum($values) / count($values);
         }
@@ -810,6 +805,28 @@ class Measurement
     protected function isMinVersion($minVersion)
     {
         return Util::versionIsAtLeast($this->version, $minVersion);
+    }
+
+    private function calculateSecondThirdMean(&$values): void
+    {
+        sort($values);
+        if ($values[1] - $values[0] < $values[2] - $values[1]) {
+            array_pop($values);
+        } elseif ($values[2] - $values[1] < $values[1] - $values[0]) {
+            array_shift($values);
+        }
+    }
+
+    private function calculatePediatricMean($field): ?float
+    {
+        $values = array_filter($this->fieldData->{$field});
+        if (count($values) > 0) {
+            if (count($values) === 3) {
+                $this->calculateSecondThirdMean($values);
+            }
+            return array_sum($values) / count($values);
+        }
+        return null;
     }
 
     private function getAdultSummary(): array
@@ -860,7 +877,7 @@ class Measurement
     {
         $summary = [];
         if (isset($this->fieldData->{'height'})) {
-            if ($height = $this->calculateMean('height')) {
+            if ($height = $this->calculatePediatricMean('height')) {
                 $summary['height'] = [
                     'cm' => $height,
                     'ftin' => self::cmToFtIn($height)
@@ -868,7 +885,7 @@ class Measurement
                 $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
             }
         }
-        if ($weight = $this->calculateMean('weight')) {
+        if ($weight = $this->calculatePediatricMean('weight')) {
             $summary['weight'] = [
                 'kg' => $weight,
                 'lb' => self::kgToLb($weight)
@@ -889,7 +906,7 @@ class Measurement
         ];
 
         foreach ($circumferenceFields as $key => $circumferenceField) {
-            if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculateMean($circumferenceField)) {
+            if (isset($this->fieldData->{$circumferenceField}) && $mean = $this->calculatePediatricMean($circumferenceField)) {
                 $summary[$key] = [
                     'cm' => $mean,
                     'in' => self::cmToIn($mean)
@@ -901,8 +918,8 @@ class Measurement
         }
 
         if (isset($this->fieldData->{'blood-pressure-systolic'})) {
-            $systolic = $this->calculateMean('blood-pressure-systolic');
-            $diastolic = $this->calculateMean('blood-pressure-diastolic');
+            $systolic = $this->calculatePediatricMean('blood-pressure-systolic');
+            $diastolic = $this->calculatePediatricMean('blood-pressure-diastolic');
             if ($systolic && $diastolic) {
                 $summary['bloodpressure'] = [
                     'systolic' => $systolic,
@@ -911,7 +928,7 @@ class Measurement
             }
         }
         if (isset($this->fieldData->{'heart-rate'})) {
-            if ($heartrate = $this->calculateMean('heart-rate')) {
+            if ($heartrate = $this->calculatePediatricMean('heart-rate')) {
                 $summary['heartrate'] = $heartrate;
             }
         }
