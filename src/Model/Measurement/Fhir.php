@@ -1448,7 +1448,7 @@ class Fhir
     {
         $entry = $this->simpleMetric(
             'weight-mean',
-            !empty($this->summary['weight']['cm']) ? $this->summary['weight']['cm'] : null,
+            !empty($this->summary['weight']['kg']) ? $this->summary['weight']['kg'] : null,
             'Computed weight, mean of closest two measures',
             'kg',
             [
