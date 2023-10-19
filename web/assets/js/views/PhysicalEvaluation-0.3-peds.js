@@ -708,7 +708,11 @@ let viewExtension = Backbone.View.extend({
             block.find(".modification-toggle").hide();
             block.find(".modification-select").show();
         }
-        if (modification === "parental-refusal" || modification === "child-dissenting-behavior" || modification === "colostomy-bag") {
+        if (
+            modification === "parental-refusal" ||
+            modification === "child-dissenting-behavior" ||
+            modification === "colostomy-bag"
+        ) {
             block.find(".modification-affected input:text, .modification-affected select").each(function () {
                 $(this).valChange("").attr("disabled", true);
             });
