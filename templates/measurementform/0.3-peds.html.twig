@@ -150,9 +150,12 @@
         </div>
     </div>
 </div>
-<div class="panel panel-default" id="panel-hip-waist">
+{% set isWaistOnly = schema.fields['head-circumference-protocol-modification'] is defined ? false : true %}
+<div class="panel panel-default">
     <div class="panel-heading">
-        <div class="pull-right" id="hip-waist-skip"></div>
+        {% if isWaistOnly %}
+            <div class="pull-right" id="waist-skip"></div>
+        {% endif %}
         <h3 class="panel-title">
             {% if schema.fields['waist-circumference-protocol-modification'] is defined and schema.fields['head-circumference-protocol-modification'] is defined %}
                 Head and Waist Circumference
@@ -163,7 +166,7 @@
             {% endif %}
         </h3>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" id="{{ isWaistOnly ? 'panel-waist': 'panel-head-waist' }}">
         {% if schema.fields['head-circumference-protocol-modification'] is defined %}
             <h4>Head Circumference</h4>
             <div class="row replicate row-equal-height">
@@ -197,41 +200,47 @@
             <hr>
         {% endif %}
         {% if schema.fields['waist-circumference'] is defined %}
-            <h4>Waist Circumference</h4>
-            <div class="well">
-                <div class="row">
-                    <div class="col-sm-4">
-                        {{ metrics.form_row(measurementForm, schema.fields['waist-circumference-location']) }}
+            <h4>
+                Waist Circumference
+                {% if not isWaistOnly %}
+                    <span id="waist-skip"></span></h4>
+                {% endif %}
+            <div {% if not isWaistOnly %} id="panel-waist" {% endif %}>
+                <div class="well">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            {{ metrics.form_row(measurementForm, schema.fields['waist-circumference-location']) }}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row replicate row-equal-height">
-                {% for i in 0..2 %}
-                    <div class="col-sm-4">
-                        <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
-                            <div class="panel-body">
-                                <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
-                                <div class="modification-block">
-                                    <div class="modification-affected">
-                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference'], i) }}
-                                        {% if i == 2 %}
-                                            <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
-                                        {% endif %}
-                                    </div>
-                                    <div class="modification-toggle text-right">
-                                        <a class="small">Add protocol modification</a>
-                                    </div>
-                                    <div class="modification-select" style="display:none">
-                                        {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification'], i) }}
-                                        <div class="modification-notes" style="display:none">
-                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                <div class="row replicate row-equal-height">
+                    {% for i in 0..2 %}
+                        <div class="col-sm-4">
+                            <div class="panel panel-default panel-waist-circumference-{{ i + 1 }}">
+                                <div class="panel-body">
+                                    <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                                    <div class="modification-block">
+                                        <div class="modification-affected">
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference'], i) }}
+                                            {% if i == 2 %}
+                                                <p class="text-info">Third measurement is required when first two differ by more than 1 cm</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modification-toggle text-right">
+                                            <a class="small">Add protocol modification</a>
+                                        </div>
+                                        <div class="modification-select" style="display:none">
+                                            {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification'], i) }}
+                                            <div class="modification-notes" style="display:none">
+                                                {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
             <hr>
         {% endif %}
@@ -252,7 +261,7 @@
                             </p>
                         {% endif %}
                         {% if schema.fields['waist-circumference'] is defined %}
-                            <p class="lead">
+                            <p class="lead" id="panel-waist-mean">
                                 Waist Circumference:
                                 <span id="mean-waist-circumference"></span>
                                 {{ schema.fields['waist-circumference'].unit }}

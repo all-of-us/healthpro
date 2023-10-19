@@ -16,7 +16,7 @@
       "warnings": [
         {
           "val": true,
-          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the hip and waist of wheelchair user participants."
+          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the waist of wheelchair user participants."
         }
       ]
     },
@@ -77,7 +77,7 @@
         "Weight is more than weight measuring range": "weight-out-of-range",
         "Weight is less than weight measuring range": "weight-below-range",
         "Can't balance on scale": "cannot-balance-on-scale",
-        "Uses a wheelchair": "uses-wheelchair",
+        "Uses a wheelchair": "wheelchair-user",
         "Parental refusal": "parental-refusal",
         "Child dissenting behavior": "child-dissenting-behavior",
         "Clothing not removed": "clothing-not-removed",
@@ -101,7 +101,7 @@
           "message": "Deviation successfully captured."
         },
         {
-          "val": "uses-wheelchair",
+          "val": "wheelchair-user",
           "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
         },
         {
@@ -191,7 +191,7 @@
         "None": "",
         "Height is more than measuring device range": "height-out-of-range",
         "Hair style": "hair-style",
-        "Uses a wheelchair": "uses-wheelchair",
+        "Uses a wheelchair": "wheelchair-user",
         "Unable to stand in a straight position": "unable-to-stand-straight",
         "Parental refusal": "parental-refusal",
         "Child dissenting behavior": "child-dissenting-behavior",
@@ -295,7 +295,7 @@
         },
         {
           "val": "colostomy-bag",
-          "message": "Deviation successfully captured."
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
         },
         {
           "val": "parental-refusal",
