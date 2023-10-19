@@ -121,8 +121,10 @@ let viewExtension = Backbone.View.extend({
         console.log(field, "lms", lmsValues);
         const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
+        console.log('Zscore', zScore);
         percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
+        console.log('percentile', percentile);
         percentileElement.html("<strong>" + percentile + "</strong>th");
         percentileElement.attr("data-percentile", percentile);
     },
@@ -142,6 +144,7 @@ let viewExtension = Backbone.View.extend({
             const percentileElement = this.$("#percentile-weight-for-length");
             console.log("weight-for-length", "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
+            console.log('Zscore', zScore);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
             percentileElement.html("<strong>" + percentile + "</strong>th");
@@ -241,16 +244,18 @@ let viewExtension = Backbone.View.extend({
         }
         if (isWheelchairUser) {
             if (this.rendered) {
-                this.$("#form_height-protocol-modification").valChange("wheelchair-user");
-                this.$("#form_weight-protocol-modification").valChange("wheelchair-user");
+                this.$(".field-weight-protocol-modification select, .field-height-protocol-modification select").each(function () {
+                    $(this).valChange("wheelchair-user");
+                });
             }
         }
         if (!isWheelchairUser) {
-            if (this.rendered && this.$("#form_height-protocol-modification").val() == "wheelchair-user") {
-                this.$("#form_height-protocol-modification").valChange("");
-            }
-            if (this.rendered && this.$("#form_weight-protocol-modification").val() == "wheelchair-user") {
-                this.$("#form_weight-protocol-modification").valChange("");
+            if (this.rendered) {
+                this.$(".field-weight-protocol-modification select, .field-height-protocol-modification select").each(function () {
+                    if ($(this).val() === "wheelchair-user") {
+                        $(this).valChange("");
+                    }
+                });
             }
         }
         if (!isWheelchairUser) {

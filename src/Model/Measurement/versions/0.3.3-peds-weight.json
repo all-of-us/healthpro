@@ -52,7 +52,7 @@
         "Weight is more than weight measuring range": "weight-out-of-range",
         "Weight is less than weight measuring range": "weight-below-range",
         "Can't balance on scale": "cannot-balance-on-scale",
-        "Uses a wheelchair": "uses-wheelchair",
+        "Uses a wheelchair": "wheelchair-user",
         "Parental refusal": "parental-refusal",
         "Child dissenting behavior": "child-dissenting-behavior",
         "Clothing not removed": "clothing-not-removed",
@@ -76,7 +76,7 @@
           "message": "Deviation successfully captured."
         },
         {
-          "val": "uses-wheelchair",
+          "val": "wheelchair-user",
           "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
         },
         {
