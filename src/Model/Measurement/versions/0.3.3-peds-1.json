@@ -273,7 +273,6 @@
       "name": "head-circumference-protocol-modification",
       "label": "Modification to Head Circumference Protocol",
       "replicates": 3,
-      "max": 120,
       "options": {
         "None": "",
         "Head is more than measuring device": "head-circumference-out-of-range",
