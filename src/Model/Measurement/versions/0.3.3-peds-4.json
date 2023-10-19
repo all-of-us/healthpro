@@ -295,7 +295,7 @@
         },
         {
           "val": "colostomy-bag",
-          "message": "Deviation successfully captured."
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
         },
         {
           "val": "parental-refusal",
