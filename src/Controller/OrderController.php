@@ -774,7 +774,8 @@ class OrderController extends BaseController
             'participant' => $participant,
             'siteType' => $requestStack->getSession()->get('siteType'),
             'weightMeasurement' => $measurement,
-            'measurementData' => $measurementData
+            'measurementData' => $measurementData,
+            'measurementId' => $measurement ? $measurement->getId() : null,
         ]);
     }
 

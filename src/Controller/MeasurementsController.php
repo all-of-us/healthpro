@@ -200,9 +200,15 @@ class MeasurementsController extends BaseController
                                     'showAutoModification' => 1
                                 ]);
                             }
-                            if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm()) {
+                            if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && !$newMeasurement) {
                                 return $this->redirectToRoute('order_check_pediatric_weight', [
                                     'participantId' => $participant->id
+                                ]);
+                            } elseif ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && $newMeasurement) {
+                                return $this->redirectToRoute('measurement', [
+                                    'participantId' => $participant->id,
+                                    'measurementId' => $measurementId,
+                                    'type' => 'peds-weight'
                                 ]);
                             }
                             return $this->redirectToRoute('measurement', [
@@ -218,7 +224,11 @@ class MeasurementsController extends BaseController
                         if (empty($rdrError)) {
                             $this->addFlash('notice', 'Physical measurements saved');
                         }
-
+                        if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm()) {
+                            return $this->redirectToRoute('order_check_pediatric_weight', [
+                                'participantId' => $participant->id
+                            ]);
+                        }
                         // If finalization failed, values are still saved, but do not redirect
                         // so that errors can be displayed
                         if ($measurementsForm->isValid()) { // @phpstan-ignore-line
