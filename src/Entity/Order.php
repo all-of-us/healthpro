@@ -1220,6 +1220,9 @@ class Order
         if ($this->getType() === 'saliva') {
             unset($columns['process']);
         }
+        if ($this->isPediatricOrder()) {
+            unset($columns['process']);
+        }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
             if (!$this->{'get' . $column . 'Ts'}()) {
