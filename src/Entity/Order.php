@@ -25,7 +25,7 @@ class Order
     public const ORDER_TYPE_KIT = 'kit';
     public const ORDER_TYPE_DIVERSION = 'diversion';
     public const PEDIATRIC_ORDER_STRING = 'ped';
-    public const PEDIATRIC_BLOOD_SAMPLES = ['2ED04', '2ED02', '1ED10', '1PXR2'];
+    public const PEDIATRIC_BLOOD_SAMPLES = ['1ED04', '2ED02', '1ED10', '1PXR2', '1ED02'];
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
     public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
 
