@@ -200,11 +200,11 @@ class MeasurementsController extends BaseController
                                     'showAutoModification' => 1
                                 ]);
                             }
-                            if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && !$newMeasurement) {
+                            if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && !isset($newMeasurement)) {
                                 return $this->redirectToRoute('order_check_pediatric_weight', [
                                     'participantId' => $participant->id
                                 ]);
-                            } elseif ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && $newMeasurement) {
+                            } elseif ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && isset($newMeasurement)) {
                                 return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
                                     'measurementId' => $measurementId,
