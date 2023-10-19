@@ -24,7 +24,7 @@
     </ul>
     <br/>
     {% if weightMeasurement is null %}
-    <h4>Please Confirm the participants weight is accurate prior to biospeciment collection</h4>
+    <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
         <div class="col-md-12">
             <span class="text-danger"><i class="fas fa-exclamation-circle"></i> Weight measurement not found. Please complete and finalize a physical measurements form prior to biospecimen collection.</span>
         </div>
@@ -40,11 +40,11 @@
     </div>
     <div class="col-md-12">
         <p>
-            <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-primary">Start New Physical Measurements</a>
+            <a href="{{ path('measurement', {'participantId': participant.id}) }}" class="btn btn-primary">Start New Physical Measurements</a>
         </p>
     </div>
     {%  elseif weightMeasurement.finalizedTs|date('U') < "-1 day"|date('U') %}
-        <h4>Please Confirm the participants weight is accurate prior to biospeciment collection</h4>
+        <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
         <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> The participant's weight measurement was taken more than 1 day ago. Please recapture the weight to proceed.</span>
         <div class="col-md-12">
             <div class="col-md-4">
@@ -58,11 +58,11 @@
         </div>
         <div class="col-md-12">
             <p>
-                <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+                <a href="{{ path('measurement', {'participantId': participant.id, 'measurementId': measurementId, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
             </p>
         </div>
         {% else %}
-            <h4>Please Confirm the participants weight is accurate prior to biospeciment collection. Click confirm if the participants weight is accurate. Click Amend to edit the weight captured on todays
+            <h4>Please confirm the participant's weight is accurate prior to biospecimen collection. Click confirm if the participant's weight is accurate. Click Amend to edit the weight captured on today's
             physical measurements form.</h4>
             <div class="col-md-12">
                 <div class="col-md-4">
@@ -77,7 +77,7 @@
             <div class="col-md-12">
                 <p>
                     <a href="{{ path('order_check_pediatric', {'participantId': participant.id}) }}" class="btn btn-primary">Confirm</a>
-                    <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Amend</a>
+                    <a href="{{ path('measurement', {'participantId': participant.id, 'measurementId': measurementId, 'type': 'peds-weight', 'copy': true}) }}" class="btn btn-warning">Amend</a>
                 </p>
             </div>
     {% endif %}

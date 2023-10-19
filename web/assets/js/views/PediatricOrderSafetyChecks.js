@@ -9,8 +9,7 @@ $(document).ready(function () {
                 });
             showHighestPriorityChecked(this);
         } else {
-            // Hide all questions after the one that was just answered
-            $(this).closest("div.question").nextAll().hide().find("input:checked").prop("checked", false);
+            hideAllCheckedQuestions(this);
             $(".sampleTypes").val("no");
             if ($(this).data("show-target")) {
                 let showTarget = $(this).data("show-target");
@@ -30,6 +29,15 @@ $(document).ready(function () {
 
     function showHighestPriorityChecked(element) {
         let highestPriorityChecked = $(element).closest("div.question").find("input:checked")[0];
+        hideAllWarnings(element);
         $($(highestPriorityChecked).data("vis-toggle")).show();
+    }
+
+    function hideAllCheckedQuestions(element) {
+        $(element).closest("div.question").nextAll().hide().find("input:checked").prop("checked", false);
+        hideAllWarnings(element);
+    }
+    function hideAllWarnings(element) {
+        $(element).closest("div.question").parent().find("span.warning").hide();
     }
 });
