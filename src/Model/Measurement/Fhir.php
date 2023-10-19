@@ -121,12 +121,30 @@ class Fhir
             }
         }
 
-        if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
-            $metrics[] = 'hip-circumference-1';
-            $metrics[] = 'hip-circumference-2';
-            $metrics[] = 'waist-circumference-1';
-            $metrics[] = 'waist-circumference-2';
+        if ($this->isPediatricForm()) {
+            if (in_array('wheelchair', $metrics)) {
+                if (isset($this->schema->fields['hip-circumference'])) {
+                    $metrics[] = 'hip-circumference-1';
+                    $metrics[] = 'hip-circumference-2';
+                }
+                if (isset($this->schema->fields['waist-circumference'])) {
+                    $metrics[] = 'waist-circumference-1';
+                    $metrics[] = 'waist-circumference-2';
+                }
+                if (isset($this->schema->fields['head-circumference'])) {
+                    $metrics[] = 'head-circumference-1';
+                    $metrics[] = 'head-circumference-2';
+                }
+            }
+        } else {
+            if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
+                $metrics[] = 'hip-circumference-1';
+                $metrics[] = 'hip-circumference-2';
+                $metrics[] = 'waist-circumference-1';
+                $metrics[] = 'waist-circumference-2';
+            }
         }
+
         // add bmi if height and weight are both included
         if (!$this->isPediatricForm() && in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
@@ -163,13 +181,23 @@ class Fhir
             $metrics[] = 'growth-percentile-weight-for-length';
             if ($this->schema->displayBmi) {
                 $metrics[] = 'growth-percentile-bmi-for-age';
+                $metrics[] = 'bmi';
             }
         }
-        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
-            $metrics[] = 'blood-pressure-mean';
-        }
-        if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
-            $metrics[] = 'heart-rate-mean';
+        if ($this->isPediatricForm()) {
+            if (in_array('blood-pressure-1', $metrics) || in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
+                $metrics[] = 'blood-pressure-mean';
+            }
+            if (in_array('heart-rate-1', $metrics) || in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+                $metrics[] = 'heart-rate-mean';
+            }
+        } else {
+            if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
+                $metrics[] = 'blood-pressure-mean';
+            }
+            if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+                $metrics[] = 'heart-rate-mean';
+            }
         }
         if (in_array('hip-circumference-1', $metrics) || in_array('hip-circumference-2', $metrics) || in_array('hip-circumference-3', $metrics)) {
             $metrics[] = 'hip-circumference-mean';
@@ -603,14 +631,12 @@ class Fhir
 
     protected function bmi()
     {
-        if (!$this->data->height || !$this->data->weight) {
+        if (!isset($this->summary['bmi'])) {
             return;
         }
-        $cm = $this->data->height / 100;
-        $bmi = round($this->data->weight / ($cm * $cm), 1);
         $entry = $this->simpleMetric(
             'bmi',
-            $bmi,
+            $this->summary['bmi'],
             'Computed body mass index',
             'kg/m2',
             [
@@ -1065,10 +1091,11 @@ class Fhir
 
     protected function heartratemean()
     {
+        $displayText = $this->isPediatricForm() ? 'Computed heart rate, mean of closest two measures' : 'Computed heart rate, mean of 2nd and 3rd measures';
         $entry = $this->simpleMetric(
             'heart-rate-mean',
             isset($this->summary['heartrate']) ? $this->summary['heartrate'] : null,
-            'Computed heart rate, mean of 2nd and 3rd measures',
+            $displayText,
             '/min',
             [
                 [
@@ -1078,7 +1105,7 @@ class Fhir
                 ],
                 [
                     'code' => 'heart-rate-mean',
-                    'display' => 'Computed heart rate, mean of 2nd and 3rd measures',
+                    'display' => $displayText,
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ]
@@ -1448,7 +1475,7 @@ class Fhir
     {
         $entry = $this->simpleMetric(
             'weight-mean',
-            !empty($this->summary['weight']['cm']) ? $this->summary['weight']['cm'] : null,
+            !empty($this->summary['weight']['kg']) ? $this->summary['weight']['kg'] : null,
             'Computed weight, mean of closest two measures',
             'kg',
             [
