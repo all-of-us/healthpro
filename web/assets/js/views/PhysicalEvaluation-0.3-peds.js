@@ -8,7 +8,7 @@ let viewExtension = Backbone.View.extend({
         "change #form_blood-pressure-arm-circumference": "calculateCuff",
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
-        "change #form_pregnant, #form_wheelchair": "handlePregnantOrWheelchair",
+        "change #form_pregnant, #form_wheelchair": "handleWheelchair",
         "change #form_height-protocol-modification": "handleHeightProtocol",
         "change #form_weight-protocol-modification": "handleWeightProtocol",
         "change .field-weight input": "toggleThirdWeight",
@@ -226,34 +226,18 @@ let viewExtension = Backbone.View.extend({
             this.$("#cuff-size").text("Adult thigh (16×42 cm)");
         }
     },
-    handlePregnantOrWheelchair: function () {
-        let isPregnant = this.$("#form_pregnant").val() == 1;
+    handleWheelchair: function () {
         let isWheelchairUser = this.$("#form_wheelchair").val() == 1;
         let self = this;
-        if (isPregnant || isWheelchairUser) {
-            this.$("#panel-hip-waist input").each(function () {
+        if (isWheelchairUser) {
+            this.$("#panel-waist input").each(function () {
                 $(this).valChange("");
             });
-            this.$("#panel-hip-waist input, #panel-hip-waist select").each(function () {
+            this.$("#panel-waist input, #panel-waist select").each(function () {
                 $(this).attr("disabled", true);
             });
-            this.$("#hip-waist-skip").html('<span class="label label-danger">Skip</span>');
-            this.$("#panel-hip-waist>.panel-body").hide();
-        }
-        if (isPregnant) {
-            this.$(".field-weight-prepregnancy").show();
-            this.$(".field-weight-prepregnancy").next(".alt-units-block").show();
-            if (this.rendered) {
-                this.$("#form_weight-protocol-modification").valChange("pregnancy");
-            }
-        }
-        if (!isPregnant) {
-            this.$("#form_weight-prepregnancy").valChange("");
-            this.$(".field-weight-prepregnancy").hide();
-            this.$(".field-weight-prepregnancy").next(".alt-units-block").hide();
-            if (this.rendered && this.$("#form_weight-protocol-modification").val() == "pregnancy") {
-                this.$("#form_weight-protocol-modification").valChange("");
-            }
+            this.$("#waist-skip").html('<span class="label label-danger">Skip</span>');
+            this.$("#panel-waist, #panel-waist-mean").hide();
         }
         if (isWheelchairUser) {
             if (this.rendered) {
@@ -269,8 +253,8 @@ let viewExtension = Backbone.View.extend({
                 this.$("#form_weight-protocol-modification").valChange("");
             }
         }
-        if (!isPregnant && !isWheelchairUser) {
-            this.$("#panel-hip-waist input, #panel-hip-waist select").each(function () {
+        if (!isWheelchairUser) {
+            this.$("#panel-waist input, #panel-waist select").each(function () {
                 if (!self.finalized) {
                     $(this).attr("disabled", false);
                 }
@@ -278,8 +262,8 @@ let viewExtension = Backbone.View.extend({
                     self.handleProtocolModificationBlock($(this).closest(".modification-block"));
                 }
             });
-            this.$("#hip-waist-skip").text("");
-            this.$("#panel-hip-waist>.panel-body").show();
+            this.$("#waist-skip").text("");
+            this.$("#panel-waist, #panel-waist-mean").show();
         }
     },
     handleHeightProtocol: function () {
@@ -948,7 +932,7 @@ let viewExtension = Backbone.View.extend({
         this.calculateBmi();
         this.calculateCuff();
         this.calculateIrregularHeartRate();
-        this.handlePregnantOrWheelchair();
+        this.handleWheelchair();
         this.handleHeightProtocol();
         this.handleWeightProtocol();
         this.toggleThirdWeight();
