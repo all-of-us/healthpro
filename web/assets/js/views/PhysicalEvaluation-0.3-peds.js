@@ -913,7 +913,9 @@ let viewExtension = Backbone.View.extend({
             "heart-rate",
             "hip-circumference",
             "waist-circumference",
-            "head-circumference"
+            "head-circumference",
+            "blood-pressure-systolic",
+            "blood-pressure-diastolic"
         ];
         this.percentileFields = {
             weight: ["weight-for-age", "weight-for-length"],
