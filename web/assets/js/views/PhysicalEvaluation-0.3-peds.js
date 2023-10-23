@@ -125,7 +125,7 @@ let viewExtension = Backbone.View.extend({
         percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
         console.log("percentile", percentile);
-        percentileElement.html("<strong>" + percentile + "</strong>th");
+        percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
     },
     calculateWeightForLengthPercentile: function () {
@@ -147,7 +147,7 @@ let viewExtension = Backbone.View.extend({
             console.log("Zscore", zScore);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
-            percentileElement.html("<strong>" + percentile + "</strong>th");
+            percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
             percentileElement.attr("data-percentile", percentile);
         }
     },
@@ -828,6 +828,21 @@ let viewExtension = Backbone.View.extend({
         if (e.type == "change") {
             block.parent().prev().find("input").trigger("change"); // trigger change even if not different
             block.parent().prev().find("input").parsley().validate(); // trigger parsley validation
+        }
+    },
+    addPercentileSuffix: function (percentile) {
+        if (percentile >= 11 && percentile <= 13) {
+            return percentile + "th";
+        }
+        switch (percentile % 10) {
+            case 1:
+                return percentile + "st";
+            case 2:
+                return percentile + "nd";
+            case 3:
+                return percentile + "rd";
+            default:
+                return percentile + "th";
         }
     },
     // for parsley validator
