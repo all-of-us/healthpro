@@ -104,7 +104,7 @@ let viewExtension = Backbone.View.extend({
         } else {
             meanElement.text("--");
             meanElement.attr("data-mean", "");
-            this.$("#convert-" + field).text();
+            this.$("#convert-" + field).html("");
         }
     },
     calculatePercentile: function (field, X) {
