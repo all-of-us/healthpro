@@ -136,8 +136,8 @@
       "name": "height-or-length",
       "label": "Indicate Height or Length Measurement",
       "options": {
-        "Length": "length",
-        "Height": "height"
+        "Height": "height",
+        "Length": "length"
       }
     },
     {
@@ -334,8 +334,8 @@
       "name": "waist-circumference-location",
       "label": "Waist Circumference Location",
       "options": {
-        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
-        "Umbilicus": "umbilicus"
+        "Umbilicus": "umbilicus",
+        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk"
       },
       "help": {
         "caption": "Help text placeholder."
