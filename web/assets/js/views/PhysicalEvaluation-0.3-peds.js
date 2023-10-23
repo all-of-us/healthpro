@@ -804,11 +804,13 @@ let viewExtension = Backbone.View.extend({
         let val;
         if (type == "alt-units-height") {
             let inches = 0;
-            if (parseFloat($("#alt-units-height-ft").val())) {
-                inches += 12 * parseFloat($("#alt-units-height-ft").val());
+            let ft = parseFloat(block.find(".alt-units-height-ft").val());
+            if (ft) {
+                inches += 12 * ft;
             }
-            if (parseFloat($("#alt-units-height-in").val())) {
-                inches += parseFloat($("#alt-units-height-in").val());
+            let inch = parseFloat(block.find(".alt-units-height-ft").val());
+            if (inch) {
+                inches += inch;
             }
             val = this.inToCm(inches);
         } else {
