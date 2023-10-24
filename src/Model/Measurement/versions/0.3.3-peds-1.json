@@ -395,7 +395,7 @@
     },
     {
       "name": "blood-pressure-protocol-modification",
-      "label": "Modification to Protocol",
+      "label": "Modification to Heart Rate Protocol",
       "replicates": 3,
       "options": {
         "None": "",
