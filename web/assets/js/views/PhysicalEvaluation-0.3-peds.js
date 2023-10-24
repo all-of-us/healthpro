@@ -666,7 +666,8 @@ let viewExtension = Backbone.View.extend({
             modification === "parental-refusal" ||
             modification === "child-dissenting-behavior" ||
             modification === "colostomy-bag" ||
-            modification === "cannot-balance-on-scale"
+            modification === "cannot-balance-on-scale" ||
+            modification === "crying"
         ) {
             block.find(".modification-affected input:text, .modification-affected select").each(function () {
                 $(this).valChange("").attr("disabled", true);
