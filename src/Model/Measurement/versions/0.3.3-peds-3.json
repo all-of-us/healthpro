@@ -237,8 +237,8 @@
       "name": "waist-circumference-location",
       "label": "Waist Circumference Location",
       "options": {
-        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk",
-        "Umbilicus": "umbilicus"
+        "Umbilicus": "umbilicus",
+        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk"
       },
       "help": {
         "caption": "Help text placeholder."
@@ -418,8 +418,8 @@
       "name": "heart-rate-method",
       "label": "Heart Rate Method",
       "options": {
-        "Apical": "apical",
         "Automated": "automated",
+        "Apical": "apical",
         "Radical": "radical",
         "Brachial": "brachial"
       }

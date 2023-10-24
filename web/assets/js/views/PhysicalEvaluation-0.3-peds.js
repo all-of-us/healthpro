@@ -104,7 +104,7 @@ let viewExtension = Backbone.View.extend({
         } else {
             meanElement.text("--");
             meanElement.attr("data-mean", "");
-            this.$("#convert-" + field).text();
+            this.$("#convert-" + field).html("");
         }
     },
     calculatePercentile: function (field, X) {
@@ -125,7 +125,7 @@ let viewExtension = Backbone.View.extend({
         percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
         console.log("percentile", percentile);
-        percentileElement.html("<strong>" + percentile + "</strong>th");
+        percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
     },
     calculateWeightForLengthPercentile: function () {
@@ -147,7 +147,7 @@ let viewExtension = Backbone.View.extend({
             console.log("Zscore", zScore);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
-            percentileElement.html("<strong>" + percentile + "</strong>th");
+            percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
             percentileElement.attr("data-percentile", percentile);
         }
     },
@@ -804,11 +804,13 @@ let viewExtension = Backbone.View.extend({
         let val;
         if (type == "alt-units-height") {
             let inches = 0;
-            if (parseFloat($("#alt-units-height-ft").val())) {
-                inches += 12 * parseFloat($("#alt-units-height-ft").val());
+            let ft = parseFloat(block.find(".alt-units-height-ft").val());
+            if (ft) {
+                inches += 12 * ft;
             }
-            if (parseFloat($("#alt-units-height-in").val())) {
-                inches += parseFloat($("#alt-units-height-in").val());
+            let inch = parseFloat(block.find(".alt-units-height-ft").val());
+            if (inch) {
+                inches += inch;
             }
             val = this.inToCm(inches);
         } else {
@@ -828,6 +830,21 @@ let viewExtension = Backbone.View.extend({
         if (e.type == "change") {
             block.parent().prev().find("input").trigger("change"); // trigger change even if not different
             block.parent().prev().find("input").parsley().validate(); // trigger parsley validation
+        }
+    },
+    addPercentileSuffix: function (percentile) {
+        if (percentile >= 11 && percentile <= 13) {
+            return percentile + "th";
+        }
+        switch (percentile % 10) {
+            case 1:
+                return percentile + "st";
+            case 2:
+                return percentile + "nd";
+            case 3:
+                return percentile + "rd";
+            default:
+                return percentile + "th";
         }
     },
     // for parsley validator
@@ -898,7 +915,9 @@ let viewExtension = Backbone.View.extend({
             "heart-rate",
             "hip-circumference",
             "waist-circumference",
-            "head-circumference"
+            "head-circumference",
+            "blood-pressure-systolic",
+            "blood-pressure-diastolic"
         ];
         this.percentileFields = {
             weight: ["weight-for-age", "weight-for-length"],
