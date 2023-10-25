@@ -119,7 +119,7 @@ let viewExtension = Backbone.View.extend({
         console.log(field, "lms", lmsValues);
         const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
-        console.log("Zscore", zScore);
+        console.log(field, "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
         console.log("percentile", percentile);
@@ -142,7 +142,7 @@ let viewExtension = Backbone.View.extend({
             const percentileElement = this.$("#percentile-weight-for-length");
             console.log("weight-for-length", "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
-            console.log("Zscore", zScore);
+            console.log("weight-for-length", "Zscore", zScore);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
             percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
@@ -480,7 +480,7 @@ let viewExtension = Backbone.View.extend({
         }
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
-            let zscore = Math.abs($("#percentile-" + deviationField).attr("data-zscore"));
+            let zscore = $("#percentile-" + deviationField).attr("data-zscore");
             return zscore > warning.max;
         }
         if (warning.hasOwnProperty("percentile")) {
