@@ -862,7 +862,13 @@ let viewExtension = Backbone.View.extend({
         this.heartRateAgeCharts = obj.heartRateAgeCharts;
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
-        this.requireConversionFields = ["hip-circumference", "waist-circumference", "head-circumference", "weight", "height"];
+        this.requireConversionFields = [
+            "hip-circumference",
+            "waist-circumference",
+            "head-circumference",
+            "weight",
+            "height"
+        ];
         this.meanFields = [
             "weight",
             "height",
