@@ -9,8 +9,6 @@ let viewExtension = Backbone.View.extend({
         "keyup #form_blood-pressure-arm-circumference": "calculateCuff",
         "change .field-irregular-heart-rate input": "calculateIrregularHeartRate",
         "change #form_pregnant, #form_wheelchair": "handleWheelchair",
-        "change #form_height-protocol-modification": "handleHeightProtocol",
-        "change #form_weight-protocol-modification": "handleWeightProtocol",
         "change .field-weight input": "toggleThirdWeight",
         "change .field-height input": "toggleThirdHeight",
         "change .field-head-circumference input": "toggleThirdHeadCircumference",
@@ -121,7 +119,7 @@ let viewExtension = Backbone.View.extend({
         console.log(field, "lms", lmsValues);
         const percentileElement = this.$("#percentile-" + field);
         const zScore = this.getZScore(X, lmsValues);
-        console.log("Zscore", zScore);
+        console.log(field, "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
         const percentile = this.getPercentile(zScore);
         console.log("percentile", percentile);
@@ -144,7 +142,7 @@ let viewExtension = Backbone.View.extend({
             const percentileElement = this.$("#percentile-weight-for-length");
             console.log("weight-for-length", "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
-            console.log("Zscore", zScore);
+            console.log("weight-for-length", "Zscore", zScore);
             percentileElement.attr("data-zscore", zScore);
             const percentile = this.getPercentile(zScore);
             percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
@@ -273,50 +271,6 @@ let viewExtension = Backbone.View.extend({
             });
             this.$("#waist-skip").text("");
             this.$("#panel-waist, #panel-waist-mean").show();
-        }
-    },
-    handleHeightProtocol: function () {
-        let selected = this.$("#form_height-protocol-modification").val();
-        if (selected === "parental-refusal" || selected === "pandemic") {
-            this.$("#form_height").valChange("").attr("disabled", true);
-            this.$(".field-height").next(".alt-units-block").hide();
-        } else {
-            if (!this.finalized) {
-                this.$("#form_height").attr("disabled", false);
-                this.$(".field-height").next(".alt-units-block").show();
-            }
-        }
-        if (selected === "other") {
-            this.$(".field-height-protocol-modification-notes").parent().show();
-        } else {
-            this.$(".field-height-protocol-modification-notes").parent().hide();
-            this.$("#form_height-protocol-modification-notes").val("");
-        }
-    },
-    handleWeightProtocol: function () {
-        let selected = this.$("#form_weight-protocol-modification").val();
-        if (selected === "cannot-balance-on-scale" || selected === "parental-refusal") {
-            this.$("#form_weight, #form_weight-prepregnancy").each(function () {
-                $(this).valChange("").attr("disabled", true);
-            });
-            this.$(".field-weight, .field-weight-prepregnancy").each(function () {
-                $(this).next(".alt-units-block").hide();
-            });
-        } else {
-            if (!this.finalized) {
-                this.$("#form_weight").attr("disabled", false);
-                this.$(".field-weight").next(".alt-units-block").show();
-                if (this.$("#form_pregnant").val() == 1) {
-                    this.$("#form_weight-prepregnancy").attr("disabled", false);
-                    this.$(".field-weight-prepregnancy").next(".alt-units-block").show();
-                }
-            }
-        }
-        if (selected === "other") {
-            this.$(".field-weight-protocol-modification-notes").parent().show();
-        } else {
-            this.$(".field-weight-protocol-modification-notes").parent().hide();
-            this.$("#form_weight-protocol-modification-notes").val("");
         }
     },
     toggleThirdReading: function (field) {
@@ -526,7 +480,7 @@ let viewExtension = Backbone.View.extend({
         }
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
-            let zscore = Math.abs($("#percentile-" + deviationField).attr("data-zscore"));
+            let zscore = $("#percentile-" + deviationField).attr("data-zscore");
             return zscore > warning.max;
         }
         if (warning.hasOwnProperty("percentile")) {
@@ -711,7 +665,9 @@ let viewExtension = Backbone.View.extend({
         if (
             modification === "parental-refusal" ||
             modification === "child-dissenting-behavior" ||
-            modification === "colostomy-bag"
+            modification === "colostomy-bag" ||
+            modification === "cannot-balance-on-scale" ||
+            modification === "crying"
         ) {
             block.find(".modification-affected input:text, .modification-affected select").each(function () {
                 $(this).valChange("").attr("disabled", true);
@@ -780,8 +736,6 @@ let viewExtension = Backbone.View.extend({
                 $("#form_" + field + "-protocol-modification").val(reason);
             }
         });
-        self.handleHeightProtocol();
-        self.handleWeightProtocol();
     },
     enableAltUnits: function (e) {
         let block = $(e.currentTarget).closest(".alt-units-block");
@@ -965,8 +919,6 @@ let viewExtension = Backbone.View.extend({
         this.calculateCuff();
         this.calculateIrregularHeartRate();
         this.handleWheelchair();
-        this.handleHeightProtocol();
-        this.handleWeightProtocol();
         this.toggleThirdWeight();
         this.toggleThirdHeight();
         this.toggleThirdHeadCircumference();

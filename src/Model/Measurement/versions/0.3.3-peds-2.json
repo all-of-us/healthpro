@@ -98,7 +98,7 @@
         },
         {
           "val": "cannot-balance-on-scale",
-          "message": "Deviation successfully captured."
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
         },
         {
           "val": "wheelchair-user",
@@ -469,7 +469,7 @@
     },
     {
       "name": "blood-pressure-protocol-modification",
-      "label": "Modification to Protocol",
+      "label": "Modification to Heart Rate Protocol",
       "replicates": 3,
       "options": {
         "None": "",
