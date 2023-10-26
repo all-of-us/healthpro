@@ -20,6 +20,7 @@ class IdVerificationType extends AbstractType
             'Biospecimen Collection Only' => 'BIOSPECIMEN_COLLECTION_ONLY',
             'Biospecimen Redraw' => 'BIOSPECIMEN_REDRAW_ONLY',
             'Retention Activities' => 'RETENTION_ACTIVITIES',
+            'ID Verification Only' => 'ID_VERIFICATION_ONLY',
             'Pediatric Visit' => 'PEDIATRIC_VISIT',
         ]
     ];
