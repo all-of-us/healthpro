@@ -762,7 +762,7 @@ let viewExtension = Backbone.View.extend({
             if (ft) {
                 inches += 12 * ft;
             }
-            let inch = parseFloat(block.find(".alt-units-height-ft").val());
+            let inch = parseFloat(block.find(".alt-units-height-in").val());
             if (inch) {
                 inches += inch;
             }
