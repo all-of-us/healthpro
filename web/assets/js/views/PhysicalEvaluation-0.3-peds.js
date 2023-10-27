@@ -762,7 +762,7 @@ let viewExtension = Backbone.View.extend({
             if (ft) {
                 inches += 12 * ft;
             }
-            let inch = parseFloat(block.find(".alt-units-height-ft").val());
+            let inch = parseFloat(block.find(".alt-units-height-in").val());
             if (inch) {
                 inches += inch;
             }
@@ -862,7 +862,13 @@ let viewExtension = Backbone.View.extend({
         this.heartRateAgeCharts = obj.heartRateAgeCharts;
         this.zScoreCharts = obj.zScoreCharts;
         this.rendered = false;
-        this.hipWaistHeadFields = ["hip-circumference", "waist-circumference", "head-circumference"];
+        this.requireConversionFields = [
+            "hip-circumference",
+            "waist-circumference",
+            "head-circumference",
+            "weight",
+            "height"
+        ];
         this.meanFields = [
             "weight",
             "height",
@@ -904,7 +910,7 @@ let viewExtension = Backbone.View.extend({
         });
 
         _.each(_.keys(this.conversions), function (field) {
-            if ($.inArray(field, self.hipWaistHeadFields) !== -1) {
+            if ($.inArray(field, self.requireConversionFields) !== -1) {
                 let replicates = $(".field-" + field).length;
                 for (let i = 0; i < replicates; i++) {
                     self.calculateConversion(field, i);

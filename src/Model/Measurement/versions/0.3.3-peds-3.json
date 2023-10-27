@@ -124,8 +124,8 @@
       "name": "height-or-length",
       "label": "Indicate Height or Length Measurement",
       "options": {
-        "Length": "length",
-        "Height": "height"
+        "Height": "height",
+        "Length": "length"
       }
     },
     {

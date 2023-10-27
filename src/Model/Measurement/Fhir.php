@@ -1290,7 +1290,7 @@ class Fhir
             'cm',
             [
                 [
-                    'code' => '11111-0',
+                    'code' => '9843-4',
                     'display' => 'Head circumference',
                     'system' => 'http://loinc.org'
                 ],
