@@ -24,7 +24,7 @@
         {% if order.type == 'saliva' %}
             {{ form_widget(finalizeForm.finalizedSamples) }}
         {% else %}
-            {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled or inactiveSiteFormDisabled ? false : true, samplesInfo, version) }}
+            {{ samples.form_widget(finalizeForm.finalizedSamples, order.disabled or inactiveSiteFormDisabled ? false : true, samplesInfo, version, order) }}
         {% endif %}
         {{ form_errors(finalizeForm.finalizedSamples) }}
         {% if finalizeForm.sampleShippingMethod is defined %}

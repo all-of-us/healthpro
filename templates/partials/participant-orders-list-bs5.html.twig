@@ -69,6 +69,8 @@
                                 <span class="badge bg-info">Processed</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'processed', isBiobankView) }}</span>
                             {% elseif order.collectedTs %}
                                 <span class="badge bg-secondary">Collected</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'collected', isBiobankView) }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Created</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'created', isBiobankView) }}</span>
                             {% endif %}
                         </small>
                     </div>
@@ -76,6 +78,7 @@
                         <small class="fs-sm"><strong>Order ID: {{ order.orderId }}</strong></small><br>
                         <small class="fs-xs">Order Type</small><br>
                         <small class="fs-sm">{{ order.orderTypeDisplayText }}</small>
+                        <small class="fa fa-child child-icon"></small>
                     </div>
                 </div>
                 </a>
