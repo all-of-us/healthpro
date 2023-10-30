@@ -1,4 +1,4 @@
-{% macro form_widget(form, showCheckAll, samplesInfo, version) %}
+{% macro form_widget(form, showCheckAll, samplesInfo, version, order) %}
     <div class="row">
         <div class="{% if app.request.get('_route') != 'order_create' %} col-sm-8 {% else %} col-sm-12 {% endif %}">
             <table id="{{ form.vars.id }}" class="table table-condensed table-auto-width table-samples">
@@ -9,7 +9,9 @@
                         <th colspan="4">Check all</th>
                         {% if app.request.get('_route') == 'order_finalize' %}
                             <th><span class="header-collected">Collected</span></th>
+                            {% if not order.isPediatricOrder %}
                             <th>Processed</th>
+                            {% endif %}
                         {% endif %}
                     </tr>
                     </thead>

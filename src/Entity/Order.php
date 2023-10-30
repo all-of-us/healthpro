@@ -1495,9 +1495,24 @@ class Order
         return is_array($requestedSamples) && empty(array_diff($requestedSamples, self::$urineSamples));
     }
 
+    public function isPediatricSalivaOrder(): bool
+    {
+        $requestedSamples = json_decode($this->requestedSamples, true);
+        return is_array($requestedSamples) && empty(array_diff($requestedSamples, self::PEDIATRIC_SALIVA_SAMPLES));
+    }
+
     public function getOrderTypeDisplayText(): string
     {
         if (!empty($this->requestedSamples)) {
+            if ($this->isPediatricOrder()) {
+                if ($this->isUrineOrder()) {
+                    return 'Pediatric Urine';
+                }
+                if ($this->isPediatricSalivaOrder()) {
+                    return 'Pediatric Saliva';
+                }
+                return 'Pediatric Blood';
+            }
             if ($this->isUrineOrder()) {
                 return 'Urine';
             }
