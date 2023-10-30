@@ -58,9 +58,15 @@
             {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount, participant.idVerificationsCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
+                {% set isPediatricParticipant = participant.participant is defined and participant.participant.isPediatric ? true : false %}
                 <tr>
                     {% if i == 0 %}
-                        <td {{ rowSpan }} class="align-middle" data-participant-id="{{ id }}"><a href="{{ path('participant', { id: id }) }}">{{ id }}</a></td>
+                        <td {{ rowSpan }} class="align-middle" data-participant-id="{{ id }}">
+                            <a href="{{ path('participant', { id: id }) }}">{{ id }}</a>
+                            {% if isPediatricParticipant %}
+                                <i class="fa fa-child child-icon"></i>
+                            {% endif %}
+                        </td>
                         {% if participant.participant is defined %}
                             <td {{ rowSpan }} class="align-middle">
                                 {% if participant.participant %}
@@ -141,7 +147,7 @@
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ order and order.order_type != 'saliva' ? today.displayDate(order, 'processed_ts') : '--'}}
+                        {{ order and order.order_type != 'saliva' and not isPediatricParticipant ? today.displayDate(order, 'processed_ts') : '--'}}
                     </td>
                     <td>
                         {% if order %}
