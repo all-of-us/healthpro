@@ -1073,10 +1073,10 @@ class WorkQueue
             'group' => 'enrollment'
         ],
         '1ED02' => [
-            'name' => '2 mL EDTA',
+            'name' => '2 mL EDTA (1ED02)',
             'csvNames' => [
-                '2 mL EDTA Received',
-                '2 mL EDTA Received Date'
+                '2 mL EDTA (1ED02) Received',
+                '2 mL EDTA (1ED02) Received Date'
             ],
             'rdrField' => 'sampleStatus1ED02',
             'sortField' => 'sampleStatus1ED02Time',
@@ -1088,10 +1088,10 @@ class WorkQueue
             'group' => 'enrollment'
         ],
         '1ED04' => [
-            'name' => '4 mL EDTA',
+            'name' => '4 mL EDTA (1ED04)',
             'csvNames' => [
-                '4 mL EDTA Received',
-                '4 mL EDTA Received Date'
+                '4 mL EDTA (1ED04) Received',
+                '4 mL EDTA (1ED04) Received Date'
             ],
             'rdrField' => 'sampleStatus1ED04',
             'sortField' => 'sampleStatus1ED04Time',
@@ -2290,8 +2290,8 @@ class WorkQueue
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
         '1HEP4' => '4 mL Na-Hep',
-        '1ED02' => '2 mL EDTA',
-        '1ED04' => '4 mL EDTA',
+        '1ED02' => '2 mL EDTA (1ED02)',
+        '1ED04' => '4 mL EDTA (1ED04)',
         '1ED10' => '1st 10 mL EDTA',
         '2ED10' => '2nd 10 mL EDTA',
         '1CFD9' => 'Cell-Free DNA',
