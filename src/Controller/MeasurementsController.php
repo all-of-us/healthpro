@@ -201,7 +201,7 @@ class MeasurementsController extends BaseController
                                 ]);
                             }
                             if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && !isset($newMeasurement)) {
-                                return $this->redirectToRoute('order_check_pediatric_weight', [
+                                return $this->redirectToRoute('order_check_pediatric', [
                                     'participantId' => $participant->id
                                 ]);
                             } elseif ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && isset($newMeasurement)) {
@@ -225,7 +225,7 @@ class MeasurementsController extends BaseController
                             $this->addFlash('notice', 'Physical measurements saved');
                         }
                         if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm()) {
-                            return $this->redirectToRoute('order_check_pediatric_weight', [
+                            return $this->redirectToRoute('order_check_pediatric', [
                                 'participantId' => $participant->id
                             ]);
                         }

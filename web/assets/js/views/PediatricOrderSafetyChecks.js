@@ -7,6 +7,7 @@ $(document).ready(function () {
                 .each(function () {
                     $($(this).data("vis-toggle")).hide();
                 });
+            hideAllCheckedQuestions(this);
             showHighestPriorityChecked(this);
         } else {
             hideAllCheckedQuestions(this);
@@ -40,4 +41,10 @@ $(document).ready(function () {
     function hideAllWarnings(element) {
         $(element).closest("div.question").parent().find("span.warning").hide();
     }
+
+    $("#weightConfirm").on("click", function () {
+        $("#first-qn").show();
+        $("#weightConfirmButtons").hide();
+        $("#weightConfirmText").show();
+    });
 });
