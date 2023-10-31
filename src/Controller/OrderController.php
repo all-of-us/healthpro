@@ -10,7 +10,6 @@ use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
 use App\Form\OrderType;
-use App\Repository\MeasurementRepository;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
