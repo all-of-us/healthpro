@@ -1087,6 +1087,21 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
+        '2ED02' => [
+            'name' => '2 mL EDTA (2ED02)',
+            'csvNames' => [
+                '2 mL EDTA (2ED02) Received',
+                '2 mL EDTA (2ED02) Received Date'
+            ],
+            'rdrField' => 'sampleStatus2ED02',
+            'sortField' => 'sampleStatus2ED02Time',
+            'rdrDateField' => 'sampleStatus2ED02Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
         '1ED04' => [
             'name' => '4 mL EDTA (1ED04)',
             'csvNames' => [
@@ -1096,6 +1111,21 @@ class WorkQueue
             'rdrField' => 'sampleStatus1ED04',
             'sortField' => 'sampleStatus1ED04Time',
             'rdrDateField' => 'sampleStatus1ED04Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
+        '2ED04' => [
+            'name' => '4 mL EDTA (2ED04)',
+            'csvNames' => [
+                '4 mL EDTA (2ED04) Received',
+                '4 mL EDTA (2ED04) Received Date'
+            ],
+            'rdrField' => 'sampleStatus2ED04',
+            'sortField' => 'sampleStatus2ED04Time',
+            'rdrDateField' => 'sampleStatus2ED04Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'type' => 'sample',
@@ -1386,7 +1416,9 @@ class WorkQueue
         '1PST8',
         '1HEP4',
         '1ED02',
+        '2ED02',
         '1ED04',
+        '2ED04',
         '1ED10',
         '2ED10',
         '1CFD9',
@@ -1560,7 +1592,9 @@ class WorkQueue
         'reconsentForElectronicHealthRecordsAuthored',
         'LifeFunctioning',
         'healthDataStream',
-        'NPHConsent'
+        'NPHConsent',
+        '2ED02',
+        '2ED04'
     ];
 
     public static $sortColumns = [
@@ -1643,7 +1677,9 @@ class WorkQueue
         'sampleStatus1PST8Time',
         'sampleStatus1HEP4Time',
         'sampleStatus1ED02Time',
+        'sampleStatus2ED02Time',
         'sampleStatus1ED04Time',
+        'sampleStatus2ED04Time',
         'sampleStatus1ED10Time',
         'sampleStatus2ED10Time',
         'sampleStatus1CFD9Time',
@@ -2291,7 +2327,9 @@ class WorkQueue
         '1PST8' => '8 mL PST',
         '1HEP4' => '4 mL Na-Hep',
         '1ED02' => '2 mL EDTA (1ED02)',
+        '2ED02' => '2 mL EDTA (2ED02)',
         '1ED04' => '4 mL EDTA (1ED04)',
+        '2ED04' => '4 mL EDTA (2ED04)',
         '1ED10' => '1st 10 mL EDTA',
         '2ED10' => '2nd 10 mL EDTA',
         '1CFD9' => 'Cell-Free DNA',
