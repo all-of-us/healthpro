@@ -23,12 +23,70 @@
         {% endfor %}
     </ul>
     <br/>
-
-
-    <!--TODO: change form endpoint to pediatric order creation-->
+    <div id="weightDiv">
+    {% if weightMeasurement is null %}
+        <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
+        <div class="col-md-12">
+            <span class="text-danger"><i class="fas fa-exclamation-circle"></i> Weight measurement not found. Please complete and finalize a physical measurements form prior to biospecimen collection.</span>
+        </div>
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Not Found</div>
+                    <div class="panel-body">
+                        <span class="center-block">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <p>
+                <a href="{{ path('measurement', {'participantId': participant.id}) }}" class="btn btn-primary">Start New Physical Measurements</a>
+            </p>
+        </div>
+    {%  elseif weightMeasurement.finalizedTs|date('U') < "-1 day"|date('U') %}
+        <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
+        <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> The participant's weight measurement was taken more than 1 day ago. Please recapture the weight to proceed.</span>
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
+                    <div class="panel-body">
+                        <span class="center-block text-center">{{ measurementData.weight.kg }} Kg ({{ measurementData.weight.lb }} lbs)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <p>
+                <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+            </p>
+        </div>
+    {% else %}
+        <h4>Please confirm the participant's weight is accurate prior to biospecimen collection. Click confirm if the participant's weight is accurate. Click Amend to edit the weight captured on today's
+            physical measurements form.</h4>
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
+                    <div class="panel-body">
+                        <span class="center-block text-center">{{ measurementData.weight.kg }} Kg ({{ measurementData.weight.lb }} lbs)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12" id="weightConfirmButtons">
+            <p>
+                <a href="#" id="weightConfirm" class="btn btn-primary">Confirm</a>
+                <a href="{{ path('measurement', {'participantId': participant.id, 'measurementId': measurementId, 'type': 'peds-weight', 'copy': true}) }}" class="btn btn-warning">Amend</a>
+            </p>
+        </div>
+    {% endif %}
+    </div>
+    <span id="weightConfirmText" class="text-success" style="display: none"><i class="fa fa-check"></i> Weight Confirmed</span>
     <form method="post" action="{{ path('order_create', {'participantId': participant.id}) }}" id="safety-checks" class="prevent-resubmit">
-        <div class="question" id="first-qn">
-            <h3>Has your child had a blood transfusion in the past 6 months?</h3>
+        <div class="question" id="first-qn" style="display: none">
+            <h4>Has your child had a blood transfusion in the past 6 months?</h4>
             <div class="radio">
                 <label><input type="radio" name="first-qn" data-show-target="#transfusion-qn"/> Yes</label>
             </div>
@@ -37,7 +95,7 @@
             </div>
         </div>
             <div class="question" id="transfusion-qn" style="display: none">
-                <h3>Please select the specific type of blood transfusion:</h3>
+                <h4>Please select the specific type of blood transfusion:</h4>
                 <div class="checkbox">
                     <label><input type="checkbox" data-vis-toggle="#info-text-1,#continue,#order-info-text" data-samples="urine"/> Whole blood transfusion</label>
                 </div>
@@ -49,7 +107,7 @@
                 </div>
             </div>
             <div class="question" id="rbc-qn" style="display: none">
-                <h3>Has it been at least 2 months since participant's RBC transfusion?</h3>
+                <h4>Has it been at least 2 months since participant's RBC transfusion?</h4>
                 <div class="radio">
                     <label><input type="radio" name="rbc-qn" data-show-target="#bd-qn"/> Yes</label>
                 </div>
@@ -58,7 +116,7 @@
                 </div>
             </div>
         <div class="question" id="plas-qn" style="display: none">
-            <h3>Has it been at least a week since transfusion?</h3>
+            <h4>Has it been at least a week since transfusion?</h4>
             <div class="radio">
                 <label><input type="radio" name="plas-qn" data-show-target="#bd-qn"/> Yes</label>
             </div>
@@ -67,7 +125,7 @@
             </div>
         </div>
             <div class="question" id="bd-qn" style="display: none">
-                <h3>Has your child had their blood drawn within the past 8 weeks?</h3>
+                <h4>Has your child had their blood drawn within the past 8 weeks?</h4>
                 <div class="radio">
                     <label><input type="radio" name="bd-qn" data-show-target="#draw-amount-qn"/> Yes</label>
                 </div>
@@ -76,9 +134,9 @@
                 </div>
             </div>
         <div style="display:none;" class="question" id="draw-amount-qn">
-            <h3><i class="fa fa-xs fa-question-circle clickable" data-toggle="modal" data-target="#pediatric-blood-draw-modal" id="pediatric-blood-question"></i>
+            <h4><i class="fa fa-xs fa-question-circle clickable" data-toggle="modal" data-target="#pediatric-blood-draw-modal" id="pediatric-blood-question"></i>
                 Does the amount of blood drawn during the participant’s previous draw AND the amount of blood to be drawn for AoU exceed the lesser of 50 ml or 3ml per kg in an 8 week period?
-                </h3>
+                </h4>
             <div class="radio">
                 <label><input type="radio" name="draw-amount-qn" data-show-target="#info-text-3,#continue,#order-info-text" data-samples="saliva,urine"/> Yes</label>
             </div>
@@ -90,7 +148,7 @@
             </div>
         </div>
         <div class="question" style="display:none;" id="syncope-qn">
-            <h3>Has your child had any problems with a blood draw, like becoming pale or other bad reactions?</h3>
+            <h4>Has your child had any problems with a blood draw, like becoming pale or other bad reactions?</h4>
             <div class="radio">
                 <label><input type="radio" name="syncope-qn" data-show-target="#partial-order-qn"/> Yes</label>
             </div>
@@ -99,7 +157,7 @@
             </div>
         </div>
         <div class="question" style="display:none;" id="partial-order-qn">
-            <h3>Would you like to continue with the full Biobank order or a modified order with urine and saliva only?</h3>
+            <h4>Would you like to continue with the full Biobank order or a modified order with urine and saliva only?</h4>
             <div class="radio">
                 <label><input type="radio" name="partial-order-qn" data-show-target="#continue" data-sampels="saliva,urine,blood"/> Full Biobank Order</label>
             </div>
@@ -115,7 +173,7 @@
                 Participants may not have blood drawn if they have received RBC transfusion in the past 2 months. If the participant can provide adult samples, saliva and urine collection is permissible and can be initiated by selecting Continue.<br>
             </span>
             <span id="info-text-3" class="warning"  style="display: none">
-                Caution! In order to minimize risk to participants, those who experience syncope should be offered saliva and urine collections as an alternative. Please select whether the participant would like to continue with a full Biobank order or a modified order with urine only and a saliva order.
+                The amount of blood drawn exceeds the safety limit and the participant cannot have blood drawn at this time. The pediatric participant will need to schedule their biospecimen collection at least 8 weeks from their last blood draw. If the participant can provide adult samples, saliva and urine collection is permissible at this time and can be initiated by selecting Continue.
             </span>
             <span id="info-text-4" class="warning"  style="display: none">
                  If the volume of blood drawn cannot be determined, the pediatric participant will need to schedule their biospecimen collection at least 8 weeks from their last blood draw. If the participant can provide adult samples, saliva and urine collection is permissible at this time and can be initiated by selecting Continue.

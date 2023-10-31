@@ -265,7 +265,7 @@ class OrderController extends BaseController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $nextStep = $order->getType() === 'saliva' ? 'finalize' : 'process';
+        $nextStep = ($order->getType() === 'saliva' || $order->isPediatricOrder()) ? 'finalize' : 'process';
         $wasNextStepAvailable = in_array($nextStep, $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
@@ -418,6 +418,7 @@ class OrderController extends BaseController
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
             'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
@@ -535,7 +536,7 @@ class OrderController extends BaseController
                     }
                 }
                 $redirectRoute = 'order_finalize';
-                if ($order->getType() !== 'kit' && !$wasPrintRequisitionStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                if ($order->getType() !== 'kit' && !$wasPrintRequisitionStepAvailable && (in_array('process', $order->getAvailableSteps()) || $order->isPediatricOrder())) {
                     $redirectRoute = 'order_print_requisition';
                 }
                 return $this->redirectToRoute($redirectRoute, [
@@ -577,7 +578,8 @@ class OrderController extends BaseController
         if (!in_array('print_requisition', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
-                'orderId' => $orderId
+                'orderId' => $orderId,
+                'isPediatricOrder' => $order->isPediatricOrder()
             ]);
         }
 
@@ -585,7 +587,8 @@ class OrderController extends BaseController
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder()
         ]);
     }
 
@@ -753,8 +756,8 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/pediatric/weight', name: 'order_check_pediatric_weight')]
-    public function orderCheckWeight($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
+    #[Route(path: '/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
+    public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -770,28 +773,12 @@ class OrderController extends BaseController
         } else {
             $measurementData = null;
         }
-        return $this->render('order/pediatric/weight.html.twig', [
+        return $this->render('order/check-pediatric.html.twig', [
             'participant' => $participant,
             'siteType' => $requestStack->getSession()->get('siteType'),
             'weightMeasurement' => $measurement,
             'measurementData' => $measurementData,
             'measurementId' => $measurement ? $measurement->getId() : null,
-        ]);
-    }
-
-    #[Route(path: '/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
-    public function orderCheckPediatric($participantId, MeasurementRepository $measurementRepository, RequestStack $requestStack): Response
-    {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
-        if (!$participant) {
-            throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
-        }
-        return $this->render('order/check-pediatric.html.twig', [
-            'participant' => $participant,
-            'siteType' => $requestStack->getSession()->get('siteType')
         ]);
     }
 }
