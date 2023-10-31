@@ -21,9 +21,13 @@
             </thead>
             <tbody>
             {% for measurement in measurements %}
+                {% set isPediatricParticipant = measurement.participant is defined and measurement.participant.isPediatric ? true : false %}
                 <tr>
                     <td>
                         <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
+                        {% if isPediatricParticipant %}
+                            <i class="fa fa-child child-icon"></i>
+                        {% endif %}
                     </td>
                     {% if measurement.participant is defined %}
                         <td class="align-middle">
