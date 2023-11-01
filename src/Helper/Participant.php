@@ -50,9 +50,9 @@ class Participant
     public int $sexAtBirth;
     public bool $isPediatric = false;
     public string $pediatricMeasurementsVersionType;
-    public string $guardianId;
-    public string $guardianFirstName;
-    public string $guardianLastName;
+    public string|null $guardianId = null;
+    public string|null $guardianFirstName = null;
+    public string|null $guardianLastName = null;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
