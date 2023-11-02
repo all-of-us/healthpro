@@ -302,10 +302,11 @@ class Participant
 
         if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
             $this->isPediatric = true;
-            if (isset($participant->relatedParticipants) && $participant->relatedParticipants !== 'UNSET') {
-                $this->guardianId = $participant->relatedParticipants[0]->participantId;
-                $this->guardianFirstName = $participant->relatedParticipants[0]->firstName;
-                $this->guardianLastName = $participant->relatedParticipants[0]->lastName;
+            if (isset($participant->relatedParticipants) && is_array($participant->relatedParticipants)) {
+                $guardian = $participant->relatedParticipants[0];
+                $this->guardianId = $guardian->participantId ?? null;
+                $this->guardianFirstName = $guardian->firstName ?? null;
+                $this->guardianLastName = $guardian->lastName ?? null;
             }
         }
 
