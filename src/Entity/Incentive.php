@@ -137,7 +137,7 @@ class Incentive
     private $import;
 
     #[ORM\Column(length: 30)]
-    private ?string $Recipient = null;
+    private string $Recipient;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $typeOfItem = null;
