@@ -41,8 +41,8 @@ class IncentiveRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function searchItemOfAppreciation(string $query): array {
-
+    public function searchItemOfAppreciation(string $query): array
+    {
     }
 
     public function getOnsiteIncentives($site, $params): array
