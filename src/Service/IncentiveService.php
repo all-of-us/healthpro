@@ -49,6 +49,11 @@ class IncentiveService
             if ($incentive->getGiftCardType()) {
                 $obj->giftcardType = $incentive->getGiftCardType();
             }
+            $obj->incentiveRecipient = $incentive->getRecipient();
+            if ($incentive->getTypeOfItem()) {
+                $obj->appreciationItemType = $incentive->getTypeOfItem();
+                $obj->appreciationItemCount = $incentive->getNumberOfItems();
+            }
             $obj->amount = $incentive->getIncentiveAmount();
             $obj->notes = $incentive->getNotes();
             $obj->declined = $incentive->getDeclined();
