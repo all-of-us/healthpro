@@ -49,3 +49,10 @@
         {% endif %}
     {% endif %}
 </dl>
+{% if participant.isPediatric and participant.guardianId %}
+    <hr>
+    <strong>Guardian:</strong>
+    <a class="link-primary text-decoration-none" href="{{ path('participant', { id: participant.guardianId }) }}">
+        {{ participant.guardianLastName }}, {{ participant.guardianFirstName }} ({{ participant.guardianId }})
+    </a>
+{% endif %}

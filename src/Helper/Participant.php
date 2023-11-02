@@ -50,6 +50,9 @@ class Participant
     public int $sexAtBirth;
     public bool $isPediatric = false;
     public string $pediatricMeasurementsVersionType;
+    public string|null $guardianId = null;
+    public string|null $guardianFirstName = null;
+    public string|null $guardianLastName = null;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -299,6 +302,12 @@ class Participant
 
         if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
             $this->isPediatric = true;
+            if (isset($participant->relatedParticipants) && is_array($participant->relatedParticipants)) {
+                $guardian = $participant->relatedParticipants[0];
+                $this->guardianId = $guardian->participantId ?? null;
+                $this->guardianFirstName = $guardian->firstName ?? null;
+                $this->guardianLastName = $guardian->lastName ?? null;
+            }
         }
 
         // Check for participants associated with TEST organization when disableTestAccess is set to true
