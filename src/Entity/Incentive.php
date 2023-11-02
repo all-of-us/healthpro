@@ -136,7 +136,7 @@ class Incentive
     #[ORM\ManyToOne(targetEntity: IncentiveImport::class, inversedBy: 'incentives')]
     private $import;
 
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 255)]
     private string $Recipient;
 
     #[ORM\Column(length: 255, nullable: true)]

@@ -22,7 +22,7 @@ final class Version20231024135150 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE incentive ADD recipient VARCHAR(30) NOT NULL, ADD type_of_item VARCHAR(255) DEFAULT NULL, add number_of_items integer DEFAULT NULL');
+        $this->addSql('ALTER TABLE incentive ADD recipient VARCHAR(255) NOT NULL, ADD type_of_item VARCHAR(255) DEFAULT NULL, add number_of_items integer DEFAULT NULL');
 
 
     }
