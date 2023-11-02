@@ -54,7 +54,7 @@ class IncentiveServiceTest extends ServiceTestCase
             ->setOtherIncentiveType('gift_card')
             ->setGiftCardType('target')
             ->setIncentiveAmount(15)
-            Update->setRecipient(Incentive::PEDIATRIC_PARTICIPANT);
+            ->setRecipient(Incentive::PEDIATRIC_PARTICIPANT);
         if ($type !== Incentive::CREATE) {
             $incentive->setRdrId(1);
         }
