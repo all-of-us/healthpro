@@ -27,6 +27,12 @@ $(document).ready(function () {
         });
     }
 
+    if (participantInfo.data("pediatric") == true) {
+        $("#incentive_recipient").val("pediatric_participant");
+    } else {
+        $("#incentive_recipient").val("adult_participant");
+    }
+
     if (participantInfo.data("can-view-patient-status")) {
         let hasOrgPatientStatusData = participantInfo.data("has-org-patient-status");
 

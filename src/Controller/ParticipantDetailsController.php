@@ -175,7 +175,7 @@ class ParticipantDetailsController extends BaseController
         }
 
         // Incentive Form
-        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly(), 'pediatric_participant' => $participant->isPediatric]);
 
         // Id Verification Form
         $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
@@ -349,6 +349,24 @@ class ParticipantDetailsController extends BaseController
         $results = [];
         foreach ($giftCards as $giftCard) {
             $results[] = $giftCard['giftCardType'];
+        }
+        return $this->json($results);
+    }
+
+    #[Route(path: '/ajax/search/type-of-item-prefill', name: 'search_item_type_prefill')]
+    public function itemTypePrefill(): JsonResponse
+    {
+        return $this->json(Incentive::$itemTypes);
+    }
+
+    #[Route(path: '/ajax/search/type-of-item/{query}', name: 'search_giftcard')]
+    public function itemTypeAction(Request $request): JsonResponse
+    {
+        $query = $request->get('query');
+        $itemTypes = $this->em->getRepository(Incentive::class)->search($query, 'i.typeOfItem');
+        $results = [];
+        foreach ($itemTypes as $itemType) {
+            $results[] = $itemType['typeOfItem'];
         }
         return $this->json($results);
     }
