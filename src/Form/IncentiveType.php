@@ -95,7 +95,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('string'),
                     new Constraints\Callback(function ($value, $context) {
-                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === 'item_of_appreciation' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === Incentive::ITEM_OF_APPRECIATION && empty($value)) {
                             $context->buildViolation('Please specify type of item')->addViolation();
                         }
                     })
@@ -111,7 +111,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Type('integer'),
                     new Constraints\Callback(function ($value, $context) {
-                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === 'item_of_appreciation' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === Incentive::ITEM_OF_APPRECIATION && empty($value)) {
                             $context->buildViolation('Please specify number of items')->addViolation();
                         }
                     })
@@ -174,7 +174,7 @@ class IncentiveType extends AbstractType
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) {
                         if (!$context->getRoot()['declined']->getData() &&
-                            ($context->getRoot()['incentive_type']->getData() !== 'promotional' && $context->getRoot()['incentive_type']->getData() !== 'item_of_appreciation') &&
+                            ($context->getRoot()['incentive_type']->getData() !== 'promotional' && $context->getRoot()['incentive_type']->getData() !== Incentive::ITEM_OF_APPRECIATION) &&
                             empty($value)) {
                             $context->buildViolation('Please specify incentive amount')->addViolation();
                         }
