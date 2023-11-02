@@ -74,6 +74,7 @@ $(document).ready(function () {
     });
 
     $("#order_generate_btn").on("click", function () {
+        $(this).prop("disabled", true);
         let confirmMessage =
             "Are you sure you want to generate orders and print labels? " +
             "This action will officially create the order and sample IDs. " +
@@ -81,6 +82,8 @@ $(document).ready(function () {
             "Click OK to create order(s) and print labels.";
         if (confirm(confirmMessage)) {
             $("#order_create_form").submit();
+        } else {
+            $(this).prop("disabled", false);
         }
     });
 
