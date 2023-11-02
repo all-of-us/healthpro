@@ -851,10 +851,18 @@ let viewExtension = Backbone.View.extend({
         });
     },
     initialize: function (obj) {
+        this.ageInMonths = parseInt(obj.ageInMonths);
+        if (obj.warnings.hasOwnProperty("weight")) {
+            obj.warnings.weight = obj.warnings.weight.filter((warning) => {
+                return !(
+                    warning.hasOwnProperty("ageRange") &&
+                    (this.ageInMonths < warning.ageRange[0] || this.ageInMonths > warning.ageRange[1])
+                );
+            });
+        }
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
-        this.ageInMonths = parseInt(obj.ageInMonths);
         this.ageInYears = parseInt(obj.ageInYears);
         console.log("ageInMonths", this.ageInMonths);
         this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;

@@ -29,12 +29,37 @@
       "max": 1000,
       "warnings": [
         {
-          "min": 30,
-          "message": "Please verify that this weight is correct"
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "Multiple weight measurements indicate very low weight for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
         },
         {
-          "max": 199.5,
-          "message": "Please verify that this weight is correct. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "This value may indicate very low weight for age if confirmed by repeat measure."
+        },
+        {
+          "min": 1,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol.",
+          "ageRange": [0,35]
+
+        },
+        {
+          "max": 18,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol.",
+          "ageRange": [0,35]
+        },
+        {
+          "min": 7,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol.",
+          "ageRange": [36,83]
+        },
+        {
+          "max": 35,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol.",
+          "ageRange": [36,83]
         }
       ],
       "convert": "lb",
