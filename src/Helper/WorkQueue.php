@@ -733,6 +733,22 @@ class WorkQueue
             'visible' => false,
             'group' => 'surveys'
         ],
+        'EnvironmentalExposures' => [
+            'name' => 'Environmental Exposures',
+            'csvNames' => [
+                'Environmental Exposures PPI Survey Complete',
+                'Environmental Exposures PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnEnvironmentalExposures',
+            'sortField' => 'questionnaireOnEnvironmentalExposuresAuthored',
+            'rdrDateField' => 'questionnaireOnEnvironmentalExposuresAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ],
         'CopeMay' => [
             'name' => 'COPE May',
             'csvNames' => [
@@ -1391,6 +1407,7 @@ class WorkQueue
         'LifeFunctioning',
         'EmotionalHealth',
         'BehavioralHealth',
+        'EnvironmentalExposures',
         'CopeMay',
         'CopeJune',
         'CopeJuly',
@@ -1594,7 +1611,8 @@ class WorkQueue
         'healthDataStream',
         'NPHConsent',
         '2ED02',
-        '2ED04'
+        '2ED04',
+        'EnvironmentalExposures'
     ];
 
     public static $sortColumns = [
@@ -1652,6 +1670,7 @@ class WorkQueue
         'questionnaireOnLifeFunctioningAuthored',
         'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
         'questionnaireOnBehavioralHealthAndPersonalityAuthored',
+        'questionnaireOnEnvironmentalExposuresAuthored',
         'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJulyAuthored',
@@ -2296,6 +2315,7 @@ class WorkQueue
         'LifeFunctioning' => 'Life Functioning',
         'EmotionalHealthHistoryAndWellBeing' => 'Emotional Health Hx and Well-being',
         'BehavioralHealthAndPersonality' => 'Behavioral Health and Personality',
+        'EnvironmentalExposures' => 'Environmental Exposures',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
