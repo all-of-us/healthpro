@@ -24,11 +24,11 @@
             </thead>
             <tbody>
             {% for order in orders %}
-                {% set isPediatricParticipant = order.participant is defined and order.participant.isPediatric ? true : false %}
+                {% set isPediatricForm = "ped" in order.version %}
                 <tr>
                     <td>
                         <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant_id }}</a>
-                        {% if isPediatricParticipant %}
+                        {% if isPediatricForm %}
                             <i class="fa fa-child child-icon"></i>
                         {% endif %}
                     </td>
@@ -59,7 +59,7 @@
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ order.type != 'saliva' and not isPediatricParticipant ? today.displayDate(order, 'processed_ts') : '--'}}
+                        {{ order.type != 'saliva' and not isPediatricForm ? today.displayDate(order, 'processed_ts') : '--'}}
                     </td>
                     <td>
                         {% if order.h_type != 'unlock' %}
