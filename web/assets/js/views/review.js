@@ -15,11 +15,17 @@ $(document).ready(function () {
         const td = $(this);
         $.getJSON(nameLookupUrl + td.data("participant-id"), function (data) {
             td.empty();
-            if (data && data.lastName && data.firstName) {
-                const a = $("<a>")
-                    .attr("href", td.data("href"))
-                    .text(data.lastName + ", " + data.firstName);
-                td.append(a);
+            if (data) {
+                const { lastName, firstName, isPediatric } = data;
+                if (lastName && firstName) {
+                    const a = $("<a>")
+                        .attr("href", td.data("href"))
+                        .text(lastName + ", " + firstName);
+                    td.append(a);
+                }
+                if (isPediatric) {
+                    td.parent().find(".participant-id").append(' <i class="fa fa-child child-icon"></i>');
+                }
             } else {
                 td.text(missingName);
             }
