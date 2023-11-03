@@ -17,19 +17,26 @@ class Incentive
     public const ONE_TIME = 'one_time';
     public const REDRAW = 'redraw';
     public const OTHER = 'other';
+    public const ADULT_PARTICIPANT = 'adult_participant';
+    public const PEDIATRIC_GUARDIAN = 'pediatric_guardian';
+    public const PEDIATRIC_PARTICIPANT = 'pediatric_participant';
+    public const ITEM_OF_APPRECIATION = 'item_of_appreciation';
+    public const PEDIATRIC_VISIT = 'pediatric_visit';
 
     public static $incentiveTypeChoices = [
         'Cash' => self::CASH,
         'Gift Card' => self::GIFT_CARD,
         'Voucher' => self::VOUCHER,
         'Promotional Item' => self::PROMOTIONAL,
-        'Other' => self::OTHER
+        'Item of Appreciation' => self::ITEM_OF_APPRECIATION,
+        'Other' => self::OTHER,
     ];
 
     public static $incentiveOccurrenceChoices = [
         'One-time Incentive' => self::ONE_TIME,
         'Redraw' => self::REDRAW,
-        'Other' => self::OTHER
+        'Other' => self::OTHER,
+        'Pediatric Visit' => self::PEDIATRIC_VISIT,
     ];
 
     public static $incentiveAmountChoices = [
@@ -52,6 +59,19 @@ class Incentive
         'MasterCard',
         'Amazon',
         'Meijer',
+    ];
+
+    public static $recipientChoices = [
+        'Adult Participant' => self::ADULT_PARTICIPANT,
+        'Pediatric Guardian' => self::PEDIATRIC_GUARDIAN,
+        'Pediatric Participant' => self::PEDIATRIC_PARTICIPANT,
+    ];
+
+    public static $itemTypes = [
+        'Candy',
+        'Pencil',
+        'Pen',
+        'Toy'
     ];
 
     #[ORM\Id]
@@ -115,6 +135,15 @@ class Incentive
 
     #[ORM\ManyToOne(targetEntity: IncentiveImport::class, inversedBy: 'incentives')]
     private $import;
+
+    #[ORM\Column(length: 255)]
+    private string $Recipient;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $typeOfItem = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $numberOfItems = null;
 
     public function getId(): ?int
     {
@@ -362,5 +391,59 @@ class Incentive
         $this->import = $import;
 
         return $this;
+    }
+
+    public function getRecipient(): ?string
+    {
+        return $this->Recipient;
+    }
+
+    public function setRecipient(string $Recipient): static
+    {
+        $this->Recipient = $Recipient;
+
+        return $this;
+    }
+
+    public function getTypeOfItem(): ?string
+    {
+        return $this->typeOfItem;
+    }
+
+    public function setTypeOfItem(?string $typeOfItem): static
+    {
+        $this->typeOfItem = $typeOfItem;
+
+        return $this;
+    }
+
+    public function getNumberOfItems(): ?int
+    {
+        return $this->numberOfItems;
+    }
+
+    public function setNumberOfItems(?int $numberOfItems): static
+    {
+        $this->numberOfItems = $numberOfItems;
+
+        return $this;
+    }
+
+    public static function getIncentiveOptions($isPediatricParticipant = false): array
+    {
+        $choices = self::$incentiveTypeChoices;
+        if (!$isPediatricParticipant) {
+            unset($choices['Item of Appreciation']);
+        }
+        return $choices;
+    }
+
+    public static function getIncentiveOccurenceOptions($isPediatricParticipant = false): array
+    {
+        $choices = self::$incentiveOccurrenceChoices;
+        if (!$isPediatricParticipant) {
+            unset($choices['Pediatric Visit']);
+        }
+        return $choices;
     }
 }

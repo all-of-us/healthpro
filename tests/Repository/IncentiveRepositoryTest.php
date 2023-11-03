@@ -140,6 +140,7 @@ class IncentiveRepositoryTest extends KernelTestCase
                 ->setGiftCardType($incentiveData['giftCardType'])
                 ->setNotes($incentiveData['notes'])
                 ->setCreatedTs(new \DateTime($incentiveData['createdTs']))
+                ->setRecipient($incentiveData['recipient'])
                 ->setDeclined($incentiveData['declined']);
             $this->em->persist($incentive);
         }
@@ -172,6 +173,7 @@ class IncentiveRepositoryTest extends KernelTestCase
                 'notes' => 'test',
                 'createdTs' => '2022-01-15',
                 'declined' => 0,
+                'recipient' => 'adult_participant'
             ],
             [
                 'participantId' => 'P000000001',
@@ -186,6 +188,7 @@ class IncentiveRepositoryTest extends KernelTestCase
                 'notes' => 'test2',
                 'createdTs' => '2022-02-15',
                 'declined' => 0,
+                'recipient' => 'adult_participant'
             ],
             [
                 'participantId' => 'P000000002',
@@ -200,6 +203,7 @@ class IncentiveRepositoryTest extends KernelTestCase
                 'notes' => 'test3',
                 'createdTs' => '2022-03-15',
                 'declined' => 0,
+                'recipient' => 'pediatric_guardian'
             ],
             [
                 'participantId' => 'P000000003',
@@ -214,6 +218,7 @@ class IncentiveRepositoryTest extends KernelTestCase
                 'notes' => 'test4',
                 'createdTs' => '2022-04-15',
                 'declined' => 0,
+                'recipient' => 'pediatric_guardian'
             ],
             [
                 'participantId' => 'P000000004',
@@ -228,6 +233,7 @@ class IncentiveRepositoryTest extends KernelTestCase
                 'notes' => 'test5',
                 'createdTs' => '2022-05-15',
                 'declined' => 0,
+                'recipient' => 'pediatric_participant'
             ]
         ];
     }

@@ -19,7 +19,7 @@ class IncentiveRepository extends ServiceEntityRepository
         parent::__construct($registry, Incentive::class);
     }
 
-    public function search(string $query): array
+    public function search(string $query, string $field = 'i.giftCardType'): array
     {
         $query = trim($query);
         $queryParts = preg_split('/\W+/', $query, 20, PREG_SPLIT_NO_EMPTY);
@@ -27,15 +27,15 @@ class IncentiveRepository extends ServiceEntityRepository
             return [];
         }
         $queryBuilder = $this->createQueryBuilder('i')
-            ->select('i.giftCardType')
-            ->groupBy('i.giftCardType')
-            ->orderBy('count(i.giftCardType)', 'DESC')
+            ->select($field)
+            ->groupBy($field)
+            ->orderBy("count($field)", 'DESC')
             ->setMaxResults(10);
 
         foreach ($queryParts as $i => $queryPart) {
             $parameter = "%{$queryPart}%";
             $queryBuilder
-                ->andWhere("i.giftCardType like ?{$i}")
+                ->andWhere("$field like ?{$i}")
                 ->setParameter($i, $parameter);
         }
         return $queryBuilder->getQuery()->getResult();
