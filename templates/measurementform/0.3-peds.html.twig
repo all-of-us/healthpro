@@ -110,17 +110,41 @@
                         <h3 class="panel-title">Growth Percentile</h3>
                     </div>
                     <div class="panel-body">
-                        <p class="lead">
-                            Weight <span id="percentile-weight-for-age">--</span> percentile
-                        </p>
+                        <div class="row lead">
+                            <div class="col-sm-3">Weight</div>
+                            <div class="col-sm-9">
+                                {% if participant.sexAtBirth != 2 %}
+                                    <span id="percentile-1-weight-for-age">--</span> percentile (M) <br>
+                                {% endif %}
+                                {% if participant.sexAtBirth != 1 %}
+                                    <span id="percentile-2-weight-for-age">--</span> percentile (F)
+                                {% endif %}
+                            </div>
+                        </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
-                        <p class="lead">
-                            Height/Length <span id="percentile-height-for-age">--</span> percentile
-                        </p>
+                        <div class="row lead">
+                            <div class="col-sm-5">Height/Length</div>
+                            <div class="col-sm-7">
+                                {% if participant.sexAtBirth != 2 %}
+                                    <span id="percentile-1-height-for-age">--</span> percentile (M) <br>
+                                {% endif %}
+                                {% if participant.sexAtBirth != 1 %}
+                                    <span id="percentile-2-height-for-age">--</span> percentile (F)
+                                {% endif %}
+                            </div>
+                        </div>
                         {% if schema.displayWeightForLength == true %}
-                            <p class="lead">
-                                Weight-for-Length <span id="percentile-weight-for-length">--</span> percentile
-                            </p>
+                            <div class="row lead">
+                                <div class="col-sm-5">Weight-for-Length</div>
+                                <div class="col-sm-7">
+                                    {% if participant.sexAtBirth != 2 %}
+                                        <span id="percentile-1-weight-for-length">--</span> percentile (M) <br>
+                                    {% endif %}
+                                    {% if participant.sexAtBirth != 1 %}
+                                        <span id="percentile-2-weight-for-length">--</span> percentile (F)
+                                    {% endif %}
+                                </div>
+                            </div>
                             <div id="weight-for-length-warning" class="metric-warnings text-warning"></div>
                         {% endif %}
                     </div>

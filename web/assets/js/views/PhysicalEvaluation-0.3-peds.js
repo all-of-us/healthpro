@@ -85,9 +85,9 @@ let viewExtension = Backbone.View.extend({
                 let percentileFields = this.percentileFields[field];
                 percentileFields.forEach((percentileField) => {
                     if (percentileField === "weight-for-length") {
-                        this.calculateWeightForLengthPercentile();
+                        this.calculateWeightForLengthPercentileMaleFemale();
                     } else {
-                        this.calculatePercentile(percentileField, parseFloat(mean));
+                        this.calculatePercentileMaleFemale(percentileField, parseFloat(mean));
                     }
                 });
             }
@@ -105,19 +105,37 @@ let viewExtension = Backbone.View.extend({
             this.$("#convert-" + field).html("");
         }
     },
-    calculatePercentile: function (field, X) {
+    calculatePercentileMaleFemale: function (field, X) {
+        const sex = this.sexAtBirth;
+        if (sex === 0) {
+            this.calculatePercentile(field, X, 1);
+            this.calculatePercentile(field, X, 2);
+        } else {
+            this.calculatePercentile(field, X, sex);
+        }
+    },
+    calculateWeightForLengthPercentileMaleFemale: function () {
+        const sex = this.sexAtBirth;
+        if (sex === 0) {
+            this.calculateWeightForLengthPercentile(1);
+            this.calculateWeightForLengthPercentile(2);
+        } else {
+            this.calculateWeightForLengthPercentile(sex);
+        }
+    },
+    calculatePercentile: function (field, X, sex) {
         const ageInMonths = this.ageInMonths;
         const lmsValues = [];
         let charts = this.growthCharts[field];
         charts.forEach((item) => {
-            if (item.sex === this.sexAtBirth && Math.floor(item.month) === ageInMonths) {
+            if (item.sex === sex && Math.floor(item.month) === ageInMonths) {
                 lmsValues["L"] = item.L;
                 lmsValues["M"] = item.M;
                 lmsValues["S"] = item.S;
             }
         });
         console.log(field, "lms", lmsValues);
-        const percentileElement = this.$("#percentile-" + field);
+        const percentileElement = this.$("#percentile-" + sex + "-" + field);
         const zScore = this.getZScore(X, lmsValues);
         console.log(field, "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
@@ -126,20 +144,20 @@ let viewExtension = Backbone.View.extend({
         percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
     },
-    calculateWeightForLengthPercentile: function () {
+    calculateWeightForLengthPercentile: function (sex) {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
         let avgLength = parseFloat($("#mean-height").attr("data-mean"));
         if (avgWeight && avgLength) {
             const lmsValues = [];
             let charts = this.growthCharts["weight-for-length"];
             charts.forEach((item) => {
-                if (item.sex === this.sexAtBirth && Math.round(item.length) === Math.round(avgLength)) {
+                if (item.sex === sex && Math.round(item.length) === Math.round(avgLength)) {
                     lmsValues["L"] = item.L;
                     lmsValues["M"] = item.M;
                     lmsValues["S"] = item.S;
                 }
             });
-            const percentileElement = this.$("#percentile-weight-for-length");
+            const percentileElement = this.$("#percentile-" + sex + "-weight-for-length");
             console.log("weight-for-length", "lms", lmsValues);
             const zScore = this.getZScore(avgWeight, lmsValues);
             console.log("weight-for-length", "Zscore", zScore);
@@ -203,7 +221,7 @@ let viewExtension = Backbone.View.extend({
             const bmiElement = this.$("#bmi");
             bmiElement.html("<strong>" + bmi + "</strong>");
             bmiElement.attr("data-bmi", bmi);
-            this.calculatePercentile("bmi-for-age", parseFloat(bmi));
+            this.calculatePercentileMaleFemale("bmi-for-age", parseFloat(bmi));
             if (bmi < 10 || bmi > 31) {
                 this.$("#bmi-warning").text(
                     "Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height."
