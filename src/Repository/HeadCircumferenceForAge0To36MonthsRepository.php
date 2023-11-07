@@ -41,10 +41,11 @@ class HeadCircumferenceForAge0To36MonthsRepository extends ServiceEntityReposito
 
     public function getChartsData($sex): ?array
     {
-        return $this->createQueryBuilder('hca')
-            ->where('hca.sex = :sex')
-            ->setParameter('sex', $sex)
-            ->getQuery()
-            ->getArrayResult();
+        $queryBuilder = $this->createQueryBuilder('hca');
+        if ($sex) {
+            $queryBuilder->where('hca.sex = :sex')
+                ->setParameter('sex', $sex);
+        }
+        return $queryBuilder->getQuery()->getArrayResult();
     }
 }

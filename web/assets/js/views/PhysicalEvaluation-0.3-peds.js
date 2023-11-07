@@ -110,7 +110,7 @@ let viewExtension = Backbone.View.extend({
         const lmsValues = [];
         let charts = this.growthCharts[field];
         charts.forEach((item) => {
-            if (Math.floor(item.month) === ageInMonths) {
+            if (item.sex === this.sexAtBirth && Math.floor(item.month) === ageInMonths) {
                 lmsValues["L"] = item.L;
                 lmsValues["M"] = item.M;
                 lmsValues["S"] = item.S;
@@ -133,7 +133,7 @@ let viewExtension = Backbone.View.extend({
             const lmsValues = [];
             let charts = this.growthCharts["weight-for-length"];
             charts.forEach((item) => {
-                if (Math.round(item.length) === Math.round(avgLength)) {
+                if (item.sex === this.sexAtBirth && Math.round(item.length) === Math.round(avgLength)) {
                     lmsValues["L"] = item.L;
                     lmsValues["M"] = item.M;
                     lmsValues["S"] = item.S;
@@ -864,6 +864,7 @@ let viewExtension = Backbone.View.extend({
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
         this.ageInYears = parseInt(obj.ageInYears);
+        this.sexAtBirth = obj.sexAtBirth;
         console.log("ageInMonths", this.ageInMonths);
         this.bpSystolicHeightPercentileChart = obj.bpSystolicHeightPercentileChart;
         this.bpDiastolicHeightPercentileChart = obj.bpDiastolicHeightPercentileChart;
