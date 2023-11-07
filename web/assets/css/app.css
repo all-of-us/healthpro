@@ -922,3 +922,7 @@ table.table-samples td {
 .display-none {
     display: none;
 }
+
+.right-float {
+    float: right;
+}
