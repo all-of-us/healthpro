@@ -146,25 +146,29 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getMostRecentMeasurementWithoutParent($participantId): Measurement|null
+    public function getMostRecentFinalizedNonNullWeight($participantId): Measurement|null
     {
-        $parentIds = $this->createQueryBuilder('m')
-            ->select('m.parentId')
-            ->where('m.parentId is not null')
-            ->getQuery()
-            ->getResult();
-        $queryParams = ['participantId' => $participantId];
-        $queryBuilder = $this->createQueryBuilder('m')
-            ->where('m.participantId = :participantId');
-        if (!empty($parentIds)) {
-            $queryBuilder->andWhere($queryBuilder->expr()->notIn('m.id', ':parentIds'));
-            $queryParams['parentIds'] = $parentIds;
-        }
-        return $queryBuilder
-            ->setParameters($queryParams)
-            ->setMaxResults(1)
+        $query = $this->createQueryBuilder('m')
+            ->where('m.participantId = :participantId')
+            ->andWhere('m.finalizedTs is not null')
             ->orderBy('m.finalizedTs', 'DESC')
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->leftJoin('m.history', 'mh')
+            ->setParameter('participantId', $participantId);
+        $results = $query->getQuery()->getResult();
+        $cancelledMeasurements = [];
+        foreach ($results as $result) {
+            if (in_array($result->getId(), $cancelledMeasurements)) {
+                continue;
+            }
+            if ($result->getHistory() && $result->getHistory()->getType() === Measurement::EVALUATION_CANCEL) {
+                $cancelledMeasurements[] = $result->getId();
+                continue;
+            }
+            $measurementData = json_decode($result->getData(), true);
+            if ($measurementData['weight'] && $measurementData['weight'][0] > 0) {
+                return $result;
+            }
+        }
+        return null;
     }
 }
