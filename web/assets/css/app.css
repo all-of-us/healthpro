@@ -235,6 +235,9 @@ label.label-normal {
     padding-right: 6px;
     padding-left: 6px;
 }
+#physicalEvaluation .lead {
+    font-size: 20px;
+}
 @media(max-width:767px) {
     #physicalEvaluation .row .col-sm-4 {
         margin-bottom: 6px;
