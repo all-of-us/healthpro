@@ -44,7 +44,7 @@
                 <a href="{{ path('measurement', {'participantId': participant.id}) }}" class="btn btn-primary">Start New Physical Measurements</a>
             </p>
         </div>
-    {%  elseif weightMeasurement.finalizedTs|date('U') < "-1 day"|date('U') %}
+    {%  elseif weightMeasurement.finalizedTs|date('Y-m-d') != "now"|date('Y-m-d') %}
         <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
         <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> The participant's weight measurement was taken more than 1 day ago. Please recapture the weight to proceed.</span>
         <div class="col-md-12">
@@ -134,7 +134,7 @@
                 </div>
             </div>
         <div style="display:none;" class="question" id="draw-amount-qn">
-            <h4><i class="fa fa-xs fa-question-circle clickable" data-toggle="modal" data-target="#pediatric-blood-draw-modal" id="pediatric-blood-question"></i>
+            <h4><i class="fa fa-xs fa-question-circle clickable text-info" data-toggle="modal" data-target="#pediatric-blood-draw-modal" id="pediatric-blood-question"></i>
                 Does the amount of blood drawn during the participant’s previous draw AND the amount of blood to be drawn for AoU exceed the lesser of 50 ml or 3ml per kg in an 8 week period?
                 </h4>
             <div class="radio">
@@ -150,7 +150,7 @@
         <div class="question" style="display:none;" id="syncope-qn">
             <h4>Has your child had any problems with a blood draw, like becoming pale or other bad reactions?</h4>
             <div class="radio">
-                <label><input type="radio" name="syncope-qn" data-show-target="#partial-order-qn"/> Yes</label>
+                <label><input type="radio" name="syncope-qn" data-show-target="#partial-order-qn,#info-text-5,#order-info-text"/> Yes</label>
             </div>
             <div class="radio">
                 <label><input type="radio" name="syncope-qn" data-show-target="#continue" data-samples="saliva,urine,blood"/> No</label>
@@ -159,15 +159,15 @@
         <div class="question" style="display:none;" id="partial-order-qn">
             <h4>Would you like to continue with the full Biobank order or a modified order with urine and saliva only?</h4>
             <div class="radio">
-                <label><input type="radio" name="partial-order-qn" data-show-target="#continue" data-sampels="saliva,urine,blood"/> Full Biobank Order</label>
+                <label><input type="radio" name="partial-order-qn" data-show-target="#continue,#info-text-5,#order-info-text" data-sampels="saliva,urine,blood"/> Full Biobank Order</label>
             </div>
             <div class="radio">
-                <label><input type="radio" name="partial-order-qn" data-show-target="#continue" data-samples="saliva,urine"/> Modified Order- Urine and Saliva Only</label>
+                <label><input type="radio" name="partial-order-qn" data-show-target="#continue,#info-text-5,#order-info-text" data-samples="saliva,urine"/> Modified Order- Urine and Saliva Only</label>
             </div>
         </div>
         <div class="alert alert-danger" style="display:none;" id="order-info-text">
             <span id="info-text-1" class="warning" style="display: none">
-                <strong>Important:</strong> If you have had a blood transfusion in the past 6 months, you are not eligible to donate blood or saliva for the Biobank.<br>
+                Participants may not have blood drawn and/or saliva collected if they have received Whole Blood Transfusion previously. If the participant can provide an adult sample, urine collection is permissible and can be initiated by selecting Continue.<br>
             </span>
             <span id="info-text-2" class="warning"  style="display: none">
                 Participants may not have blood drawn if they have received RBC transfusion in the past 2 months. If the participant can provide adult samples, saliva and urine collection is permissible and can be initiated by selecting Continue.<br>

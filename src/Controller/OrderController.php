@@ -100,7 +100,7 @@ class OrderController extends BaseController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentMeasurementWithoutParent($participant->id);
+        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
         if ($physicalMeasurement) {
             $measurementService->load($physicalMeasurement, $participant);
         }
@@ -765,7 +765,7 @@ class OrderController extends BaseController
         if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentMeasurementWithoutParent($participant->id);
+        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
         if ($measurement) {
             $measurementService->load($measurement, $participant);
             $measurementData = $measurement->getSummary();
