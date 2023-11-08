@@ -306,16 +306,24 @@
                 </div>
             </div>
             {% if schema.fields['head-circumference'] is defined %}
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Growth Percentile</h3>
                     </div>
                     <div class="panel-body">
                         {% if schema.fields['head-circumference-protocol-modification'] is defined %}
-                            <p class="lead">
-                                Head Circumference <span id="percentile-head-circumference-for-age">--</span> percentile
-                            </p>
+                            <div class="row row-no-gutters lead">
+                                <div class="col-sm-6">Head Circumference</div>
+                                <div class="col-sm-6">
+                                    {% if participant.sexAtBirth != 2 %}
+                                        <span id="percentile-1-head-circumference-for-age">--</span> percentile (M) <br>
+                                    {% endif %}
+                                    {% if participant.sexAtBirth != 1 %}
+                                        <span id="percentile-2-head-circumference-for-age">--</span> percentile (F)
+                                    {% endif %}
+                                </div>
+                            </div>
                         {% endif %}
                         {% if schema.fields['waist-circumference-protocol-modification'] is defined %}
                             <i>
