@@ -8,8 +8,6 @@ $(document).ready(function () {
         { name: "occurrence", data: "occurrence" },
         { name: "recipient", data: "recipient" },
         { name: "incentiveType", data: "incentiveType" },
-        { name: "typeOfItem", data: "typeOfItem" },
-        { name: "numberOfItems", data: "numberOfItems" },
         { name: "amount", data: "amount" },
         { name: "declined", data: "declined" },
         { name: "notes", data: "notes" },

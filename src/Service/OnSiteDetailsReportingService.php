@@ -116,6 +116,9 @@ class OnSiteDetailsReportingService
                     $type = 'Other, ' . $incentive['otherIncentiveType'];
                 } elseif ($incentive['incentiveType'] === Incentive::GIFT_CARD) {
                     $type = 'Gift Card, ' . $incentive['giftCardType'];
+                } elseif ($incentive['incentiveType'] === Incentive::ITEM_OF_APPRECIATION) {
+                    $type = 'Item of Appreciation, ' . $incentive['typeOfItem'] . ', ' .
+                        $incentive['numberOfItems'];
                 } else {
                     $type = array_search($incentive['incentiveType'], Incentive::$incentiveTypeChoices);
                 }
