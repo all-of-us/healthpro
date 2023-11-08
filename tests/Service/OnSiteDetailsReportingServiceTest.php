@@ -90,7 +90,10 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
                 'createdTs' => $now,
                 'declined' => 0,
                 'importId' => 1,
-                'amendedUser' => ''
+                'amendedUser' => '',
+                'recipient' => 'pediatric_participant',
+                'numberOfItems' => 1,
+                'typeOfItem' => 'test Item'
             ],
             [
                 'participantId' => 'P000000001',
@@ -107,7 +110,10 @@ class OnSiteDetailsReportingServiceTest extends ServiceTestCase
                 'createdTs' => $now,
                 'declined' => 0,
                 'importId' => 2,
-                'amendedUser' => ''
+                'amendedUser' => '',
+                'recipient' => 'pediatric_guardian',
+                'numberOfItems' => 1,
+                'typeOfItem' => 'test Item'
             ]
         ];
     }

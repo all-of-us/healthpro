@@ -6,6 +6,7 @@ $(document).ready(function () {
         { name: "user", data: "user" },
         { name: "dateOfService", data: "dateOfService" },
         { name: "occurrence", data: "occurrence" },
+        { name: "recipient", data: "recipient" },
         { name: "incentiveType", data: "incentiveType" },
         { name: "amount", data: "amount" },
         { name: "declined", data: "declined" },

@@ -82,6 +82,7 @@ $(document).ready(function () {
                 $(idPrefix + " #type_of_item").show();
                 $(idPrefix + " #number_of_items").show();
                 $(incentiveAmountSelector).prop("disabled", true);
+                $(incentiveAmountSelector).val("");
                 $(incentiveAmountSelector).removeAttr("required");
                 $(idPrefix + " #type_of_item .toggle-required").attr("required", "required");
             } else {
