@@ -285,7 +285,7 @@ let viewExtension = Backbone.View.extend({
                 difference = 5;
                 break;
         }
-        if (first > 0 && second > 0 && Math.abs(first - second) > difference) {
+        if (first > 0 && second > 0 && Math.abs(first - second).toFixed(2) > difference) {
             this.$(".panel-" + field + "-3").show();
         } else {
             this.$(".panel-" + field + "-3").hide();
