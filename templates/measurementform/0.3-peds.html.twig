@@ -362,7 +362,10 @@
                                     {% endif %}
                                 </div>
                                 {% if i == 2 %}
-                                    <p class="text-info">Third measurement is required when first two differ by more than 5 bpm/mmHg</p>
+                                    <p class="text-info">
+                                        Third measurement is required when first two differ by more than
+                                        5 bpm{% if schema.fields['blood-pressure-systolic'] is defined %}/mmHg{% endif %}
+                                    </p>
                                 {% endif %}
                             </div>
                         </div>
