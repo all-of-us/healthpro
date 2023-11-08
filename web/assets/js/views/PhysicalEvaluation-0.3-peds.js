@@ -326,14 +326,10 @@ let viewExtension = Backbone.View.extend({
         }
     },
     calculateIrregularHeartRate: function () {
-        let allIrregular = true;
-        this.$(".field-irregular-heart-rate input").each(function () {
-            if (!$(this).prop("checked")) {
-                allIrregular = false;
-            }
-        });
-        if (allIrregular) {
-            $("#irregular-heart-rate-warning").html(
+        const isIrregular = this.$(".field-irregular-heart-rate input").is(":checked");
+        const irregularHeartRateWarning = $("#irregular-heart-rate-warning");
+        if (isIrregular && !irregularHeartRateWarning.find(".alert-danger").length > 0) {
+            irregularHeartRateWarning.html(
                 '<div class="alert alert-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Refer to your site\'s SOP for irregular heart rhythm detection.</div>'
             );
             if (this.rendered) {
@@ -347,8 +343,9 @@ let viewExtension = Backbone.View.extend({
                     btnTextTrue: "Confirm and take action"
                 });
             }
-        } else {
-            $("#irregular-heart-rate-warning").text("");
+        }
+        if (!isIrregular) {
+            irregularHeartRateWarning.text("");
         }
     },
     checkDiastolic: function (e) {
