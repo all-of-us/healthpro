@@ -78,7 +78,9 @@
                         <small class="fs-sm"><strong>Order ID: {{ order.orderId }}</strong></small><br>
                         <small class="fs-xs">Order Type</small><br>
                         <small class="fs-sm">{{ order.orderTypeDisplayText }}</small>
-                        <span class="fa fa-child child-icon pediatric-order-indicator" ></span>
+                        {% if order.pediatricOrder %}
+                            <span class="fa fa-child child-icon pediatric-order-indicator" ></span>
+                        {% endif %}
                     </div>
                 </div>
                 </a>

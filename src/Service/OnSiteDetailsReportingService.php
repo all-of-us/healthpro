@@ -23,8 +23,11 @@ class OnSiteDetailsReportingService
         'Participant ID',
         'User',
         'Date of Service',
+        'Recipient',
         'Occurrence',
         'Type',
+        'Number Of Items',
+        'Type Of Item',
         'Amount',
         'Declined?',
         'Notes',
@@ -105,6 +108,7 @@ class OnSiteDetailsReportingService
                         Incentive::$incentiveOccurrenceChoices
                     );
             }
+            $row['recipient'] = array_search($incentive['recipient'], Incentive::$recipientChoices);
             $row['occurrence'] = $occurrence;
             $type = '';
             if ($incentive['incentiveType']) {
@@ -117,6 +121,8 @@ class OnSiteDetailsReportingService
                 }
             }
             $row['incentiveType'] = $type;
+            $row['numberOfItems'] = $incentive['numberOfItems'];
+            $row['typeOfItem'] = $incentive['typeOfItem'];
             $row['amount'] = $incentive['incentiveAmount'] ? '$' . $incentive['incentiveAmount'] : '';
             $row['declined'] = $incentive['declined'] ? 'Yes' : 'No';
             $row['notes'] = $incentive['notes'];

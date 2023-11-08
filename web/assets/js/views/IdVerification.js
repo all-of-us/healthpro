@@ -31,6 +31,8 @@ $(document).ready(function () {
     $("#id_verification_cancel").on("click", function () {
         $(verificationFormSelector)[0].reset();
         $(verificationFormSelector + " :input:not(:checkbox, #id_verification_cancel)").prop("disabled", true);
+        $("#id_verification_guardian_verified_0").attr("checked", false);
+        $("#id_verification_guardian_verified").attr("hidden", true);
         $(verificationFormSelector).parsley().reset();
         if (hasIdVerifications) {
             $("#id-verification-data-box").show();

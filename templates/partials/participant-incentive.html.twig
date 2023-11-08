@@ -43,7 +43,7 @@
                         <dd class="col-sm-8">{{ incentive.otherIncentiveType }}</dd>
                     {% endif %}
                     <dt class="col-sm-4">Incentive Amount</dt>
-                    <dd class="col-sm-8">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                    <dd class="col-sm-8">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '--' }}</dd>
                     <dt class="col-sm-4">Notes</dt>
                     <dd class="col-sm-8">{{ incentive.notes ? incentive.notes : '--' }}</dd>
                     <dt class="col-sm-4">Declined</dt>

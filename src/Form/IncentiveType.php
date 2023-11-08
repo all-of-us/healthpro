@@ -114,7 +114,8 @@ class IncentiveType extends AbstractType
                         if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === Incentive::ITEM_OF_APPRECIATION && empty($value)) {
                             $context->buildViolation('Please specify number of items')->addViolation();
                         }
-                    })
+                    }),
+                    new Constraints\Range(['min' => 1, 'max' => 1000])
                 ],
                 'attr' => [
                     'class' => 'item-type',

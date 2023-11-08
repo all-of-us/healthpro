@@ -65,6 +65,7 @@ class Incentive
         'Adult Participant' => self::ADULT_PARTICIPANT,
         'Pediatric Guardian' => self::PEDIATRIC_GUARDIAN,
         'Pediatric Participant' => self::PEDIATRIC_PARTICIPANT,
+        'Other' => self::OTHER,
     ];
 
     public static $itemTypes = [

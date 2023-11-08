@@ -46,7 +46,8 @@ class IncentiveRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i.createdTs, i.participantId, i.incentiveDateGiven, i.incentiveOccurrence,
                 i.otherIncentiveOccurrence, i.incentiveType, i.otherIncentiveType, i.incentiveAmount, i.giftCardType,
-                i.declined, i.notes, au.email as amendedUser, u.email, ii.id as importId')
+                i.declined, i.notes, au.email as amendedUser, u.email, ii.id as importId, i.Recipient as recipient,
+                 i.numberOfItems as numberOfItems, i.typeOfItem as typeOfItem')
             ->leftJoin('i.user', 'u')
             ->leftJoin('i.amendedUser', 'au')
             ->leftJoin('i.import', 'ii')
