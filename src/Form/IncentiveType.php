@@ -20,7 +20,7 @@ class IncentiveType extends AbstractType
 
         $builder
             ->add('recipient', Type\ChoiceType::class, [
-                'label' => 'Please select the recipient of the incentive*:',
+                'label' => 'Please select the recipient of the incentive:',
                 'choices' => Incentive::$recipientChoices,
                 'placeholder' => '-- Select Recipient --',
                 'multiple' => false,
