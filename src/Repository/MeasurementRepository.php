@@ -148,9 +148,18 @@ class MeasurementRepository extends ServiceEntityRepository
 
     public function getMostRecentFinalizedNonNullWeight($participantId): Measurement|null
     {
+        $parentIds = $this->createQueryBuilder('m')
+            ->select('m.parentId')
+            ->where('m.parentId is not null')
+            ->andWhere('m.participantId = :participantId')
+            ->setParameter('participantId', $participantId)
+            ->getQuery()
+            ->getResult();
         $query = $this->createQueryBuilder('m')
             ->where('m.participantId = :participantId')
             ->andWhere('m.finalizedTs is not null')
+            ->andWhere('m.id not in (:parentIds)')
+            ->setParameter('parentIds', $parentIds)
             ->orderBy('m.finalizedTs', 'DESC')
             ->leftJoin('m.history', 'mh')
             ->setParameter('participantId', $participantId);
