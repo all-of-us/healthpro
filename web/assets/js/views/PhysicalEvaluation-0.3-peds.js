@@ -186,7 +186,11 @@ let viewExtension = Backbone.View.extend({
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
                 const newZValue = zScore["Z"] > 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
-                    return Math.round(zScore[index] * 100);
+                    const percentile = zScore[index] * 100;
+                    if (percentile < 3) {
+                        return percentile.toFixed(1);
+                    }
+                    return Math.round(percentile);
                 }
             }
         }
@@ -482,7 +486,7 @@ let viewExtension = Backbone.View.extend({
         }
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
-            let percentile = Math.round($("#percentile-" + percentileField).attr("data-percentile"));
+            let percentile = $("#percentile-" + percentileField).attr("data-percentile");
             return percentile < warning.min;
         }
         if (warning.hasOwnProperty("age")) {
@@ -784,10 +788,15 @@ let viewExtension = Backbone.View.extend({
         }
     },
     addPercentileSuffix: function (percentile) {
-        if (percentile >= 11 && percentile <= 13) {
-            return percentile + "th";
+        const integerPart = Math.floor(percentile);
+
+        if (integerPart >= 11 && integerPart <= 13) {
+            return "th";
         }
-        switch (percentile % 10) {
+
+        const lastDigit = parseInt(percentile.toString().split('').reverse()[0], 10);
+
+        switch (lastDigit % 10) {
             case 1:
                 return percentile + "st";
             case 2:
