@@ -794,7 +794,7 @@ let viewExtension = Backbone.View.extend({
             return "th";
         }
 
-        const lastDigit = parseInt(percentile.toString().split('').reverse()[0], 10);
+        const lastDigit = parseInt(percentile.toString().split("").reverse()[0], 10);
 
         switch (lastDigit % 10) {
             case 1:
