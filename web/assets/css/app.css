@@ -385,6 +385,10 @@ label.label-normal {
     color: #363272;
 }
 
+.child-icon {
+    color: #7927FF;
+}
+
 /* Participant work queue */
 .topheader {
     border-bottom: 0 !important;
@@ -917,4 +921,8 @@ table.table-samples td {
 
 .display-none {
     display: none;
+}
+
+.right-float {
+    float: right;
 }

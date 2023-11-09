@@ -1,0 +1,142 @@
+{
+  "version": "0.3.3-peds-weight",
+  "template": "0.3-peds-weight",
+  "description": "Weight only measurement form for pediatric participants.",
+  "fields": [
+    {
+      "name": "wheelchair",
+      "label": "Is participant a wheelchair user?",
+      "options": {
+        "No": false,
+        "Yes": true
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": true,
+          "message": "Please record estimated participant weight in the \"Weight\" field."
+        }
+      ]
+    },
+    {
+      "name": "weight",
+      "label": "Weight",
+      "unit": "kg",
+      "decimals": 1,
+      "replicates": 3,
+      "max": 1000,
+      "warnings": [
+        {
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "Multiple weight measurements indicate very low weight for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "This value may indicate very low weight for age if confirmed by repeat measure."
+        },
+        {
+          "min": 1,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol.",
+          "ageRange": [0,35]
+
+        },
+        {
+          "max": 18,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol.",
+          "ageRange": [0,35]
+        },
+        {
+          "min": 7,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol.",
+          "ageRange": [36,83]
+        },
+        {
+          "max": 35,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol.",
+          "ageRange": [36,83]
+        }
+      ],
+      "convert": "lb",
+      "alternateunits": true,
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "weight-protocol-modification",
+      "label": "Modification to Weight Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Weight is more than weight measuring range": "weight-out-of-range",
+        "Weight is less than weight measuring range": "weight-below-range",
+        "Can't balance on scale": "cannot-balance-on-scale",
+        "Uses a wheelchair": "wheelchair-user",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Clothing not removed": "clothing-not-removed",
+        "Dirty diaper": "dirty-diaper",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "weight-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "weight-below-range",
+          "message": "Deviation successfully captured. Please record the minimum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "cannot-balance-on-scale",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "wheelchair-user",
+          "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to clothing."
+        },
+        {
+          "val": "dirty-diaper",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to diaper."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+        }
+      ]
+    },
+    {
+      "name": "weight-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "notes",
+      "label": "Additional Notes",
+      "type": "textarea"
+    }
+  ],
+  "displayWeightForLength": true
+}

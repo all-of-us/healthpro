@@ -79,7 +79,8 @@ class Fhir
      * Determines which metrics have values to represent and generates
      * URNs for each
      */
-    protected function getMetricUrns()
+
+    protected function getMetricUrns(): array
     {
         $metrics = [];
         /** @var stdClass $field */
@@ -120,45 +121,93 @@ class Fhir
             }
         }
 
-        if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
-            $metrics[] = 'hip-circumference-1';
-            $metrics[] = 'hip-circumference-2';
-            $metrics[] = 'waist-circumference-1';
-            $metrics[] = 'waist-circumference-2';
+        if ($this->isPediatricForm()) {
+            if (in_array('wheelchair', $metrics)) {
+                if (isset($this->schema->fields['hip-circumference'])) {
+                    $metrics[] = 'hip-circumference-1';
+                    $metrics[] = 'hip-circumference-2';
+                }
+                if (isset($this->schema->fields['waist-circumference'])) {
+                    $metrics[] = 'waist-circumference-1';
+                    $metrics[] = 'waist-circumference-2';
+                }
+                if (isset($this->schema->fields['head-circumference'])) {
+                    $metrics[] = 'head-circumference-1';
+                    $metrics[] = 'head-circumference-2';
+                }
+            }
+        } else {
+            if (in_array('wheelchair', $metrics) || in_array('pregnant', $metrics)) {
+                $metrics[] = 'hip-circumference-1';
+                $metrics[] = 'hip-circumference-2';
+                $metrics[] = 'waist-circumference-1';
+                $metrics[] = 'waist-circumference-2';
+            }
         }
+
         // add bmi if height and weight are both included
-        if (in_array('height', $metrics) && in_array('weight', $metrics)) {
+        if (!$this->isPediatricForm() && in_array('height', $metrics) && in_array('weight', $metrics)) {
             $metrics[] = 'bmi';
         }
 
         // check and rename blood pressure metrics
-        $diastolic = $this->data->{'blood-pressure-diastolic'};
-        $bpModification = $this->data->{'blood-pressure-protocol-modification'};
-        foreach ($metrics as $k => $metric) {
-            if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
-                continue;
-            }
-            $index = (int) $m[1] - 1;
-            if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
-                $metrics[$k] = 'blood-pressure-' . $m[1];
-            } else {
-                // remove if systolic exists but not diastolic
-                unset($metrics[$k]);
+        if (isset($this->data->{'blood-pressure-diastolic'})) {
+            $diastolic = $this->data->{'blood-pressure-diastolic'};
+            $bpModification = $this->data->{'blood-pressure-protocol-modification'};
+            foreach ($metrics as $k => $metric) {
+                if (!preg_match('/^blood-pressure-systolic-(\d+)$/', $metric, $m)) {
+                    continue;
+                }
+                $index = (int) $m[1] - 1;
+                if (!empty($diastolic[$index]) || !empty($bpModification[$index])) {
+                    $metrics[$k] = 'blood-pressure-' . $m[1];
+                } else {
+                    // remove if systolic exists but not diastolic
+                    unset($metrics[$k]);
+                }
             }
         }
 
         // add computed means
-        if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
-            $metrics[] = 'blood-pressure-mean';
+        if (in_array('weight-1', $metrics) || in_array('weight-2', $metrics) || in_array('weight-3', $metrics)) {
+            $metrics[] = 'weight-mean';
+            $metrics[] = 'growth-percentile-weight-for-age';
         }
-        if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
-            $metrics[] = 'heart-rate-mean';
+        if (in_array('height-1', $metrics) || in_array('height-2', $metrics) || in_array('height-3', $metrics)) {
+            $metrics[] = 'height-mean';
+            $metrics[] = 'growth-percentile-height-for-age';
+        }
+        if (in_array('weight-mean', $metrics) && in_array('height-mean', $metrics)) {
+            $metrics[] = 'growth-percentile-weight-for-length';
+            if ($this->schema->displayBmi) {
+                $metrics[] = 'growth-percentile-bmi-for-age';
+                $metrics[] = 'bmi';
+            }
+        }
+        if ($this->isPediatricForm()) {
+            if (in_array('blood-pressure-1', $metrics) || in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
+                $metrics[] = 'blood-pressure-mean';
+            }
+            if (in_array('heart-rate-1', $metrics) || in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+                $metrics[] = 'heart-rate-mean';
+            }
+        } else {
+            if (in_array('blood-pressure-2', $metrics) || in_array('blood-pressure-3', $metrics)) {
+                $metrics[] = 'blood-pressure-mean';
+            }
+            if (in_array('heart-rate-2', $metrics) || in_array('heart-rate-3', $metrics)) {
+                $metrics[] = 'heart-rate-mean';
+            }
         }
         if (in_array('hip-circumference-1', $metrics) || in_array('hip-circumference-2', $metrics) || in_array('hip-circumference-3', $metrics)) {
             $metrics[] = 'hip-circumference-mean';
         }
         if (in_array('waist-circumference-1', $metrics) || in_array('waist-circumference-2', $metrics) || in_array('waist-circumference-3', $metrics)) {
             $metrics[] = 'waist-circumference-mean';
+        }
+        if (in_array('head-circumference-1', $metrics) || in_array('head-circumference-2', $metrics) || in_array('head-circumference-3', $metrics)) {
+            $metrics[] = 'head-circumference-mean';
+            $metrics[] = 'growth-percentile-head-circumference-for-age';
         }
 
         // move notes to end
@@ -287,7 +336,7 @@ class Fhir
             ]];
         }
         if (strpos($metric, 'circumference') !== false) {
-            if ($this->data->pregnant) {
+            if (!empty($this->data->pregnant)) {
                 $entry['resource']['related'][] = [
                     'type' => 'qualified-by',
                     'target' => [
@@ -447,12 +496,16 @@ class Fhir
         ];
     }
 
-    protected function height()
+    protected function height($replicate = null): array
     {
-        return $this->simpleMetric(
-            'height',
-            $this->data->height,
-            'Height',
+        $metricName = $replicate ? 'height-' . $replicate : 'height';
+        $value = $replicate ? $this->data->height[$replicate - 1] : $this->data->height;
+        $label = $replicate ? self::ordinalLabel('height', $replicate) : 'Height';
+
+        $entry = $this->simpleMetric(
+            $metricName,
+            $value,
+            $label,
             'cm',
             [
                 [
@@ -468,14 +521,24 @@ class Fhir
             ],
             $this->getEffectiveDateTime('height-source')
         );
+
+        if (isset($this->data->{'height-or-length'})) {
+            $entry['resource']['component'] = [$this->getPediatricComponent('height-or-length')];
+        }
+
+        return $entry;
     }
 
-    protected function weight()
+    protected function weight($replicate = null)
     {
+        $metricName = $replicate ? 'weight-' . $replicate : 'weight';
+        $value = $replicate ? $this->data->weight[$replicate - 1] : $this->data->weight;
+        $label = $replicate ? self::ordinalLabel('weight', $replicate) : 'Weight';
+
         return $this->simpleMetric(
-            'weight',
-            $this->data->weight,
-            'Weight',
+            $metricName,
+            $value,
+            $label,
             'kg',
             [
                 [
@@ -568,14 +631,12 @@ class Fhir
 
     protected function bmi()
     {
-        if (!$this->data->height || !$this->data->weight) {
+        if (!isset($this->summary['bmi'])) {
             return;
         }
-        $cm = $this->data->height / 100;
-        $bmi = round($this->data->weight / ($cm * $cm), 1);
         $entry = $this->simpleMetric(
             'bmi',
-            $bmi,
+            $this->summary['bmi'],
             'Computed body mass index',
             'kg/m2',
             [
@@ -682,6 +743,14 @@ class Fhir
             } else {
                 $entry['resource']['related'][] = $qualifiedBy;
             }
+        }
+
+        if (isset($this->data->{'heart-rate-position'})) {
+            $entry['resource']['component'][] = $this->getPediatricComponent('heart-rate-position');
+        }
+
+        if (isset($this->data->{'heart-rate-method'})) {
+            $entry['resource']['component'][] = $this->getPediatricComponent('heart-rate-method');
         }
 
         return $entry;
@@ -885,6 +954,9 @@ class Fhir
         if (isset($this->data->{'blood-pressure-location'})) {
             $entry['resource']['bodySite'] = $this->getBpBodySite($this->data->{'blood-pressure-location'});
         }
+        if (isset($this->data->{'blood-pressure-position'})) {
+            $entry['resource']['component'][] = $this->getPediatricComponent('blood-pressure-position');
+        }
         $modificationMetric = 'blood-pressure-protocol-modification-' . $replicate;
         $modificationMetricManual = 'manual-blood-pressure-' . $replicate;
         if (array_key_exists($modificationMetric, $this->metricUrns)) {
@@ -936,14 +1008,14 @@ class Fhir
         return $this->protocolModification('waist-circumference', $replicate);
     }
 
-    protected function heightprotocolmodification()
+    protected function heightprotocolmodification($replicate = null)
     {
-        return $this->protocolModification('height');
+        return $this->protocolModification('height', $replicate);
     }
 
-    protected function weightprotocolmodification()
+    protected function weightprotocolmodification($replicate = null)
     {
-        return $this->protocolModification('weight');
+        return $this->protocolModification('weight', $replicate);
     }
 
     protected function meanProtocolModifications($replicates, $modificationMetric, $modificationMetricManual = null)
@@ -1019,10 +1091,11 @@ class Fhir
 
     protected function heartratemean()
     {
+        $displayText = $this->isPediatricForm() ? 'Computed heart rate, mean of closest two measures' : 'Computed heart rate, mean of 2nd and 3rd measures';
         $entry = $this->simpleMetric(
             'heart-rate-mean',
             isset($this->summary['heartrate']) ? $this->summary['heartrate'] : null,
-            'Computed heart rate, mean of 2nd and 3rd measures',
+            $displayText,
             '/min',
             [
                 [
@@ -1032,7 +1105,7 @@ class Fhir
                 ],
                 [
                     'code' => 'heart-rate-mean',
-                    'display' => 'Computed heart rate, mean of 2nd and 3rd measures',
+                    'display' => $displayText,
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ]
@@ -1173,5 +1246,254 @@ class Fhir
             return $this->data->{$field . '-ehr-date'}->format('Y-m-d\TH:i:s\Z');
         }
         return $this->date;
+    }
+
+    private function isPediatricForm(): bool
+    {
+        return str_contains($this->version, 'peds');
+    }
+
+    private function getPediatricComponent(string $propertyName): array
+    {
+        $propertyValue = $this->data->{$propertyName};
+
+        $concept = [
+            'coding' => [[
+                'code' => $propertyValue,
+                'display' => ucfirst($propertyValue),
+                'system' => "http://terminology.pmi-ops.org/CodeSystem/{$propertyName}"
+            ]],
+            'text' => ucfirst($propertyValue)
+        ];
+
+        $component = [
+            'code' => [
+                'coding' => [[
+                    'code' => $propertyName,
+                    'display' => ucfirst($propertyName),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]],
+                'text' => ucfirst($propertyName)
+            ],
+            'valueCodeableConcept' => $concept
+        ];
+
+        return $component;
+    }
+
+    private function headcircumference(int $replicate): array
+    {
+        return $this->simpleMetric(
+            'head-circumference-' . $replicate,
+            $this->data->{'head-circumference'}[$replicate - 1],
+            self::ordinalLabel('head circumference', $replicate),
+            'cm',
+            [
+                [
+                    'code' => '9843-4',
+                    'display' => 'Head circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'head-circumference-' . $replicate,
+                    'display' => self::ordinalLabel('head circumference', $replicate),
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('head-circumference-source')
+        );
+    }
+
+    private function growthpercentileweightforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-weight-for-age',
+            $this->summary['growth-percentile-weight-for-age'] ?? null,
+            'Computed growth percentile weight for age',
+            'percentile',
+            [
+                [
+                    'code' => '22222-0',
+                    'display' => 'Growth percentile weight for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-weight-for-age',
+                    'display' => 'Computed growth percentile weight for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    private function growthpercentileheightforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-height-for-age',
+            $this->summary['growth-percentile-height-for-age'] ?? null,
+            'Computed growth percentile height for age',
+            'percentile',
+            [
+                [
+                    'code' => '33333-0',
+                    'display' => 'Growth percentile height for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-height-for-age',
+                    'display' => 'Computed growth percentile weight for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('height-source')
+        );
+    }
+
+    private function growthpercentileweightforlength(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-weight-for-length',
+            $this->summary['growth-percentile-weight-for-length'] ?? null,
+            'Computed growth percentile weight for length',
+            'percentile',
+            [
+                [
+                    'code' => '44444-0',
+                    'display' => 'Growth percentile weight for length',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-weight-for-length',
+                    'display' => 'Computed growth percentile weight for length',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    private function growthpercentileheadcircumferenceforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-head-circumference-for-age',
+            $this->summary['growth-percentile-head-circumference-for-age'] ?? null,
+            'Computed growth percentile head circumference for age',
+            'percentile',
+            [
+                [
+                    'code' => '55555-0',
+                    'display' => 'Growth percentile head circumference for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-head-circumference-for-age',
+                    'display' => 'Computed growth percentile head circumference for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('head-circumference-source')
+        );
+    }
+
+    private function growthpercentilebmiforage(): array
+    {
+        return $this->simpleMetric(
+            'growth-percentile-bmi-for-age',
+            $this->summary['growth-percentile-bmi-for-age'] ?? null,
+            'Computed growth percentile bmi for age',
+            'percentile',
+            [
+                [
+                    'code' => '66666-0',
+                    'display' => 'Growth percentile bmi for age',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'growth-percentile-bmi-for-age',
+                    'display' => 'Computed growth percentile bmi for age',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ],
+            $this->getEffectiveDateTime('weight-source')
+        );
+    }
+
+    private function headcircumferencemean(): array
+    {
+        $entry = $this->simpleMetric(
+            'head-circumference-mean',
+            !empty($this->summary['head']['cm']) ? $this->summary['head']['cm'] : null,
+            'Computed head circumference, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '11111-0',
+                    'display' => 'Head circumference',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'head-circumference-mean',
+                    'display' => 'Computed head circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'head-circumference-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    private function heightmean(): array
+    {
+        $entry = $this->simpleMetric(
+            'height-mean',
+            !empty($this->summary['height']['cm']) ? $this->summary['height']['cm'] : null,
+            'Computed height, mean of closest two measures',
+            'cm',
+            [
+                [
+                    'code' => '8302-2',
+                    'display' => 'Body height',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'height-mean',
+                    'display' => 'Computed height, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'height-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
+    }
+
+    private function weightmean(): array
+    {
+        $entry = $this->simpleMetric(
+            'weight-mean',
+            !empty($this->summary['weight']['kg']) ? $this->summary['weight']['kg'] : null,
+            'Computed weight, mean of closest two measures',
+            'kg',
+            [
+                [
+                    'code' => '29463-7',
+                    'display' => 'Body weight',
+                    'system' => 'http://loinc.org'
+                ],
+                [
+                    'code' => 'weight-mean',
+                    'display' => 'Computed weight circumference, mean of closest two measures',
+                    'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
+                ]
+            ]
+        );
+        if ($related = $this->meanProtocolModifications([1, 2, 3], 'weight-protocol-modification-')) {
+            $entry['resource']['related'] = $related;
+        }
+        return $entry;
     }
 }

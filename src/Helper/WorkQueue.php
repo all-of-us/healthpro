@@ -733,6 +733,22 @@ class WorkQueue
             'visible' => false,
             'group' => 'surveys'
         ],
+        'EnvironmentalExposures' => [
+            'name' => 'Environmental Exposures',
+            'csvNames' => [
+                'Environmental Exposures PPI Survey Complete',
+                'Environmental Exposures PPI Survey Completion Date'
+            ],
+            'rdrField' => 'questionnaireOnEnvironmentalExposures',
+            'sortField' => 'questionnaireOnEnvironmentalExposuresAuthored',
+            'rdrDateField' => 'questionnaireOnEnvironmentalExposuresAuthored',
+            'method' => 'displaySurveyStatus',
+            'params' => 3,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'group' => 'surveys'
+        ],
         'CopeMay' => [
             'name' => 'COPE May',
             'csvNames' => [
@@ -1073,10 +1089,10 @@ class WorkQueue
             'group' => 'enrollment'
         ],
         '1ED02' => [
-            'name' => '2 mL EDTA',
+            'name' => '2 mL EDTA (1ED02)',
             'csvNames' => [
-                '2 mL EDTA Received',
-                '2 mL EDTA Received Date'
+                '2 mL EDTA (1ED02) Received',
+                '2 mL EDTA (1ED02) Received Date'
             ],
             'rdrField' => 'sampleStatus1ED02',
             'sortField' => 'sampleStatus1ED02Time',
@@ -1087,15 +1103,45 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
-        '1ED04' => [
-            'name' => '4 mL EDTA',
+        '2ED02' => [
+            'name' => '2 mL EDTA (2ED02)',
             'csvNames' => [
-                '4 mL EDTA Received',
-                '4 mL EDTA Received Date'
+                '2 mL EDTA (2ED02) Received',
+                '2 mL EDTA (2ED02) Received Date'
+            ],
+            'rdrField' => 'sampleStatus2ED02',
+            'sortField' => 'sampleStatus2ED02Time',
+            'rdrDateField' => 'sampleStatus2ED02Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
+        '1ED04' => [
+            'name' => '4 mL EDTA (1ED04)',
+            'csvNames' => [
+                '4 mL EDTA (1ED04) Received',
+                '4 mL EDTA (1ED04) Received Date'
             ],
             'rdrField' => 'sampleStatus1ED04',
             'sortField' => 'sampleStatus1ED04Time',
             'rdrDateField' => 'sampleStatus1ED04Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment'
+        ],
+        '2ED04' => [
+            'name' => '4 mL EDTA (2ED04)',
+            'csvNames' => [
+                '4 mL EDTA (2ED04) Received',
+                '4 mL EDTA (2ED04) Received Date'
+            ],
+            'rdrField' => 'sampleStatus2ED04',
+            'sortField' => 'sampleStatus2ED04Time',
+            'rdrDateField' => 'sampleStatus2ED04Time',
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'type' => 'sample',
@@ -1361,6 +1407,7 @@ class WorkQueue
         'LifeFunctioning',
         'EmotionalHealth',
         'BehavioralHealth',
+        'EnvironmentalExposures',
         'CopeMay',
         'CopeJune',
         'CopeJuly',
@@ -1386,7 +1433,9 @@ class WorkQueue
         '1PST8',
         '1HEP4',
         '1ED02',
+        '2ED02',
         '1ED04',
+        '2ED04',
         '1ED10',
         '2ED10',
         '1CFD9',
@@ -1560,7 +1609,10 @@ class WorkQueue
         'reconsentForElectronicHealthRecordsAuthored',
         'LifeFunctioning',
         'healthDataStream',
-        'NPHConsent'
+        'NPHConsent',
+        '2ED02',
+        '2ED04',
+        'EnvironmentalExposures'
     ];
 
     public static $sortColumns = [
@@ -1618,6 +1670,7 @@ class WorkQueue
         'questionnaireOnLifeFunctioningAuthored',
         'questionnaireOnEmotionalHealthHistoryAndWellBeingAuthored',
         'questionnaireOnBehavioralHealthAndPersonalityAuthored',
+        'questionnaireOnEnvironmentalExposuresAuthored',
         'questionnaireOnCopeMayAuthored',
         'questionnaireOnCopeJuneAuthored',
         'questionnaireOnCopeJulyAuthored',
@@ -1643,7 +1696,9 @@ class WorkQueue
         'sampleStatus1PST8Time',
         'sampleStatus1HEP4Time',
         'sampleStatus1ED02Time',
+        'sampleStatus2ED02Time',
         'sampleStatus1ED04Time',
+        'sampleStatus2ED04Time',
         'sampleStatus1ED10Time',
         'sampleStatus2ED10Time',
         'sampleStatus1CFD9Time',
@@ -2260,6 +2315,7 @@ class WorkQueue
         'LifeFunctioning' => 'Life Functioning',
         'EmotionalHealthHistoryAndWellBeing' => 'Emotional Health Hx and Well-being',
         'BehavioralHealthAndPersonality' => 'Behavioral Health and Personality',
+        'EnvironmentalExposures' => 'Environmental Exposures',
         'CopeMay' => 'COPE May',
         'CopeJune' => 'COPE June',
         'CopeJuly' => 'COPE July',
@@ -2290,8 +2346,10 @@ class WorkQueue
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
         '1HEP4' => '4 mL Na-Hep',
-        '1ED02' => '2 mL EDTA',
-        '1ED04' => '4 mL EDTA',
+        '1ED02' => '2 mL EDTA (1ED02)',
+        '2ED02' => '2 mL EDTA (2ED02)',
+        '1ED04' => '4 mL EDTA (1ED04)',
+        '2ED04' => '4 mL EDTA (2ED04)',
         '1ED10' => '1st 10 mL EDTA',
         '2ED10' => '2nd 10 mL EDTA',
         '1CFD9' => 'Cell-Free DNA',

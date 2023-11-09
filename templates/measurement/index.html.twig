@@ -3,7 +3,22 @@
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
     {% set participantRoute = readOnlyView ? 'read_participant' : 'participant' %}
-    <div id="physicalEvaluation" data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}" data-warnings="{{ warnings|json_encode|escape('html_attr') }}" data-conversions="{{ conversions|json_encode|escape('html_attr') }}" data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}">
+    <div id="physicalEvaluation"
+         data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}"
+         data-warnings="{{ warnings|json_encode|escape('html_attr') }}"
+         data-conversions="{{ conversions|json_encode|escape('html_attr') }}"
+         data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}"
+         data-age-in-months="{{ participant.ageInMonths }}"
+         data-age-in-years="{{ participant.age }}"
+         data-weight-for-age-charts="{{ weightForAgeCharts|json_encode }}"
+         data-weight-for-length-charts="{{ weightForLengthCharts|json_encode }}"
+         data-height-for-age-charts="{{ heightForAgeCharts|json_encode }}"
+         data-head-circumference-for-age-charts="{{ headCircumferenceForAgeCharts|json_encode }}"
+         data-bmi-for-age-charts="{{ bmiForAgeCharts|json_encode }}"
+         data-bp-systolic-height-percentile-charts="{{ bpSystolicHeightPercentileChart|json_encode }}"
+         data-bp-diastolic-height-percentile-charts="{{ bpDiastolicHeightPercentileChart|json_encode }}"
+         data-heart-rate-age-charts="{{ heartRateAgeCharts|json_encode }}"
+         data-z-score-charts="{{ zScoreCharts|json_encode }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
@@ -16,7 +31,12 @@
                 {% else %}
                     New Physical Measurements
                 {% endif %}
-                <small><a href="{{ path(participantRoute, { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
+                <small>
+                    <a href="{{ path(participantRoute, { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a>
+                    {% if participant.isPediatric %}
+                        <i class="fa fa-child child-icon" title="Pediatric Participant" data-toggle="tooltip"></i>
+                    {% endif %}
+                </small>
                 {% if measurement.id and not readOnlyView%}
                     {% if measurement.rdrId and (measurement.history is empty or measurement.history.type != 'cancel') %}
                         <button type="submit" class="btn btn-sm btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
@@ -65,7 +85,7 @@
         {% endif %}
 
         {{ form_errors(measurementForm) }}
-        {% if showAutoModification %}
+        {% if not participant.isPediatric and showAutoModification %}
             <div class="row">
                 <div class="col-sm-6 col-sm-offset-3">
                     <div class="panel panel-danger">

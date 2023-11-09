@@ -36,15 +36,16 @@
                     <dt class="col-sm-4">Incentive Type</dt>
                     <dd class="col-sm-8">
                         {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
+                        {{ incentive.typeOfItem  ? ', ' ~ incentive.typeOfItem  ~ ', ' ~ incentive.numberOfItems : 'blank' }}
                     </dd>
                     {% if incentive.otherIncentiveType %}
                         <dt class="col-sm-4">Other Incentive Type</dt>
                         <dd class="col-sm-8">{{ incentive.otherIncentiveType }}</dd>
                     {% endif %}
                     <dt class="col-sm-4">Incentive Amount</dt>
-                    <dd class="col-sm-8">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                    <dd class="col-sm-8">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '--' }}</dd>
                     <dt class="col-sm-4">Notes</dt>
-                    <dd class="col-sm-8">{{ incentive.notes }}</dd>
+                    <dd class="col-sm-8">{{ incentive.notes ? incentive.notes : '--' }}</dd>
                     <dt class="col-sm-4">Declined</dt>
                     <dd class="col-sm-8">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                 </dl>
@@ -61,18 +62,25 @@
             {{ form_errors(incentiveForm) }}
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(incentiveForm.incentive_date_given) }}
-                    {{ form_row(incentiveForm.incentive_occurrence) }}
+                    {{ form_row(incentiveForm.recipient) }}
+                    {{ form_row(incentiveForm.incentive_type) }}
                     {{ form_row(incentiveForm.other_incentive_occurrence) }}
+                    {{ form_row(incentiveForm.incentive_amount) }}
+                    <div id="number_of_items">
+                        {{ form_row(incentiveForm.number_of_items) }}
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(incentiveForm.incentive_type) }}
+                    {{ form_row(incentiveForm.incentive_date_given) }}
+                    {{ form_row(incentiveForm.incentive_occurrence) }}
                     <div id="gift_card">
                         {{ form_row(incentiveForm.gift_card_type) }}
                     </div>
                     {{ form_row(incentiveForm.other_incentive_type) }}
-                    {{ form_row(incentiveForm.incentive_amount) }}
                     {{ form_row(incentiveForm.other_incentive_amount) }}
+                    <div id="type_of_item">
+                        {{ form_row(incentiveForm.type_of_item) }}
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -137,15 +145,16 @@
                             <dt class="col-sm-5">Incentive Type</dt>
                             <dd class="col-sm-7">
                                 {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
+                                {{ incentive.typeOfItem  ? ', ' ~ incentive.typeOfItem  ~ ', ' ~ incentive.numberOfItems : '' }}
                             </dd>
                             {% if incentive.otherIncentiveType %}
                                 <dt class="col-sm-5">Other Incentive Type</dt>
                                 <dd class="col-sm-7">{{ incentive.otherIncentiveType }}</dd>
                             {% endif %}
                             <dt class="col-sm-5">Incentive Amount</dt>
-                            <dd class="col-sm-7">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '' }}</dd>
+                            <dd class="col-sm-7">{{ incentive.incentiveAmount ? '$'~incentive.incentiveAmount : '--' }}</dd>
                             <dt class="col-sm-5">Notes</dt>
-                            <dd class="col-sm-7">{{ incentive.notes }}</dd>
+                            <dd class="col-sm-7">{{ incentive.notes ? incentive.notes : '--' }}</dd>
                             <dt class="col-sm-5">Declined</dt>
                             <dd class="col-sm-7">{{ incentive.declined ? 'Yes' : 'No' }}</dd>
                         </dl>

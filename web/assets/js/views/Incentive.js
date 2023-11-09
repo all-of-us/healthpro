@@ -32,6 +32,10 @@ $(document).ready(function () {
                 let incentiveAmountSelector = idPrefix + " #" + incentivePrefix + "incentive_amount";
                 $(incentiveAmountSelector).removeAttr("required");
             }
+            if ($(incentiveTypeSelector).val() === "item_of_appreciation") {
+                let incentiveAmountSelector = idPrefix + " #" + incentivePrefix + "incentive_amount";
+                $(incentiveAmountSelector).removeAttr("required");
+            }
         }
         $(idPrefix + " .incentive-form")
             .parsley()
@@ -73,6 +77,21 @@ $(document).ready(function () {
                     $(incentiveAmountSelector).removeAttr("disabled");
                 }
                 $(incentiveAmountSelector).attr("required", "required");
+            }
+            if ($(that).val() === "item_of_appreciation") {
+                $(idPrefix + " #type_of_item").show();
+                $(idPrefix + " #number_of_items").show();
+                $(incentiveAmountSelector).prop("disabled", true);
+                $(incentiveAmountSelector).val("");
+                $(incentiveAmountSelector).removeAttr("required");
+                $(idPrefix + " #type_of_item .toggle-required").attr("required", "required");
+            } else {
+                $(idPrefix + " #type_of_item").hide();
+                $(idPrefix + " #number_of_items").hide();
+                $(incentiveAmountSelector).prop("disabled", false);
+                $(incentiveAmountSelector).attr("required", "required");
+                $(idPrefix + " #type_of_item").val("");
+                $(idPrefix + " #type_of_item .toggle-required").removeAttr("required");
             }
         }
         $(idPrefix + " .incentive-form")
@@ -157,6 +176,18 @@ $(document).ready(function () {
             }
         });
 
+        window.getTypeOfItem = new Bloodhound({
+            name: "typeOfItem",
+            datumTokenizer: Bloodhound.tokenizers.whitespace,
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: 10,
+            prefetch: "/ajax/search/type-of-item-prefill",
+            remote: {
+                url: "/ajax/search/type-of-item/%QUERY",
+                wildcard: "%QUERY"
+            }
+        });
+
         var handleGiftCardAutoPopulate = function (idPrefix = "#incentive_create") {
             $(idPrefix + " .gift-card").typeahead(
                 {
@@ -167,6 +198,17 @@ $(document).ready(function () {
                 }
             );
         };
+    }
+
+    function handleTypeOfItemAutoPopulate(idPrefix = "#incentive_create") {
+        $(idPrefix + " .item-type").typeahead(
+            {
+                highlight: true
+            },
+            {
+                source: getTypeOfItem
+            }
+        );
     }
 
     var incentiveEditModal = "#incentive_edit_form_modal";
@@ -185,6 +227,7 @@ $(document).ready(function () {
 
     if (!readOnlyView) {
         handleGiftCardAutoPopulate();
+        handleTypeOfItemAutoPopulate();
     }
 
     if (hasIncentives) {

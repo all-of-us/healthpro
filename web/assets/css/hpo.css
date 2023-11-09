@@ -31,3 +31,12 @@
 .participant-details-card {
     background-color: #f8f9fa;
 }
+
+.border-right {
+    border-right: 1px solid #ddd;
+}
+.pediatric-order-indicator {
+    bottom: 5px;
+    right: 10px;
+    position: absolute;
+}

@@ -1,0 +1,164 @@
+{% import 'macros/display-text.html.twig' as macros %}
+<div class="row">
+    <div class="col-sm-12 position-relative">
+        <nav id="navbar-participant-overview" class="navbar bg-light px-3 mb-3">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="#scrollspyConsents">Consents</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#scrollspyInPerson">In-Person Enrollment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#scrollspyContact">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#scrollspyDemographics">Demographics</a>
+                </li>
+            </ul>
+        </nav>
+        <div data-bs-spy="scroll" data-bs-target="#navbar-participant-overview" data-bs-root-margin="0px 0px -40%"
+             data-bs-smooth-scroll="true" class="scrollspy-participant-overview p-3 rounded-2" tabindex="0">
+            <div id="scrollspyConsents">&nbsp;</div>
+            <h6 class="text-primary scroll-header"><span>Consents</span></h6>
+            <div class="participant-detail-new-status text-start big-status-box">
+                <strong class="d-block">Primary Consent</strong>
+                {{ macros.displayFirstConsentPanelStatus(participant, 'reconsentForStudyEnrollmentAuthored', 'reconsentForStudyEnrollmentFilePath', 'consentForStudyEnrollment', showConsentPDFs) }}
+            </div>
+            <div class="participant-detail-new-status text-start big-status-box">
+                <strong class="d-block">EHR Consent</strong>
+                {{ macros.displayFirstConsentPanelStatus(participant, 'reconsentForElectronicHealthRecordsAuthored', 'reconsentForElectronicHealthRecordsFilePath', 'consentForElectronicHealthRecords', showConsentPDFs, 'ehr') }}
+                {% if participant.ehrConsentExpireStatus == 'EXPIRED' %}
+                    (Expired on {{ participant.ehrConsentExpireAuthored ? participant.ehrConsentExpireAuthored|date('n/j/Y g:ia', app.user.timezone) : '--' }})
+                {% elseif participant.consentForElectronicHealthRecords == 'SUBMITTED' and participant.ehrConsentExpireStatus is empty %}
+                    (Active)
+                {% endif %}
+            </div>
+            <div class="participant-detail-new-status text-start big-status-box">
+                <strong class="d-block">gRoR Consent</strong>
+                {{ macros.displayConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Consent Cohort</strong>
+                {{ participant.consentCohortText }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Program Update</strong>
+                {{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Language of Primary Consent</strong>
+                {{ participant.primaryLanguage|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">DV-only EHR Sharing</strong>
+                {{ macros.displayConsentPanelStatus(participant, 'consentForDvElectronicHealthRecordsSharing') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Exploring the Mind Consent</strong>
+                {{ macros.displayConsentPanelStatus(participant, 'consentForEtM') }}
+            </div>
+            {% for type, label in digitalHealthSharingTypes %}
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">{{ label }}</strong>
+                    {{ macros.displayDigitalSharing(participant.digitalHealthSharingStatus, type) }}
+                </div>
+            {% endfor %}
+            <div id="scrollspyInPerson">&nbsp;</div>
+            <h6 class="text-primary scroll-header"><span>In-Person Enrollment</span></h6>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Paired Awardee</strong>
+                {% if participant.awardee %}
+                    <i class="fa fa-check text-success"
+                       aria-hidden="true"></i> {{ siteInfo.getAwardeeDisplayName(participant.awardee) }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    <small>(not paired)</small>
+                {% endif %}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Paired Organization</strong>
+                {% if participant.organization %}
+                    <i class="fa fa-check text-success"
+                       aria-hidden="true"></i> {{ siteInfo.getOrganizationDisplayName(participant.organization) }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    <small>(not paired)</small>
+                {% endif %}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Paired Site</strong>
+                {% if participant.siteSuffix %}
+                    <i class="fa fa-check text-success"
+                       aria-hidden="true"></i> Location: {{ siteInfo.getSiteDisplayName(participant.siteSuffix) }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                    <small>(not paired)</small>
+                {% endif %}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Enrollment Site</strong>
+                {% if participant.enrollmentSiteSuffix %}
+                    <i class="fa fa-check text-success"
+                       aria-hidden="true"></i> Location: {{ siteInfo.getSiteDisplayName(participant.enrollmentSiteSuffix) }}
+                {% else %}
+                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                {% endif %}
+            </div>
+            <div id="scrollspyContact">&nbsp;</div>
+            <h6 class="text-primary scroll-header"><span>Contact</span></h6>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Contact Method</strong>
+                {{ participant.recontactMethod|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Address</strong>
+                {{ participant.getAddress(true)|default('--')|nl2br }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <span class="float-end"
+                      title="This is either the registration email or the email provided after consent if the participant registered with a phone number"
+                      data-bs-toggle="tooltip"><span class="sr-only">What is Email?</span><i
+                            class="fa fa-question-circle text-info"></i></span>
+                <strong class="d-block">Email</strong>
+                {{ participant.email|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <span class="float-end" title="This is the verified SMS number used during registration"
+                      data-bs-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i
+                            class="fa fa-question-circle text-info"></i></span>
+                <strong class="d-block">Login Phone</strong>
+                {{ participant.loginPhoneNumber|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <span class="float-end" title="This is the phone number provided after consent"
+                      data-bs-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i
+                            class="fa fa-question-circle text-info"></i></span>
+                <strong class="d-block">Contact Phone</strong>
+                {{ participant.phoneNumber|default('--') }}
+            </div>
+            <div id="scrollspyDemographics">&nbsp;</div>
+            <h6 class="text-primary scroll-header"><span>Demographics</span></h6>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Age</strong>
+                {{ participant.getAge()|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Sex</strong>
+                {{ participant.sex|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Gender Identity</strong>
+                {{ participant.genderIdentity|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Race/Ethnicity</strong>
+                {{ participant.race|default('--') }}
+            </div>
+            <div class="participant-detail-new-status text-start">
+                <strong class="d-block">Education</strong>
+                {{ participant.education|default('--') }}
+            </div>
+        </div>
+    </div>
+</div>
