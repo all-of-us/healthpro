@@ -338,8 +338,8 @@ class NphOrderService
                         $nphSample->setCollectedTs($collectedTs);
                         $nphSample->setCollectedTimezoneId($this->getTimezoneid());
                         $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
-                        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
-                            $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+                        if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
+                            $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity', 'totalCollectionVolume']));
                         }
                     } else {
                         $nphSample->setCollectedUser(null);
@@ -426,7 +426,7 @@ class NphOrderService
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
-        } elseif ($order->getOrderType() === 'urine') {
+        } elseif ($order->getOrderType() === NPHOrder::TYPE_URINE || $order->getOrderType() === NPHOrder::TYPE_24URINE) {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
             $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
@@ -494,7 +494,7 @@ class NphOrderService
         $order = $sample->getNphOrder();
         $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
         $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
-        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
+        if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
             if ($sample->getSampleMetaData()) {
                 $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
                 if (!empty($sampleMetadata['urineColor'])) {
@@ -993,7 +993,7 @@ class NphOrderService
             $this->saveNphAliquotFinalizedInfo($sample, $aliquots, $formData);
         }
         $sampleMetadata = '';
-        if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE) {
+        if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $sample->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
             $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']);
         }
         $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata);

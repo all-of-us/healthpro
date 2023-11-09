@@ -514,7 +514,7 @@ class NphSample
             'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
             'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
         ];
-        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE) {
+        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $this->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
             $sampleData['color'] = $samplesMetadata['urineColor'] ?? null;
             $sampleData['clarity'] = $samplesMetadata['urineClarity'] ?? null;
         }

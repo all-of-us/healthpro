@@ -77,7 +77,7 @@
                 {% endfor %}
                 </tbody>
             </table>
-            {% if order.orderType == constant('TYPE_URINE', order) %}
+            {% if order.orderType == constant('TYPE_URINE', order) or order.orderType == constant('TYPE_24URINE', order)  %}
                 {% set nphSample = order.nphSamples[0] %}
                 <hr>
                 <h4>

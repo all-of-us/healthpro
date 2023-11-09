@@ -38,6 +38,9 @@
                     {% if order.orderType != constant('TYPE_STOOL', order) %}
                         <th>Collection Time</th>
                     {% endif %}
+                    {% if order.orderType == constant('TYPE_24URINE', order) %}
+                        <th>Total Collection Volume</th>
+                    {% endif %}
                     <th>Notes</th>
                     <th>
                         {% if order.canCancel %}
@@ -62,6 +65,9 @@
                             <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
                         </tr>
                     {% endif %}
+                    {% if order.orderType == constant('TYPE_24URINE', order) %}
+                        {% include 'program/nph/order/partials/order-collect-urine24.html.twig' %}
+                    {% else %}
                     <tr class="row-samples">
                         <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
                             class="has-error"{% endif %}>
@@ -115,6 +121,7 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                 {% endfor %}
                 <tr>
                     <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
@@ -123,7 +130,7 @@
                 </tbody>
             </table>
             <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
-            {% if order.orderType == constant('TYPE_URINE', order) %}
+            {% if order.orderType == constant('TYPE_URINE', order) or order.orderType == constant('TYPE_24URINE', order)  %}
                 <hr>
                 <h4>
                     Color and Clarity
