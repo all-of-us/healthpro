@@ -30,7 +30,6 @@ class Fhir
         $this->schema = $options['schema'];
         $this->patient = $options['patient'];
         $this->version = $options['version'];
-        $this->metricUrns = $this->getMetricUrns();
         // Convert DateTime object to UTC timestamp
         // (can't use 'c' ISO 8601 format because that results in +00:00 instead of Z)
         $date = clone $options['datetime'];
@@ -42,6 +41,7 @@ class Fhir
         $this->finalizedUser = $options['finalized_user'];
         $this->finalizedSite = $options['finalized_site'];
         $this->summary = $options['summary'];
+        $this->metricUrns = $this->getMetricUrns();
     }
 
     public function toObject()
@@ -168,19 +168,40 @@ class Fhir
             }
         }
 
+        $summaryKeys = $this->summary ? array_keys($this->summary) : [];
         // add computed means
         if (in_array('weight-1', $metrics) || in_array('weight-2', $metrics) || in_array('weight-3', $metrics)) {
             $metrics[] = 'weight-mean';
-            $metrics[] = 'growth-percentile-weight-for-age';
+            $weightGrowthMetrics = ['growth-percentile-weight-for-age', 'growth-percentile-weight-for-age-male', 'growth-percentile-weight-for-age-female'];
+            foreach ($weightGrowthMetrics as $weightGrowthMetric) {
+                if (in_array($weightGrowthMetric, $summaryKeys)) {
+                    $metrics[] = $weightGrowthMetric;
+                }
+            }
         }
         if (in_array('height-1', $metrics) || in_array('height-2', $metrics) || in_array('height-3', $metrics)) {
             $metrics[] = 'height-mean';
-            $metrics[] = 'growth-percentile-height-for-age';
+            $heightGrowthMetrics = ['growth-percentile-height-for-age', 'growth-percentile-height-for-age-male', 'growth-percentile-height-for-age-female'];
+            foreach ($heightGrowthMetrics as $heightGrowthMetric) {
+                if (in_array($heightGrowthMetric, $summaryKeys)) {
+                    $metrics[] = $heightGrowthMetric;
+                }
+            }
         }
         if (in_array('weight-mean', $metrics) && in_array('height-mean', $metrics)) {
-            $metrics[] = 'growth-percentile-weight-for-length';
+            $weightLengthGrowthMetrics = ['growth-percentile-weight-for-length', 'growth-percentile-weight-for-length-male', 'growth-percentile-weight-for-length-female'];
+            foreach ($weightLengthGrowthMetrics as $weightLengthGrowthMetric) {
+                if (in_array($weightLengthGrowthMetric, $summaryKeys)) {
+                    $metrics[] = $weightLengthGrowthMetric;
+                }
+            }
             if ($this->schema->displayBmi) {
-                $metrics[] = 'growth-percentile-bmi-for-age';
+                $bmiGrowthMetrics = ['growth-percentile-bmi-for-age', 'growth-percentile-bmi-for-age-male', 'growth-percentile-bmi-for-age-female'];
+                foreach ($bmiGrowthMetrics as $bmiGrowthMetric) {
+                    if (in_array($bmiGrowthMetric, $summaryKeys)) {
+                        $metrics[] = $bmiGrowthMetric;
+                    }
+                }
                 $metrics[] = 'bmi';
             }
         }
@@ -207,7 +228,12 @@ class Fhir
         }
         if (in_array('head-circumference-1', $metrics) || in_array('head-circumference-2', $metrics) || in_array('head-circumference-3', $metrics)) {
             $metrics[] = 'head-circumference-mean';
-            $metrics[] = 'growth-percentile-head-circumference-for-age';
+            $headCircumferenceGrowthMetrics = ['growth-percentile-head-circumference-for-age', 'growth-percentile-head-circumference-for-age-male', 'growth-percentile-head-circumference-for-age-female'];
+            foreach ($headCircumferenceGrowthMetrics as $headCircumferenceGrowthMetric) {
+                if (in_array($headCircumferenceGrowthMetric, $summaryKeys)) {
+                    $metrics[] = $headCircumferenceGrowthMetric;
+                }
+            }
         }
 
         // move notes to end
@@ -1306,20 +1332,37 @@ class Fhir
 
     private function growthpercentileweightforage(): array
     {
+        return $this->getGrowthpercentileweightforage();
+    }
+
+    private function growthpercentileweightforageMale(): array
+    {
+        return $this->getGrowthpercentileweightforage('male');
+    }
+
+    private function growthpercentileweightforageFemale(): array
+    {
+        return $this->getGrowthpercentileweightforage('female');
+    }
+
+    private function getGrowthpercentileweightforage(string $sex = null): array
+    {
+        $sexKey = $sex ? "-{$sex}": '';
+        $sexValue = $sex ?? '';
         return $this->simpleMetric(
-            'growth-percentile-weight-for-age',
-            $this->summary['growth-percentile-weight-for-age'] ?? null,
-            'Computed growth percentile weight for age',
+            "growth-percentile-weight-for-age{$sexKey}",
+            $this->summary["growth-percentile-weight-for-age{$sexKey}"] ?? null,
+            "Computed growth percentile weight for age {$sexValue}",
             'percentile',
             [
                 [
                     'code' => '22222-0',
-                    'display' => 'Growth percentile weight for age',
+                    'display' => "Growth percentile weight for age {$sexValue}",
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'growth-percentile-weight-for-age',
-                    'display' => 'Computed growth percentile weight for age',
+                    'code' => "growth-percentile-weight-for-age{$sexKey}",
+                    'display' => "Computed growth percentile weight for age {$sexValue}",
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
@@ -1329,20 +1372,37 @@ class Fhir
 
     private function growthpercentileheightforage(): array
     {
+        return $this->getGrowthpercentileheightforage();
+    }
+
+    private function growthpercentileheightforageMale(): array
+    {
+        return $this->getGrowthpercentileheightforage('male');
+    }
+
+    private function growthpercentileheightforageFemale(): array
+    {
+        return $this->getGrowthpercentileheightforage('female');
+    }
+
+    private function getGrowthpercentileheightforage(string $sex = null): array
+    {
+        $sexKey = $sex ? "-{$sex}": '';
+        $sexValue = $sex ?? '';
         return $this->simpleMetric(
-            'growth-percentile-height-for-age',
-            $this->summary['growth-percentile-height-for-age'] ?? null,
-            'Computed growth percentile height for age',
+            "growth-percentile-height-for-age{$sexKey}",
+            $this->summary["growth-percentile-height-for-age{$sexKey}"] ?? null,
+            "Computed growth percentile height for age {$sexValue}",
             'percentile',
             [
                 [
                     'code' => '33333-0',
-                    'display' => 'Growth percentile height for age',
+                    'display' => "Growth percentile height for age {$sexValue}",
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'growth-percentile-height-for-age',
-                    'display' => 'Computed growth percentile weight for age',
+                    'code' => "growth-percentile-height-for-age{$sexKey}",
+                    'display' => "Computed growth percentile weight for age {$sexValue}",
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
@@ -1352,20 +1412,38 @@ class Fhir
 
     private function growthpercentileweightforlength(): array
     {
+        return $this->getGrowthpercentileweightforlength();
+    }
+
+    private function growthpercentileweightforlengthMale(): array
+    {
+        return $this->getGrowthpercentileweightforlength('male');
+    }
+
+    private function growthpercentileweightforlengthFemale(): array
+    {
+        return $this->getGrowthpercentileweightforlength('female');
+    }
+
+
+    private function getGrowthpercentileweightforlength(string $sex = null): array
+    {
+        $sexKey = $sex ? "-{$sex}": '';
+        $sexValue = $sex ?? '';
         return $this->simpleMetric(
-            'growth-percentile-weight-for-length',
-            $this->summary['growth-percentile-weight-for-length'] ?? null,
-            'Computed growth percentile weight for length',
+            "growth-percentile-weight-for-length{$sexKey}",
+            $this->summary["growth-percentile-weight-for-length{$sexKey}"] ?? null,
+            "Computed growth percentile weight for length {$sexValue}",
             'percentile',
             [
                 [
                     'code' => '44444-0',
-                    'display' => 'Growth percentile weight for length',
+                    'display' => "Growth percentile weight for length {$sexValue}",
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'growth-percentile-weight-for-length',
-                    'display' => 'Computed growth percentile weight for length',
+                    'code' => "growth-percentile-weight-for-length{$sexValue}",
+                    'display' => "Computed growth percentile weight for length {$sexValue}",
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
@@ -1375,20 +1453,37 @@ class Fhir
 
     private function growthpercentileheadcircumferenceforage(): array
     {
+        return $this->getGrowthpercentileheadcircumferenceforage();
+    }
+
+    private function growthpercentileheadcircumferenceforageMale(): array
+    {
+        return $this->getGrowthpercentileheadcircumferenceforage('male');
+    }
+
+    private function growthpercentileheadcircumferenceforageFemale(): array
+    {
+        return $this->getGrowthpercentileheadcircumferenceforage('female');
+    }
+
+    private function getGrowthpercentileheadcircumferenceforage(string $sex = null): array
+    {
+        $sexKey = $sex ? "-{$sex}": '';
+        $sexValue = $sex ?? '';
         return $this->simpleMetric(
-            'growth-percentile-head-circumference-for-age',
-            $this->summary['growth-percentile-head-circumference-for-age'] ?? null,
-            'Computed growth percentile head circumference for age',
+            "growth-percentile-head-circumference-for-age{$sexKey}",
+            $this->summary["growth-percentile-head-circumference-for-age{$sexKey}"] ?? null,
+            "Computed growth percentile head circumference for age {$sexValue}",
             'percentile',
             [
                 [
                     'code' => '55555-0',
-                    'display' => 'Growth percentile head circumference for age',
+                    'display' => "Growth percentile head circumference for age {$sexValue}",
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'growth-percentile-head-circumference-for-age',
-                    'display' => 'Computed growth percentile head circumference for age',
+                    'code' => "growth-percentile-head-circumference-for-age{$sexKey}",
+                    'display' => "Computed growth percentile head circumference for age {$sexValue}",
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
@@ -1398,20 +1493,37 @@ class Fhir
 
     private function growthpercentilebmiforage(): array
     {
+        return $this->getGrowthpercentilebmiforage();
+    }
+
+    private function growthpercentilebmiforageMale(): array
+    {
+        return $this->getGrowthpercentilebmiforage('male');
+    }
+
+    private function growthpercentilebmiforageFemale(): array
+    {
+        return $this->getGrowthpercentilebmiforage('female');
+    }
+
+    private function getGrowthpercentilebmiforage(string $sex = null): array
+    {
+        $sexKey = $sex ? "-{$sex}": '';
+        $sexValue = $sex ?? '';
         return $this->simpleMetric(
-            'growth-percentile-bmi-for-age',
-            $this->summary['growth-percentile-bmi-for-age'] ?? null,
-            'Computed growth percentile bmi for age',
+            "growth-percentile-bmi-for-age{$sexKey}",
+            $this->summary["growth-percentile-bmi-for-age{$sexKey}"] ?? null,
+            "Computed growth percentile bmi for age {$sexValue}",
             'percentile',
             [
                 [
                     'code' => '66666-0',
-                    'display' => 'Growth percentile bmi for age',
+                    'display' => "Growth percentile bmi for age {$sexValue}",
                     'system' => 'http://loinc.org'
                 ],
                 [
-                    'code' => 'growth-percentile-bmi-for-age',
-                    'display' => 'Computed growth percentile bmi for age',
+                    'code' => "growth-percentile-bmi-for-age{$sexKey}",
+                    'display' => "Computed growth percentile bmi for age {$sexValue}",
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ],
