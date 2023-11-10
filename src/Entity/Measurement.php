@@ -84,6 +84,8 @@ class Measurement
 
     private array $growthCharts = [];
 
+    private int $sexAtBirth;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -322,6 +324,18 @@ class Measurement
     public function setAgeInMonths(float $ageInMonths): self
     {
         $this->ageInMonths = $ageInMonths;
+
+        return $this;
+    }
+
+    public function getSexAtBirth(): ?int
+    {
+        return $this->sexAtBirth;
+    }
+
+    public function setSexAtBirth(int $sexAtBirth): self
+    {
+        $this->sexAtBirth = $sexAtBirth;
 
         return $this;
     }
