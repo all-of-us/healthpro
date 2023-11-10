@@ -126,10 +126,11 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayConsentPanelStatus(participant, field, showConsentPDFs = '') %}
+{% macro displayConsentPanelStatus(participant, field, showConsentPDFs = '', showCheck = false) %}
     {% set consentValues = ['SUBMITTED', 'SUBMITTED_NO_CONSENT', 'SUBMITTED_NOT_SURE', 'SUBMITTED_INVALID'] %}
     {% if attribute(participant, field) in consentValues %}
         {% set time = attribute(participant, field ~ 'Authored') %}
+        {% if showCheck %}<i class="fa fa-check text-success" aria-hidden="true"></i>{% endif %}
         {{ time ? _self.displayConsent(time, attribute(participant, field ~ 'FilePath'), field, participant.id, showConsentPDFs) : '--' }}
     {% else %}
         (not completed)
