@@ -114,10 +114,10 @@
                             <div class="col-sm-3">Weight</div>
                             <div class="col-sm-9">
                                 {% if participant.sexAtBirth != 2 %}
-                                    <span id="percentile-1-weight-for-age">--</span> percentile (M) <br>
+                                    <span id="percentile-1-weight-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
                                 {% endif %}
                                 {% if participant.sexAtBirth != 1 %}
-                                    <span id="percentile-2-weight-for-age">--</span> percentile (F)
+                                    <span id="percentile-2-weight-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -126,10 +126,10 @@
                             <div class="col-sm-5">Height/Length</div>
                             <div class="col-sm-7">
                                 {% if participant.sexAtBirth != 2 %}
-                                    <span id="percentile-1-height-for-age">--</span> percentile (M) <br>
+                                    <span id="percentile-1-height-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
                                 {% endif %}
                                 {% if participant.sexAtBirth != 1 %}
-                                    <span id="percentile-2-height-for-age">--</span> percentile (F)
+                                    <span id="percentile-2-height-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -138,10 +138,10 @@
                                 <div class="col-sm-6">Weight-for-Length</div>
                                 <div class="col-sm-6">
                                     {% if participant.sexAtBirth != 2 %}
-                                        <span id="percentile-1-weight-for-length">--</span> percentile (M) <br>
+                                        <span id="percentile-1-weight-for-length">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
                                     {% endif %}
                                     {% if participant.sexAtBirth != 1 %}
-                                        <span id="percentile-2-weight-for-length">--</span> percentile (F)
+                                        <span id="percentile-2-weight-for-length">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -167,10 +167,10 @@
                                 <div class="col-sm-5">BMI Percentile</div>
                                 <div class="col-sm-7">
                                     {% if participant.sexAtBirth != 2 %}
-                                        <span id="percentile-1-bmi-for-age">--</span> percentile (M) <br>
+                                        <span id="percentile-1-bmi-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
                                     {% endif %}
                                     {% if participant.sexAtBirth != 1 %}
-                                        <span id="percentile-2-bmi-for-age">--</span> percentile (F)
+                                        <span id="percentile-2-bmi-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -317,10 +317,10 @@
                                 <div class="col-sm-6">Head Circumference</div>
                                 <div class="col-sm-6">
                                     {% if participant.sexAtBirth != 2 %}
-                                        <span id="percentile-1-head-circumference-for-age">--</span> percentile (M) <br>
+                                        <span id="percentile-1-head-circumference-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
                                     {% endif %}
                                     {% if participant.sexAtBirth != 1 %}
-                                        <span id="percentile-2-head-circumference-for-age">--</span> percentile (F)
+                                        <span id="percentile-2-head-circumference-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
