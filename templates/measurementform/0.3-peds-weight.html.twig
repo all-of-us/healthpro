@@ -62,9 +62,17 @@
                         <h3 class="panel-title">Growth Percentile</h3>
                     </div>
                     <div class="panel-body">
-                        <p class="lead">
-                            Weight <span id="percentile-weight-for-age">--</span> percentile
-                        </p>
+                        <div class="row row-no-gutters lead">
+                            <div class="col-sm-3">Weight</div>
+                            <div class="col-sm-9">
+                                {% if participant.sexAtBirth != 2 %}
+                                    <span id="percentile-1-weight-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
+                                {% endif %}
+                                {% if participant.sexAtBirth != 1 %}
+                                    <span id="percentile-2-weight-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
                     </div>
                 </div>
