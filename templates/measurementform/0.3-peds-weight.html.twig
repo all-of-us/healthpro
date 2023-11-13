@@ -1,4 +1,5 @@
 {% import 'measurementform/metrics.html.twig' as metrics %}
+{% import 'measurementform/macros/growth-percentile.html.twig' as growthMacros %}
 
 <div class="well">
     <div class="row">
@@ -65,12 +66,7 @@
                         <div class="row row-no-gutters lead">
                             <div class="col-sm-3">Weight</div>
                             <div class="col-sm-9">
-                                {% if participant.sexAtBirth != 2 %}
-                                    <span id="percentile-1-weight-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (M) {% endif %} <br>
-                                {% endif %}
-                                {% if participant.sexAtBirth != 1 %}
-                                    <span id="percentile-2-weight-for-age">--</span> percentile {% if participant.sexAtBirth == 0 %} (F) {% endif %}
-                                {% endif %}
+                                {{ growthMacros.displayGrowthPercentile('weight-for-age', participant.sexAtBirth) }}
                             </div>
                         </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
