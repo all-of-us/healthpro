@@ -1347,7 +1347,7 @@ class Fhir
 
     private function getGrowthpercentileweightforage(string $sex = null): array
     {
-        $sexKey = $sex ? "-{$sex}": '';
+        $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
         return $this->simpleMetric(
             "growth-percentile-weight-for-age{$sexKey}",
@@ -1387,7 +1387,7 @@ class Fhir
 
     private function getGrowthpercentileheightforage(string $sex = null): array
     {
-        $sexKey = $sex ? "-{$sex}": '';
+        $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
         return $this->simpleMetric(
             "growth-percentile-height-for-age{$sexKey}",
@@ -1428,7 +1428,7 @@ class Fhir
 
     private function getGrowthpercentileweightforlength(string $sex = null): array
     {
-        $sexKey = $sex ? "-{$sex}": '';
+        $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
         return $this->simpleMetric(
             "growth-percentile-weight-for-length{$sexKey}",
@@ -1468,7 +1468,7 @@ class Fhir
 
     private function getGrowthpercentileheadcircumferenceforage(string $sex = null): array
     {
-        $sexKey = $sex ? "-{$sex}": '';
+        $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
         return $this->simpleMetric(
             "growth-percentile-head-circumference-for-age{$sexKey}",
@@ -1508,7 +1508,7 @@ class Fhir
 
     private function getGrowthpercentilebmiforage(string $sex = null): array
     {
-        $sexKey = $sex ? "-{$sex}": '';
+        $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
         return $this->simpleMetric(
             "growth-percentile-bmi-for-age{$sexKey}",
