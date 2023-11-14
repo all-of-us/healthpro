@@ -194,7 +194,7 @@ let viewExtension = Backbone.View.extend({
                 }
             }
         }
-        return "--";
+        return "";
     },
 
     calculateBmi: function () {
@@ -457,7 +457,7 @@ let viewExtension = Backbone.View.extend({
             if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
                 let maxValue = null;
                 let heightPercentileField = "heightPer5";
-                let heightPercentile = $("#percentile-height-for-age");
+                let heightPercentile = $("#percentile-height-for-age").attr('data-percentile');
                 if (heightPercentile) {
                     const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
                     heightPercentileField = "heightPer" + nearestPercentile;
@@ -788,6 +788,9 @@ let viewExtension = Backbone.View.extend({
         }
     },
     addPercentileSuffix: function (percentile) {
+        if (!percentile) {
+            return "--";
+        }
         const integerPart = Math.floor(percentile);
 
         if (integerPart >= 11 && integerPart <= 13) {
