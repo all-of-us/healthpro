@@ -457,7 +457,7 @@ let viewExtension = Backbone.View.extend({
             if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
                 let maxValue = null;
                 let heightPercentileField = "heightPer5";
-                let heightPercentile = $("#percentile-height-for-age").attr('data-percentile');
+                let heightPercentile = $("#percentile-height-for-age").attr("data-percentile");
                 if (heightPercentile) {
                     const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
                     heightPercentileField = "heightPer" + nearestPercentile;
