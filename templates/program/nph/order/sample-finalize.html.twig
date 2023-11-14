@@ -242,6 +242,15 @@
                         </div>
                         <hr>
                     {% endif %}
+                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE') %}
+                        <div class="row">
+                            <div class="form-group col-sm-12 {% if not sampleFinalizeForm['totalCollectionVolume'].vars.valid %} has-error{% endif %}">
+                                {{ form_label(sampleFinalizeForm['totalCollectionVolume']) }}
+                                {{ form_widget(sampleFinalizeForm['totalCollectionVolume']) }}
+                                {{ form_errors(sampleFinalizeForm['totalCollectionVolume']) }}
+                            </div>
+                        </div>
+                    {% endif %}
                     {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') %}
                         <label>
                             Bristol Stool Chart Questions

@@ -150,6 +150,13 @@
                         {{ form_errors(orderCollectForm['urineClarity']) }}
                     </div>
                 </div>
+                <div class="row">
+                    <div class="form-group col-sm-3">
+                        {{ form_label(orderCollectForm['totalCollectionVolume']) }}
+                        {{ form_widget(orderCollectForm['totalCollectionVolume']) }}
+                        {{ form_errors(orderCollectForm['totalCollectionVolume']) }}
+                    </div>
+                </div>
             {% endif %}
             {% if order.orderType == constant('TYPE_STOOL', order) %}
                 <hr>

@@ -29,6 +29,10 @@ class NphSampleFinalizeType extends NphOrderForm
             $this->addStoolMetadataFields($builder, $disableMetadataFields);
         }
 
+        if ($orderType === NphOrder::TYPE_24URINE) {
+            $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
+        }
+
         $formData = $builder->getData();
 
         if (!empty($options['aliquots'])) {

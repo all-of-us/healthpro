@@ -382,7 +382,7 @@ class NphOrderService
                 $orderCollectionData[$sampleCode] = true;
             }
             $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
-            if ($order->getOrderType() === 'urine') {
+            if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
                 if ($nphSample->getSampleMetaData()) {
                     $sampleMetadata = json_decode($nphSample->getSampleMetaData(), true);
                     if (!empty($sampleMetadata['urineColor'])) {
@@ -390,6 +390,9 @@ class NphOrderService
                     }
                     if (!empty($sampleMetadata['urineClarity'])) {
                         $orderCollectionData['urineClarity'] = $sampleMetadata['urineClarity'];
+                    }
+                    if (!empty($sampleMetadata['totalCollectionVolume'])) {
+                        $orderCollectionData['totalCollectionVolume'] = $sampleMetadata['totalCollectionVolume'];
                     }
                 }
             }
@@ -502,6 +505,9 @@ class NphOrderService
                 }
                 if (!empty($sampleMetadata['urineClarity'])) {
                     $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
+                }
+                if (!empty($sampleMetadata['totalCollectionVolume'])) {
+                    $sampleData['totalCollectionVolume'] = $sampleMetadata['totalCollectionVolume'];
                 }
             }
         }
