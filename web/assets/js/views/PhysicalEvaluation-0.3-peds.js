@@ -184,7 +184,7 @@ let viewExtension = Backbone.View.extend({
                 return Math.round(zScore["Z_0"] * 100);
             }
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
-                const newZValue = zScore["Z"] > 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
+                const newZValue = zScore["Z"] >= 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
                     const percentile = zScore[index] * 100;
                     if (percentile < 3) {

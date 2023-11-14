@@ -670,7 +670,7 @@ class Measurement
                 return (int) round($zScore['Z_0'] * 100, 0);
             }
             foreach ($decimalPoints as $index => $decimalPoint) {
-                $newZValue = $zScore['Z'] > 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
+                $newZValue = $zScore['Z'] >= 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
                 if ($z == round($newZValue, 2)) {
                     return (int) round($zScore[$index] * 100, 0);
                 }
