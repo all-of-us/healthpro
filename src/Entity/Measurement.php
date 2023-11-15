@@ -84,6 +84,8 @@ class Measurement
 
     private array $growthCharts = [];
 
+    private int $sexAtBirth;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -322,6 +324,18 @@ class Measurement
     public function setAgeInMonths(float $ageInMonths): self
     {
         $this->ageInMonths = $ageInMonths;
+
+        return $this;
+    }
+
+    public function getSexAtBirth(): ?int
+    {
+        return $this->sexAtBirth;
+    }
+
+    public function setSexAtBirth(int $sexAtBirth): self
+    {
+        $this->sexAtBirth = $sexAtBirth;
 
         return $this;
     }
@@ -882,7 +896,7 @@ class Measurement
                     'cm' => $height,
                     'ftin' => self::cmToFtIn($height)
                 ];
-                $summary['growth-percentile-height-for-age'] = $this->calculateGrowthPercentileForAge('heightForAgeCharts', $height);
+                $this->addGrowthPercentileForAge($summary, $height, 'growth-percentile-height-for-age', 'heightForAgeCharts');
             }
         }
         if ($weight = $this->calculatePediatricMean('weight')) {
@@ -890,13 +904,13 @@ class Measurement
                 'kg' => $weight,
                 'lb' => self::kgToLb($weight)
             ];
-            $summary['growth-percentile-weight-for-age'] = $this->calculateGrowthPercentileForAge('weightForAgeCharts', $weight);
+            $this->addGrowthPercentileForAge($summary, $weight, 'growth-percentile-weight-for-age', 'weightForAgeCharts');
         }
         if ($weight && !empty($height)) {
-            $summary['growth-percentile-weight-for-length'] = $this->calculateGrowthPercentileForLength('weightForLengthCharts', $height, $weight);
+            $this->addGrowthPercentileForLength($summary, $height, $weight, 'growth-percentile-weight-for-length', 'weightForLengthCharts');
             if ($this->schema->displayBmi) {
                 $summary['bmi'] = round(self::calculateBmi($height, $weight), 1);
-                $summary['growth-percentile-bmi-for-age'] = $this->calculateGrowthPercentileForAge('bmiForAgeCharts', $summary['bmi']);
+                $this->addGrowthPercentileForAge($summary, $summary['bmi'], 'growth-percentile-bmi-for-age', 'bmiForAgeCharts');
             }
         }
         $circumferenceFields = [
@@ -912,7 +926,7 @@ class Measurement
                     'in' => self::cmToIn($mean)
                 ];
                 if ($key === 'head') {
-                    $summary['growth-percentile-head-circumference-for-age'] = $this->calculateGrowthPercentileForAge('headCircumferenceForAgeCharts', $mean);
+                    $this->addGrowthPercentileForAge($summary, $mean, 'growth-percentile-head-circumference-for-age', 'headCircumferenceForAgeCharts');
                 }
             }
         }
@@ -933,6 +947,28 @@ class Measurement
             }
         }
         return $summary;
+    }
+
+    private function addGrowthPercentileForAge(array &$summary, float $value, string $field, string $chartType): void
+    {
+        $sexAtBirth = $this->getSexAtBirth();
+        $sexIds = $sexAtBirth ? [$sexAtBirth] : [1, 2];
+        foreach ($sexIds as $sexId) {
+            $fieldSuffix = $sexId == 1 ? 'male' : 'female';
+            $key = $sexAtBirth ? $field : "{$field}-{$fieldSuffix}";
+            $summary[$key] = $this->calculateGrowthPercentileForAge($chartType, $value, $sexId);
+        }
+    }
+
+    private function addGrowthPercentileForLength(array &$summary, float $value1, float $value2, string $field, string $chartType): void
+    {
+        $sexAtBirth = $this->getSexAtBirth();
+        $sexIds = $sexAtBirth ? [$sexAtBirth] : [1, 2];
+        foreach ($sexIds as $sexId) {
+            $fieldSuffix = $sexId == 1 ? 'male' : 'female';
+            $key = $sexAtBirth ? $field : "{$field}-{$fieldSuffix}";
+            $summary[$key] = $this->calculateGrowthPercentileForLength($chartType, $value1, $value2, $sexId);
+        }
     }
 
     private function getAdultFinalizeErrors(): array
@@ -1086,9 +1122,9 @@ class Measurement
         return $errors;
     }
 
-    private function calculateGrowthPercentileForAge(string $type, float $X): ?float
+    private function calculateGrowthPercentileForAge(string $type, float $X, int $sexAtBirth): ?float
     {
-        $lmsValues = $this->getLMSValuesFromAge($type);
+        $lmsValues = $this->getLMSValuesFromAge($type, $sexAtBirth);
 
         if ($lmsValues) {
             $zScore = $this->calculateZScore($X, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
@@ -1098,9 +1134,9 @@ class Measurement
         return null;
     }
 
-    private function calculateGrowthPercentileForLength(string $type, float $length, float $X): ?float
+    private function calculateGrowthPercentileForLength(string $type, float $length, float $X, int $sexAtBirth): ?float
     {
-        $lmsValues = $this->getLMSValuesFromLength($type, $length);
+        $lmsValues = $this->getLMSValuesFromLength($type, $length, $sexAtBirth);
 
         if ($lmsValues) {
             $zScore = $this->calculateZScore($X, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
@@ -1110,14 +1146,14 @@ class Measurement
         return null;
     }
 
-    private function getLMSValuesFromAge(string $chartType): array
+    private function getLMSValuesFromAge(string $chartType, int $sexAtBirth): array
     {
         $ageInMonths = $this->ageInMonths;
         $lmsValues = [];
         $charts = $this->growthCharts[$chartType];
 
         foreach ($charts as $item) {
-            if (floor($item['month']) === $ageInMonths) {
+            if ($item['sex'] === $sexAtBirth && floor($item['month']) === $ageInMonths) {
                 $lmsValues['L'] = $item['L'];
                 $lmsValues['M'] = $item['M'];
                 $lmsValues['S'] = $item['S'];
@@ -1126,13 +1162,13 @@ class Measurement
         return $lmsValues;
     }
 
-    private function getLMSValuesFromLength(string $chartType, float $length): array
+    private function getLMSValuesFromLength(string $chartType, float $length, int $sexAtBrith): array
     {
         $lmsValues = [];
         $charts = $this->growthCharts[$chartType];
 
         foreach ($charts as $item) {
-            if (round($item['length']) === round($length)) {
+            if ($item['sex'] === $sexAtBrith && round($item['length']) === round($length)) {
                 $lmsValues['L'] = $item['L'];
                 $lmsValues['M'] = $item['M'];
                 $lmsValues['S'] = $item['S'];

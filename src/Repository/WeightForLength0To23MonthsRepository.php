@@ -42,10 +42,11 @@ class WeightForLength0To23MonthsRepository extends ServiceEntityRepository
 
     public function getChartsData($sex): ?array
     {
-        return $this->createQueryBuilder('wfl')
-            ->where('wfl.sex = :sex')
-            ->setParameter('sex', $sex)
-            ->getQuery()
-            ->getArrayResult();
+        $queryBuilder = $this->createQueryBuilder('wfl');
+        if ($sex) {
+            $queryBuilder->where('wfl.sex = :sex')
+                ->setParameter('sex', $sex);
+        }
+        return $queryBuilder->getQuery()->getArrayResult();
     }
 }

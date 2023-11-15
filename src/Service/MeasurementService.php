@@ -53,6 +53,7 @@ class MeasurementService
         if ($measurement->isPediatricForm()) {
             $growthChartsData = $this->getGrowthChartsData($participant->sexAtBirth, $participant->ageInMonths);
             $measurement->setGrowthCharts($growthChartsData);
+            $measurement->setSexAtBirth($participant->sexAtBirth);
         }
     }
 
