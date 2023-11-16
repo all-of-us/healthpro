@@ -318,18 +318,22 @@ let viewExtension = Backbone.View.extend({
     },
     toggleThirdHeartRate: function () {
         const fieldsToCheck = ["heart-rate", "blood-pressure-systolic", "blood-pressure-diastolic"];
+        let showMeasurementPanel = false;
         for (const field of fieldsToCheck) {
             let first = parseFloat(this.$("#form_" + field + "_0").val());
             let second = parseFloat(this.$("#form_" + field + "_1").val());
             if (first > 0 && second > 0 && Math.abs(first - second) > 5) {
-                $(".panel-heart-rate-3").show();
+                showMeasurementPanel = true;
                 break;
-            } else {
-                $(".panel-heart-rate-3").hide();
-                $(".panel-heart-rate-3 input, .panel-heart-rate-3 select").each(function () {
-                    $(this).valChange("");
-                });
             }
+        }
+        if (showMeasurementPanel) {
+            $(".panel-heart-rate-3").show();
+        } else {
+            $(".panel-heart-rate-3").hide();
+            $(".panel-heart-rate-3 input, .panel-heart-rate-3 select").each(function () {
+                $(this).valChange("");
+            });
         }
     },
     calculateIrregularHeartRate: function () {
