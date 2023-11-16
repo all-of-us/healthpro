@@ -672,7 +672,11 @@ class Measurement
             foreach ($decimalPoints as $index => $decimalPoint) {
                 $newZValue = $zScore['Z'] >= 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
                 if ($z == round($newZValue, 2)) {
-                    return (int) round($zScore[$index] * 100, 0);
+                    $percentile = $zScore[$index] * 100;
+                    if ($percentile < 3) {
+                        return round($percentile, 1);
+                    }
+                    return (int) round($percentile, 0);
                 }
             }
         }
