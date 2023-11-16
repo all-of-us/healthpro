@@ -494,7 +494,7 @@ let viewExtension = Backbone.View.extend({
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
             let percentile = $("#percentile-" + percentileField).attr("data-percentile");
-            return percentile !== ""  && parseFloat(percentile) < warning.min;
+            return percentile !== "" && parseFloat(percentile) < warning.min;
         }
         if (warning.hasOwnProperty("age")) {
             if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {
