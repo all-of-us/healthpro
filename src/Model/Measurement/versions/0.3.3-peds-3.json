@@ -341,7 +341,6 @@
       "max": 300,
       "warnings": [
         {
-          "maxValue": 140,
           "addValue": 30,
           "customPercentile": "bp-systolic",
           "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
@@ -357,7 +356,6 @@
           "consecutive": 2
         },
         {
-          "maxValue": 140,
           "addValue": 30,
           "customPercentile": "bp-systolic",
           "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
@@ -391,7 +389,6 @@
       },
       "warnings": [
         {
-          "maxValue": 90,
           "addValue": 30,
           "customPercentile": "bp-diastolic",
           "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
@@ -407,7 +404,6 @@
           "consecutive": 2
         },
         {
-          "maxValue": 90,
           "addValue": 30,
           "customPercentile": "bp-diastolic",
           "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
