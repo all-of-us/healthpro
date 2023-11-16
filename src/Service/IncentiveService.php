@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Audit\Log;
 use App\Entity\Incentive;
-use App\Form\IncentiveType;
 use Doctrine\ORM\EntityManagerInterface;
 
 class IncentiveService
@@ -161,7 +160,7 @@ class IncentiveService
             $incentive->setIncentiveAmount(0);
         }
         if ($incentive->getRecipient() === Incentive::OTHER) {
-            $incentive->setRecipient(Incentive::OTHER . ', ' .$incentiveForm['other_incentive_recipient']->getData());
+            $incentive->setRecipient(Incentive::OTHER . ', ' . $incentiveForm['other_incentive_recipient']->getData());
         }
         return $incentive;
     }
