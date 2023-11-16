@@ -186,9 +186,12 @@ let viewExtension = Backbone.View.extend({
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
                 const newZValue = zScore["Z"] >= 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
-                    const percentile = zScore[index] * 100;
+                    let percentile = zScore[index] * 100;
                     if (percentile < 3) {
-                        return percentile.toFixed(1);
+                        percentile = percentile.toFixed(1);
+                        if (percentile % 1 !== 0) {
+                            return percentile;
+                        }
                     }
                     return Math.round(percentile);
                 }
@@ -482,12 +485,16 @@ let viewExtension = Backbone.View.extend({
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
             let zscore = $("#percentile-" + deviationField).attr("data-zscore");
-            return zscore > warning.max;
+            if (zscore !== "") {
+                return parseFloat(zscore) > warning.max;
+            }
         }
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
             let percentile = $("#percentile-" + percentileField).attr("data-percentile");
-            return percentile < warning.min;
+            if (percentile !== "") {
+                return parseFloat(percentile) < warning.min;
+            }
         }
         if (warning.hasOwnProperty("age")) {
             if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {
@@ -788,13 +795,13 @@ let viewExtension = Backbone.View.extend({
         }
     },
     addPercentileSuffix: function (percentile) {
-        if (!percentile) {
+        if (percentile === "") {
             return "--";
         }
         const integerPart = Math.floor(percentile);
 
         if (integerPart >= 11 && integerPart <= 13) {
-            return "th";
+            return percentile + "th";
         }
 
         const lastDigit = parseInt(percentile.toString().split("").reverse()[0], 10);
