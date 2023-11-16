@@ -186,9 +186,12 @@ let viewExtension = Backbone.View.extend({
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
                 const newZValue = zScore["Z"] >= 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
-                    const percentile = zScore[index] * 100;
+                    let percentile = zScore[index] * 100;
                     if (percentile < 3) {
-                        return percentile.toFixed(1);
+                        percentile = percentile.toFixed(1);
+                        if (percentile % 1 !== 0) {
+                            return percentile;
+                        }
                     }
                     return Math.round(percentile);
                 }
@@ -792,7 +795,7 @@ let viewExtension = Backbone.View.extend({
         }
     },
     addPercentileSuffix: function (percentile) {
-        if (!percentile) {
+        if (percentile === "") {
             return "--";
         }
         const integerPart = Math.floor(percentile);
