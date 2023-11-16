@@ -801,7 +801,7 @@ let viewExtension = Backbone.View.extend({
         const integerPart = Math.floor(percentile);
 
         if (integerPart >= 11 && integerPart <= 13) {
-            return "th";
+            return percentile + "th";
         }
 
         const lastDigit = parseInt(percentile.toString().split("").reverse()[0], 10);
