@@ -479,7 +479,7 @@ let viewExtension = Backbone.View.extend({
                         break;
                     }
                 }
-                if (warning.hasOwnProperty('maxValue') && maxValue > warning.maxValue) {
+                if (warning.hasOwnProperty("maxValue") && maxValue > warning.maxValue) {
                     maxValue = warning.maxValue;
                 }
                 console.log(warning.customPercentile, "warningValue", maxValue);
