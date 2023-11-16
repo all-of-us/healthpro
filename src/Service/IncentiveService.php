@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Audit\Log;
 use App\Entity\Incentive;
+use App\Form\IncentiveType;
 use Doctrine\ORM\EntityManagerInterface;
 
 class IncentiveService
@@ -46,6 +47,11 @@ class IncentiveService
             $obj->dateGiven = $incentive->getIncentiveDateGiven()->format('Y-m-d\TH:i:s\Z');
             $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
             $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
+            $obj->incentiveRecipient = $incentive->getRecipient();
+            if ($incentive->getIncentiveType() === Incentive::ITEM_OF_APPRECIATION) {
+                $obj->appreciationItemType = $incentive->getTypeOfItem();
+                $obj->appreciationItemCount = (string) $incentive->getNumberOfItems();
+            }
             if ($incentive->getGiftCardType()) {
                 $obj->giftcardType = $incentive->getGiftCardType();
             }
@@ -153,6 +159,9 @@ class IncentiveService
         }
         if ($incentive->getIncentiveType() === 'promotional') {
             $incentive->setIncentiveAmount(0);
+        }
+        if ($incentive->getRecipient() === Incentive::OTHER) {
+            $incentive->setRecipient(Incentive::OTHER . ', ' .$incentiveForm['other_incentive_recipient']->getData());
         }
         return $incentive;
     }

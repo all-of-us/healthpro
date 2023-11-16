@@ -33,6 +33,19 @@ class IncentiveType extends AbstractType
                     })
                 ]
             ])
+            ->add('other_incentive_recipient', Type\TextType::class, [
+                'label' => 'Specify Other',
+                'required' => false,
+                'mapped' => false,
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['recipient']->getData() === Incentive::OTHER && empty($value)) {
+                            $context->buildViolation('Please specify the other recipient.')->addViolation();
+                        }
+                    })
+                ],
+            ])
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date of Service',
@@ -120,6 +133,7 @@ class IncentiveType extends AbstractType
                 'attr' => [
                     'class' => 'item-type',
                     'autocomplete' => 'off',
+                    'min' => 0
                 ]
             ])
             ->add('other_incentive_type', Type\TextType::class, [
