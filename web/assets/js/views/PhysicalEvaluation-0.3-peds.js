@@ -480,9 +480,45 @@ let viewExtension = Backbone.View.extend({
                 return this.warningCondition(warning, val);
             }
             if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
+                if (this.sexAtBirth === 0) {
+                    let maxValueMale, maxValueFemale = null;
+                    let heightPercentileFieldMale, heightPercentileFieldFemale = "heightPer5";
+                    let heightPercentileMale = $("#percentile-1-height-for-age").attr("data-percentile");
+                    let heightPercentileFemale = $("#percentile-2-height-for-age").attr("data-percentile");
+                    if (heightPercentileMale) {
+                        const nearestPercentileMale = this.roundDownToNearestPercentile(heightPercentileMale);
+                        heightPercentileFieldMale = "heightPer" + nearestPercentileMale;
+                    }
+                    if (heightPercentileFemale) {
+                        const nearestPercentileFemale = this.roundDownToNearestPercentile(heightPercentileFemale);
+                        heightPercentileFieldFemale = "heightPer" + nearestPercentileFemale;
+                    }
+                    const bpHeightPercentileCharts =
+                        warning.customPercentile === "bp-systolic"
+                            ? this.bpSystolicHeightPercentileChart
+                            : this.bpDiastolicHeightPercentileChart;
+                    for (const bpHeightPercentile of bpHeightPercentileCharts) {
+                        if (bpHeightPercentile.sex === 1 && this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
+                            maxValueMale = bpHeightPercentile[heightPercentileFieldMale] + warning.addValue;
+                        }
+                        if (bpHeightPercentile.sex === 2 && this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
+                            maxValueFemale = bpHeightPercentile[heightPercentileFieldFemale] + warning.addValue;
+                        }
+                    }
+                    if (warning.hasOwnProperty("maxValue")) {
+                        if (maxValueMale > warning.maxValue) {
+                            maxValueMale = warning.maxValue;
+                        }
+                        if (maxValueFemale > warning.maxValue) {
+                            maxValueFemale = warning.maxValue;
+                        }
+                    }
+                    console.log(warning.customPercentile, "warningValue-male-female", maxValueMale, maxValueFemale);
+                    return val >= maxValueMale || val >= maxValueFemale;
+                }
                 let maxValue = null;
                 let heightPercentileField = "heightPer5";
-                let heightPercentile = $("#percentile-height-for-age").attr("data-percentile");
+                let heightPercentile = $("#percentile-"+ this.sexAtBirth + "-height-for-age").attr("data-percentile");
                 if (heightPercentile) {
                     const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
                     heightPercentileField = "heightPer" + nearestPercentile;
@@ -492,7 +528,7 @@ let viewExtension = Backbone.View.extend({
                         ? this.bpSystolicHeightPercentileChart
                         : this.bpDiastolicHeightPercentileChart;
                 for (const bpHeightPercentile of bpHeightPercentileCharts) {
-                    if (this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
+                    if (bpHeightPercentile.sex === this.sexAtBirth && this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
                         maxValue = bpHeightPercentile[heightPercentileField] + warning.addValue;
                         break;
                     }
