@@ -506,12 +506,28 @@ let viewExtension = Backbone.View.extend({
         }
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
-            let zscore = $("#percentile-" + deviationField).attr("data-zscore");
+            let deviationMale, deviationFemale, conditionMale, conditionFemale;
+            if (this.sexAtBirth === 0) {
+                deviationMale = $("#percentile-1-" + deviationField).attr("data-zscore");
+                deviationFemale = $("#percentile-2-" + deviationField).attr("data-zscore");
+                conditionMale = deviationMale !== "" && parseFloat(deviationMale) > warning.max;
+                conditionFemale = deviationFemale !== "" && parseFloat(deviationFemale) > warning.max;
+                return conditionMale || conditionFemale;
+            }
+            let zscore = $("#percentile-" + this.sexAtBirth + "-" + deviationField).attr("data-zscore");
             return zscore !== "" && parseFloat(zscore) > warning.max;
         }
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
-            let percentile = $("#percentile-" + percentileField).attr("data-percentile");
+            let percentileMale, percentileFemale, conditionMale, conditionFemale;
+            if (this.sexAtBirth === 0) {
+                percentileMale = $("#percentile-1-" + percentileField).attr("data-percentile");
+                percentileFemale = $("#percentile-2-" + percentileField).attr("data-percentile");
+                conditionMale = percentileMale !== "" && parseFloat(percentileMale) < warning.min;
+                conditionFemale = percentileFemale !== "" && parseFloat(percentileFemale) < warning.min;
+                return conditionMale || conditionFemale;
+            }
+            let percentile = $("#percentile-" + this.sexAtBirth + "-" + percentileField).attr("data-percentile");
             return percentile !== "" && parseFloat(percentile) < warning.min;
         }
         if (warning.hasOwnProperty("age")) {
