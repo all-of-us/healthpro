@@ -7,9 +7,11 @@ use App\Helper\NphParticipant;
 use App\Nph\Order\Modules\Module1;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NphOrderType extends AbstractType
 {
@@ -130,6 +132,22 @@ class NphOrderType extends AbstractType
         $builder->add('checkAll', Type\CheckboxType::class, [
             'required' => false
         ]);
+
+        $builder->add('downtime_generated', Type\CheckboxType::class, [
+            'required' => false,
+        ]);
+
+        $builder->add('createdTs', DateTimeType::class, [
+        'format' => 'M/d/yyyy h:mm a',
+        'html5' => false,
+        'required' => false,
+        'widget' => 'single_text',
+        'model_timezone' => 'UTC',
+        'label' => 'Dose Date/Time',
+        'attr' => ['class' => 'order-ts'],
+        'constraints' => new NotBlank(['message' => 'Order Generation Time is required.'])
+        ]);
+
         return $builder->getForm();
     }
 

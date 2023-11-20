@@ -146,4 +146,23 @@ $(document).ready(function () {
     });
 
     $(".sample-disabled-colored").parent().addClass("sample-disabled-colored");
+
+    $("#nph_order_downtime_generated").on("click", function () {
+        if ($(this).prop("checked")) {
+            $("#downtime-warning-modal").modal("show");
+        }
+        $(this).prop("checked", false);
+    });
+
+    $("#downtime-agree").on("click", function () {
+        $("#nph_order_downtime_generated").prop("checked", true);
+        $("#downtime-created-ts").show();
+        $("#downtime-warning-modal").modal("hide");
+    });
+    $("#downtime-disagree").on("click", function () {
+        $("#nph_order_downtime_generated").prop("checked", false);
+        $("#downtime-warning-modal").modal("hide");
+    });
+
+    $("#nph_order_createdTs").pmiDateTimePicker();
 });
