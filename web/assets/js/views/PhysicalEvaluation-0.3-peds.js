@@ -480,9 +480,20 @@ let viewExtension = Backbone.View.extend({
                 return this.warningCondition(warning, val);
             }
             if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
+                let heightPercentileField = "heightPer5";
+                let heightPercentile = $("#percentile-" + this.sexAtBirth + "-height-for-age").attr("data-percentile");
+                if (heightPercentile) {
+                    const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
+                    heightPercentileField = "heightPer" + nearestPercentile;
+                }
+                const bpHeightPercentileCharts =
+                    warning.customPercentile === "bp-systolic"
+                        ? this.bpSystolicHeightPercentileChart
+                        : this.bpDiastolicHeightPercentileChart;
+
                 if (this.sexAtBirth === 0) {
-                    let maxValueMale, maxValueFemale = null;
-                    let heightPercentileFieldMale, heightPercentileFieldFemale = "heightPer5";
+                    let heightPercentileFieldMale,
+                        heightPercentileFieldFemale = "heightPer5";
                     let heightPercentileMale = $("#percentile-1-height-for-age").attr("data-percentile");
                     let heightPercentileFemale = $("#percentile-2-height-for-age").attr("data-percentile");
                     if (heightPercentileMale) {
@@ -493,49 +504,30 @@ let viewExtension = Backbone.View.extend({
                         const nearestPercentileFemale = this.roundDownToNearestPercentile(heightPercentileFemale);
                         heightPercentileFieldFemale = "heightPer" + nearestPercentileFemale;
                     }
-                    const bpHeightPercentileCharts =
-                        warning.customPercentile === "bp-systolic"
-                            ? this.bpSystolicHeightPercentileChart
-                            : this.bpDiastolicHeightPercentileChart;
-                    for (const bpHeightPercentile of bpHeightPercentileCharts) {
-                        if (bpHeightPercentile.sex === 1 && this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
-                            maxValueMale = bpHeightPercentile[heightPercentileFieldMale] + warning.addValue;
-                        }
-                        if (bpHeightPercentile.sex === 2 && this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
-                            maxValueFemale = bpHeightPercentile[heightPercentileFieldFemale] + warning.addValue;
-                        }
-                    }
-                    if (warning.hasOwnProperty("maxValue")) {
-                        if (maxValueMale > warning.maxValue) {
-                            maxValueMale = warning.maxValue;
-                        }
-                        if (maxValueFemale > warning.maxValue) {
-                            maxValueFemale = warning.maxValue;
-                        }
-                    }
+                    const maxValueMale = this.getMaxValueForPercentile(
+                        warning,
+                        1,
+                        heightPercentileFieldMale,
+                        bpHeightPercentileCharts,
+                        this.ageInYears
+                    );
+                    const maxValueFemale = this.getMaxValueForPercentile(
+                        warning,
+                        2,
+                        heightPercentileFieldFemale,
+                        bpHeightPercentileCharts,
+                        this.ageInYears
+                    );
                     console.log(warning.customPercentile, "warningValue-male-female", maxValueMale, maxValueFemale);
                     return val >= maxValueMale || val >= maxValueFemale;
                 }
-                let maxValue = null;
-                let heightPercentileField = "heightPer5";
-                let heightPercentile = $("#percentile-"+ this.sexAtBirth + "-height-for-age").attr("data-percentile");
-                if (heightPercentile) {
-                    const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
-                    heightPercentileField = "heightPer" + nearestPercentile;
-                }
-                const bpHeightPercentileCharts =
-                    warning.customPercentile === "bp-systolic"
-                        ? this.bpSystolicHeightPercentileChart
-                        : this.bpDiastolicHeightPercentileChart;
-                for (const bpHeightPercentile of bpHeightPercentileCharts) {
-                    if (bpHeightPercentile.sex === this.sexAtBirth && this.ageInYears === bpHeightPercentile.ageYear && bpHeightPercentile.bpCentile === 95) {
-                        maxValue = bpHeightPercentile[heightPercentileField] + warning.addValue;
-                        break;
-                    }
-                }
-                if (warning.hasOwnProperty("maxValue") && maxValue > warning.maxValue) {
-                    maxValue = warning.maxValue;
-                }
+                const maxValue = this.getMaxValueForPercentile(
+                    warning,
+                    this.sexAtBirth,
+                    heightPercentileField,
+                    bpHeightPercentileCharts,
+                    this.ageInYears
+                );
                 console.log(warning.customPercentile, "warningValue", maxValue);
                 return val >= maxValue;
             }
@@ -573,6 +565,23 @@ let viewExtension = Backbone.View.extend({
             return false;
         }
         return this.warningCondition(warning, val);
+    },
+    getMaxValueForPercentile: function (warning, sex, heightPercentileField, bpHeightPercentileCharts, ageInYears) {
+        let maxValue = null;
+        for (const bpHeightPercentile of bpHeightPercentileCharts) {
+            if (
+                bpHeightPercentile.sex === sex &&
+                ageInYears === bpHeightPercentile.ageYear &&
+                bpHeightPercentile.bpCentile === 95
+            ) {
+                maxValue = bpHeightPercentile[heightPercentileField] + warning.addValue;
+                break;
+            }
+        }
+        if (warning.hasOwnProperty("maxValue") && maxValue > warning.maxValue) {
+            maxValue = warning.maxValue;
+        }
+        return maxValue;
     },
     warningCondition: function (warning, val) {
         return (
