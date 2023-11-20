@@ -477,6 +477,7 @@ let viewExtension = Backbone.View.extend({
                     }
                 }
                 warning[warning.percentileType] = maxMinValue;
+                console.log(warning.customPercentile, "warningValue", maxMinValue);
                 return this.warningCondition(warning, val);
             }
             if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
