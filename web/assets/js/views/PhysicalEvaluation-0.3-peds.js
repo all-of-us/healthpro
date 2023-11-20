@@ -714,8 +714,12 @@ let viewExtension = Backbone.View.extend({
                         warning.percentile === "bmi-for-age"
                     ) {
                         $("#" + warning.percentile + "-warning").html(warning.message);
+                        return true;
                     } else {
                         container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    }
+                    if (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-age") {
+                        return true;
                     }
                     return false; // only show first (highest priority) warning
                 }
