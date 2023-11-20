@@ -322,7 +322,7 @@ class ParticipantDetailsController extends BaseController
                     }
                 }
             } else {
-                $this->addFlash('incentive-error', 'Invalid form');
+                $this->addFlash('incentive-error', $incentiveForm->getErrors(true)->current()->getMessage());
             }
             return $this->redirectToRoute('participant', ['id' => $id]);
         }
