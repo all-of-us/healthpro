@@ -43,8 +43,8 @@ $(document).ready(function () {
     };
 
     var handleIncentiveFormFields = function (that, idPrefix = "#incentive_create") {
-        var selectFieldId = $(that).attr("id").replace(incentivePrefix, "");
-        var otherFieldSelector = idPrefix + " #" + incentivePrefix + "other_" + selectFieldId;
+        let selectFieldId = $(that).attr("id").replace(incentivePrefix, "");
+        let otherFieldSelector = idPrefix + " #" + incentivePrefix + "other_" + selectFieldId;
         if ($(that).val() === "other") {
             $(otherFieldSelector).parent().show();
             $(otherFieldSelector).attr("required", "required");
@@ -84,15 +84,29 @@ $(document).ready(function () {
                 $(incentiveAmountSelector).prop("disabled", true);
                 $(incentiveAmountSelector).val("");
                 $(incentiveAmountSelector).removeAttr("required");
+                $("#incentive_type_of_item").attr("required", "required");
+                $("#incentive_number_of_items").attr("required", "required");
                 $(idPrefix + " #type_of_item .toggle-required").attr("required", "required");
             } else {
                 $(idPrefix + " #type_of_item").hide();
+                $("#incentive_type_of_item").removeAttr("required");
+                $("#incentive_number_of_items").removeAttr("required");
                 $(idPrefix + " #number_of_items").hide();
                 $(incentiveAmountSelector).prop("disabled", false);
                 $(incentiveAmountSelector).attr("required", "required");
                 $(idPrefix + " #type_of_item").val("");
                 $(idPrefix + " #type_of_item .toggle-required").removeAttr("required");
             }
+        }
+        let recipientSelector = $("#incentive_recipient");
+        let recipientOtherSelector = $("#incentive_other_incentive_recipient");
+        if (recipientSelector.val() === "other") {
+            recipientOtherSelector.parent().show();
+            recipientOtherSelector.attr("required", "required");
+        } else {
+            recipientOtherSelector.parent().hide();
+            recipientOtherSelector.removeAttr("required");
+            recipientOtherSelector.val("");
         }
         $(idPrefix + " .incentive-form")
             .parsley()

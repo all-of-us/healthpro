@@ -184,13 +184,20 @@ let viewExtension = Backbone.View.extend({
                 return Math.round(zScore["Z_0"] * 100);
             }
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
-                const newZValue = zScore["Z"] > 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
+                const newZValue = zScore["Z"] >= 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
-                    return Math.round(zScore[index] * 100);
+                    let percentile = zScore[index] * 100;
+                    if (percentile < 3) {
+                        percentile = percentile.toFixed(1);
+                        if (percentile % 1 !== 0) {
+                            return percentile;
+                        }
+                    }
+                    return Math.round(percentile);
                 }
             }
         }
-        return "--";
+        return "";
     },
 
     calculateBmi: function () {
@@ -311,18 +318,22 @@ let viewExtension = Backbone.View.extend({
     },
     toggleThirdHeartRate: function () {
         const fieldsToCheck = ["heart-rate", "blood-pressure-systolic", "blood-pressure-diastolic"];
+        let showMeasurementPanel = false;
         for (const field of fieldsToCheck) {
             let first = parseFloat(this.$("#form_" + field + "_0").val());
             let second = parseFloat(this.$("#form_" + field + "_1").val());
             if (first > 0 && second > 0 && Math.abs(first - second) > 5) {
-                $(".panel-heart-rate-3").show();
+                showMeasurementPanel = true;
                 break;
-            } else {
-                $(".panel-heart-rate-3").hide();
-                $(".panel-heart-rate-3 input, .panel-heart-rate-3 select").each(function () {
-                    $(this).valChange("");
-                });
             }
+        }
+        if (showMeasurementPanel) {
+            $(".panel-heart-rate-3").show();
+        } else {
+            $(".panel-heart-rate-3").hide();
+            $(".panel-heart-rate-3 input, .panel-heart-rate-3 select").each(function () {
+                $(this).valChange("");
+            });
         }
     },
     calculateIrregularHeartRate: function () {
@@ -453,7 +464,7 @@ let viewExtension = Backbone.View.extend({
             if (warning.customPercentile === "bp-systolic" || warning.customPercentile === "bp-diastolic") {
                 let maxValue = null;
                 let heightPercentileField = "heightPer5";
-                let heightPercentile = $("#percentile-height-for-age");
+                let heightPercentile = $("#percentile-height-for-age").attr("data-percentile");
                 if (heightPercentile) {
                     const nearestPercentile = this.roundDownToNearestPercentile(heightPercentile);
                     heightPercentileField = "heightPer" + nearestPercentile;
@@ -468,7 +479,7 @@ let viewExtension = Backbone.View.extend({
                         break;
                     }
                 }
-                if (maxValue > warning.maxValue) {
+                if (warning.hasOwnProperty("maxValue") && maxValue > warning.maxValue) {
                     maxValue = warning.maxValue;
                 }
                 console.log(warning.customPercentile, "warningValue", maxValue);
@@ -478,12 +489,12 @@ let viewExtension = Backbone.View.extend({
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
             let zscore = $("#percentile-" + deviationField).attr("data-zscore");
-            return zscore > warning.max;
+            return zscore !== "" && parseFloat(zscore) > warning.max;
         }
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
-            let percentile = Math.round($("#percentile-" + percentileField).attr("data-percentile"));
-            return percentile < warning.min;
+            let percentile = $("#percentile-" + percentileField).attr("data-percentile");
+            return percentile !== "" && parseFloat(percentile) < warning.min;
         }
         if (warning.hasOwnProperty("age")) {
             if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {
@@ -784,10 +795,18 @@ let viewExtension = Backbone.View.extend({
         }
     },
     addPercentileSuffix: function (percentile) {
-        if (percentile >= 11 && percentile <= 13) {
+        if (percentile === "") {
+            return "--";
+        }
+        const integerPart = Math.floor(percentile);
+
+        if (integerPart >= 11 && integerPart <= 13) {
             return percentile + "th";
         }
-        switch (percentile % 10) {
+
+        const lastDigit = parseInt(percentile.toString().split("").reverse()[0], 10);
+
+        switch (lastDigit % 10) {
             case 1:
                 return percentile + "st";
             case 2:

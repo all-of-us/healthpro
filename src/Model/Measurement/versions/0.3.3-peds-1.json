@@ -337,6 +337,20 @@
       "max": 300,
       "warnings": [
         {
+          "age": [0, 11],
+          "max": 200,
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "age": [12, 72],
+          "max": 175,
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
           "customPercentile": "heart-rate",
           "percentileType": "max",
           "percentileField": "centile99",

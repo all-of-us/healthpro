@@ -36,14 +36,25 @@
           "consecutive": 2
         },
         {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "Multiple height/length and weight measurements indicate very low weight-for-stature. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
           "percentile": "weight-for-age",
           "min": 3,
           "message": "This value may indicate very low weight for age if confirmed by repeat measure."
         },
         {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "The height/length and weight values may indicate very low weight-for-stature if confirmed by repeat measure."
+        },
+        {
           "min": 7,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol."
-
         },
         {
           "max": 35,
@@ -141,6 +152,18 @@
         "image": "height.png"
       },
       "warnings": [
+        {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "Multiple height/length and weight measurements indicate very low weight-for-stature. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "weight-for-length",
+          "min": 2.3,
+          "message": "The height/length and weight values may indicate very low weight-for-stature if confirmed by repeat measure."
+        },
         {
           "between": [0, 2.3],
           "message": "Please verify that this number has been entered in centimeters, and not feet (1ft = 30.48cm)"
@@ -318,7 +341,6 @@
       "max": 300,
       "warnings": [
         {
-          "maxValue": 140,
           "addValue": 30,
           "customPercentile": "bp-systolic",
           "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
@@ -334,7 +356,6 @@
           "consecutive": 2
         },
         {
-          "maxValue": 140,
           "addValue": 30,
           "customPercentile": "bp-systolic",
           "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
@@ -368,7 +389,6 @@
       },
       "warnings": [
         {
-          "maxValue": 90,
           "addValue": 30,
           "customPercentile": "bp-diastolic",
           "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
@@ -384,7 +404,6 @@
           "consecutive": 2
         },
         {
-          "maxValue": 90,
           "addValue": 30,
           "customPercentile": "bp-diastolic",
           "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
@@ -431,6 +450,12 @@
       "replicates": 3,
       "max": 300,
       "warnings": [
+        {
+          "max": 175,
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
         {
           "customPercentile": "heart-rate",
           "percentileType": "max",

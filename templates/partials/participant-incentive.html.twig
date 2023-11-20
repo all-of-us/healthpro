@@ -63,10 +63,12 @@
             <div class="row">
                 <div class="col-md-6">
                     {{ form_row(incentiveForm.recipient) }}
+                    {{ form_row(incentiveForm.other_incentive_recipient) }}
                     {{ form_row(incentiveForm.incentive_type) }}
                     {{ form_row(incentiveForm.other_incentive_occurrence) }}
                     {{ form_row(incentiveForm.incentive_amount) }}
                     <div id="number_of_items">
+                        {{ form_errors(incentiveForm.number_of_items) }}
                         {{ form_row(incentiveForm.number_of_items) }}
                     </div>
                 </div>
