@@ -84,9 +84,13 @@ $(document).ready(function () {
                 $(incentiveAmountSelector).prop("disabled", true);
                 $(incentiveAmountSelector).val("");
                 $(incentiveAmountSelector).removeAttr("required");
+                $("#incentive_type_of_item").attr("required", "required");
+                $("#incentive_number_of_items").attr("required", "required");
                 $(idPrefix + " #type_of_item .toggle-required").attr("required", "required");
             } else {
                 $(idPrefix + " #type_of_item").hide();
+                $("#incentive_type_of_item").removeAttr("required");
+                $("#incentive_number_of_items").removeAttr("required");
                 $(idPrefix + " #number_of_items").hide();
                 $(incentiveAmountSelector).prop("disabled", false);
                 $(incentiveAmountSelector).attr("required", "required");
