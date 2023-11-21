@@ -44,8 +44,11 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
+        $this->module1Data['formData']['createdTs'] = new \DateTime($this->module1Data['formData']['createdTs']);
         // Module 2
         $this->module2Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_2.json'), true);
+        $this->module2Data['formData']['createdTs'] = new \DateTime($this->module2Data['formData']['createdTs']);
+
     }
 
     public function testLoadModules(): void
@@ -173,7 +176,9 @@ class NphOrderServiceTest extends ServiceTestCase
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000006', 'T10000000');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
-        $this->assertSame($this->module1Data['formData'], $this->service->getExistingOrdersData());
+        $orderData = $this->module1Data['formData'];
+        unset($orderData['createdTs'], $orderData['downtime_generated']);
+        $this->assertSame($orderData, $this->service->getExistingOrdersData());
     }
 
     public function testGetSamplesWithOrderIds()
