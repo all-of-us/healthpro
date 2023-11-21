@@ -507,16 +507,12 @@ let viewExtension = Backbone.View.extend({
         if (warning.hasOwnProperty("deviation")) {
             let deviationField = warning.deviation;
             let zscore = $("#percentile-" + deviationField).attr("data-zscore");
-            if (zscore !== "") {
-                return parseFloat(zscore) > warning.max;
-            }
+            return zscore !== "" && parseFloat(zscore) > warning.max;
         }
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
             let percentile = $("#percentile-" + percentileField).attr("data-percentile");
-            if (percentile !== "") {
-                return parseFloat(percentile) < warning.min;
-            }
+            return percentile !== "" && parseFloat(percentile) < warning.min;
         }
         if (warning.hasOwnProperty("age")) {
             if (this.ageInMonths > warning.age[0] && this.ageInMonths < warning.age[1]) {

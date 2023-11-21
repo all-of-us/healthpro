@@ -133,7 +133,7 @@ class IncentiveType extends AbstractType
                 'attr' => [
                     'class' => 'item-type',
                     'autocomplete' => 'off',
-                    'min' => 0
+                    'min' => 1
                 ]
             ])
             ->add('other_incentive_type', Type\TextType::class, [
