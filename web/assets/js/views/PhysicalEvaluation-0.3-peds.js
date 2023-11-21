@@ -224,7 +224,11 @@ let viewExtension = Backbone.View.extend({
             let hasWarning = false;
             for (const percentileId of percentileIds) {
                 const percentileField = $("#" + percentileId);
-                if (percentileField && percentileField.attr("data-zscore") && percentileField.attr("data-percentile") === "") {
+                if (
+                    percentileField &&
+                    percentileField.attr("data-zscore") &&
+                    percentileField.attr("data-percentile") === ""
+                ) {
                     hasWarning = true;
                     break;
                 }
@@ -232,13 +236,19 @@ let viewExtension = Backbone.View.extend({
             $("#" + warningFieldId).toggle(hasWarning);
         };
         const weightLengthPercentileIds = [
-            "percentile-1-weight-for-age", "percentile-2-weight-for-age",
-            "percentile-1-height-for-age", "percentile-2-height-for-age",
-            "percentile-1-weight-for-length", "percentile-2-weight-for-length"
+            "percentile-1-weight-for-age",
+            "percentile-2-weight-for-age",
+            "percentile-1-height-for-age",
+            "percentile-2-height-for-age",
+            "percentile-1-weight-for-length",
+            "percentile-2-weight-for-length"
         ];
         displayWarning(weightLengthPercentileIds, "weight-length-percentile-warning");
 
-        const headCircumferencePercentileIds = ["percentile-1-head-circumference-for-age", "percentile-2-head-circumference-for-age"];
+        const headCircumferencePercentileIds = [
+            "percentile-1-head-circumference-for-age",
+            "percentile-2-head-circumference-for-age"
+        ];
         displayWarning(headCircumferencePercentileIds, "head-circumference-percentile-warning");
 
         const bmiPercentileIds = ["percentile-1-bmi-for-age", "percentile-2-bmi-for-age"];
