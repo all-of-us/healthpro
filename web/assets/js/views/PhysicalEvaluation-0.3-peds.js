@@ -220,37 +220,29 @@ let viewExtension = Backbone.View.extend({
         return "";
     },
     handleOutOfRangePercentileWarning: function () {
-        let displayWarning = false;
-        let weightLengthPercentileIds = ["percentile-1-weight-for-age", "percentile-2-weight-for-age", "percentile-1-height-for-age", "percentile-2-height-for-age", "percentile-1-weight-for-length", "percentile-2-weight-for-length"];
-        for (const weightLengthPercentileId of weightLengthPercentileIds) {
-            const weightLengthPercentileField = $("#" + weightLengthPercentileId);
-            if (weightLengthPercentileField && weightLengthPercentileField.attr("data-zscore") && weightLengthPercentileField.attr("data-percentile") === "") {
-                displayWarning = true;
-                break;
+        const displayWarning = (percentileIds, warningFieldId) => {
+            let hasWarning = false;
+            for (const percentileId of percentileIds) {
+                const percentileField = $("#" + percentileId);
+                if (percentileField && percentileField.attr("data-zscore") && percentileField.attr("data-percentile") === "") {
+                    hasWarning = true;
+                    break;
+                }
             }
-        }
-        let weightLengthWarningField = $("#weight-length-percentile-warning");
-        if (displayWarning) {
-            weightLengthWarningField.show();
-        } else {
-            weightLengthWarningField.hide();
-        }
+            $("#" + warningFieldId).toggle(hasWarning);
+        };
+        const weightLengthPercentileIds = [
+            "percentile-1-weight-for-age", "percentile-2-weight-for-age",
+            "percentile-1-height-for-age", "percentile-2-height-for-age",
+            "percentile-1-weight-for-length", "percentile-2-weight-for-length"
+        ];
+        displayWarning(weightLengthPercentileIds, "weight-length-percentile-warning");
 
-        let displayBmiWarning = false;
-        let bmiPercentileIds = ["percentile-1-bmi-for-age", "percentile-2-bmi-for-age"];
-        for (const bmiPercentileId of bmiPercentileIds) {
-            const bmiPercentileField = $("#" + bmiPercentileId);
-            if (bmiPercentileField && bmiPercentileField.attr("data-zscore") && bmiPercentileField.attr("data-percentile") === "") {
-                displayBmiWarning = true;
-                break;
-            }
-        }
-        let bmiWarningField = $("#bmi-percentile-warning");
-        if (displayBmiWarning) {
-            bmiWarningField.show();
-        } else {
-            bmiWarningField.hide();
-        }
+        const headCircumferencePercentileIds = ["percentile-1-head-circumference-for-age", "percentile-2-head-circumference-for-age"];
+        displayWarning(headCircumferencePercentileIds, "head-circumference-percentile-warning");
+
+        const bmiPercentileIds = ["percentile-1-bmi-for-age", "percentile-2-bmi-for-age"];
+        displayWarning(bmiPercentileIds, "bmi-percentile-warning");
     },
     calculateBmi: function () {
         let height = parseFloat(this.$("#mean-height").attr("data-mean"));
