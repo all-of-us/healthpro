@@ -75,7 +75,7 @@ class NphOrder
     private $createdTimezoneId;
 
     #[ORM\Column]
-    private ?bool $DowntimeGenerated = null;
+    private bool $DowntimeGenerated = false;
 
     #[ORM\ManyToOne]
     private ?User $DowntimeGeneratedUser = null;
@@ -403,7 +403,7 @@ class NphOrder
         return ucfirst($this->getOrderType());
     }
 
-    public function isDowntimeGenerated(): ?bool
+    public function isDowntimeGenerated(): bool
     {
         return $this->DowntimeGenerated;
     }
