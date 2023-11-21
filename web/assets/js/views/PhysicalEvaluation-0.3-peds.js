@@ -143,6 +143,7 @@ let viewExtension = Backbone.View.extend({
         console.log("percentile", percentile);
         percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
+        this.handleOutOfRangePercentileWarning();
     },
     calculateWeightForLengthPercentile: function (sex) {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
@@ -165,6 +166,7 @@ let viewExtension = Backbone.View.extend({
             const percentile = this.getPercentile(zScore);
             percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
             percentileElement.attr("data-percentile", percentile);
+            this.handleOutOfRangePercentileWarning();
         }
     },
     getZScore: function (X, lmsValues) {
@@ -217,7 +219,39 @@ let viewExtension = Backbone.View.extend({
         }
         return "";
     },
+    handleOutOfRangePercentileWarning: function () {
+        let displayWarning = false;
+        let weightLengthPercentileIds = ["percentile-1-weight-for-age", "percentile-2-weight-for-age", "percentile-1-height-for-age", "percentile-2-height-for-age", "percentile-1-weight-for-length", "percentile-2-weight-for-length"];
+        for (const weightLengthPercentileId of weightLengthPercentileIds) {
+            const weightLengthPercentileField = $("#" + weightLengthPercentileId);
+            if (weightLengthPercentileField && weightLengthPercentileField.attr("data-zscore") && weightLengthPercentileField.attr("data-percentile") === "") {
+                displayWarning = true;
+                break;
+            }
+        }
+        let weightLengthWarningField = $("#weight-length-percentile-warning");
+        if (displayWarning) {
+            weightLengthWarningField.show();
+        } else {
+            weightLengthWarningField.hide();
+        }
 
+        let displayBmiWarning = false;
+        let bmiPercentileIds = ["percentile-1-bmi-for-age", "percentile-2-bmi-for-age"];
+        for (const bmiPercentileId of bmiPercentileIds) {
+            const bmiPercentileField = $("#" + bmiPercentileId);
+            if (bmiPercentileField && bmiPercentileField.attr("data-zscore") && bmiPercentileField.attr("data-percentile") === "") {
+                displayBmiWarning = true;
+                break;
+            }
+        }
+        let bmiWarningField = $("#bmi-percentile-warning");
+        if (displayBmiWarning) {
+            bmiWarningField.show();
+        } else {
+            bmiWarningField.hide();
+        }
+    },
     calculateBmi: function () {
         let height = parseFloat(this.$("#mean-height").attr("data-mean"));
         let weight = parseFloat(this.$("#mean-weight").attr("data-mean"));
