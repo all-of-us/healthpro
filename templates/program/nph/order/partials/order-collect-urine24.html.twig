@@ -1,0 +1,58 @@
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+<tr class="row-samples">
+    <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+        class="has-error"{% endif %}>
+        {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
+        {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+        {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
+            <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
+        {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
+            <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
+        {% elseif nphSample.finalizedTs is not empty %}
+            <p class="text-success"><i class="fa fa-check-circle"></i>
+                {{ macros.displayCollectAliquotStatus(nphSample) }}
+            </p>
+        {% endif %}
+    </td>
+    {% if orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
+        <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+            class="has-error"{% endif %}>
+            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+        </td>
+    {% endif %}
+    <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+        class="has-error"{% endif %}>
+        {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+        {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+        {% if index == order.nphSamples|length - 1 %}
+            <small class="text-warning">
+                Comments entered in this field are transmitted to the Biobank via reconciliation
+                reporting.
+                <br>
+                Do not enter any participant identifying information here.
+            </small>
+        {% endif %}
+    </td>
+    <td {% if not orderCollectForm['totalCollectionVolume'].vars.valid %}
+        class="has-error"{% endif %}>
+
+    </td>
+    <td>
+        {% if nphSample.finalizedTs is not empty %}
+            <p>
+                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                    order.id, sampleId: nphSample.id}) }}" class="btn btn-primary btn-xs">
+                    View
+                </a>
+            </p>
+            {% if nphSample.canUnlock %}
+                <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
+                    order.id, sampleId: nphSample.id, modifyType: 'unlock'}) }}" class="btn
+                                        btn-warning btn-xs">
+                    Edit
+                </a>
+            {% endif %}
+        {% endif %}
+    </td>
+</tr>
