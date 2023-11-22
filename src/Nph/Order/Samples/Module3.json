@@ -111,7 +111,7 @@
         }
       }
     },
-    "URINE": {
+    "URINES": {
       "label": "Spot Urine",
       "color": "Yellow",
       "temperature": "Refrigerated",

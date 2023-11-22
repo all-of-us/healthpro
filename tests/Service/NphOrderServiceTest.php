@@ -46,6 +46,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
         // Module 2
         $this->module2Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_2.json'), true);
+        $this->module3Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_3.json'), true);
     }
 
     public function testLoadModules(): void
@@ -68,6 +69,15 @@ class NphOrderServiceTest extends ServiceTestCase
 
         $this->assertSame($this->module2Data['stoolSamples'], $this->service->getSamplesByType('stool'));
         $this->assertSame($this->module2Data['bloodSamples'], $this->service->getSamplesByType('blood'));
+
+        $this->service->loadModules(3, 'OrangeDSMT', 'P0000000001', 'T10000000');
+        $this->assertSame($this->module3Data['timePointSamples'], $this->service->getTimePointSamples());
+        $this->assertSame($this->module3Data['timePoints'], $this->service->getTimePoints());
+        $this->assertSame($this->module3Data['samples'], $this->service->getSamples());
+        $this->assertSame('ORANGE', $this->service->getVisitDiet());
+
+        $this->assertSame($this->module3Data['stoolSamples'], $this->service->getSamplesByType('stool'));
+        $this->assertSame($this->module3Data['bloodSamples'], $this->service->getSamplesByType('blood'));
     }
 
     /**
