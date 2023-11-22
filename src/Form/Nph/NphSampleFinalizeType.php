@@ -21,7 +21,7 @@ class NphSampleFinalizeType extends NphOrderForm
         $disableMetadataFields = $options['disableMetadataFields'] && $options['nphSample']->getModifyType() !==
             NphSample::UNLOCK;
 
-        if ($orderType === NphOrder::TYPE_URINE | $orderType === NPHOrder::TYPE_24URINE) {
+        if ($orderType === NphOrder::TYPE_URINE || $orderType === NPHOrder::TYPE_24URINE) {
             $this->addUrineMetadataFields($builder, $disableMetadataFields);
         }
 
