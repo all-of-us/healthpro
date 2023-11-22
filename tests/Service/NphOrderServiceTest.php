@@ -262,10 +262,12 @@ class NphOrderServiceTest extends ServiceTestCase
         string $sampleCode,
         \DateTime $collectedTs,
         string $notes,
-        array $metaData = []
+        int $module,
+        string $visit,
+        array $metaData = [],
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
+        $this->service->loadModules($module, $visit, 'P0000000008', 'T10000000');
         if ($orderType === NphOrder::TYPE_STOOL) {
             $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
             $nphSample = $this->service->createSample($sampleCode, $nphOrder, '1000000005', 'T0000000001');
@@ -309,11 +311,13 @@ class NphOrderServiceTest extends ServiceTestCase
             'bowelQuality' => 'normal'
         ];
         return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData],
-            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2'],
-            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', $stoolMetaData],
-            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4'],
-            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5'],
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 1, 'LMT', $urineMetaData],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 1, 'LMT'],
+            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', 1, 'LMT', $stoolMetaData],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 1, 'LMT'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 1, 'LMT'],
+            ['preDSMT', 'blood', 'LIH4', $collectedTs, 'Test Notes 7', 3, 'OrangeDSMT'],
+            ['postDSMT', 'urine', 'URINE', $collectedTs, 'Test Notes 8', 3, 'OrangeDSMT', $urineMetaData]
         ];
     }
 

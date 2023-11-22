@@ -17,7 +17,7 @@
     "LIH4": "4 mL Li Hep",
     "EDTA4": "4 mL EDTA",
     "P800": "2 mL P800",
-    "URINES": "Spot Urine",
+    "URINE": "Spot Urine",
     "SALIVA": "Saliva",
     "URINEDLW": "Urine DLW",
     "STOOL": "Stool",
@@ -29,7 +29,7 @@
   },
   "timePointSamples": {
     "preDSMT": {
-      "URINES": "Spot Urine",
+      "URINE": "Spot Urine",
       "SALIVA": "Saliva",
       "STOOL": "Stool",
       "ST1": "95% Ethanol Tube 1",
@@ -92,7 +92,7 @@
       "P800": "2 mL P800"
     },
     "postDSMT": {
-      "URINES": "Spot Urine",
+      "URINE": "Spot Urine",
       "SALIVA": "Saliva"
     }
   },
