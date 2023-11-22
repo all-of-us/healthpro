@@ -1,4 +1,5 @@
 {% import 'measurementform/metrics.html.twig' as metrics %}
+{% import 'measurementform/macros/growth-percentile.html.twig' as growthMacros %}
 
 <div class="well">
     <div class="row">
@@ -110,19 +111,31 @@
                         <h3 class="panel-title">Growth Percentile</h3>
                     </div>
                     <div class="panel-body">
-                        <p class="lead">
-                            Weight <span id="percentile-weight-for-age">--</span> percentile
-                        </p>
+                        <div class="row row-no-gutters lead">
+                            <div class="col-sm-3">Weight</div>
+                            <div class="col-sm-9">
+                                {{ growthMacros.displayGrowthPercentile('weight-for-age', participant.sexAtBirth) }}
+                            </div>
+                        </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
-                        <p class="lead">
-                            Height/Length <span id="percentile-height-for-age">--</span> percentile
-                        </p>
+                        <div class="row row-no-gutters lead">
+                            <div class="col-sm-5">Height/Length</div>
+                            <div class="col-sm-7">
+                                {{ growthMacros.displayGrowthPercentile('height-for-age', participant.sexAtBirth) }}
+                            </div>
+                        </div>
                         {% if schema.displayWeightForLength == true %}
-                            <p class="lead">
-                                Weight-for-Length <span id="percentile-weight-for-length">--</span> percentile
-                            </p>
+                            <div class="row row-no-gutters lead">
+                                <div class="col-sm-6">Weight-for-Length</div>
+                                <div class="col-sm-6">
+                                    {{ growthMacros.displayGrowthPercentile('weight-for-length', participant.sexAtBirth) }}
+                                </div>
+                            </div>
                             <div id="weight-for-length-warning" class="metric-warnings text-warning"></div>
                         {% endif %}
+                        <div id="weight-length-percentile-warning" class="text-warning" style="display: none;">
+                            Growth percentile cannot be calculated because the measurement(s) are out of percentile ranges.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,10 +152,16 @@
                                 BMI <span id="bmi">--</span>
                             </p>
                             <div id="bmi-warning" class="metric-warnings text-warning"></div>
-                            <p class="lead">
-                                BMI Percentile <span id="percentile-bmi-for-age">--</span> percentile
-                            </p>
+                            <div class="row row-no-gutters lead">
+                                <div class="col-sm-5">BMI Percentile</div>
+                                <div class="col-sm-7">
+                                    {{ growthMacros.displayGrowthPercentile('bmi-for-age', participant.sexAtBirth) }}
+                                </div>
+                            </div>
                             <div id="bmi-for-age-warning" class="metric-warnings text-warning"></div>
+                            <div id="bmi-percentile-warning" class="text-warning" style="display: none;">
+                                Growth percentile cannot be calculated because the measurement(s) are out of percentile ranges.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -274,16 +293,19 @@
                 </div>
             </div>
             {% if schema.fields['head-circumference'] is defined %}
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Growth Percentile</h3>
                     </div>
                     <div class="panel-body">
                         {% if schema.fields['head-circumference-protocol-modification'] is defined %}
-                            <p class="lead">
-                                Head Circumference <span id="percentile-head-circumference-for-age">--</span> percentile
-                            </p>
+                            <div class="row row-no-gutters lead">
+                                <div class="col-sm-6">Head Circumference</div>
+                                <div class="col-sm-6">
+                                    {{ growthMacros.displayGrowthPercentile('head-circumference-for-age', participant.sexAtBirth) }}
+                                </div>
+                            </div>
                         {% endif %}
                         {% if schema.fields['waist-circumference-protocol-modification'] is defined %}
                             <i>
@@ -291,6 +313,9 @@
                             </i>
                         {% endif %}
                         <div id="head-circumference-warning" class="metric-warnings text-warning"></div>
+                        <div id="head-circumference-percentile-warning" class="text-warning" style="display: none;">
+                            Growth percentile cannot be calculated because the measurement(s) are out of percentile ranges.
+                        </div>
                     </div>
                 </div>
             </div>

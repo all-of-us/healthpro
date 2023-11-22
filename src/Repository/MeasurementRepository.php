@@ -158,11 +158,13 @@ class MeasurementRepository extends ServiceEntityRepository
         $query = $this->createQueryBuilder('m')
             ->where('m.participantId = :participantId')
             ->andWhere('m.finalizedTs is not null')
-            ->andWhere('m.id not in (:parentIds)')
-            ->setParameter('parentIds', $parentIds)
             ->orderBy('m.finalizedTs', 'DESC')
             ->leftJoin('m.history', 'mh')
             ->setParameter('participantId', $participantId);
+        if (!empty($parentIds)) {
+            $query->andWhere('m.id not in (:parentIds)')
+            ->setParameter('parentIds', $parentIds);
+        }
         $results = $query->getQuery()->getResult();
         $cancelledMeasurements = [];
         foreach ($results as $result) {

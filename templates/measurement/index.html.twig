@@ -9,6 +9,7 @@
          data-conversions="{{ conversions|json_encode|escape('html_attr') }}"
          data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}"
          data-age-in-months="{{ participant.ageInMonths }}"
+         data-sex-at-birth="{{ participant.sexAtBirth }}"
          data-age-in-years="{{ participant.age }}"
          data-weight-for-age-charts="{{ weightForAgeCharts|json_encode }}"
          data-weight-for-length-charts="{{ weightForLengthCharts|json_encode }}"
