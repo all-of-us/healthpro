@@ -143,6 +143,7 @@ let viewExtension = Backbone.View.extend({
         console.log("percentile", percentile);
         percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
+        this.handleOutOfRangePercentileWarning();
     },
     calculateWeightForLengthPercentile: function (sex) {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
@@ -165,6 +166,7 @@ let viewExtension = Backbone.View.extend({
             const percentile = this.getPercentile(zScore);
             percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
             percentileElement.attr("data-percentile", percentile);
+            this.handleOutOfRangePercentileWarning();
         }
     },
     getZScore: function (X, lmsValues) {
@@ -217,7 +219,41 @@ let viewExtension = Backbone.View.extend({
         }
         return "";
     },
+    handleOutOfRangePercentileWarning: function () {
+        const displayWarning = (percentileIds, warningFieldId) => {
+            let hasWarning = false;
+            for (const percentileId of percentileIds) {
+                const percentileField = $("#" + percentileId);
+                if (
+                    percentileField &&
+                    percentileField.attr("data-zscore") &&
+                    percentileField.attr("data-percentile") === ""
+                ) {
+                    hasWarning = true;
+                    break;
+                }
+            }
+            $("#" + warningFieldId).toggle(hasWarning);
+        };
+        const weightLengthPercentileIds = [
+            "percentile-1-weight-for-age",
+            "percentile-2-weight-for-age",
+            "percentile-1-height-for-age",
+            "percentile-2-height-for-age",
+            "percentile-1-weight-for-length",
+            "percentile-2-weight-for-length"
+        ];
+        displayWarning(weightLengthPercentileIds, "weight-length-percentile-warning");
 
+        const headCircumferencePercentileIds = [
+            "percentile-1-head-circumference-for-age",
+            "percentile-2-head-circumference-for-age"
+        ];
+        displayWarning(headCircumferencePercentileIds, "head-circumference-percentile-warning");
+
+        const bmiPercentileIds = ["percentile-1-bmi-for-age", "percentile-2-bmi-for-age"];
+        displayWarning(bmiPercentileIds, "bmi-percentile-warning");
+    },
     calculateBmi: function () {
         let height = parseFloat(this.$("#mean-height").attr("data-mean"));
         let weight = parseFloat(this.$("#mean-weight").attr("data-mean"));
