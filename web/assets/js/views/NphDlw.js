@@ -14,7 +14,7 @@ $(document).ready(function () {
         weight = (weight / 2.2046).toFixed(1);
         $("input#dlw_participantWeight").val(weight);
         let dosage = weight * 1.5;
-        $("input#dlw_calculatedDose").val(dosage.toFixed(0));
+        $("input#dlw_calculatedDose").val(dosage.toFixed(1));
         $("#pound_modal").modal("hide");
     });
 
@@ -29,7 +29,7 @@ $(document).ready(function () {
     function calculateDose() {
         let weight = $("input#dlw_participantWeight").val();
         let dosage = weight * 1.5;
-        $("input#dlw_calculatedDose").val(dosage.toFixed(0));
+        $("input#dlw_calculatedDose").val(dosage.toFixed(1));
     }
 
     calculateDose();
