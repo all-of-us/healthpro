@@ -18,8 +18,9 @@ class NphOrderServiceTest extends ServiceTestCase
 {
     protected $service;
     protected $em;
-    protected $module1Data;
+    protected array $module1Data;
     protected array $module2Data;
+    protected array $module3Data;
     protected testSetup $testSetup;
 
     public function setUp(): void
@@ -50,7 +51,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->module2Data['formData']['createdTs'] = new \DateTime($this->module2Data['formData']['createdTs']);
         // Module 3
         $this->module3Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_3.json'), true);
-        $this->module3Data['formData']['createdTs'] = new \DateTime($this->module2Data['formData']['createdTs']);
+        $this->module3Data['formData']['createdTs'] = new \DateTime($this->module3Data['formData']['createdTs']);
     }
 
     public function testLoadModules(): void
