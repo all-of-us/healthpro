@@ -6,6 +6,7 @@ use App\Form\Nph\NphOrderForm;
 use App\Repository\NphOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'nph_orders')]
@@ -72,6 +73,15 @@ class NphOrder
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private $createdTimezoneId;
+
+    #[ORM\Column]
+    private bool $DowntimeGenerated = false;
+
+    #[ORM\ManyToOne]
+    private ?User $DowntimeGeneratedUser = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $downtimeGeneratedTs = null;
 
     public function __construct()
     {
@@ -391,5 +401,41 @@ class NphOrder
             return $this::TYPE_DISPLAY_OVERRIDE[$this->getModule()][$this->getOrderType()];
         }
         return ucfirst($this->getOrderType());
+    }
+
+    public function isDowntimeGenerated(): bool
+    {
+        return $this->DowntimeGenerated;
+    }
+
+    public function setDowntimeGenerated(bool $DowntimeGenerated): static
+    {
+        $this->DowntimeGenerated = $DowntimeGenerated;
+
+        return $this;
+    }
+
+    public function getDowntimeGeneratedUser(): ?User
+    {
+        return $this->DowntimeGeneratedUser;
+    }
+
+    public function setDowntimeGeneratedUser(?User $DowntimeGeneratedUser): static
+    {
+        $this->DowntimeGeneratedUser = $DowntimeGeneratedUser;
+
+        return $this;
+    }
+
+    public function getDowntimeGeneratedTs(): ?\DateTimeInterface
+    {
+        return $this->downtimeGeneratedTs;
+    }
+
+    public function setDowntimeGeneratedTs(?\DateTimeInterface $downtimeGeneratedTs): static
+    {
+        $this->downtimeGeneratedTs = $downtimeGeneratedTs;
+
+        return $this;
     }
 }

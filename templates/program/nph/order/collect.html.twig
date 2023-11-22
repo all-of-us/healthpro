@@ -11,6 +11,11 @@
             </a>
         </div>
     </div>
+    {% if order.downtimeGenerated() %}
+    <div class="alert bg-success well-sm margin-top-15 text-success">
+        <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y') }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia')}}] </span>
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}

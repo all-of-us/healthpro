@@ -201,6 +201,11 @@
                     {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
                 {% endif %}
                 <div class="panel-body">
+                    {% if order.downtimeGenerated() %}
+                        <div class="alert bg-success well-sm margin-top-15 text-success">
+                            <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y') }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia')}}] </span>
+                        </div>
+                    {% endif %}
                     {% if isFormDisabled %}
                         {% set formClasses = 'disable-enter prevent-resumbit' %}
                     {% else  %}

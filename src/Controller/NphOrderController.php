@@ -330,7 +330,8 @@ class NphOrderController extends BaseController
             'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
             'biobankView' => false,
             'isFormDisabled' => $isFormDisabled,
-            'visitDiet' => $nphOrderService->getVisitDiet()
+            'visitDiet' => $nphOrderService->getVisitDiet(),
+            'order' => $order
         ]);
     }
 

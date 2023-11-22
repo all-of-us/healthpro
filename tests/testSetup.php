@@ -61,6 +61,7 @@ class testSetup
         $nphOrder->setSite($site->getSiteId());
         $nphOrder->setCreatedTs(new \DateTime());
         $nphOrder->setOrderType('urine');
+        $nphOrder->setDowntimeGenerated(false);
         $this->em->persist($nphOrder);
         $this->em->flush();
 

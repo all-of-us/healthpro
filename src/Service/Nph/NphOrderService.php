@@ -251,21 +251,21 @@ class NphOrderService
                     } elseif (in_array($sample, $this->getSamplesByType(NphOrder::TYPE_BLOOD))) {
                         $samplesByType['blood'][] = $sample;
                     } elseif (!in_array($sample, self::$placeholderSamples)) {
-                        $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
+                        $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample), null, $formData['downtime_generated'], $formData['createdTs']);
                         $this->createSample($sample, $nphOrder, $sampleGroup);
                     }
                 }
                 if (!empty($samplesByType['nail'])) {
-                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_NAIL, $samplesByType['nail'], $sampleGroup);
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_NAIL, $samplesByType['nail'], $sampleGroup, $formData['downtime_generated'], $formData['createdTs']);
                 }
                 if (!empty($samplesByType['blood'])) {
-                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_BLOOD, $samplesByType['blood'], $sampleGroup);
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_BLOOD, $samplesByType['blood'], $sampleGroup, $formData['downtime_generated'], $formData['createdTs']);
                 }
             }
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit']);
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit'], $formData['downtime_generated'], $formData['createdTs']);
             foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
@@ -275,7 +275,7 @@ class NphOrderService
         return $sampleGroup;
     }
 
-    public function createOrder(string $timePoint, string $orderType, string $orderId = null): NphOrder
+    public function createOrder(string $timePoint, string $orderType, string $orderId = null, bool $downtimeGenerated = false, DateTime $downtimeGeneratedTs = new DateTime()): NphOrder
     {
         if ($orderId === null) {
             $orderId = $this->generateOrderId();
@@ -289,9 +289,14 @@ class NphOrderService
         $nphOrder->setBiobankId($this->biobankId);
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
-        $nphOrder->setCreatedTs(new DateTime());
+        $nphOrder->setCreatedTs($downtimeGeneratedTs);
         $nphOrder->setCreatedTimezoneId($this->getTimezoneid());
         $nphOrder->setOrderType($orderType);
+        $nphOrder->setDowntimeGenerated($downtimeGenerated);
+        $nphOrder->setDowntimeGeneratedUser($downtimeGenerated ? $this->user : null);
+        if ($downtimeGenerated) {
+            $nphOrder->setDowntimeGeneratedTs(new DateTime());
+        }
         $this->em->persist($nphOrder);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_ORDER_CREATE, $nphOrder->getId());
@@ -894,9 +899,9 @@ class NphOrderService
         return $id;
     }
 
-    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup): void
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, DateTime $downtimeGeneratedCreatedTs = new DateTime()): void
     {
-        $nphOrder = $this->createOrder($timePoint, $orderType);
+        $nphOrder = $this->createOrder($timePoint, $orderType, null, $downtimeGenerated, $downtimeGeneratedCreatedTs);
         foreach ($samples as $sample) {
             $this->createSample($sample, $nphOrder, $sampleGroup);
         }
