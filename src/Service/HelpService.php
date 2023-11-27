@@ -257,6 +257,13 @@ class HelpService
         'data_dictionaries' => 'https://www.aoucollaborations.net/x/a8U_/',
         'release_notes' => 'https://www.aoucollaborations.net/x/MQElvw'
     ];
+
+    public static array $nphResources = [
+        'program_mop' => 'https://nutritionforprecisionhealth.org/secure/documents/mops',
+        'moodle_resources' => 'https://moodle.nutritionforprecisionhealth.org/course/view.php?id=14',
+        'release_notes' => 'https://moodle.nutritionforprecisionhealth.org/mod/forum/view.php?id=264'
+    ];
+
     protected $params;
 
     public function __construct(ParameterBagInterface $params)
