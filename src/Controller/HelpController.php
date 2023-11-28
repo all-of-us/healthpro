@@ -6,6 +6,7 @@ use App\HttpClient;
 use App\Service\HelpService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,6 +23,12 @@ class HelpController extends BaseController
     public function index()
     {
         return $this->render('help/index.html.twig');
+    }
+
+    #[Route(path: '/nph', name: 'help_nph')]
+    public function nphAction(HelpService $helpService): Response
+    {
+        return $this->render('help/nph/index.html.twig');
     }
 
     #[Route(path: '/videos', name: 'help_videos')]
@@ -56,6 +63,12 @@ class HelpController extends BaseController
         return $this->render('help/faq.html.twig', ['faqs' => $helpService::$faqs]);
     }
 
+    #[Route(path: '/nph/faq', name: 'help_nph_faq')]
+    public function nphFaqAction(HelpService $helpService): Response
+    {
+        return $this->render('help/nph/faq.html.twig', ['faqs' => $helpService::$faqs]);
+    }
+
     #[Route(path: '/sop', name: 'help_sop')]
     public function sopAction(HelpService $helpService)
     {
@@ -78,6 +91,21 @@ class HelpController extends BaseController
         return $this->render('help/sop-pdf.html.twig', [
             'sop' => $id,
             'title' => trim(str_replace($id, '', $document['title'])),
+            'document' => $document,
+            'language' => $language,
+            'path' => $helpService->getStoragePath()
+        ]);
+    }
+
+    #[Route(path: '/nph/sop/{id}/{language}', name: 'help_nph_sopView')]
+    public function nphSopViewAction($id, $language, HelpService $helpService): Response
+    {
+        $document = $helpService->getDocumentInfo($id);
+        if (!$document) {
+            throw $this->createNotFoundException('Page Not Found!');
+        }
+        return $this->render('help/nph/sop-pdf.html.twig', [
+            'sop' => $id,
             'document' => $document,
             'language' => $language,
             'path' => $helpService->getStoragePath()

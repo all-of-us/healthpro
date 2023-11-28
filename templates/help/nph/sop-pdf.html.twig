@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+{% block title %} {{ sop }} - {% endblock %}
+{% block body %}
+    <ol class="breadcrumb">
+        <li><a href="{{ path('home') }}">Home</a></li>
+        <li><a href="{{ path('help_nph') }}">Help</a></li>
+        <li class="active">HealthPro Application SOP</li>
+    </ol>
+    <div class="page-header">
+        <h2>
+            <i class="fa fa-file-text-o" aria-hidden="true"></i> NPH HealthPro Application SOP
+        </h2>
+    </div>
+    <div class="text-right">
+        <a class="pull-right" href="{{ path('help_sopFile', { id: sop, language: language }) }}" target="_blank">
+            <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download
+        </a>
+    </div>
+    <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: sop, language: language }) }}#view=FitH"></iframe>
+    {% include 'help/footer.html.twig' %}
+{% endblock %}
