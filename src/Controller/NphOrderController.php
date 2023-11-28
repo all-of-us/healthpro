@@ -97,12 +97,14 @@ class NphOrderController extends BaseController
                 $oderForm->addError(new FormError('Please correct the errors below'));
             }
         }
+        $downtimeOrders = $nphOrderService->getDowntimeOrderSummary();
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
             'timePointSamples' => $timePointSamples,
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'downtimeOrders' => $downtimeOrders,
             'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
