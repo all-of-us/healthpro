@@ -88,7 +88,10 @@ $(document).ready(function () {
     });
 
     $("#nph_order_checkAll").on("change", function () {
-        $("#order_create_form input:checkbox:enabled").prop("checked", $(this).prop("checked"));
+        $("#order_create_form input:checkbox:enabled:not(#nph_order_downtime_generated)").prop(
+            "checked",
+            $(this).prop("checked")
+        );
     });
 
     $(".timepointCheckAll").on("change", function () {

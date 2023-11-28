@@ -158,7 +158,7 @@ class NphOrderRepository extends ServiceEntityRepository
         $endDate = new \DateTime('tomorrow', new \DateTimeZone($timezone));
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -173,7 +173,7 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -186,7 +186,7 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -201,7 +201,7 @@ class NphOrderRepository extends ServiceEntityRepository
         $endDate = new \DateTime('-7 days', new \DateTimeZone($timezone));
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitType, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId, 
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.modifiedTs, ns.modifiedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -210,5 +210,18 @@ class NphOrderRepository extends ServiceEntityRepository
             ->setParameter('endDate', $endDate)
             ->addOrderBy('no.orderId', 'DESC');
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getDownTimeGeneratedOrdersByModuleAndVisit(string $ParticipantId, string $Module, String $Visit): array
+    {
+        $queryBuild = $this->createQueryBuilder('no')
+            ->where('no.participantId = :participantId')
+            ->andWhere('no.module = :module')
+            ->andWhere('no.visitType = :visitType')
+            ->andWhere('no.DowntimeGenerated = 1')
+            ->setParameter('participantId', $ParticipantId)
+            ->setParameter('module', $Module)
+            ->setParameter('visitType', $Visit);
+        return $queryBuild->getQuery()->getResult();
     }
 }

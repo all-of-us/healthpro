@@ -33,9 +33,19 @@
             </div>
             <div class="row">
                 <div class="col-sm-3" style="margin-bottom: 25px" hidden="hidden" id="downtime-created-ts">
-                    <label>Order Generation Time</label>
+                    <label>Order Generation Time<sup>{{ downtimeOrders['orderInfo']|length + 1 }}</sup></label>
                     {{ form_widget(orderForm['createdTs']) }}
+                    <sub class="text-success"><i class="fa fa-history"></i> Downtime order initiated by:
+                        {{app.user.email}}</sub>
                 </div>
+                {% for orderNumber, order in downtimeOrders['orderInfo'] %}
+                    <div class="col-sm-3" style="margin-bottom: 25px">
+                        <label>Order Generation Time<sup>{{ orderNumber }}</sup></label>
+                        <input type="text" disabled class="order-ts form-control" style="" value="{{ order['orderCreatedTime']|date('n/j/Y g:ia') }}">
+                        <sub class="text-success"><i class="fa fa-history"></i> Downtime order initiated by:
+                            {{order['orderUser']}}</sub>
+                    </div>
+                {% endfor %}
             </div>
             <div class="row">
                 <div>
@@ -80,7 +90,7 @@
                         <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
                              data-timepoint="{{ timePoint }}">
                             {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
-                                participant.id, module, visit, samplesStatus) }}
+                                participant.id, module, visit, samplesStatus, downtimeOrders) }}
                         </div>
                     </div>
                 </div>
