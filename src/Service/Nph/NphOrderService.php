@@ -836,6 +836,30 @@ class NphOrderService
         return $dlwSummary;
     }
 
+    public function getDowntimeOrderSummary(): array
+    {
+        $orders = $this->getDowntimeGeneratedOrdersByModuleAndVisit($this->participantId, $this->module, $this->visit);
+        $existingSamples = $this->getExistingOrdersData();
+        $downtimeGenerated = [];
+        $orderNumber = 1;
+        /** @var NphOrder $order */
+        foreach ($orders as $order) {
+            if (array_key_exists($order->getTimepoint(), $existingSamples)) {
+                $downtimeGenerated['orderInfo'][$orderNumber]['orderUser'] = $order->getUser()->getEmail();
+                $downtimeGenerated['orderInfo'][$orderNumber]['orderDowntimeCreatedTime'] = $order->getDowntimeGeneratedTs();
+                $downtimeGenerated['orderInfo'][$orderNumber]['orderCreatedTime'] = $order->getCreatedTs();
+                /** @var NphSample $sample */
+                foreach ($order->getNphSamples() as $sample) {
+                    if (in_array($sample->getSampleCode(), $existingSamples[$order->getTimepoint()], true)) {
+                        $downtimeGenerated['sampleInfo'][$order->getTimepoint()][$sample->getSampleCode()] = $orderNumber;
+                    }
+                }
+                $orderNumber++;
+            }
+        }
+        return $downtimeGenerated;
+    }
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
@@ -1209,33 +1233,5 @@ class NphOrderService
     {
         $orders = $this->em->getRepository(NphOrder::class)->getDownTimeGeneratedOrdersByModuleAndVisit($ParticipantId, $Module, $Visit);
         return $orders;
-    }
-
-    public function getDowntimeOrderSummary(): array
-    {
-        $orders = $this->getDowntimeGeneratedOrdersByModuleAndVisit($this->participantId, $this->module, $this->visit);
-        $existingSamples = $this->getExistingOrdersData();
-        $downtimeGenerated = [];
-        $orderNumber = 1;
-        /** @var NphOrder $order */
-        foreach ($orders as $order)
-        {
-            if (array_key_exists($order->getTimepoint(), $existingSamples))
-            {
-                $downtimeGenerated['orderInfo'][$orderNumber]['orderUser'] = $order->getUser()->getEmail();
-                $downtimeGenerated['orderInfo'][$orderNumber]['orderDowntimeCreatedTime'] = $order->getDowntimeGeneratedTs();
-                $downtimeGenerated['orderInfo'][$orderNumber]['orderCreatedTime'] = $order->getCreatedTs();
-                /** @var NphSample $sample */
-                foreach ($order->getNphSamples() as $sample)
-                {
-                    if (in_array($sample->getSampleCode(), $existingSamples[$order->getTimepoint()], true))
-                    {
-                        $downtimeGenerated['sampleInfo'][$order->getTimepoint()][$sample->getSampleCode()] = $orderNumber;
-                    }
-                }
-                $orderNumber++;
-            }
-        }
-        return $downtimeGenerated;
     }
 }
