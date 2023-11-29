@@ -72,7 +72,7 @@
 {% endmacro %}
 
 {% macro displayDowntimeGeneratedOrderNumber(downtimeGeneratedOrders, timePoint, sample) %}
-    {% if downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] %}
+    {% if downtimeGeneratedOrders['sampleInfo']|length > 0 and downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] %}
         <sup>{{ downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] }}</sup>
     {% endif %}
 {% endmacro %}

@@ -21,6 +21,14 @@
             {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
         </td>
     {% endif %}
+    <td style="position: relative" {% if not orderCollectForm['totalCollectionVolume'].vars.valid %}
+        class="has-error"{% endif %}>
+        <div class="input-group">
+            {{ form_widget(orderCollectForm['totalCollectionVolume']) }}
+            {{ form_errors(orderCollectForm['totalCollectionVolume']) }}
+            <span class="input-group-addon">mL</span>
+        </div>
+    </td>
     <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
         class="has-error"{% endif %}>
         {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}

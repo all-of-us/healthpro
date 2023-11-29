@@ -29,10 +29,13 @@
                     Check if the order occurred during a system downtime.
                     {{ form_widget(orderForm['downtime_generated']) }}
                 </span>
+                    <div >
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-3" style="margin-bottom: 25px" hidden="hidden" id="downtime-created-ts">
+                <div class="col-sm-3{% if not orderForm['downtime_generated'].vars.valid %} has-error {% endif %}" style="margin-bottom: 25px"  hidden="hidden" id="downtime-created-ts">
+                    {{ form_errors(orderForm['downtime_generated']) }}
                     <label>Order Generation Time<sup>{{ downtimeOrders['orderInfo']|length + 1 }}</sup></label>
                     {{ form_widget(orderForm['createdTs']) }}
                     <sub class="text-success"><i class="fa fa-history"></i> Downtime order initiated by:

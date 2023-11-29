@@ -275,10 +275,13 @@ class NphOrderService
         return $sampleGroup;
     }
 
-    public function createOrder(string $timePoint, string $orderType, string $orderId = null, bool $downtimeGenerated = false, DateTime $downtimeGeneratedTs = new DateTime()): NphOrder
+    public function createOrder(string $timePoint, string $orderType, string $orderId = null, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedTs = new DateTime()): NphOrder
     {
         if ($orderId === null) {
             $orderId = $this->generateOrderId();
+        }
+        if ($downtimeGeneratedTs === null) {
+            $downtimeGeneratedTs = new DateTime();
         }
         $nphOrder = new NphOrder();
         $nphOrder->setModule($this->module);
@@ -438,6 +441,9 @@ class NphOrderService
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
             $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
+            if ($order->getOrderType() === NPHOrder::TYPE_24URINE) {
+                $metadata['totalCollectionVolume'] = $metadata['totalCollectionVolume'] ?? null;
+            }
         }
         return $metadata;
     }
@@ -841,6 +847,8 @@ class NphOrderService
         $orders = $this->getDowntimeGeneratedOrdersByModuleAndVisit($this->participantId, $this->module, $this->visit);
         $existingSamples = $this->getExistingOrdersData();
         $downtimeGenerated = [];
+        $downtimeGenerated['orderInfo'] = [];
+        $downtimeGenerated['sampleInfo'] = [];
         $orderNumber = 1;
         /** @var NphOrder $order */
         foreach ($orders as $order) {
@@ -1029,7 +1037,7 @@ class NphOrderService
         }
         $sampleMetadata = '';
         if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $sample->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
-            $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']);
+            $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity', 'totalCollectionVolume']);
         }
         $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata);
 
