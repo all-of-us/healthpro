@@ -937,7 +937,7 @@ class NphOrderService
         return $id;
     }
 
-    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, DateTime $downtimeGeneratedCreatedTs = new DateTime()): void
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedCreatedTs = new DateTime()): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType, null, $downtimeGenerated, $downtimeGeneratedCreatedTs);
         foreach ($samples as $sample) {
