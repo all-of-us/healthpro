@@ -44,8 +44,8 @@
         </ul>
     </div>
     <div class="col-sm-10 participant-modules">
-        {% for moduleNumber, module in programSummaryAndOrderInfo %}
-            {% if loop.first %}
+        {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+            {% if participant.module == moduleNumber %}
                 {% set modulePanelDisplay = '' %}
             {% else %}
                 {% set modulePanelDisplay = 'hidden' %}
