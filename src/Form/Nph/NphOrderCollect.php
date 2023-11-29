@@ -42,7 +42,7 @@ class NphOrderCollect extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_24URINE) {
-            $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
+            $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields']);
         }
 
         if ($orderType === NphOrder::TYPE_STOOL) {
