@@ -160,10 +160,10 @@ class NphOrderForm extends AbstractType
             'disabled' => $disabled,
             'constraints' => [
                 new Constraints\Callback(function ($value, $context) {
-                    if (empty($value)) {
-                        $context->buildViolation('Total collection volume is required')->addViolation();
-                    } elseif ($value == 0) {
+                    if ($value === 0.0) {
                         $context->buildViolation('Total collection volume must be greater than 0')->addViolation();
+                    } elseif (empty($value)) {
+                        $context->buildViolation('Total collection volume is required')->addViolation();
                     }
                 })
             ],

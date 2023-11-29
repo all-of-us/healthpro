@@ -25,12 +25,14 @@
         has-error{% endif %} totalCollectionVolumeField">
         <div class="input-group">
             {{ form_widget(orderCollectForm['totalCollectionVolume']) }}
-            {{ form_errors(orderCollectForm['totalCollectionVolume']) }}
             <span class="input-group-addon">mL</span>
         </div>
+        <div>
+            {{ form_errors(orderCollectForm['totalCollectionVolume']) }}
         <span class="text-warning aliquot-volume-warning" id="totalCollectionVolumeWarning" style="display: none;">
             Please verify unit of measure is correct.  (Expected volume is measured mL, for reference 1L = 1000mL)
         </span>
+        </div>
     </td>
     <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
         class="has-error"{% endif %}>
