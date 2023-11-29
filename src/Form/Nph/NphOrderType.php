@@ -11,7 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class NphOrderType extends AbstractType
 {
@@ -145,7 +144,15 @@ class NphOrderType extends AbstractType
         'model_timezone' => 'UTC',
         'label' => 'Dose Date/Time',
         'attr' => ['class' => 'order-ts'],
-        'constraints' => new NotBlank(['message' => 'Order Generation Time is required.'])
+            'constraints' => new Constraints\Callback(function ($value, $context) {
+                $formData = $context->getRoot()->getData();
+                if ($formData['downtime_generated'] && empty($value)) {
+                    $context->buildViolation('Please enter a downtime generation time');
+                }
+                if ($value > new \DateTime()) {
+                    $context->buildViolation('Generation time cannot be in the future');
+                }
+            })
         ]);
 
         return $builder->getForm();
