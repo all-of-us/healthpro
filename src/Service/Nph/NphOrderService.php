@@ -441,6 +441,9 @@ class NphOrderService
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
             $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
+            if ($order->getOrderType() === NPHOrder::TYPE_24URINE) {
+                $metadata['totalCollectionVolume'] = $metadata['totalCollectionVolume'] ?? null;
+            }
         }
         return $metadata;
     }
