@@ -55,7 +55,7 @@ $(document).ready(function () {
     $("#nph_order_collect_totalCollectionVolume, #nph_sample_finalize_totalCollectionVolume").on("change", function () {
         let warningMinVolume = $(this).data("warning-min-volume");
         let warningMaxVolume = $(this).data("warning-max-volume");
-        if ($(this).val() > warningMinVolume && $(this).val() < warningMaxVolume) {
+        if ($(this).val() >= warningMinVolume && $(this).val() <= warningMaxVolume) {
             $("#totalCollectionVolumeWarning").show();
         } else {
             $("#totalCollectionVolumeWarning").hide();
