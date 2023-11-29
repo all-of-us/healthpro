@@ -340,6 +340,7 @@
       "unit": "mmHg",
       "replicates": 3,
       "max": 300,
+      "inputType": "integer",
       "warnings": [
         {
           "addValue": 30,
@@ -383,6 +384,7 @@
       "unit": "mmHg",
       "replicates": 3,
       "max": 300,
+      "inputType": "integer",
       "compare": {
         "type": "less-than",
         "field": "blood-pressure-systolic",
@@ -450,6 +452,7 @@
       "unit": "bpm",
       "replicates": 3,
       "max": 300,
+      "inputType": "integer",
       "warnings": [
         {
           "age": [12, 72],
