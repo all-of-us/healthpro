@@ -134,6 +134,17 @@ class NphOrderType extends AbstractType
 
         $builder->add('downtime_generated', Type\CheckboxType::class, [
             'required' => false,
+            'constraints' => [
+                new Constraints\Callback(function ($value, $context) {
+                    $formData = $context->getRoot()->getData();
+                    if ($value && empty($formData['createdTs'])) {
+                        $context->buildViolation('Please enter a downtime generation time')->addViolation();
+                    }
+                    if ($formData['createdTs'] > new \DateTime()) {
+                        $context->buildViolation('Generation time cannot be in the future')->addViolation();
+                    }
+                })
+            ]
         ]);
 
         $builder->add('createdTs', DateTimeType::class, [
@@ -141,18 +152,10 @@ class NphOrderType extends AbstractType
         'html5' => false,
         'required' => false,
         'widget' => 'single_text',
+        'view_timezone' => $options['userTimezone'],
         'model_timezone' => 'UTC',
-        'label' => 'Dose Date/Time',
-        'attr' => ['class' => 'order-ts'],
-            'constraints' => new Constraints\Callback(function ($value, $context) {
-                $formData = $context->getRoot()->getData();
-                if ($formData['downtime_generated'] && empty($value)) {
-                    $context->buildViolation('Please enter a downtime generation time');
-                }
-                if ($value > new \DateTime()) {
-                    $context->buildViolation('Generation time cannot be in the future');
-                }
-            })
+        'label' => 'Order Creation Time',
+        'attr' => ['class' => 'order-ts']
         ]);
 
         return $builder->getForm();
@@ -166,6 +169,7 @@ class NphOrderType extends AbstractType
             'stoolSamples' => null,
             'module' => null,
             'module1tissueCollectConsent' => null,
+            'userTimezone' => null,
         ]);
     }
 

@@ -155,17 +155,29 @@ $(document).ready(function () {
             $("#downtime-warning-modal").modal("show");
         }
         $(this).prop("checked", false);
+        showHideDowntimeCreatedTs();
     });
 
     $("#downtime-agree").on("click", function () {
         $("#nph_order_downtime_generated").prop("checked", true);
-        $("#downtime-created-ts").show();
+        showHideDowntimeCreatedTs();
         $("#downtime-warning-modal").modal("hide");
     });
     $("#downtime-disagree").on("click", function () {
         $("#nph_order_downtime_generated").prop("checked", false);
+        showHideDowntimeCreatedTs();
         $("#downtime-warning-modal").modal("hide");
     });
 
+    function showHideDowntimeCreatedTs() {
+        if ($("#nph_order_downtime_generated").prop("checked")) {
+            $("#downtime-created-ts").show();
+        } else {
+            $("#nph_order_createdTs").val("");
+            $("#downtime-created-ts").hide();
+        }
+    }
+
+    showHideDowntimeCreatedTs();
     $("#nph_order_createdTs").pmiDateTimePicker();
 });

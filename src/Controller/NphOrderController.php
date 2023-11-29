@@ -71,7 +71,7 @@ class NphOrderController extends BaseController
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
                 $nphOrderService->getSamplesByType('stool'),
                 'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
-                'module' => $module]
+                'module' => $module, 'userTimezone' => $this->getSecurityUser()->getTimezone()]
         );
         $showPreview = false;
         $oderForm->handleRequest($request);
