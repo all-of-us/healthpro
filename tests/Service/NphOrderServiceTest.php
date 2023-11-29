@@ -18,8 +18,9 @@ class NphOrderServiceTest extends ServiceTestCase
 {
     protected $service;
     protected $em;
-    protected $module1Data;
+    protected array $module1Data;
     protected array $module2Data;
+    protected array $module3Data;
     protected testSetup $testSetup;
 
     public function setUp(): void
@@ -44,8 +45,13 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->em = static::$container->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
+        $this->module1Data['formData']['createdTs'] = new \DateTime($this->module1Data['formData']['createdTs']);
         // Module 2
         $this->module2Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_2.json'), true);
+        $this->module2Data['formData']['createdTs'] = new \DateTime($this->module2Data['formData']['createdTs']);
+        // Module 3
+        $this->module3Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_3.json'), true);
+        $this->module3Data['formData']['createdTs'] = new \DateTime($this->module3Data['formData']['createdTs']);
     }
 
     public function testLoadModules(): void
@@ -68,6 +74,15 @@ class NphOrderServiceTest extends ServiceTestCase
 
         $this->assertSame($this->module2Data['stoolSamples'], $this->service->getSamplesByType('stool'));
         $this->assertSame($this->module2Data['bloodSamples'], $this->service->getSamplesByType('blood'));
+
+        $this->service->loadModules(3, 'OrangeDSMT', 'P0000000001', 'T10000000');
+        $this->assertSame($this->module3Data['timePointSamples'], $this->service->getTimePointSamples());
+        $this->assertSame($this->module3Data['timePoints'], $this->service->getTimePoints());
+        $this->assertSame($this->module3Data['samples'], $this->service->getSamples());
+        $this->assertSame('ORANGE', $this->service->getVisitDiet());
+
+        $this->assertSame($this->module3Data['stoolSamples'], $this->service->getSamplesByType('stool'));
+        $this->assertSame($this->module3Data['bloodSamples'], $this->service->getSamplesByType('blood'));
     }
 
     /**
@@ -173,7 +188,9 @@ class NphOrderServiceTest extends ServiceTestCase
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000006', 'T10000000');
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
-        $this->assertSame($this->module1Data['formData'], $this->service->getExistingOrdersData());
+        $orderData = $this->module1Data['formData'];
+        unset($orderData['createdTs'], $orderData['downtime_generated']);
+        $this->assertSame($orderData, $this->service->getExistingOrdersData());
     }
 
     public function testGetSamplesWithOrderIds()
@@ -252,10 +269,12 @@ class NphOrderServiceTest extends ServiceTestCase
         string $sampleCode,
         \DateTime $collectedTs,
         string $notes,
-        array $metaData = []
+        int $module,
+        string $visit,
+        array $metaData = [],
     ): void {
         // Module 1
-        $this->service->loadModules(1, 'LMT', 'P0000000008', 'T10000000');
+        $this->service->loadModules($module, $visit, 'P0000000008', 'T10000000');
         if ($orderType === NphOrder::TYPE_STOOL) {
             $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
             $nphSample = $this->service->createSample($sampleCode, $nphOrder, '1000000005', 'T0000000001');
@@ -299,11 +318,13 @@ class NphOrderServiceTest extends ServiceTestCase
             'bowelQuality' => 'normal'
         ];
         return [
-            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData],
-            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2'],
-            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', $stoolMetaData],
-            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4'],
-            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5'],
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 1, 'LMT', $urineMetaData],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 1, 'LMT'],
+            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', 1, 'LMT', $stoolMetaData],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 1, 'LMT'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 1, 'LMT'],
+            ['preDSMT', 'blood', 'LIH4', $collectedTs, 'Test Notes 7', 3, 'OrangeDSMT'],
+            ['postDSMT', 'urine', 'URINE', $collectedTs, 'Test Notes 8', 3, 'OrangeDSMT', $urineMetaData]
         ];
     }
 

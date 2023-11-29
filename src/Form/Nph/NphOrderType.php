@@ -7,6 +7,7 @@ use App\Helper\NphParticipant;
 use App\Nph\Order\Modules\Module1;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
@@ -130,6 +131,33 @@ class NphOrderType extends AbstractType
         $builder->add('checkAll', Type\CheckboxType::class, [
             'required' => false
         ]);
+
+        $builder->add('downtime_generated', Type\CheckboxType::class, [
+            'required' => false,
+            'constraints' => [
+                new Constraints\Callback(function ($value, $context) {
+                    $formData = $context->getRoot()->getData();
+                    if ($value && empty($formData['createdTs'])) {
+                        $context->buildViolation('Please enter a downtime generation time')->addViolation();
+                    }
+                    if ($formData['createdTs'] > new \DateTime()) {
+                        $context->buildViolation('Generation time cannot be in the future')->addViolation();
+                    }
+                })
+            ]
+        ]);
+
+        $builder->add('createdTs', DateTimeType::class, [
+        'format' => 'M/d/yyyy h:mm a',
+        'html5' => false,
+        'required' => false,
+        'widget' => 'single_text',
+        'view_timezone' => $options['userTimezone'],
+        'model_timezone' => 'UTC',
+        'label' => 'Order Creation Time',
+        'attr' => ['class' => 'order-ts']
+        ]);
+
         return $builder->getForm();
     }
 
@@ -141,6 +169,7 @@ class NphOrderType extends AbstractType
             'stoolSamples' => null,
             'module' => null,
             'module1tissueCollectConsent' => null,
+            'userTimezone' => null,
         ]);
     }
 

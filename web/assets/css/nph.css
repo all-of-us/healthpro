@@ -190,3 +190,7 @@ div.order-row {
 .visit-diet-details.collapsed:after {
     content: "\f107";
 }
+
+.totalCollectionVolumeField {
+    width: 20%;
+}

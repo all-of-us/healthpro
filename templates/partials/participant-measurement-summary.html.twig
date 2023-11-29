@@ -92,6 +92,13 @@
                     <td colspan="2">
                         {% if summary['growth-percentile-weight-for-age'] is defined and summary['growth-percentile-weight-for-age'] is not empty %}
                             {{ summary['growth-percentile-weight-for-age'] }}th percentile
+                        {% elseif summary['growth-percentile-weight-for-age-male'] is defined or summary['growth-percentile-weight-for-age-female'] is defined %}
+                            {% if summary['growth-percentile-weight-for-age-male'] is defined %}
+                                {{ summary['growth-percentile-weight-for-age-male'] }}th percentile (M) <br>
+                            {% endif %}
+                            {% if summary['growth-percentile-weight-for-age-female'] is defined %}
+                                {{ summary['growth-percentile-weight-for-age-female'] }}th percentile (F)
+                            {% endif %}
                         {% else %}
                             --
                         {% endif %}
@@ -102,6 +109,13 @@
                     <td colspan="2">
                         {% if summary['growth-percentile-height-for-age'] is defined and summary['growth-percentile-height-for-age'] is not empty %}
                             {{ summary['growth-percentile-height-for-age'] }}th percentile
+                        {% elseif summary['growth-percentile-height-for-age-male'] is defined or summary['growth-percentile-height-for-age-female'] is defined %}
+                            {% if summary['growth-percentile-height-for-age-male'] is defined %}
+                                {{ summary['growth-percentile-height-for-age-male'] }}th percentile (M) <br>
+                            {% endif %}
+                            {% if summary['growth-percentile-height-for-age-female'] is defined %}
+                                {{ summary['growth-percentile-height-for-age-female'] }}th percentile (F)
+                            {% endif %}
                         {% else %}
                             --
                         {% endif %}
@@ -112,6 +126,13 @@
                     <td colspan="2">
                         {% if summary['growth-percentile-weight-for-length'] is defined and summary['growth-percentile-weight-for-length'] is not empty %}
                             {{ summary['growth-percentile-weight-for-length'] }}th percentile
+                        {% elseif summary['growth-percentile-weight-for-length-male'] is defined or summary['growth-percentile-weight-for-length-female'] is defined %}
+                            {% if summary['growth-percentile-weight-for-length-male'] is defined %}
+                                {{ summary['growth-percentile-weight-for-length-male'] }}th percentile (M) <br>
+                            {% endif %}
+                            {% if summary['growth-percentile-weight-for-length-female'] is defined %}
+                                {{ summary['growth-percentile-weight-for-length-female'] }}th percentile (F)
+                            {% endif %}
                         {% else %}
                             --
                         {% endif %}
@@ -122,6 +143,13 @@
                     <td colspan="2">
                         {% if summary['growth-percentile-bmi-for-age'] is defined and summary['growth-percentile-bmi-for-age'] is not empty %}
                             {{ summary['growth-percentile-bmi-for-age'] }}th percentile
+                        {% elseif summary['growth-percentile-bmi-for-age-male'] is defined or summary['growth-percentile-bmi-for-age-female'] is defined %}
+                            {% if summary['growth-percentile-bmi-for-age-male'] is defined %}
+                                {{ summary['growth-percentile-bmi-for-age-male'] }}th percentile (M) <br>
+                            {% endif %}
+                            {% if summary['growth-percentile-bmi-for-age-female'] is defined %}
+                                {{ summary['growth-percentile-bmi-for-age-female'] }}th percentile (F) <br>
+                            {% endif %}
                         {% else %}
                             --
                         {% endif %}

@@ -201,6 +201,11 @@
                     {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
                 {% endif %}
                 <div class="panel-body">
+                    {% if order.downtimeGenerated() %}
+                        <div class="alert bg-success well-sm margin-top-15 text-success">
+                            <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y') }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia')}}] </span>
+                        </div>
+                    {% endif %}
                     {% if isFormDisabled %}
                         {% set formClasses = 'disable-enter prevent-resumbit' %}
                     {% else  %}
@@ -221,7 +226,21 @@
                         {% endif %}
                     </div>
                     <hr>
-                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_URINE') %}
+                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE') %}
+                        <div class="row">
+                            <div class="form-group col-sm-12 {% if not sampleFinalizeForm['totalCollectionVolume'].vars.valid %} has-error{% endif %}">
+                                {{ form_label(sampleFinalizeForm['totalCollectionVolume']) }}
+                                <div class="input-group">
+                                    {{ form_widget(sampleFinalizeForm['totalCollectionVolume']) }}
+                                    <span class="input-group-addon">mL</span>
+                                </div>
+                                {{ form_errors(sampleFinalizeForm['totalCollectionVolume']) }}
+                            </div>
+
+                        </div>
+                        <hr>
+                    {% endif %}
+                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_URINE') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE')  %}
                         <label>
                             Color and Clarity
                             <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">

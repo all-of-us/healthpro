@@ -88,7 +88,10 @@ $(document).ready(function () {
     });
 
     $("#nph_order_checkAll").on("change", function () {
-        $("#order_create_form input:checkbox:enabled").prop("checked", $(this).prop("checked"));
+        $("#order_create_form input:checkbox:enabled:not(#nph_order_downtime_generated)").prop(
+            "checked",
+            $(this).prop("checked")
+        );
     });
 
     $(".timepointCheckAll").on("change", function () {
@@ -146,4 +149,37 @@ $(document).ready(function () {
     });
 
     $(".sample-disabled-colored").parent().addClass("sample-disabled-colored");
+
+    $("#nph_order_downtime_generated").on("click", function () {
+        if ($(this).prop("checked")) {
+            $("#downtime-warning-modal").modal("show");
+        }
+        $(this).prop("checked", false);
+        showHideDowntimeCreatedTs();
+    });
+
+    $("#downtime-agree").on("click", function () {
+        $("#nph_order_downtime_generated").prop("checked", true);
+        showHideDowntimeCreatedTs();
+        $("#downtime-warning-modal").modal("hide");
+    });
+    $("#downtime-disagree").on("click", function () {
+        $("#nph_order_downtime_generated").prop("checked", false);
+        showHideDowntimeCreatedTs();
+        $("#downtime-warning-modal").modal("hide");
+    });
+
+    function showHideDowntimeCreatedTs() {
+        if ($("#nph_order_downtime_generated").prop("checked")) {
+            $("#downtime-created-ts").show();
+        } else {
+            $("#nph_order_createdTs").val("");
+            $("#downtime-created-ts").hide();
+        }
+    }
+
+    showHideDowntimeCreatedTs();
+    $("#nph_order_createdTs").pmiDateTimePicker({
+        maxDate: new Date()
+    });
 });

@@ -13,21 +13,23 @@
     "postDSMT": "Post DSMT"
   },
   "samples": {
-    "SST8P5": "8.5 mL SST",
-    "LIHP1": "6 mL Li Hep",
-    "EDTA10": "10 mL EDTA",
+    "1SST4": "4 mL SST",
+    "LIH4": "4 mL Li Hep",
+    "EDTA4": "4 mL EDTA",
     "P800": "2 mL P800",
-    "URINES": "Spot Urine",
+    "URINE": "Spot Urine",
     "SALIVA": "Saliva",
+    "URINEDLW": "Urine DLW",
     "STOOL": "Stool",
     "ST1": "95% Ethanol Tube 1",
     "ST2": "95% Ethanol Tube 2",
     "ST3": "DNA/RNA Shield Tube 1",
-    "ST4": "DNA/RNA Shield Tube 2"
+    "ST4": "DNA/RNA Shield Tube 2",
+    "URINE24": "24 Hour Urine"
   },
   "timePointSamples": {
     "preDSMT": {
-      "URINES": "Spot Urine",
+      "URINE": "Spot Urine",
       "SALIVA": "Saliva",
       "STOOL": "Stool",
       "ST1": "95% Ethanol Tube 1",
@@ -36,61 +38,62 @@
       "ST4": "DNA/RNA Shield Tube 2"
     },
     "minus15min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "minus5min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "15min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "30min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "60min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "90min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "120min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "180min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "240min": {
-      "SST8P5": "8.5 mL SST",
-      "LIHP1": "6 mL Li Hep",
-      "EDTA10": "10 mL EDTA",
+      "1SST4": "4 mL SST",
+      "LIH4": "4 mL Li Hep",
+      "EDTA4": "4 mL EDTA",
       "P800": "2 mL P800"
     },
     "postDSMT": {
-      "URINES": "Spot Urine"
+      "URINE": "Spot Urine",
+      "SALIVA": "Saliva"
     }
   },
   "stoolSamples": [
@@ -100,9 +103,9 @@
     "ST4"
   ],
   "bloodSamples": [
-    "SST8P5",
-    "LIHP1",
-    "EDTA10",
+    "1SST4",
+    "LIH4",
+    "EDTA4",
     "P800"
   ],
   "formData": {
@@ -112,15 +115,15 @@
       "STOOL"
     ],
     "30min": [
-      "SST8P5",
-      "LIHP1",
-      "EDTA10",
+      "1SST4",
+      "LIH4",
+      "EDTA4",
       "P800"
     ],
     "240min": [
-      "SST8P5",
-      "LIHP1",
-      "EDTA10",
+      "1SST4",
+      "LIH4",
+      "EDTA4",
       "P800"
     ],
     "postDSMT": [
@@ -131,7 +134,7 @@
     "ST2": "T0000000002",
     "ST3": "T0000000003",
     "ST4": "T0000000004",
-    "downtime_generated": "false",
+    "downtimeGenerated": "false",
     "createdTs": "2023-11-21 15:42:20.111251"
   }
 }

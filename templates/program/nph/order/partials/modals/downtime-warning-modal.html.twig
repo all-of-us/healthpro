@@ -1,0 +1,37 @@
+<div class="modal fade" id="downtime-warning-modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Downtime Procedure Indicated</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="well-sm bg-warning text-warning">
+                            <p style="text-align: left">
+                                <strong><i class="fa fa-warning bg-warning"></i>You have indicated this order occurred during a downtime procedure</strong>
+                                <br>
+                                <br>
+                                This checkbox should only be selected when entering orders created during downtime operations. Downtime orders are subject to auditing. Any misuse of this downtime functionality may result in reportable action to the NIH.
+                                <br>
+                                <br>
+                                &#8226; If you do not wish to continue with this downtime order, click Cancel.
+                                <br>
+                                &#8226; If you wish to continue with this downtime order, click Agree.
+                                <br>
+                                <br>
+                                <strong>User Account: {{app.user.email}}</strong>
+                                <br>
+                                <strong>Date: {{ "now"|date('n/j/Y') }}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="downtime-agree">Agree</button>
+                <button type="button" class="btn btn-secondary" id="downtime-disagree">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
