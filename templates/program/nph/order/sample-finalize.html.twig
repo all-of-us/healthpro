@@ -235,7 +235,11 @@
                                     <span class="input-group-addon">mL</span>
                                 </div>
                                 {{ form_errors(sampleFinalizeForm['totalCollectionVolume']) }}
+                                <span class="text-warning aliquot-volume-warning" id="totalCollectionVolumeWarning" style="display: none;">
+                                Please verify unit of measure is correct.  (Expected volume is measured mL, for reference 1L = 1000mL)
+                                </span>
                             </div>
+
                         </div>
                         <hr>
                     {% endif %}

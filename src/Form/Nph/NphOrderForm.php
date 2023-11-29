@@ -152,14 +152,25 @@ class NphOrderForm extends AbstractType
 
     protected function addUrineTotalCollectionVolume(
         FormBuilderInterface $builder,
-        bool $disabled = false,
-        string $formType = self::FORM_FINALIZE_TYPE
+        bool $disabled = false
     ): void {
-        $required = $formType === self::FORM_FINALIZE_TYPE;
         $urineVolumeCollection = [
             'label' => 'Total Collection Volume',
-            'required' => $required,
-            'disabled' => $disabled
+            'required' => true,
+            'disabled' => $disabled,
+            'constraints' => [
+                new Constraints\Callback(function ($value, $context) {
+                    if (empty($value)) {
+                        $context->buildViolation('Total collection volume is required')->addViolation();
+                    } elseif ($value == 0) {
+                        $context->buildViolation('Total collection volume must be greater than 0')->addViolation();
+                    }
+                })
+            ],
+            'attr' => [
+                'data-warning-min-volume' => 0.1,
+                'data-warning-max-volume' => 10,
+            ]
         ];
         $builder->add('totalCollectionVolume', Type\NumberType::class, $urineVolumeCollection);
     }
