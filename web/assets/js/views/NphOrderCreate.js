@@ -179,5 +179,7 @@ $(document).ready(function () {
     }
 
     showHideDowntimeCreatedTs();
-    $("#nph_order_createdTs").pmiDateTimePicker();
+    $("#nph_order_createdTs").pmiDateTimePicker({
+        maxDate: new Date()
+    });
 });
