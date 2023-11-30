@@ -335,6 +335,7 @@
       "unit": "bpm",
       "replicates": 3,
       "max": 300,
+      "inputType": "integer",
       "warnings": [
         {
           "age": [0, 11],

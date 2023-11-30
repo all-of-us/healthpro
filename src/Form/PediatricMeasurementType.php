@@ -39,6 +39,10 @@ class PediatricMeasurementType extends AbstractType
             if (isset($field->decimals)) {
                 $fieldOptions['scale'] = $field->decimals;
             }
+            if (isset($field->inputType)) {
+                $attributes['data-parsley-type'] = $field->inputType;
+                $attributes['data-parsley-type-message'] = 'Please enter a valid whole number';
+            }
             if (isset($field->max)) {
                 $constraints[] = new Constraints\LessThan($field->max);
                 $attributes['data-parsley-lt'] = $field->max;
