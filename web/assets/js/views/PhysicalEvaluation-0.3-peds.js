@@ -52,6 +52,7 @@ let viewExtension = Backbone.View.extend({
     calculateMean: function (field) {
         let fieldSelector = ".field-" + field;
         let values = [];
+        let mean;
         this.$(fieldSelector)
             .find("input")
             .each(function () {
@@ -78,19 +79,9 @@ let viewExtension = Backbone.View.extend({
                 },
                 0
             );
-            let mean = (sum / values.length).toFixed(1);
+            mean = (sum / values.length).toFixed(1);
             meanElement.html("<strong>" + mean + "</strong>");
             meanElement.attr("data-mean", mean);
-            if (this.percentileFields.hasOwnProperty(field) && mean) {
-                let percentileFields = this.percentileFields[field];
-                percentileFields.forEach((percentileField) => {
-                    if (percentileField === "weight-for-length") {
-                        this.calculateWeightForLengthPercentileMaleFemale();
-                    } else {
-                        this.calculatePercentileMaleFemale(percentileField, parseFloat(mean));
-                    }
-                });
-            }
             if (this.conversions[field]) {
                 let converted = this.convert(this.conversions[field], mean);
                 this.$("#convert-" + field).html("(" + converted + ")");
@@ -103,6 +94,17 @@ let viewExtension = Backbone.View.extend({
             meanElement.text("--");
             meanElement.attr("data-mean", "");
             this.$("#convert-" + field).html("");
+        }
+        if (this.percentileFields.hasOwnProperty(field)) {
+            let percentileFields = this.percentileFields[field];
+            percentileFields.forEach((percentileField) => {
+                if (percentileField === "weight-for-length") {
+                    this.calculateWeightForLengthPercentileMaleFemale();
+                } else {
+                    mean = mean ? parseFloat(mean) : "";
+                    this.calculatePercentileMaleFemale(percentileField, mean);
+                }
+            });
         }
     },
     calculatePercentileMaleFemale: function (field, X) {
@@ -125,7 +127,7 @@ let viewExtension = Backbone.View.extend({
     },
     calculatePercentile: function (field, X, sex) {
         const ageInMonths = this.ageInMonths;
-        const lmsValues = [];
+        let lmsValues = [];
         let charts = this.growthCharts[field];
         charts.forEach((item) => {
             if (item.sex === sex && Math.floor(item.month) === ageInMonths) {
@@ -136,28 +138,38 @@ let viewExtension = Backbone.View.extend({
         });
         console.log(field, "lms", lmsValues);
         const percentileElement = this.$("#percentile-" + sex + "-" + field);
-        const zScore = this.getZScore(X, lmsValues);
+        const zScore = X ? this.getZScore(X, lmsValues) : "";
         console.log(field, "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
-        const percentile = this.getPercentile(zScore);
+        const percentile = zScore ? this.getPercentile(zScore) : "";
         console.log("percentile", percentile);
         percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
         this.handleOutOfRangePercentileWarning();
     },
     calculateWeightForLengthPercentile: function (sex) {
-        const lmsValues = this.getWeightForLengthLMSValues(sex);
-        if (lmsValues) {
-            let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
-            const percentileElement = this.$("#percentile-" + sex + "-weight-for-length");
-            const zScore = this.getZScore(avgWeight, lmsValues);
-            console.log("weight-for-length", "Zscore", zScore);
-            percentileElement.attr("data-zscore", zScore);
-            const percentile = this.getPercentile(zScore);
-            percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
-            percentileElement.attr("data-percentile", percentile);
-            this.handleOutOfRangePercentileWarning();
+        let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
+        let avgLength = parseFloat($("#mean-height").attr("data-mean"));
+        let lmsValues = [];
+        if (avgLength) {
+            let charts = this.growthCharts["weight-for-length"];
+            charts.forEach((item) => {
+                if (item.sex === sex && Math.round(item.length) === Math.round(avgLength)) {
+                    lmsValues["L"] = item.L;
+                    lmsValues["M"] = item.M;
+                    lmsValues["S"] = item.S;
+                }
+            });
         }
+        const percentileElement = this.$("#percentile-" + sex + "-weight-for-length");
+        console.log("weight-for-length", "lms", lmsValues);
+        const zScore = avgWeight && Object.keys(lmsValues).length > 0 ? this.getZScore(avgWeight, lmsValues) : "";
+        console.log("weight-for-length", "Zscore", zScore);
+        percentileElement.attr("data-zscore", zScore);
+        const percentile = zScore ? this.getPercentile(zScore) : "";
+        percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
+        percentileElement.attr("data-percentile", percentile);
+        this.handleOutOfRangePercentileWarning();
     },
     getWeightForLengthLMSValues: function (sex) {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
