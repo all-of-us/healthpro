@@ -616,12 +616,20 @@ let viewExtension = Backbone.View.extend({
                 // Fallback calculation if weight-for-age/weight-for-length percentile can't be calculated
                 if (percentileMale === "" || percentileFemale === "") {
                     if (warning.percentile === "weight-for-age") {
-                        conditionMale = percentileMale === "" && val < this.getX(thirdPercentileZScore, this.getLMSValues(1, percentileField));
-                        conditionFemale = percentileFemale === "" && val < this.getX(thirdPercentileZScore, this.getLMSValues(2, percentileField));
+                        conditionMale =
+                            percentileMale === "" &&
+                            val < this.getX(thirdPercentileZScore, this.getLMSValues(1, percentileField));
+                        conditionFemale =
+                            percentileFemale === "" &&
+                            val < this.getX(thirdPercentileZScore, this.getLMSValues(2, percentileField));
                     }
                     if (warning.percentile === "weight-for-length") {
-                        conditionMale = percentileMale === "" && avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(1));
-                        conditionFemale = percentileFemale === "" && avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(2));
+                        conditionMale =
+                            percentileMale === "" &&
+                            avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(1));
+                        conditionFemale =
+                            percentileFemale === "" &&
+                            avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(2));
                     }
                     if (conditionMale || conditionFemale) {
                         return true;
@@ -637,7 +645,10 @@ let viewExtension = Backbone.View.extend({
                     return val < this.getX(thirdPercentileZScore, this.getLMSValues(this.sexAtBirth, percentileField));
                 }
                 if (warning.percentile === "weight-for-length") {
-                    return avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(this.sexAtBirth));
+                    return (
+                        avgWeight <
+                        this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(this.sexAtBirth))
+                    );
                 }
             }
             return percentile !== "" && parseFloat(percentile) < warning.min;
@@ -690,7 +701,18 @@ let viewExtension = Backbone.View.extend({
                     let val = input.val();
                     $.each(warnings, function (key, warning) {
                         if (!warning.consecutive && self.warningConditionMet(warning, val)) {
-                            container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                            if (
+                                (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-length") ||
+                                warning.percentile === "bmi-for-age"
+                            ) {
+                                $("#" + warning.percentile + "-warning").html(warning.message);
+                                return true;
+                            } else {
+                                container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                            }
+                            if (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-age") {
+                                return true;
+                            }
                             return false; // only show first (highest priority) warning
                         }
                     });
