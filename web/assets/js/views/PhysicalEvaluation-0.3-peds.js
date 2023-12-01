@@ -150,20 +150,10 @@ let viewExtension = Backbone.View.extend({
     calculateWeightForLengthPercentile: function (sex) {
         let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
         let avgLength = parseFloat($("#mean-height").attr("data-mean"));
-        let lmsValues = [];
-        if (avgLength) {
-            let charts = this.growthCharts["weight-for-length"];
-            charts.forEach((item) => {
-                if (item.sex === sex && Math.round(item.length) === Math.round(avgLength)) {
-                    lmsValues["L"] = item.L;
-                    lmsValues["M"] = item.M;
-                    lmsValues["S"] = item.S;
-                }
-            });
-        }
+        let lmsValues = this.getWeightForLengthLMSValues(sex);
         const percentileElement = this.$("#percentile-" + sex + "-weight-for-length");
         console.log("weight-for-length", "lms", lmsValues);
-        const zScore = avgWeight && Object.keys(lmsValues).length > 0 ? this.getZScore(avgWeight, lmsValues) : "";
+        const zScore = avgWeight && avgLength ? this.getZScore(avgWeight, lmsValues) : "";
         console.log("weight-for-length", "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
         const percentile = zScore ? this.getPercentile(zScore) : "";
