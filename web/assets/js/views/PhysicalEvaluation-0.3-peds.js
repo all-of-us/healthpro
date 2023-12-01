@@ -607,30 +607,21 @@ let viewExtension = Backbone.View.extend({
         if (warning.hasOwnProperty("percentile")) {
             let percentileField = warning.percentile;
             let percentileMale, percentileFemale, conditionMale, conditionFemale;
-            const zScore = -2; // 2.3rd percentile zScore
+            const twoThirdPercentileZScore = -2;
             const thirdPercentileZScore = -1.88;
             const avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
             if (this.sexAtBirth === 0) {
                 percentileMale = $("#percentile-1-" + percentileField).attr("data-percentile");
                 percentileFemale = $("#percentile-2-" + percentileField).attr("data-percentile");
                 // Fallback calculation if weight-for-age/weight-for-length percentile can't be calculated
-                if (warning.percentile === "weight-for-age" && (percentileMale === "" || percentileFemale === "")) {
-                    if (percentileMale === "") {
-                        conditionMale = val < this.getX(zScore, this.getLMSValues(1, percentileField));
+                if (percentileMale === "" || percentileFemale === "") {
+                    if (warning.percentile === "weight-for-age") {
+                        conditionMale = percentileMale === "" && val < this.getX(thirdPercentileZScore, this.getLMSValues(1, percentileField));
+                        conditionFemale = percentileFemale === "" && val < this.getX(thirdPercentileZScore, this.getLMSValues(2, percentileField));
                     }
-                    if (percentileFemale === "") {
-                        conditionFemale = val < this.getX(zScore, this.getLMSValues(2, percentileField));
-                    }
-                    if (conditionMale || conditionFemale) {
-                        return true;
-                    }
-                }
-                if (warning.percentile === "weight-for-length" && (percentileMale === "" || percentileFemale === "")) {
-                    if (percentileMale === "") {
-                        conditionMale = avgWeight < this.getX(zScore, this.getWeightForLengthLMSValues(1));
-                    }
-                    if (percentileFemale === "") {
-                        conditionFemale = avgWeight < this.getX(zScore, this.getWeightForLengthLMSValues(2));
+                    if (warning.percentile === "weight-for-length") {
+                        conditionMale = percentileMale === "" && avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(1));
+                        conditionFemale = percentileFemale === "" && avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(2));
                     }
                     if (conditionMale || conditionFemale) {
                         return true;
@@ -641,15 +632,13 @@ let viewExtension = Backbone.View.extend({
                 return conditionMale || conditionFemale;
             }
             let percentile = $("#percentile-" + this.sexAtBirth + "-" + percentileField).attr("data-percentile");
-            if (warning.percentile === "weight-for-age" && percentile === "") {
-                const lmsValues = this.getLMSValues(this.sexAtBirth, percentileField);
-                const weight = this.getX(thirdPercentileZScore, lmsValues);
-                return val < weight;
-            }
-            if (warning.percentile === "weight-for-length" && percentile === "") {
-                const lmsValues = this.getWeightForLengthLMSValues(this.sexAtBirth);
-                const weight = this.getX(zScore, lmsValues);
-                return avgWeight < weight;
+            if (percentile === "") {
+                if (warning.percentile === "weight-for-age") {
+                    return val < this.getX(thirdPercentileZScore, this.getLMSValues(this.sexAtBirth, percentileField));
+                }
+                if (warning.percentile === "weight-for-length") {
+                    return avgWeight < this.getX(twoThirdPercentileZScore, this.getWeightForLengthLMSValues(this.sexAtBirth));
+                }
             }
             return percentile !== "" && parseFloat(percentile) < warning.min;
         }
