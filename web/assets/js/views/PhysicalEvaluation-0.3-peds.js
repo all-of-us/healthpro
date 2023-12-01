@@ -126,17 +126,7 @@ let viewExtension = Backbone.View.extend({
         }
     },
     calculatePercentile: function (field, X, sex) {
-        const ageInMonths = this.ageInMonths;
-        let lmsValues = [];
-        let charts = this.growthCharts[field];
-        charts.forEach((item) => {
-            if (item.sex === sex && Math.floor(item.month) === ageInMonths) {
-                lmsValues["L"] = item.L;
-                lmsValues["M"] = item.M;
-                lmsValues["S"] = item.S;
-            }
-        });
-        console.log(field, "lms", lmsValues);
+        const lmsValues = this.getLMSValues(sex, field);
         const percentileElement = this.$("#percentile-" + sex + "-" + field);
         const zScore = X ? this.getZScore(X, lmsValues) : "";
         console.log(field, "Zscore", zScore);
@@ -148,9 +138,9 @@ let viewExtension = Backbone.View.extend({
         this.handleOutOfRangePercentileWarning();
     },
     calculateWeightForLengthPercentile: function (sex) {
-        let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
-        let avgLength = parseFloat($("#mean-height").attr("data-mean"));
-        let lmsValues = this.getWeightForLengthLMSValues(sex);
+        const avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
+        const avgLength = parseFloat($("#mean-height").attr("data-mean"));
+        const lmsValues = this.getWeightForLengthLMSValues(sex);
         const percentileElement = this.$("#percentile-" + sex + "-weight-for-length");
         console.log("weight-for-length", "lms", lmsValues);
         const zScore = avgWeight && avgLength ? this.getZScore(avgWeight, lmsValues) : "";
@@ -161,11 +151,25 @@ let viewExtension = Backbone.View.extend({
         percentileElement.attr("data-percentile", percentile);
         this.handleOutOfRangePercentileWarning();
     },
+    getLMSValues: function (sex, field) {
+        const ageInMonths = this.ageInMonths;
+        let lmsValues = [];
+        let charts = this.growthCharts[field];
+        charts.forEach((item) => {
+            if (item.sex === sex && Math.floor(item.month) === ageInMonths) {
+                lmsValues["L"] = item.L;
+                lmsValues["M"] = item.M;
+                lmsValues["S"] = item.S;
+            }
+        });
+        console.log(field, "lms", lmsValues);
+        return lmsValues;
+    },
     getWeightForLengthLMSValues: function (sex) {
-        let avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
-        let avgLength = parseFloat($("#mean-height").attr("data-mean"));
+        const avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
+        const avgLength = parseFloat($("#mean-height").attr("data-mean"));
+        let lmsValues = [];
         if (avgWeight && avgLength) {
-            const lmsValues = [];
             let charts = this.growthCharts["weight-for-length"];
             charts.forEach((item) => {
                 if (item.sex === sex && Math.round(item.length) === Math.round(avgLength)) {
@@ -174,10 +178,9 @@ let viewExtension = Backbone.View.extend({
                     lmsValues["S"] = item.S;
                 }
             });
-            console.log("weight-for-length", "lms", lmsValues);
-            return lmsValues;
         }
-        return [];
+        console.log("weight-for-length", "lms", lmsValues);
+        return lmsValues;
     },
     getZScore: function (X, lmsValues) {
         const L = parseFloat(lmsValues["L"]);
@@ -605,11 +608,23 @@ let viewExtension = Backbone.View.extend({
             let percentileField = warning.percentile;
             let percentileMale, percentileFemale, conditionMale, conditionFemale;
             const zScore = -2; // 2.3rd percentile zScore
+            const thirdPercentileZScore = -1.88;
             const avgWeight = parseFloat($("#mean-weight").attr("data-mean"));
             if (this.sexAtBirth === 0) {
                 percentileMale = $("#percentile-1-" + percentileField).attr("data-percentile");
                 percentileFemale = $("#percentile-2-" + percentileField).attr("data-percentile");
-                // Fallback calculation if weight-for-length percentile can't be calculated
+                // Fallback calculation if weight-for-age/weight-for-length percentile can't be calculated
+                if (warning.percentile === "weight-for-age" && (percentileMale === "" || percentileFemale === "")) {
+                    if (percentileMale === "") {
+                        conditionMale = val < this.getX(zScore, this.getLMSValues(1, percentileField));
+                    }
+                    if (percentileFemale === "") {
+                        conditionFemale = val < this.getX(zScore, this.getLMSValues(2, percentileField));
+                    }
+                    if (conditionMale || conditionFemale) {
+                        return true;
+                    }
+                }
                 if (warning.percentile === "weight-for-length" && (percentileMale === "" || percentileFemale === "")) {
                     if (percentileMale === "") {
                         conditionMale = avgWeight < this.getX(zScore, this.getWeightForLengthLMSValues(1));
@@ -626,7 +641,12 @@ let viewExtension = Backbone.View.extend({
                 return conditionMale || conditionFemale;
             }
             let percentile = $("#percentile-" + this.sexAtBirth + "-" + percentileField).attr("data-percentile");
-            if (percentile === "" && warning.percentile === "weight-for-length") {
+            if (warning.percentile === "weight-for-age" && percentile === "") {
+                const lmsValues = this.getLMSValues(this.sexAtBirth, percentileField);
+                const weight = this.getX(thirdPercentileZScore, lmsValues);
+                return val < weight;
+            }
+            if (warning.percentile === "weight-for-length" && percentile === "") {
                 const lmsValues = this.getWeightForLengthLMSValues(this.sexAtBirth);
                 const weight = this.getX(zScore, lmsValues);
                 return avgWeight < weight;
