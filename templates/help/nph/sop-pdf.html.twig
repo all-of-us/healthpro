@@ -12,10 +12,10 @@
         </h2>
     </div>
     <div class="text-right">
-        <a class="pull-right" href="{{ path('help_sopFile', { id: sop, language: language }) }}" target="_blank">
+        <a class="pull-right" href="{{ path('help_sopFile', { id: sop, language: language, documentGroup: 'nph' }) }}" target="_blank">
             <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download
         </a>
     </div>
-    <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: sop, language: language }) }}#view=FitH"></iframe>
+    <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: sop, language: language, documentGroup: 'nph' }) }}#view=FitH"></iframe>
     {% include 'help/footer.html.twig' %}
 {% endblock %}

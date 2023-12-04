@@ -100,7 +100,7 @@ class HelpController extends BaseController
     #[Route(path: '/nph/sop/{id}/{language}', name: 'help_nph_sopView')]
     public function nphSopViewAction($id, $language, HelpService $helpService): Response
     {
-        $document = $helpService->getDocumentInfo($id);
+        $document = $helpService->getDocumentInfo($id, 'nph');
         if (!$document) {
             throw $this->createNotFoundException('Page Not Found!');
         }
@@ -112,10 +112,10 @@ class HelpController extends BaseController
         ]);
     }
 
-    #[Route(path: '/sop/file/{id}/{language}', name: 'help_sopFile')]
-    public function sopFileAction($id, $language, HelpService $helpService)
+    #[Route(path: '/sop/file/{id}/{language}/{documentGroup}', name: 'help_sopFile')]
+    public function sopFileAction(string $id, string $language, HelpService $helpService, string $documentGroup = 'hpo')
     {
-        $document = $helpService->getDocumentInfo($id);
+        $document = $helpService->getDocumentInfo($id, $documentGroup);
         if (!$document) {
             throw $this->createNotFoundException('Page Not Found!');
         }

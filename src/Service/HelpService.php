@@ -203,6 +203,20 @@ class HelpService
         ]
     ];
 
+    public static array $nphDocumentGroups = [
+        [
+            'title' => 'NPH Application SOPs',
+            'documents' => [
+                'NPH-HealthPro-SOP' => [
+                    'title' => 'NPH HealthPro Application SOP',
+                    'filename' => 'NPH HealthPro Application SOP.pdf',
+                    'languages' => ['es', 'en'],
+                    'es_title' => 'NPH HealthPro Application SOP'
+                ]
+            ]
+        ]
+    ];
+
     public static $videoPlaylists = [
         'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
@@ -276,9 +290,10 @@ class HelpService
         return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
     }
 
-    public function getDocumentInfo($id)
+    public function getDocumentInfo(string $id, string $documentGroup = 'hpo')
     {
-        foreach (self::$documentGroups as $documentGroup) {
+        $documentGroups = $documentGroup === 'nph' ? self::$nphDocumentGroups : self::$documentGroups;
+        foreach ($documentGroups as $documentGroup) {
             if (array_key_exists($id, $documentGroup['documents'])) {
                 return $documentGroup['documents'][$id];
             }
