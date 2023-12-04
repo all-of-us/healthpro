@@ -155,7 +155,7 @@ class NphOrderType extends AbstractType
         'view_timezone' => $options['userTimezone'],
         'model_timezone' => 'UTC',
         'label' => 'Order Creation Time',
-        'attr' => ['class' => 'order-ts']
+        'attr' => ['class' => 'order-ts', 'autocomplete' => 'off'],
         ]);
 
         return $builder->getForm();
