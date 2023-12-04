@@ -171,6 +171,21 @@ $(document).ready(function () {
         });
     }
 
+    $(".order-ts").on("dp.change", function (event) {
+        let orderCollectedTs = new Date($('input[id*="CollectedTs"]').val());
+        let aliquotTs = new Date($(this).val());
+        let difference = Math.abs(aliquotTs.getTime() - orderCollectedTs.getTime()) / (60 * 60 * 1000);
+        if (difference > 2) {
+            $(this).parent().addClass("has-warning");
+            $("#aliquotTimeWarning").show();
+        } else {
+            $(this).parent().removeClass("has-warning");
+            if ($("td.has-warning>input.order-ts").length === 0) {
+                $("#aliquotTimeWarning").hide();
+            }
+        }
+    });
+
     disableEnableAliquotFields();
 
     $(".aliquot-volume").trigger("keyup");

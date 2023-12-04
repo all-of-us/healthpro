@@ -284,6 +284,15 @@
                         </span>
                         <hr>
                     {% endif %}
+                    <div class="panel-heading text-warning bg-warning" id="aliquotTimeWarning" hidden="hidden">
+                        <p><i class="fa fa-warning"></i> Please ensure collection and aliquot times are correct.</p>
+                        <ul>
+                            <li>As a general guideline, samples should be aliquoted within 2 hours of collection.</li>
+                            <li>Double check the AM/PM selection for each time.</li>
+                            <li>If the times entered are correct, you may continue with finalization.</li>
+                        </ul>
+                    </div>
+                    <span></span>
                     <label>Aliquot</label>
                     {% if aliquots is not empty %}
                         <table class="table table-samples">
