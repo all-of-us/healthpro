@@ -797,6 +797,9 @@ let viewExtension = Backbone.View.extend({
             return;
         }
         let val = input.val();
+        if (val === "") {
+            this.displayWarnings();
+        }
         if (this.warnings[field]) {
             let warned = false;
             $.each(this.warnings[field], function (key, warning) {
