@@ -216,11 +216,14 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         $queryBuild = $this->createQueryBuilder('no')
             ->where('no.participantId = :participantId')
+            ->join('no.nphSamples', 'ns')
             ->andWhere('no.module = :module')
             ->andWhere('no.visitType = :visitType')
             ->andWhere('no.DowntimeGenerated = 1')
+            ->andWhere('ns.modifyType != :modifyType OR ns.modifyType IS NULL')
             ->setParameter('participantId', $ParticipantId)
             ->setParameter('module', $Module)
+            ->setParameter('modifyType', NphSample::CANCEL)
             ->setParameter('visitType', $Visit);
         return $queryBuild->getQuery()->getResult();
     }
