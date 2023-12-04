@@ -178,8 +178,14 @@ $(document).ready(function () {
         }
     }
 
-    showHideDowntimeCreatedTs();
-    $("#nph_order_createdTs").pmiDateTimePicker({
-        maxDate: new Date()
-    });
+    function initializeDowntimeCreatedTsDatePicker() {
+        showHideDowntimeCreatedTs();
+        let dateSelector = $("#nph_order_createdTs");
+        let currentValue = dateSelector.val();
+        $("#nph_order_createdTs").pmiDateTimePicker({
+            maxDate: new Date()
+        });
+        dateSelector.val(currentValue);
+    }
+    initializeDowntimeCreatedTsDatePicker();
 });
