@@ -275,12 +275,12 @@ class NphOrderService
         return $sampleGroup;
     }
 
-    public function createOrder(string $timePoint, string $orderType, string $orderId = null, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedTs = new DateTime()): NphOrder
+    public function createOrder(string $timePoint, string $orderType, string $orderId = null, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedTs = null): NphOrder
     {
         if ($orderId === null) {
             $orderId = $this->generateOrderId();
         }
-        if ($downtimeGeneratedTs === null) {
+        if (empty($downtimeGeneratedTs)) {
             $downtimeGeneratedTs = new DateTime();
         }
         $nphOrder = new NphOrder();
@@ -937,7 +937,7 @@ class NphOrderService
         return $id;
     }
 
-    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedCreatedTs = new DateTime()): void
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedCreatedTs = null): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType, null, $downtimeGenerated, $downtimeGeneratedCreatedTs);
         foreach ($samples as $sample) {

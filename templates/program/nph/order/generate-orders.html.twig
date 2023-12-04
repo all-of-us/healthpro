@@ -44,7 +44,7 @@
                 {% for orderNumber, order in downtimeOrders['orderInfo'] %}
                     <div class="col-sm-3" style="margin-bottom: 25px">
                         <label>Order Generation Time<sup>{{ orderNumber }}</sup></label>
-                        <input type="text" disabled class="order-ts form-control" style="" value="{{ order['orderCreatedTime']|date('n/j/Y g:ia') }}">
+                        <input type="text" disabled class="order-ts form-control" style="" value="{{ order['orderCreatedTime']|date('n/j/Y g:ia', app.user.timezone) }}">
                         <sub class="text-success"><i class="fa fa-history"></i> Downtime order initiated by:
                             {{order['orderUser']}}</sub>
                     </div>
