@@ -849,20 +849,24 @@ class NphOrderService
         $downtimeGenerated = [];
         $downtimeGenerated['orderInfo'] = [];
         $downtimeGenerated['sampleInfo'] = [];
-        $orderNumber = 1;
+        $orderNumber = 0;
+        $seenSampleGroups = [];
         /** @var NphOrder $order */
         foreach ($orders as $order) {
             if (array_key_exists($order->getTimepoint(), $existingSamples)) {
-                $downtimeGenerated['orderInfo'][$orderNumber]['orderUser'] = $order->getUser()->getEmail();
-                $downtimeGenerated['orderInfo'][$orderNumber]['orderDowntimeCreatedTime'] = $order->getDowntimeGeneratedTs();
-                $downtimeGenerated['orderInfo'][$orderNumber]['orderCreatedTime'] = $order->getCreatedTs();
                 /** @var NphSample $sample */
                 foreach ($order->getNphSamples() as $sample) {
+                    if (!in_array($sample->getSampleGroup(), $seenSampleGroups, true)) {
+                        $seenSampleGroups[] = $sample->getSampleGroup();
+                        $orderNumber++;
+                        $downtimeGenerated['orderInfo'][$orderNumber]['orderUser'] = $order->getUser()->getEmail();
+                        $downtimeGenerated['orderInfo'][$orderNumber]['orderDowntimeCreatedTime'] = $order->getDowntimeGeneratedTs();
+                        $downtimeGenerated['orderInfo'][$orderNumber]['orderCreatedTime'] = $order->getCreatedTs();
+                    }
                     if (in_array($sample->getSampleCode(), $existingSamples[$order->getTimepoint()], true)) {
                         $downtimeGenerated['sampleInfo'][$order->getTimepoint()][$sample->getSampleCode()] = $orderNumber;
                     }
                 }
-                $orderNumber++;
             }
         }
         return $downtimeGenerated;
