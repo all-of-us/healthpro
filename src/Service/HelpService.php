@@ -250,8 +250,7 @@ class HelpService
                 'NPH-HealthPro-SOP' => [
                     'title' => 'NPH HealthPro Application SOP',
                     'filename' => 'NPH HealthPro Application SOP.pdf',
-                    'languages' => ['es', 'en'],
-                    'es_title' => 'NPH HealthPro Application SOP'
+                    'languages' => ['es']
                 ]
             ]
         ]
