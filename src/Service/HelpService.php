@@ -39,6 +39,46 @@ class HelpService
                     'filename' => 'SOP-015 Waist-Hip Circumference Measurement.pdf',
                     'languages' => ['es', 'en'],
                     'es_title' => 'SOP Número 015 Medición de la circunferencia de la cintura y la cadera'
+                ],
+                'SOP-P001' => [
+                    'title' => 'P001 Physical Measures Overview SOP',
+                    'filename' => 'P001 Physical Measures Overview SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P002' => [
+                    'title' => 'P002 Pediatric Weight SOP',
+                    'filename' => 'P002 Pediatric Weight SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P003' => [
+                    'title' => 'P003 Pediatric Recumbent Length and Height SOP',
+                    'filename' => 'P003 Pediatric Recumbent Length and Height SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P004' => [
+                    'title' => 'P004 Pediatric Head Circumference SOP',
+                    'filename' => 'P004 Pediatric Head Circumference SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P005' => [
+                    'title' => 'P005 Pediatric Waist Circumference SOP',
+                    'filename' => 'P005 Pediatric Waist Circumference SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P006' => [
+                    'title' => 'P006 Pediatric Heart Rate_Pulse SOP',
+                    'filename' => 'P006 Pediatric Heart Rate_Pulse SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P007' => [
+                    'title' => 'P007 Pediatric Blood Pressure and Heart Rate SOP',
+                    'filename' => 'P007 Pediatric Blood Pressure and Heart Rate SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P008' => [
+                    'title' => 'P008 Pediatric Urgent and Emergent Findings SOP',
+                    'filename' => 'P008 Pediatric Urgent and Emergent Findings SOP.pdf',
+                    'languages' => ['en']
                 ]
             ]
         ],
