@@ -203,6 +203,20 @@ class HelpService
         ]
     ];
 
+    public static array $nphDocumentGroups = [
+        [
+            'title' => 'NPH Application SOPs',
+            'documents' => [
+                'NPH-HealthPro-SOP' => [
+                    'title' => 'NPH HealthPro Application SOP',
+                    'filename' => 'NPH HealthPro Application SOP.pdf',
+                    'languages' => ['es', 'en'],
+                    'es_title' => 'NPH HealthPro Application SOP'
+                ]
+            ]
+        ]
+    ];
+
     public static $videoPlaylists = [
         'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
@@ -257,6 +271,13 @@ class HelpService
         'data_dictionaries' => 'https://www.aoucollaborations.net/x/a8U_/',
         'release_notes' => 'https://www.aoucollaborations.net/x/MQElvw'
     ];
+
+    public static array $nphResources = [
+        'program_mop' => 'https://nutritionforprecisionhealth.org/secure/documents/mops',
+        'moodle_resources' => 'https://moodle.nutritionforprecisionhealth.org/course/view.php?id=14',
+        'release_notes' => 'https://moodle.nutritionforprecisionhealth.org/mod/forum/view.php?id=264'
+    ];
+
     protected $params;
 
     public function __construct(ParameterBagInterface $params)
@@ -269,9 +290,10 @@ class HelpService
         return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
     }
 
-    public function getDocumentInfo($id)
+    public function getDocumentInfo(string $id, string $documentGroup = 'hpo')
     {
-        foreach (self::$documentGroups as $documentGroup) {
+        $documentGroups = $documentGroup === 'nph' ? self::$nphDocumentGroups : self::$documentGroups;
+        foreach ($documentGroups as $documentGroup) {
             if (array_key_exists($id, $documentGroup['documents'])) {
                 return $documentGroup['documents'][$id];
             }
