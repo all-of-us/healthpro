@@ -104,7 +104,27 @@ class HelpService
                     'filename' => 'SOP-026 HPO Biobank Order Review.pdf',
                     'languages' => ['es', 'en'],
                     'es_title' => 'SOP Número 026 Revisión de órdenes de biobanco de las HPO'
-                ]
+                ],
+                'SOP-040' => [
+                    'title' => 'SOP-040 Pediatric HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition',
+                    'filename' => 'SOP-040 Pediatric HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf',
+                    'languages' => ['en'],
+                ],
+                'SOP-041' => [
+                    'title' => 'SOP-041 Pediatric HPO Blood Specimens Collection and Processing',
+                    'filename' => 'SOP-041 Pediatric HPO Blood Specimens Collection and Processing.pdf',
+                    'languages' => ['en'],
+                ],
+                'SOP-042' => [
+                    'title' => 'SOP-042 Pediatric HPO Urine Specimen Collection',
+                    'filename' => 'SOP-042 Pediatric HPO Urine Specimen Collection.pdf',
+                    'languages' => ['en'],
+                ],
+                'SOP-043' => [
+                    'title' => 'SOP-043 Pediatric HPO Saliva Oragene Collection',
+                    'filename' => 'SOP-043 Pediatric HPO Saliva Oragene Collection.pdf',
+                    'languages' => ['en'],
+                ],
             ]
         ],
         [
