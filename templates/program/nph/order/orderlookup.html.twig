@@ -47,9 +47,9 @@
                         <tbody>
                         {% for order in recentOrders %}
                             <tr>
-                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}">{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</a></td>
-                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}">{{ order.orderId }}</a></td>
-                                <td><a href="{{ path('nph_participant_summary', { participantId: order.participantId }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
+                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}" class="text-decoration-none">{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</a></td>
+                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}" class="text-decoration-none">{{ order.orderId }}</a></td>
+                                <td><a href="{{ path('nph_participant_summary', { participantId: order.participantId }) }}" class="text-decoration-none">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
                             </tr>
                         {% endfor %}
                         </tbody>
