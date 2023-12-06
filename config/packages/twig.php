@@ -20,6 +20,7 @@ $container->loadFromExtension('twig', [
         'feedback_url' => HelpService::getFeedbackUrl(),
         'report_technical_issue_url' => HelpService::getReportTechnicalIssueUrl(),
         'userTimezones' => User::$timezones,
-        'inactiveSiteFormDisabled' => 0
+        'inactiveSiteFormDisabled' => 0,
+        'nphResources' => HelpService::$nphResources
     ],
 ]);
