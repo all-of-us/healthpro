@@ -4,6 +4,7 @@
 {% block body %}
     {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
     {% form_theme sampleIdForm 'bootstrap_5_layout.html.twig' %}
+    {% form_theme aliquotIdForm 'bootstrap_5_layout.html.twig' %}
     <div class="page-header border-bottom">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Biospecimen Lookup</h2>
     </div>
@@ -23,6 +24,13 @@
             {{ form_widget(sampleIdForm) }}
             <button type="submit" class="btn btn-primary">Go</button>
             {{ form_end(sampleIdForm) }}
+            <hr>
+            <h3>Find by Aliquot ID</h3>
+            <p class="fst-italic">Search for an aliquot ID to view the associated aliquot form.</p>
+            {{ form_start(aliquotIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+            {{ form_widget(aliquotIdForm) }}
+            <button type="submit" class="btn btn-primary">Go</button>
+            {{ form_end(aliquotIdForm) }}
         </div>
         {% if recentOrders is not null %}
             <div class="col-sm-6 col-md-7">
