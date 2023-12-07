@@ -41,11 +41,25 @@ class NphOrderLookupController extends AbstractController
         if ($idForm instanceof RedirectResponse) {
             return $idForm;
         }
-        $sampleIdForm = $this->getSampleIdForm($request, $siteService, $participantSummary);
+        $sampleIdForm = $this->getSampleAliquotIdForm(
+            $request,
+            $siteService,
+            $participantSummary,
+            NphSampleLookupType::class,
+            'sampleId',
+            'Collection Sample ID'
+        );
         if ($sampleIdForm instanceof RedirectResponse) {
             return $sampleIdForm;
         }
-        $aliquotIdForm = $this->getAliquotIdForm($request, $siteService, $participantSummary);
+        $aliquotIdForm = $this->getSampleAliquotIdForm(
+            $request,
+            $siteService,
+            $participantSummary,
+            NphAliquotLookupType::class,
+            'aliquotId',
+            'Aliquot ID'
+        );
         if ($aliquotIdForm instanceof RedirectResponse) {
             return $aliquotIdForm;
         }
@@ -84,62 +98,31 @@ class NphOrderLookupController extends AbstractController
                         'orderId' => $order->getId()
                     ]);
                 }
-                $crossSiteErrorMessage = 'Lookup for this order ID is not permitted because the participant is paired with another site';
+                $crossSiteErrorMessage = 'Lookup for this Order ID is not permitted because the participant is paired with another site';
             }
             $this->addFlash('error', $crossSiteErrorMessage ?? 'Order ID not found');
         }
         return $idForm;
     }
 
-    private function getSampleIdForm(
+    private function getSampleAliquotIdForm(
         Request $request,
         SiteService $siteService,
-        NphParticipantSummaryService $nphParticipantSummaryService
+        NphParticipantSummaryService $nphParticipantSummaryService,
+        string $formType,
+        string $lookupKey,
+        string $fieldLabel
     ): FormInterface|RedirectResponse {
-        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null, ['label' => 'Collection Sample ID']);
-        $sampleIdForm->handleRequest($request);
-
-        if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
-            $id = $sampleIdForm->get('sampleId')->getData();
-
-            $sample = $this->em->getRepository(NphSample::class)->findOneBy([
-                'sampleId' => $id
+        $form = $this->createForm($formType, null, ['label' => $fieldLabel]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $id = $form->get($lookupKey)->getData();
+            $entityClass = ($formType === NphSampleLookupType::class) ? NphSample::class : NphAliquot::class;
+            $entity = $this->em->getRepository($entityClass)->findOneBy([
+                $lookupKey => $id
             ]);
-            if ($sample) {
-                $participantId = $sample->getNphOrder()->getParticipantId();
-                $participant = $nphParticipantSummaryService->getParticipantById($participantId);
-                if (!$participant) {
-                    throw $this->createNotFoundException('Participant not found.');
-                }
-                if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
-                    return $this->redirectToRoute('nph_sample_finalize', [
-                        'participantId' => $sample->getNphOrder()->getParticipantId(),
-                        'orderId' => $sample->getNphOrder()->getId(),
-                        'sampleId' => $sample->getId()
-                    ]);
-                }
-                $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
-            }
-            $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
-        }
-        return $sampleIdForm;
-    }
-
-    private function getAliquotIdForm(
-        Request $request,
-        SiteService $siteService,
-        NphParticipantSummaryService $nphParticipantSummaryService
-    ): FormInterface|RedirectResponse {
-        $aliquotIdForm = $this->createForm(NphAliquotLookupType::class, null);
-        $aliquotIdForm->handleRequest($request);
-
-        if ($aliquotIdForm->isSubmitted() && $aliquotIdForm->isValid()) {
-            $id = $aliquotIdForm->get('aliquotId')->getData();
-            $aliquot = $this->em->getRepository(NphAliquot::class)->findOneBy([
-                'aliquotId' => $id
-            ]);
-            if ($aliquot) {
-                $sample = $aliquot->getNphSample();
+            if ($entity) {
+                $sample = ($entity instanceof NphSample) ? $entity : $entity->getNphSample();
                 if ($sample) {
                     $participantId = $sample->getNphOrder()->getParticipantId();
                     $participant = $nphParticipantSummaryService->getParticipantById($participantId);
@@ -153,12 +136,12 @@ class NphOrderLookupController extends AbstractController
                             'sampleId' => $sample->getId()
                         ]);
                     }
-                    $crossSiteErrorMessage = 'Lookup for this aliquot ID is not permitted because the participant is paired with another site';
+                    $crossSiteErrorMessage = "Lookup for this $fieldLabel is not permitted because the participant is paired with another site";
                 }
             }
-            $this->addFlash('error', $crossSiteErrorMessage ?? 'Aliquot ID not found');
+            $this->addFlash('error', $crossSiteErrorMessage ?? "$fieldLabel not found");
         }
-        return $aliquotIdForm;
+        return $form;
     }
 
     private function generateOrderLookupView(
