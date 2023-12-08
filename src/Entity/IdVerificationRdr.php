@@ -12,44 +12,44 @@ class IdVerificationRdr
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(length: 255)]
-    private ?string $participantId = null;
+    private string $participantId;
 
     #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column]
-    private ?int $userId = null;
+    private int $userId;
 
     #[ORM\Column(length: 255)]
-    private ?string $siteName = null;
+    private string $siteName;
 
-    #[ORM\Column]
-    private ?int $siteId = null;
+    #[ORM\Column(length: 255)]
+    private string $siteId;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $verificationDate = null;
+    private \DateTimeInterface $verifiedDate;
 
     #[ORM\Column(length: 255)]
-    private ?string $verificationType = null;
+    private string $verificationType;
 
     #[ORM\Column(length: 255)]
-    private ?string $visitType = null;
+    private string $visitType;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdTs = null;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(nullable: true)]
-    private ?int $insertStatus = null;
+    private ?int $insertId = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getParticipantId(): ?string
+    public function getParticipantId(): string
     {
         return $this->participantId;
     }
@@ -61,7 +61,7 @@ class IdVerificationRdr
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -85,7 +85,7 @@ class IdVerificationRdr
         return $this;
     }
 
-    public function getSiteName(): ?string
+    public function getSiteName(): string
     {
         return $this->siteName;
     }
@@ -97,31 +97,31 @@ class IdVerificationRdr
         return $this;
     }
 
-    public function getSiteId(): ?int
+    public function getSiteId(): string
     {
         return $this->siteId;
     }
 
-    public function setSiteId(int $siteId): static
+    public function setSiteId(string $siteId): static
     {
         $this->siteId = $siteId;
 
         return $this;
     }
 
-    public function getVerificationDate(): ?\DateTimeInterface
+    public function getVerifiedDate(): ?\DateTimeInterface
     {
-        return $this->verificationDate;
+        return $this->verifiedDate;
     }
 
-    public function setVerificationDate(\DateTimeInterface $verificationDate): static
+    public function setVerifiedDate(\DateTimeInterface $verifiedDate): static
     {
-        $this->verificationDate = $verificationDate;
+        $this->verifiedDate = $verifiedDate;
 
         return $this;
     }
 
-    public function getVerificationType(): ?string
+    public function getVerificationType(): string
     {
         return $this->verificationType;
     }
@@ -133,7 +133,7 @@ class IdVerificationRdr
         return $this;
     }
 
-    public function getVisitType(): ?string
+    public function getVisitType(): string
     {
         return $this->visitType;
     }
@@ -157,14 +157,14 @@ class IdVerificationRdr
         return $this;
     }
 
-    public function getInsertStatus(): ?int
+    public function getInsertId(): ?int
     {
-        return $this->insertStatus;
+        return $this->insertId;
     }
 
-    public function setInsertStatus(?int $insertStatus): static
+    public function setInsertId(?int $insertId): static
     {
-        $this->insertStatus = $insertStatus;
+        $this->insertId = $insertId;
 
         return $this;
     }

@@ -20,4 +20,14 @@ class IdVerificationRdrRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, IdVerificationRdr::class);
     }
+
+    public function getIdVerificationsRdr(int $limit): array
+    {
+        return $this->createQueryBuilder('ivr')
+            ->where('ivr.insertId is null')
+            ->setMaxResults($limit)
+            ->orderBy('ivr.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
