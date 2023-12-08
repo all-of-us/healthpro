@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Audit\Log;
 use App\Entity\IdVerification;
+use App\Entity\IdVerificationRdr;
 use Doctrine\ORM\EntityManagerInterface;
 
 class IdVerificationService
@@ -100,21 +101,55 @@ class IdVerificationService
         return false;
     }
 
-    public function saveIdVerification($data): void
+    public function saveIdVerification($data): ?int
     {
-        $idVerification = new IdVerification();
-        $idVerification->setParticipantId($data['participantId']);
-        $idVerification->setUser($data['user']);
-        $idVerification->setSite($data['site']);
-        $idVerification->setVisitType($data['visitType']);
-        $idVerification->setVerificationType($data['verificationType']);
-        $idVerification->setVerifiedDate($data['verifiedDate']);
-        $idVerification->setGuardianVerified($data['guardianVerified'] ?? false);
-        if (isset($data['import'])) {
-            $idVerification->setImport($data['import']);
+        try {
+            $idVerification = new IdVerification();
+            $idVerification->setParticipantId($data['participantId']);
+            $idVerification->setUser($data['user']);
+            $idVerification->setSite($data['site']);
+            $idVerification->setVisitType($data['visitType']);
+            $idVerification->setVerificationType($data['verificationType']);
+            $idVerification->setVerifiedDate($data['verifiedDate']);
+            $idVerification->setGuardianVerified($data['guardianVerified'] ?? false);
+            if (isset($data['import'])) {
+                $idVerification->setImport($data['import']);
+            }
+            $createdTs = new \DateTime();
+            if (isset($data['createdTs'])) {
+                $createdTs = $data['createdTs'];
+            }
+            $idVerification->setCreatedTs($createdTs);
+            $this->em->persist($idVerification);
+            $this->em->flush();
+            $this->loggerService->log(Log::ID_VERIFICATION_ADD, $idVerification->getId());
+            return $idVerification->getId();
+        } catch (\Exception $e) {
+            $this->loggerService->log('error', $e->getMessage());
+            return null;
         }
-        $idVerification->setCreatedTs(new \DateTime());
-        $this->em->persist($idVerification);
+    }
+
+    //TODO: Remove this once the backfill is done
+    public function backfillIdVerificationsRdr(): void
+    {
+        $idVerificationsRdr = $this->em->getRepository(IdVerificationRdr::class)->getIdVerificationsRdr(50);
+        foreach ($idVerificationsRdr as $idVerificationRdr) {
+            $idVerificationData = [];
+            $idVerificationData['participantId'] = $idVerificationRdr->getParticipantId();
+            $user = $this->userService->getUserEntityFromEmail($idVerificationRdr->getEmail());
+            $idVerificationData['user'] = $user;
+            $idVerificationData['site'] = $idVerificationRdr->getSiteId();
+            $idVerificationData['visitType'] = $idVerificationRdr->getVisitType();
+            $idVerificationData['verificationType'] = $idVerificationRdr->getVerificationType();
+            $idVerificationData['verifiedDate'] = $idVerificationRdr->getVerifiedDate();
+            $idVerificationData['createdTs'] = $idVerificationRdr->getCreatedTs();
+            if ($insertId = $this->saveIdVerification($idVerificationData)) {
+                $idVerificationRdr->setInsertId($insertId);
+                $this->em->persist($idVerificationRdr);
+            }
+        }
         $this->em->flush();
+        $this->em->clear();
     }
 }
