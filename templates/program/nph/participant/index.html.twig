@@ -44,7 +44,7 @@
                     </div>
                     <hr>
                     <div class="col-md-12">
-                        {% include 'program/nph/order/partials/participant-consents.html.twig' %}
+                        {{ macros.displayModuleConsents(programSummaryAndOrderInfo, participant) }}
                     </div>
                 </div>
             </div>
@@ -83,7 +83,6 @@
                             <div class="tab-pane fade ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                                 <div class="row">
                                     <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
-                                    {% include 'program/nph/participant/partials/hair-nail-optin-badge.html.twig' %}
                                 </div>
                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                     {% if VisitCode != 'sampleStatusCount' %}
