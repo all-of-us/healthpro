@@ -36,17 +36,17 @@
 
 {% macro generateStatusLabel(status) %}
     {% if status == 'Collected' %}
-        {% set labelClass = 'label-primary' %}
+        {% set labelClass = 'bg-primary' %}
     {% elseif status == 'Finalized' %}
-        {% set labelClass = 'label-success' %}
+        {% set labelClass = 'bg-success' %}
     {% elseif status == 'In Progress' %}
-        {% set labelClass = 'label-warning' %}
+        {% set labelClass = 'bg-warning' %}
     {% elseif status == 'Canceled' %}
-        {% set labelClass = 'label-danger' %}
+        {% set labelClass = 'bg-danger' %}
     {% else %}
-        {% set labelClass = 'label-default' %}
+        {% set labelClass = 'bg-primary' %}
     {% endif %}
-    <div class="col-sm-2"><span class="label {{ labelClass }}">{{ status }}</span></div>
+    <span><span class="badge {{ labelClass }}">{{ status }}</span></span>
 {% endmacro %}
 
 {% macro displayDateAndTimezone(time, timezoneId) %}
@@ -91,3 +91,51 @@
     {% endif %}
     {{ status }}
 {% endmacro %}
+
+{% macro displayModuleConsents(programSummaryAndOrderInfo, participant) %}
+    {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+        <ul class="list-group mb-2">
+            {% if participant.module %}
+                <span class="nph-module-badge nph-module-{{ moduleNumber }}">NPH Module {{ moduleNumber }}</span>
+            {% endif %}
+            {% if participant.moduleConsents[moduleNumber] is defined %}
+                {% for consent, consentStatus in participant.moduleConsents[moduleNumber] %}
+                <li class="list-group-item">
+                    <span>{{ _self.displayConsentCheck(consentStatus, participant) }} <strong>{{ consent }}</strong> {{ consentStatus['time']|date('m/d/Y') }}</span>
+                </li>
+                {% endfor %}
+                {% if moduleNumber == 1 %}
+                    <li class="list-group-item">{{ _self.displayHairNailOptin(participant) }}</li>
+                {% endif %}
+            {% else %}
+                <li class="list-group-item"></li>
+            {% endif %}
+        </ul>
+    {% endfor %}
+{% endmacro %}
+
+{% macro displayConsentCheck(consentStatus, participant) %}
+    {% if consentStatus['value'] == constant('OPTIN_PERMIT', participant) %}
+        <i class="fa fa-check text-success" aria-hidden="true"></i>
+    {% else %}
+        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro displayHairNailOptin(participant) %}
+        {% if participant.module1TissueConsentStatus == constant('OPTIN_PERMIT', participant) %}
+            <i class="fa fa-check text-success" title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <strong>Hair & Nail Opt-In</strong>
+        {% elseif participant.module1TissueConsentStatus == constant('OPTIN_NAIL', participant) %}
+            <i class="fa fa-check text-success" title="The participant has opted into nail collections only" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <strong>Nail Only Opt-In</strong>
+        {% elseif participant.module1TissueConsentStatus == constant('OPTIN_HAIR', participant) %}
+            <i class="fa fa-check text-success" title="The participant has opted into hair collections only" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <strong>Hair Only Opt-In</strong>
+        {% else %}
+            <i class="fa fa-times text-danger"  title="The participant has <u>not</u> opted into hair and nail collections" data-html="true" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <strong>Hair & Nail Opt-In</strong>
+        {% endif %}
+        {{ participant.module1TissueConsentTime|date('m/d/Y') }}
+{% endmacro %}
+
