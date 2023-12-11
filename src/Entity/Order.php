@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Helper\Participant;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,6 +24,10 @@ class Order
     public const ORDER_STEP_FINALIZED = 'finalized';
     public const ORDER_TYPE_KIT = 'kit';
     public const ORDER_TYPE_DIVERSION = 'diversion';
+    public const PEDIATRIC_ORDER_STRING = 'ped';
+    public const PEDIATRIC_BLOOD_SAMPLES = ['1ED04', '2ED02', '2ED04', '1ED10', '1PXR2', '1ED02'];
+    public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
+    public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
 
@@ -224,6 +229,9 @@ class Order
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $submissionTs;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $ageInMonths;
 
     private $quanumCollectedUser;
 
@@ -877,17 +885,43 @@ class Order
         return $this->currentVersion;
     }
 
-    public function loadSamplesSchema($params = [])
+    public function getAgeInMonths(): int
+    {
+        return $this->ageInMonths;
+    }
+
+    public function setAgeInMonths(?int $ageInMonths): self
+    {
+        $this->ageInMonths = $ageInMonths;
+
+        return $this;
+    }
+
+    public function loadSamplesSchema($params = [], Participant $participant = null, Measurement $physicalMeasurement = null)
     {
         $this->currentVersion = $this->getVersion();
+        if ($participant) {
+            $pediatricFlag = $participant->isPediatric;
+        } else {
+            $pediatricFlag = false;
+        }
         if (empty($this->currentVersion)) {
             if (!empty($this->getId())) {
                 // Initial orders doesn't have a version so set version for those orders
                 $this->currentVersion = self::INITIAL_VERSION;
+                if ($pediatricFlag && $physicalMeasurement) {
+                    $summary = $physicalMeasurement->getSummary();
+                    $this->currentVersion = "{$this->currentVersion}-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
+                if ($pediatricFlag && $physicalMeasurement) {
+                    $summary = $physicalMeasurement->getSummary();
+                    $this->currentVersion = "{$this->currentVersion}-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                }
             }
         }
+
         $this->params = $params;
         $file = __DIR__ . "/../Order/versions/{$this->currentVersion}.json";
         if (!file_exists($file)) {
@@ -1186,6 +1220,9 @@ class Order
         if ($this->getType() === 'saliva') {
             unset($columns['process']);
         }
+        if ($this->isPediatricOrder()) {
+            unset($columns['process']);
+        }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
             if (!$this->{'get' . $column . 'Ts'}()) {
@@ -1214,6 +1251,9 @@ class Order
             unset($columns['print_requisition']);
         }
         if ($this->getType() === 'saliva') {
+            unset($columns['process']);
+        }
+        if ($this->isPediatricOrder()) {
             unset($columns['process']);
         }
         $steps = [];
@@ -1455,9 +1495,24 @@ class Order
         return is_array($requestedSamples) && empty(array_diff($requestedSamples, self::$urineSamples));
     }
 
+    public function isPediatricSalivaOrder(): bool
+    {
+        $requestedSamples = json_decode($this->requestedSamples, true);
+        return is_array($requestedSamples) && empty(array_diff($requestedSamples, self::PEDIATRIC_SALIVA_SAMPLES));
+    }
+
     public function getOrderTypeDisplayText(): string
     {
         if (!empty($this->requestedSamples)) {
+            if ($this->isPediatricOrder()) {
+                if ($this->isUrineOrder()) {
+                    return 'Pediatric Urine';
+                }
+                if ($this->isPediatricSalivaOrder()) {
+                    return 'Pediatric Saliva';
+                }
+                return 'Pediatric Blood';
+            }
             if ($this->isUrineOrder()) {
                 return 'Urine';
             }
@@ -1478,6 +1533,49 @@ class Order
     {
         return $this->getFedexTracking() === null && ($this->getType() === self::ORDER_TYPE_KIT || $this->getType()
                 === self::ORDER_TYPE_DIVERSION);
+    }
+
+    public function getPediatricBloodSamples(): array
+    {
+        $samples = [];
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_BLOOD_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function getPediatricUrineSamples(): array
+    {
+        $samples = [];
+        foreach ($this->samples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_URINE_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function getPediatricSalivaSamples(): array
+    {
+        $samples = [];
+        foreach ($this->salivaSamples as $sample) {
+            if (in_array($sample, self::PEDIATRIC_SALIVA_SAMPLES)) {
+                $samples[] = $sample;
+            }
+        }
+        return $samples;
+    }
+
+    public function isPediatricOrder(): bool
+    {
+        if ($this->version) {
+            return str_contains($this->version, self::PEDIATRIC_ORDER_STRING);
+        } elseif ($this->getCurrentVersion()) {
+            return str_contains($this->getCurrentVersion(), self::PEDIATRIC_ORDER_STRING);
+        }
+        return false;
     }
 
     protected function getSampleTime($set, $sample)

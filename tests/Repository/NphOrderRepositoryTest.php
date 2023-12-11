@@ -33,6 +33,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $nphOrder->setSite($siteId);
         $nphOrder->setCreatedTs(new \DateTime());
         $nphOrder->setOrderType('urine');
+        $nphOrder->setDowntimeGenerated(false);
         $this->em->persist($nphOrder);
         $this->em->flush();
 

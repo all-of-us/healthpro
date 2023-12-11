@@ -38,4 +38,14 @@ class HeightForAge0To23MonthsRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getChartsData($sex): ?array
+    {
+        $queryBuilder = $this->createQueryBuilder('hfa');
+        if ($sex) {
+            $queryBuilder->where('hfa.sex = :sex')
+                ->setParameter('sex', $sex);
+        }
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
 }

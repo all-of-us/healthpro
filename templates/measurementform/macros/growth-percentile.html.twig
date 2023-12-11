@@ -1,0 +1,8 @@
+{% macro displayGrowthPercentile(spanId, sexAtBirth) %}
+    {% if sexAtBirth != 2 %}
+        <span id="percentile-1-{{ spanId }}">--</span> percentile {% if sexAtBirth == 0 %} (M) {% endif %} <br>
+    {% endif %}
+    {% if sexAtBirth != 1 %}
+        <span id="percentile-2-{{ spanId }}">--</span> percentile {% if sexAtBirth == 0 %} (F) {% endif %}
+    {% endif %}
+{% endmacro %}

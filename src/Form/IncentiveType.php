@@ -19,6 +19,33 @@ class IncentiveType extends AbstractType
         ) ? $builder->getData()->getIncentiveAmount() : 0;
 
         $builder
+            ->add('recipient', Type\ChoiceType::class, [
+                'label' => 'Please select the recipient of the incentive:',
+                'choices' => Incentive::$recipientChoices,
+                'placeholder' => '-- Select Recipient --',
+                'multiple' => false,
+                'required' => true,
+                'constraints' => [
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && empty($value)) {
+                            $context->buildViolation('Please specify recipient')->addViolation();
+                        }
+                    })
+                ]
+            ])
+            ->add('other_incentive_recipient', Type\TextType::class, [
+                'label' => 'Specify Other',
+                'required' => false,
+                'mapped' => false,
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['recipient']->getData() === Incentive::OTHER && empty($value)) {
+                            $context->buildViolation('Please specify the other recipient.')->addViolation();
+                        }
+                    })
+                ],
+            ])
             ->add('incentive_date_given', Type\DateType::class, [
                 'widget' => 'single_text',
                 'label' => 'Date of Service',
@@ -44,7 +71,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('incentive_type', Type\ChoiceType::class, [
                 'label' => 'Incentive Type',
-                'choices' => Incentive::$incentiveTypeChoices,
+                'choices' => Incentive::getIncentiveOptions($options['pediatric_participant']),
                 'placeholder' => '-- Select incentive type --',
                 'multiple' => false,
                 'required' => false,
@@ -75,6 +102,40 @@ class IncentiveType extends AbstractType
                     'autocomplete' => 'off'
                 ]
             ])
+            ->add('type_of_item', Type\TextType::class, [
+                'label' => 'Specify Type of Item',
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Type('string'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === Incentive::ITEM_OF_APPRECIATION && empty($value)) {
+                            $context->buildViolation('Please specify type of item')->addViolation();
+                        }
+                    })
+                ],
+                'attr' => [
+                    'class' => 'item-type',
+                    'autocomplete' => 'off',
+                ]
+            ])
+            ->add('number_of_items', Type\IntegerType::class, [
+                'label' => 'Number of Items',
+                'required' => false,
+                'constraints' => [
+                    new Constraints\Type('integer'),
+                    new Constraints\Callback(function ($value, $context) {
+                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() === Incentive::ITEM_OF_APPRECIATION && empty($value)) {
+                            $context->buildViolation('Please specify number of items')->addViolation();
+                        }
+                    }),
+                    new Constraints\Range(['min' => 1, 'max' => 1000])
+                ],
+                'attr' => [
+                    'class' => 'item-type',
+                    'autocomplete' => 'off',
+                    'min' => 1
+                ]
+            ])
             ->add('other_incentive_type', Type\TextType::class, [
                 'label' => 'Specify Other',
                 'required' => false,
@@ -89,7 +150,7 @@ class IncentiveType extends AbstractType
             ])
             ->add('incentive_occurrence', Type\ChoiceType::class, [
                 'label' => 'Incentive Occurrence',
-                'choices' => Incentive::$incentiveOccurrenceChoices,
+                'choices' => Incentive::getIncentiveOccurenceOptions($options['pediatric_participant']),
                 'placeholder' => '-- Select incentive occurrence --',
                 'multiple' => false,
                 'required' => false,
@@ -127,7 +188,9 @@ class IncentiveType extends AbstractType
                 ],
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) {
-                        if (!$context->getRoot()['declined']->getData() && $context->getRoot()['incentive_type']->getData() !== 'promotional' && empty($value)) {
+                        if (!$context->getRoot()['declined']->getData() &&
+                            ($context->getRoot()['incentive_type']->getData() !== 'promotional' && $context->getRoot()['incentive_type']->getData() !== Incentive::ITEM_OF_APPRECIATION) &&
+                            empty($value)) {
                             $context->buildViolation('Please specify incentive amount')->addViolation();
                         }
                     })
@@ -187,7 +250,8 @@ class IncentiveType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Incentive::class,
-            'require_notes' => false
+            'require_notes' => false,
+            'pediatric_participant' => false
         ]);
     }
 }

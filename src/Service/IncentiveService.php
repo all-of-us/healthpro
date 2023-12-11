@@ -46,8 +46,18 @@ class IncentiveService
             $obj->dateGiven = $incentive->getIncentiveDateGiven()->format('Y-m-d\TH:i:s\Z');
             $obj->occurrence = $incentive->getOtherIncentiveOccurrence() ?? $incentive->getIncentiveOccurrence();
             $obj->incentiveType = $incentive->getOtherIncentiveType() ?: $incentive->getIncentiveType();
+            $obj->incentiveRecipient = $incentive->getRecipient();
+            if ($incentive->getIncentiveType() === Incentive::ITEM_OF_APPRECIATION) {
+                $obj->appreciationItemType = $incentive->getTypeOfItem();
+                $obj->appreciationItemCount = (string) $incentive->getNumberOfItems();
+            }
             if ($incentive->getGiftCardType()) {
                 $obj->giftcardType = $incentive->getGiftCardType();
+            }
+            $obj->incentiveRecipient = $incentive->getRecipient();
+            if ($incentive->getTypeOfItem()) {
+                $obj->appreciationItemType = $incentive->getTypeOfItem();
+                $obj->appreciationItemCount = $incentive->getNumberOfItems();
             }
             $obj->amount = $incentive->getIncentiveAmount();
             $obj->notes = $incentive->getNotes();
@@ -148,6 +158,9 @@ class IncentiveService
         }
         if ($incentive->getIncentiveType() === 'promotional') {
             $incentive->setIncentiveAmount(0);
+        }
+        if ($incentive->getRecipient() === Incentive::OTHER) {
+            $incentive->setRecipient(Incentive::OTHER . ', ' . $incentiveForm['other_incentive_recipient']->getData());
         }
         return $incentive;
     }

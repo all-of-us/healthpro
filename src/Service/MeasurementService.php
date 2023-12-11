@@ -3,10 +3,14 @@
 namespace App\Service;
 
 use App\Audit\Log;
+use App\Entity\BloodPressureDiastolicHeightPercentile;
+use App\Entity\BloodPressureSystolicHeightPercentile;
+use App\Entity\HeartRateAge;
 use App\Entity\Measurement;
 use App\Entity\MeasurementHistory;
 use App\Entity\Site;
 use App\Entity\User;
+use App\Entity\ZScores;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -40,12 +44,17 @@ class MeasurementService
         $this->loggerService = $loggerService;
     }
 
-    public function load($measurement, $type = null)
+    public function load($measurement, $participant, $type = null)
     {
         $this->measurement = $measurement;
         $version = $this->getCurrentVersion($type);
         $measurement->setCurrentVersion($version);
         $this->loadFromAObject($measurement);
+        if ($measurement->isPediatricForm()) {
+            $growthChartsData = $this->getGrowthChartsData($participant->sexAtBirth, $participant->ageInMonths);
+            $measurement->setGrowthCharts($growthChartsData);
+            $measurement->setSexAtBirth($participant->sexAtBirth);
+        }
     }
 
     public function loadFromAObject($measurement)
@@ -102,6 +111,9 @@ class MeasurementService
     {
         if ($type === Measurement::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
             return Measurement::BLOOD_DONOR_CURRENT_VERSION;
+        }
+        if (str_starts_with($type, 'peds-')) {
+            return Measurement::CURRENT_VERSION . '-' . $type;
         }
         if ($this->requireEhrModificationProtocol()) {
             return Measurement::EHR_CURRENT_VERSION;
@@ -271,6 +283,22 @@ class MeasurementService
                 'system' => 'https://www.pmi-ops.org/site-id',
                 'value' => $site
             ]
+        ];
+    }
+
+    private function getGrowthChartsData(string $sexAtBirth, int $ageInMonths): array
+    {
+        $growthCharts = $this->measurement->getGrowthChartsByAge($ageInMonths);
+        return [
+            'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($sexAtBirth) : [],
+            'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($sexAtBirth) : [],
+            'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($sexAtBirth) : [],
+            'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($sexAtBirth) : [],
+            'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($sexAtBirth) : [],
+            'bpSystolicHeightPercentileChart' => $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData(),
+            'bpDiastolicHeightPercentileChart' => $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData(),
+            'heartRateAgeCharts' => $this->em->getRepository(HeartRateAge::class)->getChartsData(),
+            'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
         ];
     }
 }

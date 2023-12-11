@@ -28,6 +28,7 @@ class Participant
     public $evaluationFinalizedSite;
     public $orderCreatedSite;
     public $age;
+    public $ageInMonths;
     public $patientStatus;
     public $isCoreParticipant = false;
     public $isCoreMinusPMParticipant = false;
@@ -46,7 +47,12 @@ class Participant
     public $nphDeactivationAuthored = '';
     public $consentForNphModule1 = false;
     public $consentForNphModule1Authored = '';
+    public int $sexAtBirth;
     public bool $isPediatric = false;
+    public string $pediatricMeasurementsVersionType;
+    public string|null $guardianId = null;
+    public string|null $guardianFirstName = null;
+    public string|null $guardianLastName = null;
 
     private $disableTestAccess;
     private $cohortOneLaunchTime;
@@ -67,6 +73,19 @@ class Participant
     private static $deceasedStatusValues = [
         'PENDING',
         'APPROVED'
+    ];
+    private static $pediatricWeightBreakpoints = [
+        9999,
+        16.4,
+        5,
+        2.5
+    ];
+
+    private static array $pediatricAgeRangeMeasurementVersions = [
+        'peds-1' => [0, 23],
+        'peds-2' => [24, 35],
+        'peds-3' => [36, 59],
+        'peds-4' => [60, 83],
     ];
 
     public function __construct($rdrParticipant = null)
@@ -244,6 +263,32 @@ class Participant
         return false;
     }
 
+    public function getPediatricWeightBreakpoint(float $weight): float
+    {
+        $breakpoint = 0;
+        foreach (self::$pediatricWeightBreakpoints as $value) {
+            if ($weight < $value) {
+                $breakpoint = $value;
+            }
+        }
+        return $breakpoint;
+    }
+
+    private function getAgeInMonths(): ?int
+    {
+        if (!$this->dob) {
+            return null;
+        }
+
+        $now = new \DateTime();
+        $diff = $now->diff($this->dob);
+
+        $yearsInMonths = $diff->y * 12;
+        $months = $diff->m;
+
+        return $yearsInMonths + $months;
+    }
+
     private function parseRdrParticipant($participant)
     {
         if (!is_object($participant)) {
@@ -253,6 +298,16 @@ class Participant
         // Use participant id as id
         if (isset($participant->participantId)) {
             $this->id = $participant->participantId;
+        }
+
+        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
+            $this->isPediatric = true;
+            if (isset($participant->relatedParticipants) && is_array($participant->relatedParticipants)) {
+                $guardian = $participant->relatedParticipants[0];
+                $this->guardianId = $guardian->participantId ?? null;
+                $this->guardianFirstName = $guardian->firstName ?? null;
+                $this->guardianLastName = $guardian->lastName ?? null;
+            }
         }
 
         // Check for participants associated with TEST organization when disableTestAccess is set to true
@@ -266,7 +321,7 @@ class Participant
             $this->statusReason = 'basics';
         }
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_3') {
-            if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+            if (!$this->isPediatric && isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                 $this->status = false;
                 $this->editExistingOnly = true;
                 $this->statusReason = 'genomics';
@@ -277,7 +332,7 @@ class Participant
                 $this->statusReason = 'ehr-consent';
             }
         }
-        if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
+        if (!$this->isPediatric && isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
             if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
                 if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
@@ -294,7 +349,7 @@ class Participant
 
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_1') {
             if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
-                if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
+                if (!$this->isPediatric && isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
                     $this->status = false;
                     $this->editExistingOnly = true;
                     $this->statusReason = 'genomics';
@@ -346,6 +401,12 @@ class Participant
                 break;
         }
 
+        $this->sexAtBirth = match ($participant->sex ?? null) {
+            'SexAtBirth_Male' => 1,
+            'SexAtBirth_Female' => 2,
+            default => 0,
+        };
+
         // Set dob to DateTime object
         if (isset($participant->dateOfBirth)) {
             try {
@@ -367,6 +428,7 @@ class Participant
 
         //Set age
         $this->age = $this->getAge();
+        $this->ageInMonths = $this->getAgeInMonths();
 
         // Remove site prefix
         if (!empty($participant->clinicPhysicalMeasurementsFinalizedSite) && $participant->clinicPhysicalMeasurementsFinalizedSite !== 'UNSET') {
@@ -438,6 +500,18 @@ class Participant
 
         if (isset($participant->consentForNphModule1Authored)) {
             $this->consentForNphModule1Authored = $participant->consentForNphModule1Authored;
+        }
+
+        if ($this->isPediatric) {
+            $measurementVersionType = '';
+            foreach (self::$pediatricAgeRangeMeasurementVersions as $key => $range) {
+                list($start, $end) = $range;
+                if ($this->getAgeInMonths() >= $start && $this->getAgeInMonths() <= $end) {
+                    $measurementVersionType = $key;
+                    break;
+                }
+            }
+            $this->pediatricMeasurementsVersionType = $measurementVersionType;
         }
     }
 

@@ -71,7 +71,7 @@ class NphOrderController extends BaseController
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
                 $nphOrderService->getSamplesByType('stool'),
                 'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
-                'module' => $module]
+                'module' => $module, 'userTimezone' => $this->getSecurityUser()->getTimezone()]
         );
         $showPreview = false;
         $oderForm->handleRequest($request);
@@ -97,12 +97,14 @@ class NphOrderController extends BaseController
                 $oderForm->addError(new FormError('Please correct the errors below'));
             }
         }
+        $downtimeOrders = $nphOrderService->getDowntimeOrderSummary();
         return $this->render('program/nph/order/generate-orders.html.twig', [
             'orderForm' => $oderForm->createView(),
             'timePointSamples' => $timePointSamples,
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'downtimeOrders' => $downtimeOrders,
             'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
@@ -330,7 +332,8 @@ class NphOrderController extends BaseController
             'revertForm' => $this->createForm(NphSampleRevertType::class)->createView(),
             'biobankView' => false,
             'isFormDisabled' => $isFormDisabled,
-            'visitDiet' => $nphOrderService->getVisitDiet()
+            'visitDiet' => $nphOrderService->getVisitDiet(),
+            'order' => $order
         ]);
     }
 

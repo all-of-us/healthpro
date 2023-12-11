@@ -88,7 +88,7 @@
         </tbody>
     </table>
     <div style="display: none">{{ form_widget(sampleModifyForm['samplesCheckAll']) }}</div>
-    {% if order.orderType == 'urine' %}
+    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_URINE') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE') %}
         <hr>
         <h4>
             Color and Clarity

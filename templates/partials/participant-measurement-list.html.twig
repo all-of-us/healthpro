@@ -32,6 +32,11 @@
                             <span class="label label-warning">Edited &amp; Unfinalized</span> {{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}
                         {% endif %}
                     </small>
+                    {% if measurement.isPediatricForm %}
+                        <div class="pull-right">
+                            <i class="fa fa-child child-icon" data-toggle="tooltip" data-container="body" aria-label="Pediatric Participant" title="Pediatric Participant"></i>
+                        </div>
+                    {% endif %}
                 {% if readOnly is defined %}
                     </div> {# close .btn-readonly div above #}
                 {% else %}

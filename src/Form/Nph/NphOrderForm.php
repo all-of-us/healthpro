@@ -150,6 +150,31 @@ class NphOrderForm extends AbstractType
         $builder->add('bowelQuality', Type\ChoiceType::class, $bowelQualityOptions);
     }
 
+    protected function addUrineTotalCollectionVolume(
+        FormBuilderInterface $builder,
+        bool $disabled = false
+    ): void {
+        $urineVolumeCollection = [
+            'label' => 'Total Collection Volume',
+            'required' => true,
+            'disabled' => $disabled,
+            'constraints' => [
+                new Constraints\Callback(function ($value, $context) {
+                    if ($value === 0.0) {
+                        $context->buildViolation('Total collection volume must be greater than 0')->addViolation();
+                    } elseif (empty($value)) {
+                        $context->buildViolation('Total collection volume is required')->addViolation();
+                    }
+                })
+            ],
+            'attr' => [
+                'data-warning-min-volume' => 0.1,
+                'data-warning-max-volume' => 10,
+            ]
+        ];
+        $builder->add('totalCollectionVolume', Type\NumberType::class, $urineVolumeCollection);
+    }
+
     protected function getDateTimeConstraints(): array
     {
         return [

@@ -12,6 +12,7 @@ use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
+use App\Service\ParticipantSummaryService;
 use App\Service\PatientStatusService;
 use App\Service\RdrApiService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,7 +60,7 @@ class DebugToolsController extends BaseController
     }
 
     #[Route(path: '/missing/measurements', name: 'admin_debug_missing_measurements')]
-    public function missingMeasurementsAction(Request $request, MeasurementService $measurementsService, RdrApiService $rdrApiService)
+    public function missingMeasurementsAction(Request $request, MeasurementService $measurementsService, RdrApiService $rdrApiService, ParticipantSummaryService $participantSummaryService)
     {
         $missing = $this->em->getRepository(Measurement::class)->getMissingMeasurements();
         $choices = [];
@@ -77,7 +78,8 @@ class DebugToolsController extends BaseController
                     if (!$measurement) {
                         continue;
                     }
-                    $measurementsService->load($measurement);
+                    $participant = $participantSummaryService->getParticipantById($measurement->getParticipantId());
+                    $measurementsService->load($measurement, $participant);
                     $parentRdrId = null;
                     if ($measurement->getParentId()) {
                         $parentEvaluation = $repository->findOneBy(['id' => $measurement->getParentId()]);

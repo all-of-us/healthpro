@@ -9,6 +9,7 @@ use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
+use App\Form\PediatricMeasurementType;
 use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
 use App\Service\HelpService;
@@ -59,6 +60,9 @@ class MeasurementsController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $type = $request->query->get('type');
+        if ($participant->isPediatric && $participant->pediatricMeasurementsVersionType && !$type) {
+            $type = $participant->pediatricMeasurementsVersionType;
+        }
         if (!$this->measurementService->canEdit(
             $measurementId,
             $participant
@@ -70,21 +74,28 @@ class MeasurementsController extends BaseController
             if (!$measurement) {
                 throw $this->createNotFoundException('Physical Measurement not found.');
             }
-            $this->measurementService->load($measurement, $type);
+            $this->measurementService->load($measurement, $participant, $type);
             $measurement->canCancel = $measurement->canCancel();
             $measurement->canRestore = $measurement->canRestore();
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
             $measurement = new Measurement();
-            $this->measurementService->load($measurement, $type);
+            $this->measurementService->load($measurement, $participant, $type);
+            if ($measurement->isPediatricForm()) {
+                $measurement->setAgeInMonths($participant->ageInMonths);
+            }
             if ($measurement->isBloodDonorForm() && $request->query->get('wholeblood')) {
                 $measurement->setFieldData((object) [
                     'weight-protocol-modification' => 'whole-blood-donor'
                 ]);
             }
         }
+        if ($measurement->isPediatricForm()) {
+            $growthChartsData = $measurement->getGrowthCharts();
+        }
         $showAutoModification = false;
-        $measurementsForm = $this->get('form.factory')->createNamed('form', MeasurementType::class, $measurement->getFieldData(), [
+        $formType = $measurement->isPediatricForm() ? PediatricMeasurementType::class : MeasurementType::class;
+        $measurementsForm = $this->get('form.factory')->createNamed('form', $formType, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
             'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() || $this->measurementService->inactiveSiteFormDisabled()
         ]);
@@ -189,6 +200,17 @@ class MeasurementsController extends BaseController
                                     'showAutoModification' => 1
                                 ]);
                             }
+                            if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && !isset($newMeasurement)) {
+                                return $this->redirectToRoute('order_check_pediatric', [
+                                    'participantId' => $participant->id
+                                ]);
+                            } elseif ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm() && isset($newMeasurement)) {
+                                return $this->redirectToRoute('measurement', [
+                                    'participantId' => $participant->id,
+                                    'measurementId' => $measurementId,
+                                    'type' => 'peds-weight'
+                                ]);
+                            }
                             return $this->redirectToRoute('measurement', [
                                 'participantId' => $participant->id,
                                 'measurementId' => $measurementId
@@ -202,7 +224,11 @@ class MeasurementsController extends BaseController
                         if (empty($rdrError)) {
                             $this->addFlash('notice', 'Physical measurements saved');
                         }
-
+                        if ($measurement->isPediatricForm() && $measurement->isWeightOnlyPediatricForm()) {
+                            return $this->redirectToRoute('order_check_pediatric', [
+                                'participantId' => $participant->id
+                            ]);
+                        }
                         // If finalization failed, values are still saved, but do not redirect
                         // so that errors can be displayed
                         if ($measurementsForm->isValid()) { // @phpstan-ignore-line
@@ -260,7 +286,16 @@ class MeasurementsController extends BaseController
             'ehrProtocolBannerMessage' => $this->params->has('ehr_protocol_banner_message') ? $this->params->get('ehr_protocol_banner_message') : '',
             'readOnlyView' => $this->isReadOnly(),
             'sopDocumentTitles' => $this->helpService->getDocumentTitlesList(),
-            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled()
+            'inactiveSiteFormDisabled' => $this->measurementService->inactiveSiteFormDisabled(),
+            'weightForAgeCharts' => $growthChartsData['weightForAgeCharts'] ?? [],
+            'weightForLengthCharts' => $growthChartsData['weightForLengthCharts'] ?? [],
+            'heightForAgeCharts' => $growthChartsData['heightForAgeCharts'] ?? [],
+            'headCircumferenceForAgeCharts' => $growthChartsData['headCircumferenceForAgeCharts'] ?? [],
+            'bmiForAgeCharts' => $growthChartsData['bmiForAgeCharts'] ?? [],
+            'bpSystolicHeightPercentileChart' => $growthChartsData['bpSystolicHeightPercentileChart'] ?? [],
+            'bpDiastolicHeightPercentileChart' => $growthChartsData['bpDiastolicHeightPercentileChart'] ?? [],
+            'heartRateAgeCharts' => $growthChartsData['heartRateAgeCharts'] ?? [],
+            'zScoreCharts' => $growthChartsData['zScoreCharts'] ?? []
         ]);
     }
 
@@ -278,7 +313,7 @@ class MeasurementsController extends BaseController
         if (!$measurement) {
             throw $this->createNotFoundException('Physical Measurement not found.');
         }
-        $this->measurementService->load($measurement);
+        $this->measurementService->load($measurement, $participant);
         // Allow cancel for active and restored measurements
         // Allow restore for only cancelled measurements
         if (!in_array($type, [$measurement::EVALUATION_CANCEL, $measurement::EVALUATION_RESTORE])) {
@@ -384,7 +419,7 @@ class MeasurementsController extends BaseController
         if (!$measurement->getFinalizedTs()) {
             throw $this->createAccessDeniedException();
         }
-        $this->measurementService->load($measurement);
+        $this->measurementService->load($measurement, $participant);
         return $this->render('measurement/summary.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
@@ -447,7 +482,7 @@ class MeasurementsController extends BaseController
             $measurement->setFinalizedTs(new \DateTime('2017-01-01', new \DateTimeZone('UTC')));
             $measurement->setFinalizedUser($measurement->getUser());
         }
-        $this->measurementService->load($measurement);
+        $this->measurementService->load($measurement, $participant);
         if ($measurement->getFinalizedTs()) {
             $date = $measurement->getFinalizedTs();
         } else {

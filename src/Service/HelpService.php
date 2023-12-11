@@ -39,6 +39,46 @@ class HelpService
                     'filename' => 'SOP-015 Waist-Hip Circumference Measurement.pdf',
                     'languages' => ['es', 'en'],
                     'es_title' => 'SOP Número 015 Medición de la circunferencia de la cintura y la cadera'
+                ],
+                'SOP-P001' => [
+                    'title' => 'P001 Physical Measures Overview SOP',
+                    'filename' => 'P001 Physical Measures Overview SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P002' => [
+                    'title' => 'P002 Pediatric Weight SOP',
+                    'filename' => 'P002 Pediatric Weight SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P003' => [
+                    'title' => 'P003 Pediatric Recumbent Length and Height SOP',
+                    'filename' => 'P003 Pediatric Recumbent Length and Height SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P004' => [
+                    'title' => 'P004 Pediatric Head Circumference SOP',
+                    'filename' => 'P004 Pediatric Head Circumference SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P005' => [
+                    'title' => 'P005 Pediatric Waist Circumference SOP',
+                    'filename' => 'P005 Pediatric Waist Circumference SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P006' => [
+                    'title' => 'P006 Pediatric Heart Rate_Pulse SOP',
+                    'filename' => 'P006 Pediatric Heart Rate_Pulse SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P007' => [
+                    'title' => 'P007 Pediatric Blood Pressure and Heart Rate SOP',
+                    'filename' => 'P007 Pediatric Blood Pressure and Heart Rate SOP.pdf',
+                    'languages' => ['en']
+                ],
+                'SOP-P008' => [
+                    'title' => 'P008 Pediatric Urgent and Emergent Findings SOP',
+                    'filename' => 'P008 Pediatric Urgent and Emergent Findings SOP.pdf',
+                    'languages' => ['en']
                 ]
             ]
         ],
@@ -104,7 +144,27 @@ class HelpService
                     'filename' => 'SOP-026 HPO Biobank Order Review.pdf',
                     'languages' => ['es', 'en'],
                     'es_title' => 'SOP Número 026 Revisión de órdenes de biobanco de las HPO'
-                ]
+                ],
+                'SOP-040' => [
+                    'title' => 'SOP-040 Pediatric HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition',
+                    'filename' => 'SOP-040 Pediatric HPO Creating a PMI Biobank Order and Printing Specimen Labels and Test Requisition.pdf',
+                    'languages' => ['en'],
+                ],
+                'SOP-041' => [
+                    'title' => 'SOP-041 Pediatric HPO Blood Specimens Collection and Processing',
+                    'filename' => 'SOP-041 Pediatric HPO Blood Specimens Collection and Processing.pdf',
+                    'languages' => ['en'],
+                ],
+                'SOP-042' => [
+                    'title' => 'SOP-042 Pediatric HPO Urine Specimen Collection',
+                    'filename' => 'SOP-042 Pediatric HPO Urine Specimen Collection.pdf',
+                    'languages' => ['en'],
+                ],
+                'SOP-043' => [
+                    'title' => 'SOP-043 Pediatric HPO Saliva Oragene Collection',
+                    'filename' => 'SOP-043 Pediatric HPO Saliva Oragene Collection.pdf',
+                    'languages' => ['en'],
+                ],
             ]
         ],
         [
@@ -203,6 +263,19 @@ class HelpService
         ]
     ];
 
+    public static array $nphDocumentGroups = [
+        [
+            'title' => 'NPH Application SOPs',
+            'documents' => [
+                'NPH-HealthPro-SOP' => [
+                    'title' => 'NPH HealthPro Application SOP',
+                    'filename' => 'NPH HealthPro Application SOP.pdf',
+                    'languages' => ['es']
+                ]
+            ]
+        ]
+    ];
+
     public static $videoPlaylists = [
         'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
@@ -257,6 +330,13 @@ class HelpService
         'data_dictionaries' => 'https://www.aoucollaborations.net/x/a8U_/',
         'release_notes' => 'https://www.aoucollaborations.net/x/MQElvw'
     ];
+
+    public static array $nphResources = [
+        'program_mop' => 'https://nutritionforprecisionhealth.org/secure/documents/mops',
+        'moodle_resources' => 'https://moodle.nutritionforprecisionhealth.org/course/view.php?id=14',
+        'release_notes' => 'https://moodle.nutritionforprecisionhealth.org/mod/forum/view.php?id=264'
+    ];
+
     protected $params;
 
     public function __construct(ParameterBagInterface $params)
@@ -269,9 +349,10 @@ class HelpService
         return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
     }
 
-    public function getDocumentInfo($id)
+    public function getDocumentInfo(string $id, string $documentGroup = 'hpo')
     {
-        foreach (self::$documentGroups as $documentGroup) {
+        $documentGroups = $documentGroup === 'nph' ? self::$nphDocumentGroups : self::$documentGroups;
+        foreach ($documentGroups as $documentGroup) {
             if (array_key_exists($id, $documentGroup['documents'])) {
                 return $documentGroup['documents'][$id];
             }

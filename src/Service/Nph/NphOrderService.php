@@ -251,21 +251,21 @@ class NphOrderService
                     } elseif (in_array($sample, $this->getSamplesByType(NphOrder::TYPE_BLOOD))) {
                         $samplesByType['blood'][] = $sample;
                     } elseif (!in_array($sample, self::$placeholderSamples)) {
-                        $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample));
+                        $nphOrder = $this->createOrder($timePoint, $this->getSampleType($sample), null, $formData['downtime_generated'], $formData['createdTs']);
                         $this->createSample($sample, $nphOrder, $sampleGroup);
                     }
                 }
                 if (!empty($samplesByType['nail'])) {
-                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_NAIL, $samplesByType['nail'], $sampleGroup);
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_NAIL, $samplesByType['nail'], $sampleGroup, $formData['downtime_generated'], $formData['createdTs']);
                 }
                 if (!empty($samplesByType['blood'])) {
-                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_BLOOD, $samplesByType['blood'], $sampleGroup);
+                    $this->createOrderWithSamples($timePoint, NphOrder::TYPE_BLOOD, $samplesByType['blood'], $sampleGroup, $formData['downtime_generated'], $formData['createdTs']);
                 }
             }
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit']);
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit'], $formData['downtime_generated'], $formData['createdTs']);
             foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
@@ -275,10 +275,13 @@ class NphOrderService
         return $sampleGroup;
     }
 
-    public function createOrder(string $timePoint, string $orderType, string $orderId = null): NphOrder
+    public function createOrder(string $timePoint, string $orderType, string $orderId = null, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedTs = null): NphOrder
     {
         if ($orderId === null) {
             $orderId = $this->generateOrderId();
+        }
+        if (empty($downtimeGeneratedTs)) {
+            $downtimeGeneratedTs = new DateTime();
         }
         $nphOrder = new NphOrder();
         $nphOrder->setModule($this->module);
@@ -289,9 +292,14 @@ class NphOrderService
         $nphOrder->setBiobankId($this->biobankId);
         $nphOrder->setUser($this->user);
         $nphOrder->setSite($this->site);
-        $nphOrder->setCreatedTs(new DateTime());
+        $nphOrder->setCreatedTs($downtimeGeneratedTs);
         $nphOrder->setCreatedTimezoneId($this->getTimezoneid());
         $nphOrder->setOrderType($orderType);
+        $nphOrder->setDowntimeGenerated($downtimeGenerated);
+        $nphOrder->setDowntimeGeneratedUser($downtimeGenerated ? $this->user : null);
+        if ($downtimeGenerated) {
+            $nphOrder->setDowntimeGeneratedTs(new DateTime());
+        }
         $this->em->persist($nphOrder);
         $this->em->flush();
         $this->loggerService->log(Log::NPH_ORDER_CREATE, $nphOrder->getId());
@@ -338,8 +346,8 @@ class NphOrderService
                         $nphSample->setCollectedTs($collectedTs);
                         $nphSample->setCollectedTimezoneId($this->getTimezoneid());
                         $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
-                        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
-                            $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']));
+                        if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
+                            $nphSample->setSampleMetadata($this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity', 'totalCollectionVolume']));
                         }
                     } else {
                         $nphSample->setCollectedUser(null);
@@ -382,7 +390,7 @@ class NphOrderService
                 $orderCollectionData[$sampleCode] = true;
             }
             $orderCollectionData[$sampleCode . 'Notes'] = $nphSample->getCollectedNotes();
-            if ($order->getOrderType() === 'urine') {
+            if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
                 if ($nphSample->getSampleMetaData()) {
                     $sampleMetadata = json_decode($nphSample->getSampleMetaData(), true);
                     if (!empty($sampleMetadata['urineColor'])) {
@@ -390,6 +398,9 @@ class NphOrderService
                     }
                     if (!empty($sampleMetadata['urineClarity'])) {
                         $orderCollectionData['urineClarity'] = $sampleMetadata['urineClarity'];
+                    }
+                    if (!empty($sampleMetadata['totalCollectionVolume'])) {
+                        $orderCollectionData['totalCollectionVolume'] = $sampleMetadata['totalCollectionVolume'];
                     }
                 }
             }
@@ -426,10 +437,13 @@ class NphOrderService
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
-        } elseif ($order->getOrderType() === 'urine') {
+        } elseif ($order->getOrderType() === NPHOrder::TYPE_URINE || $order->getOrderType() === NPHOrder::TYPE_24URINE) {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
             $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
+            if ($order->getOrderType() === NPHOrder::TYPE_24URINE) {
+                $metadata['totalCollectionVolume'] = $metadata['totalCollectionVolume'] ?? null;
+            }
         }
         return $metadata;
     }
@@ -494,7 +508,7 @@ class NphOrderService
         $order = $sample->getNphOrder();
         $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
         $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
-        if ($order->getOrderType() === NphOrder::TYPE_URINE) {
+        if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
             if ($sample->getSampleMetaData()) {
                 $sampleMetadata = json_decode($sample->getSampleMetaData(), true);
                 if (!empty($sampleMetadata['urineColor'])) {
@@ -502,6 +516,9 @@ class NphOrderService
                 }
                 if (!empty($sampleMetadata['urineClarity'])) {
                     $sampleData['urineClarity'] = $sampleMetadata['urineClarity'];
+                }
+                if (!empty($sampleMetadata['totalCollectionVolume'])) {
+                    $sampleData['totalCollectionVolume'] = $sampleMetadata['totalCollectionVolume'];
                 }
             }
         }
@@ -661,15 +678,18 @@ class NphOrderService
         $samplesMetadata = $this->getSamplesMetadata($order);
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        if ($order->getModule() === '3' && $order->getVisitType() === $order::TYPE_DLW) {
-            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitType' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
-            $obj['dlwdose'] = [
-              'batchid' => $dlwInfo->getBatchId(),
-              'participantweight' => $dlwInfo->getParticipantWeight(),
-              'dose' => $dlwInfo->getActualDose(),
-              'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
-                'dosetime' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
-            ];
+        if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
+            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
+            if ($dlwInfo) {
+                $obj->sample = array_merge($obj->sample, [
+                    'dlwDose' => [
+                    'batchid' => $dlwInfo->getDoseBatchId(),
+                    'participantweight' => $dlwInfo->getParticipantWeight(),
+                    'dose' => $dlwInfo->getActualDose(),
+                    'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
+                    'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
+                ]]);
+            }
         }
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
@@ -822,6 +842,36 @@ class NphOrderService
         return $dlwSummary;
     }
 
+    public function getDowntimeOrderSummary(): array
+    {
+        $orders = $this->getDowntimeGeneratedOrdersByModuleAndVisit($this->participantId, $this->module, $this->visit);
+        $existingSamples = $this->getExistingOrdersData();
+        $downtimeGenerated = [];
+        $downtimeGenerated['orderInfo'] = [];
+        $downtimeGenerated['sampleInfo'] = [];
+        $orderNumber = 0;
+        $seenSampleGroups = [];
+        /** @var NphOrder $order */
+        foreach ($orders as $order) {
+            if (array_key_exists($order->getTimepoint(), $existingSamples)) {
+                /** @var NphSample $sample */
+                foreach ($order->getNphSamples() as $sample) {
+                    if (!in_array($sample->getSampleGroup(), $seenSampleGroups, true)) {
+                        $seenSampleGroups[] = $sample->getSampleGroup();
+                        $orderNumber++;
+                        $downtimeGenerated['orderInfo'][$orderNumber]['orderUser'] = $order->getUser()->getEmail();
+                        $downtimeGenerated['orderInfo'][$orderNumber]['orderDowntimeCreatedTime'] = $order->getDowntimeGeneratedTs();
+                        $downtimeGenerated['orderInfo'][$orderNumber]['orderCreatedTime'] = $order->getCreatedTs();
+                    }
+                    if (in_array($sample->getSampleCode(), $existingSamples[$order->getTimepoint()], true)) {
+                        $downtimeGenerated['sampleInfo'][$order->getTimepoint()][$sample->getSampleCode()] = $orderNumber;
+                    }
+                }
+            }
+        }
+        return $downtimeGenerated;
+    }
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
@@ -891,9 +941,9 @@ class NphOrderService
         return $id;
     }
 
-    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup): void
+    private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedCreatedTs = null): void
     {
-        $nphOrder = $this->createOrder($timePoint, $orderType);
+        $nphOrder = $this->createOrder($timePoint, $orderType, null, $downtimeGenerated, $downtimeGeneratedCreatedTs);
         foreach ($samples as $sample) {
             $this->createSample($sample, $nphOrder, $sampleGroup);
         }
@@ -990,8 +1040,8 @@ class NphOrderService
             $this->saveNphAliquotFinalizedInfo($sample, $aliquots, $formData);
         }
         $sampleMetadata = '';
-        if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE) {
-            $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity']);
+        if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $sample->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
+            $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity', 'totalCollectionVolume']);
         }
         $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata);
 
@@ -1071,7 +1121,7 @@ class NphOrderService
                             }
                         }
                         if (!empty($formData["${aliquotCode}glycerolAdditiveVolume"])) {
-                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"]]));
+                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"][$key]]));
                         }
                         $this->em->persist($nphAliquot);
                         $this->em->flush();
@@ -1189,5 +1239,11 @@ class NphOrderService
     private function getTimezoneid(): ?int
     {
         return $this->userService->getUserEntity()->getTimezoneId();
+    }
+
+    private function getDowntimeGeneratedOrdersByModuleAndVisit(string $ParticipantId, string $Module, string $Visit): array
+    {
+        $orders = $this->em->getRepository(NphOrder::class)->getDownTimeGeneratedOrdersByModuleAndVisit($ParticipantId, $Module, $Visit);
+        return $orders;
     }
 }

@@ -11,6 +11,11 @@
             </a>
         </div>
     </div>
+    {% if order.downtimeGenerated() %}
+    <div class="alert bg-success well-sm margin-top-15 text-success">
+        <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone)}}] </span>
+    </div>
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
@@ -38,6 +43,9 @@
                     {% if order.orderType != constant('TYPE_STOOL', order) %}
                         <th>Collection Time</th>
                     {% endif %}
+                    {% if order.orderType == constant('TYPE_24URINE', order) %}
+                        <th>Total Collection Volume</th>
+                    {% endif %}
                     <th>Notes</th>
                     <th>
                         {% if order.canCancel %}
@@ -62,6 +70,9 @@
                             <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
                         </tr>
                     {% endif %}
+                    {% if order.orderType == constant('TYPE_24URINE', order) %}
+                        {% include 'program/nph/order/partials/order-collect-urine24.html.twig' %}
+                    {% else %}
                     <tr class="row-samples">
                         <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
                             class="has-error"{% endif %}>
@@ -115,6 +126,7 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                 {% endfor %}
                 <tr>
                     <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
@@ -123,7 +135,7 @@
                 </tbody>
             </table>
             <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
-            {% if order.orderType == constant('TYPE_URINE', order) %}
+            {% if order.orderType == constant('TYPE_URINE', order) or order.orderType == constant('TYPE_24URINE', order)  %}
                 <hr>
                 <h4>
                     Color and Clarity

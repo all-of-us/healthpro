@@ -40,20 +40,22 @@ class OrderCreateType extends AbstractType
         } else {
             $showBloodTubes = $options['showBloodTubes'];
             $nonBloodSamples = $options['nonBloodSamples'];
-            $builder
-                ->add('samples', Type\ChoiceType::class, [
-                    'expanded' => true,
-                    'multiple' => true,
-                    'label' => 'Select requested samples',
-                    'choices' => $options['samples'],
-                    'required' => false,
-                    'choice_attr' => function ($val) use ($showBloodTubes, $nonBloodSamples) {
-                        if ($showBloodTubes) {
-                            return [];
+            if (!$options['pediatric']) {
+                $builder
+                    ->add('samples', Type\ChoiceType::class, [
+                        'expanded' => true,
+                        'multiple' => true,
+                        'label' => 'Select requested samples',
+                        'choices' => $options['samples'],
+                        'required' => false,
+                        'choice_attr' => function ($val) use ($showBloodTubes, $nonBloodSamples) {
+                            if ($showBloodTubes) {
+                                return [];
+                            }
+                            return !in_array($val, $nonBloodSamples) ? ['disabled' => 'disabled'] : ['checked' => 'checked'];
                         }
-                        return !in_array($val, $nonBloodSamples) ? ['disabled' => 'disabled'] : ['checked' => 'checked'];
-                    }
-                ]);
+                    ]);
+            }
         }
     }
 
@@ -63,7 +65,8 @@ class OrderCreateType extends AbstractType
             'orderType' => null,
             'samples' => null,
             'showBloodTubes' => null,
-            'nonBloodSamples' => null
+            'nonBloodSamples' => null,
+            'pediatric' => null,
         ]);
     }
 }

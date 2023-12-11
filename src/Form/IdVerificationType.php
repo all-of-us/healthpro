@@ -20,6 +20,8 @@ class IdVerificationType extends AbstractType
             'Biospecimen Collection Only' => 'BIOSPECIMEN_COLLECTION_ONLY',
             'Biospecimen Redraw' => 'BIOSPECIMEN_REDRAW_ONLY',
             'Retention Activities' => 'RETENTION_ACTIVITIES',
+            'ID Verification Only' => 'ID_VERIFICATION_ONLY',
+            'Pediatric Visit' => 'PEDIATRIC_VISIT',
         ]
     ];
 
@@ -46,6 +48,14 @@ class IdVerificationType extends AbstractType
                 'placeholder' => '-- Select Visit Type --',
                 'multiple' => false,
                 'required' => true
+            ])
+            ->add('guardian_verified', Type\ChoiceType::class, [
+                'label' => false,
+                'choices' => ['Participant\'s identity confirmed via the guardian.' => true],
+                'expanded' => true,
+                'multiple' => true,
+                'required' => true,
+                'attr' => ['hidden' => true]
             ]);
     }
 

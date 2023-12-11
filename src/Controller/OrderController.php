@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\Site;
 use App\Form\OrderCreateType;
@@ -11,6 +12,7 @@ use App\Form\OrderRevertType;
 use App\Form\OrderType;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
+use App\Service\MeasurementService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
 use App\Service\SiteService;
@@ -78,12 +80,12 @@ class OrderController extends BaseController
         }
         return $this->render('order/check.html.twig', [
             'participant' => $participant,
-            'siteType' => $requestStack->getSession()->get('siteType')
+            'siteType' => $requestStack->getSession()->get('siteType'),
         ]);
     }
 
     #[Route(path: '/participant/{participantId}/order/create', name: 'order_create')]
-    public function orderCreateAction($participantId, Request $request, SessionInterface $session)
+    public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -98,13 +100,18 @@ class OrderController extends BaseController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
+        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        if ($physicalMeasurement) {
+            $measurementService->load($physicalMeasurement, $participant);
+        }
         $order = new Order();
-        $this->orderService->loadSamplesSchema($order);
+        $this->orderService->loadSamplesSchema($order, $participant, $physicalMeasurement);
         $createForm = $this->createForm(OrderCreateType::class, null, [
             'orderType' => $session->get('orderType'),
             'samples' => $order->getSamples(),
             'showBloodTubes' => $showBloodTubes,
-            'nonBloodSamples' => $order::$nonBloodSamples
+            'nonBloodSamples' => $order::$nonBloodSamples,
+            'pediatric' => $participant->isPediatric,
         ]);
         $showCustom = false;
         $createForm->handleRequest($request);
@@ -140,6 +147,15 @@ class OrderController extends BaseController
                 } elseif ($request->request->has('saliva')) {
                     $order->setType('saliva');
                 }
+                if ($participant->isPediatric) {
+                    if ($request->request->has('blood')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricBloodSamples()));
+                    } elseif ($request->request->has('urine')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricUrineSamples()));
+                    } elseif ($request->request->has('saliva')) {
+                        $order->setRequestedSamples(json_encode($order->getPediatricSalivaSamples()));
+                    }
+                }
             }
             if ($createForm->isValid()) { // @phpstan-ignore-line
                 $order->setUser($this->getUserEntity());
@@ -149,6 +165,7 @@ class OrderController extends BaseController
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
                 $order->setVersion($order->getCurrentVersion());
+                $order->setAgeInMonths($participant->ageInMonths);
                 if ($session->get('orderType') === 'hpo') {
                     $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
                 }
@@ -183,6 +200,9 @@ class OrderController extends BaseController
             'showSalivaTubes' => $showSalivaTubes,
             'version' => $order->getVersion(),
             'salivaInstructions' => $order->getSalivaInstructions(),
+            'orderCurrentVersion' => $order->getCurrentVersion(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
+            'showPediatricBloodTubes' => count($order->getPediatricBloodSamples()) > 0,
         ]);
     }
 
@@ -211,7 +231,8 @@ class OrderController extends BaseController
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
             'errorMessage' => $errorMessage,
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 
@@ -243,7 +264,7 @@ class OrderController extends BaseController
     public function orderCollectAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
-        $nextStep = $order->getType() === 'saliva' ? 'finalize' : 'process';
+        $nextStep = ($order->getType() === 'saliva' || $order->isPediatricOrder()) ? 'finalize' : 'process';
         $wasNextStepAvailable = in_array($nextStep, $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
@@ -300,6 +321,7 @@ class OrderController extends BaseController
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
             'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
@@ -395,6 +417,7 @@ class OrderController extends BaseController
             'processTabClass' => $order->getProcessTabClass(),
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
             'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
         ]);
     }
@@ -512,7 +535,7 @@ class OrderController extends BaseController
                     }
                 }
                 $redirectRoute = 'order_finalize';
-                if ($order->getType() !== 'kit' && !$wasPrintRequisitionStepAvailable && in_array('process', $order->getAvailableSteps())) {
+                if ($order->getType() !== 'kit' && !$wasPrintRequisitionStepAvailable && (in_array('process', $order->getAvailableSteps()) || $order->isPediatricOrder())) {
                     $redirectRoute = 'order_print_requisition';
                 }
                 return $this->redirectToRoute($redirectRoute, [
@@ -534,7 +557,8 @@ class OrderController extends BaseController
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'showUnfinalizeMsg' => $showUnfinalizeMsg,
             'readOnlyView' => $this->isReadOnly(),
-            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
+            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled(),
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 
@@ -553,7 +577,8 @@ class OrderController extends BaseController
         if (!in_array('print_requisition', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
                 'participantId' => $participantId,
-                'orderId' => $orderId
+                'orderId' => $orderId,
+                'isPediatricOrder' => $order->isPediatricOrder()
             ]);
         }
 
@@ -561,7 +586,8 @@ class OrderController extends BaseController
             'participant' => $this->orderService->getParticipant(),
             'order' => $order,
             'processTabClass' => $order->getProcessTabClass(),
-            'readOnlyView' => $this->isReadOnly()
+            'readOnlyView' => $this->isReadOnly(),
+            'isPediatricOrder' => $order->isPediatricOrder()
         ]);
     }
 
@@ -726,6 +752,32 @@ class OrderController extends BaseController
         $order = $this->loadOrder($participantId, $orderId);
         return $this->render('biobank/summary.html.twig', [
             'biobankChanges' => $order->getBiobankChangesDetails($this->getSecurityUser()->getTimezone())
+        ]);
+    }
+
+    #[Route(path: '/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
+    public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
+    {
+        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
+            throw $this->createAccessDeniedException('Participant ineligible for order create.');
+        }
+        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        if ($measurement) {
+            $measurementService->load($measurement, $participant);
+            $measurementData = $measurement->getSummary();
+        } else {
+            $measurementData = null;
+        }
+        return $this->render('order/check-pediatric.html.twig', [
+            'participant' => $participant,
+            'siteType' => $requestStack->getSession()->get('siteType'),
+            'weightMeasurement' => $measurement,
+            'measurementData' => $measurementData,
+            'measurementId' => $measurement ? $measurement->getId() : null,
         ]);
     }
 }

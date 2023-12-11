@@ -33,10 +33,6 @@
     font-size: 0.875rem;
 }
 
-.child-icon {
-    color: #7927FF;
-}
-
 .scrollspy-participant-overview {
     height: 550px;
     overflow-y: scroll;

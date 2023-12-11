@@ -38,4 +38,14 @@ class WeightForAge24MonthsAndUpRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getChartsData($sex): ?array
+    {
+        $queryBuilder = $this->createQueryBuilder('wfa');
+        if ($sex) {
+            $queryBuilder->where('wfa.sex = :sex')
+                ->setParameter('sex', $sex);
+        }
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
 }

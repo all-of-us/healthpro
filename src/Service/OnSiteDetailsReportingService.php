@@ -23,8 +23,11 @@ class OnSiteDetailsReportingService
         'Participant ID',
         'User',
         'Date of Service',
+        'Recipient',
         'Occurrence',
         'Type',
+        'Number Of Items',
+        'Type Of Item',
         'Amount',
         'Declined?',
         'Notes',
@@ -105,6 +108,7 @@ class OnSiteDetailsReportingService
                         Incentive::$incentiveOccurrenceChoices
                     );
             }
+            $row['recipient'] = array_search($incentive['recipient'], Incentive::$recipientChoices);
             $row['occurrence'] = $occurrence;
             $type = '';
             if ($incentive['incentiveType']) {
@@ -112,11 +116,16 @@ class OnSiteDetailsReportingService
                     $type = 'Other, ' . $incentive['otherIncentiveType'];
                 } elseif ($incentive['incentiveType'] === Incentive::GIFT_CARD) {
                     $type = 'Gift Card, ' . $incentive['giftCardType'];
+                } elseif ($incentive['incentiveType'] === Incentive::ITEM_OF_APPRECIATION) {
+                    $type = 'Item of Appreciation, ' . $incentive['typeOfItem'] . ', ' .
+                        $incentive['numberOfItems'];
                 } else {
                     $type = array_search($incentive['incentiveType'], Incentive::$incentiveTypeChoices);
                 }
             }
             $row['incentiveType'] = $type;
+            $row['numberOfItems'] = $incentive['numberOfItems'];
+            $row['typeOfItem'] = $incentive['typeOfItem'];
             $row['amount'] = $incentive['incentiveAmount'] ? '$' . $incentive['incentiveAmount'] : '';
             $row['declined'] = $incentive['declined'] ? 'Yes' : 'No';
             $row['notes'] = $incentive['notes'];
@@ -160,6 +169,7 @@ class OnSiteDetailsReportingService
             } else {
                 $row['type'] = $idVerification['importId'] ? 'import' : '';
             }
+            $row['guardianVerified'] = (bool) $idVerification['guardianVerified'];
             array_push($rows, $row);
         }
         return $rows;

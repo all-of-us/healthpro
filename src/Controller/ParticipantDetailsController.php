@@ -175,7 +175,7 @@ class ParticipantDetailsController extends BaseController
         }
 
         // Incentive Form
-        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly()]);
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly(), 'pediatric_participant' => $participant->isPediatric]);
 
         // Id Verification Form
         $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
@@ -304,7 +304,7 @@ class ParticipantDetailsController extends BaseController
         if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
             throw $this->createAccessDeniedException();
         }
-        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => $incentiveId ? true : false]);
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => $incentiveId ? true : false, 'pediatric_participant' => $participant->isPediatric]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {
@@ -322,7 +322,7 @@ class ParticipantDetailsController extends BaseController
                     }
                 }
             } else {
-                $this->addFlash('incentive-error', 'Invalid form');
+                $this->addFlash('incentive-error', $incentiveForm->getErrors(true)->current()->getMessage());
             }
             return $this->redirectToRoute('participant', ['id' => $id]);
         }
@@ -349,6 +349,24 @@ class ParticipantDetailsController extends BaseController
         $results = [];
         foreach ($giftCards as $giftCard) {
             $results[] = $giftCard['giftCardType'];
+        }
+        return $this->json($results);
+    }
+
+    #[Route(path: '/ajax/search/type-of-item-prefill', name: 'search_item_type_prefill')]
+    public function itemTypePrefill(): JsonResponse
+    {
+        return $this->json(Incentive::$itemTypes);
+    }
+
+    #[Route(path: '/ajax/search/type-of-item/{query}', name: 'search_giftcard')]
+    public function itemTypeAction(Request $request): JsonResponse
+    {
+        $query = $request->get('query');
+        $itemTypes = $this->em->getRepository(Incentive::class)->search($query, 'i.typeOfItem');
+        $results = [];
+        foreach ($itemTypes as $itemType) {
+            $results[] = $itemType['typeOfItem'];
         }
         return $this->json($results);
     }

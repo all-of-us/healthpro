@@ -235,6 +235,9 @@ label.label-normal {
     padding-right: 6px;
     padding-left: 6px;
 }
+#physicalEvaluation .lead {
+    font-size: 20px;
+}
 @media(max-width:767px) {
     #physicalEvaluation .row .col-sm-4 {
         margin-bottom: 6px;
@@ -383,6 +386,10 @@ label.label-normal {
 .import-sub-header-icon {
     padding-right: 10px;
     color: #363272;
+}
+
+.child-icon {
+    color: #7927FF;
 }
 
 /* Participant work queue */
@@ -933,4 +940,7 @@ table.table-samples td {
 
 .w-10 {
     width: 10%;
+}
+.right-float {
+    float: right;
 }

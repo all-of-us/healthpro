@@ -38,4 +38,14 @@ class BmiForAge5YearsAndUpRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getChartsData($sex): ?array
+    {
+        $queryBuilder = $this->createQueryBuilder('bfa');
+        if ($sex) {
+            $queryBuilder->where('bfa.sex = :sex')
+                ->setParameter('sex', $sex);
+        }
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
 }

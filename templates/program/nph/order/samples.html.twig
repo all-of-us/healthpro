@@ -1,4 +1,4 @@
-{% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit, samplesStatus) %}
+{% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit, samplesStatus, downtimeSamples) %}
     {% set formField = orderForm[timePoint] %}
     {% for sample in formField.children %}
         {% if sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL') %}
@@ -41,7 +41,7 @@
                 <div class="checkbox">
                     <label for="{{ sample.vars.id }}">
                         {{ form_widget(sample) }}
-                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint) }}
+                        {{ _self.displaySampleLink(participantId, sample, samplesOrderIds, timePoint, downtimeSamples) }}
                     </label>
                     {{ _self.displayReprintButton(samplesOrderIds[timePoint][sample.vars.value], participantId, module, visit, samplesStatus[timePoint][sample.vars.value]) }}
                 </div>
@@ -61,13 +61,19 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displaySampleLink(participantId, sample, samplesOrderIds, timePoint) %}
+{% macro displaySampleLink(participantId, sample, samplesOrderIds, timePoint, downtimeGeneratedOrders) %}
     {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
         <a href="{{ path('nph_order_collect', {'participantId': participantId, 'orderId': samplesOrderIds[timePoint][sample.vars.value]['id']}) }}">
-            {{ sample.vars.label }}
+            {{ sample.vars.label }} {{ _self.displayDowntimeGeneratedOrderNumber(downtimeGeneratedOrders, timePoint, sample) }}
         </a>
     {% else %}
         {{ sample.vars.label }}
+    {% endif %}
+{% endmacro %}
+
+{% macro displayDowntimeGeneratedOrderNumber(downtimeGeneratedOrders, timePoint, sample) %}
+    {% if downtimeGeneratedOrders['sampleInfo']|length > 0 and timePoint in downtimeGeneratedOrders['sampleInfo']|keys and downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] %}
+        <sup>{{ downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] }}</sup>
     {% endif %}
 {% endmacro %}
 

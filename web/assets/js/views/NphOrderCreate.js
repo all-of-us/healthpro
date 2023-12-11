@@ -74,6 +74,7 @@ $(document).ready(function () {
     });
 
     $("#order_generate_btn").on("click", function () {
+        $(this).prop("disabled", true);
         let confirmMessage =
             "Are you sure you want to generate orders and print labels? " +
             "This action will officially create the order and sample IDs. " +
@@ -81,11 +82,16 @@ $(document).ready(function () {
             "Click OK to create order(s) and print labels.";
         if (confirm(confirmMessage)) {
             $("#order_create_form").submit();
+        } else {
+            $(this).prop("disabled", false);
         }
     });
 
     $("#nph_order_checkAll").on("change", function () {
-        $("#order_create_form input:checkbox:enabled").prop("checked", $(this).prop("checked"));
+        $("#order_create_form input:checkbox:enabled:not(#nph_order_downtime_generated)").prop(
+            "checked",
+            $(this).prop("checked")
+        );
     });
 
     $(".timepointCheckAll").on("change", function () {
@@ -143,4 +149,43 @@ $(document).ready(function () {
     });
 
     $(".sample-disabled-colored").parent().addClass("sample-disabled-colored");
+
+    $("#nph_order_downtime_generated").on("click", function () {
+        if ($(this).prop("checked")) {
+            $("#downtime-warning-modal").modal("show");
+        }
+        $(this).prop("checked", false);
+        showHideDowntimeCreatedTs();
+    });
+
+    $("#downtime-agree").on("click", function () {
+        $("#nph_order_downtime_generated").prop("checked", true);
+        showHideDowntimeCreatedTs();
+        $("#downtime-warning-modal").modal("hide");
+    });
+    $("#downtime-disagree").on("click", function () {
+        $("#nph_order_downtime_generated").prop("checked", false);
+        showHideDowntimeCreatedTs();
+        $("#downtime-warning-modal").modal("hide");
+    });
+
+    function showHideDowntimeCreatedTs() {
+        if ($("#nph_order_downtime_generated").prop("checked")) {
+            $("#downtime-created-ts").show();
+        } else {
+            $("#nph_order_createdTs").val("");
+            $("#downtime-created-ts").hide();
+        }
+    }
+
+    function initializeDowntimeCreatedTsDatePicker() {
+        showHideDowntimeCreatedTs();
+        let dateSelector = $("#nph_order_createdTs");
+        let currentValue = dateSelector.val();
+        $("#nph_order_createdTs").pmiDateTimePicker({
+            maxDate: new Date()
+        });
+        dateSelector.val(currentValue);
+    }
+    initializeDowntimeCreatedTsDatePicker();
 });

@@ -145,4 +145,41 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getMostRecentFinalizedNonNullWeight($participantId): Measurement|null
+    {
+        $parentIds = $this->createQueryBuilder('m')
+            ->select('m.parentId')
+            ->where('m.parentId is not null')
+            ->andWhere('m.participantId = :participantId')
+            ->setParameter('participantId', $participantId)
+            ->getQuery()
+            ->getResult();
+        $query = $this->createQueryBuilder('m')
+            ->where('m.participantId = :participantId')
+            ->andWhere('m.finalizedTs is not null')
+            ->orderBy('m.finalizedTs', 'DESC')
+            ->leftJoin('m.history', 'mh')
+            ->setParameter('participantId', $participantId);
+        if (!empty($parentIds)) {
+            $query->andWhere('m.id not in (:parentIds)')
+            ->setParameter('parentIds', $parentIds);
+        }
+        $results = $query->getQuery()->getResult();
+        $cancelledMeasurements = [];
+        foreach ($results as $result) {
+            if (in_array($result->getId(), $cancelledMeasurements)) {
+                continue;
+            }
+            if ($result->getHistory() && $result->getHistory()->getType() === Measurement::EVALUATION_CANCEL) {
+                $cancelledMeasurements[] = $result->getId();
+                continue;
+            }
+            $measurementData = json_decode($result->getData(), true);
+            if ($measurementData['weight'] && $measurementData['weight'][0] > 0) {
+                return $result;
+            }
+        }
+        return null;
+    }
 }

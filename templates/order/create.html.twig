@@ -17,6 +17,8 @@
         <li role="presentation" class="active"><a href="#">Create</a></li>
         {% if app.session.get('orderType')  == 'dv' %}
             {% set steps = ['Collect', 'Process', 'Finalize'] %}
+        {% elseif isPediatricOrder %}
+            {% set steps = ['Print Labels', 'Collect', 'Finalize', 'Print Requisition'] %}
         {% else %}
             {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% endif %}
@@ -30,7 +32,7 @@
         {{ form_start(createForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {{ form_errors(createForm) }}
         <div class="row row-equal-height">
-            {% if app.session.get('orderType') == 'hpo' %}
+            {% if app.session.get('orderType') == 'hpo' and not isPediatricOrder %}
                 <div class="col-sm-6 col-md-6 {% if app.session.get('siteType') == 'dv' %} col-sm-offset-3 col-md-offset-3 {% endif %}">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -43,9 +45,11 @@
                                     <p>
                                         <button type="submit" name="standard" class="btn btn-primary">Create</button>
                                     </p>
+                                    {% if participant.isPediatric == false %}
                                     <p>
                                         <a href="#" id="customize-enable">Customize order</a>
                                     </p>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div{% if not showCustom %} style="display:none"{% endif %} id="customize-on">
@@ -56,11 +60,13 @@
                                 {% else %}
                                     <p class="text-center">Customize your All of Us℠ biobank order</p>
                                 {% endif %}
+                                {% if not participant.isPediatric %}
                                 <div class="form-group{% if not createForm.samples.vars.valid %} has-error{% endif %}">
                                     {{ form_label(createForm.samples) }}
                                     {{ samples.form_widget(createForm.samples, false, samplesInfo, version) }}
                                     {{ form_errors(createForm.samples) }}
                                 </div>
+                                {% endif %}
                                 <div class="text-center">
                                     <p>
                                         <button type="submit" name="custom" class="btn btn-primary">Create {% if showBloodTubes %} custom {% endif %} order</button>
@@ -103,7 +109,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if app.session.get('siteType') != 'dv' %}
+            {% if app.session.get('siteType') != 'dv' and not isPediatricOrder %}
                 <div class="col-sm-6 col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -125,6 +131,9 @@
                         </div>
                     </div>
                 </div>
+            {% endif %}
+            {% if app.session.get('orderType') == 'hpo' and isPediatricOrder %}
+                {% include 'order/partials/create-pediatric.html.twig' %}
             {% endif %}
         </div>
         <p class="text-center">

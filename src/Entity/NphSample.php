@@ -514,7 +514,7 @@ class NphSample
             'collected' => $collectedTs->format('Y-m-d\TH:i:s\Z'),
             'finalized' => $finalizedTs->format('Y-m-d\TH:i:s\Z')
         ];
-        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE) {
+        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $this->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
             $sampleData['color'] = $samplesMetadata['urineColor'] ?? null;
             $sampleData['clarity'] = $samplesMetadata['urineClarity'] ?? null;
         }
@@ -528,7 +528,9 @@ class NphSample
     public function getRdrAliquotsSampleObj(array $aliquotsInfo): array
     {
         $aliquotObj = [];
+        $counter = [];
         foreach ($this->getNphAliquots() as $aliquot) {
+            $counter[$aliquot->getAliquotCode()] = isset($counter[$aliquot->getAliquotCode()]) ? $counter[$aliquot->getAliquotCode()] + 1 : 0;
             $collectedTs = $aliquot->getAliquotTs();
             $collectedTs->setTimezone(new \DateTimeZone('UTC'));
             $aliquotsData = [
@@ -542,11 +544,16 @@ class NphSample
             ];
             $metadata = $aliquot->getAliquotMetadata();
             if (isset($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'])) {
+                if (is_array($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'])) {
+                    $glycerolVolume = $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'][$counter[$aliquot->getAliquotCode()]];
+                } else {
+                    $glycerolVolume = $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'];
+                }
                 $aliquotsData['glycerolAdditiveVolume'] =
                     ['units' => 'uL',
                     'volume' => $metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume']
                 ];
-                $aliquotsData['volume'] += ($metadata[$aliquot->getAliquotCode() . 'glycerolAdditiveVolume'] / 1000);
+                $aliquotsData['volume'] += $glycerolVolume / 1000;
             }
             if ($aliquot->getStatus()) {
                 $aliquotsData['status'] = $aliquot->getStatus();
