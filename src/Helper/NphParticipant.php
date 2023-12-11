@@ -64,39 +64,25 @@ class NphParticipant
         return true;
     }
 
-    private function getModule1TissueConsentStatus(): string
+    private function getModule1TissueConsentStatus(): array
     {
         $latestDate = null;
-        $consentStatus = null;
+        $consentStatus = [];
         if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
             foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
                 if ($consent->value === self::MODULE1_CONSENT_TISSUE) {
                     $consentDate = new \DateTime($consent->time);
                     if ($latestDate === null || $consentDate > $latestDate) {
                         $latestDate = $consentDate;
-                        $consentStatus = $consent->optIn;
+                        $consentStatus['time'] = $consent->time;
+                        $consentStatus['value'] = $consent->optIn;
                     }
                 }
             }
         }
-        return $consentStatus ?? self::OPTIN_DENY;
-    }
-
-    private function getModule1TissueConsentTime(): ?string
-    {
-        $latestDate = null;
-        $consentTime = null;
-        if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
-            foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
-                if ($consent->value === self::MODULE1_CONSENT_TISSUE) {
-                    $consentDate = new \DateTime($consent->time);
-                    if ($latestDate === null || $consentDate > $latestDate) {
-                        $consentTime = $consent->time;
-                    }
-                }
-            }
-        }
-        return $consentTime ?? null;
+        $consentStatus['value'] = $consentStatus['value'] ?? self::OPTIN_DENY;
+        $consentStatus['time'] = $consentStatus['time'] ?? null;
+        return $consentStatus;
     }
 
     private function parseRdrParticipant(\stdClass $participant): void
@@ -123,8 +109,9 @@ class NphParticipant
         if (!empty($participant->biobankId)) {
             $this->biobankId = $participant->biobankId;
         }
-        $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
-        $this->module1TissueConsentTime = $this->getModule1TissueConsentTime();
+        $module1TissueConsent = $this->getModule1TissueConsentStatus();
+        $this->module1TissueConsentStatus = $module1TissueConsent['value'];
+        $this->module1TissueConsentTime = $module1TissueConsent['time'];
         $this->module = $this->getParticipantModule();
         $this->module1DietStatus = ['LMT' => 'started'];
         $this->module2DietStatus = $this->getModuleDietStatus(2);
