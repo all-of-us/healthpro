@@ -207,7 +207,11 @@ class NphParticipantSummaryService
                             participantNphId
                             nphDateOfBirth
                             biobankId
-                            nphPairedSite
+                            nphPairedSite,
+                            nphEnrollmentStatus {
+                                time
+                                value
+                            },
                             nphModule1ConsentStatus {
                                 time
                                 value
