@@ -170,13 +170,13 @@
                                                                         {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
                                                                         <div class="card mb-2">
                                                                             <div class="card-header">
-                                                                                <div class="clearfix">
-                                                                                    <span>{{ sample[orderid]['createDate'] }}</span>
-                                                                                    <span><a
+                                                                                <div class="clearfix w-100">
+                                                                                    <div class="d-inline-block w-10"><span >{{ sample[orderid]['createDate'] }}</span></div>
+                                                                                    <div class="d-inline-block w-25"><span><a
                                                                                             href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
-                                                                                    ID: {{ orderid }}</a></span>
-                                                                                    <span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span>
-                                                                                    {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
+                                                                                    ID: {{ orderid }}</a></span></div>
+                                                                                    <div class="d-inline-block w-15"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
+                                                                                    <div class="d-inline-block w-15">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
                                                                                     {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                                         {% if not loop.first %}
                                                                                             <span></span>

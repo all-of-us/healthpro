@@ -36,17 +36,17 @@
 
 {% macro generateStatusLabel(status) %}
     {% if status == 'Collected' %}
-        {% set labelClass = 'label-primary' %}
+        {% set labelClass = 'bg-primary' %}
     {% elseif status == 'Finalized' %}
-        {% set labelClass = 'label-success' %}
+        {% set labelClass = 'bg-success' %}
     {% elseif status == 'In Progress' %}
-        {% set labelClass = 'label-warning' %}
+        {% set labelClass = 'bg-warning' %}
     {% elseif status == 'Canceled' %}
-        {% set labelClass = 'label-danger' %}
+        {% set labelClass = 'bg-danger' %}
     {% else %}
-        {% set labelClass = 'label-default' %}
+        {% set labelClass = 'bg-primary' %}
     {% endif %}
-    <span><span class="label {{ labelClass }}">{{ status }}</span></span>
+    <span><span class="badge {{ labelClass }}">{{ status }}</span></span>
 {% endmacro %}
 
 {% macro displayDateAndTimezone(time, timezoneId) %}
