@@ -380,4 +380,9 @@ class HelpService
     {
         return 'https://redcap.pmi-ops.org/surveys/?s=ND8RJL78X4YWTKRX';
     }
+
+    public static function getNphFeedbackUrl(): string
+    {
+        return 'https://redcap.pmi-ops.org/surveys/?s=PDENPD8FHXPRWJ7P';
+    }
 }
