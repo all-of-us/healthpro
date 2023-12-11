@@ -82,7 +82,8 @@ class NphParticipant
         return $consentStatus ?? self::OPTIN_DENY;
     }
 
-    private function getModule1TissueConsentTime(): ?string {
+    private function getModule1TissueConsentTime(): ?string
+    {
         $latestDate = null;
         $consentTime = null;
         if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
