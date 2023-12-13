@@ -159,10 +159,16 @@
                 {% if participant.healthDataStreamSharingStatus %}
                     {% if participant.healthDataStreamSharingStatus == 'CURRENTLY_SHARING' %}
                         <i class="fa fa-check-double text-success" aria-hidden="true"></i>
-                        {{ participant.healthDataStreamSharingStatusTime|date('m/d/Y', app.user.timezone) }} (Currently Sharing)
+                        {% if participant.healthDataStreamSharingStatusTime %}
+                            {{ participant.healthDataStreamSharingStatusTime|date('m/d/Y', app.user.timezone) }}
+                        {% endif %}
+                        (Currently Sharing)
                     {% elseif participant.healthDataStreamSharingStatus == 'EVER_SHARED' %}
                         <i class="fa fa-check text-success" aria-hidden="true"></i>
-                        {{ participant.healthDataStreamSharingStatusTime|date('m/d/Y', app.user.timezone) }} (Ever Shared)
+                        {% if participant.healthDataStreamSharingStatusTime %}
+                            {{ participant.healthDataStreamSharingStatusTime|date('m/d/Y', app.user.timezone) }}
+                        {% endif %}
+                        (Ever Shared)
                     {% else %}
                         <i class="fa fa-times text-danger" aria-hidden="true"></i> (Never Shared)
                     {% endif %}
