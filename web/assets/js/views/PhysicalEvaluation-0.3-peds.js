@@ -131,7 +131,7 @@ let viewExtension = Backbone.View.extend({
         const zScore = X ? this.getZScore(X, lmsValues) : "";
         console.log(field, "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
-        const percentile = zScore ? this.getPercentile(zScore) : "";
+        const percentile = typeof zScore === 'number' ? this.getPercentile(Math.abs(zScore)) : "";
         console.log("percentile", percentile);
         percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
@@ -146,7 +146,7 @@ let viewExtension = Backbone.View.extend({
         const zScore = avgWeight && avgLength ? this.getZScore(avgWeight, lmsValues) : "";
         console.log("weight-for-length", "Zscore", zScore);
         percentileElement.attr("data-zscore", zScore);
-        const percentile = zScore ? this.getPercentile(zScore) : "";
+        const percentile = typeof zScore === 'number' ? this.getPercentile(Math.abs(zScore)) : "";
         percentileElement.html("<strong>" + this.addPercentileSuffix(percentile) + "</strong>");
         percentileElement.attr("data-percentile", percentile);
         this.handleOutOfRangePercentileWarning();
@@ -218,6 +218,9 @@ let viewExtension = Backbone.View.extend({
             }
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
                 const newZValue = zScore["Z"] >= 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
+                if (newZValue >= 0.01 && newZValue <= 0.09) {
+                    z = Math.abs(z);
+                }
                 if (z === parseFloat(newZValue.toFixed(2))) {
                     let percentile = zScore[index] * 100;
                     if (percentile < 3) {
