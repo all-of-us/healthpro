@@ -172,14 +172,17 @@ $(document).ready(function () {
     }
 
     $(".order-ts").on("dp.change", function (event) {
-        let orderCollectedTs = new Date($('input[id*="CollectedTs"]').val());
+        let collectedTsSelector = $('input[id*="CollectedTs"]');
+        let orderCollectedTs = new Date(collectedTsSelector.val());
         let aliquotTs = new Date($(this).val());
         let difference = Math.abs(aliquotTs.getTime() - orderCollectedTs.getTime()) / (60 * 60 * 1000);
         if (difference > 2) {
-            $(this).parent().addClass("has-warning");
+            $(this).addClass("date-range-warning");
+            collectedTsSelector.addClass("date-range-warning");
             $("#aliquotTimeWarning").show();
         } else {
-            $(this).parent().removeClass("has-warning");
+            $(this).removeClass("date-range-warning");
+            collectedTsSelector.removeClass("date-range-warning");
             if ($("td.has-warning>input.order-ts").length === 0) {
                 $("#aliquotTimeWarning").hide();
             }
