@@ -199,20 +199,22 @@
                                                                         <div class="card mb-2">
                                                                             <div class="card-header">
                                                                                 <div class="clearfix w-100">
-                                                                                    <div class="d-inline-block w-10"><span >{{ sample[orderid]['createDate'] }}</span></div>
-                                                                                    <div class="d-inline-block w-25"><span><a class="text-decoration-none"
+                                                                                    <div class="d-inline-block w-10 align-top"><span >{{ sample[orderid]['createDate'] }}</span></div>
+                                                                                    <div class="d-inline-block w-25 align-top"><span><a
                                                                                             href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
                                                                                     ID: {{ orderid }}</a></span></div>
-                                                                                    <div class="d-inline-block w-15"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
-                                                                                    <div class="d-inline-block w-15">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
-                                                                                    {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
-                                                                                        {% if not loop.first %}
-                                                                                            <span></span>
-                                                                                        {% endif %}
-                                                                                        <span class="float-right">({{ sampleStatusCount }}
+                                                                                    <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
+                                                                                    <div class="d-inline-block w-15 align-top">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
+                                                                                    <div class="d-inline-block w-10 align-middle">
+                                                                                        {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
+                                                                                            {% if not loop.first %}
+                                                                                                <span></span>
+                                                                                            {% endif %}
+                                                                                            <span>({{ sampleStatusCount }}
                                                                                     / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
-                                                                                </span>
-                                                                                    {% endfor %}
+                                                                                        </span>
+                                                                                        {% endfor %}
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

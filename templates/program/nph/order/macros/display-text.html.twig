@@ -44,7 +44,7 @@
     {% elseif status == 'Canceled' %}
         {% set labelClass = 'bg-danger' %}
     {% else %}
-        {% set labelClass = 'bg-primary' %}
+        {% set labelClass = 'bg-secondary' %}
     {% endif %}
     <span><span class="badge rounded-1 {{ labelClass }}">{{ status }}</span></span>
 {% endmacro %}
@@ -119,16 +119,16 @@
 
 {% macro displayHairNailOptin(participant) %}
         {% if participant.module1TissueConsentStatus == constant('OPTIN_PERMIT', participant) %}
-            <i class="fa fa-check text-success" title="The participant has opted into hair and nail collections" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <i class="fa fa-check text-success" title="The participant has opted into hair and nail collections" data-bs-toggle="tooltip" data-bs-container="body" aria-hidden="true"></i>
             <strong>Hair & Nail Opt-In</strong>
         {% elseif participant.module1TissueConsentStatus == constant('OPTIN_NAIL', participant) %}
-            <i class="fa fa-check text-success" title="The participant has opted into nail collections only" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <i class="fa fa-check text-warning" title="The participant has opted into nail collections only" data-bs-toggle="tooltip" data-bs-container="body" aria-hidden="true"></i>
             <strong>Nail Only Opt-In</strong>
         {% elseif participant.module1TissueConsentStatus == constant('OPTIN_HAIR', participant) %}
-            <i class="fa fa-check text-success" title="The participant has opted into hair collections only" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <i class="fa fa-check text-warning" title="The participant has opted into hair collections only" data-bs-toggle="tooltip" data-bs-container="body" aria-hidden="true"></i>
             <strong>Hair Only Opt-In</strong>
         {% else %}
-            <i class="fa fa-times text-danger"  title="The participant has <u>not</u> opted into hair and nail collections" data-html="true" data-toggle="tooltip" data-container="body" aria-hidden="true"></i>
+            <i class="fa fa-times text-danger"  title="The participant has <u>not</u> opted into hair and nail collections" data-bs-html="true" data-bs-toggle="tooltip" data-bs-container="body" aria-hidden="true"></i>
             <strong>Hair & Nail Opt-In</strong>
         {% endif %}
         {{ participant.module1TissueConsentTime|date('m/d/Y') }}
