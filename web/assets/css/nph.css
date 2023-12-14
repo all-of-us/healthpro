@@ -19,7 +19,7 @@
         color: #FFFFFF;
     }
 }
-.nav-tabs > li.participant-module.active > a {
+.nav-tabs > li.participant-module.active > a.nav-link {
     background-color: #235389;
     color: #FFFFFF;
 }
@@ -92,7 +92,6 @@ table tr td.nopadleft {
 table tr td input.aliquot-volume {
     padding-right: 0;
 }
-
 li.participant-activity > a {
     padding: 10px 29px
 }
@@ -197,8 +196,22 @@ div.order-row {
     content: "\f107";
 }
 
+.collapse-carat:after {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    float: right;
+    content: "\f106";
+}
+
+.collapse-carat.collapsed:after {
+    content: "\f107";
+}
+
 .totalCollectionVolumeField {
     width: 20%;
+}
+.nowrap {
+    white-space: nowrap;
 }
 .date-range-warning {
     border: 2px solid #8a6d3b;
