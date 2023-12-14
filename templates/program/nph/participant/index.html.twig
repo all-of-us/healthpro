@@ -205,12 +205,12 @@
                                                                                     ID: {{ orderid }}</a></span></div>
                                                                                     <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
                                                                                     <div class="d-inline-block w-15 align-top">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
-                                                                                    <div class="d-inline-block w-15 align-middle">
+                                                                                    <div class="d-inline-block w-10 align-middle">
                                                                                         {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                                             {% if not loop.first %}
                                                                                                 <span></span>
                                                                                             {% endif %}
-                                                                                            <span class="float-right">({{ sampleStatusCount }}
+                                                                                            <span>({{ sampleStatusCount }}
                                                                                     / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
                                                                                         </span>
                                                                                         {% endfor %}
