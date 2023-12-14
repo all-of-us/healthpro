@@ -56,11 +56,13 @@ class ParticipantSummaryService
                 $participant = json_decode($response->getBody()->getContents());
                 $disableTestAccess = $this->params->has('disable_test_access') ? $this->params->get('disable_test_access') : '';
                 $cohortOneLaunchTime = $this->params->has('cohort_one_launch_time') ? $this->params->get('cohort_one_launch_time') : '';
-                $participant->options = [
-                    'disableTestAccess' => $disableTestAccess,
-                    'siteType' => $this->getSiteType($participant->awardee),
-                    'cohortOneLaunchTime' => $cohortOneLaunchTime
-                ];
+                if ($participant) {
+                    $participant->options = [
+                        'disableTestAccess' => $disableTestAccess,
+                        'siteType' => $this->getSiteType($participant->awardee),
+                        'cohortOneLaunchTime' => $cohortOneLaunchTime
+                    ];
+                }
             } catch (\Exception $e) {
                 error_log($e->getMessage());
                 return false;

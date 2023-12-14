@@ -46,7 +46,7 @@
     {% else %}
         {% set labelClass = 'bg-secondary' %}
     {% endif %}
-    <span><span class="badge {{ labelClass }}">{{ status }}</span></span>
+    <span><span class="badge rounded-1 {{ labelClass }}">{{ status }}</span></span>
 {% endmacro %}
 
 {% macro displayDateAndTimezone(time, timezoneId) %}
@@ -93,17 +93,12 @@
 {% endmacro %}
 
 {% macro displayModuleConsents(programSummaryAndOrderInfo, participant) %}
-    {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+    {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == 1) %}
         <ul class="list-group mb-2">
             {% if participant.module %}
                 <span class="nph-module-badge nph-module-{{ moduleNumber }}">NPH Module {{ moduleNumber }}</span>
             {% endif %}
             {% if participant.moduleConsents[moduleNumber] is defined %}
-                {% for consent, consentStatus in participant.moduleConsents[moduleNumber] %}
-                <li class="list-group-item">
-                    <span>{{ _self.displayConsentCheck(consentStatus, participant) }} <strong>{{ consent }}</strong> {{ consentStatus['time']|date('m/d/Y') }}</span>
-                </li>
-                {% endfor %}
                 {% if moduleNumber == 1 %}
                     <li class="list-group-item">{{ _self.displayHairNailOptin(participant) }}</li>
                 {% endif %}
