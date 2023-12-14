@@ -170,12 +170,12 @@
                                                                         <div class="card mb-2">
                                                                             <div class="card-header">
                                                                                 <div class="clearfix w-100">
-                                                                                    <div class="d-inline-block w-10 align-middle"><span >{{ sample[orderid]['createDate'] }}</span></div>
-                                                                                    <div class="d-inline-block w-25 align-middle"><span><a
+                                                                                    <div class="d-inline-block w-10 align-top"><span >{{ sample[orderid]['createDate'] }}</span></div>
+                                                                                    <div class="d-inline-block w-25 align-top"><span><a
                                                                                             href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
                                                                                     ID: {{ orderid }}</a></span></div>
-                                                                                    <div class="d-inline-block w-15 align-middle"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
-                                                                                    <div class="d-inline-block w-15 align-middle">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
+                                                                                    <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
+                                                                                    <div class="d-inline-block w-15 align-top">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
                                                                                     <div class="d-inline-block w-15 align-middle">
                                                                                         {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                                             {% if not loop.first %}
