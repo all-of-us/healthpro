@@ -10,6 +10,7 @@ use App\Service\DeceasedNotificationService;
 use App\Service\EhrWithdrawalNotificationService;
 use App\Service\HFHRepairService;
 use App\Service\IdVerificationImportService;
+use App\Service\IdVerificationService;
 use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
@@ -209,6 +210,13 @@ class CronController extends BaseController
     public function biobonkNightlyReport(BiobankNightlyReportService $biobankNightlyReportService): Response
     {
         $biobankNightlyReportService->generateNightlyReport();
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/backfill-id-verifications-rdr', name: 'cron_backfill_id_verifications_rdr')]
+    public function backfillIdVerificationsRdrAction(IdVerificationService $idVerificationService): Response
+    {
+        $idVerificationService->backfillIdVerificationsRdr();
         return $this->json(['success' => true]);
     }
 }

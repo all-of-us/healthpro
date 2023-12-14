@@ -1,22 +1,43 @@
+{% set bootstrapVersion = 5 %}
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% block title %}Orders - {% endblock %}
 {% block body %}
-    <div class="page-header">
-        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</h2>
+    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom">
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Biospecimen Lookup</h2>
     </div>
+    <br>
     <div class="row">
         <div class="col-sm-6 col-md-5">
-            <h3><i class="fa fa-barcode" aria-hidden="true"></i> Find by ID</h3>
+            <h3>Find by Order ID</h3>
+            <p class="fst-italic">Search for an order ID to view the associated collection page.</p>
             {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             {{ form_widget(idForm) }}
-            <p>
-                <button type="submit" class="btn btn-primary">Go</button>
-            </p>
+            <button type="submit" class="btn btn-primary">Go</button>
             {{ form_end(idForm) }}
+            {% if sampleIdForm is defined %}
+                {% form_theme sampleIdForm 'bootstrap_5_layout.html.twig' %}
+                <hr>
+                <h3>Find by Collection Sample ID</h3>
+                <p class="fst-italic">Search for a collection sample ID to view the associated aliquot form.</p>
+                {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+                {{ form_widget(sampleIdForm) }}
+                <button type="submit" class="btn btn-primary">Go</button>
+                {{ form_end(sampleIdForm) }}
+            {% endif %}
+            {% if aliquotIdForm is defined %}
+                <hr>
+                {% form_theme aliquotIdForm 'bootstrap_5_layout.html.twig' %}
+                <h3>Find by Aliquot ID</h3>
+                <p class="fst-italic">Search for an aliquot ID to view the associated aliquot form.</p>
+                {{ form_start(aliquotIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+                {{ form_widget(aliquotIdForm) }}
+                <button type="submit" class="btn btn-primary">Go</button>
+                {{ form_end(aliquotIdForm) }}
+            {% endif %}
         </div>
         {% if recentOrders is not null %}
             <div class="col-sm-6 col-md-7">
-                <hr class="visible-xs"/>
                 <h3><i class="fa fa-clock-o" aria-hidden="true"></i> Recent orders</h3>
                 {% if recentOrders|length > 0 %}
                     <table class="table table-striped">
@@ -30,9 +51,9 @@
                         <tbody>
                         {% for order in recentOrders %}
                             <tr>
-                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}">{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</a></td>
-                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}">{{ order.orderId }}</a></td>
-                                <td><a href="{{ path('nph_participant_summary', { participantId: order.participantId }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
+                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}" class="text-decoration-none">{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}</a></td>
+                                <td><a href="{{ path('nph_order_collect', { participantId: order.participantId, orderId: order.id }) }}" class="text-decoration-none">{{ order.orderId }}</a></td>
+                                <td><a href="{{ path('nph_participant_summary', { participantId: order.participantId }) }}" class="text-decoration-none">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a></td>
                             </tr>
                         {% endfor %}
                         </tbody>

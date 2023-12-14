@@ -18,8 +18,10 @@ $container->loadFromExtension('twig', [
         'timeZones' => $env->getTimeZones(),
         'confluenceResources' => HelpService::$confluenceResources,
         'feedback_url' => HelpService::getFeedbackUrl(),
+        'nph_feedback_url' => HelpService::getNphFeedbackUrl(),
         'report_technical_issue_url' => HelpService::getReportTechnicalIssueUrl(),
         'userTimezones' => User::$timezones,
-        'inactiveSiteFormDisabled' => 0
+        'inactiveSiteFormDisabled' => 0,
+        'nphResources' => HelpService::$nphResources
     ],
 ]);

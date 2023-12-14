@@ -926,6 +926,22 @@ table.table-samples td {
     display: none;
 }
 
+.participant-details-card {
+    background-color: #f8f9fa;
+}
+
+.w-15 {
+    width: 15%;
+}
+
+.w-20 {
+    width: 20%;
+}
+
+.w-10 {
+    width: 10%;
+}
+
 .right-float {
     float: right;
 }

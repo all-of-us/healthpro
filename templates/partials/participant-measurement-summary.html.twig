@@ -139,6 +139,23 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Growth Percentile Head Circumference for Age</th>
+                    <td colspan="2">
+                        {% if summary['growth-percentile-head-circumference-for-age'] is defined and summary['growth-percentile-head-circumference-for-age'] is not empty %}
+                            {{ summary['growth-percentile-head-circumference-for-age'] }}th percentile
+                        {% elseif summary['growth-percentile-head-circumference-for-age-male'] is defined or summary['growth-percentile-head-circumference-for-age-female'] is defined %}
+                            {% if summary['growth-percentile-head-circumference-for-age-male'] is defined %}
+                                {{ summary['growth-percentile-head-circumference-for-age-male'] }}th percentile (M) <br>
+                            {% endif %}
+                            {% if summary['growth-percentile-head-circumference-for-age-female'] is defined %}
+                                {{ summary['growth-percentile-head-circumference-for-age-female'] }}th percentile (F)
+                            {% endif %}
+                        {% else %}
+                            --
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
                     <th>Growth Percentile BMI for Age</th>
                     <td colspan="2">
                         {% if summary['growth-percentile-bmi-for-age'] is defined and summary['growth-percentile-bmi-for-age'] is not empty %}

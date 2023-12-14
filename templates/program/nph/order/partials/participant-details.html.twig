@@ -1,21 +1,20 @@
-<div class="row">
-    <div class="col-md-4">
-        <div><strong>Participant ID</strong></div>
+<dl class="row">
+    <dt class="col-md-6">
+        <div>Participant ID</div>
+    </dt>
+    <dd class="col-md-6">
         <div>{{ participant.id }}</div>
-    </div>
-    <div class="col-md-4">
-        <div><strong>Biobank ID</strong></div>
+    </dd>
+    <dt class="col-md-6">
+        <div>Biobank ID</div>
+    </dt>
+    <dd class="col-md-6">
         <div>{{ participant.biobankId }}</div>
-    </div>
-    <div class="col-md-4">
-        <div><strong>Site</strong></div>
-        <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
-    </div>
-</div>
-<br>
-<div class="row">
-    <div class="col-md-4">
-        <div><strong>DOB</strong></div>
+    </dd>
+    <dt class="col-md-6">
+        <div>DOB</div>
+    </dt>
+    <dd class="col-md-6">
         <div>
             {% if participant.dob %}
                 {{ participant.dob|date('n/j/Y') }}
@@ -23,9 +22,17 @@
                 <i class="text-danger fa fa-exclamation-circle"></i>
             {% endif %}
         </div>
-    </div>
-    <div class="col-md-4">
-        <div><strong>Gender Identity</strong></div>
+    </dd>
+    <dt class="col-md-6">
+        <div>Gender Identity</div>
+    </dt>
+    <dd class="col-md-6">
         <div>{{ participant.genderIdentity|default('--') }}</div>
-    </div>
-</div>
+    </dd>
+    <dt class="col-md-6">
+        <div>Site</div>
+    </dt>
+    <dd class="col-md-6">
+        <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+    </dd>
+</dl>

@@ -12,6 +12,7 @@ namespace App\Helper;
 class NphParticipant
 {
     public const MODULE1_CONSENT_TISSUE = 'm1_consent_tissue';
+    public const MODULE1_CONSENT_RECONTACT = 'm1_consent_gps';
     public const OPTIN_PERMIT = 'PERMIT';
     public const OPTIN_HAIR = 'PERMIT2';
     public const OPTIN_NAIL = 'PERMIT3';
@@ -28,10 +29,12 @@ class NphParticipant
     public $nphPairedSiteSuffix;
     public $module;
     public $module1TissueConsentStatus;
+    public $module1TissueConsentTime;
     public array $module1DietStatus;
     public array $module2DietStatus;
     public array $module3DietStatus;
     public string $biobankId = '';
+    public array $moduleConsents = [];
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -61,22 +64,25 @@ class NphParticipant
         return true;
     }
 
-    private function getModule1TissueConsentStatus(): string
+    private function getModule1TissueConsentStatus(): array
     {
         $latestDate = null;
-        $consentStatus = null;
+        $consentStatus = [];
         if (isset($this->rdrData->nphModule1ConsentStatus) && is_array($this->rdrData->nphModule1ConsentStatus)) {
             foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
                 if ($consent->value === self::MODULE1_CONSENT_TISSUE) {
                     $consentDate = new \DateTime($consent->time);
                     if ($latestDate === null || $consentDate > $latestDate) {
                         $latestDate = $consentDate;
-                        $consentStatus = $consent->optIn;
+                        $consentStatus['time'] = $consent->time;
+                        $consentStatus['value'] = $consent->optIn;
                     }
                 }
             }
         }
-        return $consentStatus ?? self::OPTIN_DENY;
+        $consentStatus['value'] = $consentStatus['value'] ?? self::OPTIN_DENY;
+        $consentStatus['time'] = $consentStatus['time'] ?? null;
+        return $consentStatus;
     }
 
     private function parseRdrParticipant(\stdClass $participant): void
@@ -103,11 +109,14 @@ class NphParticipant
         if (!empty($participant->biobankId)) {
             $this->biobankId = $participant->biobankId;
         }
-        $this->module1TissueConsentStatus = $this->getModule1TissueConsentStatus();
+        $module1TissueConsent = $this->getModule1TissueConsentStatus();
+        $this->module1TissueConsentStatus = $module1TissueConsent['value'];
+        $this->module1TissueConsentTime = $module1TissueConsent['time'];
         $this->module = $this->getParticipantModule();
         $this->module1DietStatus = ['LMT' => 'started'];
         $this->module2DietStatus = $this->getModuleDietStatus(2);
         $this->module3DietStatus = $this->getModuleDietStatus(3);
+        $this->moduleConsents = $this->getModuleConsents();
     }
 
     private function getSiteSuffix(string $site): string
@@ -164,5 +173,21 @@ class NphParticipant
             }
         }
         return $dietStatus;
+    }
+
+    private function getModuleConsents()
+    {
+        $consentStatus = [];
+        if (isset($this->rdrData->nphModule1ConsentStatus)) {
+            foreach ($this->rdrData->nphModule1ConsentStatus as $consent) {
+                switch ($consent->value) {
+                    case self::MODULE1_CONSENT_RECONTACT:
+                        $consentStatus[1]['Recontact Opt In']['value'] = $consent->optIn;
+                        $consentStatus[1]['Recontact Opt In']['time'] = $consent->time;
+                        break;
+                }
+            }
+        }
+        return $consentStatus;
     }
 }
