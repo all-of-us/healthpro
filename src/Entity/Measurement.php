@@ -1078,12 +1078,18 @@ class Measurement
                     if ((!$this->fieldData->{'blood-pressure-protocol-modification'}[$k]) && !$value) {
                         $errors[] = [$field, $k];
                     }
-                    if ($this->fieldData->{'blood-pressure-protocol-modification'}[$k] === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
-                        $errors[] = [$field, $k];
-                    }
                 }
             }
         }
+
+        if (isset($this->fieldData->{'blood-pressure-protocol-modification'})) {
+            foreach ($this->fieldData->{'blood-pressure-protocol-modification'} as $k => $value) {
+                if ($value === 'other' && empty($this->fieldData->{'blood-pressure-protocol-modification-notes'}[$k])) {
+                    $errors[] = ['blood-pressure-protocol-modification-notes', $k];
+                }
+            }
+        }
+
         foreach (['height', 'weight'] as $field) {
             if (isset($this->fieldData->$field)) {
                 foreach ($this->fieldData->$field as $k => $value) {
