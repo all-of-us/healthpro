@@ -30,6 +30,7 @@ class Measurement
     public const EHR_PROTOCOL_MODIFICATION_LABEL = 'Observation obtained from EHR';
     public const EVALUATION_CANCEL_STATUS = 'entered-in-error';
     public const EVALUATION_RESTORE_STATUS = 'final';
+    private const ZSCORE_0_01 = 0.50399;
 
     public static $cancelReasons = [
         'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
@@ -684,9 +685,11 @@ class Measurement
                 return (int) round($zScore['Z_0'] * 100, 0);
             }
             foreach ($decimalPoints as $index => $decimalPoint) {
-                $newZValue = $zScore['Z'] >= 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
-                if ($newZValue >= 0.01 && $newZValue <= 0.09) {
-                    $z = abs($z);
+                // Handle -0 & +0 ZScore rows
+                if ($zScore['Z'] == 0) {
+                    $newZValue = $zScore['Z_01'] == self::ZSCORE_0_01 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
+                } else {
+                    $newZValue = $zScore['Z'] > 0 ? $zScore['Z'] + $decimalPoint : $zScore['Z'] - $decimalPoint;
                 }
                 if ($z == round($newZValue, 2)) {
                     $percentile = $zScore[$index] * 100;

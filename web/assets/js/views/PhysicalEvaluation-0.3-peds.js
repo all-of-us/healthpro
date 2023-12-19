@@ -217,10 +217,11 @@ let viewExtension = Backbone.View.extend({
                 return Math.round(zScore["Z_0"] * 100);
             }
             for (const [index, decimalPoint] of Object.entries(decimalPoints)) {
-                const newZValue = zScore["Z"] >= 0 ? zScore["Z"] + decimalPoint : zScore["Z"] - decimalPoint;
-                if (newZValue >= 0.01 && newZValue <= 0.09) {
-                    z = Math.abs(z);
-                }
+                // Handle -0 & +0 ZScore rows
+                const newZValue =
+                    Object.is(0, zScore["Z"]) || zScore["Z"] > 0
+                        ? zScore["Z"] + decimalPoint
+                        : zScore["Z"] - decimalPoint;
                 if (z === parseFloat(newZValue.toFixed(2))) {
                     let percentile = zScore[index] * 100;
                     if (percentile < 3) {
