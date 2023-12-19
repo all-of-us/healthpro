@@ -39,46 +39,51 @@ class PatientStatusController extends BaseController
     ) {
         $form = $this->createForm(PatientStatusImportFormType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
-            $file = $form['patient_status_csv']->getData();
-            $fileName = $file->getClientOriginalName();
-            $patientStatuses = [];
-            $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
-            if ($form->isValid()) {
-                if (!empty($patientStatuses)) {
-                    $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $siteService->getSiteOrganization()]);
-                    $patientStatusImport = new PatientStatusImport();
-                    $patientStatusImport
-                        ->setFileName($fileName)
-                        ->setOrganization($organization)
-                        ->setAwardee($siteService->getSiteAwardeeId())
-                        ->setUserId($this->getSecurityUser()->getId())
-                        ->setSite($session->get('site')->id)
-                        ->setCreatedTs(new \DateTime());
-                    $this->em->persist($patientStatusImport);
-                    $batchSize = 50;
-                    foreach ($patientStatuses as $key => $patientStatus) {
-                        $PatientStatusImportRow = new PatientStatusImportRow();
-                        $PatientStatusImportRow
-                            ->setParticipantId($patientStatus['participant_id'])
-                            ->setStatus($patientStatus['status'])
-                            ->setComments($patientStatus['comments'])
-                            ->setImport($patientStatusImport);
-                        $this->em->persist($PatientStatusImportRow);
-                        if (($key % $batchSize) === 0) {
-                            $this->em->flush();
-                            $this->em->clear(PatientStatusImportRow::class);
+        try {
+            if ($form->isSubmitted()) {
+                $file = $form['patient_status_csv']->getData();
+                $fileName = $file->getClientOriginalName();
+                $patientStatuses = [];
+                $patientStatusImportService->extractCsvFileData($file, $form, $patientStatuses);
+                if ($form->isValid()) {
+                    if (!empty($patientStatuses)) {
+                        $organization = $this->em->getRepository(Organization::class)->findOneBy(['id' => $siteService->getSiteOrganization()]);
+                        $patientStatusImport = new PatientStatusImport();
+                        $patientStatusImport
+                            ->setFileName($fileName)
+                            ->setOrganization($organization)
+                            ->setAwardee($siteService->getSiteAwardeeId())
+                            ->setUserId($this->getSecurityUser()->getId())
+                            ->setSite($session->get('site')->id)
+                            ->setCreatedTs(new \DateTime());
+                        $this->em->persist($patientStatusImport);
+                        $batchSize = 50;
+                        foreach ($patientStatuses as $key => $patientStatus) {
+                            $PatientStatusImportRow = new PatientStatusImportRow();
+                            $PatientStatusImportRow
+                                ->setParticipantId($patientStatus['participant_id'])
+                                ->setStatus($patientStatus['status'])
+                                ->setComments($patientStatus['comments'])
+                                ->setImport($patientStatusImport);
+                            $this->em->persist($PatientStatusImportRow);
+                            if (($key % $batchSize) === 0) {
+                                $this->em->flush();
+                                $this->em->clear(PatientStatusImportRow::class);
+                            }
                         }
+                        $this->em->flush();
+                        $id = $patientStatusImport->getId();
+                        $loggerService->log(Log::PATIENT_STATUS_IMPORT_ADD, $id);
+                        $this->em->clear();
+                        return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
                     }
-                    $this->em->flush();
-                    $id = $patientStatusImport->getId();
-                    $loggerService->log(Log::PATIENT_STATUS_IMPORT_ADD, $id);
-                    $this->em->clear();
-                    return $this->redirectToRoute('patientStatusImportConfirmation', ['id' => $id]);
+                } else {
+                    $form->addError(new FormError('Please correct the errors below'));
                 }
-            } else {
-                $form->addError(new FormError('Please correct the errors below'));
             }
+        } catch (\Exception $e) {
+            $loggerService->log('error', $e->getMessage());
+            $this->addFlash('error', 'Import failed. Please try again.');
         }
         $patientStatusImports = $this->em->getRepository(PatientStatusImport::class)->findBy(['userId' => $this->getSecurityUser()->getId(), 'confirm' => 1], ['id' => 'DESC']);
         return $this->render('patientstatus/import.html.twig', [
@@ -96,22 +101,27 @@ class PatientStatusController extends BaseController
         }
         $form = $this->createForm(PatientStatusImportConfirmFormType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var SubmitButton $confirmButton */
-            $confirmButton = $form->get('Confirm');
-            if ($confirmButton->isClicked()) {
-                // Update confirm status
-                $patientStatusImport->setConfirm(1);
-                $this->em->flush();
-                $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
-                $this->em->clear();
-                $this->addFlash('success', 'Successfully Imported!');
-            } else {
-                $this->addFlash('notice', 'Import canceled!');
-                $this->em->remove($patientStatusImport);
-                $this->em->flush();
+        try {
+            if ($form->isSubmitted() && $form->isValid()) {
+                /** @var SubmitButton $confirmButton */
+                $confirmButton = $form->get('Confirm');
+                if ($confirmButton->isClicked()) {
+                    // Update confirm status
+                    $patientStatusImport->setConfirm(1);
+                    $this->em->flush();
+                    $loggerService->log(Log::PATIENT_STATUS_IMPORT_EDIT, $patientStatusImport->getId());
+                    $this->em->clear();
+                    $this->addFlash('success', 'Successfully Imported!');
+                } else {
+                    $this->addFlash('notice', 'Import canceled!');
+                    $this->em->remove($patientStatusImport);
+                    $this->em->flush();
+                }
+                return $this->redirectToRoute('patientStatusImport');
             }
-            return $this->redirectToRoute('patientStatusImport');
+        } catch (\Exception $e) {
+            $loggerService->log('error', $e->getMessage());
+            $this->addFlash('error', 'Import failed. Please try again.');
         }
         $importPatientStatuses = $patientStatusImport->getPatientStatusImportRows()->slice(0, 100);
 
