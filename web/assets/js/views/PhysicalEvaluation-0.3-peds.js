@@ -532,7 +532,7 @@ let viewExtension = Backbone.View.extend({
             if (warning.customPercentile === "heart-rate") {
                 let maxMinValue = null;
                 for (const heartRate of this.heartRateAgeCharts) {
-                    if (this.ageInMonths > heartRate.startAge && this.ageInMonths < heartRate.endAge) {
+                    if (this.ageInMonths >= heartRate.startAge && this.ageInMonths < heartRate.endAge) {
                         maxMinValue = heartRate[warning.percentileField];
                         break;
                     }
