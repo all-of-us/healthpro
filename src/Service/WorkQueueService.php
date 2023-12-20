@@ -188,6 +188,12 @@ class WorkQueueService
                 $rdrParams['nphWithdrawal'] = 1;
             }
         }
+        if (!empty($params['selfReportedPhysicalMeasurementsStatus'])) {
+            $rdrParams['selfReportedPhysicalMeasurementsStatus'] = $params['selfReportedPhysicalMeasurementsStatus'];
+        }
+        if (!empty($params['clinicPhysicalMeasurementsStatus'])) {
+            $rdrParams['clinicPhysicalMeasurementsStatus'] = $params['clinicPhysicalMeasurementsStatus'];
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];

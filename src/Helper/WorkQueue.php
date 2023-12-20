@@ -2217,6 +2217,24 @@ class WorkQueue
                 ]
             ],
         ],
+        'PMB' => [
+            'selfReportedPhysicalMeasurementsStatus' => [
+                'label' => 'Remote Phys Measurements',
+                'options' => [
+                    'View All' => '',
+                    'Completed' => 'COMPLETED',
+                    'Not Completed' => 'UNSET'
+                ]
+            ],
+            'clinicPhysicalMeasurementsStatus' => [
+                'label' => 'Phys Measurements',
+                'options' => [
+                    'View All' => '',
+                    'Completed' => 'COMPLETED',
+                    'Not Completed' => 'UNSET'
+                ]
+            ],
+        ],
         'Ancillary Studies' => [
             'NphStudyStatus' => [
                 'label' => 'Nutrition For Precision Health',
@@ -2253,7 +2271,12 @@ class WorkQueue
         'EHR' => 'fa-laptop-medical',
         'Retention' => 'fa-check-double',
         'Pairing' => 'fa-building',
-        'Ancillary Studies' => 'fa-microscope'
+        'Ancillary Studies' => 'fa-microscope',
+        'PMB' => 'fa-vial'
+    ];
+
+    public static array $customFilterLabels = [
+        'PMB' => 'PM&B'
     ];
 
     //These are currently not working in the RDR

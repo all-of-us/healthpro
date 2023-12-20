@@ -203,6 +203,7 @@ class WorkQueueController extends BaseController
             'columns' => WorkQueue::$columns,
             'columnsDef' => WorkQueue::$columnsDef,
             'filterIcons' => WorkQueue::$filterIcons,
+            'customFilterLabels' => WorkQueue::$customFilterLabels,
             'columnGroups' => WorkQueue::$columnGroups,
             'filterLabelOptionPairs' => WorkQueue::getFilterLabelOptionPairs($advancedFilters),
             'workQueueViewForm' => $this->createForm(WorkQueueViewType::class)->createView(),
