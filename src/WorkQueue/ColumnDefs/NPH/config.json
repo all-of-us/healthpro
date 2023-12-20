@@ -1,0 +1,93 @@
+{
+  "columns": [
+      {
+        "display": "Date of Birth",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "nphDateOfBirth",
+        "workqueueField": "dob",
+        "group": "Participant Details"
+      },
+      {
+        "display": "First Name",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "firstName",
+        "workqueueField": "firstname",
+        "class": "participantLink",
+        "group": "Participant Details"
+      },
+      {
+        "display": "Last Name",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "lastName",
+        "workqueueField": "lastname",
+        "class": "participantLink",
+        "group": "Participant Details"
+      },
+      {
+        "display": "Middle Name",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "middleName",
+        "workqueueField": "middleinitial",
+        "class": "participantLink",
+        "group": "Participant Details"
+      },
+      {
+        "display": "Participant ID",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "participantNphId",
+        "workqueueField": "participantid",
+        "class": "participantLink",
+        "group": "Participant Details"
+      },
+      {
+        "display": "Enrollment Status",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "nphEnrollmentStatus",
+        "class": "enrollmentStatus",
+        "group": "Activity Status"
+      },
+      {
+        "display": "Withdrawal Status",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "nphWithdrawalStatus",
+        "class": "statusField",
+        "group": "Activity Status"
+      },
+      {
+        "display": "Deactivation Status",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "nphDeactivationStatus",
+        "class": "statusField",
+        "group": "Activity Status"
+      },
+      {
+        "display": "Module 1 Consent Status",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "nphModule1ConsentStatus",
+        "class": "module1ConsentStatus",
+        "group": "Consents"
+      },
+    {
+      "display": "Module 1 Hair and Nail Opt In",
+        "sortable": false,
+        "filterable": false,
+        "dataField": "nphModule1ConsentStatus",
+        "class": "module1HairAndNailOptIn",
+        "group": "Consents"
+    }
+  ],
+  "columnGroups": [
+    "Participant Details",
+    "Activity Status",
+    "Consents"
+  ]
+}

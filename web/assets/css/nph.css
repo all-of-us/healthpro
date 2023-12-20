@@ -216,3 +216,19 @@ div.order-row {
 .date-range-warning {
     border: 2px solid #8a6d3b;
 }
+
+#workqueueTable > thead > tr > th.participant_details {
+    background-color: #D8ECFF;
+}
+#workqueueTable > thead > tr > th.activity_status {
+    background-color: #FFEED3;
+}
+#workqueueTable > thead > tr > th.consents {
+    background-color: #EEFFDD;
+}
+#workqueueTable > thead > tr > th.pairing {
+    background-color: #FFFDC7;
+}
+#workqueueTable > thead > tr > th.contact {
+    background-color: #EEE9FF;
+}

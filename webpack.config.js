@@ -83,6 +83,7 @@ Encore
     .addEntry("nph-review", "./web/assets/js/views/NphReview.js")
     .addEntry("nph-biobank-review", "./web/assets/js/views/NphBiobankReview.js")
     .addEntry("nph-dlw", "./web/assets/js/views/NphDlw.js")
+    .addEntry("workqueueGeneralized", "./web/assets/js/views/WorkqueueGeneralized.js")
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
