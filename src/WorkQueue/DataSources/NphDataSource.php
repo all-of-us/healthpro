@@ -25,16 +25,17 @@ class NphDataSource implements WorkqueueDatasource
 
     public function getWorkqueueData(int $offset, int $limit, ColumnCollection $columnCollection): array
     {
-        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery());
+        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery($offset, $limit));
         $result = json_decode($response->getBody()->getContents(), true);
         return $result;
     }
 
-    private function getSearchQuery(): string
+    private function getSearchQuery($offset, $limit): string
     {
-        return '
+        $site = $this->currentSite;
+        return "
         query {
-        participant (limit: 50, offSet: 0, nphPairedSite: "nph-site-'. $this->currentSite . '") {
+        participant (limit: ${limit}, offSet: ${offset}, nphPairedSite: \"nph-site-${site}\") {
                     totalCount
                     resultCount
                     edges {
@@ -101,7 +102,17 @@ class NphDataSource implements WorkqueueDatasource
                                 time
                                 value
                                 optIn
-                            },
+                            }
+                            nphModule2ConsentStatus {
+                                time
+                                value
+                                optIn
+                            }
+                            nphModule3ConsentStatus {
+                                time
+                                value
+                                optIn
+                            }
                             nphModule2DietStatus {
                                 dietName
                                 dietStatus {
@@ -109,7 +120,7 @@ class NphDataSource implements WorkqueueDatasource
                                     status
                                     current
                                 }
-                            },
+                            }
                             nphModule3DietStatus {
                                 dietName
                                 dietStatus {
@@ -122,7 +133,7 @@ class NphDataSource implements WorkqueueDatasource
                     }
                 }
             }
-            ';
+            ";
     }
 
 }

@@ -5,6 +5,9 @@ use DateTime;
 
 class utilFunctions
 {
+    public const GREENCHECK = "<i class='fas fa-check text-success'></i>";
+    public const REDX = "<i class='fas fa-times text-danger'></i>";
+    public const ORANGECHECK = "<i class='fas fa-check text-warning'></i>";
     public static function getLatestTimestampElement($data): ?array
     {
         $lastSeen = null;

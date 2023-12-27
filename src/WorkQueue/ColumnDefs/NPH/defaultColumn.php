@@ -13,6 +13,7 @@ class defaultColumn implements columnInterface
     private string $dataField = '';
     private string $displayName = '';
     private string $columnGroup = '';
+    private bool $enabled = true;
     private array $config = [];
 
     public function __construct($config)
@@ -22,7 +23,7 @@ class defaultColumn implements columnInterface
 
     public function getColumnDisplay($data, $dataRow): string
     {
-        return $data;
+        return $data ?? '';
     }
 
     public function getColumnDisplayName(): string
@@ -49,12 +50,10 @@ class defaultColumn implements columnInterface
     {
         // TODO: Implement setFilterData() method.
     }
-
     public function setSort($sort): void
     {
         // TODO: Implement setSort() method.
     }
-
     public function setColumnDisplayed(bool $columnDisplayed): void
     {
         $this->displayed = $columnDisplayed;
@@ -68,11 +67,10 @@ class defaultColumn implements columnInterface
     {
         return $this->workqueueField;
     }
-public function getDataField(): string
-{
-    return $this->dataField;
-}
-
+    public function getDataField(): string
+    {
+        return $this->dataField;
+    }
     private function loadConfig($config)
     {
         if (isset($config['filterable'])) {
@@ -93,6 +91,9 @@ public function getDataField(): string
         if (isset($config['group'])) {
             $this->columnGroup = $config['group'];
         }
+        if (isset($config['enable'])) {
+            $this->enabled = $config['enable'];
+        }
         $this->config = $config;
     }
 
@@ -108,5 +109,10 @@ public function getDataField(): string
     public function getConfig(): array
     {
         return $this->config;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 }

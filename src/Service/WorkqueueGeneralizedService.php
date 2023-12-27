@@ -1,20 +1,22 @@
 <?php
 
-namespace App\WorkQueue;
+namespace App\Service;
 
+use App\WorkQueue\ColumnCollection;
 use App\WorkQueue\DataSources\WorkqueueDatasource;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class WorkqueueService
+class WorkqueueGeneralizedService
 {
     private WorkqueueDatasource $datasource;
     private ColumnCollection $columnCollection;
     private $columnGroups = [];
     private UrlGeneratorInterface $route;
-    public function __construct(UrlGeneratorInterface $route)
+    private SiteService $siteService;
+    public function __construct(UrlGeneratorInterface $route, SiteService $siteService)
     {
         $this->route = $route;
+        $this->siteService = $siteService;
     }
 
     public function setDataSource(WorkqueueDatasource $datasource): void
@@ -27,7 +29,7 @@ class WorkqueueService
         $this->columnCollection = $columnCollection;
     }
 
-    public function getWorkqueueData(int $offset, int $limit): array
+    public function getWorkqueueData(int $offset = 0, int $limit = 10): array
     {
         $rawData = $this->datasource->getWorkqueueData($offset, $limit, $this->columnCollection);
         $result = [];
@@ -42,14 +44,16 @@ class WorkqueueService
                 }
                 $iterator->next();
             }
-            $result[] = $temprow;
+            $result['data'][] = $temprow;
         }
+        $result['recordsTotal'] = $rawData['participant']['totalCount'];
+        $result['recordsFiltered'] = $rawData['participant']['totalCount'];
         return $result;
     }
 
     public function loadWorkqueueColumns(string $workqueueProgram)
     {
-        $columnConfig = json_decode(file_get_contents(__DIR__ . '/ColumnDefs/' . $workqueueProgram . '/config.json'), true);
+        $columnConfig = json_decode(file_get_contents(__DIR__ . '/../WorkQueue/ColumnDefs/' . $workqueueProgram . '/config.json'), true);
         $columns = [];
         foreach ($columnConfig['columns'] as $index => $column) {
             if (!isset($column['class'])) {
@@ -61,11 +65,17 @@ class WorkqueueService
             if (method_exists($columnObject, 'setRouteService')) {
                 $columnObject->setRouteService($this->route);
             }
-            $columns[] = $columnObject;
-            if (isset($this->columnGroups[$columnObject->getColumnGroup()])) {
-                $this->columnGroups[$columnObject->getColumnGroup()]++;
-            } else {
-                $this->columnGroups[$columnObject->getColumnGroup()] = 1;
+            if (method_exists($columnObject, 'setSiteService')) {
+                $columnObject->setSiteService($this->siteService);
+            }
+            if ($columnObject->isEnabled()) {
+                $columns[] = $columnObject;
+
+                if (isset($this->columnGroups[$columnObject->getColumnGroup()]) && $column) {
+                    $this->columnGroups[$columnObject->getColumnGroup()]++;
+                } else {
+                    $this->columnGroups[$columnObject->getColumnGroup()] = 1;
+                }
             }
         }
 
@@ -106,5 +116,17 @@ class WorkqueueService
     public function getColumnGroups(): array
     {
         return $this->columnGroups;
+    }
+
+    public function getSortableColumns(): array
+    {
+        $sortableColumns = [];
+        $iterator = $this->columnCollection->getIterator();
+        while ($iterator->valid()) {
+            $column = $iterator->current();
+            $sortableColumns[] = $column->isSortable();
+            $iterator->next();
+        }
+        return $sortableColumns;
     }
 }

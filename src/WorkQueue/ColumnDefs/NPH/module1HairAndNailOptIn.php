@@ -16,13 +16,13 @@ class module1HairAndNailOptIn extends defaultColumn
         $latestTimestampString = $latestTimestamp->format('m/d/Y h:i A');
         switch ($latestTimestampElement['optIn']) {
             case 'PERMIT':
-                return "Consented Hair and Nail<br>${latestTimestampString}";
+                return "<i class='fas fa-check text-success'></i> Consented Hair and Nail<br>${latestTimestampString}";
             case 'PERMIT2':
-                return "Consented Hair Only<br>${latestTimestampString}";
+                return "<i class='fas fa-check text-warning'></i> Consented Hair Only<br>${latestTimestampString}";
             case 'PERMIT3':
-                return "Consented Nail Only<br>${latestTimestampString}";
+                return "<i class='fas fa-check text-warning'></i> Consented Nail Only<br>${latestTimestampString}";
             case 'DENY':
-                return "Consented No<br>${latestTimestampString}";
+                return "<i class='fas fa-times text-danger'></i> Consented No<br>${latestTimestampString}";
             default:
                 return 'Not Consented';
         }

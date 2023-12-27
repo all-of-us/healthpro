@@ -2,11 +2,13 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-class module1ConsentStatus extends defaultColumn
+use App\WorkQueue\ColumnDefs\NPH\defaultColumn;
+
+class module1RecontactConsent extends defaultColumn
 {
     public function getColumnDisplay($data, $dataRow): string
     {
-        $latestTimestampElement = utilFunctions::searchLatestTimestampElement($data, ['m1_consent']);
+        $latestTimestampElement = utilFunctions::searchLatestTimestampElement($data, ['m1_consent_recontact']);
         if ($latestTimestampElement === null) {
             return 'Not Consented';
         }

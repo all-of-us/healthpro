@@ -23,15 +23,29 @@ function generateColvisGroups(columnGroups) {
     return colvisGroups;
 }
 
+function generateSortableColumns(sortableColumns) {
+    let sortable = [];
+    sortableColumns.forEach(function (columnIsSortable) {
+        sortable.push({
+            orderable: columnIsSortable
+        });
+    });
+    return sortable;
+}
+
 $(document).ready(function () {
     let colvisGroups = generateColvisGroups($("#workqueueTable").data("colvis-groups"));
+    let sortable = generateSortableColumns($("#workqueueTable").data("sortable-columns"));
     colvisGroups.push("colvis");
     let table = $("#workqueueTable").DataTable({
         ajax: "/nph/workqueue/data",
         responsive: true,
         buttons: colvisGroups,
+        serverSide: true,
+        columns: sortable,
         initComplete: function () {
             table.buttons().container().appendTo("#workqueueTable-wrapper");
-        }
+        },
+        scrollX: true
     });
 });

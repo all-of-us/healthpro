@@ -17,4 +17,5 @@ interface columnInterface
     public function getDataField(): string;
     public function setColumnGroup(string $columnGroup): void;
     public function getColumnGroup(): string;
+    public function isEnabled(): bool;
 }
