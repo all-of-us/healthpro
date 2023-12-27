@@ -2217,6 +2217,136 @@ class WorkQueue
                 ]
             ],
         ],
+        'PMB' => [
+            'selfReportedPhysicalMeasurementsStatus' => [
+                'label' => 'Remote Phys Measurements',
+                'options' => [
+                    'View All' => '',
+                    'Completed' => 'COMPLETED',
+                    'Not Completed' => 'UNSET'
+                ]
+            ],
+            'clinicPhysicalMeasurementsStatus' => [
+                'label' => 'Phys Measurements',
+                'options' => [
+                    'View All' => '',
+                    'Completed' => 'COMPLETED',
+                    'Not Completed' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1SST8' => [
+                'label' => '8 mL SST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1PST8' => [
+                'label' => '8 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1HEP4' => [
+                'label' => '4 mL Na-Hep',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1ED02' => [
+                'label' => '2 mL EDTA (1ED02)',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus2ED02' => [
+                'label' => '2 mL EDTA (2ED02)',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1ED04' => [
+                'label' => '4 mL EDTA (1ED04)',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus2ED04' => [
+                'label' => '4 mL EDTA (2ED04)',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1ED10' => [
+                'label' => '1st 10 mL EDTA',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus2ED10' => [
+                'label' => '2nd 10 mL EDTA',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1CFD9' => [
+                'label' => 'Cell-Free DNA',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1PXR2' => [
+                'label' => 'Paxgene RNA',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1UR10' => [
+                'label' => 'Urine 10 mL',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1UR90' => [
+                'label' => 'Urine 90 mL',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1SAL' => [
+                'label' => 'Saliva',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ]
+        ],
         'Ancillary Studies' => [
             'NphStudyStatus' => [
                 'label' => 'Nutrition For Precision Health',
@@ -2227,6 +2357,25 @@ class WorkQueue
                 ]
             ],
         ]
+    ];
+
+    public static array $rdrPmbFilterParams = [
+        'selfReportedPhysicalMeasurementsStatus',
+        'clinicPhysicalMeasurementsStatus',
+        'sampleStatus1SST8',
+        'sampleStatus1PST8',
+        'sampleStatus1HEP4',
+        'sampleStatus1ED02',
+        'sampleStatus2ED02',
+        'sampleStatus1ED04',
+        'sampleStatus2ED04',
+        'sampleStatus1ED10',
+        'sampleStatus2ED10',
+        'sampleStatus1CFD9',
+        'sampleStatus1PXR2',
+        'sampleStatus1UR10',
+        'sampleStatus1UR90',
+        'sampleStatus1SAL'
     ];
 
     public static $filterDateFieldLabels = [
@@ -2253,7 +2402,12 @@ class WorkQueue
         'EHR' => 'fa-laptop-medical',
         'Retention' => 'fa-check-double',
         'Pairing' => 'fa-building',
-        'Ancillary Studies' => 'fa-microscope'
+        'Ancillary Studies' => 'fa-microscope',
+        'PMB' => 'fa-vial'
+    ];
+
+    public static array $customFilterLabels = [
+        'PMB' => 'PM&B'
     ];
 
     //These are currently not working in the RDR
