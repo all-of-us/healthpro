@@ -75,7 +75,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
-      "class": "module1ConsentStatus",
+      "class": "moduleConsentStatus",
       "group": "Consents"
     },
     {
@@ -99,7 +99,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule2ConsentStatus",
-      "class": "module2ConsentStatus",
+      "class": "moduleConsentStatus",
       "group": "Consents",
       "enable": true
     },
@@ -108,7 +108,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule3ConsentStatus",
-      "class": "module3ConsentStatus",
+      "class": "moduleConsentStatus",
       "group": "Consents",
       "enable": true
     },

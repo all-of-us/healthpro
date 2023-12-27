@@ -2,7 +2,7 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-use App\WorkQueue\ColumnDefs\NPH\defaultColumn;
+use App\WorkQueue\ColumnDefs\defaultColumn;
 
 class module1HairAndNailOptIn extends defaultColumn
 {

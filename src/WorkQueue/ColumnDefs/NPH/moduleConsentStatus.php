@@ -2,7 +2,9 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-class module1ConsentStatus extends defaultColumn
+use App\WorkQueue\ColumnDefs\defaultColumn;
+
+class moduleConsentStatus extends defaultColumn
 {
     public function getColumnDisplay($data, $dataRow): string
     {

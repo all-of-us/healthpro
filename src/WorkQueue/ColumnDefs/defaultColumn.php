@@ -1,8 +1,6 @@
 <?php
 
-namespace App\WorkQueue\ColumnDefs\NPH;
-
-use App\WorkQueue\ColumnDefs\columnInterface;
+namespace App\WorkQueue\ColumnDefs;
 
 class defaultColumn implements columnInterface
 {

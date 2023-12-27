@@ -2,7 +2,7 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-use DateTime;
+use App\WorkQueue\ColumnDefs\defaultColumn;
 
 class statusField extends defaultColumn
 {
