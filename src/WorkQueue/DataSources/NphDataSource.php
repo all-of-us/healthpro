@@ -24,16 +24,6 @@ class NphDataSource implements WorkqueueDatasource
         return $result;
     }
 
-    private function getSearchFilter(): string
-    {
-        $site = $this->currentSite;
-        return "
-        filter: {
-            nphPairedSite: \"nph-site-${site}\"
-        }
-        ";
-    }
-
     private function getSearchQuery(int $offset, int $limit): string
     {
         $site = $this->currentSite;
