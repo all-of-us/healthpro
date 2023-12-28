@@ -10,17 +10,11 @@ class NphDataSource implements WorkqueueDatasource
 {
     private $rdrApi = null;
     private $currentSite = null;
-    private $columnCollection = null;
 
     public function __construct(RdrApiService $api, SiteService $siteService)
     {
         $this->rdrApi = $api;
         $this->currentSite = $siteService->getSiteId();
-    }
-
-    public function setColumnCollection(ColumnCollection $columnCollection): void
-    {
-        $this->columnCollection = $columnCollection;
     }
 
     public function getWorkqueueData(int $offset, int $limit, ColumnCollection $columnCollection): array
