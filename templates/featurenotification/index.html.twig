@@ -39,8 +39,8 @@
                 </td>
                 <td>{{ notification.message|length > 100 ? notification.message|slice(0, 100) ~ '...' : notification.message }}</td>
                 <td>{{ notification.url }}</td>
-                <td>{{ notification.startTs ? notification.startTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
-                <td>{{ notification.endTs ? notification.endTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
+                <td data-sort="{{ notification.startTs ? notification.startTs|date('U') }}">{{ notification.startTs ? notification.startTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
+                <td data-sort="{{ notification.endTs ? notification.endTs|date('U') }}">{{ notification.endTs ? notification.endTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                 <td>
                     {% if notification.status %}
                         <span class="label label-success">Enabled</span>
