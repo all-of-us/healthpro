@@ -57,7 +57,7 @@ class WorkqueueGeneralizedService
         try {
             $columnConfig = json_decode(file_get_contents(__DIR__ . '/../WorkQueue/ColumnDefs/' . $workqueueProgram . '/config.json'), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new \Exception('Unable to load column config for ' . $workqueueProgram);
+            throw new \Exception('Unable to load column config');
         }
         $columns = [];
         foreach ($columnConfig['columns'] as $column) {
