@@ -9,6 +9,8 @@ interface columnInterface
     public function getColumnExport($data): string;
     public function isFilterable(): bool;
     public function isSortable(): bool;
+    public function isInDefaultGroup(): bool;
+    public function isIncludeInAllGroups(): bool;
     public function setFilterData($filterData): void;
     public function setSort($sort): void;
     public function setColumnDisplayed(bool $columnDisplayed): void;

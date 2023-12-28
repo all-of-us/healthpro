@@ -24,7 +24,7 @@ class NphWorkqueueController extends AbstractController
             'columnHeaders' => $columnHeaders,
             'columns' => $columns,
             'columnGroups' => $workqueueService->getColumnGroups(),
-            'sortableColumns' => $sortableColumns,
+            'sortableColumns' => $sortableColumns
         ]);
     }
 

@@ -73,7 +73,7 @@ class WorkqueueGeneralizedService
             if ($columnObject->isEnabled()) {
                 $columns[] = $columnObject;
 
-                if (isset($this->columnGroups[$columnObject->getColumnGroup()]) && $column) {
+                if ($column && isset($this->columnGroups[$columnObject->getColumnGroup()])) {
                     $this->columnGroups[$columnObject->getColumnGroup()]++;
                 } else {
                     $this->columnGroups[$columnObject->getColumnGroup()] = 1;
@@ -82,17 +82,6 @@ class WorkqueueGeneralizedService
         }
 
         $this->columnCollection = new ColumnCollection(...$columns);
-    }
-
-    public function getWorkQueueGroups(): array
-    {
-        $groups = [];
-        foreach ($this->columnCollection as $column) {
-            if ($column->getColumnDisplayed()) {
-                $groups[] = $column->getGroup()();
-            }
-        }
-        return $groups;
     }
 
     public function getWorkqueueColumnHeaders(): array

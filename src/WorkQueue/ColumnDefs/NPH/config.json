@@ -1,12 +1,15 @@
 {
   "columns": [
     {
-      "display": "Date of Birth",
+      "display": "Last Name",
       "sortable": false,
       "filterable": false,
-      "dataField": "nphDateOfBirth",
-      "workqueueField": "dob",
-      "group": "Participant Details"
+      "dataField": "lastName",
+      "workqueueField": "lastname",
+      "class": "participantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
     },
     {
       "display": "First Name",
@@ -15,16 +18,9 @@
       "dataField": "firstName",
       "workqueueField": "firstname",
       "class": "participantLink",
-      "group": "Participant Details"
-    },
-    {
-      "display": "Last Name",
-      "sortable": false,
-      "filterable": false,
-      "dataField": "lastName",
-      "workqueueField": "lastname",
-      "class": "participantLink",
-      "group": "Participant Details"
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
     },
     {
       "display": "Middle Name",
@@ -33,7 +29,19 @@
       "dataField": "middleName",
       "workqueueField": "middleinitial",
       "class": "participantLink",
-      "group": "Participant Details"
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Date of Birth",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphDateOfBirth",
+      "workqueueField": "dob",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
     },
     {
       "display": "Participant ID",
@@ -42,7 +50,20 @@
       "dataField": "participantNphId",
       "workqueueField": "participantid",
       "class": "participantLink",
-      "group": "Participant Details"
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Biobank ID",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "biobankId",
+      "workqueueField": "biobankid",
+      "class": "participantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
     },
     {
       "display": "Enrollment Status",
@@ -50,7 +71,8 @@
       "filterable": false,
       "dataField": "nphEnrollmentStatus",
       "class": "enrollmentStatus",
-      "group": "Activity Status"
+      "group": "Activity Status",
+      "defaultGroup": true
     },
     {
       "display": "Withdrawal Status",
@@ -76,7 +98,8 @@
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
       "class": "moduleConsentStatus",
-      "group": "Consents"
+      "group": "Consents",
+      "defaultGroup": true
     },
     {
       "display": "Module 1 Hair and Nail Opt In",
@@ -84,7 +107,8 @@
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
       "class": "module1HairAndNailOptIn",
-      "group": "Consents"
+      "group": "Consents",
+      "defaultGroup": true
     },
     {
       "display": "Module 1 Recontact Opt In",
@@ -92,7 +116,8 @@
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
       "class": "module1RecontactConsent",
-      "group": "Consents"
+      "group": "Consents",
+      "defaultGroup": true
     },
     {
       "display": "Module 2 Consent Status",
@@ -101,7 +126,8 @@
       "dataField": "nphModule2ConsentStatus",
       "class": "moduleConsentStatus",
       "group": "Consents",
-      "enable": true
+      "enable": true,
+      "defaultGroup": true
     },
     {
       "display": "Module 3 Consent Status",
@@ -110,43 +136,44 @@
       "dataField": "nphModule3ConsentStatus",
       "class": "moduleConsentStatus",
       "group": "Consents",
-      "enable": true
+      "enable": true,
+      "defaultGroup": true
     },
     {
       "display": "Paired Site",
       "sortable": false,
       "filterable": false,
       "dataField": "nphPairedSite",
-      "group": "Pairing",
-      "enable": true
-    },    {
+      "class": "siteName",
+      "group": "Pairing"
+    },
+    {
       "display": "Paired Organization",
       "sortable": false,
       "filterable": false,
       "dataField": "nphPairedOrg",
-      "group": "Pairing",
-      "enable": true
-    },    {
+      "group": "Pairing"
+    },
+    {
       "display": "Zip Code",
       "sortable": false,
       "filterable": false,
       "dataField": "zipCode",
-      "group": "Contact",
-      "enable": true
-    },    {
+      "group": "Contact"
+    },
+    {
       "display": "Phone Number",
       "sortable": false,
       "filterable": false,
       "dataField": "phoneNumber",
-      "group": "Contact",
-      "enable": true
-    },    {
+      "group": "Contact"
+    },
+    {
       "display": "Email",
       "sortable": false,
       "filterable": false,
       "dataField": "email",
-      "group": "Contact",
-      "enable": true
+      "group": "Contact"
     }
   ],
   "columnGroups": [

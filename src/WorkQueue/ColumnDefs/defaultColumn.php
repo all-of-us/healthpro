@@ -11,6 +11,8 @@ class defaultColumn implements columnInterface
     private string $dataField = '';
     private string $displayName = '';
     private string $columnGroup = '';
+    private bool $includeInAllGroups = false;
+    private bool $defaultGroup = false;
     private bool $enabled = true;
     private array $config = [];
 
@@ -89,6 +91,17 @@ class defaultColumn implements columnInterface
     {
         return $this->enabled;
     }
+
+    public function isIncludeInAllGroups(): bool
+    {
+        return $this->includeInAllGroups;
+    }
+
+    public function isInDefaultGroup(): bool
+    {
+        return $this->defaultGroup;
+    }
+
     private function loadConfig($config)
     {
         if (isset($config['filterable'])) {
@@ -111,6 +124,12 @@ class defaultColumn implements columnInterface
         }
         if (isset($config['enable'])) {
             $this->enabled = $config['enable'];
+        }
+        if (isset($config['includeInAllGroups'])) {
+            $this->includeInAllGroups = $config['includeInAllGroups'];
+        }
+        if (isset($config['defaultGroup'])) {
+            $this->defaultGroup = $config['defaultGroup'];
         }
         $this->config = $config;
     }

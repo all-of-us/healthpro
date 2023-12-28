@@ -7,8 +7,16 @@ use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
 
+/**
+ * Class ColumnCollection
+ * @package App\WorkQueue
+ * @implements IteratorAggregate<columnInterface>
+ */
 class ColumnCollection implements IteratorAggregate
 {
+    /**
+     * @var columnInterface[] $columns
+     */
     private array $columns;
     public function __construct(columnInterface ...$columns)
     {
