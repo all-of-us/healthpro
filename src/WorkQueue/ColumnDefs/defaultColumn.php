@@ -69,6 +69,26 @@ class defaultColumn implements columnInterface
     {
         return $this->dataField;
     }
+
+    public function setColumnGroup(string $columnGroup): void
+    {
+        $this->columnGroup = $columnGroup;
+    }
+
+    public function getColumnGroup(): string
+    {
+        return $this->columnGroup;
+    }
+
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
     private function loadConfig($config)
     {
         if (isset($config['filterable'])) {
@@ -93,24 +113,5 @@ class defaultColumn implements columnInterface
             $this->enabled = $config['enable'];
         }
         $this->config = $config;
-    }
-
-    public function setColumnGroup(string $columnGroup) : void{
-          $this->columnGroup = $columnGroup;
-    }
-
-    public function getColumnGroup(): string
-    {
-        return $this->columnGroup;
-    }
-
-    public function getConfig(): array
-    {
-        return $this->config;
-    }
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
     }
 }

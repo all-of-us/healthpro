@@ -3,8 +3,9 @@
 namespace App\WorkQueue;
 
 use App\WorkQueue\ColumnDefs\columnInterface;
+use IteratorAggregate;
 
-class ColumnCollection implements \IteratorAggregate
+class ColumnCollection implements IteratorAggregate
 {
     private array $columns;
     public function __construct(columnInterface ...$columns)
