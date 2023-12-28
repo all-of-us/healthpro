@@ -25,11 +25,6 @@ class WorkqueueGeneralizedService
         $this->datasource = $datasource;
     }
 
-    public function setColumnCollection(ColumnCollection $columnCollection): void
-    {
-        $this->columnCollection = $columnCollection;
-    }
-
     public function getWorkqueueData(int $offset = 0, int $limit = 10): array
     {
         $rawData = $this->datasource->getWorkqueueData($offset, $limit, $this->columnCollection);
