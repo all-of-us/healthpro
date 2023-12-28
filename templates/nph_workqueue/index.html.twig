@@ -3,8 +3,7 @@
 
 {% block body %}
 <div id="workqueueTable-wrapper" class="workqueueTable-wrapper col-md-12">
-    <div class="col-md-6" id="workqueueColvisContainer"></div>
-    <div class="col-md-6" id="workqueueSearchContainer"></div>
+    <div class="col-md-12" id="workqueueColvisContainer"></div>
     <div class="col-md-12" id="workqueueTableContainer">
         <table id="workqueueTable" class="table responsive table-striped" style="width: 100%"
                data-colvis-groups="{{ columnGroups|keys|json_encode }}" data-sortable-columns="{{ sortableColumns|json_encode }}">

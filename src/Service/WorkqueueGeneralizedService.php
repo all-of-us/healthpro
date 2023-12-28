@@ -5,6 +5,7 @@ namespace App\Service;
 use App\WorkQueue\ColumnCollection;
 use App\WorkQueue\DataSources\WorkqueueDatasource;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\WorkQueue\ColumnDefs\defaultColumn;
 
 class WorkqueueGeneralizedService
 {
@@ -51,13 +52,17 @@ class WorkqueueGeneralizedService
         return $result;
     }
 
-    public function loadWorkqueueColumns(string $workqueueProgram)
+    public function loadWorkqueueColumns(string $workqueueProgram): void
     {
-        $columnConfig = json_decode(file_get_contents(__DIR__ . '/../WorkQueue/ColumnDefs/' . $workqueueProgram . '/config.json'), true);
+        try {
+            $columnConfig = json_decode(file_get_contents(__DIR__ . '/../WorkQueue/ColumnDefs/' . $workqueueProgram . '/config.json'), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new \Exception('Unable to load column config for ' . $workqueueProgram);
+        }
         $columns = [];
-        foreach ($columnConfig['columns'] as $index => $column) {
+        foreach ($columnConfig['columns'] as $column) {
             if (!isset($column['class'])) {
-                $columnClass = 'App\\WorkQueue\\ColumnDefs\\' . $workqueueProgram . '\\defaultColumn';
+                $columnClass = defaultColumn::class;
             } else {
                 $columnClass = 'App\\WorkQueue\\ColumnDefs\\' . $workqueueProgram . '\\' . $column['class'];
             }

@@ -3,7 +3,9 @@
 namespace App\WorkQueue;
 
 use App\WorkQueue\ColumnDefs\columnInterface;
+use ArrayIterator;
 use IteratorAggregate;
+use Traversable;
 
 class ColumnCollection implements IteratorAggregate
 {
@@ -12,8 +14,8 @@ class ColumnCollection implements IteratorAggregate
     {
         $this->columns = $columns;
     }
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->columns);
+        return new ArrayIterator($this->columns);
     }
 }
