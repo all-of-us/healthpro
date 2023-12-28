@@ -3,9 +3,9 @@
 namespace App\Service;
 
 use App\WorkQueue\ColumnCollection;
+use App\WorkQueue\ColumnDefs\defaultColumn;
 use App\WorkQueue\DataSources\WorkqueueDatasource;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use App\WorkQueue\ColumnDefs\defaultColumn;
 
 class WorkqueueGeneralizedService
 {
