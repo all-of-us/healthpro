@@ -11,7 +11,7 @@ class WorkqueueGeneralizedService
 {
     private WorkqueueDatasource $datasource;
     private ColumnCollection $columnCollection;
-    private $columnGroups = [];
+    private array $columnGroups = [];
     private UrlGeneratorInterface $route;
     private SiteService $siteService;
     public function __construct(UrlGeneratorInterface $route, SiteService $siteService)
@@ -36,14 +36,11 @@ class WorkqueueGeneralizedService
         $result = [];
         foreach ($rawData['participant']['edges'] as $row) {
             $row = $row['node'];
-            $iterator = $this->columnCollection->getIterator();
             $temprow = [];
-            while ($iterator->valid()) {
-                $column = $iterator->current();
+            foreach ($this->columnCollection as $column) {
                 if ($column->getColumnDisplayed()) {
                     $temprow[] = $column->getColumnDisplay($row[$column->getDataField()], $row);
                 }
-                $iterator->next();
             }
             $result['data'][] = $temprow;
         }
@@ -90,13 +87,10 @@ class WorkqueueGeneralizedService
     public function getWorkQueueGroups(): array
     {
         $groups = [];
-        $iterator = $this->columnCollection->getIterator();
-        while ($iterator->valid()) {
-            $column = $iterator->current();
+        foreach ($this->columnCollection as $column) {
             if ($column->getColumnDisplayed()) {
                 $groups[] = $column->getGroup()();
             }
-            $iterator->next();
         }
         return $groups;
     }
@@ -104,11 +98,10 @@ class WorkqueueGeneralizedService
     public function getWorkqueueColumnHeaders(): array
     {
         $headers = [];
-        $iterator = $this->columnCollection->getIterator();
-        while ($iterator->valid()) {
-            $column = $iterator->current();
-            $headers[] = $column->getColumnDisplayName();
-            $iterator->next();
+        foreach ($this->columnCollection as $column) {
+            if ($column->getColumnDisplayed()) {
+                $headers[] = $column->getColumnDisplayName();
+            }
         }
         return $headers;
     }
@@ -126,11 +119,8 @@ class WorkqueueGeneralizedService
     public function getSortableColumns(): array
     {
         $sortableColumns = [];
-        $iterator = $this->columnCollection->getIterator();
-        while ($iterator->valid()) {
-            $column = $iterator->current();
+        foreach ($this->columnCollection as $column) {
             $sortableColumns[] = $column->isSortable();
-            $iterator->next();
         }
         return $sortableColumns;
     }
