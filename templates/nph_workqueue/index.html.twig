@@ -3,23 +3,27 @@
 
 {% block body %}
 <div id="workqueueTable-wrapper" class="workqueueTable-wrapper col-md-12">
-    <table id="workqueueTable" class="table responsive table-striped" style="width: 100%"
-    data-colvis-groups="{{ columnGroups|keys|json_encode }}" data-sortable-columns="{{ sortableColumns|json_encode }}">
-        <thead>
-        {% if columnGroups is not empty %}
+    <div class="col-md-6" id="workqueueColvisContainer"></div>
+    <div class="col-md-6" id="workqueueSearchContainer"></div>
+    <div class="col-md-12" id="workqueueTableContainer">
+        <table id="workqueueTable" class="table responsive table-striped" style="width: 100%"
+               data-colvis-groups="{{ columnGroups|keys|json_encode }}" data-sortable-columns="{{ sortableColumns|json_encode }}">
+            <thead>
+            {% if columnGroups is not empty %}
+                <tr>
+                    {% for columnGroup, count in columnGroups %}
+                        <th colspan="{{ count }}" class="{{ columnGroup|replace({' ': '_'})|lower }}">{{ columnGroup }}</th>
+                    {% endfor %}
+                </tr>
+            {% endif %}
             <tr>
-                {% for columnGroup, count in columnGroups %}
-                    <th colspan="{{ count }}" class="{{ columnGroup|replace({' ': '_'})|lower }}">{{ columnGroup }}</th>
+                {% for column in columns %}
+                    <th class="{{ column.getColumnGroup|replace({' ': '_'})|lower }}">{{ column.getColumnDisplayName }}</th>
                 {% endfor %}
             </tr>
-        {% endif %}
-        <tr>
-            {% for column in columns %}
-                <th class="{{ column.getColumnGroup|replace({' ': '_'})|lower }}">{{ column.getColumnDisplayName }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-    </table>
+            </thead>
+        </table>
+    </div>
 </div>
 {% endblock %}
 

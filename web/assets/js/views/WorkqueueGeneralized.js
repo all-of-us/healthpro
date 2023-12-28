@@ -44,7 +44,7 @@ $(document).ready(function () {
         serverSide: true,
         columns: sortable,
         initComplete: function () {
-            table.buttons().container().appendTo("#workqueueTable-wrapper");
+            table.buttons().container().appendTo("#workqueueColvisContainer");
         },
         scrollX: true
     });
