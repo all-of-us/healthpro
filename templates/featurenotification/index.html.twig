@@ -29,7 +29,7 @@
         <tbody>
         {% for notification in notifications %}
             <tr>
-                <td>
+                <td data-sort="{{ notification.createdTs|date('U') }}">
                     <a href="{{ path('admin_feature_notification', { id: notification.id }) }}">
                         {{ notification.createdTs|date('n/j/Y g:ia', app.user.timezone) }}
                     </a>
