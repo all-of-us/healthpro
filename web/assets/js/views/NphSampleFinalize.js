@@ -54,16 +54,18 @@ $(document).ready(function () {
     });
 
     $(document).on("keyup", ".aliquot-barcode", function () {
-        let barcode = $(this).val();
-        let expectedBarcodeLength = $(this).data("barcode-length");
-        let expectedBarcodePrefix = $(this).data("barcode-prefix");
-        let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
-        if (regex.test(barcode)) {
-            let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
-            aliquotTsSelector.focus();
-            aliquotTsSelector.data("DateTimePicker").date(new Date());
-            aliquotTsSelector.blur();
-            $(this).closest("tr").find(".aliquot-volume").focus();
+        if (!$(this).prop("readonly")) {
+            let barcode = $(this).val();
+            let expectedBarcodeLength = $(this).data("barcode-length");
+            let expectedBarcodePrefix = $(this).data("barcode-prefix");
+            let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
+            if (regex.test(barcode)) {
+                let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
+                aliquotTsSelector.focus();
+                aliquotTsSelector.data("DateTimePicker").date(new Date());
+                aliquotTsSelector.blur();
+                $(this).closest("tr").find(".aliquot-volume").focus();
+            }
         }
     });
 
