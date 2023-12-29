@@ -65,8 +65,10 @@ $(document).ready(function () {
         serverSide: true,
         columns: sortable,
         searching: false,
+        processing: true,
         initComplete: function () {
             table.buttons().container().appendTo("#workqueueColvisContainer");
+            table.button("0").trigger();
         },
         scrollX: true
     });
