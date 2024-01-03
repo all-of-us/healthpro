@@ -2,7 +2,7 @@
 
 namespace App\WorkQueue;
 
-use App\WorkQueue\ColumnDefs\columnInterface;
+use App\WorkQueue\ColumnDefs\ColumnInterface;
 use ArrayIterator;
 use IteratorAggregate;
 use Traversable;
