@@ -161,6 +161,7 @@
       "temperature": "Refrigerated",
       "specimen": "Urine",
       "type": "urine",
+      "typeDisplayName": "Spot Urine",
       "identifier": "UrineS",
       "collectionVolume": "100 mL",
       "aliquots": {
