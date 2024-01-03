@@ -5,7 +5,7 @@ namespace App\WorkQueue\ColumnDefs\NPH;
 use App\WorkQueue\ColumnDefs\defaultColumn;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class participantLink extends defaultColumn
+class ParticipantLink extends DefaultColumn
 {
     private UrlGeneratorInterface $urlGenerator;
 

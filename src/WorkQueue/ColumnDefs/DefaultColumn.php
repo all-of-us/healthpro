@@ -2,7 +2,7 @@
 
 namespace App\WorkQueue\ColumnDefs;
 
-class defaultColumn implements columnInterface
+class DefaultColumn implements ColumnInterface
 {
     private bool $filterable = true;
     private bool $sortable = true;

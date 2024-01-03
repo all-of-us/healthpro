@@ -2,13 +2,13 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-use App\WorkQueue\ColumnDefs\defaultColumn;
+use App\WorkQueue\ColumnDefs\DefaultColumn;
 
-class statusField extends defaultColumn
+class StatusField extends DefaultColumn
 {
     public function getColumnDisplay($data, $dataRow): string
     {
-        $latestTimestampElement = utilFunctions::getLatestTimestampElement($data);
+        $latestTimestampElement = UtilFunctions::getLatestTimestampElement($data);
         return $latestTimestampElement['value'] ?? '';
     }
 }

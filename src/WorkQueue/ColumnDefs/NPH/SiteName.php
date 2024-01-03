@@ -3,9 +3,9 @@
 namespace App\WorkQueue\ColumnDefs\NPH;
 
 use App\Service\SiteService;
-use App\WorkQueue\ColumnDefs\defaultColumn;
+use App\WorkQueue\ColumnDefs\DefaultColumn;
 
-class siteName extends defaultColumn
+class SiteName extends DefaultColumn
 {
     private SiteService $siteService;
 

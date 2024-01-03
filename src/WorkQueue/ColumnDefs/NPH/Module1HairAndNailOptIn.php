@@ -2,13 +2,13 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-use App\WorkQueue\ColumnDefs\defaultColumn;
+use App\WorkQueue\ColumnDefs\DefaultColumn;
 
-class module1HairAndNailOptIn extends defaultColumn
+class Module1HairAndNailOptIn extends DefaultColumn
 {
     public function getColumnDisplay($data, $dataRow): string
     {
-        $latestTimestampElement = utilFunctions::searchLatestTimestampElement($data, ['m1_consent_tissue']);
+        $latestTimestampElement = UtilFunctions::searchLatestTimestampElement($data, ['m1_consent_tissue']);
         if ($latestTimestampElement === null) {
             return 'Not Consented';
         }

@@ -2,7 +2,7 @@
 
 namespace App\WorkQueue\ColumnDefs;
 
-interface columnInterface
+interface ColumnInterface
 {
     public function getColumnDisplay($data, $dataRow): string;
     public function getColumnDisplayName(): string;

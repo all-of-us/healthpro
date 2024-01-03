@@ -4,7 +4,7 @@ namespace App\WorkQueue\ColumnDefs\NPH;
 
 use DateTime;
 
-class utilFunctions
+class UtilFunctions
 {
     public static function getLatestTimestampElement($data): ?array
     {

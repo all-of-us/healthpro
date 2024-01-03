@@ -6,7 +6,7 @@
       "filterable": false,
       "dataField": "lastName",
       "workqueueField": "lastname",
-      "class": "participantLink",
+      "class": "ParticipantLink",
       "group": "Participant Details",
       "includeInAllGroups": true,
       "defaultGroup": true
@@ -17,7 +17,7 @@
       "filterable": false,
       "dataField": "firstName",
       "workqueueField": "firstname",
-      "class": "participantLink",
+      "class": "ParticipantLink",
       "group": "Participant Details",
       "includeInAllGroups": true,
       "defaultGroup": true
@@ -28,7 +28,7 @@
       "filterable": false,
       "dataField": "middleName",
       "workqueueField": "middleinitial",
-      "class": "participantLink",
+      "class": "ParticipantLink",
       "group": "Participant Details",
       "includeInAllGroups": true,
       "defaultGroup": true
@@ -49,7 +49,7 @@
       "filterable": false,
       "dataField": "participantNphId",
       "workqueueField": "participantid",
-      "class": "participantLink",
+      "class": "ParticipantLink",
       "group": "Participant Details",
       "includeInAllGroups": true,
       "defaultGroup": true
@@ -60,7 +60,7 @@
       "filterable": false,
       "dataField": "biobankId",
       "workqueueField": "biobankid",
-      "class": "participantLink",
+      "class": "ParticipantLink",
       "group": "Participant Details",
       "includeInAllGroups": true,
       "defaultGroup": true
@@ -70,7 +70,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphEnrollmentStatus",
-      "class": "enrollmentStatus",
+      "class": "EnrollmentStatus",
       "group": "Activity Status",
       "defaultGroup": true
     },
@@ -79,7 +79,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphWithdrawalStatus",
-      "class": "statusField",
+      "class": "StatusField",
       "group": "Activity Status",
       "enable": false
     },
@@ -88,7 +88,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphDeactivationStatus",
-      "class": "statusField",
+      "class": "StatusField",
       "group": "Activity Status",
       "enable": false
     },
@@ -97,7 +97,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
-      "class": "moduleConsentStatus",
+      "class": "ModuleConsentStatus",
       "group": "Consents",
       "defaultGroup": true
     },
@@ -106,7 +106,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
-      "class": "module1HairAndNailOptIn",
+      "class": "Module1HairAndNailOptIn",
       "group": "Consents",
       "defaultGroup": true
     },
@@ -115,7 +115,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
-      "class": "module1RecontactConsent",
+      "class": "Module1RecontactConsent",
       "group": "Consents",
       "defaultGroup": true
     },
@@ -124,7 +124,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule2ConsentStatus",
-      "class": "moduleConsentStatus",
+      "class": "ModuleConsentStatus",
       "group": "Consents",
       "enable": true,
       "defaultGroup": true
@@ -134,7 +134,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule3ConsentStatus",
-      "class": "moduleConsentStatus",
+      "class": "ModuleConsentStatus",
       "group": "Consents",
       "enable": true,
       "defaultGroup": true
@@ -144,7 +144,7 @@
       "sortable": false,
       "filterable": false,
       "dataField": "nphPairedSite",
-      "class": "siteName",
+      "class": "SiteName",
       "group": "Pairing"
     },
     {

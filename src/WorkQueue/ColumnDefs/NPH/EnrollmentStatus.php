@@ -2,11 +2,11 @@
 
 namespace App\WorkQueue\ColumnDefs\NPH;
 
-class enrollmentStatus extends statusField
+class EnrollmentStatus extends StatusField
 {
     public function getColumnDisplay($data, $dataRow): string
     {
-        $latestTimestampElement = utilFunctions::getLatestTimestampElement($data);
+        $latestTimestampElement = UtilFunctions::getLatestTimestampElement($data);
         $latestTimestamp = new \DateTime($latestTimestampElement['time']);
         $latestTimestampString = $latestTimestamp->format('m/d/Y h:i A');
         switch ($latestTimestampElement['value']) {
