@@ -10,15 +10,15 @@ use Traversable;
 /**
  * Class ColumnCollection
  * @package App\WorkQueue
- * @implements IteratorAggregate<columnInterface>
+ * @implements IteratorAggregate<ColumnInterface>
  */
 class ColumnCollection implements IteratorAggregate
 {
     /**
-     * @var columnInterface[] $columns
+     * @var ColumnInterface[] $columns
      */
     private array $columns;
-    public function __construct(columnInterface ...$columns)
+    public function __construct(ColumnInterface ...$columns)
     {
         $this->columns = $columns;
     }

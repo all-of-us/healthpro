@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\WorkQueue\ColumnCollection;
-use App\WorkQueue\ColumnDefs\defaultColumn;
+use App\WorkQueue\ColumnDefs\DefaultColumn;
 use App\WorkQueue\DataSources\WorkqueueDatasource;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -54,7 +54,7 @@ class WorkqueueGeneralizedService
         $columns = [];
         foreach ($columnConfig['columns'] as $column) {
             if (!isset($column['class'])) {
-                $columnClass = defaultColumn::class;
+                $columnClass = DefaultColumn::class;
             } else {
                 $columnClass = 'App\\WorkQueue\\ColumnDefs\\' . $workqueueProgram . '\\' . $column['class'];
             }
