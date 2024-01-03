@@ -22,6 +22,9 @@ class NphOrder
     public const TYPE_DLW = 'urineDlw';
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
     private const TYPE_DISPLAY_OVERRIDE = [
+        2 => [
+            'urine' => 'Spot Urine'
+        ],
         3 => [
             'urine' => 'Spot Urine',
             '24urine' => '24 Hour Urine',
