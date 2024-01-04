@@ -326,7 +326,7 @@ class Participant
                 $this->editExistingOnly = true;
                 $this->statusReason = 'genomics';
             }
-            if (isset($this->siteType) && isset($participant->consentForElectronicHealthRecords) && $this->siteType === 'hpo' && !in_array($participant->consentForElectronicHealthRecords, ['SUBMITTED', 'SUBMITTED_INVALID', 'SUBMITTED_NOT_VALIDATED'])) {
+            if ((empty($this->siteType) || $this->siteType === 'hpo') && isset($participant->consentForElectronicHealthRecords) && !in_array($participant->consentForElectronicHealthRecords, ['SUBMITTED', 'SUBMITTED_INVALID', 'SUBMITTED_NOT_VALIDATED'])) {
                 $this->status = false;
                 $this->editExistingOnly = true;
                 $this->statusReason = 'ehr-consent';
