@@ -216,3 +216,19 @@ div.order-row {
 .date-range-warning {
     border: 2px solid #8a6d3b;
 }
+
+th.participant_details {
+    background-color: #D8ECFF;
+}
+th.activity_status {
+    background-color: #FFEED3;
+}
+th.consents {
+    background-color: #EEFFDD;
+}
+th.pairing {
+    background-color: #FFFDC7;
+}
+th.contact {
+    background-color: #EEE9FF;
+}

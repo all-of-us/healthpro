@@ -89,7 +89,6 @@ class NphParticipantSummaryService
         }
 
         $edges = $result->participant->edges;
-
         if (empty($edges)) {
             return [];
         }

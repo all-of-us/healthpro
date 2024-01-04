@@ -1,0 +1,199 @@
+{
+  "columns": [
+    {
+      "display": "Last Name",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "lastName",
+      "workqueueField": "lastname",
+      "class": "ParticipantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "First Name",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "firstName",
+      "workqueueField": "firstname",
+      "class": "ParticipantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Middle Name",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "middleName",
+      "workqueueField": "middleinitial",
+      "class": "ParticipantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Date of Birth",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphDateOfBirth",
+      "workqueueField": "dob",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Participant ID",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "participantNphId",
+      "workqueueField": "participantid",
+      "class": "ParticipantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Biobank ID",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "biobankId",
+      "workqueueField": "biobankid",
+      "class": "ParticipantLink",
+      "group": "Participant Details",
+      "includeInAllGroups": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Enrollment Status",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphEnrollmentStatus",
+      "class": "EnrollmentStatus",
+      "group": "Activity Status",
+      "defaultGroup": true
+    },
+    {
+      "display": "Withdrawal Status",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphWithdrawalStatus",
+      "class": "StatusField",
+      "group": "Activity Status",
+      "enable": false
+    },
+    {
+      "display": "Deactivation Status",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphDeactivationStatus",
+      "class": "StatusField",
+      "group": "Activity Status",
+      "enable": false
+    },
+    {
+      "display": "Module 1 Consent Status",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphModule1ConsentStatus",
+      "class": "ModuleConsentStatus",
+      "group": "Consents",
+      "defaultGroup": true
+    },
+    {
+      "display": "Module 1 Hair and Nail Opt In",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphModule1ConsentStatus",
+      "class": "Module1HairAndNailOptIn",
+      "group": "Consents",
+      "defaultGroup": true
+    },
+    {
+      "display": "Module 1 Recontact Opt In",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphModule1ConsentStatus",
+      "class": "Module1RecontactConsent",
+      "group": "Consents",
+      "defaultGroup": true
+    },
+    {
+      "display": "Module 2 Consent Status",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphModule2ConsentStatus",
+      "class": "ModuleConsentStatus",
+      "group": "Consents",
+      "enable": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Module 3 Consent Status",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphModule3ConsentStatus",
+      "class": "ModuleConsentStatus",
+      "group": "Consents",
+      "enable": true,
+      "defaultGroup": true
+    },
+    {
+      "display": "Paired Site",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphPairedSite",
+      "class": "SiteName",
+      "group": "Pairing"
+    },
+    {
+      "display": "Paired Organization",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "nphPairedOrg",
+      "group": "Pairing"
+    },
+    {
+      "display": "Zip Code",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "zipCode",
+      "group": "Contact"
+    },
+    {
+      "display": "Phone Number",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "phoneNumber",
+      "group": "Contact"
+    },
+    {
+      "display": "Email",
+      "sortable": false,
+      "filterable": false,
+      "dataField": "email",
+      "group": "Contact"
+    }
+  ],
+  "columnGroups": [
+    "Participant Details",
+    "Activity Status",
+    "Consents",
+    "Pairing",
+    "Contact"
+  ],
+  "defaultColumns": [
+    "Last Name",
+    "First Name",
+    "Middle Name",
+    "Date of Birth",
+    "Participant ID",
+    "Biobank ID",
+    "Enrollment Status",
+    "Withdrawal Status",
+    "Deactivation Status",
+    "Module 1 Consent Status",
+    "Module 1 Hair and Nail Opt In"
+  ]
+}
