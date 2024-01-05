@@ -207,9 +207,9 @@
                         </div>
                     {% endif %}
                     {% if isFormDisabled %}
-                        {% set formClasses = 'disable-enter prevent-resumbit' %}
+                        {% set formClasses = 'sample-finalize-form disable-enter prevent-resumbit' %}
                     {% else  %}
-                        {% set formClasses = 'warn-unsaved disable-enter prevent-resubmit' %}
+                        {% set formClasses = 'sample-finalize-form warn-unsaved disable-enter prevent-resubmit' %}
                     {% endif %}
                     {{ form_start(sampleFinalizeForm, { attr: { class: formClasses} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
@@ -379,8 +379,7 @@
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
                                 {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or isFormDisabled %}
                                     disabled
-                                {% endif %}
-                                formnovalidate>
+                                {% endif %}>
                             Mark as Finalized
                         </button>
                         {% if biobankView %}

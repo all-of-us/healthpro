@@ -1,8 +1,8 @@
 $(document).ready(function () {
-    $("#sample_finalize_btn").on("click", function (e) {
-        e.preventDefault();
-        $("#confirmation_modal").modal("show");
-    });
+    // $("#sample_finalize_btn").on("click", function (e) {
+    //     e.preventDefault();
+    //     $("#confirmation_modal").modal("show");
+    // });
 
     $("#confirm_finalize_btn").on("click", function () {
         $("#confirmation_modal").modal("hide");
@@ -196,4 +196,31 @@ $(document).ready(function () {
     $(".aliquot-volume").trigger("keyup");
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
+
+    window.Parsley.addValidator('customDateComparison', {
+        validateString: function (value, requirement) {
+            let inputDate = new Date(value);
+            let comparisonDate = new Date(requirement);
+            return inputDate > comparisonDate;
+        },
+        messages: {
+            en: 'Time must be after order generation.'
+        }
+    });
+
+    $(".sample-finalize-form").parsley({
+        errorClass: "has-error",
+        classHandler: function (el) {
+            return el.$element.closest(".form-group");
+        },
+        errorsContainer: function (el) {
+            return el.$element.closest(".form-group");
+        },
+        errorsWrapper: '<div class="help-block"></div>',
+        errorTemplate: "<div></div>"
+    });
+
+    $('.sample-finalize-form :input').on('blur', function () {
+        $('.sample-finalize-form').parsley().validate();
+    });
 });
