@@ -78,6 +78,7 @@ class NphOrderForm extends AbstractType
                 'attr' => [
                     'class' => 'order-ts',
                     'readonly' => $options['disableStoolCollectedTs'],
+                    'data-parsley-trigger' => 'blur',
                     'data-parsley-custom-date-comparison' => $options['orderCreatedTs']->format('m/d/Y g:i A')
                 ],
                 'disabled' => $disabled

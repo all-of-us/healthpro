@@ -85,7 +85,8 @@ class NphSampleFinalizeType extends NphOrderForm
                             'placeholder' => 'Scan Aliquot Barcode',
                             'class' => 'aliquot-barcode',
                             'data-barcode-length' => $aliquot['barcodeLength'],
-                            'data-barcode-prefix' => $aliquot['barcodePrefix'] ?? null
+                            'data-barcode-prefix' => $aliquot['barcodePrefix'] ?? null,
+                            'data-parsley-trigger' => 'blur'
                         ],
                     ],
                     'label' => $aliquot['container'],
@@ -127,6 +128,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         ],
                         'attr' => [
                             'class' => 'order-ts',
+                            'data-parsley-trigger' => 'blur'
                         ]
                     ],
                     'required' => false,
@@ -165,6 +167,7 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'attr' => [
                                     'placeholder' => $metadataField['placeholder'] ?? '',
                                     'class' => $metadataField['class'] ?? '',
+                                    'data-parsley-trigger' => 'blur'
                                 ],
                                 'constraints' => $metadataConstraints ?? [],
                             ],

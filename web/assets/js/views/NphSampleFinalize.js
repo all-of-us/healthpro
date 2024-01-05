@@ -220,7 +220,7 @@ $(document).ready(function () {
         errorTemplate: "<div></div>"
     });
 
-    $('.sample-finalize-form :input').on('blur', function () {
-        $('.sample-finalize-form').parsley().validate();
+    $(document).on("dp.hide", ".order-ts", function () {
+        $(this).parsley().validate();
     });
 });
