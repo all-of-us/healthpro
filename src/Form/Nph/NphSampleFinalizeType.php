@@ -169,7 +169,9 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'attr' => [
                                     'placeholder' => $metadataField['placeholder'] ?? '',
                                     'class' => $metadataField['class'] ?? '',
-                                    'data-parsley-trigger' => 'blur'
+                                    'data-parsley-trigger' => 'blur',
+                                    'data-parsley-max' => $metadataField['maxVolume'],
+                                    'data-parsley-max-message' => "Glycerol Volume: Please verify the volume is correct. This aliquot should contain a maximum of {$metadataField['maxVolume']} {$metadataField['units']}."
                                 ],
                                 'constraints' => $metadataConstraints ?? [],
                             ],
@@ -304,7 +306,11 @@ class NphSampleFinalizeType extends NphOrderForm
         ];
         if (isset($aliquot['maxVolume'])) {
             $volumeAttributes['data-parsley-max'] = $aliquot['maxVolume'];
-            $volumeAttributes['data-parsley-max-message'] = "Please verify the volume is correct.  This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.";
+            $errorMessage = "Please verify the volume is correct. This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.";
+            if (isset($aliquot['errorMessageVolumePrefix'])) {
+                $errorMessage = "{$aliquot['errorMessageVolumePrefix']} {$errorMessage}";
+            }
+            $volumeAttributes['data-parsley-max-message'] = $errorMessage;
         }
         if (isset($aliquot['warningMinVolume'])) {
             $volumeAttributes['data-warning-min-volume'] = $aliquot['warningMinVolume'];

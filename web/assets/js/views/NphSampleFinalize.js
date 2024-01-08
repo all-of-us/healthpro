@@ -211,10 +211,10 @@ $(document).ready(function () {
     $(".sample-finalize-form").parsley({
         errorClass: "has-error",
         classHandler: function (el) {
-            return el.$element.closest(".form-group, td");
+            return el.$element.closest(".form-group, td, .input-group");
         },
         errorsContainer: function (el) {
-            return el.$element.closest(".form-group, td");
+            return el.$element.closest(".form-group, td, .input-group");
         },
         errorsWrapper: '<div class="help-block"></div>',
         errorTemplate: "<div></div>"
