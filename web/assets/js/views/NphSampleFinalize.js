@@ -1,8 +1,8 @@
 $(document).ready(function () {
-    // $("#sample_finalize_btn").on("click", function (e) {
-    //     e.preventDefault();
-    //     $("#confirmation_modal").modal("show");
-    // });
+    $("#sample_finalize_btn").on("click", function (e) {
+        e.preventDefault();
+        $("#confirmation_modal").modal("show");
+    });
 
     $("#confirm_finalize_btn").on("click", function () {
         $("#confirmation_modal").modal("hide");
@@ -196,6 +196,21 @@ $(document).ready(function () {
     $(".aliquot-volume").trigger("keyup");
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
+
+    window.Parsley.addValidator("aliquotDateComparison", {
+        validateString: function (value, requirement) {
+            let inputDate = new Date(value);
+            let collectedTs = $("#" + requirement).val();
+            if (collectedTs) {
+                let comparisonDate = new Date(collectedTs);
+                return inputDate > comparisonDate;
+            }
+            return true;
+        },
+        messages: {
+            en: "Aliquot time must be after collection time."
+        }
+    });
 
     window.Parsley.addValidator("customDateComparison", {
         validateString: function (value, requirement) {

@@ -130,7 +130,8 @@ class NphSampleFinalizeType extends NphOrderForm
                         ],
                         'attr' => [
                             'class' => 'order-ts',
-                            'data-parsley-trigger' => 'blur'
+                            'data-parsley-trigger' => 'blur',
+                            'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                         ]
                     ],
                     'required' => false,
