@@ -1,7 +1,9 @@
 $(document).ready(function () {
     $("#sample_finalize_btn").on("click", function (e) {
         e.preventDefault();
-        $("#confirmation_modal").modal("show");
+        if ($('.sample-finalize-form').parsley().validate()) {
+            $("#confirmation_modal").modal("show");
+        }
     });
 
     $("#confirm_finalize_btn").on("click", function () {
