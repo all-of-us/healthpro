@@ -86,6 +86,8 @@ class NphSampleFinalizeType extends NphOrderForm
                             'class' => 'aliquot-barcode',
                             'data-barcode-length' => $aliquot['barcodeLength'],
                             'data-barcode-prefix' => $aliquot['barcodePrefix'] ?? null,
+                            'data-parsley-pattern' => $barcodePattern,
+                            'data-parsley-pattern-message' => $aliquot['barcodeErrorMessage'],
                             'data-parsley-trigger' => 'blur'
                         ],
                     ],
