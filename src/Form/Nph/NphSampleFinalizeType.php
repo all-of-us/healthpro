@@ -299,8 +299,13 @@ class NphSampleFinalizeType extends NphOrderForm
     {
         $volumeAttributes = [
             'class' => 'aliquot-volume',
-            'data-expected-volume' => $aliquot['expectedVolume']
+            'data-expected-volume' => $aliquot['expectedVolume'],
+            'data-parsley-trigger' => 'blur'
         ];
+        if (isset($aliquot['maxVolume'])) {
+            $volumeAttributes['data-parsley-max'] = $aliquot['maxVolume'];
+            $volumeAttributes['data-parsley-max-message'] = "Please verify the volume is correct.  This aliquot should contain a maximum of {$aliquot['maxVolume']} {$aliquot['units']}.";
+        }
         if (isset($aliquot['warningMinVolume'])) {
             $volumeAttributes['data-warning-min-volume'] = $aliquot['warningMinVolume'];
         }
