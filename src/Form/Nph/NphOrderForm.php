@@ -67,7 +67,7 @@ class NphOrderForm extends AbstractType
             }
             $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
             $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-                'required' => $formType === self::FORM_FINALIZE_TYPE,
+                'required' => false,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',

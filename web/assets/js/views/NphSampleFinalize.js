@@ -191,6 +191,7 @@ $(document).ready(function () {
                 $("#aliquotTimeWarning").hide();
             }
         }
+        clearServerErrors(event);
     });
 
     disableEnableAliquotFields();
@@ -240,4 +241,10 @@ $(document).ready(function () {
     $(document).on("dp.hide", ".order-ts", function () {
         $(this).parsley().validate();
     });
+
+    const clearServerErrors = (e) => {
+        $(e.currentTarget).next("span.help-block").remove();
+    };
+
+    $(".sample-finalize-form input").on("change", clearServerErrors);
 });
