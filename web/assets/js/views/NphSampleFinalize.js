@@ -197,14 +197,14 @@ $(document).ready(function () {
 
     $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
 
-    window.Parsley.addValidator('customDateComparison', {
+    window.Parsley.addValidator("customDateComparison", {
         validateString: function (value, requirement) {
             let inputDate = new Date(value);
             let comparisonDate = new Date(requirement);
             return inputDate > comparisonDate;
         },
         messages: {
-            en: 'Time must be after order generation.'
+            en: "Time must be after order generation."
         }
     });
 
