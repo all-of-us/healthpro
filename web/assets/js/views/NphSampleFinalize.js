@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $("#sample_finalize_btn").on("click", function (e) {
         e.preventDefault();
-        if ($('.sample-finalize-form').parsley().validate()) {
+        if ($(".sample-finalize-form").parsley().validate()) {
             $("#confirmation_modal").modal("show");
         }
     });
@@ -62,11 +62,31 @@ $(document).ready(function () {
             let expectedBarcodePrefix = $(this).data("barcode-prefix");
             let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
             if (regex.test(barcode)) {
+                let currentInput = $(this);
                 let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
                 aliquotTsSelector.focus();
                 aliquotTsSelector.data("DateTimePicker").date(new Date());
                 aliquotTsSelector.blur();
                 $(this).closest("tr").find(".aliquot-volume").focus();
+                $.ajax({
+                    url: "/nph/ajax/search/aliquot",
+                    method: "GET",
+                    data: { aliquotId: barcode },
+                    success: function (response) {
+                        let tdSelector = currentInput.closest("td");
+                        if (response === false) {
+                            let errorMessage =
+                                "<div class='help-block unique-aliquot-error'>Please enter a unique aliquot barcode.</div>";
+                            tdSelector.append(errorMessage).addClass("has-error");
+                        } else {
+                            tdSelector.find(".unique-aliquot-error").remove();
+                            tdSelector.removeClass("has-error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error checking barcode uniqueness:", error);
+                    }
+                });
             }
         }
     });
