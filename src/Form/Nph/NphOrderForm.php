@@ -96,10 +96,9 @@ class NphOrderForm extends AbstractType
         bool $disabled = false,
         string $formType = self::FORM_FINALIZE_TYPE
     ): void {
-        $required = $formType === self::FORM_FINALIZE_TYPE;
         $urineColorOptions = [
             'label' => 'Urine Color',
-            'required' => $required,
+            'required' => false,
             'choices' => NphOrderCollect::$urineColors,
             'multiple' => false,
             'placeholder' => 'Select Urine Color',
@@ -107,7 +106,7 @@ class NphOrderForm extends AbstractType
         ];
         $urineClarityOptions = [
             'label' => 'Urine Clarity',
-            'required' => $required,
+            'required' => false,
             'choices' => NphOrderCollect::$urineClarity,
             'multiple' => false,
             'placeholder' => 'Select Urine Clarity',
