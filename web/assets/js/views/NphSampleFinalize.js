@@ -260,7 +260,8 @@ $(document).ready(function () {
             }
         },
         errorsWrapper: '<div class="help-block"></div>',
-        errorTemplate: "<div></div>"
+        errorTemplate: "<div></div>",
+        trigger: "blur"
     });
 
     $(document).on("dp.hide", ".order-ts", function () {

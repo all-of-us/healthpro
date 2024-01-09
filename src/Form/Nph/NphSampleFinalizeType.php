@@ -87,8 +87,7 @@ class NphSampleFinalizeType extends NphOrderForm
                             'data-barcode-length' => $aliquot['barcodeLength'],
                             'data-barcode-prefix' => $aliquot['barcodePrefix'] ?? null,
                             'data-parsley-pattern' => $barcodePattern,
-                            'data-parsley-pattern-message' => $aliquot['barcodeErrorMessage'],
-                            'data-parsley-trigger' => 'blur'
+                            'data-parsley-pattern-message' => $aliquot['barcodeErrorMessage']
                         ],
                     ],
                     'label' => $aliquot['container'],
@@ -130,7 +129,6 @@ class NphSampleFinalizeType extends NphOrderForm
                         ],
                         'attr' => [
                             'class' => 'order-ts',
-                            'data-parsley-trigger' => 'blur',
                             'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                         ]
                     ],
@@ -170,7 +168,6 @@ class NphSampleFinalizeType extends NphOrderForm
                                 'attr' => [
                                     'placeholder' => $metadataField['placeholder'] ?? '',
                                     'class' => $metadataField['class'] ?? '',
-                                    'data-parsley-trigger' => 'blur',
                                     'data-parsley-max' => $metadataField['maxVolume'],
                                     'data-parsley-max-message' => "Glycerol Volume: Please verify the volume is correct. This aliquot should contain a maximum of {$metadataField['maxVolume']} {$metadataField['units']}."
                                 ],
@@ -302,8 +299,7 @@ class NphSampleFinalizeType extends NphOrderForm
     {
         $volumeAttributes = [
             'class' => 'aliquot-volume',
-            'data-expected-volume' => $aliquot['expectedVolume'],
-            'data-parsley-trigger' => 'blur'
+            'data-expected-volume' => $aliquot['expectedVolume']
         ];
         if (isset($aliquot['maxVolume'])) {
             $volumeAttributes['data-parsley-max'] = $aliquot['maxVolume'];
