@@ -252,7 +252,12 @@ $(document).ready(function () {
             return el.$element.closest(".form-group, td, .input-group");
         },
         errorsContainer: function (el) {
-            return el.$element.closest(".form-group, td, .input-group");
+            let errorContainer = el.$element.closest("tr").next().find("td.has-error");
+            if (errorContainer.length > 0) {
+                return errorContainer;
+            } else {
+                return el.$element.closest(".form-group, td");
+            }
         },
         errorsWrapper: '<div class="help-block"></div>',
         errorTemplate: "<div></div>"
