@@ -28,6 +28,7 @@ $(document).ready(function () {
             $(this).closest("tr").prev().find("input:not(:read-only)").val("");
         }
         $(this).closest("tr").find("input:not(:read-only)").val("");
+        $(".sample-finalize-form").parsley().validate();
     });
 
     $(document).on("keyup", ".aliquot-volume", function () {
