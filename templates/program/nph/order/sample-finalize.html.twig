@@ -229,14 +229,16 @@
                     {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE') %}
                         <div class="row">
                             <div class="form-group col-sm-12 {% if not sampleFinalizeForm['totalCollectionVolume'].vars.valid %} has-error{% endif %}">
-                                {{ form_label(sampleFinalizeForm['totalCollectionVolume']) }}
+                                {{ form_label(sampleFinalizeForm['totalCollectionVolume'], null, {'label_attr': {'class': 'required'}}) }}
                                 <div class="input-group">
                                     {{ form_widget(sampleFinalizeForm['totalCollectionVolume']) }}
                                     <span class="input-group-addon">mL</span>
                                 </div>
+                                <span class="text-warning total-collection-volume-warning" style="display: none">
+                                    Please verify unit of measure is correct.  (Expected volume is measured mL, for reference 1L = 1000mL).
+                                </span>
                                 {{ form_errors(sampleFinalizeForm['totalCollectionVolume']) }}
                             </div>
-
                         </div>
                         <hr>
                     {% endif %}

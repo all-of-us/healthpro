@@ -49,6 +49,17 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("keyup", ".total-collection-volume", function () {
+        let inputValue = parseFloat($(this).val());
+        let minValue = $(this).data("warning-min-volume");
+        let maxValue = $(this).data("warning-max-volume");
+        if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
+            $(".total-collection-volume-warning").show();
+        } else {
+            $(".total-collection-volume-warning").hide();
+        }
+    });
+
     $(document).on("keyup", ".glycerol-volume", function () {
         calculateGlycerolVolume(
             $(this).closest("tr").find(".sample"),

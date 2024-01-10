@@ -156,7 +156,7 @@ class NphOrderForm extends AbstractType
     ): void {
         $urineVolumeCollection = [
             'label' => 'Total Collection Volume',
-            'required' => true,
+            'required' => false,
             'disabled' => $disabled,
             'constraints' => [
                 new Constraints\Callback(function ($value, $context) {
@@ -168,6 +168,7 @@ class NphOrderForm extends AbstractType
                 })
             ],
             'attr' => [
+                'class' => 'total-collection-volume',
                 'data-warning-min-volume' => 0.1,
                 'data-warning-max-volume' => 10,
             ]
