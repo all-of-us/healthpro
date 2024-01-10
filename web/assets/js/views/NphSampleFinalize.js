@@ -17,6 +17,7 @@ $(document).ready(function () {
         } else {
             addNormalAliquotRow(this);
         }
+        $(".sample-finalize-form").parsley().validate();
     });
 
     $(document).on("click", ".delete-aliquot-widget", function () {
