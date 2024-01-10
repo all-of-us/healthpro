@@ -74,8 +74,8 @@ $(document).ready(function () {
             let expectedBarcodeLength = $(this).data("barcode-length");
             let expectedBarcodePrefix = $(this).data("barcode-prefix");
             let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
+            let tdSelector = $(this).closest("td");
             if (regex.test(barcode)) {
-                let currentInput = $(this);
                 let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
                 aliquotTsSelector.focus();
                 aliquotTsSelector.data("DateTimePicker").date(new Date());
@@ -86,7 +86,6 @@ $(document).ready(function () {
                     method: "GET",
                     data: { aliquotId: barcode },
                     success: function (response) {
-                        let tdSelector = currentInput.closest("td");
                         if (response === false) {
                             let errorMessage =
                                 "<div class='help-block unique-aliquot-error'>Please enter a unique aliquot barcode.</div>";
@@ -100,6 +99,8 @@ $(document).ready(function () {
                         console.error("Error checking barcode uniqueness:", error);
                     }
                 });
+            } else {
+                tdSelector.find(".unique-aliquot-error").remove();
             }
         }
     });
