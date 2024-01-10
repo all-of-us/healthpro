@@ -187,10 +187,14 @@ $(document).ready(function () {
             $(this).removeClass("duplicate-target-" + aliquotCode);
             $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr("name", barcodeName);
             $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr("name", tsName);
-            $(this).find("[name='nph_sample_finalize[SALIVAA2Volume][0]']").attr("name", volumeName);
-            $(this)
-                .find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']")
-                .attr("name", glycerolVolumeName);
+            $(this).find("[name='nph_sample_finalize[SALIVAA2Volume][0]']").attr({
+                name: volumeName,
+                "data-warning-target": targetName
+            });
+            $(this).find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']").attr({
+                name: glycerolVolumeName,
+                "data-warning-target": glycerolTarget
+            });
             $(this).find("#SALIVAA2-warning-target0").attr("id", targetName);
             $(this).find("#SALIVAA2-warning-target-glycerol0").attr("id", glycerolTarget);
             $(this).find("#SALIVAA2-warning-target-total0").attr("id", totalTarget);
@@ -198,7 +202,6 @@ $(document).ready(function () {
             $(this).find("input").val("");
             $(this).find(".text-warning").hide();
             $(this).find(".help-block").remove();
-            $(this).find(".has-error").removeClass("has-error");
             $(this).find("input:not(.totalVol)").attr("readonly", false);
         });
         counter++;
