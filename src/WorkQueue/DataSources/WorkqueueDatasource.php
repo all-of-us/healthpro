@@ -6,5 +6,5 @@ use App\WorkQueue\ColumnCollection;
 
 interface WorkqueueDatasource
 {
-    public function getWorkqueueData(int $offset, int $limit, ColumnCollection $columInfo): array;
+    public function getWorkqueueData(int $offset, int $limit, ColumnCollection $columnCollection): array;
 }

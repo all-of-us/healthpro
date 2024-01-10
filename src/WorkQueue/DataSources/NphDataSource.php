@@ -19,17 +19,29 @@ class NphDataSource implements WorkqueueDatasource
 
     public function getWorkqueueData(int $offset, int $limit, ColumnCollection $columnCollection): array
     {
-        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery($offset, $limit));
+        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery($offset, $limit, $columnCollection));
         $result = json_decode($response->getBody()->getContents(), true);
         return $result;
     }
 
-    private function getSearchQuery(int $offset, int $limit): string
+    private function getFilterString(ColumnCollection $columnCollection): string
+    {
+        $filterString = '';
+        foreach ($columnCollection as $column) {
+            if ($column->isFilterable() && $column->getFilterData() !== '') {
+                $filterString .= $column->getDataField() . ': "' . $column->getFilterData() . '", ';
+            }
+        }
+        return $filterString;
+    }
+
+    private function getSearchQuery(int $offset, int $limit, ColumnCollection $columnCollection): string
     {
         $site = $this->currentSite;
+        $filterString = $this->getFilterString($columnCollection);
         return "
         query {
-        participant (limit: ${limit}, offSet: ${offset}, nphPairedSite: \"nph-site-${site}\") {
+        participant ($filterString limit: ${limit}, offSet: ${offset}, nphPairedSite: \"nph-site-${site}\") {
                     totalCount
                     resultCount
                     edges {
@@ -128,5 +140,11 @@ class NphDataSource implements WorkqueueDatasource
                 }
             }
             ";
+    }
+
+    public function rawQuery ($query) {
+        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $query);
+        $result = json_decode($response->getBody()->getContents(), true);
+        return $result;
     }
 }

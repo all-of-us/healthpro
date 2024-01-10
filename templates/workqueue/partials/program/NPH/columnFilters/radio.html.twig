@@ -1,0 +1,15 @@
+{% set config = column.getConfig %}
+<div class="col-sm-3">
+    <div class="card">
+        <div class="card-body wq-filter-radio" data-name="{{ column.getDataField }}">
+            <label for="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}">{{ column.getColumnDisplayName }}</label>
+            <br>
+            {% for text, value in config.filterValues  %}
+                <input type="radio" name="{{ column.getDataField }}" data-field="{{ column.getDataField }}" value="{{ value }}" id="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}_{{ value }}">
+                <label for="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}_{{ value }}">{{ text }}</label>
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+

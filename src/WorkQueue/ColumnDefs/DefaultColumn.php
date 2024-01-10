@@ -14,6 +14,8 @@ class DefaultColumn implements ColumnInterface
     private bool $includeInAllGroups = false;
     private bool $defaultGroup = false;
     private bool $enabled = true;
+    private string $filterData = '';
+    private string $columnFilterType = '';
     private array $config = [];
 
     public function __construct($config)
@@ -36,6 +38,11 @@ class DefaultColumn implements ColumnInterface
         return $data;
     }
 
+    public function getColumnFilterType(): string
+    {
+        return $this->columnFilterType;
+    }
+
     public function isFilterable(): bool
     {
         return $this->filterable;
@@ -48,12 +55,18 @@ class DefaultColumn implements ColumnInterface
 
     public function setFilterData($filterData): void
     {
-        // TODO: Implement setFilterData() method.
+        $this->filterData = $filterData;
+    }
+
+    public function getFilterData(): string
+    {
+        return $this->filterData;
     }
     public function setSort($sort): void
     {
         // TODO: Implement setSort() method.
     }
+
     public function setColumnDisplayed(bool $columnDisplayed): void
     {
         $this->displayed = $columnDisplayed;
@@ -130,6 +143,9 @@ class DefaultColumn implements ColumnInterface
         }
         if (isset($config['defaultGroup'])) {
             $this->defaultGroup = $config['defaultGroup'];
+        }
+        if (isset($config['filterType'])) {
+            $this->columnFilterType = $config['filterType'];
         }
         $this->config = $config;
     }

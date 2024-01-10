@@ -3,7 +3,8 @@
     {
       "display": "Last Name",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "lastName",
       "workqueueField": "lastname",
       "class": "ParticipantLink",
@@ -14,7 +15,8 @@
     {
       "display": "First Name",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "firstName",
       "workqueueField": "firstname",
       "class": "ParticipantLink",
@@ -46,7 +48,8 @@
     {
       "display": "Participant ID",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "participantNphId",
       "workqueueField": "participantid",
       "class": "ParticipantLink",
@@ -68,7 +71,14 @@
     {
       "display": "Enrollment Status",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "radio",
+      "filterValues": {
+        "Enrolled": "Enrolled",
+        "Not Enrolled": "Not Enrolled",
+        "Withdrawn": "Withdrawn",
+        "Deactivated": "Deactivated"
+      },
       "dataField": "nphEnrollmentStatus",
       "class": "EnrollmentStatus",
       "group": "Activity Status",
@@ -164,7 +174,8 @@
     {
       "display": "Phone Number",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "phoneNumber",
       "group": "Contact"
     },

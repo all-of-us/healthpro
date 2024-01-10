@@ -1,0 +1,12 @@
+
+<div class="col-sm-3">
+    <div class="card">
+        <div class="card-body">
+            <label for="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}">{{ column.getColumnDisplayName }}</label>
+            <input class="wq-text-input" data-filter-type="text" type="text" name="{{ column.getDataField }}"
+                   id="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}"
+                   data-field="{{ column.getDataField }}">
+        </div>
+    </div>
+</div>
+

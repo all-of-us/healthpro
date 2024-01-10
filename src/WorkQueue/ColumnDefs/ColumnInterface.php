@@ -7,6 +7,7 @@ interface ColumnInterface
     public function getColumnDisplay($data, $dataRow): string;
     public function getColumnDisplayName(): string;
     public function getColumnExport($data): string;
+    public function getColumnFilterType(): string;
     public function isFilterable(): bool;
     public function isSortable(): bool;
     public function isInDefaultGroup(): bool;
@@ -17,6 +18,7 @@ interface ColumnInterface
     public function getColumnDisplayed(): bool;
     public function getWorkqueueField(): string;
     public function getDataField(): string;
+    public function getFilterData(): string;
     public function setColumnGroup(string $columnGroup): void;
     public function getColumnGroup(): string;
     public function isEnabled(): bool;

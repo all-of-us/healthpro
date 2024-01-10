@@ -45,27 +45,55 @@ function generateColvisGroups(columnGroups) {
     return colvisGroups;
 }
 
-function generateSortableColumns(sortableColumns) {
+function generateColumns(columns, sortableColumns) {
     let sortable = [];
-    sortableColumns.forEach(function (columnIsSortable) {
+    columns.forEach(function (columnName, index) {
         sortable.push({
-            orderable: columnIsSortable
+            orderable: sortableColumns[index],
+            name: columnName
         });
     });
     return sortable;
 }
 
+function generateSearch() {
+    let search = {};
+    $(".wq-text-input").each(function () {
+        let filter = $(this).val();
+        let column = $(this).data("field");
+        search[column] = filter;
+    });
+
+    $(".wq-filter-radio").each(function () {
+        let column = $(this).data("name");
+        let filter = $("input[name='" + column + "']:checked").val();
+        search[column] = filter;
+    });
+    return search;
+}
+
 $(document).ready(function () {
     let colvisGroups = generateColvisGroups($("#workqueueTable").data("colvis-groups"));
-    let sortable = generateSortableColumns($("#workqueueTable").data("sortable-columns"));
+    let columns = generateColumns(
+        $("#workqueueTable").data("column-names"),
+        $("#workqueueTable").data("sortable-columns")
+    );
     let table = $("#workqueueTable").DataTable({
-        ajax: "/nph/workqueue/data",
+        ajax: {
+            url: "/nph/workqueue/data",
+            data: function (data, settings, json) {
+                return $.extend({}, data, {
+                    search: generateSearch()
+                });
+            }
+        },
         responsive: true,
         buttons: colvisGroups,
         serverSide: true,
-        columns: sortable,
+        columns: columns,
         searching: false,
         processing: true,
+        searchable: false,
         initComplete: function () {
             table.buttons().container().appendTo("#workqueueColvisContainer");
             table.button("0").trigger();
