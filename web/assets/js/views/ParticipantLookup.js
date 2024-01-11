@@ -7,10 +7,10 @@ $(document).ready(function () {
     $("form").parsley({
         errorClass: "has-error",
         classHandler: function (el) {
-            return el.$element.closest(".form-group");
+            return el.$element.closest(".mb-3");
         },
         errorsContainer: function (el) {
-            return el.$element.closest(".form-group");
+            return el.$element.closest(".mb-3");
         },
         errorsWrapper: '<div class="help-block"></div>',
         errorTemplate: "<div></div>"

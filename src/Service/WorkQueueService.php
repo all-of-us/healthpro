@@ -188,6 +188,11 @@ class WorkQueueService
                 $rdrParams['nphWithdrawal'] = 1;
             }
         }
+        foreach (WorkQueue::$rdrPmbFilterParams as $rdrFilterKey) {
+            if (!empty($params[$rdrFilterKey])) {
+                $rdrParams[$rdrFilterKey] = $params[$rdrFilterKey];
+            }
+        }
         // Add site prefix
         if (!empty($params['site'])) {
             $site = $params['site'];

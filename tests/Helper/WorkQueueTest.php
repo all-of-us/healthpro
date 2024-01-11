@@ -209,6 +209,22 @@ class WorkQueueTest extends ServiceTestCase
                 'retentionEligibleStatus' => 'Retention Eligible',
                 'participantOrigin' => 'Participant Origination',
                 'enrollmentSite' => 'Enrollment Site',
+                'selfReportedPhysicalMeasurementsStatus' => 'Remote Phys Measurements',
+                'clinicPhysicalMeasurementsStatus' => 'Phys Measurements',
+                'sampleStatus1SST8' => '8 mL SST',
+                'sampleStatus1PST8' => '8 mL PST',
+                'sampleStatus1HEP4' => '4 mL Na-Hep',
+                'sampleStatus1ED02' => '2 mL EDTA (1ED02)',
+                'sampleStatus2ED02' => '2 mL EDTA (2ED02)',
+                'sampleStatus1ED04' => '4 mL EDTA (1ED04)',
+                'sampleStatus2ED04' => '4 mL EDTA (2ED04)',
+                'sampleStatus1ED10' => '1st 10 mL EDTA',
+                'sampleStatus2ED10' => '2nd 10 mL EDTA',
+                'sampleStatus1CFD9' => 'Cell-Free DNA',
+                'sampleStatus1PXR2' => 'Paxgene RNA',
+                'sampleStatus1UR10' => 'Urine 10 mL',
+                'sampleStatus1UR90' => 'Urine 90 mL',
+                'sampleStatus1SAL' => 'Saliva',
                 'NphStudyStatus' => 'Nutrition For Precision Health'
             ],
             'options' =>
@@ -383,6 +399,114 @@ class WorkQueueTest extends ServiceTestCase
                         [
                             '' => 'View All',
                             'UNSET' => 'Unpaired',
+                        ],
+                    'selfReportedPhysicalMeasurementsStatus' =>
+                        [
+                            '' => 'View All',
+                            'COMPLETED' => 'Completed',
+                            'UNSET' => 'Not Completed',
+                        ],
+                    'clinicPhysicalMeasurementsStatus' =>
+                        [
+                            '' => 'View All',
+                            'COMPLETED' => 'Completed',
+                            'UNSET' => 'Not Completed',
+                        ],
+                    'sampleStatus1SST8' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+                    'sampleStatus1PST8' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1HEP4' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1ED02' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus2ED02' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1ED04' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus2ED04' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1ED10' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus2ED10' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1CFD9' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1PXR2' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1UR10' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1UR90' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+
+                    'sampleStatus1SAL' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
                         ],
                     'NphStudyStatus' =>
                     [
