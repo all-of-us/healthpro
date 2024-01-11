@@ -184,15 +184,27 @@ $(document).ready(function () {
             let targetName = `SALIVAA2-warning-target${counter}`;
             let glycerolTarget = `SALIVAA2-warning-target-glycerol${counter}`;
             let totalTarget = `SALIVAA2-warning-target-total${counter}`;
+            let barcodeId = `nph_sample_finalize_SALIVAA2_${counter}`;
+            let tsId = `nph_sample_finalize_SALIVAA2AliquotTs_${counter}`;
+            let volumeId = `nph_sample_finalize_SALIVAA2Volume_${counter}`;
+            let glycerolId = `nph_sample_finalize_SALIVAA2glycerolAdditiveVolume_${counter}`;
             $(this).removeClass("duplicate-target-" + aliquotCode);
-            $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr("name", barcodeName);
-            $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr("name", tsName);
+            $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr({
+                name: barcodeName,
+                id: barcodeId
+            });
+            $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr({
+                name: tsName,
+                id: tsId
+            });
             $(this).find("[name='nph_sample_finalize[SALIVAA2Volume][0]']").attr({
                 name: volumeName,
+                id: volumeId,
                 "data-warning-target": targetName
             });
             $(this).find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']").attr({
                 name: glycerolVolumeName,
+                id: glycerolId,
                 "data-warning-target": glycerolTarget
             });
             $(this).find("#SALIVAA2-warning-target0").attr("id", targetName);
