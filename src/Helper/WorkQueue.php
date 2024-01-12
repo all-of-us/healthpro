@@ -75,8 +75,8 @@ class WorkQueue
         ],
         'participantStatus' => [
             'name' => 'Participant Status',
-            'rdrField' => 'enrollmentStatus',
-            'sortField' => 'enrollmentStatus',
+            'rdrField' => 'enrollmentStatusV3_2',
+            'sortField' => 'enrollmentStatusV3_2',
             'toggleColumn' => true,
             'type' => 'participantStatus',
             'group' => 'details',
@@ -84,13 +84,13 @@ class WorkQueue
         ],
         'coreParticipant' => [
             'name' => 'Core Participant Date',
-            'rdrDateField' => 'enrollmentStatusCoreStoredSampleTime',
+            'rdrDateField' => 'enrollmentStatusCoreV3_2Time',
             'sortField' => 'enrollmentStatus',
             'toggleColumn' => true
         ],
         'enrollmentStatusCoreMinusPMTime' => [
             'name' => 'Core Participant Minus PM Date',
-            'rdrDateField' => 'enrollmentStatusCoreMinusPMTime',
+            'rdrDateField' => 'enrollmentStatusCoreMinusPmV3_2Time',
         ],
         'activityStatus' => [
             'name' => 'Activity Status',

@@ -445,12 +445,12 @@ class Participant
         }
 
         // Determine core participant
-        if (!empty($participant->enrollmentStatus) && $participant->enrollmentStatus === 'FULL_PARTICIPANT') {
+        if (!empty($participant->enrollmentStatusV3_2) && $participant->enrollmentStatusV3_2 === 'FULL_PARTICIPANT') {
             $this->isCoreParticipant = true;
         }
 
         // Determine core minus pm participant
-        if (!empty($participant->enrollmentStatus) && $participant->enrollmentStatus === 'CORE_MINUS_PM') {
+        if (!empty($participant->enrollmentStatusV3_2) && $participant->enrollmentStatusV3_2 === 'CORE_MINUS_PM') {
             $this->isCoreMinusPMParticipant = true;
         }
 
