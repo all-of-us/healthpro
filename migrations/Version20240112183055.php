@@ -18,7 +18,7 @@ final class Version20240112183055 extends AbstractMigration
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE nph_orders ADD visit_period VARCHAR(50) NOT NULL');
+        $this->addSql('ALTER TABLE nph_orders ADD visit_period VARCHAR(50) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
