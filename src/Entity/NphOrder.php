@@ -87,6 +87,9 @@ class NphOrder
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $downtimeGeneratedTs = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $visitPeriod = null;
+
     public function __construct()
     {
         $this->nphSamples = new ArrayCollection();
@@ -439,6 +442,18 @@ class NphOrder
     public function setDowntimeGeneratedTs(?\DateTimeInterface $downtimeGeneratedTs): static
     {
         $this->downtimeGeneratedTs = $downtimeGeneratedTs;
+
+        return $this;
+    }
+
+    public function getVisitPeriod(): ?string
+    {
+        return $this->visitPeriod;
+    }
+
+    public function setVisitPeriod(?string $visitPeriod): static
+    {
+        $this->visitPeriod = $visitPeriod;
 
         return $this;
     }
