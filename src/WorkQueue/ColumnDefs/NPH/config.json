@@ -27,7 +27,8 @@
     {
       "display": "Middle Name",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "middleName",
       "workqueueField": "middleinitial",
       "class": "ParticipantLink",
@@ -71,7 +72,7 @@
     {
       "display": "Enrollment Status",
       "sortable": false,
-      "filterable": true,
+      "filterable": false,
       "filterType": "radio",
       "filterValues": {
         "Enrolled": "Enrolled",
