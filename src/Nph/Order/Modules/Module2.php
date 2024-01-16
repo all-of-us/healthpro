@@ -8,31 +8,31 @@ class Module2 extends Samples
 {
     private static $module = 2;
 
-    private static $visitTypes = [
-        'OrangeDiet' => 'Orange Diet',
-        'OrangeDSMT' => 'Orange DSMT',
-        'BlueDiet' => 'Blue Diet',
-        'BlueDSMT' => 'Blue DSMT',
-        'PurpleDiet' => 'Purple Diet',
-        'PurpleDSMT' => 'Purple DSMT'
+    private static array $visitTypes = [
+        'Period1Diet' => 'Period 1 Diet',
+        'Period1DSMT' => 'Period 1 DSMT',
+        'Period2Diet' => 'Period 2 Diet',
+        'Period2DSMT' => 'Period 2 DSMT',
+        'Period3Diet' => 'Period 3 Diet',
+        'Period3DSMT' => 'Period 3 DSMT'
     ];
 
-    private static $visitTypeMapper = [
-        'OrangeDiet' => 'Diet',
-        'OrangeDSMT' => 'DSMT',
-        'BlueDiet' => 'Diet',
-        'BlueDSMT' => 'DSMT',
-        'PurpleDiet' => 'Diet',
-        'PurpleDSMT' => 'DSMT'
+    private static array $visitTypeMapper = [
+        'Period1Diet' => 'Diet',
+        'Period1DSMT' => 'DSMT',
+        'Period2Diet' => 'Diet',
+        'Period2DSMT' => 'DSMT',
+        'Period3Diet' => 'Diet',
+        'Period3DSMT' => 'DSMT'
     ];
 
     private static array $visitDietMapper = [
-        'OrangeDiet' => 'ORANGE',
-        'OrangeDSMT' => 'ORANGE',
-        'BlueDiet' => 'BLUE',
-        'BlueDSMT' => 'BLUE',
-        'PurpleDiet' => 'PURPLE',
-        'PurpleDSMT' => 'PURPLE'
+        'Period1Diet' => 'PERIOD1',
+        'Period1DSMT' => 'PERIOD1',
+        'Period2Diet' => 'PERIOD2',
+        'Period2DSMT' => 'PERIOD2',
+        'Period3Diet' => 'PERIOD3',
+        'Period3DSMT' => 'PERIOD3'
     ];
 
     public function __construct($visit)
