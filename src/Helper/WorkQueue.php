@@ -1750,8 +1750,10 @@ class WorkQueue
             'label' => 'Participant Status',
             'options' => [
                 'Participant' => 'INTERESTED',
-                'Participant + EHR Consent' => 'MEMBER',
-                'Core Participant' => 'FULL_PARTICIPANT',
+                'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
+                'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
+                'PM&B Eligible' => 'PMB_ELIGIBLE',
+                'Core Participant' => 'CORE_PARTICIPANT',
                 'Core Participant Minus PM' => 'CORE_MINUS_PM'
             ]
         ],

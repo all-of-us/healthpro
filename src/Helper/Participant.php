@@ -445,7 +445,7 @@ class Participant
         }
 
         // Determine core participant
-        if (!empty($participant->enrollmentStatusV3_2) && $participant->enrollmentStatusV3_2 === 'FULL_PARTICIPANT') {
+        if (!empty($participant->enrollmentStatusV3_2) && $participant->enrollmentStatusV3_2 === 'CORE_PARTICIPANT') {
             $this->isCoreParticipant = true;
         }
 
