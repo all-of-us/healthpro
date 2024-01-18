@@ -108,7 +108,7 @@
                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                     {% if VisitCode != 'sampleStatusCount' %}
                                         {% set visitDiet = visit['visitDiet'] %}
-                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietStatus' %}
+                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}
                                         {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
                                         {% if moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
                                             {% set textDivSize = 'col-md-9' %}
