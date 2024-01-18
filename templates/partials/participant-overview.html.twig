@@ -38,6 +38,12 @@
                 <strong class="d-block">gRoR Consent</strong>
                 {{ macros.displayGrorConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}
             </div>
+            {% if siteInfo.displayCaborConsent %}
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">CABoR Consent</strong>
+                    {{ macros.displayConsentPanelStatus(participant, 'consentForCABoR', showConsentPDFs) }}
+                </div>
+            {% endif %}
             <div class="participant-detail-new-status text-start">
                 <strong class="d-block">Consent Cohort</strong>
                 {{ participant.consentCohortText }}
