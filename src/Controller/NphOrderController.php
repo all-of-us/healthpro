@@ -243,7 +243,7 @@ class NphOrderController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $isDietStarted = $nphOrderService->isDietStarted($participant->{'module' . $order->getModule() . 'DietStatus'});
+        $isDietStarted = $nphOrderService->isDietStarted($participant->{'module' . $order->getModule() . 'DietPeriod'});
         $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStarted);
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
