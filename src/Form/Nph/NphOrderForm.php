@@ -66,6 +66,9 @@ class NphOrderForm extends AbstractType
                 ]);
             }
             $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
+            $orderCreatedTs = clone $options['orderCreatedTs'];
+            $userTimeZone = new \DateTimeZone($options['timeZone']);
+            $orderCreatedTs->setTimezone($userTimeZone);
             $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
                 'required' => false,
                 'label' => 'Collection Time',
@@ -78,7 +81,7 @@ class NphOrderForm extends AbstractType
                 'attr' => [
                     'class' => 'order-ts',
                     'readonly' => $options['disableStoolCollectedTs'],
-                    'data-parsley-custom-date-comparison' => $options['orderCreatedTs']->format('m/d/Y g:i A')
+                    'data-parsley-custom-date-comparison' => $orderCreatedTs->format('m/d/Y g:i A')
                 ],
                 'disabled' => $disabled
             ]);
