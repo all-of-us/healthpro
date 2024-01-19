@@ -8,7 +8,7 @@ class ModuleConsentStatus extends DefaultColumn
 {
     public function getColumnDisplay($data, $dataRow): string
     {
-        $latestTimestampElement = UtilFunctions::searchLatestTimestampElement($data, ['m1_consent']);
+        $latestTimestampElement = UtilFunctions::searchLatestTimestampElement($data, [$this->config['timestampField']]);
         if ($latestTimestampElement === null) {
             return 'Not Consented';
         }

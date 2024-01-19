@@ -142,4 +142,8 @@ class WorkqueueGeneralizedService
         $rawData = $this->datasource->rawQuery($query);
         return $rawData;
     }
+
+    public function hasMoreResults() {
+        $this->datasource->hasMoreResults();
+    }
 }

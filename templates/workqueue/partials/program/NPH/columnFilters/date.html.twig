@@ -9,7 +9,7 @@
                 <button class="btn-close text-danger position-absolute top-0 end-0 m-2 filter-dismiss" data-column="{{ column.getDataField }}" data-columngroup="{{ columnGroup|replace({" ": "_"})|lower }}"></button>
             </div>
             <div class="mt-1">
-                <input class="wq-text-input form-control" data-filter-type="text" type="text" name="{{ column.getDataField }}"
+                <input class="wq-text-input form-control date-picker" data-filter-type="date" type="date" name="{{ column.getDataField }}"
                        id="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}"
                        data-column-display-name="{{ column.getColumnDisplayName }}"
                        data-columngroup="{{ columnGroup|replace({" ": "_"})|lower }}"

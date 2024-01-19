@@ -8,8 +8,9 @@ use App\WorkQueue\ColumnCollection;
 
 class NphDataSource implements WorkqueueDatasource
 {
-    private $rdrApi = null;
-    private $currentSite = null;
+    private RdrApiService|null $rdrApi = null;
+    private string|null $currentSite = null;
+    private bool $hasMoreResults = false;
 
     public function __construct(RdrApiService $api, SiteService $siteService)
     {
@@ -21,7 +22,24 @@ class NphDataSource implements WorkqueueDatasource
     {
         $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery($offset, $limit, $columnCollection));
         $result = json_decode($response->getBody()->getContents(), true);
+        if ($result['participant']['totalCount'] > $offset + $limit) {
+            $this->hasMoreResults = true;
+        } else {
+            $this->hasMoreResults = false;
+        }
         return $result;
+    }
+
+    public function rawQuery($query)
+    {
+        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $query);
+        $result = json_decode($response->getBody()->getContents(), true);
+        return $result;
+    }
+
+    public function hasMoreResults(): bool
+    {
+        return $this->hasMoreResults;
     }
 
     private function getFilterString(ColumnCollection $columnCollection): string
@@ -140,11 +158,5 @@ class NphDataSource implements WorkqueueDatasource
                 }
             }
             ";
-    }
-
-    public function rawQuery ($query) {
-        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $query);
-        $result = json_decode($response->getBody()->getContents(), true);
-        return $result;
     }
 }

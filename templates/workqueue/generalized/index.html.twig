@@ -5,9 +5,31 @@
 <div id="workqueueTable-wrapper" class="workqueueTable-wrapper col-md-12">
     <div class="row mb-3">
         <div class="col-md-12">
+            <div class="row">
                 {% for columnGroup, number in filteredColumnGroups %}
                     {% if number > 0 %}
-                        <div class="col-md-12 d-none">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ columnGroup }}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for column in columns %}
+                                        {% if column.getColumnGroup == columnGroup %}
+                                            {% if column.isFilterable %}
+                                                <li><a class="dropdown-item filter-show" href="#" data-column="{{ column.getDatafield }}" data-columngroup="{{ columnGroup|replace({" ": "_"})|lower }}">{{ column.getColumnDisplayName }}</a></li>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+                {% for columnGroup, number in filteredColumnGroups %}
+                    {% if number > 0 %}
+                        <div class="col-md-12 d-none" id="filter-group-{{ columnGroup|replace({" ": "_"})|lower }}">
                             <p class="me-4">{{ columnGroup }}</p>
                             <div class="row">
                                 {% for column in columns %}
@@ -18,13 +40,16 @@
                             </div>
                         </div>
                     {% endif %}
-                    {% if loop.last %}
-                        <div class="col-md-2 mt-4 d-none">
-                            <button class="btn btn-primary" id="workqueuePerformSearch" onclick="$('#workqueueTable').DataTable().draw()">Perform Search</button>
-                        </div>
-                    {% endif %}
                 {% endfor %}
             </div>
+        <div class="col-md-12 d-none" id="applied-filters">
+            <div class="col-md-12">
+                <p class="me-4">Applied Filters:</p>
+            </div>
+            <div class="row" id="applied-filters-area">
+
+            </div>
+        </div>
     </div>
     <div class="col-md-12 mb-3" id="workqueueColvisContainer"></div>
     <div class="col-md-12" id="workqueueTableContainer">

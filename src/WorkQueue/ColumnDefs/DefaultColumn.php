@@ -16,7 +16,7 @@ class DefaultColumn implements ColumnInterface
     private bool $enabled = true;
     private string $filterData = '';
     private string $columnFilterType = '';
-    private array $config = [];
+    protected array $config = [];
 
     public function __construct($config)
     {

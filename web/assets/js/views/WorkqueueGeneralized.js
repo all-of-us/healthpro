@@ -58,18 +58,66 @@ function generateColumns(columns, sortableColumns) {
 
 function generateSearch() {
     let search = {};
-    $(".wq-text-input").each(function () {
-        let filter = $(this).val();
-        let column = $(this).data("field");
-        search[column] = filter;
-    });
-
-    $(".wq-filter-radio").each(function () {
-        let column = $(this).data("name");
-        let filter = $("input[name='" + column + "']:checked").val();
-        search[column] = filter;
+    $(".filter-value").each(function () {
+        let column = $(this).data("filter-field");
+        let filterVal = $(this).data("filter-value");
+        if (filterVal !== "") {
+            search[column] = filterVal;
+        }
     });
     return search;
+}
+
+function removeFilter(element) {
+    $(element).parent().parent().parent().remove();
+    let appliedFiltersElement = $("#applied-filters");
+    if ($("#applied-filters-area").children().length === 0) {
+        appliedFiltersElement.addClass("d-none");
+    }
+}
+
+function redrawTable() {
+    $("#workqueueTable").DataTable().draw();
+}
+
+function createFilterElementText(element) {
+    let textElement = $(element).parent().siblings().find("input");
+    let appliedFiltersArea = $("#applied-filters-area");
+    let appliedFiltersElement = $("#applied-filters");
+    let column = textElement.data("field");
+    let columnDisplay = textElement.data("column-display-name");
+    let columnGroup = textElement.data("columngroup");
+    let filterVal = textElement.val();
+    textElement.val("");
+    $(`#filter-${column}`).addClass("d-none");
+    let columnGroupElement = $(`#filter-group-${columnGroup}`);
+    if ($(`.filter-column-group-${columnGroup}:not(.d-none)`).length === 0) {
+        columnGroupElement.addClass("d-none");
+    }
+    appliedFiltersElement.removeClass("d-none");
+    if ($(`#filter-value-${column}`).length > 0) {
+        $(`#filter-value-${column}`).remove();
+    }
+    let newElement = appliedFiltersElement.append(
+        `<div id="filter-value-${column}" data-filter-field="${column}" data-filter-value="${filterVal}" class="filter-value col-sm-1">
+            <div class="card">
+                <div>
+                    <button class="btn-close text-danger position-absolute top-0 end-0 m-2 filter-remove"></button>
+                </div>
+                <div class="card-header">
+                    <label>${columnDisplay}</label>
+                </div>
+                <div class="card-body">
+                  <label class="">${filterVal}</label>
+                </div>
+            </div>
+        </div>`
+    );
+    newElement.find(".filter-remove").on("click", function () {
+        removeFilter($(this));
+        redrawTable();
+    });
+    redrawTable();
 }
 
 $(document).ready(function () {
@@ -99,5 +147,38 @@ $(document).ready(function () {
             table.button("0").trigger();
         },
         scrollX: true
+    });
+
+    $(".filter-dismiss").on("click", function () {
+        let column = $(this).data("column");
+        let columnGroup = $(this).data("columngroup");
+        let columnGroupElement = $(`#filter-group-${columnGroup}`);
+        $(`#filter-${column}`).addClass("d-none");
+        if ($(`.filter-column-group-${columnGroup}:not(.d-none)`).length === 0) {
+            columnGroupElement.addClass("d-none");
+        }
+    });
+
+    $(".filter-show").on("click", function () {
+        let column = $(this).data("column");
+        let columnGroup = $(this).data("columngroup");
+        $(`#filter-${column}`).removeClass("d-none");
+        $(`#filter-group-${columnGroup}`).removeClass("d-none");
+    });
+
+    $(".apply-filter-button").on("click", function () {
+        if ($(this).data("filter-type") == "text") {
+            createFilterElementText($(this));
+        }
+    });
+
+    $(".date-picker").each(function () {
+        const maxDate = new Date();
+        maxDate.setHours(23, 59, 59, 999);
+        bs5DateTimepicker(this, {
+            format: "MM/dd/yyyy",
+            maxDate: maxDate,
+            clock: false
+        });
     });
 });

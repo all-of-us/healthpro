@@ -40,6 +40,21 @@ class NphWorkqueueController extends AbstractController
         return $this->json($data);
     }
 
+    #[Route('/nph/workqueue/export', name: 'nph_workqueue_export')]
+    public function export(WorkqueueGeneralizedService $workqueueService, NphDataSource $dataSource, Request $request): Response
+    {
+        $workqueueService->loadWorkqueueColumns('NPH');
+        $workqueueService->setDataSource($dataSource);
+        $workqueueService->setSearch($request->get('search'));
+        $workqueueService->hasMoreResults();
+        $data = $workqueueService->getWorkqueueData(0, 100000);
+        $csv = $workqueueService->exportToCsv($data['data']);
+        $response = new Response($csv);
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="workqueue.csv"');
+        return $response;
+    }
+
     #[Route('/nph/workqueue/data/rawquery', name: 'app_nph_workqueue_rawquery')]
     public function rawQuery(WorkqueueGeneralizedService $workqueueService, NphDataSource $dataSource, Request $request): Response
     {
