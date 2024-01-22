@@ -9,18 +9,18 @@ class Module3 extends Samples
     private $module = 3;
 
     private static array $visitTypes = [
-        'Period1Diet' => 'Period 1 Diet',
-        'Period1DLW' => 'Period 1 DLW',
-        'Period1DSMT' => 'Period 1 DSMT',
-        'Period1LMT' => 'Period 1 LMT',
-        'Period2Diet' => 'Period 2 Diet',
-        'Period2DLW' => 'Period 2 DLW',
-        'Period2DSMT' => 'BPeriod 2DSMT',
-        'Period2LMT' => 'Period 2 LMT',
-        'Period3Diet' => 'Period 3 Diet',
-        'Period3DLW' => 'Period 3 DLW',
-        'Period3DSMT' => 'Period 3 DSMT',
-        'Period3LMT' => 'Period 3 LMT',
+        'Period1Diet' => 'Diet Period 1 Diet',
+        'Period1DLW' => 'Diet Period 1 DLW',
+        'Period1DSMT' => 'Diet Period 1 DSMT',
+        'Period1LMT' => 'Diet Period 1 LMT',
+        'Period2Diet' => 'Diet Period 2 Diet',
+        'Period2DLW' => 'Diet Period 2 DLW',
+        'Period2DSMT' => 'Diet Period 2 DSMT',
+        'Period2LMT' => 'Diet Period 2 LMT',
+        'Period3Diet' => 'Diet Period 3 Diet',
+        'Period3DLW' => 'Diet Period 3 DLW',
+        'Period3DSMT' => 'Diet Period 3 DSMT',
+        'Period3LMT' => 'Diet Period 3 LMT',
     ];
 
     private static array $visitTypeMapper = [
