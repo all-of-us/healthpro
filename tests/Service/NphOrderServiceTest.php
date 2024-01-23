@@ -66,20 +66,20 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($this->module1Data['bloodSamples'], $this->service->getSamplesByType('blood'));
         $this->assertSame($this->module1Data['nailSamples'], $this->service->getSamplesByType('nail'));
 
-        $this->service->loadModules(2, 'OrangeDSMT', 'P0000000001', 'T10000000');
+        $this->service->loadModules(2, 'Period1DSMT', 'P0000000001', 'T10000000');
         $this->assertSame($this->module2Data['timePointSamples'], $this->service->getTimePointSamples());
         $this->assertSame($this->module2Data['timePoints'], $this->service->getTimePoints());
         $this->assertSame($this->module2Data['samples'], $this->service->getSamples());
-        $this->assertSame('ORANGE', $this->service->getVisitDiet());
+        $this->assertSame('PERIOD1', $this->service->getVisitDiet());
 
         $this->assertSame($this->module2Data['stoolSamples'], $this->service->getSamplesByType('stool'));
         $this->assertSame($this->module2Data['bloodSamples'], $this->service->getSamplesByType('blood'));
 
-        $this->service->loadModules(3, 'OrangeDSMT', 'P0000000001', 'T10000000');
+        $this->service->loadModules(3, 'Period1DSMT', 'P0000000001', 'T10000000');
         $this->assertSame($this->module3Data['timePointSamples'], $this->service->getTimePointSamples());
         $this->assertSame($this->module3Data['timePoints'], $this->service->getTimePoints());
         $this->assertSame($this->module3Data['samples'], $this->service->getSamples());
-        $this->assertSame('ORANGE', $this->service->getVisitDiet());
+        $this->assertSame('PERIOD1', $this->service->getVisitDiet());
 
         $this->assertSame($this->module3Data['stoolSamples'], $this->service->getSamplesByType('stool'));
         $this->assertSame($this->module3Data['bloodSamples'], $this->service->getSamplesByType('blood'));
@@ -323,8 +323,8 @@ class NphOrderServiceTest extends ServiceTestCase
             ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', 1, 'LMT', $stoolMetaData],
             ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 1, 'LMT'],
             ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 1, 'LMT'],
-            ['preDSMT', 'blood', 'LIH4', $collectedTs, 'Test Notes 7', 3, 'OrangeDSMT'],
-            ['postDSMT', 'urine', 'URINE', $collectedTs, 'Test Notes 8', 3, 'OrangeDSMT', $urineMetaData]
+            ['preDSMT', 'blood', 'LIH4', $collectedTs, 'Test Notes 7', 3, 'Period1DSMT'],
+            ['postDSMT', 'urine', 'URINE', $collectedTs, 'Test Notes 8', 3, 'Period1DSMT', $urineMetaData]
         ];
     }
 
@@ -416,7 +416,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals('Patient/P0000000008', $rdrObject->subject);
         // Assert module info
         $this->assertEquals(1, $rdrObject->module);
-        $this->assertEquals('LMT', $rdrObject->visitType);
+        $this->assertEquals('LMT', $rdrObject->visitPeriod);
         $this->assertEquals($expectedRdrTimePoint, $rdrObject->timepoint);
         // Assert identifiers orderId and sampleId
         $this->assertEquals($nphOrder->getOrderId(), $rdrObject->identifier[0]['value']);
@@ -696,7 +696,7 @@ class NphOrderServiceTest extends ServiceTestCase
      */
     public function testIsDietStarted(array $moduleDietStatus, bool $expectedResult): void
     {
-        $this->service->loadModules(2, 'OrangeDiet', 'P0000000010', 'T10000000');
+        $this->service->loadModules(2, 'Period1Diet', 'P0000000010', 'T10000000');
         $actualResult = $this->service->isDietStarted($moduleDietStatus);
         $this->assertEquals($expectedResult, $actualResult);
     }
@@ -705,15 +705,15 @@ class NphOrderServiceTest extends ServiceTestCase
     {
         return [
             [
-                ['ORANGE' => NphParticipant::DIET_STARTED],
+                ['PERIOD1' => NphParticipant::DIET_STARTED],
                 true,
             ],
             [
-                ['ORANGE' => NphParticipant::DIET_COMPLETED],
+                ['PERIOD1' => NphParticipant::DIET_COMPLETED],
                 false,
             ],
             [
-                ['ORANGE' => NphParticipant::DIET_DISCONTINUED],
+                ['PERIOD1' => NphParticipant::DIET_DISCONTINUED],
                 false,
             ],
         ];
@@ -724,7 +724,7 @@ class NphOrderServiceTest extends ServiceTestCase
      */
     public function testIsDietStartedOrCompleted(array $moduleDietStatus, bool $expectedResult): void
     {
-        $this->service->loadModules(2, 'OrangeDiet', 'P0000000010', 'T10000000');
+        $this->service->loadModules(2, 'Period1Diet', 'P0000000010', 'T10000000');
         $actualResult = $this->service->isDietStartedOrCompleted($moduleDietStatus);
         $this->assertEquals($expectedResult, $actualResult);
     }
@@ -733,15 +733,15 @@ class NphOrderServiceTest extends ServiceTestCase
     {
         return [
             [
-                ['ORANGE' => NphParticipant::DIET_STARTED],
+                ['PERIOD1' => NphParticipant::DIET_STARTED],
                 true,
             ],
             [
-                ['ORANGE' => NphParticipant::DIET_COMPLETED],
+                ['PERIOD1' => NphParticipant::DIET_COMPLETED],
                 true,
             ],
             [
-                ['ORANGE' => NphParticipant::DIET_DISCONTINUED],
+                ['PERIOD1' => NphParticipant::DIET_DISCONTINUED],
                 false,
             ],
         ];
@@ -750,7 +750,7 @@ class NphOrderServiceTest extends ServiceTestCase
     public function saveDlwCollectionDataProvider(): array
     {
         return [
-            ['P0000000003', 1, 'OrangeDiet', [
+            ['P0000000003', 1, 'Period1Diet', [
                 'actualDose' => 100.0,
                 'participantWeight' => 120.1,
                 'collectionDate' => new \DateTime(),
