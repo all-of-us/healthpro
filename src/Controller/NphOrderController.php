@@ -135,7 +135,7 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
@@ -236,7 +236,7 @@ class NphOrderController extends BaseController
         }
         $nphOrderService->loadModules(
             $order->getModule(),
-            $order->getVisitType(),
+            $order->getVisitPeriod(),
             $participantId,
             $participant->biobankId
         );
@@ -382,7 +382,7 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException();
         }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
             'type' => $type, 'samples' => $order->getNphSamples(), 'activeSamples' => $activeSamples
         ]);
@@ -442,7 +442,7 @@ class NphOrderController extends BaseController
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
         ]);
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $object = $nphOrderService->getRdrObject($order, $sample);
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
@@ -476,7 +476,7 @@ class NphOrderController extends BaseController
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         $nphOrderService->loadModules(
             $order->getModule(),
-            $order->getVisitType(),
+            $order->getVisitPeriod(),
             $participantId,
             $participant->biobankId
         );

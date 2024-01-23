@@ -219,7 +219,7 @@ class NphBiobankController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participant->id, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participant->id, $participant->biobankId);
         return $this->render('program/nph/biobank/order-collect-details.html.twig', [
             'order' => $order,
             'participant' => $participant,
@@ -251,7 +251,7 @@ class NphBiobankController extends BaseController
         ]);
         $nphOrderService->loadModules(
             $order->getModule(),
-            $order->getVisitType(),
+            $order->getVisitPeriod(),
             $participant->id,
             $participant->biobankId
         );

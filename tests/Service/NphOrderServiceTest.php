@@ -168,7 +168,7 @@ class NphOrderServiceTest extends ServiceTestCase
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000004', 'T10000000');
         $nphOrder = $this->service->createOrder('preLMT', 'saliva');
-        $this->assertSame('LMT', $nphOrder->getVisitType());
+        $this->assertSame('LMT', $nphOrder->getVisitPeriod());
         $this->assertSame('preLMT', $nphOrder->getTimepoint());
         $this->assertSame('saliva', $nphOrder->getOrderType());
     }
@@ -200,7 +200,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
 
         $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
-            'participantId' => 'P0000000007', 'visitType' => 'LMT'
+            'participantId' => 'P0000000007', 'visitPeriod' => 'LMT'
         ]);
         $samplesWithOrderIds = $this->service->getSamplesWithOrderIds();
         $timePointSamples = [
@@ -480,7 +480,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->service->createOrdersAndSamples($this->module1Data['formData']);
 
         $nphOrders = $this->em->getRepository(NphOrder::class)->findBy([
-            'participantId' => 'P0000000010', 'visitType' => 'LMT'
+            'participantId' => 'P0000000010', 'visitPeriod' => 'LMT'
         ]);
         $samplesWithStatus = $this->service->getSamplesWithStatus();
         $timePointSamples = [
