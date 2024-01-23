@@ -664,7 +664,7 @@ class NphOrderService
         $createdTs->setTimezone(new \DateTimeZone('UTC'));
         $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
         $obj->module = $order->getModule();
-        $obj->visitType = $this->getVisitTypes()[$order->getVisitType()];
+        $obj->visitPeriod = $this->getVisitTypes()[$order->getVisitType()];
         // Handle RDR specific timepoint needs
         if ($this->getRdrTimePoints() && isset($this->getRdrTimePoints()[$order->getTimepoint()])) {
             $rdrTimePoint = $this->getRdrTimePoints()[$order->getTimepoint()];
