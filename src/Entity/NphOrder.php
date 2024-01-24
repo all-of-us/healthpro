@@ -21,17 +21,6 @@ class NphOrder
     public const TYPE_NAIL = 'nail';
     public const TYPE_DLW = 'urineDlw';
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
-    private const TYPE_DISPLAY_OVERRIDE = [
-        2 => [
-            'urine' => 'Spot Urine'
-        ],
-        3 => [
-            'urine' => 'Spot Urine',
-            '24urine' => '24 Hour Urine',
-            'urineDlw' => 'Urine DLW',
-            'saliva3' => 'Saliva',
-        ],
-    ];
     public const VISIT_DISPLAY_NAME_MAPPER = [
         'LMT' => 'LMT',
         'Period1Diet' => 'Diet Period 1 - Diet',
@@ -46,6 +35,17 @@ class NphOrder
         'Period3DLW' => 'Diet Period 3 - DLW',
         'Period3DSMT' => 'Diet Period 3 - DSMT',
         'Period3LMT' => 'Diet Period 3 - LMT',
+    ];
+    private const TYPE_DISPLAY_OVERRIDE = [
+        2 => [
+            'urine' => 'Spot Urine'
+        ],
+        3 => [
+            'urine' => 'Spot Urine',
+            '24urine' => '24 Hour Urine',
+            'urineDlw' => 'Urine DLW',
+            'saliva3' => 'Saliva',
+        ],
     ];
 
     #[ORM\Id]
