@@ -20,7 +20,7 @@ class NphDlw
     #[ORM\Column(length: 10)]
     private string $module = '';
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private string $visit = '';
 
     #[ORM\Column(length: 100)]
@@ -44,6 +44,9 @@ class NphDlw
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private User $User;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $visitPeriod = null;
 
     public function getId(): int
     {
@@ -166,6 +169,18 @@ class NphDlw
     public function setUser(?User $User): static
     {
         $this->User = $User;
+
+        return $this;
+    }
+
+    public function getVisitPeriod(): ?string
+    {
+        return $this->visitPeriod;
+    }
+
+    public function setVisitPeriod(?string $visitPeriod): static
+    {
+        $this->visitPeriod = $visitPeriod;
 
         return $this;
     }
