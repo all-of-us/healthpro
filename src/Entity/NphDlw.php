@@ -21,7 +21,7 @@ class NphDlw
     private string $module = '';
 
     #[ORM\Column(length: 50, nullable: true)]
-    private string $visit = '';
+    private ?string $visit = null;
 
     #[ORM\Column(length: 100)]
     private string $doseBatchId = '';
