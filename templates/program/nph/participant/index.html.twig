@@ -110,7 +110,7 @@
                                         {% set visitDiet = visit['visitDiet'] %}
                                         {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}
                                         {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
-                                        {% if moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
+                                        {% if moduleNumber == 3 and VisitCode in ['Period1DLW', 'Period2DLW', 'Period3DLW'] %}
                                             {% set textDivSize = 'col-md-9' %}
                                             {% set dlwDiet = true %}
                                         {% else %}

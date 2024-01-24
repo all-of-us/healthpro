@@ -540,7 +540,7 @@ class NphOrderController extends BaseController
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         $dlwObject = $this->em->getRepository(NphDlw::class)->findOneBy([
             'NphParticipant' => $participantId,
-            'visit' => $visit,
+            'visitPeriod' => $visit,
             'module' => $module
         ]);
         $dlwForm = $this->createForm(DlwType::class, $dlwObject, ['timezone' => $this->getSecurityUser()->getTimezone()]);

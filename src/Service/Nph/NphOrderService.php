@@ -680,7 +680,7 @@ class NphOrderService
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
-            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit'
+            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitPeriod'
             => $order->getVisitPeriod(), 'NphParticipant' => $order->getParticipantId()]);
             if ($dlwInfo) {
                 $obj->sample = array_merge($obj->sample, [
@@ -826,7 +826,7 @@ class NphOrderService
     {
         $formData->setNphParticipant($participantId);
         $formData->setModule($module);
-        $formData->setVisit($visit);
+        $formData->setVisitPeriod($visit);
         $formData->setModifiedTimezoneId($this->getTimezoneid());
         $formData->setModifiedTs(new DateTime());
         $formData->setUser($this->user);
