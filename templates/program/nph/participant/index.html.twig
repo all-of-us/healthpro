@@ -120,7 +120,7 @@
                                         <div class="card mb-2 border-0">
                                             <div class="card-header collapse-carat" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                                  role="button" style="font-weight: bold">
-                                                Visit {{ visit['visitDisplayName'] }}
+                                                Visit | {{ macros.displayVisitName(moduleNumber, visit['visitDisplayName']) }}
                                                 {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                             </div>
                                             <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">

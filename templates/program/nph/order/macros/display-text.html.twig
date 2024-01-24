@@ -134,3 +134,13 @@
         {{ participant.module1TissueConsentTime|date('m/d/Y') }}
 {% endmacro %}
 
+{% macro displayVisitName(module, visitName) %}
+    {% if module in [2, 3] %}
+        {% set words = visitName|split(' ') %}
+        {% set lastWord = words|last %}
+        {% set words = words|slice(0, -1) %}
+        {{ words|join(' ') ~ ' - ' ~ lastWord }}
+    {% else %}
+        {{ visitName }}
+    {% endif %}
+{% endmacro %}

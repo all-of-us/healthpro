@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+
 {% block title %}NPH Print Label{% endblock %}
 
 {% block body %}
@@ -15,7 +17,7 @@
         </div>
         <div class="col-sm-6">
             <div class="alert well-sm text-white nph-module-badge nph-module-{{ module }}">Module | NPH Module {{ module }}</div>
-            <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ visitDisplayName }}</div>
+            <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ macros.displayVisitName(module, visitDisplayName) }}</div>
         </div>
     </div>
     <div class="row" style="padding-top: 2em">
