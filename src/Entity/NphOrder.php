@@ -32,6 +32,21 @@ class NphOrder
             'saliva3' => 'Saliva',
         ],
     ];
+    public const VISIT_DISPLAY_NAME_MAPPER = [
+        'LMT' => 'LMT',
+        'Period1Diet' => 'Diet Period 1 - Diet',
+        'Period1DLW' => 'Diet Period 1 - DLW',
+        'Period1DSMT' => 'Diet Period 1 - DSMT',
+        'Period1LMT' => 'Diet Period 1 - LMT',
+        'Period2Diet' => 'Diet Period 2 - Diet',
+        'Period2DLW' => 'Diet Period 2 - DLW',
+        'Period2DSMT' => 'Diet Period 2 - DSMT',
+        'Period2LMT' => 'Diet Period 2 - LMT',
+        'Period3Diet' => 'Diet Period 3 - Diet',
+        'Period3DLW' => 'Diet Period 3 - DLW',
+        'Period3DSMT' => 'Diet Period 3 - DSMT',
+        'Period3LMT' => 'Diet Period 3 - LMT',
+    ];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -456,5 +471,10 @@ class NphOrder
         $this->visitPeriod = $visitPeriod;
 
         return $this;
+    }
+
+    public function getVisitDisplayName(): ?string
+    {
+        return self::VISIT_DISPLAY_NAME_MAPPER[$this->visitPeriod];
     }
 }
