@@ -2,6 +2,8 @@
 
 namespace App\Service\Nph;
 
+use App\Entity\NphOrder;
+
 class NphProgramSummaryService
 {
     public function getModules(): array
@@ -84,7 +86,7 @@ class NphProgramSummaryService
                 }
                 $moduleSummary[$visit][$timePoint] = ['timePointInfo' => $moduleSummary[$visit][$timePoint], 'timePointDisplayName' => $module->getTimePoints()[$timePoint]];
             }
-            $moduleSummary[$visit] = ['visitInfo' => $moduleSummary[$visit], 'visitDisplayName' => $visits[$visit], 'visitDiet' => $moduleClass::getVisitDiet($visit)];
+            $moduleSummary[$visit] = ['visitInfo' => $moduleSummary[$visit], 'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit], 'visitDiet' => $moduleClass::getVisitDiet($visit)];
         }
         return $moduleSummary;
     }

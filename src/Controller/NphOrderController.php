@@ -106,7 +106,7 @@ class NphOrderController extends BaseController
             'module' => $module,
             'visit' => $visit,
             'downtimeOrders' => $downtimeOrders,
-            'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
+            'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_STOOL),
@@ -351,7 +351,7 @@ class NphOrderController extends BaseController
                 'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
-                'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
+                'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
                 'sampleCount' => $orderInfo['sampleCount'],
                 'sampleGroup' => $sampleGroup]
         );

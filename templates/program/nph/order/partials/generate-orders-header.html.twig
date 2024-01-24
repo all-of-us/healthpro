@@ -1,10 +1,9 @@
-{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 <div class="row">
     <div class="col-sm-9">
         {% include 'program/nph/order/partials/participant-details-with-name.html.twig' %}
     </div>
     <div class="col-sm-3">
         <div class="alert well-sm text-white nph-module-badge nph-module-{{ module }}">Module | NPH Module {{ module }}</div>
-        <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{  macros.displayVisitName(module, visitDisplayName) }}</div>
+        <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ visitDisplayName }}</div>
     </div>
 </div>
