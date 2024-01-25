@@ -559,6 +559,7 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'disabled' => $disabled,
             'dlwInfo' => $dlwObject,
             'form' => $dlwForm->createView()
