@@ -70,7 +70,7 @@
                 <td {{ moduleRowSpan }}>
                     {{ sample.module }}
                 </td>
-                <td {{ moduleRowSpan }}>{{ sample.visitType }}</td>
+                <td {{ moduleRowSpan }}>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
             {% endif %}
             <td {{ rowSpan }}>{{ sample.timepoint }}</td>
             <td {{ rowSpan }}><a href="{{ path('nph_order_collect', {participantId: sample.participantId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a></td>
