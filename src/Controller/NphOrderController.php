@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
@@ -563,6 +564,17 @@ class NphOrderController extends BaseController
             'form' => $dlwForm->createView()
         ]);
     }
+
+    #[Route(path: '/ajax/search/aliquot', name: 'search_aliquot_id')]
+    public function giftCardAction(Request $request): JsonResponse
+    {
+        $aliquotId = $request->get('aliquotId');
+        $aliquot = $this->em->getRepository(NphAliquot::class)->findOneBy([
+            'aliquotId' => $aliquotId
+        ]);
+        return $this->json(!$aliquot);
+    }
+
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {

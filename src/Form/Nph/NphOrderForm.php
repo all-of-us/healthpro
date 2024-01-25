@@ -66,8 +66,11 @@ class NphOrderForm extends AbstractType
                 ]);
             }
             $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
+            $orderCreatedTs = clone $options['orderCreatedTs'];
+            $userTimeZone = new \DateTimeZone($options['timeZone']);
+            $orderCreatedTs->setTimezone($userTimeZone);
             $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-                'required' => $formType === self::FORM_FINALIZE_TYPE,
+                'required' => false,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
@@ -77,7 +80,8 @@ class NphOrderForm extends AbstractType
                 'constraints' => $constraints,
                 'attr' => [
                     'class' => 'order-ts',
-                    'readonly' => $options['disableStoolCollectedTs']
+                    'readonly' => $options['disableStoolCollectedTs'],
+                    'data-parsley-custom-date-comparison' => $orderCreatedTs->format('m/d/Y g:i A')
                 ],
                 'disabled' => $disabled
             ]);
@@ -95,10 +99,9 @@ class NphOrderForm extends AbstractType
         bool $disabled = false,
         string $formType = self::FORM_FINALIZE_TYPE
     ): void {
-        $required = $formType === self::FORM_FINALIZE_TYPE;
         $urineColorOptions = [
             'label' => 'Urine Color',
-            'required' => $required,
+            'required' => false,
             'choices' => NphOrderCollect::$urineColors,
             'multiple' => false,
             'placeholder' => 'Select Urine Color',
@@ -106,7 +109,7 @@ class NphOrderForm extends AbstractType
         ];
         $urineClarityOptions = [
             'label' => 'Urine Clarity',
-            'required' => $required,
+            'required' => false,
             'choices' => NphOrderCollect::$urineClarity,
             'multiple' => false,
             'placeholder' => 'Select Urine Clarity',
@@ -156,7 +159,7 @@ class NphOrderForm extends AbstractType
     ): void {
         $urineVolumeCollection = [
             'label' => 'Total Collection Volume',
-            'required' => true,
+            'required' => false,
             'disabled' => $disabled,
             'constraints' => [
                 new Constraints\Callback(function ($value, $context) {
@@ -168,6 +171,7 @@ class NphOrderForm extends AbstractType
                 })
             ],
             'attr' => [
+                'class' => 'total-collection-volume',
                 'data-warning-min-volume' => 0.1,
                 'data-warning-max-volume' => 10,
             ]
