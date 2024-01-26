@@ -133,7 +133,7 @@
                                                                 {% for index, status in dietStatuses %}
                                                                     {% set index = index + 1 %}
                                                                     {% if index in VisitCode %}
-                                                                        <div class="float-end">
+                                                                        <div class="float-end text-{{ status|lower }}">
                                                                             <i class="fa fa-utensils"></i> {{ status|title }} Diet
                                                                         </div>
                                                                     {% endif %}
