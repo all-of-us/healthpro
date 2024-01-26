@@ -128,6 +128,17 @@
                                                     {% if participant.dob %}
                                                         <br>
                                                         <div class="{{ textDivSize }}">
+                                                            {% if moduleNumber in [2, 3] %}
+                                                                {% set dietStatuses = attribute(participant, 'module' ~ moduleNumber ~ 'DietStatus')|keys %}
+                                                                {% for index, status in dietStatuses %}
+                                                                    {% set index = index + 1 %}
+                                                                    {% if index in VisitCode %}
+                                                                        <div class="float-end">
+                                                                            <i class="fa fa-utensils"></i> {{ status|title }} Diet
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endif %}
                                                             {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
                                                                 <a class="btn btn-primary btn-sm mb-2" role="button"
                                                                    href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
