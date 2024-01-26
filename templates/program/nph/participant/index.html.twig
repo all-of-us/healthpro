@@ -108,9 +108,9 @@
                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                     {% if VisitCode != 'sampleStatusCount' %}
                                         {% set visitDiet = visit['visitDiet'] %}
-                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietStatus' %}
+                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}
                                         {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
-                                        {% if moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
+                                        {% if moduleNumber == 3 and VisitCode in ['Period1DLW', 'Period2DLW', 'Period3DLW'] %}
                                             {% set textDivSize = 'col-md-9' %}
                                             {% set dlwDiet = true %}
                                         {% else %}
@@ -120,7 +120,7 @@
                                         <div class="card mb-2 border-0">
                                             <div class="card-header collapse-carat" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                                  role="button" style="font-weight: bold">
-                                                Visit {{ visit['visitDisplayName'] }}
+                                                Visit | {{ visit['visitDisplayName']}}
                                                 {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                             </div>
                                             <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">

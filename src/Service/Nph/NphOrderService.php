@@ -285,7 +285,7 @@ class NphOrderService
         }
         $nphOrder = new NphOrder();
         $nphOrder->setModule($this->module);
-        $nphOrder->setVisitType($this->visit);
+        $nphOrder->setVisitPeriod($this->visit);
         $nphOrder->setTimepoint($timePoint);
         $nphOrder->setOrderId($orderId);
         $nphOrder->setParticipantId($this->participantId);
@@ -458,7 +458,8 @@ class NphOrderService
     public function getParticipantOrderSummaryByModuleAndVisit(string $participantid, string $module, string $visit): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
-        $orderInfo = $OrderRepository->findBy(['participantId' => $participantid, 'visitType' => $visit, 'module' => $module]);
+        $orderInfo = $OrderRepository->findBy(['participantId' => $participantid, 'visitPeriod' => $visit, 'module' =>
+            $module]);
         $orderSummary = $this->generateOrderSummaryArray($orderInfo);
         $orderSummary['order'] = $orderSummary['order'][$module][$visit];
         return $orderSummary;
@@ -664,7 +665,7 @@ class NphOrderService
         $createdTs->setTimezone(new \DateTimeZone('UTC'));
         $obj->created = $createdTs->format('Y-m-d\TH:i:s\Z');
         $obj->module = $order->getModule();
-        $obj->visitType = $this->getVisitTypes()[$order->getVisitType()];
+        $obj->visitPeriod = $this->getVisitTypes()[$order->getVisitPeriod()];
         // Handle RDR specific timepoint needs
         if ($this->getRdrTimePoints() && isset($this->getRdrTimePoints()[$order->getTimepoint()])) {
             $rdrTimePoint = $this->getRdrTimePoints()[$order->getTimepoint()];
@@ -679,7 +680,8 @@ class NphOrderService
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
         if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
-            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visit' => $order->getVisitType(), 'NphParticipant' => $order->getParticipantId()]);
+            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitPeriod'
+            => $order->getVisitPeriod(), 'NphParticipant' => $order->getParticipantId()]);
             if ($dlwInfo) {
                 $obj->sample = array_merge($obj->sample, [
                     'dlwDose' => [
@@ -824,7 +826,7 @@ class NphOrderService
     {
         $formData->setNphParticipant($participantId);
         $formData->setModule($module);
-        $formData->setVisit($visit);
+        $formData->setVisitPeriod($visit);
         $formData->setModifiedTimezoneId($this->getTimezoneid());
         $formData->setModifiedTs(new DateTime());
         $formData->setUser($this->user);
@@ -882,15 +884,14 @@ class NphOrderService
             foreach ($samples as $sample) {
                 $sampleCount++;
                 $moduleClass = 'App\Nph\Order\Modules\Module' . $order->getModule();
-                $module = new $moduleClass($order->getVisitType());
+                $module = new $moduleClass($order->getVisitPeriod());
                 $sampleName = $module->getSampleLabelFromCode($sample->getSampleCode());
                 $timePointsDisplay = $module->getTimePoints();
                 $sampleCollectionVolume = $module->getSampleCollectionVolumeFromCode($sample->getSampleCode());
-                $visitTypes = $module->getVisitTypes();
                 $sampleStatus = $sample->getStatus();
                 $orderId = $order->getOrderId();
                 $orderSummary[$order->getModule()]
-                [$order->getVisitType()]
+                [$order->getVisitPeriod()]
                 [$order->getTimepoint()]
                 [$module->getSampleType($sample->getSampleCode())]
                 [$sample->getSampleCode()]
@@ -905,7 +906,7 @@ class NphOrderService
                     'timepointDisplayName' => $timePointsDisplay[$order->getTimepoint()],
                     'sampleTypeDisplayName' => $module->getSampleTypeDisplayName($sample->getSampleCode()),
                     'identifier' => $module->getSampleIdentifierFromCode($sample->getSampleCode()),
-                    'visitDisplayName' => $visitTypes[$order->getVisitType()],
+                    'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$order->getVisitPeriod()],
                     'sampleGroup' => $sample->getSampleGroup(),
                     'modifyType' => $sample->getModifyType(),
                     'orderStatus' => $order->getStatus(),

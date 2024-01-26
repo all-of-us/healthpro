@@ -52,7 +52,7 @@ class testSetup
     {
         $nphOrder = new NphOrder();
         $nphOrder->setModule(1);
-        $nphOrder->setVisitType('LMT');
+        $nphOrder->setVisitPeriod('LMT');
         $nphOrder->setTimepoint('preLMT');
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId($participant->id);
