@@ -139,6 +139,25 @@
                                                                     {% endif %}
                                                                 {% endfor %}
                                                             {% endif %}
+                                                            {% set displayDietColorWarning = false %}
+                                                            {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                                                {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                                                    {% if sampleInfo['numberSamples'] is not empty and not displayDietColorWarning %}
+                                                                        {% for sampleCode, sample in sampleInfo %}
+                                                                            {% for orderid, numberSamples in sampleInfo['numberSamples'] if not displayDietColorWarning %}
+                                                                                {% if sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['oldVisitType'] is not empty %}
+                                                                                    {% set displayDietColorWarning = true %}
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endfor %}
+                                                            {% if displayDietColorWarning %}
+                                                                <div class="text-discontinue pb-2">
+                                                                    <i class="fa fa-exclamation-circle"></i> Samples in this visit were collected using “diet color”. All order information has been updated to now follow “diet period”.
+                                                                </div>
+                                                            {% endif %}
                                                             {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
                                                                 <a class="btn btn-primary btn-sm mb-2" role="button"
                                                                    href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
@@ -183,10 +202,10 @@
                                                         {% endif %}
                                                     {% else %}
                                                         <div class="{{ textDivSize }}">
-                                        <span class="alert alert-danger no-dob-banner">
-                                            <i class="text-danger fa fa-exclamation-circle"></i>
-                                            DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
-                                        </span>
+                                                            <span class="alert alert-danger no-dob-banner">
+                                                                <i class="text-danger fa fa-exclamation-circle"></i>
+                                                                DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
+                                                            </span>
                                                         </div>
                                                     {% endif %}
                                                 </div>
