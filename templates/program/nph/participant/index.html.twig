@@ -127,7 +127,7 @@
                                                 <div class="row">
                                                     {% if participant.dob %}
                                                         <br>
-                                                        <div class="{{ textDivSize }}">
+                                                        <div class="{{ textDivSize }} ps-1">
                                                             {% if moduleNumber in [2, 3] %}
                                                                 {% set dietStatuses = attribute(participant, 'module' ~ moduleNumber ~ 'DietStatus')|keys %}
                                                                 {% for index, status in dietStatuses %}
