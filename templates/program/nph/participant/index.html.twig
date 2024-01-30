@@ -133,7 +133,9 @@
                                                                 {% for index, status in dietStatuses %}
                                                                     {% set index = index + 1 %}
                                                                     {% if index in VisitCode %}
-                                                                        <div class="float-end text-{{ status|lower }}">
+                                                                        <div class="float-end text-{{ status|lower }}"
+                                                                             data-bs-toggle="tooltip"
+                                                                             title="Diet color is provided by the RTI system. Please allow time for systems to sync if changes/updates have been made to the diet color. The diet color displayed is for informational purposes only and will NOT impact orders in HPRO.">
                                                                             <i class="fa fa-utensils"></i> {{ status|title }} Diet
                                                                         </div>
                                                                     {% endif %}
