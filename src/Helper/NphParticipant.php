@@ -158,6 +158,7 @@ class NphParticipant
         $dietStatus = [];
         $dietStatusField = 'nphModule' . $module . 'DietStatus';
         $nphModuleDietStatus = $this->rdrData->{$dietStatusField} ?? [];
+        $this->sortDietStatus($nphModuleDietStatus);
         foreach ($nphModuleDietStatus as $diet) {
             $dietStatuses = array_column($diet->dietStatus, 'status');
             if (in_array(self::DIET_COMPLETED, $dietStatuses)) {
@@ -187,7 +188,7 @@ class NphParticipant
         }
         $dietStatusField = 'nphModule' . $module . 'DietStatus';
         $nphModuleDietStatus = $this->rdrData->{$dietStatusField} ?? [];
-
+        $this->sortDietStatus($nphModuleDietStatus);
         // If diet status is empty diet period 1 will be started
         if (empty($nphModuleDietStatus)) {
             return [
@@ -248,5 +249,16 @@ class NphParticipant
             }
         }
         return $consentStatus;
+    }
+
+    private function sortDietStatus(array &$dietStatus): void
+    {
+        if (!empty($dietStatus)) {
+            usort($dietStatus, function ($a, $b) {
+                $latestTimeA = max(array_column($a->dietStatus, 'time'));
+                $latestTimeB = max(array_column($b->dietStatus, 'time'));
+                return strtotime($latestTimeA) - strtotime($latestTimeB);
+            });
+        }
     }
 }
