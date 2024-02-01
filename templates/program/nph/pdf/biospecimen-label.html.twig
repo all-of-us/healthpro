@@ -13,14 +13,11 @@
         <div>{{ SpecimenID }}</div>
         <div style="font-size: 20px; font-weight: bold;">{{ SampleCode }}</div>
     </div>
-    {% if 'DLW' in VisitType %}
-    <div style="width: 30px; height: 30px; font-size: 22px; padding-top: 15px">M{{ ModuleNum }}</div>
-    {% endif %}
 </div>
 {% if 'DLW' in VisitType  %}
-    <div style="height: 15%; font-size: 16px; margin-bottom: 5px; width: 100%" align="center">
-        <div style="width: 30%; float: right">{{ VisitType }}</div>
-        <div style="width: 70%; float: left">{{ TimePoint }}</div>
+    <div style="height: 15%; font-size: 14.5px; margin-bottom: 5px; width: 100%" align="center">
+        <div style="width: 36%; float: left; text-align: left">{{ VisitType }}</div>
+        <div style="width: 64%; float: right; text-align: right">{{ TimePoint }}</div>
     </div>
 {% else %}
     <div style="height: 15%; font-size: 20px; margin-bottom: 5px" align="center">
