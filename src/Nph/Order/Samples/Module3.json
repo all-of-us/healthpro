@@ -23,7 +23,7 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false,
           "required": true
           }
@@ -51,7 +51,7 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false,
           "required": true
         }
@@ -78,7 +78,7 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false,
           "required": true
         }
@@ -105,7 +105,7 @@
             "maxVolume": 500,
             "warningMinVolume": 0.1,
             "warningMaxVolume": 0.5,
-            "addNew": false,
+            "addNew": true,
             "collectMetadata": false,
             "required": true
         }
