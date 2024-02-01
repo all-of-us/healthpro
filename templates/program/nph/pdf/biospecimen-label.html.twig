@@ -2,6 +2,9 @@
     <div align="left" style="width: 65%; float: left">{{ PatientName }}</div>
     <div align="left" style="float: right; width: 35%">{{ dob }}</div>
 </div>
+<div style="position: absolute; left: 270px; font-size: 24px; top: 85px">
+    <div align="left" style="width: 10px; float: left;">M{{ ModuleNum }}</div>
+</div>
 <div style="height: 40%; margin-top: 15px; position: relative">
     <div style="margin-bottom: 10px; margin-left: 25px; width: 25%; float: left; position: absolute">
         <img src="var:datamatrix"/>
@@ -21,9 +24,8 @@
     </div>
 {% else %}
     <div style="height: 15%; font-size: 20px; margin-bottom: 5px" align="center">
-        <div align="left" style="width: 10%; float: left;">M{{ ModuleNum }}</div>
-        <div align="right" style="width: 45%; float: left">{{ VisitType }}</div>
-        <div align="center" style="width: 45%; float: left">{{ TimePoint }}</div>
+        <div align="left" style="width: 70%; float: left">{{ VisitType }}</div>
+        <div align="center" style="width: 30%; float: left">{{ TimePoint }}</div>
     </div>
 {% endif %}
 <div>
