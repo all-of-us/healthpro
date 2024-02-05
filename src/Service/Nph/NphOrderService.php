@@ -839,7 +839,7 @@ class NphOrderService
     {
         $dlwSummary = [];
         foreach ($dlwRepository as $dlw) {
-            $dlwSummary[$dlw->getModule()][$dlw->getVisit()] = $dlw->getModifiedTs();
+            $dlwSummary[$dlw->getModule()][$dlw->getVisitPeriod()] = $dlw->getModifiedTs();
         }
         return $dlwSummary;
     }
