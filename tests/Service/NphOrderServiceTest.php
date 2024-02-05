@@ -778,8 +778,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $dlw = $this->testSetup->generateNphDlw(self::getContainer()->get(UserService::class)->getUserEntity());
         $dlwRepository = $this->em->getRepository(NphDlw::class)->findOneBy(['id' => $dlw->getId()]);
         $dlwSummary = $this->service->generateDlwSummary([$dlwRepository]);
-        $this->arrayHasKey($dlw->getModule(), $dlwSummary);
-        $this->arrayHasKey($dlw->getVisit(), $dlwSummary[$dlw->getModule()]);
+        $this->assertArrayHasKey($dlw->getModule(), $dlwSummary);
+        $this->assertArrayHasKey($dlw->getVisitPeriod(), $dlwSummary[$dlw->getModule()]);
         $this->assertEquals($dlw->getDoseAdministered(), $dlwSummary[$dlw->getModule()][$dlw->getVisitPeriod()]);
     }
 
