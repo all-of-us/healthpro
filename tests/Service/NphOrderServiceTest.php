@@ -780,7 +780,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $dlwSummary = $this->service->generateDlwSummary([$dlwRepository]);
         $this->arrayHasKey($dlw->getModule(), $dlwSummary);
         $this->arrayHasKey($dlw->getVisit(), $dlwSummary[$dlw->getModule()]);
-        $this->assertEquals($dlw->getDoseAdministered(), $dlwSummary[$dlw->getModule()][$dlw->getVisit()]);
+        $this->assertEquals($dlw->getDoseAdministered(), $dlwSummary[$dlw->getModule()][$dlw->getVisitPeriod()]);
     }
 
     private function getGuzzleResponse($data): Response
