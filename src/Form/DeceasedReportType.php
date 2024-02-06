@@ -30,6 +30,10 @@ class DeceasedReportType extends AbstractType
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
+                    ]),
+                    new Constraints\GreaterThan([
+                        'value' => $options['dob'],
+                        'message' => 'Date cannot be before participant\'s date of birth'
                     ])
                 ],
                 'attr' => [
@@ -102,7 +106,8 @@ class DeceasedReportType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DeceasedReport::class,
-            'attr' => ['data-parsley-validate' => true]
+            'attr' => ['data-parsley-validate' => true],
+            'dob' => null
         ]);
     }
 }
