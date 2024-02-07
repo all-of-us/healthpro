@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints;
 
 class DeceasedReportType extends AbstractType
 {
-    const AOU_START_DATE = '2018-05-06';
+    private const AOU_START_DATE = '2018-05-06';
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
