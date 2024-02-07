@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints;
 
 class DeceasedReportType extends AbstractType
 {
+    const AOU_START_DATE = '2018-05-06';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -36,7 +38,7 @@ class DeceasedReportType extends AbstractType
                         'message' => 'Date should be greater than participant\'s date of birth'
                     ]),
                     new Constraints\GreaterThanOrEqual([
-                        'value' => new \DateTime('2018-05-06'),
+                        'value' => new \DateTime(self::AOU_START_DATE),
                         'message' => 'Date should be greater than or equal to AOU start date'
                     ]),
                 ],
