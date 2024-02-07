@@ -33,8 +33,12 @@ class DeceasedReportType extends AbstractType
                     ]),
                     new Constraints\GreaterThan([
                         'value' => $options['dob'],
-                        'message' => 'Date cannot be before participant\'s date of birth'
-                    ])
+                        'message' => 'Date should be greater than participant\'s date of birth'
+                    ]),
+                    new Constraints\GreaterThanOrEqual([
+                        'value' => new \DateTime('2018-05-06'),
+                        'message' => 'Date should be greater than or equal to AOU start date'
+                    ]),
                 ],
                 'attr' => [
                     'autocomplete' => 'off'
