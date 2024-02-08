@@ -106,12 +106,10 @@ $(document).ready(function () {
     });
 
     let disableEnableAliquotFields = function () {
-        let $checkboxes = $(".sample-modify-checkbox:checkbox:enabled");
+        let $checkboxes = $(".sample-cancel-checkbox:checkbox:enabled");
         $checkboxes.each(function () {
             let $row = $(this).closest("tr");
-            $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
-            if ($row.find(".aliquot-volume").data("expected-volume")) {
-            }
+            $row.find(".order-ts, .aliquot-volume").prop("readonly", $(this).is(":checked"));
         });
     };
 
@@ -247,7 +245,7 @@ $(document).ready(function () {
 
     $(".aliquot-volume").trigger("keyup");
 
-    $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
+    $(".sample-cancel-checkbox").on("change", disableEnableAliquotFields);
 
     window.Parsley.addValidator("aliquotDateComparison", {
         validateString: function (value, requirement) {
