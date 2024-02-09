@@ -24,7 +24,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
         $siteId = $this->getSite()->getGoogleGroup();
         $nphOrder = new NphOrder();
         $nphOrder->setModule(1);
-        $nphOrder->setVisitType('LMT');
+        $nphOrder->setVisitPeriod('LMT');
         $nphOrder->setTimepoint('preLMT');
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId('P000000001');

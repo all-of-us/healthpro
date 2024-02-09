@@ -30,7 +30,7 @@ class NphSampleFinalizeType extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_24URINE) {
-            $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields']);
+            $this->addUrineTotalCollectionVolume($builder, $disableMetadataFields);
         }
 
         $formData = $builder->getData();

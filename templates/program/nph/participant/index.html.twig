@@ -108,9 +108,9 @@
                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                     {% if VisitCode != 'sampleStatusCount' %}
                                         {% set visitDiet = visit['visitDiet'] %}
-                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietStatus' %}
+                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}
                                         {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
-                                        {% if moduleNumber == 3 and (VisitCode == 'OrangeDLW' or VisitCode == 'BlueDLW' or VisitCode == 'PurpleDLW') %}
+                                        {% if moduleNumber == 3 and VisitCode in ['Period1DLW', 'Period2DLW', 'Period3DLW'] %}
                                             {% set textDivSize = 'col-md-9' %}
                                             {% set dlwDiet = true %}
                                         {% else %}
@@ -120,14 +120,46 @@
                                         <div class="card mb-2 border-0">
                                             <div class="card-header collapse-carat" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                                  role="button" style="font-weight: bold">
-                                                Visit {{ visit['visitDisplayName'] }}
+                                                Visit | {{ visit['visitDisplayName']}}
                                                 {% include 'program/nph/participant/partials/display-diet.html.twig' %}
                                             </div>
                                             <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
                                                 <div class="row">
                                                     {% if participant.dob %}
                                                         <br>
-                                                        <div class="{{ textDivSize }}">
+                                                        <div class="{{ textDivSize }} ps-1">
+                                                            {% if moduleNumber in [2, 3] %}
+                                                                {% set dietStatuses = attribute(participant, 'module' ~ moduleNumber ~ 'DietStatus')|keys %}
+                                                                {% for index, status in dietStatuses %}
+                                                                    {% set index = index + 1 %}
+                                                                    {% if index in VisitCode %}
+                                                                        <div class="float-end text-{{ status|lower }}"
+                                                                             data-bs-toggle="tooltip"
+                                                                             title="Diet color is provided by the RTI system. Please allow time for systems to sync if changes/updates have been made to the diet color. The diet color displayed is for informational purposes only and will NOT impact orders in HPRO.">
+                                                                            <i class="fa fa-utensils"></i> {{ status|title }} Diet
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            {% set displayDietColorWarning = false %}
+                                                            {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                                                {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                                                    {% if sampleInfo['numberSamples'] is not empty and not displayDietColorWarning %}
+                                                                        {% for sampleCode, sample in sampleInfo %}
+                                                                            {% for orderid, numberSamples in sampleInfo['numberSamples'] if not displayDietColorWarning %}
+                                                                                {% if sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['oldVisitType'] is not empty %}
+                                                                                    {% set displayDietColorWarning = true %}
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endfor %}
+                                                            {% if displayDietColorWarning %}
+                                                                <div class="text-discontinue pb-2">
+                                                                    <i class="fa fa-exclamation-circle"></i> Samples in this visit were collected using “diet color”. All order information has been updated to now follow “diet period”.
+                                                                </div>
+                                                            {% endif %}
                                                             {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
                                                                 <a class="btn btn-primary btn-sm mb-2" role="button"
                                                                    href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
@@ -172,10 +204,10 @@
                                                         {% endif %}
                                                     {% else %}
                                                         <div class="{{ textDivSize }}">
-                                        <span class="alert alert-danger no-dob-banner">
-                                            <i class="text-danger fa fa-exclamation-circle"></i>
-                                            DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
-                                        </span>
+                                                            <span class="alert alert-danger no-dob-banner">
+                                                                <i class="text-danger fa fa-exclamation-circle"></i>
+                                                                DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
+                                                            </span>
                                                         </div>
                                                     {% endif %}
                                                 </div>
