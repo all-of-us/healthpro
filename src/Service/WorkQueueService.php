@@ -673,8 +673,20 @@ class WorkQueueService
 
     private function getEnrollmentStatusTime($participant, $userTimezone)
     {
-        if ($participant->enrollmentStatusV3_2 === 'PARTICIPANT_PLUS_EHR') {
+        if ($participant->rdrData->enrollmentStatusV3_2 === 'PARTICIPANT_PLUS_EHR') {
             $time = $participant->enrollmentStatusParticipantPlusEhrV3_2Time;
+        } elseif ($participant->rdrData->enrollmentStatusV3_2 === 'ENROLLED_PARTICIPANT') {
+            $time = $participant->enrollmentStatusEnrolledParticipantV3_2Time;
+        } elseif ($participant->rdrData->enrollmentStatusV3_2 === 'PARTICIPANT') {
+            $time = $participant->enrollmentStatusParticipantV3_2Time;
+        } elseif ($participant->rdrData->enrollmentStatusV3_2 === 'PMB_ELIGIBLE') {
+            $time = $participant->enrollmentStatusPmbEligibleV3_2Time;
+        } elseif ($participant->rdrData->enrollmentStatusV3_2 === 'CORE_PARTICIPANT') {
+            $time = $participant->enrollmentStatusCoreV3_2Time;
+        } elseif ($participant->rdrData->enrollmentStatusV3_2 === 'CORE_MINUS_PM') {
+            $time = $participant->enrollmentStatusCoreMinusPmV3_2Time;
+        } else {
+            $time = null;
         }
         if (!empty($time)) {
             return '<br>' . WorkQueue::dateFromString($time, $userTimezone);
