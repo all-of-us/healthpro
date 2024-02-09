@@ -88,7 +88,7 @@ class WorkQueue
             'sortField' => 'enrollmentStatusV3_2',
             'toggleColumn' => true
         ],
-        'enrollmentStatusCoreMinusPMTime' => [
+        'enrollmentStatusCoreMinusPmV3_2Time' => [
             'name' => 'Core Participant Minus PM Date',
             'rdrDateField' => 'enrollmentStatusCoreMinusPmV3_2Time',
         ],
@@ -1589,7 +1589,7 @@ class WorkQueue
         'race',
         'education',
         'CopeFeb',
-        'enrollmentStatusCoreMinusPMTime',
+        'enrollmentStatusCoreMinusPmV3_2Time',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'fitbit',
