@@ -97,7 +97,8 @@ class MeasurementsController extends BaseController
         $formType = $measurement->isPediatricForm() ? PediatricMeasurementType::class : MeasurementType::class;
         $measurementsForm = $this->get('form.factory')->createNamed('form', $formType, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
-            'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() || $this->measurementService->inactiveSiteFormDisabled()
+            'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() ||
+                $this->measurementService->inactiveSiteFormDisabled() || $measurement->isEvaluationCancelled()
         ]);
         $measurementsForm->handleRequest($request);
         if ($measurementsForm->isSubmitted()) {

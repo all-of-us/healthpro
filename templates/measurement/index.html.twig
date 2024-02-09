@@ -7,7 +7,7 @@
          data-schema-template="{{ schema.template is defined ? schema.template : '0.1' }}"
          data-warnings="{{ warnings|json_encode|escape('html_attr') }}"
          data-conversions="{{ conversions|json_encode|escape('html_attr') }}"
-         data-finalized="{{ (measurement and measurement.finalizedTs) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}"
+         data-finalized="{{ (measurement and (measurement.finalizedTs or measurement.isEvaluationCancelled)) or (readOnlyView or inactiveSiteFormDisabled ? 1 : 0) }}"
          data-age-in-months="{{ participant.ageInMonths }}"
          data-sex-at-birth="{{ participant.sexAtBirth }}"
          data-age-in-years="{{ participant.age }}"
