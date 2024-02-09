@@ -57,14 +57,14 @@ class NphSampleRepository extends ServiceEntityRepository
             ->andWhere('o.participantId = :participantId')
             ->andWhere('o.module = :module')
             ->andWhere('o.timepoint = :timepoint')
-            ->andWhere('o.visitType = :visitType')
+            ->andWhere('o.visitPeriod = :visitPeriod')
             ->andWhere('o.site = :site')
             ->andWhere('s.modifyType IN (:types) or s.modifyType is null')
             ->setParameters([
                 'participantId' => $order->getParticipantId(),
                 'module' => $order->getModule(),
                 'timepoint' => $order->getTimepoint(),
-                'visitType' => $order->getVisitType(),
+                'visitPeriod' => $order->getVisitPeriod(),
                 'site' => $site,
                 'types' => [NphSample::RESTORE, NphSample::UNLOCK, NphSample::EDITED, NphSample::REVERT]
             ])

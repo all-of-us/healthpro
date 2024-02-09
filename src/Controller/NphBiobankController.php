@@ -219,7 +219,7 @@ class NphBiobankController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participant->id, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participant->id, $participant->biobankId);
         return $this->render('program/nph/biobank/order-collect-details.html.twig', [
             'order' => $order,
             'participant' => $participant,
@@ -251,14 +251,14 @@ class NphBiobankController extends BaseController
         ]);
         $nphOrderService->loadModules(
             $order->getModule(),
-            $order->getVisitType(),
+            $order->getVisitPeriod(),
             $participant->id,
             $participant->biobankId
         );
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $isDietStartedOrCompleted = $nphOrderService->isDietStartedOrCompleted($participant->{'module' . $order->getModule() . 'DietStatus'});
+        $isDietStartedOrCompleted = $nphOrderService->isDietStartedOrCompleted($participant->{'module' . $order->getModule() . 'DietPeriod'});
         $isSampleDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStartedOrCompleted);
         $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $isSampleDisabled : true;
         $sampleFinalizeForm = $this->createForm(

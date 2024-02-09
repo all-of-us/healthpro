@@ -67,6 +67,10 @@ class PDFService
                             } elseif ($sampleType === 'stool' && $stoolPrinted === true) {
                                 continue;
                             }
+                            $visit = $sample['visitDisplayName'];
+                            if ($module > 1) {
+                                $visit = str_replace('Diet ', '', $visit);
+                            }
                             $this->renderPDF(
                                 $participantFullName,
                                 $sampleType,
@@ -75,7 +79,7 @@ class PDFService
                                 $module,
                                 $sample['timepointDisplayName'],
                                 $sample['identifier'],
-                                $sample['visitDisplayName'],
+                                $visit,
                                 $sample['sampleCollectionVolume']
                             );
                         } catch (MpdfException|LoaderError|RuntimeError|SyntaxError $e) {

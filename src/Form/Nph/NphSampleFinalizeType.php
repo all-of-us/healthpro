@@ -30,7 +30,7 @@ class NphSampleFinalizeType extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_24URINE) {
-            $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields']);
+            $this->addUrineTotalCollectionVolume($builder, $disableMetadataFields);
         }
 
         $formData = $builder->getData();
@@ -252,7 +252,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         'required' => false,
                         'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
                         'attr' => [
-                            'class' => 'sample-modify-checkbox',
+                            'class' => 'sample-cancel-checkbox',
                         ]
                     ]
                 );
@@ -262,10 +262,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL,
-                        'attr' => [
-                            'class' => 'sample-modify-checkbox',
-                        ]
+                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
                     ]
                 );
             }

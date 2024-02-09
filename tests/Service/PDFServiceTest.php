@@ -33,8 +33,8 @@ class PDFServiceTest extends ServiceTestCase
         $pdfService = static::getContainer()->get(PDFService::class);
         $participant = $this->testSetup->generateNphParticipant();
         $nphOrder = $this->testSetup->generateNPHOrder($participant, self::getContainer()->get(UserService::class)->getUserEntity(), self::getContainer()->get(SiteService::class));
-        $orderSummary = $this->nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participant->id, $nphOrder->getModule(), $nphOrder->getVisitType());
-        $pdf = $pdfService->batchPDF($orderSummary['order'], $participant, $nphOrder->getModule(), $nphOrder->getVisitType());
+        $orderSummary = $this->nphOrderService->getParticipantOrderSummaryByModuleAndVisit($participant->id, $nphOrder->getModule(), $nphOrder->getVisitPeriod());
+        $pdf = $pdfService->batchPDF($orderSummary['order'], $participant, $nphOrder->getModule(), $nphOrder->getVisitPeriod());
         $this->assertIsString($pdf);
         $this->assertStringContainsString('%PDF', $pdf);
     }

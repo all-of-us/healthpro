@@ -6,7 +6,7 @@
     <div class="alert bg-light well-sm margin-top-15">
         <span class="font-bold">{{ timePoints[order.timepoint] }} {{ order.orderTypeDisplayName }}</span>
         <div class="pull-right">
-            <a href="{{ path('nph_order_label_print', {'participantId': order.participantId, 'module': order.module, 'visit': order.visitType, 'sampleGroup': order.nphSamples[0].sampleGroup}) }}">
+            <a href="{{ path('nph_order_label_print', {'participantId': order.participantId, 'module': order.module, 'visit': order.visitPeriod, 'sampleGroup': order.nphSamples[0].sampleGroup}) }}">
                 View Order Summary/Reprint Labels
             </a>
         </div>

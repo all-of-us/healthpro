@@ -21,6 +21,21 @@ class NphOrder
     public const TYPE_NAIL = 'nail';
     public const TYPE_DLW = 'urineDlw';
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
+    public const VISIT_DISPLAY_NAME_MAPPER = [
+        'LMT' => 'LMT',
+        'Period1Diet' => 'Diet Period 1 - Diet',
+        'Period1DLW' => 'Diet Period 1 - DLW',
+        'Period1DSMT' => 'Diet Period 1 - DSMT',
+        'Period1LMT' => 'Diet Period 1 - LMT',
+        'Period2Diet' => 'Diet Period 2 - Diet',
+        'Period2DLW' => 'Diet Period 2 - DLW',
+        'Period2DSMT' => 'Diet Period 2 - DSMT',
+        'Period2LMT' => 'Diet Period 2 - LMT',
+        'Period3Diet' => 'Diet Period 3 - Diet',
+        'Period3DLW' => 'Diet Period 3 - DLW',
+        'Period3DSMT' => 'Diet Period 3 - DSMT',
+        'Period3LMT' => 'Diet Period 3 - LMT',
+    ];
     private const TYPE_DISPLAY_OVERRIDE = [
         2 => [
             'urine' => 'Spot Urine'
@@ -50,7 +65,7 @@ class NphOrder
     #[ORM\Column(type: 'string', length: 50)]
     private $timepoint;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $visitType;
 
     #[ORM\Column(type: 'string', length: 50)]
@@ -86,6 +101,9 @@ class NphOrder
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $downtimeGeneratedTs = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $visitPeriod = null;
 
     public function __construct()
     {
@@ -441,5 +459,22 @@ class NphOrder
         $this->downtimeGeneratedTs = $downtimeGeneratedTs;
 
         return $this;
+    }
+
+    public function getVisitPeriod(): ?string
+    {
+        return $this->visitPeriod;
+    }
+
+    public function setVisitPeriod(?string $visitPeriod): static
+    {
+        $this->visitPeriod = $visitPeriod;
+
+        return $this;
+    }
+
+    public function getVisitDisplayName(): ?string
+    {
+        return self::VISIT_DISPLAY_NAME_MAPPER[$this->visitPeriod];
     }
 }

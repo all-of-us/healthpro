@@ -14,7 +14,7 @@
           "identifier": "SSTS1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
-          "expectedAliquots": 3,
+          "expectedAliquots": 4,
           "expectedVolume": 500,
           "units": "μL",
           "barcodeLength" : 10,
@@ -23,7 +23,7 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false,
           "required": true
           }
@@ -42,7 +42,7 @@
           "identifier": "LiHP1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
-          "expectedAliquots": 3,
+          "expectedAliquots": 4,
           "expectedVolume": 500,
           "units": "μL",
           "barcodeLength" : 10,
@@ -51,7 +51,7 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false,
           "required": true
         }
@@ -69,7 +69,7 @@
           "identifier": "EDTAP1-U",
           "container": "1.4mL Matrix tube",
           "description": "1.4mL Matrix tube",
-          "expectedAliquots": 3,
+          "expectedAliquots": 4,
           "expectedVolume": 500,
           "units": "μL",
           "barcodeLength" : 10,
@@ -78,7 +78,7 @@
           "maxVolume": 500,
           "warningMinVolume": 0.1,
           "warningMaxVolume": 0.5,
-          "addNew": false,
+          "addNew": true,
           "collectMetadata": false,
           "required": true
         }
@@ -96,7 +96,7 @@
             "identifier": "P800P1-U",
             "container": "1.4mL Matrix tube",
             "description": "1.4mL Matrix tube",
-            "expectedAliquots": 2,
+            "expectedAliquots": 3,
             "expectedVolume": 500,
             "units": "μL",
             "barcodeLength" : 10,
@@ -105,7 +105,7 @@
             "maxVolume": 500,
             "warningMinVolume": 0.1,
             "warningMaxVolume": 0.5,
-            "addNew": false,
+            "addNew": true,
             "collectMetadata": false,
             "required": true
         }

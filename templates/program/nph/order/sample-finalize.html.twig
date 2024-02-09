@@ -72,6 +72,7 @@
         {% set firstIteration = false %}
     {% endif %}
     {% set aliquotId = form[aliquotCode][i].vars.data %}
+    {% set disableTimeVolume = form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined and form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId].vars.disabled %}
     <tr class="aliquots-row-{{ aliquotCode }}{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}" id="aliquots_{{ aliquotCode }}_{{ i }}">
         <td {% if not form[aliquotCode][i].vars.valid %}
             class="has-error"{% endif %}>
@@ -81,11 +82,11 @@
         </td>
         <td {% if not form[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
             class="has-error"{% endif %} style="position: relative;">
-            {{ form_widget(form[aliquotCode ~ 'AliquotTs'][i]) }}
+            {{ form_widget(form[aliquotCode ~ 'AliquotTs'][i], {'attr':{'readonly':disableTimeVolume}}) }}
             {{ form_errors(form[aliquotCode ~ 'AliquotTs'][i]) }}
         </td>
         {% if not skipVolume %}
-            {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i) }}
+            {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i, disableTimeVolume) }}
         {% elseif skipVolume and sample.unlocked %}
             <td colspan="2"></td>
         {% endif %}
@@ -101,10 +102,10 @@
         {% endif %}
     </tr>
 {% endmacro %}
-{% macro displayVolumeTD(aliquotCode, aliquot, sample, form, i, style) %}
+{% macro displayVolumeTD(aliquotCode, aliquot, sample, form, i, disable) %}
 <td {% if not form[aliquotCode ~ 'Volume'][i].vars.valid %}
     class="has-error"{% endif %}>
-    {{ form_widget(form[aliquotCode ~ 'Volume'][i]) }}
+    {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr':{'readonly':disable}}) }}
     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
     <span class="text-warning aliquot-volume-warning" style="display: none">
         Please verify the volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).
