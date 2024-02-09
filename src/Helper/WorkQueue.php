@@ -85,7 +85,7 @@ class WorkQueue
         'coreParticipant' => [
             'name' => 'Core Participant Date',
             'rdrDateField' => 'enrollmentStatusCoreV3_2Time',
-            'sortField' => 'enrollmentStatus',
+            'sortField' => 'enrollmentStatusV3_2',
             'toggleColumn' => true
         ],
         'enrollmentStatusCoreMinusPMTime' => [
@@ -1621,7 +1621,7 @@ class WorkQueue
         'dateOfBirth',
         'participantId',
         'biobankId',
-        'enrollmentStatus',
+        'enrollmentStatusV3_2',
         'withdrawalAuthored',
         'withdrawalReason',
         'participantOrigin',
@@ -1746,10 +1746,10 @@ class WorkQueue
                 'Deceased (Pending)' => 'deceased_pending'
             ]
         ],
-        'enrollmentStatus' => [
-            'label' => 'Participant Status',
+        'enrollmentStatusV3_2' => [
+            'label' => 'Participant Statu',
             'options' => [
-                'Participant' => 'INTERESTED',
+                'Participant' => 'PARTICIPANT',
                 'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
                 'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
                 'PM&B Eligible' => 'PMB_ELIGIBLE',
@@ -1890,12 +1890,14 @@ class WorkQueue
                 'Deceased (Pending)' => 'deceased_pending'
             ]
         ],
-        'enrollmentStatus' => [
+        'enrollmentStatusV3_2' => [
             'label' => 'Participant Status',
             'options' => [
-                'Participant' => 'INTERESTED',
-                'Participant + EHR Consent' => 'MEMBER',
-                'Core Participant' => 'FULL_PARTICIPANT',
+                'Participant' => 'PARTICIPANT',
+                'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
+                'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
+                'PM&B Eligible' => 'PMB_ELIGIBLE',
+                'Core Participant' => 'CORE_PARTICIPANT',
                 'Core Participant Minus PM' => 'CORE_MINUS_PM'
             ]
         ],
@@ -1987,13 +1989,15 @@ class WorkQueue
     //TODO rename to advancedFilters
     public static $consentAdvanceFilters = [
         'Status' => [
-            'enrollmentStatus' => [
+            'enrollmentStatusV3_2' => [
                 'label' => 'Participant Status',
                 'options' => [
                     'View All' => '',
-                    'Participant' => 'INTERESTED',
-                    'Participant + EHR Consent' => 'MEMBER',
-                    'Core Participant' => 'FULL_PARTICIPANT',
+                    'Participant' => 'PARTICIPANT',
+                    'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
+                    'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
+                    'PM&B Eligible' => 'PMB_ELIGIBLE',
+                    'Core Participant' => 'CORE_PARTICIPANT',
                     'Core Participant Minus PM' => 'CORE_MINUS_PM'
                 ]
             ],
@@ -2637,7 +2641,7 @@ class WorkQueue
         'participantStatus' => [
             'participantStatus',
             'coreParticipant',
-            'enrollmentStatusCoreMinusPMTime'
+            'enrollmentStatusCoreMinusPmV3_2Time'
         ],
         'activityStatus' => [
             'withdrawalStatus',

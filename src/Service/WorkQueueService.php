@@ -131,8 +131,8 @@ class WorkQueueService
                 }
             }
         }
-        if (!empty($params['enrollmentStatus'])) {
-            $rdrParams['enrollmentStatus'] = $params['enrollmentStatus'];
+        if (!empty($params['enrollmentStatusV3_2'])) {
+            $rdrParams['enrollmentStatusV3_2'] = $params['enrollmentStatusV3_2'];
         }
         if (!empty($params['consentForElectronicHealthRecords'])) {
             $rdrParams['consentForElectronicHealthRecords'] = $params['consentForElectronicHealthRecords'];
@@ -673,10 +673,8 @@ class WorkQueueService
 
     private function getEnrollmentStatusTime($participant, $userTimezone)
     {
-        if ($participant->isCoreParticipant) {
-            $time = $participant->enrollmentStatusCoreStoredSampleTime;
-        } elseif ($participant->isCoreMinusPMParticipant) {
-            $time = $participant->enrollmentStatusCoreMinusPMTime;
+        if ($participant->enrollmentStatusV3_2 === 'PARTICIPANT_PLUS_EHR') {
+            $time = $participant->enrollmentStatusParticipantPlusEhrV3_2Time;
         }
         if (!empty($time)) {
             return '<br>' . WorkQueue::dateFromString($time, $userTimezone);
