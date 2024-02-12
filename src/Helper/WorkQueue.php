@@ -1747,7 +1747,7 @@ class WorkQueue
             ]
         ],
         'enrollmentStatusV3_2' => [
-            'label' => 'Participant Statu',
+            'label' => 'Participant Status',
             'options' => [
                 'Participant' => 'PARTICIPANT',
                 'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
