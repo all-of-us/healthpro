@@ -188,7 +188,7 @@ class WorkQueueTest extends ServiceTestCase
     {
         $filterLabelOptionPairs = [
             'labels' => [
-                'enrollmentStatus' => 'Participant Status',
+                'enrollmentStatusV3_2' => 'Participant Status',
                 'activityStatus' => 'Activity Status',
                 'patientStatus' => 'Patient Status',
                 'consentForStudyEnrollment' => 'Primary Consent',
@@ -229,12 +229,14 @@ class WorkQueueTest extends ServiceTestCase
             ],
             'options' =>
                 [
-                    'enrollmentStatus' =>
+                    'enrollmentStatusV3_2' =>
                         [
                             '' => 'View All',
-                            'INTERESTED' => 'Participant',
-                            'MEMBER' => 'Participant + EHR Consent',
-                            'FULL_PARTICIPANT' => 'Core Participant',
+                            'PARTICIPANT' => 'Participant',
+                            'PARTICIPANT_PLUS_EHR' => 'Participant + EHR Consent',
+                            'ENROLLED_PARTICIPANT' => 'Enrolled Participant',
+                            'PMB_ELIGIBLE' => 'PM&B Eligible',
+                            'CORE_PARTICIPANT' => 'Core Participant',
                             'CORE_MINUS_PM' => 'Core Participant Minus PM',
                         ],
                     'activityStatus' =>
