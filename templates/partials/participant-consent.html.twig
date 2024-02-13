@@ -48,7 +48,7 @@
     {% endif %}
     <li class="list-group-item">
         <strong>Participant Status</strong>
-        {{ codebook_display(participant.enrollmentStatusV3_2) }}
+        {{ participant.enrollmentStatusV3_2 }}
         {{ participant.enrollmentStatusTime|date('d/m/Y') }}
     </li>
 </ul>
