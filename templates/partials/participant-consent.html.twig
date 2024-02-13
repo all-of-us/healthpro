@@ -49,6 +49,8 @@
     <li class="list-group-item">
         <strong>Participant Status</strong>
         {{ participant.enrollmentStatusV3_2 }}
-        {{ participant.enrollmentStatusV3_2Time|date('m/d/Y') }}
+        {% if participant.enrollmentStatusV3_2Time is not null %}
+            {{ participant.enrollmentStatusV3_2Time|date('m/d/Y') }}
+        {% endif %}
     </li>
 </ul>
