@@ -517,17 +517,17 @@ class Participant
 
         if (isset($participant->enrollmentStatusV3_2)) {
             if ($participant->enrollmentStatusV3_2 === 'PARTICIPANT_PLUS_EHR') {
-                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusParticipantPlusEhrV3_2Time;
+                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusParticipantPlusEhrV3_2Time ?? null;
             } elseif ($participant->enrollmentStatusV3_2 === 'ENROLLED_PARTICIPANT') {
-                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusEnrolledParticipantV3_2Time;
+                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusEnrolledParticipantV3_2Time ?? null;
             } elseif ($participant->enrollmentStatusV3_2 === 'PARTICIPANT') {
-                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusParticipantV3_2Time;
+                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusParticipantV3_2Time ?? null;
             } elseif ($participant->enrollmentStatusV3_2 === 'PMB_ELIGIBLE') {
-                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusPmbEligibleV3_2Time;
+                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusPmbEligibleV3_2Time ?? null;
             } elseif ($participant->enrollmentStatusV3_2 === 'CORE_PARTICIPANT') {
-                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusCoreV3_2Time;
+                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusCoreV3_2Time ?? null;
             } elseif ($participant->enrollmentStatusV3_2 === 'CORE_MINUS_PM') {
-                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusCoreMinusPmV3_2Time;
+                $this->enrollmentStatusV3_2Time = $participant->enrollmentStatusCoreMinusPmV3_2Time ?? null;
             } else {
                 $this->enrollmentStatusV3_2Time = null;
             }
