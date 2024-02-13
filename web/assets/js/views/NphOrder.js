@@ -61,4 +61,28 @@ $(document).ready(function () {
             $("#totalCollectionVolumeWarning").hide();
         }
     });
+
+    window.Parsley.addValidator("customDateComparison", {
+        validateString: function (value, requirement) {
+            let inputDate = new Date(value);
+            let comparisonDate = new Date(requirement);
+            return inputDate > comparisonDate;
+        },
+        messages: {
+            en: "Time must be after order generation."
+        }
+    });
+
+    $("form[name='nph_order_collect']").parsley({
+        errorClass: "has-error",
+        classHandler: function (el) {
+            return el.$element.closest(".form-group, td, .input-group");
+        },
+        errorsContainer: function (el) {
+            return el.$element.closest(".form-group, td");
+        },
+        errorsWrapper: '<div class="help-block"></div>',
+        errorTemplate: "<div></div>",
+        trigger: "blur"
+    });
 });
