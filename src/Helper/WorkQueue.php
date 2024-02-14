@@ -92,6 +92,14 @@ class WorkQueue
             'name' => 'Core Participant Minus PM Date',
             'rdrDateField' => 'enrollmentStatusCoreMinusPmV3_2Time',
         ],
+        'enrollmentStatusParticipantV3_2Time' => [
+            'name' => 'Participant Date',
+            'rdrDateField' => 'enrollmentStatusParticipantV3_2Time',
+        ],
+        'enrollmentStatusParticipantPlusEhrV3_2Time' => [
+            'name' => 'Participant + EHR Date',
+            'rdrDateField' => 'enrollmentStatusParticipantPlusEhrV3_2Time',
+        ],
         'activityStatus' => [
             'name' => 'Activity Status',
             'rdrField' => 'activityStatus',
@@ -1590,6 +1598,8 @@ class WorkQueue
         'education',
         'CopeFeb',
         'enrollmentStatusCoreMinusPmV3_2Time',
+        'enrollmentStatusParticipantV3_2Time',
+        'enrollmentStatusParticipantPlusEhrV3_2Time',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'fitbit',
