@@ -92,6 +92,14 @@ class WorkQueue
             'name' => 'Core Participant Minus PM Date',
             'rdrDateField' => 'enrollmentStatusCoreMinusPmV3_2Time',
         ],
+        'enrollmentStatusParticipantV3_2Time' => [
+            'name' => 'Participant Date',
+            'rdrDateField' => 'enrollmentStatusParticipantV3_2Time',
+        ],
+        'enrollmentStatusParticipantPlusEhrV3_2Time' => [
+            'name' => 'Participant + EHR Date',
+            'rdrDateField' => 'enrollmentStatusParticipantPlusEhrV3_2Time',
+        ],
         'activityStatus' => [
             'name' => 'Activity Status',
             'rdrField' => 'activityStatus',
@@ -1590,6 +1598,8 @@ class WorkQueue
         'education',
         'CopeFeb',
         'enrollmentStatusCoreMinusPmV3_2Time',
+        'enrollmentStatusParticipantV3_2Time',
+        'enrollmentStatusParticipantPlusEhrV3_2Time',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'fitbit',
@@ -1753,8 +1763,8 @@ class WorkQueue
                 'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
                 'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
                 'PM&B Eligible' => 'PMB_ELIGIBLE',
-                'Core Participant' => 'CORE_PARTICIPANT',
-                'Core Participant Minus PM' => 'CORE_MINUS_PM'
+                'Core Participant Minus PM' => 'CORE_MINUS_PM',
+                'Core Participant' => 'CORE_PARTICIPANT'
             ]
         ],
         'patientStatus' => [
@@ -1897,8 +1907,8 @@ class WorkQueue
                 'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
                 'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
                 'PM&B Eligible' => 'PMB_ELIGIBLE',
-                'Core Participant' => 'CORE_PARTICIPANT',
-                'Core Participant Minus PM' => 'CORE_MINUS_PM'
+                'Core Participant Minus PM' => 'CORE_MINUS_PM',
+                'Core Participant' => 'CORE_PARTICIPANT'
             ]
         ],
         'patientStatus' => [
@@ -1997,8 +2007,8 @@ class WorkQueue
                     'Participant + EHR Consent' => 'PARTICIPANT_PLUS_EHR',
                     'Enrolled Participant' => 'ENROLLED_PARTICIPANT',
                     'PM&B Eligible' => 'PMB_ELIGIBLE',
+                    'Core Participant Minus PM' => 'CORE_MINUS_PM',
                     'Core Participant' => 'CORE_PARTICIPANT',
-                    'Core Participant Minus PM' => 'CORE_MINUS_PM'
                 ]
             ],
             'activityStatus' => [
