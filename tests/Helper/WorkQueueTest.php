@@ -236,8 +236,8 @@ class WorkQueueTest extends ServiceTestCase
                             'PARTICIPANT_PLUS_EHR' => 'Participant + EHR Consent',
                             'ENROLLED_PARTICIPANT' => 'Enrolled Participant',
                             'PMB_ELIGIBLE' => 'PM&B Eligible',
-                            'CORE_PARTICIPANT' => 'Core Participant',
                             'CORE_MINUS_PM' => 'Core Participant Minus PM',
+                            'CORE_PARTICIPANT' => 'Core Participant',
                         ],
                     'activityStatus' =>
                         [
