@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints;
 
 class DeceasedReportType extends AbstractType
 {
+    private const AOU_START_DATE = '2018-05-06';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -30,10 +32,19 @@ class DeceasedReportType extends AbstractType
                     new Constraints\LessThanOrEqual([
                         'value' => new \DateTime('today'),
                         'message' => 'Date cannot be in the future'
-                    ])
+                    ]),
+                    new Constraints\GreaterThan([
+                        'value' => $options['dob'],
+                        'message' => 'Date should be greater than participant\'s date of birth'
+                    ]),
+                    new Constraints\GreaterThanOrEqual([
+                        'value' => new \DateTime(self::AOU_START_DATE),
+                        'message' => 'Date should be greater than or equal to AOU start date'
+                    ]),
                 ],
                 'attr' => [
-                    'autocomplete' => 'off'
+                    'autocomplete' => 'off',
+                    'placeholder' => 'MM/DD/YYYY'
                 ]
             ])
             ->add('causeOfDeath', TextType::class, [
@@ -102,7 +113,8 @@ class DeceasedReportType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => DeceasedReport::class,
-            'attr' => ['data-parsley-validate' => true]
+            'attr' => ['data-parsley-validate' => true],
+            'dob' => null
         ]);
     }
 }
