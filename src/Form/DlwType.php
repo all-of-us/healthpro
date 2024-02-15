@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
 
 class DlwType extends AbstractType
 {
@@ -20,14 +21,18 @@ class DlwType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $doseBatchIdErrorMessage = 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . $this::DOSE_BATCH_ID_DIGITS . ' digits).';
         $builder
             ->add('doseBatchId', TextType::class, [
                 'label' => 'Dose Batch ID',
-                'constraints' => new Length([
-                    'min' => $this::DOSE_BATCH_ID_DIGITS,
-                    'max' => $this::DOSE_BATCH_ID_DIGITS,
-                    'exactMessage' => 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . $this::DOSE_BATCH_ID_DIGITS . ' digits).'
-                ]),
+                'constraints' => [
+                    new Type('integer', $doseBatchIdErrorMessage),
+                    new Length([
+                        'min' => $this::DOSE_BATCH_ID_DIGITS,
+                        'max' => $this::DOSE_BATCH_ID_DIGITS,
+                        'exactMessage' => $doseBatchIdErrorMessage
+                    ])
+                ],
                 'required' => true,
                 'attr' => ['class' => 'form-control'],
             ])
