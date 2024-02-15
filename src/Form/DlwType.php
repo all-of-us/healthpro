@@ -6,14 +6,12 @@ use App\Entity\NphDlw;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Type;
 
 class DlwType extends AbstractType
 {
@@ -23,10 +21,10 @@ class DlwType extends AbstractType
     {
         $doseBatchIdErrorMessage = 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . $this::DOSE_BATCH_ID_DIGITS . ' digits).';
         $builder
-            ->add('doseBatchId', TextType::class, [
+            ->add('doseBatchId', NumberType::class, [
                 'label' => 'Dose Batch ID',
                 'constraints' => [
-                    new Type('integer', $doseBatchIdErrorMessage),
+                    new NotBlank(),
                     new Length([
                         'min' => $this::DOSE_BATCH_ID_DIGITS,
                         'max' => $this::DOSE_BATCH_ID_DIGITS,
@@ -41,6 +39,7 @@ class DlwType extends AbstractType
                 'required' => true,
                 'empty_data' => 0,
                 'constraints' => [
+                    new NotBlank(),
                     new GreaterThan([
                         'value' => 0,
                         'message' => 'Dose must be greater than 0.'
@@ -58,6 +57,7 @@ class DlwType extends AbstractType
                 'label' => 'Participant Weight (kg)*',
                 'empty_data' => 0,
                 'constraints' => [
+                    new NotBlank(),
                     new GreaterThan([
                         'value' => 0,
                         'message' => 'Please verify the measurement is correct. Value should be greater than 0 kg.'
