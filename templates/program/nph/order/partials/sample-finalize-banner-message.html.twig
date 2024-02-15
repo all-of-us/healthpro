@@ -1,4 +1,5 @@
 {% if sample.rdrId and sample.finalizedTs %}
+    {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
     <div class="alert alert-success well-sm">
         {% if biobankView %}
             <i class="fa fa-exclamation-circle"></i>
