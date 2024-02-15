@@ -100,6 +100,10 @@ class WorkQueue
             'name' => 'Participant + EHR Date',
             'rdrDateField' => 'enrollmentStatusParticipantPlusEhrV3_2Time',
         ],
+        'enrollmentStatusPmbEligibleV3_2Time' => [
+            'name' => 'PM&B Eligible Date',
+            'rdrDateField' => 'enrollmentStatusPmbEligibleV3_2Time',
+        ],
         'activityStatus' => [
             'name' => 'Activity Status',
             'rdrField' => 'activityStatus',
@@ -1600,6 +1604,7 @@ class WorkQueue
         'enrollmentStatusCoreMinusPmV3_2Time',
         'enrollmentStatusParticipantV3_2Time',
         'enrollmentStatusParticipantPlusEhrV3_2Time',
+        'enrollmentStatusPmbEligibleV3_2Time',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'fitbit',
