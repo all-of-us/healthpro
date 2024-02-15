@@ -43,7 +43,8 @@ class DeceasedReportType extends AbstractType
                     ]),
                 ],
                 'attr' => [
-                    'autocomplete' => 'off'
+                    'autocomplete' => 'off',
+                    'placeholder' => 'MM/DD/YYYY'
                 ]
             ])
             ->add('causeOfDeath', TextType::class, [
