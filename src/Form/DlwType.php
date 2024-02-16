@@ -32,7 +32,10 @@ class DlwType extends AbstractType
                     ])
                 ],
                 'required' => true,
-                'attr' => ['class' => 'form-control'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'data-parsley-required-message' => 'Dose batch ID required.'
+                ],
             ])
             ->add('actualDose', NumberType::class, [
                 'label' => 'Actual Dose (g)*',
@@ -50,7 +53,10 @@ class DlwType extends AbstractType
                                 ->addViolation();
                         }
                     })
-                ]
+                ],
+                'attr' => [
+                    'data-parsley-required-message' => 'Actual dose required.'
+                ],
             ])
             ->add('participantWeight', NumberType::class, [
                 'required' => true,
@@ -75,7 +81,11 @@ class DlwType extends AbstractType
                             $context->buildViolation('Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.')
                                 ->addViolation();
                         }
-                    })]
+                    })
+                ],
+                'attr' => [
+                    'data-parsley-required-message' => 'Participant weight required.'
+                ]
             ])
             ->add('doseAdministered', DateTimeType::class, [
                 'format' => 'M/d/yyyy h:mm a',
@@ -84,7 +94,10 @@ class DlwType extends AbstractType
                 'widget' => 'single_text',
                 'model_timezone' => 'UTC',
                 'label' => 'Dose Date/Time',
-                'attr' => ['class' => 'order-ts'],
+                'attr' => [
+                    'class' => 'order-ts',
+                    'data-parsley-required-message' => 'Dose date/time required.'
+                ],
                 'view_timezone' => $options['timezone'],
                 'constraints' => new NotBlank(['message' => 'Dose date/time required.'])
             ])

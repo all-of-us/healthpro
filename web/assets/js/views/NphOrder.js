@@ -85,4 +85,8 @@ $(document).ready(function () {
         errorTemplate: "<div></div>",
         trigger: "blur"
     });
+
+    $(document).on("dp.hide", ".order-ts", function () {
+        $(this).parsley().validate();
+    });
 });
