@@ -55,7 +55,8 @@ class DlwType extends AbstractType
                     })
                 ],
                 'attr' => [
-                    'data-parsley-required-message' => 'Actual dose required.'
+                    'data-parsley-required-message' => 'Actual dose required.',
+                    'data-parsley-decimal-place-limit' => true,
                 ],
             ])
             ->add('participantWeight', NumberType::class, [
@@ -84,7 +85,8 @@ class DlwType extends AbstractType
                     })
                 ],
                 'attr' => [
-                    'data-parsley-required-message' => 'Participant weight required.'
+                    'data-parsley-required-message' => 'Participant weight required.',
+                    'data-parsley-decimal-place-limit' => true,
                 ]
             ])
             ->add('doseAdministered', DateTimeType::class, [

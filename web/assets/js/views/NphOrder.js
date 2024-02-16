@@ -73,6 +73,22 @@ $(document).ready(function () {
         }
     });
 
+    window.Parsley.addValidator("decimalPlaceLimit", {
+        validateString: function (value) {
+            if (isNaN(value)) {
+                return true;
+            }
+            if (parseInt(value) === parseFloat(value)) {
+                return true;
+            }
+            const totalDecimalPlaces = value.toString().length - value.toString().lastIndexOf('.') - 1;
+            return totalDecimalPlaces <= 1;
+        },
+        messages: {
+            en: "Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place."
+        }
+    });
+
     $("form[name='nph_order_collect'], form[name='dlw']").parsley({
         errorClass: "has-error",
         classHandler: function (el) {
