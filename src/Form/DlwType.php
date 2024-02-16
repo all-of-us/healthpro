@@ -16,6 +16,17 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class DlwType extends AbstractType
 {
     private const DOSE_BATCH_ID_DIGITS = 8;
+    private const WEIGHT_DOSE_GREATER_THAN = 0;
+    private const PARTICIPANT_WEIGHT_LESS_THAN_WEIGHT = 907;
+    private const DOSE_BATCH_ID_REQUIRED_ERROR_MESSAGE = 'Dose batch ID required.';
+    private const DOSE_BATCH_ID_INVALID_ERROR_MESSAGE = 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . self::DOSE_BATCH_ID_DIGITS . ' digits).';
+    private const ACTUAL_DOSE_REQUIRED_ERROR_MESSAGE = 'Actual dose required.';
+    private const ACTUAL_DOSE_GREATER_THAN_ERROR_MESSAGE = 'Dose must be greater than ' . self::WEIGHT_DOSE_GREATER_THAN . '.';
+    private const PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE = 'Participant weight required';
+    private const PARTICIPANT_WEIGHT_GREATER_THAN_ERROR_MESSAGE = 'Please verify the measurement is correct. Value should be greater than ' . self::WEIGHT_DOSE_GREATER_THAN . ' kg.';
+    private const PARTICIPANT_WEIGHT_LESS_THAN_ERROR_MESSAGE = 'Please verify the measurement is correct. Value should be less than ' . self::PARTICIPANT_WEIGHT_LESS_THAN_WEIGHT . ' kg.';
+    private const TENTH_PLACE_ERROR_MESSAGE = 'Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.';
+    private const DOSE_DATE_TIME_REQUIRED = 'Dose date/time required.';
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -28,14 +39,14 @@ class DlwType extends AbstractType
                     new Length([
                         'min' => $this::DOSE_BATCH_ID_DIGITS,
                         'max' => $this::DOSE_BATCH_ID_DIGITS,
-                        'exactMessage' => $doseBatchIdErrorMessage
+                        'exactMessage' => self::DOSE_BATCH_ID_INVALID_ERROR_MESSAGE
                     ])
                 ],
                 'required' => true,
                 'attr' => [
                     'class' => 'form-control',
-                    'data-parsley-required-message' => 'Dose batch ID required.',
-                    'data-parsley-pattern-message' => $doseBatchIdErrorMessage,
+                    'data-parsley-required-message' => self::DOSE_BATCH_ID_REQUIRED_ERROR_MESSAGE,
+                    'data-parsley-pattern-message' => self::DOSE_BATCH_ID_INVALID_ERROR_MESSAGE,
                     'data-parsley-type' => 'number',
                     'data-parsley-pattern' => '^\d{' . self::DOSE_BATCH_ID_DIGITS . '}$'
                 ],
@@ -47,22 +58,22 @@ class DlwType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                     new GreaterThan([
-                        'value' => 0,
-                        'message' => 'Dose must be greater than 0.'
+                        'value' => self::WEIGHT_DOSE_GREATER_THAN,
+                        'message' => self::ACTUAL_DOSE_GREATER_THAN_ERROR_MESSAGE
                     ]),
                     new Callback(function ($value, $context) {
                         if ($this->getNumDecimalPlaces($value) > 1) {
-                            $context->buildViolation('Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.')
+                            $context->buildViolation(self::TENTH_PLACE_ERROR_MESSAGE)
                                 ->addViolation();
                         }
                     })
                 ],
                 'attr' => [
-                    'data-parsley-required-message' => 'Actual dose required.',
-                    'data-parsley-gt-message' => 'Actual dose required.',
+                    'data-parsley-required-message' => self::ACTUAL_DOSE_REQUIRED_ERROR_MESSAGE,
+                    'data-parsley-gt-message' => self::ACTUAL_DOSE_REQUIRED_ERROR_MESSAGE,
                     'data-parsley-decimal-place-limit' => true,
                     'data-parsley-type' => 'number',
-                    'data-parsley-gt' => 0,
+                    'data-parsley-gt' => self::WEIGHT_DOSE_GREATER_THAN,
                 ],
             ])
             ->add('participantWeight', NumberType::class, [
@@ -72,32 +83,32 @@ class DlwType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                     new GreaterThan([
-                        'value' => 0,
-                        'message' => 'Please verify the measurement is correct. Value should be greater than 0 kg.'
+                        'value' => self::WEIGHT_DOSE_GREATER_THAN,
+                        'message' => self::PARTICIPANT_WEIGHT_GREATER_THAN_ERROR_MESSAGE
                     ]),
                     new Callback(function ($value, $context) {
-                        if ($value < 0 || $value === null) {
-                            $context->buildViolation('Participant weight required.')
+                        if ($value < self::WEIGHT_DOSE_GREATER_THAN || $value === null) {
+                            $context->buildViolation(self::PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE)
                                 ->addViolation();
                         }
-                        if ($value > 907) {
-                            $context->buildViolation('Please verify the measurement is correct. Value should be less than 907 kg.')
+                        if ($value > self::PARTICIPANT_WEIGHT_LESS_THAN_WEIGHT) {
+                            $context->buildViolation(self::PARTICIPANT_WEIGHT_LESS_THAN_ERROR_MESSAGE)
                                 ->addViolation();
                         }
                         if ($this->getNumDecimalPlaces($value) > 1) {
-                            $context->buildViolation('Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.')
+                            $context->buildViolation(self::TENTH_PLACE_ERROR_MESSAGE)
                                 ->addViolation();
                         }
                     })
                 ],
                 'attr' => [
-                    'data-parsley-required-message' => 'Participant weight required.',
-                    'data-parsley-gt-message' => 'Participant weight required.',
-                    'data-parsley-lt-message' => 'Please verify the measurement is correct. Value should be less than 907 kg.',
+                    'data-parsley-required-message' => self::PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE,
+                    'data-parsley-gt-message' => self::PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE,
+                    'data-parsley-lt-message' => self::PARTICIPANT_WEIGHT_LESS_THAN_ERROR_MESSAGE,
                     'data-parsley-decimal-place-limit' => true,
                     'data-parsley-type' => 'number',
-                    'data-parsley-gt' => 0,
-                    'data-parsley-lt' => 907,
+                    'data-parsley-gt' => self::WEIGHT_DOSE_GREATER_THAN,
+                    'data-parsley-lt' => self::PARTICIPANT_WEIGHT_LESS_THAN_WEIGHT,
                 ]
             ])
             ->add('doseAdministered', DateTimeType::class, [
@@ -109,10 +120,10 @@ class DlwType extends AbstractType
                 'label' => 'Dose Date/Time',
                 'attr' => [
                     'class' => 'order-ts',
-                    'data-parsley-required-message' => 'Dose date/time required.'
+                    'data-parsley-required-message' => self::DOSE_DATE_TIME_REQUIRED
                 ],
                 'view_timezone' => $options['timezone'],
-                'constraints' => new NotBlank(['message' => 'Dose date/time required.'])
+                'constraints' => new NotBlank(['message' => self::DOSE_DATE_TIME_REQUIRED])
             ])
             ->add('calculatedDose', null, ['attr' => ['readonly' => true], 'mapped' => false]);
     }
