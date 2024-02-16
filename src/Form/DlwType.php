@@ -21,11 +21,12 @@ class DlwType extends AbstractType
     private const DOSE_BATCH_ID_REQUIRED_ERROR_MESSAGE = 'Dose batch ID required.';
     private const DOSE_BATCH_ID_INVALID_ERROR_MESSAGE = 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . self::DOSE_BATCH_ID_DIGITS . ' digits).';
     private const ACTUAL_DOSE_REQUIRED_ERROR_MESSAGE = 'Actual dose required.';
-    private const ACTUAL_DOSE_GREATER_THAN_ERROR_MESSAGE = 'Dose must be greater than ' . self::WEIGHT_DOSE_GREATER_THAN . '.';
+    private const ACTUAL_DOSE_GREATER_THAN_ERROR_MESSAGE = 'Please verify the dose is correct. Value should be greater than ' . self::WEIGHT_DOSE_GREATER_THAN . '.';
+    private const ACTUAL_DOSE_TENTH_PLACE_ERROR_MESSAGE = 'Please verify the dose is correct. Value can be entered up to the tenths (0.1) place.';
     private const PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE = 'Participant weight required';
     private const PARTICIPANT_WEIGHT_GREATER_THAN_ERROR_MESSAGE = 'Please verify the measurement is correct. Value should be greater than ' . self::WEIGHT_DOSE_GREATER_THAN . ' kg.';
     private const PARTICIPANT_WEIGHT_LESS_THAN_ERROR_MESSAGE = 'Please verify the measurement is correct. Value should be less than ' . self::PARTICIPANT_WEIGHT_LESS_THAN_WEIGHT . ' kg.';
-    private const TENTH_PLACE_ERROR_MESSAGE = 'Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.';
+    private const PARTICIPANT_WEIGHT_TENTH_PLACE_ERROR_MESSAGE = 'Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place.';
     private const DOSE_DATE_TIME_REQUIRED = 'Dose date/time required.';
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -63,14 +64,15 @@ class DlwType extends AbstractType
                     ]),
                     new Callback(function ($value, $context) {
                         if ($this->getNumDecimalPlaces($value) > 1) {
-                            $context->buildViolation(self::TENTH_PLACE_ERROR_MESSAGE)
+                            $context->buildViolation(self::ACTUAL_DOSE_TENTH_PLACE_ERROR_MESSAGE)
                                 ->addViolation();
                         }
                     })
                 ],
                 'attr' => [
                     'data-parsley-required-message' => self::ACTUAL_DOSE_REQUIRED_ERROR_MESSAGE,
-                    'data-parsley-gt-message' => self::ACTUAL_DOSE_REQUIRED_ERROR_MESSAGE,
+                    'data-parsley-gt-message' => self::ACTUAL_DOSE_GREATER_THAN_ERROR_MESSAGE,
+                    'data-parsley-decimal-place-limit-message' => self::ACTUAL_DOSE_TENTH_PLACE_ERROR_MESSAGE,
                     'data-parsley-decimal-place-limit' => true,
                     'data-parsley-type' => 'number',
                     'data-parsley-gt' => self::WEIGHT_DOSE_GREATER_THAN,
@@ -96,15 +98,16 @@ class DlwType extends AbstractType
                                 ->addViolation();
                         }
                         if ($this->getNumDecimalPlaces($value) > 1) {
-                            $context->buildViolation(self::TENTH_PLACE_ERROR_MESSAGE)
+                            $context->buildViolation(self::PARTICIPANT_WEIGHT_TENTH_PLACE_ERROR_MESSAGE)
                                 ->addViolation();
                         }
                     })
                 ],
                 'attr' => [
                     'data-parsley-required-message' => self::PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE,
-                    'data-parsley-gt-message' => self::PARTICIPANT_WEIGHT_REQUIRED_ERROR_MESSAGE,
+                    'data-parsley-gt-message' => self::PARTICIPANT_WEIGHT_GREATER_THAN_ERROR_MESSAGE,
                     'data-parsley-lt-message' => self::PARTICIPANT_WEIGHT_LESS_THAN_ERROR_MESSAGE,
+                    'data-parsley-decimal-place-limit-message' => self::PARTICIPANT_WEIGHT_TENTH_PLACE_ERROR_MESSAGE,
                     'data-parsley-decimal-place-limit' => true,
                     'data-parsley-type' => 'number',
                     'data-parsley-gt' => self::WEIGHT_DOSE_GREATER_THAN,

@@ -83,9 +83,6 @@ $(document).ready(function () {
             }
             const totalDecimalPlaces = value.toString().length - value.toString().lastIndexOf('.') - 1;
             return totalDecimalPlaces <= 1;
-        },
-        messages: {
-            en: "Please verify the measurement is correct. Value can be entered up to the tenths (0.1) place."
         }
     });
 
