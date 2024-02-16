@@ -105,4 +105,8 @@ $(document).ready(function () {
     $(document).on("dp.hide", ".order-ts", function () {
         $(this).parsley().validate();
     });
+
+    $(document).on("click", "#confirm_btn", function () {
+        $("#dlw_participantWeight").parsley().validate();
+    })
 });

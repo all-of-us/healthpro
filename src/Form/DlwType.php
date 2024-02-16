@@ -35,9 +35,9 @@ class DlwType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'data-parsley-required-message' => 'Dose batch ID required.',
-                    'data-parsley-minlength-message' => $doseBatchIdErrorMessage,
+                    'data-parsley-pattern-message' => $doseBatchIdErrorMessage,
                     'data-parsley-type' => 'number',
-                    'data-parsley-minlength' => $this::DOSE_BATCH_ID_DIGITS
+                    'data-parsley-pattern' => '^\d{' . self::DOSE_BATCH_ID_DIGITS . '}$'
                 ],
             ])
             ->add('actualDose', NumberType::class, [
@@ -93,9 +93,11 @@ class DlwType extends AbstractType
                 'attr' => [
                     'data-parsley-required-message' => 'Participant weight required.',
                     'data-parsley-gt-message' => 'Participant weight required.',
+                    'data-parsley-lt-message' => 'Please verify the measurement is correct. Value should be less than 907 kg.',
                     'data-parsley-decimal-place-limit' => true,
                     'data-parsley-type' => 'number',
                     'data-parsley-gt' => 0,
+                    'data-parsley-lt' => 907,
                 ]
             ])
             ->add('doseAdministered', DateTimeType::class, [
