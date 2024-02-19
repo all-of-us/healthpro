@@ -4,7 +4,7 @@
         {% if sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL') %}
             <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample, {'attr': {'class': 'stool-checkbox'}}) }} {{ sample.vars.label }}</label></div>
             <div class="stool-text-fields">
-                <div class="stool-samples-box bg-light {% if not orderForm.stoolKit.vars.valid %} has-error {% endif %}">
+                <div class="stool-input stool-samples-box bg-light {% if not orderForm.stoolKit.vars.valid %} has-error {% endif %}">
                     {{ form_label(orderForm.stoolKit) }}
                     {% set break = false %}
                     {% for stoolSample in stoolSamples%}
@@ -27,7 +27,7 @@
                         <label>{{ tubeType.label }}</label>
                         {% for stoolSample in stoolSamples %}
                             {% if stoolSample in tubeType.tubes %}
-                                <div class="stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
+                                <div class="stool-input stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
                                     {{ form_widget(orderForm[stoolSample]) }}
                                     {{ form_errors(orderForm[stoolSample]) }}
                                 </div>
@@ -76,5 +76,3 @@
         <sup>{{ downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] }}</sup>
     {% endif %}
 {% endmacro %}
-
-

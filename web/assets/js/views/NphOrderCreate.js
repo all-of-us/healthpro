@@ -192,10 +192,10 @@ $(document).ready(function () {
     $("form[name='nph_order']").parsley({
         errorClass: "has-error",
         classHandler: function (el) {
-            return el.$element.closest(".stool-samples-box");
+            return el.$element.closest(".stool-input");
         },
         errorsContainer: function (el) {
-            return el.$element.closest(".stool-samples-box");
+            return el.$element.closest(".stool-input");
         },
         errorsWrapper: '<div class="help-block"></div>',
         errorTemplate: "<div></div>",
