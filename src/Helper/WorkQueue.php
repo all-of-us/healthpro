@@ -2661,7 +2661,6 @@ class WorkQueue
         'participantStatus' => [
             'participantStatus',
             'coreParticipant',
-            'enrollmentStatusCoreMinusPmV3_2Time',
             'enrollmentStatusEnrolledParticipantV3_2Time',
             'enrollmentStatusCoreMinusPmV3_2Time',
             'enrollmentStatusParticipantV3_2Time',
