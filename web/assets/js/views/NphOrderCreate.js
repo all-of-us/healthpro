@@ -201,4 +201,33 @@ $(document).ready(function () {
         errorTemplate: "<div></div>",
         trigger: "blur"
     });
+
+    $(document).on("keyup", ".stool-id", function () {
+        let type = $(this).data("stool-type");
+        let stoolId = $(this).val();
+        let divSelector = $(this).closest("div");
+        if (stoolId && $(this).parsley().isValid()) {
+            $.ajax({
+                url: "/nph/ajax/search/stool",
+                method: "GET",
+                data: { stoolId: stoolId, type: type },
+                success: function (response) {
+                    if (response === false) {
+                        let errorMessage = type === 'kit' ? 'This Kit ID has already been used for another order' : 'This Tube ID has already been used for another sample';
+                        divSelector.find('.stool-unique-error').html(errorMessage);
+                        divSelector.addClass("unique-error has-error");
+                    } else {
+                        divSelector.find('.stool-unique-error').html('');
+                        divSelector.removeClass("unique-error has-error");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error checking uniqueness:", error);
+                }
+            });
+        } else {
+            divSelector.find(".stool-unique-error").html('');
+            divSelector.removeClass("unique-error");
+        }
+    });
 });

@@ -17,6 +17,7 @@
                     {% endfor %}
                     {{ form_widget(orderForm.stoolKit) }}
                     {{ form_errors(orderForm.stoolKit) }}
+                    <div class="stool-unique-error"></div>
                 </div>
                 {% set stoolTubes = [
                     {'label': '95% Ethanol Tubes (2)', 'tubes': ['ST1', 'ST2']},
@@ -30,6 +31,7 @@
                                 <div class="stool-input stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
                                     {{ form_widget(orderForm[stoolSample]) }}
                                     {{ form_errors(orderForm[stoolSample]) }}
+                                    <div class="stool-unique-error"></div>
                                 </div>
                             {% endif %}
                         {% endfor %}

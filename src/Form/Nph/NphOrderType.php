@@ -36,10 +36,12 @@ class NphOrderType extends AbstractType
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === self::STOOL_ST1) {
                     $stoolKitAttributes = [
+                        'class' => 'stool-id',
                         'placeholder' => 'Scan Kit ID',
                         'disabled' => $isStoolKitDisabled,
                         'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
-                        'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
+                        'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE,
+                        'data-stool-type' => 'kit'
                     ];
                     if ($isStoolKitDisabled) {
                         $stoolKitAttributes['value'] = $ordersData['stoolKit'];
@@ -65,10 +67,12 @@ class NphOrderType extends AbstractType
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
                     $stoolTubeAttributes = [
+                        'class' => 'stool-id',
                         'placeholder' => 'Scan Tube',
                         'disabled' => $isStoolKitDisabled,
                         'data-parsley-pattern' => self::STOOL_BARCODE_ID_PATTERN,
-                        'data-parsley-pattern-message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE
+                        'data-parsley-pattern-message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE,
+                        'data-stool-type' => 'tube'
                     ];
                     if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
                         $stoolTubeAttributes['value'] = $ordersData[$sampleCode];

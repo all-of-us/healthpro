@@ -582,4 +582,21 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
         }
     }
+
+    #[Route(path: '/ajax/search/stool', name: 'search_stool_id')]
+    public function stoolSearchAction(Request $request): JsonResponse
+    {
+        $stoolId = $request->get('stoolId');
+        $type = $request->get('type');
+        if ($type === 'kit') {
+            $stool = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $stoolId
+            ]);
+        } else {
+            $stool = $this->em->getRepository(NphSample::class)->findOneBy([
+                'sampleId' => $stoolId
+            ]);
+        }
+        return $this->json(!$stool);
+    }
 }
