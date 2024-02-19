@@ -189,6 +189,20 @@ $(document).ready(function () {
     }
     initializeDowntimeCreatedTsDatePicker();
 
+    window.Parsley.addValidator("unique", {
+        validateString: function (value, currentId) {
+            let $inputs = $(".tube-id:not(#nph_order_" + currentId + ")");
+            let unique = true;
+            $inputs.each(function () {
+                if ($(this).val() === value) {
+                    unique = false;
+                    return false;
+                }
+            });
+            return unique;
+        }
+    });
+
     $("form[name='nph_order']").parsley({
         errorClass: "has-error",
         classHandler: function (el) {
@@ -213,11 +227,14 @@ $(document).ready(function () {
                 data: { stoolId: stoolId, type: type },
                 success: function (response) {
                     if (response === false) {
-                        let errorMessage = type === 'kit' ? 'This Kit ID has already been used for another order' : 'This Tube ID has already been used for another sample';
-                        divSelector.find('.stool-unique-error').html(errorMessage);
+                        let errorMessage =
+                            type === "kit"
+                                ? "This Kit ID has already been used for another order"
+                                : "This Tube ID has already been used for another sample";
+                        divSelector.find(".stool-unique-error").html(errorMessage);
                         divSelector.addClass("unique-error has-error");
                     } else {
-                        divSelector.find('.stool-unique-error').html('');
+                        divSelector.find(".stool-unique-error").html("");
                         divSelector.removeClass("unique-error has-error");
                     }
                 },
@@ -226,7 +243,7 @@ $(document).ready(function () {
                 }
             });
         } else {
-            divSelector.find(".stool-unique-error").html('');
+            divSelector.find(".stool-unique-error").html("");
             divSelector.removeClass("unique-error");
         }
     });

@@ -81,7 +81,7 @@ $(document).ready(function () {
             if (parseInt(value) === parseFloat(value)) {
                 return true;
             }
-            const totalDecimalPlaces = value.toString().length - value.toString().lastIndexOf('.') - 1;
+            const totalDecimalPlaces = value.toString().length - value.toString().lastIndexOf(".") - 1;
             return totalDecimalPlaces <= 1;
         }
     });
@@ -105,5 +105,5 @@ $(document).ready(function () {
 
     $(document).on("click", "#confirm_btn", function () {
         $("#dlw_participantWeight").parsley().validate();
-    })
+    });
 });

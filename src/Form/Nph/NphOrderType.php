@@ -67,11 +67,13 @@ class NphOrderType extends AbstractType
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
                     $stoolTubeAttributes = [
-                        'class' => 'stool-id',
+                        'class' => 'stool-id tube-id',
                         'placeholder' => 'Scan Tube',
                         'disabled' => $isStoolKitDisabled,
                         'data-parsley-pattern' => self::STOOL_BARCODE_ID_PATTERN,
                         'data-parsley-pattern-message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE,
+                        'data-parsley-unique' => $sampleCode,
+                        'data-parsley-unique-message' => 'Please enter unique Stool Tube IDs.',
                         'data-stool-type' => 'tube'
                     ];
                     if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
