@@ -188,4 +188,17 @@ $(document).ready(function () {
         dateSelector.val(currentValue);
     }
     initializeDowntimeCreatedTsDatePicker();
+
+    $("form[name='nph_order']").parsley({
+        errorClass: "has-error",
+        classHandler: function (el) {
+            return el.$element.closest(".stool-samples-box");
+        },
+        errorsContainer: function (el) {
+            return el.$element.closest(".stool-samples-box");
+        },
+        errorsWrapper: '<div class="help-block"></div>',
+        errorTemplate: "<div></div>",
+        trigger: "blur"
+    });
 });

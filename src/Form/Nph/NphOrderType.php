@@ -21,6 +21,8 @@ class NphOrderType extends AbstractType
         'class' => 'sample-disabled sample-disabled-colored',
         'checked' => false
     ];
+    private const STOOL_KIT_ID_PATTERN = '/^KIT-[0-9]{8}$/';
+    private const STOOL_KIT_ID_PATTERN_ERROR_MESSAGE = 'Please enter a valid KIT ID. Format should include the prefix KIT- (Found on label on front of stool kit box).';
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -34,6 +36,8 @@ class NphOrderType extends AbstractType
                     $stoolKitAttributes = [
                         'placeholder' => 'Scan Kit ID',
                         'disabled' => $isStoolKitDisabled,
+                        'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
+                        'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
                     ];
                     if ($isStoolKitDisabled) {
                         $stoolKitAttributes['value'] = $ordersData['stoolKit'];
@@ -44,8 +48,8 @@ class NphOrderType extends AbstractType
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
-                                'pattern' => '/^KIT-[0-9]{8}$/',
-                                'message' => 'Please enter a valid KIT ID. Format should include the prefix KIT- (Found on label on front of stool kit box).'
+                                'pattern' => self::STOOL_KIT_ID_PATTERN,
+                                'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
                             ]),
                             new Constraints\Callback(function ($value, $context) {
                                 $formData = $context->getRoot()->getData();
