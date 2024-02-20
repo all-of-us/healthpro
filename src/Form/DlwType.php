@@ -31,7 +31,6 @@ class DlwType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $doseBatchIdErrorMessage = 'Dose Batch ID invalid, Please enter a valid dose batch ID (' . $this::DOSE_BATCH_ID_DIGITS . ' digits).';
         $builder
             ->add('doseBatchId', NumberType::class, [
                 'label' => 'Dose Batch ID',
