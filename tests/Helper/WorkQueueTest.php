@@ -93,12 +93,12 @@ class WorkQueueTest extends ServiceTestCase
             'Samples to Isolate DNA',
             'Baseline Samples',
             'Core Participant Minus PM Date',
+            'Date of Primary Re-Consent',
+            'Date of EHR Re-Consent',
             'Enrolled Participant Date',
             'Participant Date',
             'Participant + EHR Date',
             'PM&B Eligible Date',
-            'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent'
         ], $exportHeaders);
     }
 
@@ -184,15 +184,15 @@ class WorkQueueTest extends ServiceTestCase
             'Patient Status: No',
             'Patient Status: No Access',
             'Patient Status: Unknown',
+            'Date of Primary Re-Consent',
+            'Date of EHR Re-Consent',
+            'Health Data Stream Sharing Status',
+            'Health Data Stream Sharing Date',
             'Core Participant Minus PM Date',
             'Enrolled Participant Date',
             'Participant Date',
             'Participant + EHR Date',
             'PM&B Eligible Date',
-            'Date of Primary Re-Consent',
-            'Date of EHR Re-Consent',
-            'Health Data Stream Sharing Status',
-            'Health Data Stream Sharing Date',
         ], $exportHeaders);
     }
 

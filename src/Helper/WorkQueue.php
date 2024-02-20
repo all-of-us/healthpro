@@ -1606,10 +1606,6 @@ class WorkQueue
         'education',
         'CopeFeb',
         'enrollmentStatusCoreMinusPmV3_2Time',
-        'enrollmentStatusEnrolledParticipantV3_2Time',
-        'enrollmentStatusParticipantV3_2Time',
-        'enrollmentStatusParticipantPlusEhrV3_2Time',
-        'enrollmentStatusPmbEligibleV3_2Time',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'fitbit',
@@ -1631,7 +1627,11 @@ class WorkQueue
         'NPHConsent',
         '2ED02',
         '2ED04',
-        'EnvironmentalExposures'
+        'EnvironmentalExposures',
+        'enrollmentStatusEnrolledParticipantV3_2Time',
+        'enrollmentStatusParticipantV3_2Time',
+        'enrollmentStatusParticipantPlusEhrV3_2Time',
+        'enrollmentStatusPmbEligibleV3_2Time',
     ];
 
     public static $sortColumns = [
