@@ -2658,6 +2658,11 @@ class WorkQueue
             'firstEhrConsent',
             'reconsentForElectronicHealthRecordsAuthored'
         ],
+        'digitalHealthSharingStatus' => [
+            'fitbit',
+            'appleHealthKit',
+            'appleEHR'
+        ],
         'participantStatus' => [
             'participantStatus',
             'coreParticipant',
