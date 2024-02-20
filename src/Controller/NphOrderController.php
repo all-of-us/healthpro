@@ -576,13 +576,6 @@ class NphOrderController extends BaseController
         return $this->json(!$aliquot);
     }
 
-    private function checkCrossSiteParticipant(string $participantSiteId): void
-    {
-        if ($participantSiteId !== $this->siteService->getSiteId()) {
-            throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
-        }
-    }
-
     #[Route(path: '/ajax/search/stool', name: 'search_stool_id')]
     public function stoolSearchAction(Request $request): JsonResponse
     {
@@ -598,5 +591,12 @@ class NphOrderController extends BaseController
             ]);
         }
         return $this->json(!$stool);
+    }
+
+    private function checkCrossSiteParticipant(string $participantSiteId): void
+    {
+        if ($participantSiteId !== $this->siteService->getSiteId()) {
+            throw $this->createNotFoundException('Page not available because this participant is paired with another site.');
+        }
     }
 }

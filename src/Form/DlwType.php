@@ -142,7 +142,7 @@ class DlwType extends AbstractType
 
     private function getNumDecimalPlaces($num): int
     {
-        if ((int)$num == $num) {
+        if ((int) $num == $num) {
             return 0;
         } elseif (!is_numeric($num)) {
             return 0;
