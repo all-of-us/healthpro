@@ -109,16 +109,17 @@ $(document).ready(function () {
                 $(".stool-text-fields input").prop("disabled", true).val("");
                 $(".stool-text-fields .has-error").removeClass("has-error");
                 $(".stool-text-fields span.help-block ul li").remove();
+                $(".stool-unique-error").html("");
             }
         }
     };
 
     disableEnableStoolFields();
 
-    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on(
-        "change",
-        disableEnableStoolFields
-    );
+    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on("change", function () {
+        disableEnableStoolFields();
+        $("form[name='nph_order']").parsley().reset();
+    });
 
     if (
         $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length
@@ -216,7 +217,7 @@ $(document).ready(function () {
         trigger: "blur"
     });
 
-    $(document).on("keyup", ".stool-id", function () {
+    $(document).on("blur", ".stool-id", function () {
         let type = $(this).data("stool-type");
         let stoolId = $(this).val();
         let divSelector = $(this).closest("div");
