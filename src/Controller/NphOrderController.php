@@ -149,7 +149,7 @@ class NphOrderController extends BaseController
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
             $formData = $oderCollectForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($formData) === false) {
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
                 $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($oderCollectForm->isValid()) {
@@ -448,7 +448,7 @@ class NphOrderController extends BaseController
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {
             $samplesModifyData = $nphSampleModifyForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($samplesModifyData) === false) {
+            if ($nphOrderService->isAtLeastOneSampleChecked($samplesModifyData, $order) === false) {
                 $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($nphSampleModifyForm->isValid()) {
