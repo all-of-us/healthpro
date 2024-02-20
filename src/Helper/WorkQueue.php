@@ -88,6 +88,10 @@ class WorkQueue
             'sortField' => 'enrollmentStatusV3_2',
             'toggleColumn' => true
         ],
+        'enrollmentStatusEnrolledParticipantV3_2Time' => [
+            'name' => 'Enrolled Participant Date',
+            'rdrDateField' => 'enrollmentStatusEnrolledParticipantV3_2Time',
+        ],
         'enrollmentStatusCoreMinusPmV3_2Time' => [
             'name' => 'Core Participant Minus PM Date',
             'rdrDateField' => 'enrollmentStatusCoreMinusPmV3_2Time',
@@ -1602,9 +1606,6 @@ class WorkQueue
         'education',
         'CopeFeb',
         'enrollmentStatusCoreMinusPmV3_2Time',
-        'enrollmentStatusParticipantV3_2Time',
-        'enrollmentStatusParticipantPlusEhrV3_2Time',
-        'enrollmentStatusPmbEligibleV3_2Time',
         'CopeVaccineMinute1',
         'CopeVaccineMinute2',
         'fitbit',
@@ -1626,7 +1627,11 @@ class WorkQueue
         'NPHConsent',
         '2ED02',
         '2ED04',
-        'EnvironmentalExposures'
+        'EnvironmentalExposures',
+        'enrollmentStatusEnrolledParticipantV3_2Time',
+        'enrollmentStatusParticipantV3_2Time',
+        'enrollmentStatusParticipantPlusEhrV3_2Time',
+        'enrollmentStatusPmbEligibleV3_2Time',
     ];
 
     public static $sortColumns = [
@@ -2653,10 +2658,19 @@ class WorkQueue
             'firstEhrConsent',
             'reconsentForElectronicHealthRecordsAuthored'
         ],
+        'digitalHealthSharingStatus' => [
+            'fitbit',
+            'appleHealthKit',
+            'appleEHR'
+        ],
         'participantStatus' => [
             'participantStatus',
             'coreParticipant',
-            'enrollmentStatusCoreMinusPmV3_2Time'
+            'enrollmentStatusEnrolledParticipantV3_2Time',
+            'enrollmentStatusCoreMinusPmV3_2Time',
+            'enrollmentStatusParticipantV3_2Time',
+            'enrollmentStatusParticipantPlusEhrV3_2Time',
+            'enrollmentStatusPmbEligibleV3_2Time'
         ],
         'activityStatus' => [
             'withdrawalStatus',
