@@ -12,6 +12,7 @@ use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
+use App\Form\Nph\NphSampleModifyBulkType;
 use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
 use App\HttpClient;
@@ -148,7 +149,7 @@ class NphOrderController extends BaseController
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
             $formData = $oderCollectForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData) === false) {
                 $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($oderCollectForm->isValid()) {
@@ -357,6 +358,64 @@ class NphOrderController extends BaseController
         );
     }
 
+    #[Route(path: '/participant/{participantId}/module/{module}/samples/modify/{type}', name: 'nph_samples_modify_all')]
+    public function sampleModifyAll(
+        string $participantId,
+        string $module,
+        string $type,
+        NphOrderService $nphOrderService,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        Request $request
+    ) {
+        if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK])) {
+            throw $this->createNotFoundException();
+        }
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
+        $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSamplesByParticipantId($participantId, $module);
+        $nphSampleModifyForm = $this->createForm(NphSampleModifyBulkType::class, null, [
+            'type' => $type, 'samples' => $activeSamples, 'activeSamples' => $activeSamples
+        ]);
+        $nphSampleModifyForm->handleRequest($request);
+        if ($nphSampleModifyForm->isSubmitted()) {
+            $samplesModifyData = $nphSampleModifyForm->getData();
+            $isAtleastOneSampleChecked = false;
+            foreach ($samplesModifyData as $sampleId => $checked) {
+                if ($checked === true) {
+                    $isAtleastOneSampleChecked = true;
+                    break;
+                }
+            }
+            if (!$isAtleastOneSampleChecked) {
+                $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
+            if ($nphSampleModifyForm->isValid()) {
+                if ($nphOrderService->updateSampleModificationBulk($samplesModifyData, $type)) {
+                    $modifySuccessText = NphSample::$modifySuccessText[$type];
+                    $this->addFlash('success', "Samples {$modifySuccessText}");
+                    return $this->redirectToRoute('nph_participant_summary', [
+                        'participantId' => $participantId,
+                    ]);
+                }
+                $this->addFlash('error', "Failed to {$type} one or more samples. Please try again.");
+                return $this->redirectToRoute('nph_samples_modify_all', [
+                    'participantId' => $participantId,
+                    'module' => $module,
+                    'type' => $type
+                ]);
+            }
+            $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
+        }
+        return $this->render('program/nph/order/sample-modify-bulk.html.twig', [
+            'activeSamples' => $activeSamples,
+            'participant' => $participant,
+            'sampleModifyForm' => $nphSampleModifyForm->createView(),
+            'type' => $type,
+        ]);
+    }
     #[Route(path: '/participant/{participantId}/order/{orderId}/samples/modify/{type}', name: 'nph_samples_modify')]
     public function sampleModifyAction(
         $participantId,
@@ -389,7 +448,7 @@ class NphOrderController extends BaseController
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {
             $samplesModifyData = $nphSampleModifyForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($samplesModifyData, $order) === false) {
+            if ($nphOrderService->isAtLeastOneSampleChecked($samplesModifyData) === false) {
                 $nphSampleModifyForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
             }
             if ($nphSampleModifyForm->isValid()) {

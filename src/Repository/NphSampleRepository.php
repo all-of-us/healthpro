@@ -72,4 +72,22 @@ class NphSampleRepository extends ServiceEntityRepository
             ->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR_COLUMN)
         ;
     }
+
+    public function findActiveSamplesByParticipantId(string $participantId, string $module): array
+    {
+        $sampleIds = $this->createQueryBuilder('s')
+            ->select('s.id')
+            ->join('s.nphOrder', 'o')
+            ->andWhere('o.participantId = :participantId')
+            ->andWhere('o.module = :module')
+            ->andWhere('s.modifyType IN (:types) or s.modifyType is null')
+            ->setParameters([
+                'participantId' => $participantId,
+                'module' => $module,
+                'types' => [NphSample::RESTORE, NphSample::UNLOCK, NphSample::EDITED, NphSample::REVERT]
+            ])
+            ->getQuery()
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR_COLUMN);
+        return $this->findBy(['id' => $sampleIds]);
+    }
 }

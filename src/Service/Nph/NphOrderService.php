@@ -597,6 +597,32 @@ class NphOrderService
         return $status;
     }
 
+    public function updateSampleModificationBulk(array $formData, string $type): bool
+    {
+        $status = true;
+        foreach ($formData as $sampleId => $checked) {
+            $sample = $this->em->getRepository(NphSample::class)->findOneBy(['sampleId' => $sampleId]);
+            if ($checked) {
+                $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                if ($sample->getRdrId()) {
+                    if ($this->cancelRestoreSample(
+                        $sample->getRdrId(),
+                        $sample->getNphOrder()->getParticipantId(),
+                        $type,
+                        $sampleObject
+                    )) {
+                        $this->saveSampleModificationsData($sample, $type, $formData);
+                    } else {
+                        $status = false;
+                    }
+                } else {
+                    $this->saveSampleModificationsData($sample, $type, $formData);
+                }
+            }
+        }
+        return $status;
+    }
+
     public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
     {
         $this->saveSampleModificationsData($sample, $type, $formData);
