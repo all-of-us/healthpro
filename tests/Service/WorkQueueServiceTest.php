@@ -249,10 +249,6 @@ class WorkQueueServiceTest extends ServiceTestCase
             0,
             '',
             '',
-            '',
-            '',
-            '',
-            '',
             0,
             '',
             0,
@@ -295,6 +291,10 @@ class WorkQueueServiceTest extends ServiceTestCase
             '0',
             '',
             0,
+            '',
+            '',
+            '',
+            '',
             '',
         ], $row);
     }
@@ -339,12 +339,12 @@ class WorkQueueServiceTest extends ServiceTestCase
             '0',
             0,
             '',
-            '',
-            '',
-            '',
-            '',
             '8/3/2022 3:00 pm',
-            '8/3/2022 3:00 pm'
+            '8/3/2022 3:00 pm',
+            '',
+            '',
+            '',
+            '',
         ], $row);
     }
 
