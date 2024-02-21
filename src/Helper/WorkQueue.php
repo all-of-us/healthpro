@@ -141,6 +141,7 @@ class WorkQueue
             'name' => 'Pediatric Status',
             'rdrField' => 'isPediatric',
             'method' => 'getPediatricStatus',
+            'csvMethod' => 'getPediatricStatus',
             'toggleColumn' => true,
             'visible' => false,
             'orderable' => false,
@@ -1642,6 +1643,7 @@ class WorkQueue
         'enrollmentStatusParticipantV3_2Time',
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
+        'pediatricStatus'
     ];
 
     public static $sortColumns = [
