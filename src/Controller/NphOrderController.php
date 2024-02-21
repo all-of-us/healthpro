@@ -383,7 +383,7 @@ class NphOrderController extends BaseController
         if ($nphSampleModifyForm->isSubmitted()) {
             $samplesModifyData = $nphSampleModifyForm->getData();
             $isAtleastOneSampleChecked = false;
-            foreach ($samplesModifyData as $sampleId => $checked) {
+            foreach ($samplesModifyData as $checked) {
                 if ($checked === true) {
                     $isAtleastOneSampleChecked = true;
                     break;
