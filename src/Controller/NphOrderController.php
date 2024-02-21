@@ -576,6 +576,23 @@ class NphOrderController extends BaseController
         return $this->json(!$aliquot);
     }
 
+    #[Route(path: '/ajax/search/stool', name: 'search_stool_id')]
+    public function stoolSearchAction(Request $request): JsonResponse
+    {
+        $stoolId = $request->get('stoolId');
+        $type = $request->get('type');
+        if ($type === 'kit') {
+            $stool = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $stoolId
+            ]);
+        } else {
+            $stool = $this->em->getRepository(NphSample::class)->findOneBy([
+                'sampleId' => $stoolId
+            ]);
+        }
+        return $this->json(!$stool);
+    }
+
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {

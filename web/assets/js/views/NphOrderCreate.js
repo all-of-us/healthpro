@@ -109,16 +109,17 @@ $(document).ready(function () {
                 $(".stool-text-fields input").prop("disabled", true).val("");
                 $(".stool-text-fields .has-error").removeClass("has-error");
                 $(".stool-text-fields span.help-block ul li").remove();
+                $(".stool-unique-error").html("");
             }
         }
     };
 
     disableEnableStoolFields();
 
-    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on(
-        "change",
-        disableEnableStoolFields
-    );
+    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on("change", function () {
+        disableEnableStoolFields();
+        $("form[name='nph_order']").parsley().reset();
+    });
 
     if (
         $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length
@@ -188,4 +189,63 @@ $(document).ready(function () {
         dateSelector.val(currentValue);
     }
     initializeDowntimeCreatedTsDatePicker();
+
+    window.Parsley.addValidator("unique", {
+        validateString: function (value, currentId) {
+            let $inputs = $(".tube-id:not(#nph_order_" + currentId + ")");
+            let unique = true;
+            $inputs.each(function () {
+                if ($(this).val() === value) {
+                    unique = false;
+                    return false;
+                }
+            });
+            return unique;
+        }
+    });
+
+    $("form[name='nph_order']").parsley({
+        errorClass: "has-error",
+        classHandler: function (el) {
+            return el.$element.closest(".stool-input");
+        },
+        errorsContainer: function (el) {
+            return el.$element.closest(".stool-input");
+        },
+        errorsWrapper: '<div class="help-block"></div>',
+        errorTemplate: "<div></div>",
+        trigger: "blur"
+    });
+
+    $(document).on("blur", ".stool-id", function () {
+        let type = $(this).data("stool-type");
+        let stoolId = $(this).val();
+        let divSelector = $(this).closest("div");
+        if (stoolId && $(this).parsley().isValid()) {
+            $.ajax({
+                url: "/nph/ajax/search/stool",
+                method: "GET",
+                data: { stoolId: stoolId, type: type },
+                success: function (response) {
+                    if (response === false) {
+                        let errorMessage =
+                            type === "kit"
+                                ? "This Kit ID has already been used for another order"
+                                : "This Tube ID has already been used for another sample";
+                        divSelector.find(".stool-unique-error").html(errorMessage);
+                        divSelector.addClass("unique-error has-error");
+                    } else {
+                        divSelector.find(".stool-unique-error").html("");
+                        divSelector.removeClass("unique-error has-error");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error checking uniqueness:", error);
+                }
+            });
+        } else {
+            divSelector.find(".stool-unique-error").html("");
+            divSelector.removeClass("unique-error");
+        }
+    });
 });

@@ -21,6 +21,10 @@ class NphOrderType extends AbstractType
         'class' => 'sample-disabled sample-disabled-colored',
         'checked' => false
     ];
+    private const STOOL_KIT_ID_PATTERN = '/^KIT-[0-9]{8}$/';
+    private const STOOL_KIT_ID_PATTERN_ERROR_MESSAGE = 'Please enter a valid KIT ID. Format should include the prefix KIT- (Found on label on front of stool kit box).';
+    private const STOOL_BARCODE_ID_PATTERN = '/^[0-9]{11}$/';
+    private const STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE = 'Stool tube barcode ID invalid.  Please enter a valid stool tube barcode ID.';
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -32,8 +36,12 @@ class NphOrderType extends AbstractType
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === self::STOOL_ST1) {
                     $stoolKitAttributes = [
+                        'class' => 'stool-id',
                         'placeholder' => 'Scan Kit ID',
                         'disabled' => $isStoolKitDisabled,
+                        'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
+                        'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE,
+                        'data-stool-type' => 'kit'
                     ];
                     if ($isStoolKitDisabled) {
                         $stoolKitAttributes['value'] = $ordersData['stoolKit'];
@@ -44,8 +52,8 @@ class NphOrderType extends AbstractType
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
-                                'pattern' => '/^KIT-[0-9]{8}$/',
-                                'message' => 'Please enter a valid KIT ID. Format should include the prefix KIT- (Found on label on front of stool kit box).'
+                                'pattern' => self::STOOL_KIT_ID_PATTERN,
+                                'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
                             ]),
                             new Constraints\Callback(function ($value, $context) {
                                 $formData = $context->getRoot()->getData();
@@ -59,8 +67,14 @@ class NphOrderType extends AbstractType
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
                     $stoolTubeAttributes = [
+                        'class' => 'stool-id tube-id',
                         'placeholder' => 'Scan Tube',
                         'disabled' => $isStoolKitDisabled,
+                        'data-parsley-pattern' => self::STOOL_BARCODE_ID_PATTERN,
+                        'data-parsley-pattern-message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE,
+                        'data-parsley-unique' => $sampleCode,
+                        'data-parsley-unique-message' => 'Please enter unique Stool Tube IDs.',
+                        'data-stool-type' => 'tube'
                     ];
                     if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
                         $stoolTubeAttributes['value'] = $ordersData[$sampleCode];
@@ -71,8 +85,8 @@ class NphOrderType extends AbstractType
                         'constraints' => [
                             new Constraints\Type('string'),
                             new Constraints\Regex([
-                                'pattern' => '/^[0-9]{11}$/',
-                                'message' => 'Stool tube barcode ID invalid.  Please enter a valid stool tube barcode ID.'
+                                'pattern' => self::STOOL_BARCODE_ID_PATTERN,
+                                'message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE
                             ]),
                             new Constraints\Callback(function ($value, $context) {
                                 $formData = $context->getRoot()->getData();
