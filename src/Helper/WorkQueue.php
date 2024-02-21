@@ -137,6 +137,15 @@ class WorkQueue
             'visible' => false,
             'group' => 'details'
         ],
+        'pediatricStatus' => [
+            'name' => 'Pediatric Status',
+            'rdrField' => 'isPediatric',
+            'method' => 'getPediatricStatus',
+            'toggleColumn' => true,
+            'visible' => false,
+            'orderable' => false,
+            'group' => 'details'
+        ],
         'deactivationStatus' => [
             'name' => 'Deactivation Status',
             'csvNames' => [
@@ -1379,6 +1388,7 @@ class WorkQueue
         'participantStatus',
         'activityStatus',
         'withdrawalReason',
+        'pediatricStatus',
         'participantOrigin',
         'consentCohort',
         'primaryConsent',
@@ -1644,6 +1654,7 @@ class WorkQueue
         'enrollmentStatusV3_2',
         'withdrawalAuthored',
         'withdrawalReason',
+        'isPediatric',
         'participantOrigin',
         'consentCohort',
         'consentForStudyEnrollmentAuthored',
@@ -3276,5 +3287,10 @@ class WorkQueue
         }
 
         return $participant->$fieldKey ? 1 : 0;
+    }
+
+    public static function getPediatricStatus(bool $isPediatric): string
+    {
+        return $isPediatric ? 'Pediatric Participant' : 'Adult Participant';
     }
 }
