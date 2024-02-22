@@ -564,7 +564,7 @@ class WorkQueue
         'relatedParticipants' => [
             'name' => 'Related Participants',
             'rdrField' => 'relatedParticipants',
-            'method' => 'getRelatedParticipants',
+            'wqServiceMethod' => 'getRelatedParticipants',
             'csvMethod' => 'getRelatedParticipants',
             'toggleColumn' => true,
             'orderable' => false,

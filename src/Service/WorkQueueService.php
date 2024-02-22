@@ -341,6 +341,8 @@ class WorkQueueService
                             $row[$field] = WorkQueue::HTML_DANGER;
                         }
                     }
+                } elseif (isset($columnDef['wqServiceMethod'])) {
+                    $row[$field] = $this->{$columnDef['wqServiceMethod']}($participant->{$columnDef['rdrField']});
                 } elseif (isset($columnDef['method'])) {
                     if (isset($columnDef['rdrDateField'])) {
                         if (isset($columnDef['otherField'])) {
@@ -637,13 +639,14 @@ class WorkQueueService
         return $this->participantSummaryService->getNextToken();
     }
 
-    private function generateLink($id, $name)
+    private function generateLink($id, $name = null)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
             $url = $this->urlGenerator->generate('participant', ['id' => $id]);
         } else {
             $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
         }
+        $name = $name ?? $id;
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return sprintf('<a href="%s">%s</a>', $url, $text);
@@ -718,5 +721,17 @@ class WorkQueueService
             $this->userService->getUser()->getTimezone(),
             $statusDisplay
         );
+    }
+
+    private function getRelatedParticipants(string|array $relatedParticipants): string
+    {
+        if (!is_array($relatedParticipants)) {
+            return 'N/A';
+        }
+        $participantIds = array_map(function ($participant) {
+            return $this->generateLink($participant->participantId);
+        }, $relatedParticipants);
+
+        return implode('<br>', $participantIds);
     }
 }
