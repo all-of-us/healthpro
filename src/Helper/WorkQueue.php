@@ -143,8 +143,8 @@ class WorkQueue
             'method' => 'getPediatricStatus',
             'csvMethod' => 'getPediatricStatus',
             'toggleColumn' => true,
-            'visible' => false,
             'orderable' => false,
+            'default' => true,
             'group' => 'details'
         ],
         'deactivationStatus' => [
@@ -2577,6 +2577,7 @@ class WorkQueue
             'participantId',
             'participantStatus',
             'activityStatus',
+            'pediatricStatus',
             'consentCohort',
             'primaryConsent',
             'questionnaireOnDnaProgram',
