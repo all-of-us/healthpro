@@ -561,6 +561,15 @@ class WorkQueue
             'visible' => false,
             'group' => 'contact'
         ],
+        'relatedParticipants' => [
+            'name' => 'Related Participants',
+            'rdrField' => 'relatedParticipants',
+            'method' => 'getRelatedParticipants',
+            'csvMethod' => 'getRelatedParticipants',
+            'toggleColumn' => true,
+            'orderable' => false,
+            'group' => 'contact'
+        ],
         'ppiStatus' => [
             'name' => 'Required Complete',
             'csvName' => 'Required PPI Surveys Complete',
@@ -1420,6 +1429,7 @@ class WorkQueue
         'email',
         'loginPhone',
         'phone',
+        'relatedParticipants',
         'ppiStatus',
         'ppiSurveys',
         'TheBasics',
@@ -3295,5 +3305,17 @@ class WorkQueue
     public static function getPediatricStatus(bool $isPediatric): string
     {
         return $isPediatric ? 'Pediatric Participant' : 'Adult Participant';
+    }
+
+    public static function getRelatedParticipants(string|array $relatedParticipants): string
+    {
+        if (empty($relatedParticipants) && !is_array($relatedParticipants)) {
+            return '';
+        }
+        $participants = '';
+        foreach ($relatedParticipants as $relatedParticipant) {
+            $participants .= $relatedParticipant->participantId . '<br>';
+        }
+        return $participants;
     }
 }
