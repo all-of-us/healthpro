@@ -290,10 +290,11 @@ class WorkQueueService
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
                 } elseif (isset($columnDef['generateLink'])) {
+                    $childIcon = isset($columnDef['displayPediatricIcon']) && $participant->isPediatric ? WorkQueue::HTML_CHILD_ICON : '';
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
-                        $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
+                        $row[$field] = $childIcon . $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
                     } else {
-                        $row[$field] = $e($participant->{$columnDef['rdrField']});
+                        $row[$field] = $childIcon . $e($participant->{$columnDef['rdrField']});
                     }
                 } elseif (isset($columnDef['formatDate'])) {
                     if (!empty($participant->{$columnDef['rdrField']})) {

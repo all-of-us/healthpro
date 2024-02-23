@@ -20,6 +20,7 @@ class WorkQueue
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
     public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
     public const HTML_SUCCESS_DOUBLE = '<i class="fa fa-check-double text-success" aria-hidden="true"></i>';
+    public const HTML_CHILD_ICON = '<i class="fa fa-child child-icon" aria-hidden="true"></i>';
 
     public static $columnsDef = [
         'lastName' => [
@@ -28,7 +29,8 @@ class WorkQueue
             'sortField' => 'lastName',
             'generateLink' => true,
             'toggleColumn' => false,
-            'default' => true
+            'default' => true,
+            'displayPediatricIcon' => true
         ],
         'firstName' => [
             'name' => 'First Name',
