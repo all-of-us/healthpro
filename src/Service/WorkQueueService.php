@@ -723,7 +723,7 @@ class WorkQueueService
         );
     }
 
-    private function getRelatedParticipants(string|array $relatedParticipants): string
+    private function getRelatedParticipants(string|array|null $relatedParticipants): string
     {
         if (!is_array($relatedParticipants)) {
             return 'N/A';

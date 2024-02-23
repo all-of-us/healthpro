@@ -1653,7 +1653,8 @@ class WorkQueue
         'enrollmentStatusParticipantV3_2Time',
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
-        'pediatricStatus'
+        'pediatricStatus',
+        'relatedParticipants'
     ];
 
     public static $sortColumns = [
@@ -3307,15 +3308,15 @@ class WorkQueue
         return $isPediatric ? 'Pediatric Participant' : 'Adult Participant';
     }
 
-    public static function getRelatedParticipants(string|array $relatedParticipants): string
+    public static function getRelatedParticipants(string|array|null $relatedParticipants): string
     {
-        if (empty($relatedParticipants) && !is_array($relatedParticipants)) {
-            return '';
+        if (!is_array($relatedParticipants)) {
+            return 'N/A';
         }
-        $participants = '';
-        foreach ($relatedParticipants as $relatedParticipant) {
-            $participants .= $relatedParticipant->participantId . '<br>';
-        }
-        return $participants;
+        $participantIds = array_map(function ($participant) {
+            return $participant->participantId;
+        }, $relatedParticipants);
+
+        return implode(', ', $participantIds);
     }
 }
