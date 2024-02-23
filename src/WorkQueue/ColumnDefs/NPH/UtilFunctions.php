@@ -11,6 +11,9 @@ class UtilFunctions
         $lastSeen = null;
         $lastSeenData = null;
         foreach ($data as $value) {
+            if ($value === null) {
+                return null;
+            }
             $timestamp = new DateTime($value['time']);
             if ($lastSeen == null || $timestamp > $lastSeen) {
                 $lastSeen = $timestamp;

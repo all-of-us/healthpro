@@ -107,6 +107,17 @@
       "enable": false
     },
     {
+      "display": "AOU Deceased Status",
+      "sortable": true,
+      "filterable": false,
+      "dataField": "aouDeceasedStatus",
+      "sortField": "aouDeceasedStatus:time",
+      "class": "StatusField",
+      "group": "Activity Status",
+      "enable": true,
+      "defaultGroup": true
+    },
+    {
       "display": "Module 1 Consent Status",
       "sortable": false,
       "filterable": false,
