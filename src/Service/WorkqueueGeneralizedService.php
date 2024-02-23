@@ -146,4 +146,23 @@ class WorkqueueGeneralizedService
     public function hasMoreResults() {
         $this->datasource->hasMoreResults();
     }
+
+    public function setSort($query) {
+        $columns = $query->get('columns');
+        $orders = $query->get('order');
+        $sortInfo = [];
+        $sortOrder = 1;
+        foreach ($orders as $order) {
+            $sortInfo[$columns[$order['column']]['name']] = ['dir' => $order['dir'], 'order' => 1];
+            $sortOrder++;
+        }
+
+        foreach ($this->columnCollection as $column) {
+            if ($column->getDataField() && isset($sortInfo[$column->getDataField()])) {
+                $column->setSortDirection($sortInfo[$column->getDataField()]['dir']);
+                $column->setSortOrder($sortInfo[$column->getDataField()]['order']);
+            }
+        }
+
+    }
 }

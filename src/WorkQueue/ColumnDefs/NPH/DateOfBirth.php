@@ -8,7 +8,6 @@ class DateOfBirth extends DefaultColumn
 {
     public function setFilterData($filterData): void
     {
-        $filterData = str_replace('-', '/', $filterData);
         parent::setFilterData($filterData);
     }
 }

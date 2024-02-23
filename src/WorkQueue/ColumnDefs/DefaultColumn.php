@@ -4,6 +4,7 @@ namespace App\WorkQueue\ColumnDefs;
 
 class DefaultColumn implements ColumnInterface
 {
+    protected array $config = [];
     private bool $filterable = true;
     private bool $sortable = true;
     private bool $displayed = true;
@@ -16,7 +17,9 @@ class DefaultColumn implements ColumnInterface
     private bool $enabled = true;
     private string $filterData = '';
     private string $columnFilterType = '';
-    protected array $config = [];
+    private string $sortDirection = '';
+    private int $sortOrder = -1;
+    private string $sortField = '';
 
     public function __construct($config)
     {
@@ -115,6 +118,26 @@ class DefaultColumn implements ColumnInterface
         return $this->defaultGroup;
     }
 
+    public function setSortDirection($sortDirection): void
+    {
+        $this->sortDirection = $sortDirection;
+    }
+
+    public function setSortOrder($sortOrder): void
+    {
+        $this->sortOrder = $sortOrder;
+    }
+
+    public function getSortDirection(): string
+    {
+        return $this->sortDirection;
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
     private function loadConfig($config)
     {
         if (isset($config['filterable'])) {
@@ -147,6 +170,19 @@ class DefaultColumn implements ColumnInterface
         if (isset($config['filterType'])) {
             $this->columnFilterType = $config['filterType'];
         }
+        if (isset($config['sortField'])) {
+            $this->sortField = $config['sortField'];
+        }
         $this->config = $config;
+    }
+
+    public function getSortField(): string
+    {
+        return $this->sortField;
+    }
+
+    public function setSortField(string $sortField): void
+    {
+        $this->sortField = $sortField;
     }
 }

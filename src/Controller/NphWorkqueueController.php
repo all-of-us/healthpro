@@ -36,6 +36,7 @@ class NphWorkqueueController extends AbstractController
         $workqueueService->loadWorkqueueColumns('NPH');
         $workqueueService->setDataSource($dataSource);
         $workqueueService->setSearch($request->get('search'));
+        $workqueueService->setSort($request->query);
         $data = $workqueueService->getWorkqueueData($request->get('start'), $request->get('length'));
         return $this->json($data);
     }

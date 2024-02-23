@@ -123,6 +123,7 @@
       "dataField": "nphModule1ConsentStatus",
       "class": "Module1HairAndNailOptIn",
       "timestampField": "m1_consent_tissue",
+      "sortField": "m1_consent_tissue:time",
       "group": "Consents",
       "defaultGroup": true
     },

@@ -22,4 +22,10 @@ interface ColumnInterface
     public function setColumnGroup(string $columnGroup): void;
     public function getColumnGroup(): string;
     public function isEnabled(): bool;
+    public function getSortDirection(): string;
+    public function setSortDirection(string $sortDirection): void;
+    public function setSortOrder(int $sortOrder): void;
+    public function getSortOrder(): int;
+    public function getSortField(): string;
+    public function setSortField(string $sortField): void;
 }
