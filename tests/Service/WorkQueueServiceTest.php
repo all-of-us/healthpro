@@ -296,7 +296,8 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             '',
-            'Adult Participant'
+            'Adult Participant',
+            'N/A'
         ], $row);
     }
 
@@ -346,6 +347,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             '',
+            'Adult Participant'
         ], $row);
     }
 
@@ -369,6 +371,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             'p1@example.com',
             null,
             '8885551001',
+            'N/A'
         ], $row);
     }
 
