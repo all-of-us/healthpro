@@ -19,4 +19,10 @@ class TestDataSource implements WorkqueueDatasource
     {
         return false;
     }
+
+    //Todo: Remove before production merge.
+    public function rawQuery($query)
+    {
+        // TODO: Implement rawQuery() method.
+    }
 }
