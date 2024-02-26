@@ -14,4 +14,15 @@ class TestDataSource implements WorkqueueDatasource
                 ['TestField1' => 'TestValue10', 'TestField2' => 'TestValue11', 'TestField3' => 'TestValue12'],
                 ['TestField1' => 'TestValue13', 'TestField2' => 'TestValue14', 'TestField3' => 'TestValue15']];
     }
+
+    public function hasMoreResults(): bool
+    {
+        return false;
+    }
+
+    //Todo: Remove before production merge.
+    public function rawQuery($query)
+    {
+        // TODO: Implement rawQuery() method.
+    }
 }

@@ -12,6 +12,7 @@ class WorkqueueGeneralizedService
     private WorkqueueDatasource $datasource;
     private ColumnCollection $columnCollection;
     private array $columnGroups = [];
+    private array $filteredColumnGroups = [];
     private UrlGeneratorInterface $route;
     private SiteService $siteService;
     public function __construct(UrlGeneratorInterface $route, SiteService $siteService)
@@ -73,6 +74,11 @@ class WorkqueueGeneralizedService
                 } else {
                     $this->columnGroups[$columnObject->getColumnGroup()] = 1;
                 }
+                if ($columnObject->isFilterable() && isset($this->filteredColumnGroups[$columnObject->getColumnGroup()])) {
+                    $this->filteredColumnGroups[$columnObject->getColumnGroup()]++;
+                } elseif ($columnObject->isFilterable()) {
+                    $this->filteredColumnGroups[$columnObject->getColumnGroup()] = 1;
+                }
             }
         }
 
@@ -100,6 +106,11 @@ class WorkqueueGeneralizedService
         return $this->columnGroups;
     }
 
+    public function getFilteredColumnGroups(): array
+    {
+        return $this->filteredColumnGroups;
+    }
+
     public function getSortableColumns(): array
     {
         $sortableColumns = [];
@@ -107,5 +118,72 @@ class WorkqueueGeneralizedService
             $sortableColumns[] = $column->isSortable();
         }
         return $sortableColumns;
+    }
+
+    public function getWorkqueueFieldNames(): array
+    {
+        $fieldNames = [];
+        foreach ($this->columnCollection as $column) {
+            $fieldNames[] = $column->getDataField();
+        }
+        return $fieldNames;
+    }
+
+    public function setSearch($searchParams): void
+    {
+        foreach ($this->columnCollection as $column) {
+            if ($column->isFilterable() && isset($searchParams[$column->getDataField()])) {
+                $column->setFilterData($searchParams[$column->getDataField()]);
+            }
+        }
+    }
+
+    //Todo: Remove before production merge
+    public function rawQuery($query)
+    {
+        $rawData = $this->datasource->rawQuery($query);
+        return $rawData;
+    }
+
+    public function exportToCsv($data): string
+    {
+        $csv = '';
+        foreach ($this->columnCollection as $column) {
+            if ($column->getColumnDisplayed()) {
+                $csv .= $column->getColumnDisplayName() . ',';
+            }
+        }
+        $csv = rtrim($csv, ',') . "\n";
+        foreach ($data as $row) {
+            foreach ($row as $cell) {
+                $csv .= $cell . ',';
+            }
+            $csv = rtrim($csv, ',') . "\n";
+        }
+        return $csv;
+    }
+
+    public function hasMoreResults()
+    {
+        $this->datasource->hasMoreResults();
+    }
+
+    public function setSort($query)
+    {
+        $columns = $query->get('columns');
+        $orders = $query->get('order');
+        $sortInfo = [];
+        $sortOrder = 1;
+        foreach ($orders as $order) {
+            $sortInfo[$columns[$order['column']]['name']] = ['dir' => $order['dir'], 'order' => 1];
+            $sortOrder++;
+        }
+
+        foreach ($this->columnCollection as $column) {
+            if ($column->getDataField() && isset($sortInfo[$column->getDataField()])) {
+                $column->setSortDirection($sortInfo[$column->getDataField()]['dir']);
+                $column->setSortOrder($sortInfo[$column->getDataField()]['order']);
+            }
+        }
     }
 }

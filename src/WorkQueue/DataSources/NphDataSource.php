@@ -8,8 +8,9 @@ use App\WorkQueue\ColumnCollection;
 
 class NphDataSource implements WorkqueueDatasource
 {
-    private $rdrApi = null;
-    private $currentSite = null;
+    private RdrApiService|null $rdrApi = null;
+    private string|null $currentSite = null;
+    private bool $hasMoreResults = false;
 
     public function __construct(RdrApiService $api, SiteService $siteService)
     {
@@ -19,17 +20,65 @@ class NphDataSource implements WorkqueueDatasource
 
     public function getWorkqueueData(int $offset, int $limit, ColumnCollection $columnCollection): array
     {
-        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery($offset, $limit));
+        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $this->getSearchQuery($offset, $limit, $columnCollection));
+        $result = json_decode($response->getBody()->getContents(), true);
+        if ($result['participant']['totalCount'] > $offset + $limit) {
+            $this->hasMoreResults = true;
+        } else {
+            $this->hasMoreResults = false;
+        }
+        return $result;
+    }
+
+    //Todo: Remove before production merge.
+    public function rawQuery($query)
+    {
+        $response = $this->rdrApi->GQLPost('rdr/v1/nph_participant', $query);
         $result = json_decode($response->getBody()->getContents(), true);
         return $result;
     }
 
-    private function getSearchQuery(int $offset, int $limit): string
+    public function hasMoreResults(): bool
+    {
+        return $this->hasMoreResults;
+    }
+
+    private function getFilterString(ColumnCollection $columnCollection): string
+    {
+        $filterString = '';
+        foreach ($columnCollection as $column) {
+            if ($column->isFilterable() && $column->getFilterData() !== '') {
+                $filterString .= $column->getDataField() . ': "' . $column->getFilterData() . '", ';
+            }
+        }
+        return $filterString;
+    }
+
+    private function getOrderString($columnCollection): string
+    {
+        $orderString = '';
+        $columnOrder = [];
+        foreach ($columnCollection as $column) {
+            if ($column->isSortable() && $column->getSortDirection() !== '') {
+                $columnOrder[$column->getSortOrder()] = ['field' => $column->getSortField(), 'direction' => $column->getSortDirection()];
+            }
+        }
+        ksort($columnOrder);
+        foreach ($columnOrder as $order) {
+            $orderString .= $order['field'] . ', ';
+        }
+        $orderString = trim($orderString, ', ');
+        return "sortBy: \"$orderString\", ";
+    }
+
+    private function getSearchQuery(int $offset, int $limit, ColumnCollection $columnCollection): string
     {
         $site = $this->currentSite;
-        return "
+        $filterString = $this->getFilterString($columnCollection);
+        $orderString = $this->getOrderString($columnCollection);
+        $query = "
         query {
-        participant (limit: ${limit}, offSet: ${offset}, nphPairedSite: \"nph-site-${site}\") {
+        participant ($filterString $orderString limit: ${limit}, offSet: ${offset}, nphPairedSite: \"nph-site-${site}\") {
                     totalCount
                     resultCount
                     edges {
@@ -128,5 +177,6 @@ class NphDataSource implements WorkqueueDatasource
                 }
             }
             ";
+        return $query;
     }
 }

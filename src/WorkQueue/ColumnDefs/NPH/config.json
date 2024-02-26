@@ -3,7 +3,8 @@
     {
       "display": "Last Name",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "lastName",
       "workqueueField": "lastname",
       "class": "ParticipantLink",
@@ -14,7 +15,8 @@
     {
       "display": "First Name",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "firstName",
       "workqueueField": "firstname",
       "class": "ParticipantLink",
@@ -25,7 +27,8 @@
     {
       "display": "Middle Name",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "middleName",
       "workqueueField": "middleinitial",
       "class": "ParticipantLink",
@@ -36,9 +39,11 @@
     {
       "display": "Date of Birth",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "date",
       "dataField": "nphDateOfBirth",
       "workqueueField": "dob",
+      "class": "DateOfBirth",
       "group": "Participant Details",
       "includeInAllGroups": true,
       "defaultGroup": true
@@ -46,7 +51,8 @@
     {
       "display": "Participant ID",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "participantNphId",
       "workqueueField": "participantid",
       "class": "ParticipantLink",
@@ -57,7 +63,8 @@
     {
       "display": "Biobank ID",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "biobankId",
       "workqueueField": "biobankid",
       "class": "ParticipantLink",
@@ -69,6 +76,13 @@
       "display": "Enrollment Status",
       "sortable": false,
       "filterable": false,
+      "filterType": "radio",
+      "filterValues": {
+        "Enrolled": "Enrolled",
+        "Not Enrolled": "Not Enrolled",
+        "Withdrawn": "Withdrawn",
+        "Deactivated": "Deactivated"
+      },
       "dataField": "nphEnrollmentStatus",
       "class": "EnrollmentStatus",
       "group": "Activity Status",
@@ -93,11 +107,23 @@
       "enable": false
     },
     {
+      "display": "AOU Deceased Status",
+      "sortable": true,
+      "filterable": false,
+      "dataField": "aouDeceasedStatus",
+      "sortField": "aouDeceasedStatus:time",
+      "class": "StatusField",
+      "group": "Activity Status",
+      "enable": true,
+      "defaultGroup": true
+    },
+    {
       "display": "Module 1 Consent Status",
       "sortable": false,
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
       "class": "ModuleConsentStatus",
+      "timestampField": "m1_consent",
       "group": "Consents",
       "defaultGroup": true
     },
@@ -107,6 +133,8 @@
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
       "class": "Module1HairAndNailOptIn",
+      "timestampField": "m1_consent_tissue",
+      "sortField": "m1_consent_tissue:time",
       "group": "Consents",
       "defaultGroup": true
     },
@@ -116,6 +144,7 @@
       "filterable": false,
       "dataField": "nphModule1ConsentStatus",
       "class": "Module1RecontactConsent",
+      "timestampField": "m1_consent_recontact",
       "group": "Consents",
       "defaultGroup": true
     },
@@ -125,6 +154,7 @@
       "filterable": false,
       "dataField": "nphModule2ConsentStatus",
       "class": "ModuleConsentStatus",
+      "timestampField": "m2_consent",
       "group": "Consents",
       "enable": true,
       "defaultGroup": true
@@ -135,6 +165,7 @@
       "filterable": false,
       "dataField": "nphModule3ConsentStatus",
       "class": "ModuleConsentStatus",
+      "timestampField": "m3_consent",
       "group": "Consents",
       "enable": true,
       "defaultGroup": true
@@ -142,7 +173,8 @@
     {
       "display": "Paired Site",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "nphPairedSite",
       "class": "SiteName",
       "group": "Pairing"
@@ -150,28 +182,32 @@
     {
       "display": "Paired Organization",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "nphPairedOrg",
       "group": "Pairing"
     },
     {
       "display": "Zip Code",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "zipCode",
       "group": "Contact"
     },
     {
       "display": "Phone Number",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "phoneNumber",
       "group": "Contact"
     },
     {
       "display": "Email",
       "sortable": false,
-      "filterable": false,
+      "filterable": true,
+      "filterType": "text",
       "dataField": "email",
       "group": "Contact"
     }

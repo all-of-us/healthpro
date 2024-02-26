@@ -1,0 +1,24 @@
+
+<div class="col-sm-3 d-none filter-column-group-{{ columnGroup|replace({" ": "_"})|lower }}" id="filter-{{ column.getDataField }}">
+    <div class="card">
+        <div class="card-header">
+            <label for="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}">{{ column.getColumnDisplayName }}</label>
+        </div>
+        <div class="card-body">
+            <div>
+                <button class="btn-close text-danger position-absolute top-0 end-0 m-2 filter-dismiss" data-column="{{ column.getDataField }}" data-columngroup="{{ columnGroup|replace({" ": "_"})|lower }}"></button>
+            </div>
+            <div class="mt-1">
+                <input class="wq-text-input form-control" data-filter-type="text" type="text" name="{{ column.getDataField }}"
+                       id="{{ column.getColumnDisplayName|replace({' ': '_'})|lower }}"
+                       data-column-display-name="{{ column.getColumnDisplayName }}"
+                       data-columngroup="{{ columnGroup|replace({" ": "_"})|lower }}"
+                       data-field="{{ column.getDataField }}">
+            </div>
+            <div class="mt-1">
+                <button class="btn btn-primary w-100 apply-filter-button" data-filter-type="text" type="button">Apply Filter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
