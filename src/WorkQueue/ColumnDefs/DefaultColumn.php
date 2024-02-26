@@ -138,6 +138,16 @@ class DefaultColumn implements ColumnInterface
         return $this->sortOrder;
     }
 
+    public function getSortField(): string
+    {
+        return $this->sortField;
+    }
+
+    public function setSortField(string $sortField): void
+    {
+        $this->sortField = $sortField;
+    }
+
     private function loadConfig($config)
     {
         if (isset($config['filterable'])) {
@@ -174,15 +184,5 @@ class DefaultColumn implements ColumnInterface
             $this->sortField = $config['sortField'];
         }
         $this->config = $config;
-    }
-
-    public function getSortField(): string
-    {
-        return $this->sortField;
-    }
-
-    public function setSortField(string $sortField): void
-    {
-        $this->sortField = $sortField;
     }
 }

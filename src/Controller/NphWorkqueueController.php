@@ -61,6 +61,6 @@ class NphWorkqueueController extends AbstractController
     {
         $workqueueService->setDataSource($dataSource);
         $test = $workqueueService->rawQuery(json_decode($request->getContent())->query);
-        return $this->json(["data" => $test]);
+        return $this->json(['data' => $test]);
     }
 }

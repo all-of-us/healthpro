@@ -138,16 +138,19 @@ class WorkqueueGeneralizedService
         }
     }
 
-    public function rawQuery ($query) {
+    public function rawQuery($query)
+    {
         $rawData = $this->datasource->rawQuery($query);
         return $rawData;
     }
 
-    public function hasMoreResults() {
+    public function hasMoreResults()
+    {
         $this->datasource->hasMoreResults();
     }
 
-    public function setSort($query) {
+    public function setSort($query)
+    {
         $columns = $query->get('columns');
         $orders = $query->get('order');
         $sortInfo = [];
@@ -163,6 +166,5 @@ class WorkqueueGeneralizedService
                 $column->setSortOrder($sortInfo[$column->getDataField()]['order']);
             }
         }
-
     }
 }
