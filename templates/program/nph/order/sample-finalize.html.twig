@@ -72,6 +72,7 @@
         {% set firstIteration = false %}
     {% endif %}
     {% set aliquotId = form[aliquotCode][i].vars.data %}
+    {% set disableTimeVolume = form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId] is defined and form['cancel_' ~ aliquotCode ~ '_' ~ aliquotId].vars.disabled %}
     <tr class="aliquots-row-{{ aliquotCode }}{% if firstIteration %} duplicate-target-{{ aliquotCode }} {% endif %}" id="aliquots_{{ aliquotCode }}_{{ i }}">
         <td {% if not form[aliquotCode][i].vars.valid %}
             class="has-error"{% endif %}>
@@ -81,11 +82,11 @@
         </td>
         <td {% if not form[aliquotCode ~ 'AliquotTs'][i].vars.valid %}
             class="has-error"{% endif %} style="position: relative;">
-            {{ form_widget(form[aliquotCode ~ 'AliquotTs'][i]) }}
+            {{ form_widget(form[aliquotCode ~ 'AliquotTs'][i], {'attr':{'readonly':disableTimeVolume}}) }}
             {{ form_errors(form[aliquotCode ~ 'AliquotTs'][i]) }}
         </td>
         {% if not skipVolume %}
-            {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i) }}
+            {{ _self.displayVolumeTD(aliquotCode, aliquot, sample, form, i, disableTimeVolume) }}
         {% elseif skipVolume and sample.unlocked %}
             <td colspan="2"></td>
         {% endif %}
@@ -101,10 +102,10 @@
         {% endif %}
     </tr>
 {% endmacro %}
-{% macro displayVolumeTD(aliquotCode, aliquot, sample, form, i, style) %}
+{% macro displayVolumeTD(aliquotCode, aliquot, sample, form, i, disable) %}
 <td {% if not form[aliquotCode ~ 'Volume'][i].vars.valid %}
     class="has-error"{% endif %}>
-    {{ form_widget(form[aliquotCode ~ 'Volume'][i]) }}
+    {{ form_widget(form[aliquotCode ~ 'Volume'][i], {'attr':{'readonly':disable}}) }}
     {{ form_errors(form[aliquotCode ~ 'Volume'][i]) }}
     <span class="text-warning aliquot-volume-warning" style="display: none">
         Please verify the volume unit of measurement is correct.  (Expected volume is in {{ aliquot['units'] }}).
@@ -165,10 +166,20 @@
                         <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
                         {% for aliquot in aliquots %}
                             <p>
-                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }}
+                                {{ aliquot.container }}:
+                                {% if aliquot.expectedAliquotsDisplay is defined %}
+                                    {{ aliquot.expectedAliquotsDisplay }}
+                                {% else %}
+                                    {{ aliquot.expectedAliquots }}
+                                {% endif %}
                                 {% if aliquot.expectedVolume %}
                                     <span style="padding: 1em"></span>
                                     Volume: {{ aliquot.expectedVolume|default('--') }} {{ aliquot.units }}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% if aliquot.expectedAliquotsDisplay is defined %}
+                                    An additional aliquot line has been added to the form in the event extra sample is available.
                                 {% endif %}
                             </p>
                         {% endfor %}
@@ -207,15 +218,15 @@
                         </div>
                     {% endif %}
                     {% if isFormDisabled %}
-                        {% set formClasses = 'disable-enter prevent-resumbit' %}
+                        {% set formClasses = 'sample-finalize-form disable-enter prevent-resumbit' %}
                     {% else  %}
-                        {% set formClasses = 'warn-unsaved disable-enter prevent-resubmit' %}
+                        {% set formClasses = 'sample-finalize-form warn-unsaved disable-enter prevent-resubmit' %}
                     {% endif %}
                     {{ form_start(sampleFinalizeForm, { attr: { class: formClasses} }) }}
                     {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
                             has-error{% endif %}">
-                        {{ form_label(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
+                        {{ form_label(sampleFinalizeForm[sampleCode ~ 'CollectedTs'], null, {'label_attr': {'class': 'required'}}) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_errors(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') %}
@@ -229,14 +240,16 @@
                     {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE') %}
                         <div class="row">
                             <div class="form-group col-sm-12 {% if not sampleFinalizeForm['totalCollectionVolume'].vars.valid %} has-error{% endif %}">
-                                {{ form_label(sampleFinalizeForm['totalCollectionVolume']) }}
+                                {{ form_label(sampleFinalizeForm['totalCollectionVolume'], null, {'label_attr': {'class': 'required'}}) }}
                                 <div class="input-group">
                                     {{ form_widget(sampleFinalizeForm['totalCollectionVolume']) }}
                                     <span class="input-group-addon">mL</span>
                                 </div>
+                                <span class="text-warning total-collection-volume-warning" style="display: none">
+                                    Please verify unit of measure is correct.  (Expected volume is measured mL, for reference 1L = 1000mL).
+                                </span>
                                 {{ form_errors(sampleFinalizeForm['totalCollectionVolume']) }}
                             </div>
-
                         </div>
                         <hr>
                     {% endif %}
@@ -249,12 +262,12 @@
                         </label>
                         <div class="row">
                             <div class="form-group col-sm-6 {% if not sampleFinalizeForm['urineColor'].vars.valid %} has-error{% endif %}">
-                                {{ form_label(sampleFinalizeForm['urineColor']) }}
+                                {{ form_label(sampleFinalizeForm['urineColor'], null, {'label_attr': {'class': 'required'}}) }}
                                 {{ form_widget(sampleFinalizeForm['urineColor']) }}
                                 {{ form_errors(sampleFinalizeForm['urineColor']) }}
                             </div>
                             <div class="form-group col-sm-6 {% if not sampleFinalizeForm['urineClarity'].vars.valid %} has-error{% endif %}">
-                                {{ form_label(sampleFinalizeForm['urineClarity']) }}
+                                {{ form_label(sampleFinalizeForm['urineClarity'], null, {'label_attr': {'class': 'required'}}) }}
                                 {{ form_widget(sampleFinalizeForm['urineClarity']) }}
                                 {{ form_errors(sampleFinalizeForm['urineClarity']) }}
                             </div>
@@ -379,8 +392,7 @@
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
                                 {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or isFormDisabled %}
                                     disabled
-                                {% endif %}
-                                formnovalidate>
+                                {% endif %}>
                             Mark as Finalized
                         </button>
                         {% if biobankView %}

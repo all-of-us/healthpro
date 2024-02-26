@@ -2,6 +2,9 @@
     <div align="left" style="width: 65%; float: left">{{ PatientName }}</div>
     <div align="left" style="float: right; width: 35%">{{ dob }}</div>
 </div>
+<div style="position: absolute; left: 270px; font-size: 24px; top: 85px">
+    <div align="left" style="width: 10px; float: left;">M{{ ModuleNum }}</div>
+</div>
 <div style="height: 40%; margin-top: 15px; position: relative">
     <div style="margin-bottom: 10px; margin-left: 25px; width: 25%; float: left; position: absolute">
         <img src="var:datamatrix"/>
@@ -10,20 +13,16 @@
         <div>{{ SpecimenID }}</div>
         <div style="font-size: 20px; font-weight: bold;">{{ SampleCode }}</div>
     </div>
-    {% if 'DLW' in VisitType %}
-    <div style="width: 30px; height: 30px; font-size: 22px; padding-top: 15px">M{{ ModuleNum }}</div>
-    {% endif %}
 </div>
 {% if 'DLW' in VisitType  %}
-    <div style="height: 15%; font-size: 16px; margin-bottom: 5px; width: 100%" align="center">
-        <div style="width: 30%; float: right">{{ VisitType }}</div>
-        <div style="width: 70%; float: left">{{ TimePoint }}</div>
+    <div style="height: 15%; font-size: 14.5px; margin-bottom: 5px; width: 100%" align="center">
+        <div style="width: 36%; float: left; text-align: left">{{ VisitType }}</div>
+        <div style="width: 64%; float: right; text-align: right">{{ TimePoint }}</div>
     </div>
 {% else %}
     <div style="height: 15%; font-size: 20px; margin-bottom: 5px" align="center">
-        <div align="left" style="width: 10%; float: left;">M{{ ModuleNum }}</div>
-        <div align="right" style="width: 45%; float: left">{{ VisitType }}</div>
-        <div align="center" style="width: 45%; float: left">{{ TimePoint }}</div>
+        <div align="left" style="width: 65%; float: left">{{ VisitType }}</div>
+        <div align="center" style="width: 35%; float: right">{{ TimePoint }}</div>
     </div>
 {% endif %}
 <div>

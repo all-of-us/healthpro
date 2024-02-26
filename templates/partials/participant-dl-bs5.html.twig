@@ -11,27 +11,11 @@
         <dt class="col-sm-5">Age</dt>
         <dd class="col-sm-7">{{ participant.ageInMonths <= 23 ? participant.ageInMonths ~ ' mo' : participant.age ~ ' y/o' }}</dd>
         <dt class="col-sm-5">Sex</dt>
-        <dd class="col-sm-7">
-            {% if participant.sexAtBirth == 1 %}
-                Male
-            {% elseif participant.sexAtBirth == 2 %}
-                Female
-            {% else %}
-                --
-            {% endif %}
-        </dd>
+        <dd class="col-sm-7">{{ participant.sex|default('--') }}</dd>
     {% else %}
         <dt class="col-sm-5">Gender Identity</dt>
         <dd class="col-sm-7">{{ participant.genderIdentity|default('--') }}</dd>
     {% endif %}
-    <dt class="col-sm-5">Participant Status</dt>
-    <dd class="col-sm-7">{{ participant.enrollmentStatus|default('--') }}
-        {% if participant.isCoreParticipant and  participant.enrollmentStatusCoreStoredSampleTime is not empty %}
-            ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.user.timezone) }})
-        {% elseif participant.isCoreMinusPMParticipant and  participant.enrollmentStatusCoreMinusPMTime is not empty %}
-            ({{ participant.enrollmentStatusCoreMinusPMTime|date('n/j/Y', app.user.timezone) }})
-        {% endif %}
-    </dd>
     {% if app.session.get('siteType') == 'dv' or is_granted('ROLE_AWARDEE_SCRIPPS') %}
         <dt class="col-sm-5">Participant Origination</dt>
         <dd class="col-sm-7">{{ participant.participantOrigin|default('--') }}</dd>

@@ -52,7 +52,7 @@ class testSetup
     {
         $nphOrder = new NphOrder();
         $nphOrder->setModule(1);
-        $nphOrder->setVisitType('LMT');
+        $nphOrder->setVisitPeriod('LMT');
         $nphOrder->setTimepoint('preLMT');
         $nphOrder->setOrderId('100000001');
         $nphOrder->setParticipantId($participant->id);
@@ -107,7 +107,7 @@ class testSetup
         User $user,
         string $participantId = null,
         string $module = null,
-        string $visit = null,
+        string $visitPeriod = null,
         \DateTime $doseAdministered = null,
         float $actualDose = null,
         float $participantWeight = null,
@@ -122,8 +122,8 @@ class testSetup
         if ($module === null) {
             $module = '3';
         }
-        if ($visit === null) {
-            $visit = 'OrangeDiet';
+        if ($visitPeriod === null) {
+            $visitPeriod = 'period1DLW';
         }
         if ($doseAdministered === null) {
             $doseAdministered = new \DateTime('2000-01-01');
@@ -146,7 +146,7 @@ class testSetup
         $dlw = new NphDlw();
         $dlw->setDoseAdministered($doseAdministered);
         $dlw->setModule($module);
-        $dlw->setVisit($visit);
+        $dlw->setVisitPeriod($visitPeriod);
         $dlw->setParticipantWeight($participantWeight);
         $dlw->setActualDose($actualDose);
         $dlw->setNphParticipant($participantId);

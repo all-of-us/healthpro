@@ -292,6 +292,10 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             0,
             '',
+            '',
+            '',
+            '',
+            '',
         ], $row);
     }
 
@@ -336,7 +340,11 @@ class WorkQueueServiceTest extends ServiceTestCase
             0,
             '',
             '8/3/2022 3:00 pm',
-            '8/3/2022 3:00 pm'
+            '8/3/2022 3:00 pm',
+            '',
+            '',
+            '',
+            '',
         ], $row);
     }
 
@@ -378,6 +386,10 @@ class WorkQueueServiceTest extends ServiceTestCase
             'Woman',
             'Black or African American',
             'College 4 years or more (College graduate)',
+            '',
+            '',
+            '',
+            '',
             ''
         ], $row);
     }

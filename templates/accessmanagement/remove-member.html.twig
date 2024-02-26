@@ -29,10 +29,13 @@
                 {{ form_label(removeGoupMemberForm.reason) }}
                 {% for reason in removeGoupMemberForm.reason %}
                     {{ form_widget(reason) }}
+                    {% set programText = app.session.get('program') == constant('App\\Entity\\User::PROGRAM_NPH') ? 'NPH and AoU' : 'AoU and NPH' %}
                     {% if loop.index == 1 %}
-                        <i class="text-info small">Note: Member will be removed from all associated HealthPro groups.</i>
+                        <i class="text-info small">Note: Member will be removed from all associated HealthPro groups. (This includes removal from all
+                            {{ programText }} groups, if applicable.)</i>
                     {% else %}
-                        <i class="text-info small">Note: Member will be removed from this group, but maintain access to HealthPro through other associated groups.</i>
+                        <i class="text-info small">Note: Member will be removed from this group, but <u>maintain access</u> to HealthPro through other associated groups. (This includes maintaining access to all other
+                            {{ programText }} groups, if applicable.)</i>
                     {% endif %}
                 {% endfor %}
                 {{ form_errors(removeGoupMemberForm.reason) }}

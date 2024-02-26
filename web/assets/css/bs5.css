@@ -113,3 +113,15 @@
     padding: 15px;
     font-size: 0.9rem;
 }
+
+.text-blue {
+    color: #0d6efd;
+}
+
+.text-orange {
+    color: #fd7e14;
+}
+
+.text-purple {
+    color: #6f42c1;
+}

@@ -1,7 +1,9 @@
 $(document).ready(function () {
     $("#sample_finalize_btn").on("click", function (e) {
         e.preventDefault();
-        $("#confirmation_modal").modal("show");
+        if ($(".sample-finalize-form").parsley().validate()) {
+            $("#confirmation_modal").modal("show");
+        }
     });
 
     $("#confirm_finalize_btn").on("click", function () {
@@ -15,6 +17,7 @@ $(document).ready(function () {
         } else {
             addNormalAliquotRow(this);
         }
+        $(".sample-finalize-form").parsley().validate();
     });
 
     $(document).on("click", ".delete-aliquot-widget", function () {
@@ -26,6 +29,7 @@ $(document).ready(function () {
             $(this).closest("tr").prev().find("input:not(:read-only)").val("");
         }
         $(this).closest("tr").find("input:not(:read-only)").val("");
+        $(".sample-finalize-form").parsley().validate();
     });
 
     $(document).on("keyup", ".aliquot-volume", function () {
@@ -45,6 +49,17 @@ $(document).ready(function () {
         }
     });
 
+    $(document).on("keyup", ".total-collection-volume", function () {
+        let inputValue = parseFloat($(this).val());
+        let minValue = $(this).data("warning-min-volume");
+        let maxValue = $(this).data("warning-max-volume");
+        if (inputValue && inputValue >= minValue && inputValue <= maxValue) {
+            $(".total-collection-volume-warning").show();
+        } else {
+            $(".total-collection-volume-warning").hide();
+        }
+    });
+
     $(document).on("keyup", ".glycerol-volume", function () {
         calculateGlycerolVolume(
             $(this).closest("tr").find(".sample"),
@@ -54,26 +69,47 @@ $(document).ready(function () {
     });
 
     $(document).on("keyup", ".aliquot-barcode", function () {
-        let barcode = $(this).val();
-        let expectedBarcodeLength = $(this).data("barcode-length");
-        let expectedBarcodePrefix = $(this).data("barcode-prefix");
-        let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
-        if (regex.test(barcode)) {
-            let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
-            aliquotTsSelector.focus();
-            aliquotTsSelector.data("DateTimePicker").date(new Date());
-            aliquotTsSelector.blur();
-            $(this).closest("tr").find(".aliquot-volume").focus();
+        if (!$(this).prop("readonly")) {
+            let barcode = $(this).val();
+            let expectedBarcodeLength = $(this).data("barcode-length");
+            let expectedBarcodePrefix = $(this).data("barcode-prefix");
+            let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
+            let tdSelector = $(this).closest("td");
+            if (regex.test(barcode)) {
+                let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
+                aliquotTsSelector.focus();
+                aliquotTsSelector.data("DateTimePicker").date(new Date());
+                aliquotTsSelector.blur();
+                $(this).closest("tr").find(".aliquot-volume").focus();
+                $.ajax({
+                    url: "/nph/ajax/search/aliquot",
+                    method: "GET",
+                    data: { aliquotId: barcode },
+                    success: function (response) {
+                        if (response === false) {
+                            let errorMessage =
+                                "<div class='help-block unique-aliquot-error'>Please enter a unique aliquot barcode.</div>";
+                            tdSelector.append(errorMessage).addClass("has-error");
+                        } else {
+                            tdSelector.find(".unique-aliquot-error").remove();
+                            tdSelector.removeClass("has-error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error checking barcode uniqueness:", error);
+                    }
+                });
+            } else {
+                tdSelector.find(".unique-aliquot-error").remove();
+            }
         }
     });
 
     let disableEnableAliquotFields = function () {
-        let $checkboxes = $(".sample-modify-checkbox:checkbox:enabled");
+        let $checkboxes = $(".sample-cancel-checkbox:checkbox:enabled");
         $checkboxes.each(function () {
             let $row = $(this).closest("tr");
-            $row.find(".order-ts").prop("readonly", $(this).is(":checked"));
-            if ($row.find(".aliquot-volume").data("expected-volume")) {
-            }
+            $row.find(".order-ts, .aliquot-volume").prop("readonly", $(this).is(":checked"));
         });
     };
 
@@ -146,13 +182,29 @@ $(document).ready(function () {
             let targetName = `SALIVAA2-warning-target${counter}`;
             let glycerolTarget = `SALIVAA2-warning-target-glycerol${counter}`;
             let totalTarget = `SALIVAA2-warning-target-total${counter}`;
+            let barcodeId = `nph_sample_finalize_SALIVAA2_${counter}`;
+            let tsId = `nph_sample_finalize_SALIVAA2AliquotTs_${counter}`;
+            let volumeId = `nph_sample_finalize_SALIVAA2Volume_${counter}`;
+            let glycerolId = `nph_sample_finalize_SALIVAA2glycerolAdditiveVolume_${counter}`;
             $(this).removeClass("duplicate-target-" + aliquotCode);
-            $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr("name", barcodeName);
-            $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr("name", tsName);
-            $(this).find("[name='nph_sample_finalize[SALIVAA2Volume][0]']").attr("name", volumeName);
-            $(this)
-                .find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']")
-                .attr("name", glycerolVolumeName);
+            $(this).find("[name='nph_sample_finalize[SALIVAA2][0]']").attr({
+                name: barcodeName,
+                id: barcodeId
+            });
+            $(this).find("[name='nph_sample_finalize[SALIVAA2AliquotTs][0]']").attr({
+                name: tsName,
+                id: tsId
+            });
+            $(this).find("[name='nph_sample_finalize[SALIVAA2Volume][0]']").attr({
+                name: volumeName,
+                id: volumeId,
+                "data-warning-target": targetName
+            });
+            $(this).find("[name='nph_sample_finalize[SALIVAA2glycerolAdditiveVolume][0]']").attr({
+                name: glycerolVolumeName,
+                id: glycerolId,
+                "data-warning-target": glycerolTarget
+            });
             $(this).find("#SALIVAA2-warning-target0").attr("id", targetName);
             $(this).find("#SALIVAA2-warning-target-glycerol0").attr("id", glycerolTarget);
             $(this).find("#SALIVAA2-warning-target-total0").attr("id", totalTarget);
@@ -160,7 +212,6 @@ $(document).ready(function () {
             $(this).find("input").val("");
             $(this).find(".text-warning").hide();
             $(this).find(".help-block").remove();
-            $(this).find(".has-error").removeClass("has-error");
             $(this).find("input:not(.totalVol)").attr("readonly", false);
         });
         counter++;
@@ -187,11 +238,66 @@ $(document).ready(function () {
                 $("#aliquotTimeWarning").hide();
             }
         }
+        clearServerErrors(event);
     });
 
     disableEnableAliquotFields();
 
     $(".aliquot-volume").trigger("keyup");
 
-    $(".sample-modify-checkbox").on("change", disableEnableAliquotFields);
+    $(".sample-cancel-checkbox").on("change", disableEnableAliquotFields);
+
+    window.Parsley.addValidator("aliquotDateComparison", {
+        validateString: function (value, requirement) {
+            let inputDate = new Date(value);
+            let collectedTs = $("#" + requirement).val();
+            if (collectedTs) {
+                let comparisonDate = new Date(collectedTs);
+                return inputDate > comparisonDate;
+            }
+            return true;
+        },
+        messages: {
+            en: "Aliquot time must be after collection time."
+        }
+    });
+
+    window.Parsley.addValidator("customDateComparison", {
+        validateString: function (value, requirement) {
+            let inputDate = new Date(value);
+            let comparisonDate = new Date(requirement);
+            return inputDate > comparisonDate;
+        },
+        messages: {
+            en: "Time must be after order generation."
+        }
+    });
+
+    $(".sample-finalize-form").parsley({
+        errorClass: "has-error",
+        classHandler: function (el) {
+            return el.$element.closest(".form-group, td, .input-group");
+        },
+        errorsContainer: function (el) {
+            let errorContainer = el.$element.closest("tr").next().find("td.has-error");
+            if (errorContainer.length > 0) {
+                return errorContainer;
+            } else {
+                return el.$element.closest(".form-group, td");
+            }
+        },
+        errorsWrapper: '<div class="help-block"></div>',
+        errorTemplate: "<div></div>",
+        trigger: "blur"
+    });
+
+    $(document).on("dp.hide", ".order-ts", function () {
+        $(this).parsley().validate();
+    });
+
+    const clearServerErrors = (e) => {
+        $(e.currentTarget).next("span.help-block").remove();
+    };
+
+    $(".sample-finalize-form input").on("change", clearServerErrors);
 });

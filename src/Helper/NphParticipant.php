@@ -33,6 +33,9 @@ class NphParticipant
     public array $module1DietStatus;
     public array $module2DietStatus;
     public array $module3DietStatus;
+    public array $module1DietPeriod;
+    public array $module2DietPeriod;
+    public array $module3DietPeriod;
     public string $biobankId = '';
     public array $moduleConsents = [];
 
@@ -113,9 +116,11 @@ class NphParticipant
         $this->module1TissueConsentStatus = $module1TissueConsent['value'];
         $this->module1TissueConsentTime = $module1TissueConsent['time'];
         $this->module = $this->getParticipantModule();
-        $this->module1DietStatus = ['LMT' => 'started'];
+        $this->module1DietStatus = $this->module1DietPeriod = ['LMT' => 'started'];
         $this->module2DietStatus = $this->getModuleDietStatus(2);
         $this->module3DietStatus = $this->getModuleDietStatus(3);
+        $this->module2DietPeriod = $this->getModuleDietPeriod(2);
+        $this->module3DietPeriod = $this->getModuleDietPeriod(3);
         $this->moduleConsents = $this->getModuleConsents();
     }
 
@@ -153,6 +158,7 @@ class NphParticipant
         $dietStatus = [];
         $dietStatusField = 'nphModule' . $module . 'DietStatus';
         $nphModuleDietStatus = $this->rdrData->{$dietStatusField} ?? [];
+        $this->sortDietStatus($nphModuleDietStatus);
         foreach ($nphModuleDietStatus as $diet) {
             $dietStatuses = array_column($diet->dietStatus, 'status');
             if (in_array(self::DIET_COMPLETED, $dietStatuses)) {
@@ -175,6 +181,60 @@ class NphParticipant
         return $dietStatus;
     }
 
+    private function getModuleDietPeriod(int $module): array
+    {
+        if ($module !== $this->getParticipantModule()) {
+            return [];
+        }
+        $dietStatusField = 'nphModule' . $module . 'DietStatus';
+        $nphModuleDietStatus = $this->rdrData->{$dietStatusField} ?? [];
+        $this->sortDietStatus($nphModuleDietStatus);
+        // If diet status is empty diet period 1 will be started
+        if (empty($nphModuleDietStatus)) {
+            return [
+                'PERIOD1' => self::DIET_STARTED
+            ];
+        }
+        $dietPeriods = [];
+        $period = 1;
+        foreach ($nphModuleDietStatus as $diet) {
+            $currentDiet = "PERIOD{$period}";
+            $nextDiet = 'PERIOD' . ($period + 1);
+            $dietStatuses = array_column($diet->dietStatus, 'status');
+            if (in_array(self::DIET_COMPLETED, $dietStatuses)) {
+                $dietPeriods[$currentDiet] = self::DIET_COMPLETED;
+                if ($period <= 2) {
+                    $dietPeriods[$nextDiet] = self::DIET_STARTED;
+                }
+            } elseif (in_array(self::DIET_DISCONTINUED, $dietStatuses) && !in_array(
+                self::DIET_CONTINUED,
+                $dietStatuses
+            )) {
+                $dietPeriods[$currentDiet] = self::DIET_DISCONTINUED;
+                $key = array_search(self::DIET_DISCONTINUED, $dietStatuses);
+                if ($key !== false) {
+                    if ($diet->dietStatus[$key]->current === false && $period <= 2) {
+                        $dietPeriods[$nextDiet] = self::DIET_STARTED;
+                    }
+                }
+            } else {
+                $key = array_search(self::DIET_CONTINUED, $dietStatuses);
+                if ($key !== false) {
+                    $dietPeriods[$currentDiet] = self::DIET_INCOMPLETE;
+                    if ($diet->dietStatus[$key]->current === false) {
+                        if ($period <= 2) {
+                            $dietPeriods[$nextDiet] = self::DIET_STARTED;
+                        }
+                    }
+                } elseif (in_array(self::DIET_STARTED, $dietStatuses)) {
+                    $dietPeriods[$currentDiet] = self::DIET_STARTED;
+                }
+            }
+            $period++;
+        }
+        return $dietPeriods;
+    }
+
     private function getModuleConsents()
     {
         $consentStatus = [];
@@ -189,5 +249,16 @@ class NphParticipant
             }
         }
         return $consentStatus;
+    }
+
+    private function sortDietStatus(array &$dietStatus): void
+    {
+        if (!empty($dietStatus)) {
+            usort($dietStatus, function ($a, $b) {
+                $latestTimeA = max(array_column($a->dietStatus, 'time'));
+                $latestTimeB = max(array_column($b->dietStatus, 'time'));
+                return strtotime($latestTimeA) - strtotime($latestTimeB);
+            });
+        }
     }
 }

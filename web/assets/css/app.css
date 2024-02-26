@@ -911,6 +911,10 @@ table.table-samples td {
     display:inline-block;
 }
 
+.stool-unique-error {
+    color: #a94442;
+}
+
 /* NPH Participant details */
 
 .no-dob-banner {

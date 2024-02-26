@@ -11,15 +11,7 @@
         <dt>Age</dt>
         <dd>{{ participant.ageInMonths <= 23 ? participant.ageInMonths ~ ' mo' : participant.age ~ ' y/o' }}</dd>
         <dt>Sex</dt>
-        <dd>
-            {% if participant.sexAtBirth == 1 %}
-                Male
-            {% elseif participant.sexAtBirth == 2 %}
-                Female
-            {% else %}
-                --
-            {% endif %}
-        </dd>
+        <dd>{{ participant.sex|default('--') }}</dd>
     {% else %}
         <dt>Gender Identity</dt>
         <dd>{{ participant.genderIdentity|default('--') }}</dd>

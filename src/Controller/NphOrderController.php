@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
@@ -59,7 +60,7 @@ class NphOrderController extends BaseController
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
-        if (!$nphOrderService->isDietStarted($participant->{'module' . $module . 'DietStatus'})) {
+        if (!$nphOrderService->isDietStarted($participant->{'module' . $module . 'DietPeriod'})) {
             throw $this->createNotFoundException('Orders cannot be generated for this diet.');
         }
         $timePointSamples = $nphOrderService->getTimePointSamples();
@@ -105,7 +106,7 @@ class NphOrderController extends BaseController
             'module' => $module,
             'visit' => $visit,
             'downtimeOrders' => $downtimeOrders,
-            'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
+            'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'stoolSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_STOOL),
@@ -134,7 +135,7 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
         $oderCollectForm = $this->createForm(
@@ -235,14 +236,14 @@ class NphOrderController extends BaseController
         }
         $nphOrderService->loadModules(
             $order->getModule(),
-            $order->getVisitType(),
+            $order->getVisitPeriod(),
             $participantId,
             $participant->biobankId
         );
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $isDietStarted = $nphOrderService->isDietStarted($participant->{'module' . $order->getModule() . 'DietStatus'});
+        $isDietStarted = $nphOrderService->isDietStarted($participant->{'module' . $order->getModule() . 'DietPeriod'});
         $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStarted);
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
@@ -350,7 +351,7 @@ class NphOrderController extends BaseController
                 'orderSummary' => $orderInfo['order'],
                 'module' => $module,
                 'visit' => $visit,
-                'visitDisplayName' => $nphOrderService->getVisitTypes()[$visit],
+                'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
                 'sampleCount' => $orderInfo['sampleCount'],
                 'sampleGroup' => $sampleGroup]
         );
@@ -381,7 +382,7 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException();
         }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyType::class, null, [
             'type' => $type, 'samples' => $order->getNphSamples(), 'activeSamples' => $activeSamples
         ]);
@@ -441,7 +442,7 @@ class NphOrderController extends BaseController
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
         ]);
-        $nphOrderService->loadModules($order->getModule(), $order->getVisitType(), $participantId, $participant->biobankId);
+        $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $object = $nphOrderService->getRdrObject($order, $sample);
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
@@ -475,7 +476,7 @@ class NphOrderController extends BaseController
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         $nphOrderService->loadModules(
             $order->getModule(),
-            $order->getVisitType(),
+            $order->getVisitPeriod(),
             $participantId,
             $participant->biobankId
         );
@@ -539,7 +540,7 @@ class NphOrderController extends BaseController
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         $dlwObject = $this->em->getRepository(NphDlw::class)->findOneBy([
             'NphParticipant' => $participantId,
-            'visit' => $visit,
+            'visitPeriod' => $visit,
             'module' => $module
         ]);
         $dlwForm = $this->createForm(DlwType::class, $dlwObject, ['timezone' => $this->getSecurityUser()->getTimezone()]);
@@ -558,11 +559,40 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'module' => $module,
             'visit' => $visit,
+            'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'disabled' => $disabled,
             'dlwInfo' => $dlwObject,
             'form' => $dlwForm->createView()
         ]);
     }
+
+    #[Route(path: '/ajax/search/aliquot', name: 'search_aliquot_id')]
+    public function giftCardAction(Request $request): JsonResponse
+    {
+        $aliquotId = $request->get('aliquotId');
+        $aliquot = $this->em->getRepository(NphAliquot::class)->findOneBy([
+            'aliquotId' => $aliquotId
+        ]);
+        return $this->json(!$aliquot);
+    }
+
+    #[Route(path: '/ajax/search/stool', name: 'search_stool_id')]
+    public function stoolSearchAction(Request $request): JsonResponse
+    {
+        $stoolId = $request->get('stoolId');
+        $type = $request->get('type');
+        if ($type === 'kit') {
+            $stool = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $stoolId
+            ]);
+        } else {
+            $stool = $this->em->getRepository(NphSample::class)->findOneBy([
+                'sampleId' => $stoolId
+            ]);
+        }
+        return $this->json(!$stool);
+    }
+
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {
