@@ -143,6 +143,14 @@
                 <strong class="d-block">Contact Phone</strong>
                 {{ participant.phoneNumber|default('--') }}
             </div>
+            {% if participant.isPediatric and participant.guardianId %}
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">Guardian</strong>
+                    <a class="link-primary text-decoration-none" href="{{ path('participant', { id: participant.guardianId }) }}">
+                        {{ participant.guardianLastName }}, {{ participant.guardianFirstName }} ({{ participant.guardianId }})
+                    </a>
+                </div>
+            {% endif %}
             <div id="scrollspyDemographics">&nbsp;</div>
             <h6 class="text-primary scroll-header"><span>Demographics</span></h6>
             <div class="participant-detail-new-status text-start">
