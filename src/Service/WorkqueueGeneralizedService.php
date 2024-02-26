@@ -145,6 +145,24 @@ class WorkqueueGeneralizedService
         return $rawData;
     }
 
+    public function exportToCsv($data): string
+    {
+        $csv = '';
+        foreach ($this->columnCollection as $column) {
+            if ($column->getColumnDisplayed()) {
+                $csv .= $column->getColumnDisplayName() . ',';
+            }
+        }
+        $csv = rtrim($csv, ',') . "\n";
+        foreach ($data as $row) {
+            foreach ($row as $cell) {
+                $csv .= $cell . ',';
+            }
+            $csv = rtrim($csv, ',') . "\n";
+        }
+        return $csv;
+    }
+
     public function hasMoreResults()
     {
         $this->datasource->hasMoreResults();
