@@ -34,10 +34,12 @@
                     (Active)
                 {% endif %}
             </div>
-            <div class="participant-detail-new-status text-start big-status-box">
-                <strong class="d-block">gRoR Consent</strong>
-                {{ macros.displayGrorConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}
-            </div>
+            {% if not participant.isPediatric %}
+                <div class="participant-detail-new-status text-start big-status-box">
+                    <strong class="d-block">gRoR Consent</strong>
+                    {{ macros.displayGrorConsentPanelStatus(participant, 'consentForGenomicsROR', showConsentPDFs) }}
+                </div>
+            {% endif %}
             {% if siteInfo.displayCaborConsent %}
                 <div class="participant-detail-new-status text-start">
                     <strong class="d-block">CABoR Consent</strong>
@@ -48,22 +50,26 @@
                 <strong class="d-block">Consent Cohort</strong>
                 {{ participant.consentCohortText }}
             </div>
-            <div class="participant-detail-new-status text-start">
-                <strong class="d-block">Program Update</strong>
-                {{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}
-            </div>
+            {% if not participant.isPediatric %}
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">Program Update</strong>
+                    {{ macros.displayProgramUpdate(participant.consentCohort, participant.questionnaireOnDnaProgram, participant.questionnaireOnDnaProgramAuthored) }}
+                </div>
+            {% endif %}
             <div class="participant-detail-new-status text-start">
                 <strong class="d-block">Language of Primary Consent</strong>
                 {{ participant.primaryLanguage|default('--') }}
             </div>
-            <div class="participant-detail-new-status text-start">
-                <strong class="d-block">DV-only EHR Sharing</strong>
-                {{ macros.displayConsentPanelStatus(participant, 'consentForDvElectronicHealthRecordsSharing') }}
-            </div>
-            <div class="participant-detail-new-status text-start">
-                <strong class="d-block">Exploring the Mind Consent</strong>
-                {{ macros.displayConsentPanelStatus(participant, 'consentForEtM') }}
-            </div>
+            {% if not participant.isPediatric %}
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">DV-only EHR Sharing</strong>
+                    {{ macros.displayConsentPanelStatus(participant, 'consentForDvElectronicHealthRecordsSharing') }}
+                </div>
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">Exploring the Mind Consent</strong>
+                    {{ macros.displayConsentPanelStatus(participant, 'consentForEtM') }}
+                </div>
+            {% endif %}
             {% for type, label in digitalHealthSharingTypes %}
                 <div class="participant-detail-new-status text-start">
                     <strong class="d-block">{{ label }}</strong>
@@ -129,20 +135,22 @@
                 <strong class="d-block">Email</strong>
                 {{ participant.email|default('--') }}
             </div>
-            <div class="participant-detail-new-status text-start">
-                <span class="float-end" title="This is the verified SMS number used during registration"
-                      data-bs-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i
-                            class="fa fa-question-circle text-info"></i></span>
-                <strong class="d-block">Login Phone</strong>
-                {{ participant.loginPhoneNumber|default('--') }}
-            </div>
-            <div class="participant-detail-new-status text-start">
-                <span class="float-end" title="This is the phone number provided after consent"
-                      data-bs-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i
-                            class="fa fa-question-circle text-info"></i></span>
-                <strong class="d-block">Contact Phone</strong>
-                {{ participant.phoneNumber|default('--') }}
-            </div>
+            {% if not participant.isPediatric %}
+                <div class="participant-detail-new-status text-start">
+                    <span class="float-end" title="This is the verified SMS number used during registration"
+                          data-bs-toggle="tooltip"><span class="sr-only">What is Login Phone?</span><i
+                                class="fa fa-question-circle text-info"></i></span>
+                    <strong class="d-block">Login Phone</strong>
+                    {{ participant.loginPhoneNumber|default('--') }}
+                </div>
+                <div class="participant-detail-new-status text-start">
+                    <span class="float-end" title="This is the phone number provided after consent"
+                          data-bs-toggle="tooltip"><span class="sr-only">What is Contact Phone?</span><i
+                                class="fa fa-question-circle text-info"></i></span>
+                    <strong class="d-block">Contact Phone</strong>
+                    {{ participant.phoneNumber|default('--') }}
+                </div>
+            {% endif %}
             {% if participant.isPediatric and participant.guardianId %}
                 <div class="participant-detail-new-status text-start">
                     <strong class="d-block">Guardian</strong>
@@ -161,10 +169,12 @@
                 <strong class="d-block">Sex</strong>
                 {{ participant.sex|default('--') }}
             </div>
-            <div class="participant-detail-new-status text-start">
-                <strong class="d-block">Gender Identity</strong>
-                {{ participant.genderIdentity|default('--') }}
-            </div>
+            {% if not participant.isPediatric %}
+                <div class="participant-detail-new-status text-start">
+                    <strong class="d-block">Gender Identity</strong>
+                    {{ participant.genderIdentity|default('--') }}
+                </div>
+            {% endif %}
             <div class="participant-detail-new-status text-start">
                 <strong class="d-block">Race/Ethnicity</strong>
                 {{ participant.race|default('--') }}
