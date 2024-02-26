@@ -601,7 +601,7 @@ class NphOrderService
     {
         $status = true;
         foreach ($formData as $sampleId => $checked) {
-            if (isset($checked) && $checked !== null && is_bool($checked) && $checked) {
+            if ($checked === true) {
                 $sample = $this->em->getRepository(NphSample::class)->findOneBy(['sampleId' => $sampleId]);
                 if ($sample !== null) {
                     $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
