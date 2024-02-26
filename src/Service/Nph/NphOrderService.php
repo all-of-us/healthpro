@@ -601,22 +601,24 @@ class NphOrderService
     {
         $status = true;
         foreach ($formData as $sampleId => $checked) {
-            $sample = $this->em->getRepository(NphSample::class)->findOneBy(['sampleId' => $sampleId]);
-            if ($checked) {
-                $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
-                if ($sample->getRdrId()) {
-                    if ($this->cancelRestoreSample(
-                        $sample->getRdrId(),
-                        $sample->getNphOrder()->getParticipantId(),
-                        $type,
-                        $sampleObject
-                    )) {
-                        $this->saveSampleModificationsData($sample, $type, $formData);
+            if (isset($checked) && $checked !== null && is_bool($checked) && $checked) {
+                $sample = $this->em->getRepository(NphSample::class)->findOneBy(['sampleId' => $sampleId]);
+                if ($sample !== null) {
+                    $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                    if ($sample->getRdrId()) {
+                        if ($this->cancelRestoreSample(
+                            $sample->getRdrId(),
+                            $sample->getNphOrder()->getParticipantId(),
+                            $type,
+                            $sampleObject
+                        )) {
+                            $this->saveSampleModificationsData($sample, $type, $formData);
+                        } else {
+                            $status = false;
+                        }
                     } else {
-                        $status = false;
+                        $this->saveSampleModificationsData($sample, $type, $formData);
                     }
-                } else {
-                    $this->saveSampleModificationsData($sample, $type, $formData);
                 }
             }
         }
