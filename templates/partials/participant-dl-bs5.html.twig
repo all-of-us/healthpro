@@ -33,7 +33,7 @@
         {% endif %}
     {% endif %}
 </dl>
-{% if participant.isPediatric and participant.relatedParticipants %}
+{% if participant.isPediatric and participant.relatedParticipants and participant.relatedParticipants is iterable %}
     <hr>
     <strong>Guardian:</strong>
     {% for relatedParticipant in participant.relatedParticipants %}

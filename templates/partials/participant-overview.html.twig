@@ -151,7 +151,7 @@
                     {{ participant.phoneNumber|default('--') }}
                 </div>
             {% endif %}
-            {% if participant.isPediatric and participant.relatedParticipants %}
+            {% if participant.isPediatric and participant.relatedParticipants and participant.relatedParticipants is iterable %}
                 <div class="participant-detail-new-status text-start">
                     <strong class="d-block">Guardian</strong>
                     {% for relatedParticipant in participant.relatedParticipants %}
