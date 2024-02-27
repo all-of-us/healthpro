@@ -640,14 +640,16 @@ class WorkQueueService
         return $this->participantSummaryService->getNextToken();
     }
 
-    private function generateLink($id, $name = null)
+    private function generateLink($id, $name = null, $type = null)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
             $url = $this->urlGenerator->generate('participant', ['id' => $id]);
         } else {
             $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
         }
-        $name = $name ?? $id;
+        if ($type === 'id') {
+            $name = $id;
+        }
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return sprintf('<a href="%s">%s</a>', $url, $text);
@@ -730,7 +732,7 @@ class WorkQueueService
             return 'N/A';
         }
         $participantIds = array_map(function ($participant) {
-            return $this->generateLink($participant->participantId);
+            return $this->generateLink($participant->participantId, null, 'id');
         }, $relatedParticipants);
 
         return implode('<br>', $participantIds);

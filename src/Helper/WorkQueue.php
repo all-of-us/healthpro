@@ -44,7 +44,7 @@ class WorkQueue
             'name' => 'Middle Name',
             'csvName' => 'Middle Initial',
             'rdrField' => 'middleName',
-            'sortField' => 'firstName',
+            'sortField' => 'middleName',
             'generateLink' => true,
             'toggleColumn' => false,
             'default' => true
