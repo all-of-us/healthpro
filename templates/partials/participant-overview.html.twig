@@ -151,12 +151,14 @@
                     {{ participant.phoneNumber|default('--') }}
                 </div>
             {% endif %}
-            {% if participant.isPediatric and participant.guardianId %}
+            {% if participant.isPediatric and participant.relatedParticipants %}
                 <div class="participant-detail-new-status text-start">
                     <strong class="d-block">Guardian</strong>
-                    <a class="link-primary text-decoration-none" href="{{ path('participant', { id: participant.guardianId }) }}">
-                        {{ participant.guardianLastName }}, {{ participant.guardianFirstName }} ({{ participant.guardianId }})
-                    </a>
+                    {% for relatedParticipant in participant.relatedParticipants %}
+                        <a class="link-primary text-decoration-none d-block" href="{{ path('participant', { id: relatedParticipant.participantId }) }}">
+                            {{ relatedParticipant.lastName }}, {{ relatedParticipant.firstName }} ({{ relatedParticipant.participantId }})
+                        </a>
+                    {% endfor %}
                 </div>
             {% endif %}
             <div id="scrollspyDemographics">&nbsp;</div>
