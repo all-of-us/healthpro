@@ -2533,6 +2533,12 @@ class WorkQueue
         'CopeVaccineMinute4' => 'New Year Minute'
     ];
 
+    public static array $pedsSurveys = [
+        'TheBasics' => 'Basics',
+        'OverallHealth' => 'Health',
+        'EnvironmentalExposures' => 'Environmental Exposures'
+    ];
+
     public static $initialSurveys = [
         'TheBasics',
         'OverallHealth',

@@ -229,6 +229,7 @@ class ParticipantDetailsController extends BaseController
             'canViewDetails' => $canViewDetails,
             'samples' => WorkQueue::$samples,
             'surveys' => WorkQueue::$surveys,
+            'pedsSurveys' => WorkQueue::$pedsSurveys,
             'samplesAlias' => WorkQueue::$samplesAlias,
             'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
             'cancelRoute' => $cancelRoute,
