@@ -89,10 +89,10 @@ $(document).ready(function () {
     $("form[name='nph_order_collect'], form[name='dlw']").parsley({
         errorClass: "has-error",
         classHandler: function (el) {
-            return el.$element.closest(".col-md-4, .col-md-3");
+            return el.$element.closest("td, .col-md-4, .col-md-3");
         },
         errorsContainer: function (el) {
-            return el.$element.closest(".col-md-4, .col-md-3");
+            return el.$element.closest("td, .col-md-4, .col-md-3");
         },
         errorsWrapper: '<div class="help-block"></div>',
         errorTemplate: "<div></div>",
