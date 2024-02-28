@@ -409,10 +409,13 @@ class NphOrderController extends BaseController
             }
             $nphSampleModifyForm->addError(new FormError('Please correct the errors below'));
         }
+        $orderSummary = $nphOrderService->getParticipantOrderSummary($participantId);
         return $this->render('program/nph/order/sample-modify-bulk.html.twig', [
             'activeSamples' => $activeSamples,
             'participant' => $participant,
             'sampleModifyForm' => $nphSampleModifyForm->createView(),
+            'ordersSummary' => $orderSummary['order'][$module],
+            'module' => $module,
             'type' => $type,
         ]);
     }

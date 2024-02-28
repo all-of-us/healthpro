@@ -11,6 +11,16 @@
     </h2>
     <hr>
 
+    <div class="row" id="order_info">
+        <div class="col-sm-12">
+            {% include 'program/nph/order/partials/participant-details-with-name.html.twig' %}
+        </div>
+    </div>
+
+    <div class="alert bg-light well-sm">
+        <strong>Module {{ module }}: Cancel All Samples</strong>
+    </div>
+
     {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
         <p class="text-danger">Select samples to be cancelled</p>
     {% else %}
@@ -18,7 +28,7 @@
     {% endif %}
     {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {{ form_errors(sampleModifyForm) }}
-    <table class="table table-samples">
+    <table class="table table-samples" style="max-height: 350px; display: block; overflow: auto">
         <thead>
         <tr>
             <th>
@@ -33,6 +43,7 @@
         </thead>
         <tbody class="modify-samples">
         {% for index, nphSample in activeSamples %}
+            {% set sampleOrder = nphSample.nphOrder %}
             {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
                 {% set sampleClass = 'no-restore' %}
             {% else %}
@@ -43,19 +54,19 @@
                     {{ form_widget(sampleModifyForm[nphSample.sampleId]) }}
                 </td>
                 <td>
-                    <p>({{ index + 1 }}) {{ nphSample.sampleCode }} ({{ nphSample.sampleId }})
+                    <p>{{ nphSample.nphOrder.visitDisplayName }}</p>
+                </td>
+                <td>
+                    <p>{{ nphSample.nphOrder.timepointDisplayName }}</p>
+                </td>
+                <td>
+                    <p>({{ ordersSummary[sampleOrder.visitPeriod][sampleOrder.Timepoint][sampleOrder.OrderType][nphSample.SampleCode][sampleOrder.orderId]['sampleName'] }})
                         {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL')%}
                             <span class="text-danger">Cancelled</span>
                         {% else %}
                             <span class="text-success">Active</span>
                         {% endif %}
                     </p>
-                </td>
-                <td>
-                    <p>{{ nphSample.nphOrder.visitDisplayName }}</p>
-                </td>
-                <td>
-                    <p>{{ nphSample.nphOrder.timepointDisplayName }}</p>
                 </td>
                 <td>
                     <p>
