@@ -2570,6 +2570,17 @@ class WorkQueue
         '1SAL' => 'Saliva'
     ];
 
+    public static array $pedsSamples = [
+        '1ED02' => '2 mL EDTA (1ED02)',
+        '2ED02' => '2 mL EDTA (2ED02)',
+        '1ED04' => '4 mL EDTA (1ED04)',
+        '2ED04' => '4 mL EDTA (2ED04)',
+        '1ED10' => '1st 10 mL EDTA',
+        '1PXR2' => 'Paxgene RNA',
+        '1UR10' => 'Urine 10 mL',
+        '1SAL' => 'Saliva'
+    ];
+
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',

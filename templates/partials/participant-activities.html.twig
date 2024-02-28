@@ -38,7 +38,6 @@
                     </button>
                 </div>
             </div>
-            {% set surveys = participant.isPediatric ? pedsSurveys : surveys %}
             {% for field, label in surveys %}
                 <div class="participant-detail-new-status text-start">
                     <strong class="d-block">{{ label }}</strong>
