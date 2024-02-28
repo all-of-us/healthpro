@@ -11,7 +11,7 @@
     </h2>
     <hr>
 
-    <div class="row" id="order_info">
+    <div class="row margin-bottom-15" id="order_info">
         <div class="col-sm-12">
             {% include 'program/nph/order/partials/participant-details-with-name.html.twig' %}
         </div>
@@ -28,7 +28,7 @@
     {% endif %}
     {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {{ form_errors(sampleModifyForm) }}
-    <table class="table table-samples" style="max-height: 350px; display: block; overflow: auto">
+    <table class="table table-samples bulk-modify-table">
         <thead>
         <tr>
             <th>
