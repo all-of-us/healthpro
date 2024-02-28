@@ -4,13 +4,13 @@ namespace App\WorkQueue\ColumnDefs\NPH;
 
 use App\WorkQueue\ColumnDefs\DefaultColumn;
 
-class ModuleConsentStatus extends DefaultColumn
+class Module1ConsentStatus extends DefaultColumn
 {
     public function getColumnDisplay($data, $dataRow): string
     {
         $latestTimestampElement = UtilFunctions::searchLatestTimestampElement($data, [$this->config['timestampField']]);
         if ($latestTimestampElement === null) {
-            return 'Not Consented';
+            return "<i class='fas fa-times text-danger'></i> Not Completed<br>";
         }
         $latestTimestamp = new \DateTime($latestTimestampElement['time']);
         $latestTimestampString = $latestTimestamp->format('m/d/Y h:i A');
@@ -20,7 +20,7 @@ class ModuleConsentStatus extends DefaultColumn
             case 'DENY':
                 return "<i class='fas fa-times text-danger'></i> Consented No<br>${latestTimestampString}";
             default:
-                return "<i class='fas fa-times text-danger'></i> Not Consented";
+                return $latestTimestampElement['optIn'];
         }
     }
 }

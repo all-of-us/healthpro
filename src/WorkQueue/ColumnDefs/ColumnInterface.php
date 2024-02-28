@@ -6,7 +6,8 @@ interface ColumnInterface
 {
     public function getColumnDisplay($data, $dataRow): string;
     public function getColumnDisplayName(): string;
-    public function getColumnExport($data): string;
+    public function getColumnExportHeaders(): array;
+    public function getColumnExport($data, $dataRow): string;
     public function getColumnFilterType(): string;
     public function isFilterable(): bool;
     public function isSortable(): bool;

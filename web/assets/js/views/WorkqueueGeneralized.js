@@ -120,6 +120,18 @@ function createFilterElementText(element) {
     redrawTable();
 }
 
+function triggerExport(type = "full") {
+    let search = generateSearch();
+    let columns = [];
+    if (type === "full") {
+        columns = [];
+    } else {
+        columns = $("#workqueueTable").DataTable().columns().visible();
+    }
+    console.dir(search);
+    console.dir(columns);
+}
+
 $(document).ready(function () {
     let colvisGroups = generateColvisGroups($("#workqueueTable").data("colvis-groups"));
     let columns = generateColumns(

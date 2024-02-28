@@ -20,6 +20,7 @@ class EnrollmentStatus extends StatusField
                 return "Module 1 Enrolled<br>${latestTimestampString}";
             case 'module1_consented':
                 return "Module 1 Consented<br>${latestTimestampString}";
+            case ''
         }
         return $latestTimestampElement['value'] ?? '';
     }

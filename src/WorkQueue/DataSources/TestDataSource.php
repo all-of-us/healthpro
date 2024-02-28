@@ -15,6 +15,11 @@ class TestDataSource implements WorkqueueDatasource
                 ['TestField1' => 'TestValue13', 'TestField2' => 'TestValue14', 'TestField3' => 'TestValue15']];
     }
 
+    public function lastNumResults(): int
+    {
+        return 5;
+    }
+
     public function hasMoreResults(): bool
     {
         return false;

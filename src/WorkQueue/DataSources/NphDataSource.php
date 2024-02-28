@@ -11,6 +11,7 @@ class NphDataSource implements WorkqueueDatasource
     private RdrApiService|null $rdrApi = null;
     private string|null $currentSite = null;
     private bool $hasMoreResults = false;
+    private int $lastNumResults = 0;
 
     public function __construct(RdrApiService $api, SiteService $siteService)
     {
@@ -27,6 +28,7 @@ class NphDataSource implements WorkqueueDatasource
         } else {
             $this->hasMoreResults = false;
         }
+        $this->lastNumResults = $result['participant']['resultCount'];
         return $result;
     }
 
@@ -41,6 +43,11 @@ class NphDataSource implements WorkqueueDatasource
     public function hasMoreResults(): bool
     {
         return $this->hasMoreResults;
+    }
+
+    public function lastNumResults(): int
+    {
+        return $this->lastNumResults;
     }
 
     private function getFilterString(ColumnCollection $columnCollection): string

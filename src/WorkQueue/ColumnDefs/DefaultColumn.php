@@ -36,9 +36,14 @@ class DefaultColumn implements ColumnInterface
         return $this->displayName;
     }
 
-    public function getColumnExport($data): string
+    public function getColumnExport($data, $dataRow): string
     {
         return $data;
+    }
+
+    public function getColumnExportHeaders(): array
+    {
+        return [$this->displayName];
     }
 
     public function getColumnFilterType(): string

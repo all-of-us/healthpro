@@ -10,4 +10,13 @@ class DateOfBirth extends DefaultColumn
     {
         parent::setFilterData($filterData);
     }
+
+    public function getColumnDisplay($data, $dataRow): string
+    {
+        if ($data === 'UNSET') {
+            return '';
+        }
+        $date = new \DateTime($data);
+        return $date->format('m/d/Y');
+    }
 }

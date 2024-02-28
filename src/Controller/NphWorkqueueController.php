@@ -47,9 +47,9 @@ class NphWorkqueueController extends AbstractController
         $workqueueService->loadWorkqueueColumns('NPH');
         $workqueueService->setDataSource($dataSource);
         $workqueueService->setSearch($request->get('search'));
+        $workqueueService->setSort($request->query);
         $workqueueService->hasMoreResults();
-        $data = $workqueueService->getWorkqueueData(0, 100000);
-        $csv = $workqueueService->exportToCsv($data['data']);
+        $csv = $workqueueService->exportToCsv();
         $response = new Response($csv);
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="workqueue.csv"');

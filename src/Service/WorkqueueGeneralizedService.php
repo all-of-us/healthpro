@@ -15,6 +15,7 @@ class WorkqueueGeneralizedService
     private array $filteredColumnGroups = [];
     private UrlGeneratorInterface $route;
     private SiteService $siteService;
+
     public function __construct(UrlGeneratorInterface $route, SiteService $siteService)
     {
         $this->route = $route;
@@ -29,7 +30,7 @@ class WorkqueueGeneralizedService
     public function getWorkqueueData(int $offset = 0, int $limit = 10): array
     {
         $rawData = $this->datasource->getWorkqueueData($offset, $limit, $this->columnCollection);
-        $result = [];
+
         foreach ($rawData['participant']['edges'] as $row) {
             $row = $row['node'];
             $temprow = [];
@@ -42,6 +43,27 @@ class WorkqueueGeneralizedService
         }
         $result['recordsTotal'] = $rawData['participant']['totalCount'];
         $result['recordsFiltered'] = $rawData['participant']['totalCount'];
+
+        return $result;
+    }
+
+    public function getWorkQueueExportData(int $offset = 0, int $limit = 10): array
+    {
+        $rawData = $this->datasource->getWorkqueueData($offset, $limit, $this->columnCollection);
+
+        foreach ($rawData['participant']['edges'] as $row) {
+            $row = $row['node'];
+            $temprow = [];
+            foreach ($this->columnCollection as $column) {
+                if ($column->getColumnDisplayed()) {
+                    $temprow[] = $column->getColumnExport($row[$column->getDataField()], $row);
+                }
+            }
+            $result['data'][] = $temprow;
+        }
+        $result['recordsTotal'] = $rawData['participant']['totalCount'];
+        $result['recordsFiltered'] = $rawData['participant']['totalCount'];
+
         return $result;
     }
 
@@ -145,8 +167,21 @@ class WorkqueueGeneralizedService
         return $rawData;
     }
 
-    public function exportToCsv($data): string
+    public function exportToCsv(): string
     {
+        $csvHeaders = [];
+        foreach ($this->columnCollection as $column) {
+            if ($column->getColumnDisplayed()) {
+                $csvHeaders = array_merge($csvHeaders, $column->getColumnExportHeaders());
+            }
+        }
+        $data = $this->getWorkQueueExportData(0, 1000);
+        $count = $this->datasource->lastNumResults();
+        while ($this->datasource->hasMoreResults() && $count < 10000) {
+            $data = array_merge($data, $this->getWorkQueueExportData(count($data['data']), 1000));
+            $count += $this->datasource->lastNumResults();
+        }
+        $data = $this->getWorkqueueData();
         $csv = '';
         foreach ($this->columnCollection as $column) {
             if ($column->getColumnDisplayed()) {
@@ -174,9 +209,11 @@ class WorkqueueGeneralizedService
         $orders = $query->get('order');
         $sortInfo = [];
         $sortOrder = 1;
-        foreach ($orders as $order) {
-            $sortInfo[$columns[$order['column']]['name']] = ['dir' => $order['dir'], 'order' => 1];
-            $sortOrder++;
+        if ($orders !== null) {
+            foreach ($orders as $order) {
+                $sortInfo[$columns[$order['column']]['name']] = ['dir' => $order['dir'], 'order' => 1];
+                $sortOrder++;
+            }
         }
 
         foreach ($this->columnCollection as $column) {
