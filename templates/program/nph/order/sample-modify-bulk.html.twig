@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% set bootstrapVersion = 5 %}
 {% block title %}Sample - Modify - {% endblock %}
 {% block body %}
     <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% endif %}">
@@ -29,17 +30,17 @@
     {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {{ form_errors(sampleModifyForm) }}
     <table class="table table-samples bulk-modify-table">
-        <thead>
-        <tr>
-            <th>
-                <input type="checkbox" id="modify_check_all"> {{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore'}}
-            </th>
-            <th>Visit</th>
-            <th>Timepoint</th>
-            <th>Sample</th>
-            <th>Collected</th>
-            <th>Aliquoted and Finalized</th>
-        </tr>
+        <thead class="bg-light sticky-top top-0">
+            <tr>
+                <th>
+                    <input type="checkbox" id="modify_check_all" checked="true"> {{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore'}}
+                </th>
+                <th>Visit</th>
+                <th>Timepoint</th>
+                <th>Sample</th>
+                <th>Collected</th>
+                <th>Aliquoted and Finalized</th>
+            </tr>
         </thead>
         <tbody class="modify-samples">
         {% for index, nphSample in activeSamples %}

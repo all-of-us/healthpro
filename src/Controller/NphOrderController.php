@@ -377,7 +377,7 @@ class NphOrderController extends BaseController
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSamplesByParticipantId($participantId, $module);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyBulkType::class, null, [
-            'type' => $type, 'samples' => $activeSamples, 'activeSamples' => $activeSamples
+            'type' => $type, 'samples' => $activeSamples, 'activeSamples' => $activeSamples,
         ]);
         $nphSampleModifyForm->handleRequest($request);
         if ($nphSampleModifyForm->isSubmitted()) {

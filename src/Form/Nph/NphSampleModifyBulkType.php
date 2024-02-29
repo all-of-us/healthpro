@@ -30,7 +30,7 @@ class NphSampleModifyBulkType extends AbstractType
                     'required' => false,
                     'disabled' => $disabled,
                     'attr' => [
-                        'checked' => $disabled,
+                        'checked' => true,
                     ]
                 ]);
             }
