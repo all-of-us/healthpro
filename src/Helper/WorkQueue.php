@@ -3345,12 +3345,12 @@ class WorkQueue
         return implode(', ', $participantIds);
     }
 
-    public static function getSamples($isPediatric): array
+    public static function getParticipantSummarySamples(bool $isPediatric): array
     {
         return $isPediatric ? self::$pedsSamples : array_diff_key(self::$samples, array_flip(self::$pedsOnlyFields));
     }
 
-    public static function getSurveys($isPediatric): array
+    public static function getParticipantSummarySurveys(bool $isPediatric): array
     {
         return $isPediatric ? self::$pedsSurveys : array_diff_key(self::$surveys, array_flip(self::$pedsOnlyFields));
     }

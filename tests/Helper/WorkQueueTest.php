@@ -686,4 +686,84 @@ class WorkQueueTest extends ServiceTestCase
             $this->assertSame($expected[$fieldKey], WorkQueue::getCsvNphStudyStatus($participant, $fieldKey,'America/Chicago'));
         }
     }
+
+    public function samplesDataProvider(): array
+    {
+        return [
+            [true, [
+                '1ED02' => '2 mL EDTA (1ED02)',
+                '2ED02' => '2 mL EDTA (2ED02)',
+                '1ED04' => '4 mL EDTA (1ED04)',
+                '2ED04' => '4 mL EDTA (2ED04)',
+                '1ED10' => '1st 10 mL EDTA',
+                '1PXR2' => 'Paxgene RNA',
+                '1UR10' => 'Urine 10 mL',
+                '1SAL' => 'Saliva'
+            ]],
+            [false, [
+                '1SST8' => '8 mL SST',
+                '1PST8' => '8 mL PST',
+                '1HEP4' => '4 mL Na-Hep',
+                '1ED02' => '2 mL EDTA (1ED02)',
+                '1ED04' => '4 mL EDTA (1ED04)',
+                '1ED10' => '1st 10 mL EDTA',
+                '2ED10' => '2nd 10 mL EDTA',
+                '1CFD9' => 'Cell-Free DNA',
+                '1PXR2' => 'Paxgene RNA',
+                '1UR10' => 'Urine 10 mL',
+                '1UR90' => 'Urine 90 mL',
+                '1SAL' => 'Saliva'
+            ]]
+        ];
+    }
+
+    /**
+     * @dataProvider samplesDataProvider
+     */
+    public function testGetSamples(bool $isPediatric, array $expectedResult): void
+    {
+        $this->assertEquals($expectedResult, WorkQueue::getParticipantSummarySamples($isPediatric));
+    }
+
+    public function surveysDataProvider(): array
+    {
+        return [
+            [true, [
+                'TheBasics' => 'Basics',
+                'OverallHealth' => 'Health',
+                'EnvironmentalExposures' => 'Environmental Exposures'
+            ]],
+            [false, [
+                'TheBasics' => 'Basics',
+                'OverallHealth' => 'Health',
+                'Lifestyle' => 'Lifestyle',
+                'MedicalHistory' => 'Med History',
+                'FamilyHealth' => 'Family History',
+                'PersonalAndFamilyHealthHistory' => 'Personal & Family Hx',
+                'HealthcareAccess' => 'Access',
+                'SocialDeterminantsOfHealth' => 'SDOH',
+                'LifeFunctioning' => 'Life Functioning',
+                'EmotionalHealthHistoryAndWellBeing' => 'Emotional Health Hx and Well-being',
+                'BehavioralHealthAndPersonality' => 'Behavioral Health and Personality',
+                'CopeMay' => 'COPE May',
+                'CopeJune' => 'COPE June',
+                'CopeJuly' => 'COPE July',
+                'CopeNov' => 'COPE Nov',
+                'CopeDec' => 'COPE Dec',
+                'CopeFeb' => 'COPE Feb',
+                'CopeVaccineMinute1' => 'Summer Minute',
+                'CopeVaccineMinute2' => 'Fall Minute',
+                'CopeVaccineMinute3' => 'Winter Minute',
+                'CopeVaccineMinute4' => 'New Year Minute'
+            ]]
+        ];
+    }
+
+    /**
+     * @dataProvider surveysDataProvider
+     */
+    public function testGetSurveys(bool $isPediatric, array $expectedResult)
+    {
+        $this->assertEquals($expectedResult, WorkQueue::getParticipantSummarySurveys($isPediatric));
+    }
 }
