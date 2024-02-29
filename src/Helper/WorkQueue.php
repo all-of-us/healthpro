@@ -20,6 +20,7 @@ class WorkQueue
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
     public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
     public const HTML_SUCCESS_DOUBLE = '<i class="fa fa-check-double text-success" aria-hidden="true"></i>';
+    public const HTML_CHILD_ICON = '<i class="fa fa-child child-icon" aria-hidden="true"></i> ';
 
     public static $columnsDef = [
         'lastName' => [
@@ -28,7 +29,8 @@ class WorkQueue
             'sortField' => 'lastName',
             'generateLink' => true,
             'toggleColumn' => false,
-            'default' => true
+            'default' => true,
+            'displayPediatricIcon' => true
         ],
         'firstName' => [
             'name' => 'First Name',
@@ -42,7 +44,7 @@ class WorkQueue
             'name' => 'Middle Name',
             'csvName' => 'Middle Initial',
             'rdrField' => 'middleName',
-            'sortField' => 'firstName',
+            'sortField' => 'middleName',
             'generateLink' => true,
             'toggleColumn' => false,
             'default' => true
@@ -135,6 +137,16 @@ class WorkQueue
             'sortField' => 'withdrawalReason',
             'toggleColumn' => true,
             'visible' => false,
+            'group' => 'details'
+        ],
+        'pediatricStatus' => [
+            'name' => 'Pediatric Status',
+            'rdrField' => 'isPediatric',
+            'method' => 'getPediatricStatus',
+            'csvMethod' => 'getPediatricStatus',
+            'toggleColumn' => true,
+            'orderable' => false,
+            'default' => true,
             'group' => 'details'
         ],
         'deactivationStatus' => [
@@ -549,6 +561,15 @@ class WorkQueue
             'sortField' => 'phoneNumber',
             'toggleColumn' => true,
             'visible' => false,
+            'group' => 'contact'
+        ],
+        'relatedParticipants' => [
+            'name' => 'Related Participants',
+            'rdrField' => 'relatedParticipants',
+            'wqServiceMethod' => 'getRelatedParticipants',
+            'csvMethod' => 'getRelatedParticipants',
+            'toggleColumn' => true,
+            'orderable' => false,
             'group' => 'contact'
         ],
         'ppiStatus' => [
@@ -1379,6 +1400,7 @@ class WorkQueue
         'participantStatus',
         'activityStatus',
         'withdrawalReason',
+        'pediatricStatus',
         'participantOrigin',
         'consentCohort',
         'primaryConsent',
@@ -1409,6 +1431,7 @@ class WorkQueue
         'email',
         'loginPhone',
         'phone',
+        'relatedParticipants',
         'ppiStatus',
         'ppiSurveys',
         'TheBasics',
@@ -1632,6 +1655,8 @@ class WorkQueue
         'enrollmentStatusParticipantV3_2Time',
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
+        'pediatricStatus',
+        'relatedParticipants'
     ];
 
     public static $sortColumns = [
@@ -1644,6 +1669,7 @@ class WorkQueue
         'enrollmentStatusV3_2',
         'withdrawalAuthored',
         'withdrawalReason',
+        'isPediatric',
         'participantOrigin',
         'consentCohort',
         'consentForStudyEnrollmentAuthored',
@@ -2564,6 +2590,7 @@ class WorkQueue
             'participantId',
             'participantStatus',
             'activityStatus',
+            'pediatricStatus',
             'consentCohort',
             'primaryConsent',
             'questionnaireOnDnaProgram',
@@ -3276,5 +3303,22 @@ class WorkQueue
         }
 
         return $participant->$fieldKey ? 1 : 0;
+    }
+
+    public static function getPediatricStatus(bool $isPediatric): string
+    {
+        return $isPediatric ? 'Pediatric Participant' : 'Adult Participant';
+    }
+
+    public static function getRelatedParticipants(string|array|null $relatedParticipants): string
+    {
+        if (!is_array($relatedParticipants)) {
+            return 'N/A';
+        }
+        $participantIds = array_map(function ($participant) {
+            return $participant->participantId;
+        }, $relatedParticipants);
+
+        return implode(', ', $participantIds);
     }
 }

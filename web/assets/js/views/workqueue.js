@@ -177,7 +177,8 @@ $(document).ready(function () {
                     ".col-group-ppi",
                     ".col-group-contact",
                     ".col-group-metrics:not(.col-group-metrics-ehr)",
-                    ".col-group-ancillarystudies"
+                    ".col-group-ancillarystudies",
+                    ".col-group-pediatric"
                 ]
             },
             {
@@ -196,7 +197,8 @@ $(document).ready(function () {
                     ".col-group-language-primary-consent",
                     ".col-group-ehr-expire-status",
                     ".col-group-consent",
-                    ".col-group-ancillarystudies"
+                    ".col-group-ancillarystudies",
+                    ".col-group-pediatric"
                 ]
             },
             {
@@ -210,7 +212,8 @@ $(document).ready(function () {
                     ".col-group-ppi",
                     ".col-group-patient-status",
                     ".col-group-contact",
-                    ".col-group-ancillarystudies"
+                    ".col-group-ancillarystudies",
+                    ".col-group-pediatric"
                 ]
             },
             {
@@ -226,7 +229,8 @@ $(document).ready(function () {
                     ".col-group-contact",
                     ".col-group-metrics",
                     ".col-group-ehr-expire-status",
-                    ".col-group-consent"
+                    ".col-group-consent",
+                    ".col-group-pediatric"
                 ]
             },
             {

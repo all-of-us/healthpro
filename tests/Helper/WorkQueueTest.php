@@ -99,6 +99,7 @@ class WorkQueueTest extends ServiceTestCase
             'Participant Date',
             'Participant + EHR Date',
             'PM&B Eligible Date',
+            'Pediatric Status'
         ], $exportHeaders);
     }
 
@@ -120,7 +121,8 @@ class WorkQueueTest extends ServiceTestCase
             'Zip',
             'Email',
             'Login Phone',
-            'Phone'
+            'Phone',
+            'Related Participants'
         ], $exportHeaders);
     }
 
