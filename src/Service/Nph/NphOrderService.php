@@ -1276,4 +1276,23 @@ class NphOrderService
         $orders = $this->em->getRepository(NphOrder::class)->getDownTimeGeneratedOrdersByModuleAndVisit($ParticipantId, $Module, $Visit);
         return $orders;
     }
+
+    public function getSampleStatusCounts(array $nphOrderInfo): array
+    {
+        $moduleStatusCount = [];
+        foreach (array_keys($nphOrderInfo) as $module) {
+            if (count($nphOrderInfo[$module]['sampleStatusCount']) === 0) {
+                $moduleStatusCount[$module] = ['active' => 0];
+            }
+            foreach ($nphOrderInfo[$module]['sampleStatusCount'] as $orderId => $statusCount) {
+                foreach ($statusCount as $status => $count) {
+                    $moduleStatusCount[$module][$status] = isset($moduleStatusCount[$module][$status]) ? $moduleStatusCount[$module][$status] + $count : $count;
+                    if ($status !== 'Canceled') {
+                        $moduleStatusCount[$module]['active'] = isset($moduleStatusCount[$module]['active']) ? $moduleStatusCount[$module]['active'] + $count : $count;
+                    }
+                }
+            }
+        }
+        return $moduleStatusCount;
+    }
 }

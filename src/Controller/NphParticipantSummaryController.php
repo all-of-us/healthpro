@@ -54,6 +54,7 @@ class NphParticipantSummaryController extends BaseController
         $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participantId);
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
         $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo, $nphProgramSummary);
+        $sampleStatusCounts = $nphOrderService->getSampleStatusCounts($combined);
         $isCrossSite = $participant->nphPairedSiteSuffix !== $siteService->getSiteId();
         $hasNoParticipantAccess = $isCrossSite && empty($session->get('agreeCrossSite_' . $participantId));
         if ($hasNoParticipantAccess) {
@@ -76,7 +77,8 @@ class NphParticipantSummaryController extends BaseController
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
             'cacheEnabled' => $cacheEnabled,
-            'dlwSummary' => $dlwSummary
+            'dlwSummary' => $dlwSummary,
+            'sampleStatusCounts' => $sampleStatusCounts,
         ]);
     }
 }

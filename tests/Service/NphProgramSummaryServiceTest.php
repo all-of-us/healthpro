@@ -87,4 +87,25 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
             $this->assertSame($timepointInfo['timePointDisplayName'], $this->module1data['timePoints'][$timepoint]);
         }
     }
+
+    public function testgetSampleStatusCounts()
+    {
+        $programSummary = $this->service->getProgramSummary();
+        $nphOrder = $this->testSetup->generateNPHOrder($this->testSetup->generateNphParticipant(), $this->userService->getUserEntity(), $this->siteService);
+        $orderSummary = $this->nphOrderService->getParticipantOrderSummary($nphOrder->getParticipantId());
+        $combinedSummary = $this->service->combineOrderSummaryWithProgramSummary($orderSummary, $programSummary);
+        $sampleStatusCounts = $this->nphOrderService->getSampleStatusCounts($combinedSummary);
+        $this->assertIsArray($sampleStatusCounts);
+        $this->assertNotEmpty($sampleStatusCounts);
+        $this->assertContainsOnly('array', $sampleStatusCounts);
+        $this->assertArrayHasKey('1', $sampleStatusCounts);
+        $this->assertArrayHasKey('2', $sampleStatusCounts);
+        $this->assertArrayHasKey('3', $sampleStatusCounts);
+        $this->assertArrayHasKey('active', $sampleStatusCounts['1']);
+        $this->assertArrayHasKey('active', $sampleStatusCounts['2']);
+        $this->assertArrayHasKey('active', $sampleStatusCounts['3']);
+        $this->assertArrayHasKey('Created', $sampleStatusCounts['1']);
+        $this->assertEquals(1, $sampleStatusCounts['1']['active']);
+        $this->assertEquals(1, $sampleStatusCounts['1']['Created']);
+    }
 }
