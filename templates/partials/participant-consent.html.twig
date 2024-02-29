@@ -7,9 +7,11 @@
     <li class="list-group-item">
         {{ macros.displayEHRConsentStatus(participant.consentForElectronicHealthRecords, participant.consentForElectronicHealthRecordsAuthored, participant.ehrConsentExpireStatus, participant.ehrConsentExpireAuthored) }}
     </li>
-    <li class="list-group-item">
-        {{ macros.displayGenomicsConsentStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}
-    </li>
+    {% if not participant.isPediatric %}
+        <li class="list-group-item">
+            {{ macros.displayGenomicsConsentStatus(participant.consentForGenomicsROR, participant.consentForGenomicsRORAuthored) }}
+        </li>
+    {% endif %}
     {% if siteInfo.isDVType == 'dv' %}
         <li class="list-group-item">
             {{ macros.displayConsentStatus('DV-only EHR Sharing', participant.consentForDvElectronicHealthRecordsSharing, participant.consentForDvElectronicHealthRecordsSharingAuthored) }}
