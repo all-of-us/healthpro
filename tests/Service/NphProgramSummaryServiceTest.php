@@ -88,7 +88,7 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         }
     }
 
-    public function testgetSampleStatusCounts()
+    public function testGetSampleStatusCounts(): void
     {
         $programSummary = $this->service->getProgramSummary();
         $nphOrder = $this->testSetup->generateNPHOrder($this->testSetup->generateNphParticipant(), $this->userService->getUserEntity(), $this->siteService);
