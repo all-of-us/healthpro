@@ -61,4 +61,49 @@ $(document).ready(function () {
             $("#totalCollectionVolumeWarning").hide();
         }
     });
+
+    window.Parsley.addValidator("customDateComparison", {
+        validateString: function (value, requirement) {
+            let inputDate = new Date(value);
+            let comparisonDate = new Date(requirement);
+            return inputDate > comparisonDate;
+        },
+        messages: {
+            en: "Time must be after order generation."
+        }
+    });
+
+    window.Parsley.addValidator("decimalPlaceLimit", {
+        validateString: function (value) {
+            if (isNaN(value)) {
+                return true;
+            }
+            if (parseInt(value) === parseFloat(value)) {
+                return true;
+            }
+            const totalDecimalPlaces = value.toString().length - value.toString().lastIndexOf(".") - 1;
+            return totalDecimalPlaces <= 1;
+        }
+    });
+
+    $("form[name='nph_order_collect'], form[name='dlw']").parsley({
+        errorClass: "has-error",
+        classHandler: function (el) {
+            return el.$element.closest("td, .col-md-4, .col-md-3");
+        },
+        errorsContainer: function (el) {
+            return el.$element.closest("td, .col-md-4, .col-md-3");
+        },
+        errorsWrapper: '<div class="help-block"></div>',
+        errorTemplate: "<div></div>",
+        trigger: "blur"
+    });
+
+    $(document).on("dp.hide", ".order-ts", function () {
+        $(this).parsley().validate();
+    });
+
+    $(document).on("click", "#confirm_btn", function () {
+        $("#dlw_participantWeight").parsley().validate();
+    });
 });
