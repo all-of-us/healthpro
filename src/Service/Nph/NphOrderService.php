@@ -1284,7 +1284,7 @@ class NphOrderService
             if (count($nphOrderInfo[$module]['sampleStatusCount']) === 0) {
                 $moduleStatusCount[$module] = ['active' => 0];
             }
-            foreach ($nphOrderInfo[$module]['sampleStatusCount'] as $orderId => $statusCount) {
+            foreach ($nphOrderInfo[$module]['sampleStatusCount'] as $statusCount) {
                 foreach ($statusCount as $status => $count) {
                     $moduleStatusCount[$module][$status] = isset($moduleStatusCount[$module][$status]) ? $moduleStatusCount[$module][$status] + $count : $count;
                     if ($status !== 'Canceled') {
