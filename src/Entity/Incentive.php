@@ -382,6 +382,11 @@ class Incentive
         return array_search($this->incentiveAmount, Incentive::$incentiveAmountChoices);
     }
 
+    public function getIncentiveRecipientDisplayName(): ?string
+    {
+        return array_search($this->Recipient, Incentive::$recipientChoices);
+    }
+
     public function getImport(): ?IncentiveImport
     {
         return $this->import;
