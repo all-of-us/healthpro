@@ -367,17 +367,17 @@ class Incentive
         return $this;
     }
 
-    public function getIncentiveTypeDisplayName()
+    public function getIncentiveTypeDisplayName(): ?string
     {
         return array_search($this->incentiveType, Incentive::$incentiveTypeChoices);
     }
 
-    public function getIncentiveOccurrenceDisplayName()
+    public function getIncentiveOccurrenceDisplayName(): ?string
     {
         return array_search($this->incentiveOccurrence, Incentive::$incentiveOccurrenceChoices);
     }
 
-    public function getIncentiveAmountDisplayName()
+    public function getIncentiveAmountDisplayName(): ?string
     {
         return array_search($this->incentiveAmount, Incentive::$incentiveAmountChoices);
     }
