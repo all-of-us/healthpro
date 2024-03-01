@@ -26,7 +26,7 @@
                         {% endif %}
                     </dd>
                     <dt class="col-sm-4">Recipient</dt>
-                    <dd class="col-sm-8">{{ incentive.incentiveRecipientDisplayName }}</dd>
+                    <dd class="col-sm-8">{{ incentive.incentiveRecipientDisplayName|default('--') }}</dd>
                     <dt class="col-sm-4">Date of Service</dt>
                     <dd class="col-sm-8">{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
                     <dt class="col-sm-4">Incentive Occurrence</dt>
@@ -139,7 +139,7 @@
                             <dt class="col-sm-5">Site</dt>
                             <dd class="col-sm-7">{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
                             <dt class="col-sm-5">Recipient</dt>
-                            <dd class="col-sm-7">{{ incentive.incentiveRecipientDisplayName }}</dd>
+                            <dd class="col-sm-7">{{ incentive.incentiveRecipientDisplayName|default('--') }}</dd>
                             <dt class="col-sm-5">Date of Service</dt>
                             <dd class="col-sm-7">{{ incentive.incentiveDateGiven|date('m/d/Y') }}</dd>
                             <dt class="col-sm-5">Incentive Occurrence</dt>
