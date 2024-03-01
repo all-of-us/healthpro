@@ -36,6 +36,32 @@ class NphOrder
         'Period3DSMT' => 'Diet Period 3 - DSMT',
         'Period3LMT' => 'Diet Period 3 - LMT',
     ];
+    private const TIMEPOINT_DISPLAY_NAME_MAPPER = [
+        'day0' => 'Day 0',
+        'day2' => 'Day 2',
+        'day12' => 'Day 12',
+        'day0PreDoseA' => 'Day 0 Pre Dose A',
+        'day1PreDoseB' => 'Day 1 Pre Dose B',
+        'day1PostDoseC' => 'Day Post Dose C',
+        'day1PostDoseD' => 'Day Post Dose D',
+        'day6E' => 'Day 6 E',
+        'day7F' => 'Day 7 F',
+        'day13G' => 'Day 13 G',
+        'day14F' => 'Day 14 F',
+        'preDSMT' => 'Pre DSMT',
+        'minus15min' => '-15 min',
+        'minus5min' => '-5 min',
+        '15min' => '15 min',
+        '30min' => '30 min',
+        '60min' => '60 min',
+        '90min' => '90 min',
+        '120min' => '120 min',
+        '180min' => '180 min',
+        '240min' => '240 min',
+        'postDSMT' => 'Post DSMT',
+        'preLMT' => 'Pre LMT',
+        'postLMT' => 'Post LMT',
+    ];
     private const TYPE_DISPLAY_OVERRIDE = [
         2 => [
             'urine' => 'Spot Urine'
@@ -476,5 +502,10 @@ class NphOrder
     public function getVisitDisplayName(): ?string
     {
         return self::VISIT_DISPLAY_NAME_MAPPER[$this->visitPeriod];
+    }
+
+    public function getTimepointDisplayName(): ?string
+    {
+        return self::TIMEPOINT_DISPLAY_NAME_MAPPER[$this->timepoint];
     }
 }

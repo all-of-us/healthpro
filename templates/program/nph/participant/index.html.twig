@@ -103,7 +103,12 @@
                             {% endif %}
                             <div class="tab-pane fade ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                                 <div class="row">
-                                    <h5 class="col-md-12 participant-module-header ms-3">NPH Module {{ moduleNumber }} Collections</h5>
+                                    <div class="col-md-10">
+                                        <h5 class="col-md-12 participant-module-header ms-3">NPH Module {{ moduleNumber }} Collections</h5>
+                                    </div>
+                                    <div class="col-md-2 mb-1">
+                                        <a class="badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
+                                    </div>
                                 </div>
                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                     {% if VisitCode != 'sampleStatusCount' %}

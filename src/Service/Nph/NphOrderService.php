@@ -597,6 +597,34 @@ class NphOrderService
         return $status;
     }
 
+    public function updateSampleModificationBulk(array $formData, string $type): bool
+    {
+        $status = true;
+        foreach ($formData as $sampleId => $checked) {
+            if ($checked === true) {
+                $sample = $this->em->getRepository(NphSample::class)->findOneBy(['sampleId' => $sampleId]);
+                if ($sample !== null) {
+                    $sampleObject = $this->getCancelRestoreRdrObject($type, $formData['reason']);
+                    if ($sample->getRdrId()) {
+                        if ($this->cancelRestoreSample(
+                            $sample->getRdrId(),
+                            $sample->getNphOrder()->getParticipantId(),
+                            $type,
+                            $sampleObject
+                        )) {
+                            $this->saveSampleModificationsData($sample, $type, $formData);
+                        } else {
+                            $status = false;
+                        }
+                    } else {
+                        $this->saveSampleModificationsData($sample, $type, $formData);
+                    }
+                }
+            }
+        }
+        return $status;
+    }
+
     public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
     {
         $this->saveSampleModificationsData($sample, $type, $formData);
@@ -872,6 +900,25 @@ class NphOrderService
             }
         }
         return $downtimeGenerated;
+    }
+
+    public function getSampleStatusCounts(array $nphOrderInfo): array
+    {
+        $moduleStatusCount = [];
+        foreach (array_keys($nphOrderInfo) as $module) {
+            if (count($nphOrderInfo[$module]['sampleStatusCount']) === 0) {
+                $moduleStatusCount[$module] = ['active' => 0];
+            }
+            foreach ($nphOrderInfo[$module]['sampleStatusCount'] as $statusCount) {
+                foreach ($statusCount as $status => $count) {
+                    $moduleStatusCount[$module][$status] = isset($moduleStatusCount[$module][$status]) ? $moduleStatusCount[$module][$status] + $count : $count;
+                    if ($status !== 'Canceled') {
+                        $moduleStatusCount[$module]['active'] = isset($moduleStatusCount[$module]['active']) ? $moduleStatusCount[$module]['active'] + $count : $count;
+                    }
+                }
+            }
+        }
+        return $moduleStatusCount;
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array
