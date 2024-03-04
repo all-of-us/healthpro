@@ -2581,6 +2581,12 @@ class WorkQueue
         '1SAL' => 'Saliva'
     ];
 
+    public static array $pedsOnlyFields = [
+        'EnvironmentalExposures',
+        '2ED02',
+        '2ED04'
+    ];
+
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',
@@ -3337,5 +3343,15 @@ class WorkQueue
         }, $relatedParticipants);
 
         return implode(', ', $participantIds);
+    }
+
+    public static function getParticipantSummarySamples(bool $isPediatric): array
+    {
+        return $isPediatric ? self::$pedsSamples : array_diff_key(self::$samples, array_flip(self::$pedsOnlyFields));
+    }
+
+    public static function getParticipantSummarySurveys(bool $isPediatric): array
+    {
+        return $isPediatric ? self::$pedsSurveys : array_diff_key(self::$surveys, array_flip(self::$pedsOnlyFields));
     }
 }
