@@ -441,7 +441,9 @@ class WorkQueueService
                 $columnDef = WorkQueue::$columnsDef[$field];
                 if (isset($columnDef['display_na'])) {
                     $row[$field] = WorkQueue::getPediatricAdultString($columnDef['display_na'], $participant->isPediatric);
-                    continue;
+                    if ($row[$field] !== '') {
+                        continue;
+                    }
                 }
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
