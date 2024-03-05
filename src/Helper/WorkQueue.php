@@ -3393,7 +3393,7 @@ class WorkQueue
     {
         return ($displayNa === self::NA_PEDIATRIC && $isPediatric) || ($displayNa === self::NA_ADULT && !$isPediatric) ? 'N/A' : '';
     }
-  
+
     public static function getParticipantSummarySamples(bool $isPediatric): array
     {
         return $isPediatric ? self::$pedsSamples : array_diff_key(self::$samples, array_flip(self::$pedsOnlyFields));
