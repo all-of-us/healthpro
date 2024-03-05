@@ -190,6 +190,7 @@ class WorkQueueController extends BaseController
             'filters' => $filters,
             'advancedFilters' => $advancedFilters,
             'surveys' => WorkQueue::$surveys,
+            'pedsFields' => WorkQueue::$pediatricOnlyFields,
             'samples' => WorkQueue::$samples,
             'digitalHealthSharingTypes' => WorkQueue::$digitalHealthSharingTypes,
             'participants' => [],

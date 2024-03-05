@@ -121,7 +121,7 @@
             <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Required Complete?</th>
             <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Completed Surveys</th>
             {% for field, label in surveys %}
-                <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}</th>
+                <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}{% if field in pedsFields %} <i class="fa fa-child child-icon"></i> {% endif %}</th>
             {% endfor %}
 
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Enrollment Site</th>
@@ -136,7 +136,7 @@
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Baseline Samples <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
             <th class="secondaryheader col-group-inperson multiheader-inperson">Bio&shy;specimens Site</th>
             {% for field, label in samples %}
-                <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
+                <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}{% if field in pedsFields %} <i class="fa fa-child child-icon"></i> {% endif %}</th>
             {% endfor %}
 
             <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>
