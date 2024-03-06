@@ -24,8 +24,6 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
 RUN MAKEFLAGS="-j $(nproc)" pecl install grpc \
       && docker-php-ext-enable grpc
 
-RUN pecl install xdebug && docker-php-ext-enable xdebug
-
 # Google Cloud Tools
 WORKDIR /opt
 RUN export CLOUDSDK_PYTHON=/usr/bin/python3 \
