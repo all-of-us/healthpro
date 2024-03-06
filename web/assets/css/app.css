@@ -949,3 +949,18 @@ table.table-samples td {
 .right-float {
     float: right;
 }
+
+/* Custom styles to support bootstrap5 classes */
+
+.btn-outline-primary {
+    color: #007bff;
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid #007bff;
+}
+
+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
