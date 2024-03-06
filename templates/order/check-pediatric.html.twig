@@ -24,6 +24,9 @@
     </ul>
     <br/>
     <div id="weightDiv">
+    {% if app.session.get('orderType') == constant('App\\Security\\User::HPO_TYPE') %}
+        <button type="button" class="btn btn-outline-primary" id="peds_urine_only">Bypass and create a <b>urine only</b> order <i class="fa fa-arrow-right"></i></button>
+    {% endif %}
     {% if weightMeasurement is null %}
         <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
         <div class="col-md-12">

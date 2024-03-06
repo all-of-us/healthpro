@@ -47,4 +47,8 @@ $(document).ready(function () {
         $("#weightConfirmButtons").hide();
         $("#weightConfirmText").show();
     });
+
+    $("#peds_urine_only").on("click", () => {
+        $("#safety-checks").submit();
+    });
 });
