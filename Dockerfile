@@ -4,13 +4,13 @@ FROM php:8.1
 RUN mkdir -p /usr/share/man/man1
 
 # Install baseline packages
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
       && apt-get update \
       && apt-get install -y --no-install-recommends \
         default-mysql-client \
         git-all \
         nodejs \
-        openjdk-11-jdk \
+        openjdk-17-jdk \
         libzstd-dev \
         zlib1g-dev \
         autoconf \
@@ -23,6 +23,8 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
 # Install GRPC module for PHP
 RUN MAKEFLAGS="-j $(nproc)" pecl install grpc \
       && docker-php-ext-enable grpc
+
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 # Google Cloud Tools
 WORKDIR /opt
