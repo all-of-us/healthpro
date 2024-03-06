@@ -49,6 +49,7 @@ $(document).ready(function () {
     });
 
     $("#peds_urine_only").on("click", () => {
+        $('input[name="show-blood-tubes"], input[name="show-saliva-tubes"]').val('no');
         $("#safety-checks").submit();
     });
 });
