@@ -52,14 +52,17 @@ class IdVerificationType extends AbstractType
             ])
             ->add('guardian_verified', Type\ChoiceType::class, [
                 'label' => false,
-                'choices' => ['Participant\'s identity confirmed via the guardian.' => true],
+                'choices' => [
+                    'Participant\'s identity confirmed via the guardian. <span class="toggle-help-text toggle-id-verification-help-text" data-id="guardian_help_modal"><i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>' => true
+                ],
                 'expanded' => true,
                 'multiple' => true,
                 'required' => true,
                 'attr' => [
                     'hidden' => !$options['pediatricParticipant'],
                 ],
-                'data' => $options['pediatricParticipant'] ? [true] : []
+                'data' => $options['pediatricParticipant'] ? [true] : [],
+                'label_html' => true
             ]);
     }
 
