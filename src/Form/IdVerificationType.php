@@ -47,7 +47,8 @@ class IdVerificationType extends AbstractType
                 'choices' => self::$idVerificationChoices['visitType'],
                 'placeholder' => '-- Select Visit Type --',
                 'multiple' => false,
-                'required' => true
+                'required' => true,
+                'data' => $options['pediatricParticipant'] ? 'PEDIATRIC_VISIT' : null
             ])
             ->add('guardian_verified', Type\ChoiceType::class, [
                 'label' => false,
@@ -55,14 +56,18 @@ class IdVerificationType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'required' => true,
-                'attr' => ['hidden' => true]
+                'attr' => [
+                    'hidden' => !$options['pediatricParticipant'],
+                ],
+                'data' => $options['pediatricParticipant'] ? [true] : []
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => null
+            'data_class' => null,
+            'pediatricParticipant' => false
         ]);
     }
 }
