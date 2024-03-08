@@ -16,14 +16,18 @@
             {% if idVerifications is not empty %}
                 {% set idVerification = idVerifications[0] %}
                 <dl class="row">
-                    <dt class="col-sm-3">Verified</dt>
-                    <dd class="col-sm-9">
+                    <dt class="col-sm-4">Verified</dt>
+                    <dd class="col-sm-8">
                         {{ idVerification.verifiedDate ? idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) : '' }}
                     </dd>
-                    <dt class="col-sm-3">Verification Type</dt>
-                    <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
-                    <dt class="col-sm-3">Visit Type</dt>
-                    <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                    <dt class="col-sm-4">Verification Type</dt>
+                    <dd class="col-sm-8">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
+                    <dt class="col-sm-4">Visit Type</dt>
+                    <dd class="col-sm-8">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                    {% if idVerification.visitType == constant('App\\Entity\\IdVerification::PEDIATRIC_VISIT') %}
+                        <dt class="col-sm-4">Guardian Confirmation</dt>
+                        <dd class="col-sm-8">{{ idVerification.GuardianVerified ? 'Yes' : 'No' }}</dd>
+                    {% endif %}
                 </dl>
                 {% if not readOnlyView %}
                     <div class="text-center">
@@ -61,18 +65,22 @@
                     <div class="panel-body">
                         {% for idVerification in idVerifications %}
                             <dl class="row">
-                                <dt class="col-sm-3">Verified</dt>
-                                <dd class="col-sm-9">
+                                <dt class="col-sm-4">Verified</dt>
+                                <dd class="col-sm-8">
                                     {{ idVerification.verifiedDate ? idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) : '' }}
                                 </dd>
-                                <dt class="col-sm-3">User</dt>
-                                <dd class="col-sm-9">{{ idVerification.user ? idVerification.user.email : '' }}</dd>
-                                <dt class="col-sm-3">Site</dt>
-                                <dd class="col-sm-9">{{ siteInfo.siteDisplayName(idVerification.site) }}</dd>
-                                <dt class="col-sm-3">Verification Type</dt>
-                                <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
-                                <dt class="col-sm-3">Visit Type</dt>
-                                <dd class="col-sm-9">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                                <dt class="col-sm-4">User</dt>
+                                <dd class="col-sm-8">{{ idVerification.user ? idVerification.user.email : '' }}</dd>
+                                <dt class="col-sm-4">Site</dt>
+                                <dd class="col-sm-8">{{ siteInfo.siteDisplayName(idVerification.site) }}</dd>
+                                <dt class="col-sm-4">Verification Type</dt>
+                                <dd class="col-sm-8">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
+                                <dt class="col-sm-4">Visit Type</dt>
+                                <dd class="col-sm-8">{{ macros.displayChoiceText(idVerification.visitType, idVerificationChoices['visitType']) }}</dd>
+                                {% if idVerification.visitType == constant('App\\Entity\\IdVerification::PEDIATRIC_VISIT') %}
+                                    <dt class="col-sm-4">Guardian Confirmation</dt>
+                                    <dd class="col-sm-8">{{ idVerification.GuardianVerified ? 'Yes' : 'No' }}</dd>
+                                {% endif %}
                             </dl>
                             <hr/>
                         {% endfor %}
