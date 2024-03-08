@@ -80,8 +80,8 @@ let viewExtension = Backbone.View.extend({
                 0
             );
             mean = (sum / values.length).toFixed(1);
-            if (field === 'heart-rate') {
-                mean = Math.round(mean)
+            if (field === "heart-rate") {
+                mean = Math.round(mean);
             }
             meanElement.html("<strong>" + mean + "</strong>");
             meanElement.attr("data-mean", mean);
@@ -793,11 +793,11 @@ let viewExtension = Backbone.View.extend({
     },
     displayWarning: function (e) {
         let self = this;
-        let input
+        let input;
         if (e.hasOwnProperty("currentTarget")) {
-            input = $(e.currentTarget)
+            input = $(e.currentTarget);
         } else {
-            input = e
+            input = e;
         }
         let field = input.closest(".field").data("field");
         let container = input.closest(".form-group");
@@ -861,13 +861,17 @@ let viewExtension = Backbone.View.extend({
     },
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
-        let modificationType = $(e.currentTarget).parents('.modification-select').data('modification-type')
-        let elements = $(modificationType + '-select').find('select').not(e.currentTarget).val(e.currentTarget.value).closest('.modification-block')
+        let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
+        let elements = $(modificationType + "-select")
+            .find("select")
+            .not(e.currentTarget)
+            .val(e.currentTarget.value)
+            .closest(".modification-block");
         for (let i = 0; i < elements.length; i++) {
-            this.showModificationBlock($(elements[i]))
-            this.handleProtocolModificationBlock($(elements[i]))
-            this.triggerEqualize()
-            this.displayWarning($(elements[i]))
+            this.showModificationBlock($(elements[i]));
+            this.handleProtocolModificationBlock($(elements[i]));
+            this.triggerEqualize();
+            this.displayWarning($(elements[i]));
         }
         this.handleProtocolModificationBlock(block);
     },
