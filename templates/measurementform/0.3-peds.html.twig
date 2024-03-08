@@ -37,6 +37,13 @@
                                     <div class="modification-notes" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification-notes'], i) }}
                                     </div>
+                                    {% if loop.first %}
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" class="weight-modification-all"> Apply modification to all readings
+                                            </label>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -73,6 +80,13 @@
                                     <div class="modification-notes" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['height-protocol-modification-notes'], i) }}
                                     </div>
+                                    {% if loop.first %}
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" class="weight-modification-all"> Apply modification to all readings
+                                            </label>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -209,6 +223,13 @@
                                         <div class="modification-notes" style="display:none">
                                             {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference-protocol-modification-notes'], i) }}
                                         </div>
+                                        {% if loop.first %}
+                                            <div>
+                                                <label>
+                                                    <input type="checkbox" class="weight-modification-all"> Apply modification to all readings
+                                                </label>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -254,6 +275,13 @@
                                             <div class="modification-notes" style="display:none">
                                                 {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
                                             </div>
+                                            {% if loop.first %}
+                                                <div>
+                                                    <label>
+                                                        <input type="checkbox" class="weight-modification-all"> Apply modification to all readings
+                                                    </label>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

@@ -863,16 +863,18 @@ let viewExtension = Backbone.View.extend({
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
         let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
-        let elements = $(modificationType + "-select")
-            .find("select")
-            .not(e.currentTarget)
-            .val(e.currentTarget.value)
-            .closest(".modification-block");
-        for (let i = 0; i < elements.length; i++) {
-            this.showModificationBlock($(elements[i]));
-            this.handleProtocolModificationBlock($(elements[i]));
-            this.triggerEqualize();
-            this.displayWarning($(elements[i]));
+        if ($(modificationType + "-all").is(":checked")) {
+            let elements = $(modificationType + "-select")
+                .find("select")
+                .not(e.currentTarget)
+                .val(e.currentTarget.value)
+                .closest(".modification-block");
+            for (let i = 0; i < elements.length; i++) {
+                this.showModificationBlock($(elements[i]));
+                this.handleProtocolModificationBlock($(elements[i]));
+                this.triggerEqualize();
+                this.displayWarning($(elements[i]));
+            }
         }
         this.handleProtocolModificationBlock(block);
     },
