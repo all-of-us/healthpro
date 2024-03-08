@@ -25,9 +25,9 @@
                                     {% endif %}
                                 </div>
                                 <div class="modification-toggle text-right">
-                                    <a class="small">Add protocol modification</a>
+                                    <a class="small weight-modification-toggle">Add protocol modification</a>
                                 </div>
-                                <div class="modification-select" style="display:none">
+                                <div class="modification-select weight-modification-select" data-modification-type=".weight-modification" style="display:none">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification'], i) }}
                                     <div class="modification-notes" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification-notes'], i) }}

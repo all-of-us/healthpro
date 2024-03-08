@@ -30,9 +30,9 @@
                                     {% endif %}
                                 </div>
                                 <div class="modification-toggle text-right">
-                                    <a class="small">Add protocol modification</a>
+                                    <a class="weight-modification-toggle small">Add protocol modification</a>
                                 </div>
-                                <div class="modification-select" style="display:none">
+                                <div class="modification-select weight-modification-select" data-modification-type=".weight-modification" style="display:none">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification'], i) }}
                                     <div class="modification-notes" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['weight-protocol-modification-notes'], i) }}
@@ -66,9 +66,9 @@
                                     {% endif %}
                                 </div>
                                 <div class="modification-toggle text-right">
-                                    <a class="small">Add protocol modification</a>
+                                    <a class="small .head-modification-toggle">Add protocol modification</a>
                                 </div>
-                                <div class="modification-select" style="display:none">
+                                <div class="modification-select height-modification-select" data-modification-type=".height-modification" style="display:none">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['height-protocol-modification'], i) }}
                                     <div class="modification-notes" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['height-protocol-modification-notes'], i) }}
@@ -202,9 +202,9 @@
                                         {% endif %}
                                     </div>
                                     <div class="modification-toggle text-right">
-                                        <a class="small">Add protocol modification</a>
+                                        <a class="small .head-modification-toggle">Add protocol modification</a>
                                     </div>
-                                    <div class="modification-select" style="display:none">
+                                    <div class="modification-select head-modification-select" data-modification-type=".head-modification" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference-protocol-modification'], i) }}
                                         <div class="modification-notes" style="display:none">
                                             {{ metrics.form_row_replicate(measurementForm, schema.fields['head-circumference-protocol-modification-notes'], i) }}
@@ -247,9 +247,9 @@
                                             {% endif %}
                                         </div>
                                         <div class="modification-toggle text-right">
-                                            <a class="small">Add protocol modification</a>
+                                            <a class="small .waist-modification-toggle">Add protocol modification</a>
                                         </div>
-                                        <div class="modification-select" style="display:none">
+                                        <div class="modification-select .waist-modification-select" data-modification-type=".waist-modification" style="display:none">
                                             {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification'], i) }}
                                             <div class="modification-notes" style="display:none">
                                                 {{ metrics.form_row_replicate(measurementForm, schema.fields['waist-circumference-protocol-modification-notes'], i) }}
