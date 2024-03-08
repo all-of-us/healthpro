@@ -287,6 +287,10 @@ class WorkQueueService
             //Identifiers and status
             foreach (WorkQueue::$columns as $field) {
                 $columnDef = WorkQueue::$columnsDef[$field];
+                if (isset($columnDef['display_na'])) {
+                    $row[$field] = WorkQueue::getPediatricAdultString($columnDef['display_na'], $participant->isPediatric);
+                    continue;
+                }
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
                 } elseif (isset($columnDef['generateLink'])) {
@@ -435,6 +439,12 @@ class WorkQueueService
             $row = [];
             foreach (WorkQueue::$consentColumns as $field) {
                 $columnDef = WorkQueue::$columnsDef[$field];
+                if (isset($columnDef['display_na'])) {
+                    $row[$field] = WorkQueue::getPediatricAdultString($columnDef['display_na'], $participant->isPediatric);
+                    if ($row[$field] !== '') {
+                        continue;
+                    }
+                }
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
                 } elseif (isset($columnDef['generateLink'])) {
