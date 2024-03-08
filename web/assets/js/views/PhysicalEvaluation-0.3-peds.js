@@ -302,6 +302,7 @@ let viewExtension = Backbone.View.extend({
         } else {
             this.$("#bmi").text("--");
             this.$("#percentile-1-bmi-for-age").text("--");
+            this.$("#percentile-2-bmi-for-age").text("--");
         }
     },
     calculateCuff: function () {
