@@ -2577,12 +2577,6 @@ class WorkQueue
         'EnvironmentalExposures' => 'Environmental Exposures'
     ];
 
-    public static array $pediatricOnlyFields = [
-        'EnvironmentalExposures',
-        '2ED02',
-        '2ED04'
-    ];
-
     public static $initialSurveys = [
         'TheBasics',
         'OverallHealth',
