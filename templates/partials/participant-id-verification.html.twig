@@ -17,9 +17,7 @@
                 {% set idVerification = idVerifications[0] %}
                 <dl class="row">
                     <dt class="col-sm-4">Verified</dt>
-                    <dd class="col-sm-8">
-                        {{ idVerification.verifiedDate ? idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) : '' }}
-                    </dd>
+                    <dd class="col-sm-8">{{ idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) }}</dd>
                     <dt class="col-sm-4">Verification Type</dt>
                     <dd class="col-sm-8">{{ macros.displayChoiceText(idVerification.verificationType, idVerificationChoices['verificationType']) }}</dd>
                     <dt class="col-sm-4">Visit Type</dt>
@@ -66,9 +64,7 @@
                         {% for idVerification in idVerifications %}
                             <dl class="row">
                                 <dt class="col-sm-4">Verified</dt>
-                                <dd class="col-sm-8">
-                                    {{ idVerification.verifiedDate ? idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) : '' }}
-                                </dd>
+                                <dd class="col-sm-8">{{ idVerification.verifiedDate|date('n/j/Y g:ia', app.user.timezone) }}</dd>
                                 <dt class="col-sm-4">User</dt>
                                 <dd class="col-sm-8">{{ idVerification.user ? idVerification.user.email : '' }}</dd>
                                 <dt class="col-sm-4">Site</dt>
