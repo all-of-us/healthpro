@@ -33,9 +33,9 @@
         {% endif %}
     {% endif %}
 </dl>
-{% if participant.isPediatric and participant.relatedParticipants and participant.relatedParticipants is iterable %}
+{% if participant.relatedParticipants and participant.relatedParticipants is iterable %}
     <hr>
-    <strong>Guardian</strong>
+    {% if participant.isPediatric %}<strong>Guardian</strong>{% else %}<strong>Child</strong>{% endif %}
     {% for relatedParticipant in participant.relatedParticipants %}
         <a class="link-primary text-decoration-none d-block" href="{{ path('participant', { id: relatedParticipant.participantId }) }}">
             {{ relatedParticipant.lastName }}, {{ relatedParticipant.firstName }} ({{ relatedParticipant.participantId }})
