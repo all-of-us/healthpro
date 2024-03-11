@@ -237,7 +237,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
             ->where('no.DowntimeGenerated = 1')
-            ->addOrderBy('no.orderId', 'DESC');
+            ->addOrderBy('no.downtimeGeneratedTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
 }
