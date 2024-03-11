@@ -80,6 +80,9 @@ let viewExtension = Backbone.View.extend({
                 0
             );
             mean = (sum / values.length).toFixed(1);
+            if (field === "heart-rate") {
+                mean = Math.round(mean);
+            }
             meanElement.html("<strong>" + mean + "</strong>");
             meanElement.attr("data-mean", mean);
             if (this.conversions[field]) {
@@ -298,6 +301,8 @@ let viewExtension = Backbone.View.extend({
             }
         } else {
             this.$("#bmi").text("--");
+            this.$("#percentile-1-bmi-for-age").text("--");
+            this.$("#percentile-2-bmi-for-age").text("--");
         }
     },
     calculateCuff: function () {
@@ -790,7 +795,12 @@ let viewExtension = Backbone.View.extend({
     },
     displayWarning: function (e) {
         let self = this;
-        let input = $(e.currentTarget);
+        let input;
+        if (e.hasOwnProperty("currentTarget")) {
+            input = $(e.currentTarget);
+        } else {
+            input = e;
+        }
         let field = input.closest(".field").data("field");
         let container = input.closest(".form-group");
         container.find(".metric-warnings").remove();
@@ -853,6 +863,20 @@ let viewExtension = Backbone.View.extend({
     },
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
+        let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
+        if ($(modificationType + "-all").is(":checked")) {
+            let elements = $(modificationType + "-select")
+                .find("select")
+                .not(e.currentTarget)
+                .val(e.currentTarget.value)
+                .closest(".modification-block");
+            for (let i = 0; i < elements.length; i++) {
+                this.showModificationBlock($(elements[i]));
+                this.handleProtocolModificationBlock($(elements[i]));
+                this.triggerEqualize();
+                this.displayWarning($(elements[i]));
+            }
+        }
         this.handleProtocolModificationBlock(block);
     },
     handleProtocolModificationBlock: function (block) {
