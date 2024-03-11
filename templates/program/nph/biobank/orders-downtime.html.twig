@@ -1,0 +1,52 @@
+{% extends 'program/nph/biobank/base.html.twig' %}
+{% block title %}Unlocked - Biobank Samples - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+
+{% block body %}
+    {% include 'program/nph/biobank/partials/review-page-heading.html.twig' %}
+    <table class="table table-bordered table-small">
+        <thead>
+        <tr>
+            <th>Site</th>
+            <th>Biobank ID</th>
+            <th>User</th>
+            <th>Downtime Created</th>
+            <th>Order Generation Time</th>
+            <th>Module</th>
+            <th>Visit</th>
+            <th>Timepoint</th>
+            <th>Order ID</th>
+            <th>Samples</th>
+            <th>Sample ID</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sample in samples %}
+            <tr>
+                <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
+                <td>{{ sample.biobankId }}</td>
+                <td>{{ sample.email }}</td>
+                <td data-order="{{ sample.downtimeGeneratedTs|date('Y-m-d H:i:s') }}" >{{ macros.displayDateAndTimezone(sample.downtimeGeneratedTs, sample.createdTimezoneId) }}</td>
+                <td data-order="{{ sample.createdTs|date('Y-m-d H:i:s') }}" >{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
+                <td>{{ sample.module }}</td>
+                <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
+                <td>{{ sample.timepoint }}</td>
+                <td>
+                    <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
+                </td>
+                <td>{{ sample.sampleCode }}</td>
+                <td>{{ sample.sampleId }}</td>
+                <td>{{ macros.displayBiobankSampleStatus(sample) }} <span class="label label-primary">Downtime</span>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-biobank-review') }}
+{% endblock %}

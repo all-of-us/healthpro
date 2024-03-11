@@ -227,4 +227,17 @@ class NphOrderRepository extends ServiceEntityRepository
             ->setParameter('visitPeriod', $Visit);
         return $queryBuild->getQuery()->getResult();
     }
+
+    public function getDowntimeOrders(): array
+    {
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitPeriod, u.email as email, no.downtimeGeneratedTs, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('no.DowntimeGenerated = 1')
+            ->addOrderBy('no.orderId', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

@@ -139,6 +139,15 @@ class NphBiobankController extends BaseController
         ]);
     }
 
+    #[Route(path: '/review/orders/downtime', name: 'nph_biobank_orders_downtime')]
+    public function ordersDowntimeAction(): Response
+    {
+        $samples = $this->em->getRepository(NphOrder::class)->getDowntimeOrders();
+        return $this->render('/program/nph/biobank/orders-downtime.html.twig', [
+            'samples' => $samples
+        ]);
+    }
+
     #[Route(path: '/{biobankId}', name: 'nph_biobank_participant')]
     public function participantAction(
         string $biobankId,
