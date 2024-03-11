@@ -6,6 +6,7 @@ use App\Entity\NphDlw;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -32,7 +33,7 @@ class DlwType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('doseBatchId', NumberType::class, [
+            ->add('doseBatchId', TextType::class, [
                 'label' => 'Dose Batch ID',
                 'constraints' => [
                     new NotBlank(),
@@ -47,7 +48,6 @@ class DlwType extends AbstractType
                     'class' => 'form-control',
                     'data-parsley-required-message' => self::DOSE_BATCH_ID_REQUIRED_ERROR_MESSAGE,
                     'data-parsley-pattern-message' => self::DOSE_BATCH_ID_INVALID_ERROR_MESSAGE,
-                    'data-parsley-type' => 'number',
                     'data-parsley-pattern' => '^\d{' . self::DOSE_BATCH_ID_DIGITS . '}$'
                 ],
             ])
