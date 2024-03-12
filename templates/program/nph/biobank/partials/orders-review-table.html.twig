@@ -38,7 +38,12 @@
             {% if modifiedOrdersView is defined %}
                 <td>{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
             {% endif %}
-            <td>{{ macros.displayBiobankSampleStatus(sample) }}</td>
+            <td>
+                {{ macros.displayBiobankSampleStatus(sample) }}
+                {% if sample.DowntimeGenerated %}
+                    <span class="label label-primary">Downtime</span>
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
     </tbody>
