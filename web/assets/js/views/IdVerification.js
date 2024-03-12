@@ -40,7 +40,8 @@ $(document).ready(function () {
         }
     });
 
-    $(".toggle-id-verification-help-text").on("click", function () {
+    $(".toggle-id-verification-help-text").on("click", function (e) {
+        e.preventDefault();
         let id = $(this).data("id");
         let html = $("#" + id).html();
         $("#helpModalBs5 .modal-body").html(html);

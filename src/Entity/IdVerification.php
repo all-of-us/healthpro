@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class IdVerification
 {
+    public const PEDIATRIC_VISIT = 'PEDIATRIC_VISIT';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

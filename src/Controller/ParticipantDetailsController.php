@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\IdVerification;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
@@ -178,7 +179,7 @@ class ParticipantDetailsController extends BaseController
         $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly(), 'pediatric_participant' => $participant->isPediatric]);
 
         // Id Verification Form
-        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly(), 'pediatricParticipant' => $participant->isPediatric]);
         $idVerificationForm->handleRequest($request);
         if ($idVerificationForm->isSubmitted()) {
             if ($idVerificationForm->isValid()) {
@@ -191,7 +192,7 @@ class ParticipantDetailsController extends BaseController
                 $this->addFlash('id-verification-error', 'Invalid form');
             }
         }
-        $idVerifications = $idVerificationService->getIdVerifications($id);
+        $idVerifications = $this->em->getRepository(IdVerification::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
