@@ -14,4 +14,6 @@ $(document).ready(function () {
     for (const dateType of dateTypes) {
         $("#" + dateType).html($("[data-date-type=" + dateType + "]").length);
     }
+
+    $("#review_today_filter_start_date, #review_today_filter_end_date").pmiDateTimePicker({format: "MM/DD/YYYY"});
 });
