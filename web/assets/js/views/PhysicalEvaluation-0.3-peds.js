@@ -883,7 +883,7 @@ let viewExtension = Backbone.View.extend({
             let elements = $(modificationType + "-select")
                 .find("select")
                 .not(primarySelect)
-                .val('')
+                .val("")
                 .closest(".modification-block");
             for (let i = 0; i < elements.length; i++) {
                 this.showModificationBlock($(elements[i]));
