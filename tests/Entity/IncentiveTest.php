@@ -84,7 +84,7 @@ class IncentiveTest extends KernelTestCase
             ['adult_participant', 'Adult Participant'],
             ['pediatric_guardian', 'Pediatric Guardian'],
             ['other, text1', 'Other'],
-            ['na', 'Other']
+            ['na', '']
         ];
     }
 

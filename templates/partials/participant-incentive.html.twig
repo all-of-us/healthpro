@@ -26,7 +26,7 @@
                         {% endif %}
                     </dd>
                     <dt class="col-sm-4">Recipient</dt>
-                    <dd class="col-sm-8">{{ incentive.incentiveRecipientDisplayName }}</dd>
+                    <dd class="col-sm-8">{{ incentive.incentiveRecipientDisplayName|default('--') }}</dd>
                     {% if incentive.otherIncentiveRecipient %}
                         <dt class="col-sm-4">Other Recipient</dt>
                         <dd class="col-sm-8">{{ incentive.otherIncentiveRecipient }}</dd>
@@ -143,7 +143,7 @@
                             <dt class="col-sm-5">Site</dt>
                             <dd class="col-sm-7">{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
                             <dt class="col-sm-5">Recipient</dt>
-                            <dd class="col-sm-7">{{ incentive.incentiveRecipientDisplayName }}</dd>
+                            <dd class="col-sm-7">{{ incentive.incentiveRecipientDisplayName|default('--') }}</dd>
                             {% if incentive.otherIncentiveRecipient %}
                                 <dt class="col-sm-5">Other Recipient</dt>
                                 <dd class="col-sm-7">{{ incentive.otherIncentiveRecipient }}</dd>

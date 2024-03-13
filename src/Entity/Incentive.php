@@ -384,8 +384,10 @@ class Incentive
 
     public function getIncentiveRecipientDisplayName(): ?string
     {
-        $displayName = array_search($this->Recipient, Incentive::$recipientChoices);
-        return $displayName !== false ? $displayName : 'Other';
+        if ($this->getOtherIncentiveRecipient()) {
+            return 'Other';
+        }
+        return array_search($this->Recipient, Incentive::$recipientChoices);
     }
 
     public function getOtherIncentiveRecipient(): ?string
