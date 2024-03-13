@@ -1,9 +1,6 @@
 $(document).ready(function () {
     const tableSelector = $("table");
-    let defaultSortColumn = tableSelector.data("default-sort-column");
-    if (defaultSortColumn === undefined || defaultSortColumn === null) {
-        defaultSortColumn = 8;
-    }
+    let defaultSortColumn = tableSelector.data("default-sort-column") ?? 8;
     tableSelector.DataTable({
         order: [[defaultSortColumn, "desc"]],
         pageLength: 25
