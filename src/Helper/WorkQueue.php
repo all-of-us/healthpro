@@ -971,7 +971,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'enrollmentSite' => [
             'name' => 'Enrollment Site',
