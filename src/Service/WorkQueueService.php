@@ -287,13 +287,20 @@ class WorkQueueService
             //Identifiers and status
             foreach (WorkQueue::$columns as $field) {
                 $columnDef = WorkQueue::$columnsDef[$field];
+                if (isset($columnDef['display_na'])) {
+                    $row[$field] = WorkQueue::getPediatricAdultString($columnDef['display_na'], $participant->isPediatric);
+                    if ($row[$field] == 'N/A') {
+                        continue;
+                    }
+                }
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
                 } elseif (isset($columnDef['generateLink'])) {
+                    $childIcon = isset($columnDef['displayPediatricIcon']) && $participant->isPediatric ? WorkQueue::HTML_CHILD_ICON : '';
                     if ($this->authorizationChecker->isGranted('ROLE_USER') || $this->authorizationChecker->isGranted('ROLE_AWARDEE_SCRIPPS')) {
-                        $row[$field] = $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
+                        $row[$field] = $childIcon . $this->generateLink($participant->id, $participant->{$columnDef['rdrField']});
                     } else {
-                        $row[$field] = $e($participant->{$columnDef['rdrField']});
+                        $row[$field] = $childIcon . $e($participant->{$columnDef['rdrField']});
                     }
                 } elseif (isset($columnDef['formatDate'])) {
                     if (!empty($participant->{$columnDef['rdrField']})) {
@@ -341,6 +348,8 @@ class WorkQueueService
                             $row[$field] = WorkQueue::HTML_DANGER;
                         }
                     }
+                } elseif (isset($columnDef['wqServiceMethod'])) {
+                    $row[$field] = $this->{$columnDef['wqServiceMethod']}($participant->{$columnDef['rdrField']});
                 } elseif (isset($columnDef['method'])) {
                     if (isset($columnDef['rdrDateField'])) {
                         if (isset($columnDef['otherField'])) {
@@ -432,6 +441,12 @@ class WorkQueueService
             $row = [];
             foreach (WorkQueue::$consentColumns as $field) {
                 $columnDef = WorkQueue::$columnsDef[$field];
+                if (isset($columnDef['display_na'])) {
+                    $row[$field] = WorkQueue::getPediatricAdultString($columnDef['display_na'], $participant->isPediatric);
+                    if ($row[$field] !== '') {
+                        continue;
+                    }
+                }
                 if (isset($columnDef['consentMethod'])) {
                     $row[$field] = $this->getConsent($participant, $columnDef);
                 } elseif (isset($columnDef['generateLink'])) {
@@ -637,12 +652,15 @@ class WorkQueueService
         return $this->participantSummaryService->getNextToken();
     }
 
-    private function generateLink($id, $name)
+    private function generateLink($id, $name = null, $type = null)
     {
         if ($this->authorizationChecker->isGranted('ROLE_USER')) {
             $url = $this->urlGenerator->generate('participant', ['id' => $id]);
         } else {
             $url = $this->urlGenerator->generate('workqueue_participant', ['id' => $id]);
+        }
+        if ($type === 'id') {
+            $name = $id;
         }
         $text = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
@@ -718,5 +736,17 @@ class WorkQueueService
             $this->userService->getUser()->getTimezone(),
             $statusDisplay
         );
+    }
+
+    private function getRelatedParticipants(string|array|null $relatedParticipants): string
+    {
+        if (!is_array($relatedParticipants)) {
+            return 'N/A';
+        }
+        $participantIds = array_map(function ($participant) {
+            return $this->generateLink($participant->participantId, null, 'id');
+        }, $relatedParticipants);
+
+        return implode('<br>', $participantIds);
     }
 }

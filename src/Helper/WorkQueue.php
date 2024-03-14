@@ -12,6 +12,8 @@ class WorkQueue
     public const FULL_DATA_ACCESS = 'full_data';
     public const LIMITED_DATA_ACCESS = 'limited_data';
     public const DOWNLOAD_DISABLED = 'disabled';
+    public const NA_ADULT = 'adult';
+    public const NA_PEDIATRIC = 'pediatric';
 
     public const HTML_SUCCESS = '<i class="fa fa-check text-success" aria-hidden="true"></i>';
     public const HTML_DANGER = '<i class="fa fa-times text-danger" aria-hidden="true"></i>';
@@ -20,6 +22,7 @@ class WorkQueue
     public const HTML_NOTICE = '<i class="fa fa-stop-circle text-warning" aria-hidden="true"></i>';
     public const HTML_PROCESSING = '<i class="fa fa-sync text-warning" aria-hidden="true"></i>';
     public const HTML_SUCCESS_DOUBLE = '<i class="fa fa-check-double text-success" aria-hidden="true"></i>';
+    public const HTML_CHILD_ICON = '<i class="fa fa-child child-icon" aria-hidden="true"></i> ';
 
     public static $columnsDef = [
         'lastName' => [
@@ -28,7 +31,8 @@ class WorkQueue
             'sortField' => 'lastName',
             'generateLink' => true,
             'toggleColumn' => false,
-            'default' => true
+            'default' => true,
+            'displayPediatricIcon' => true
         ],
         'firstName' => [
             'name' => 'First Name',
@@ -42,7 +46,7 @@ class WorkQueue
             'name' => 'Middle Name',
             'csvName' => 'Middle Initial',
             'rdrField' => 'middleName',
-            'sortField' => 'firstName',
+            'sortField' => 'middleName',
             'generateLink' => true,
             'toggleColumn' => false,
             'default' => true
@@ -137,6 +141,16 @@ class WorkQueue
             'visible' => false,
             'group' => 'details'
         ],
+        'pediatricStatus' => [
+            'name' => 'Pediatric Status',
+            'rdrField' => 'isPediatric',
+            'method' => 'getPediatricStatus',
+            'csvMethod' => 'getPediatricStatus',
+            'toggleColumn' => true,
+            'orderable' => false,
+            'default' => true,
+            'group' => 'details'
+        ],
         'deactivationStatus' => [
             'name' => 'Deactivation Status',
             'csvNames' => [
@@ -218,7 +232,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'display_na' => self::NA_PEDIATRIC
         ],
         'firstEhrConsent' => [
             'name' => 'Date of First EHR Consent',
@@ -288,7 +303,8 @@ class WorkQueue
             'toggleColumn' => true,
             'pdfPath' => 'consentForGenomicsRORFilePath',
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'display_na' => self::NA_PEDIATRIC
         ],
         'primaryLanguage' => [
             'name' => 'Language of Primary Consent',
@@ -313,7 +329,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'consent'
+            'group' => 'consent',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'caborConsent' => [
             'name' => 'CABoR Consent',
@@ -373,7 +390,8 @@ class WorkQueue
             'pdfPath' => 'consentForEtMRORFilePath',
             'visible' => false,
             'group' => 'consent',
-            'default' => true
+            'default' => true,
+            'display_na' => self::NA_PEDIATRIC
         ],
         'retentionEligibleStatus' => [
             'name' => 'Retention Eligible',
@@ -390,7 +408,8 @@ class WorkQueue
             'toggleColumn' => true,
             'csvStatusText' => 'ELIGIBLE',
             'visible' => false,
-            'group' => 'metrics'
+            'group' => 'metrics',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'retentionType' => [
             'name' => 'Retention Status',
@@ -401,7 +420,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'metrics'
+            'group' => 'metrics',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'isEhrDataAvailable' => [
             'name' => 'EHR Data Transfer',
@@ -540,7 +560,8 @@ class WorkQueue
             'sortField' => 'loginPhoneNumber',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'contact'
+            'group' => 'contact',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'phone' => [
             'name' => 'Contact Phone',
@@ -549,6 +570,16 @@ class WorkQueue
             'sortField' => 'phoneNumber',
             'toggleColumn' => true,
             'visible' => false,
+            'group' => 'contact',
+            'display_na' => self::NA_PEDIATRIC
+        ],
+        'relatedParticipants' => [
+            'name' => 'Related Participants',
+            'rdrField' => 'relatedParticipants',
+            'wqServiceMethod' => 'getRelatedParticipants',
+            'csvMethod' => 'getRelatedParticipants',
+            'toggleColumn' => true,
+            'orderable' => false,
             'group' => 'contact'
         ],
         'ppiStatus' => [
@@ -618,7 +649,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'MedicalHistory' => [
             'name' => 'Med History',
@@ -634,7 +666,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'FamilyHealth' => [
             'name' => 'Family History',
@@ -650,7 +683,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'PersonalAndFamilyHealthHistory' => [
             'name' => 'Personal & Family Hx',
@@ -666,7 +700,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'HealthcareAccess' => [
             'name' => 'Access',
@@ -682,7 +717,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'SocialDeterminantsOfHealth' => [
             'name' => 'SDOH',
@@ -698,7 +734,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'LifeFunctioning' => [
             'name' => 'Life Functioning',
@@ -714,7 +751,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'EmotionalHealth' => [
             'name' => 'Emotional Health Hx and Well-being',
@@ -730,7 +768,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'BehavioralHealth' => [
             'name' => 'Behavioral Health and Personality',
@@ -746,7 +785,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'EnvironmentalExposures' => [
             'name' => 'Environmental Exposures',
@@ -762,7 +802,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_ADULT
         ],
         'CopeMay' => [
             'name' => 'COPE May',
@@ -778,7 +819,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeJune' => [
             'name' => 'COPE June',
@@ -794,7 +836,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeJuly' => [
             'name' => 'COPE July',
@@ -810,7 +853,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeNov' => [
             'name' => 'COPE Nov',
@@ -826,7 +870,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeDec' => [
             'name' => 'COPE Dec',
@@ -842,7 +887,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeFeb' => [
             'name' => 'COPE Feb',
@@ -858,7 +904,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeVaccineMinute1' => [
             'name' => 'Summer Minute',
@@ -874,7 +921,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeVaccineMinute2' => [
             'name' => 'Fall Minute',
@@ -890,7 +938,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeVaccineMinute3' => [
             'name' => 'Winter Minute',
@@ -906,7 +955,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'CopeVaccineMinute4' => [
             'name' => 'New Year Minute',
@@ -922,7 +972,8 @@ class WorkQueue
             'htmlClass' => 'text-center',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'surveys'
+            'group' => 'surveys',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'enrollmentSite' => [
             'name' => 'Enrollment Site',
@@ -1071,7 +1122,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
         ],
         '1PST8' => [
             'name' => '8 mL PST',
@@ -1086,7 +1138,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
         ],
         '1HEP4' => [
             'name' => '4 mL Na-Hep',
@@ -1101,7 +1154,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
         ],
         '1ED02' => [
             'name' => '2 mL EDTA (1ED02)',
@@ -1131,7 +1185,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_ADULT
         ],
         '1ED04' => [
             'name' => '4 mL EDTA (1ED04)',
@@ -1161,7 +1216,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_ADULT
         ],
         '1ED10' => [
             'name' => '1st 10 mL EDTA',
@@ -1191,7 +1247,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
         ],
         '1CFD9' => [
             'name' => 'Cell-Free DNA',
@@ -1206,7 +1263,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
         ],
         '1PXR2' => [
             'name' => 'Paxgene RNA',
@@ -1251,7 +1309,8 @@ class WorkQueue
             'toggleColumn' => true,
             'type' => 'sample',
             'visible' => false,
-            'group' => 'enrollment'
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
         ],
         '1SAL' => [
             'name' => 'Saliva',
@@ -1294,7 +1353,8 @@ class WorkQueue
             'sortField' => 'genderIdentity',
             'toggleColumn' => true,
             'visible' => false,
-            'group' => 'demographics'
+            'group' => 'demographics',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'race' => [
             'name' => 'Race/Ethnicity',
@@ -1366,6 +1426,7 @@ class WorkQueue
                 'consentForNphModule1Authored' => 'NPH Module 1 Consent Date',
             ],
             'csvMethod' => 'getCsvNphStudyStatus',
+            'display_na' => self::NA_PEDIATRIC
         ]
     ];
 
@@ -1379,6 +1440,7 @@ class WorkQueue
         'participantStatus',
         'activityStatus',
         'withdrawalReason',
+        'pediatricStatus',
         'participantOrigin',
         'consentCohort',
         'primaryConsent',
@@ -1409,6 +1471,7 @@ class WorkQueue
         'email',
         'loginPhone',
         'phone',
+        'relatedParticipants',
         'ppiStatus',
         'ppiSurveys',
         'TheBasics',
@@ -1632,6 +1695,8 @@ class WorkQueue
         'enrollmentStatusParticipantV3_2Time',
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
+        'pediatricStatus',
+        'relatedParticipants'
     ];
 
     public static $sortColumns = [
@@ -1644,6 +1709,7 @@ class WorkQueue
         'enrollmentStatusV3_2',
         'withdrawalAuthored',
         'withdrawalReason',
+        'isPediatric',
         'participantOrigin',
         'consentCohort',
         'consentForStudyEnrollmentAuthored',
@@ -2507,6 +2573,12 @@ class WorkQueue
         'CopeVaccineMinute4' => 'New Year Minute'
     ];
 
+    public static array $pedsSurveys = [
+        'TheBasics' => 'Basics',
+        'OverallHealth' => 'Health',
+        'EnvironmentalExposures' => 'Environmental Exposures'
+    ];
+
     public static $initialSurveys = [
         'TheBasics',
         'OverallHealth',
@@ -2538,6 +2610,23 @@ class WorkQueue
         '1SAL' => 'Saliva'
     ];
 
+    public static array $pedsSamples = [
+        '1ED02' => '2 mL EDTA (1ED02)',
+        '2ED02' => '2 mL EDTA (2ED02)',
+        '1ED04' => '4 mL EDTA (1ED04)',
+        '2ED04' => '4 mL EDTA (2ED04)',
+        '1ED10' => '1st 10 mL EDTA',
+        '1PXR2' => 'Paxgene RNA',
+        '1UR10' => 'Urine 10 mL',
+        '1SAL' => 'Saliva'
+    ];
+
+    public static array $pedsOnlyFields = [
+        'EnvironmentalExposures',
+        '2ED02',
+        '2ED04'
+    ];
+
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',
@@ -2564,6 +2653,7 @@ class WorkQueue
             'participantId',
             'participantStatus',
             'activityStatus',
+            'pediatricStatus',
             'consentCohort',
             'primaryConsent',
             'questionnaireOnDnaProgram',
@@ -3276,5 +3366,37 @@ class WorkQueue
         }
 
         return $participant->$fieldKey ? 1 : 0;
+    }
+
+    public static function getPediatricStatus(bool $isPediatric): string
+    {
+        return $isPediatric ? 'Pediatric Participant' : 'Adult Participant';
+    }
+
+    public static function getRelatedParticipants(string|array|null $relatedParticipants): string
+    {
+        if (!is_array($relatedParticipants)) {
+            return 'N/A';
+        }
+        $participantIds = array_map(function ($participant) {
+            return $participant->participantId;
+        }, $relatedParticipants);
+
+        return implode(', ', $participantIds);
+    }
+
+    public static function getPediatricAdultString(string $displayNa, bool $isPediatric): string
+    {
+        return ($displayNa === self::NA_PEDIATRIC && $isPediatric) || ($displayNa === self::NA_ADULT && !$isPediatric) ? 'N/A' : '';
+    }
+
+    public static function getParticipantSummarySamples(bool $isPediatric): array
+    {
+        return $isPediatric ? self::$pedsSamples : array_diff_key(self::$samples, array_flip(self::$pedsOnlyFields));
+    }
+
+    public static function getParticipantSummarySurveys(bool $isPediatric): array
+    {
+        return $isPediatric ? self::$pedsSurveys : array_diff_key(self::$surveys, array_flip(self::$pedsOnlyFields));
     }
 }

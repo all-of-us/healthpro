@@ -156,6 +156,7 @@ class ReviewService
         $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, o.type as order_type, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
             'oh.type as h_type, ' .
+            'oh.created_ts as h_created_ts, ' .
             'u.email as created_by ' .
             'FROM orders o ' .
             'LEFT JOIN orders_history oh ' .
@@ -171,6 +172,7 @@ class ReviewService
         $measurementsQuery = 'SELECT e.participant_id, \'measurement\' as type, e.id, e.parent_id, null, e.rdr_id, null, e.created_ts, null, null, e.finalized_ts, null, null, null, ' .
             'greatest(coalesce(e.created_ts, 0), coalesce(e.finalized_ts, 0), coalesce(eh.created_ts, 0)) as latest_ts, ' .
             'eh.type as h_type, ' .
+            'eh.created_ts as h_created_ts, ' .
             'null ' .
             'FROM evaluations e ' .
             'LEFT JOIN evaluations_history eh ' .
@@ -183,12 +185,14 @@ class ReviewService
         $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.incentive_date_given, null, null, null, null, null, null, ' .
             'null, ' .
             'null, ' .
+            'null, ' .
             'null ' .
             'FROM incentive i ' .
             'WHERE i.site = :site ' .
             'AND i.incentive_date_given >= :incentiveStartTime ' .
             'AND i.incentive_date_given < :endTime ';
         $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
+            'null, ' .
             'null, ' .
             'null, ' .
             'null ' .

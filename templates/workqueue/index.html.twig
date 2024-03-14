@@ -63,6 +63,7 @@
             <th rowspan="2" class="col-group-default col-group-consent">Participant Status</th>
             <th rowspan="2" class="col-group-default col-group-info col-group-consent">Activity Status</th>
             <th rowspan="2" class="col-group-info col-group-consent">Withdrawal Reason</th>
+            <th rowspan="2" class="col-group-default col-group-pediatric">Pediatric Status <i class="fa fa-child child-icon"></i> </th>
             <th rowspan="2" class="{{ app.session.get('siteType') == 'dv' ? 'col-group-default' : 'col-group-info' }}">Participant Origination</th>
 
             <th colspan="13" class="topheader multiheader-consent">Consent</th>
@@ -71,7 +72,7 @@
 
             <th colspan="4" class="topheader multiheader-patient-status">Patient Status</th>
 
-            <th colspan="9" class="topheader multiheader-contact">Contact</th>
+            <th colspan="10" class="topheader multiheader-contact">Contact</th>
 
             <th colspan="{{ (surveys|length) + 2 }}" class="topheader multiheader-survey">PPI Survey Completion</th>
 
@@ -115,11 +116,12 @@
             <th class="secondaryheader col-group-contact multiheader-contact">Email <span title="This is either the registration email or the email provided after consent if the participant registered with a phone number" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
             <th class="secondaryheader col-group-contact multiheader-contact">Login Phone <span title="This is the verified SMS number used during registration" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
             <th class="secondaryheader col-group-contact multiheader-contact">Contact Phone <span title="This is the phone number provided after consent" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span></th>
+            <th class="secondaryheader col-group-contact multiheader-contact">Related Participants <i class="fa fa-child child-icon"></i> </th>
 
             <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Required Complete?</th>
             <th class="secondaryheader col-group-ppi col-group-default multiheader-survey">Completed Surveys</th>
             {% for field, label in surveys %}
-                <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}</th>
+                <th class="secondaryheader col-group-ppi multiheader-survey">{{ label }}{% if field in pedsFields %} <i class="fa fa-child child-icon"></i> {% endif %}</th>
             {% endfor %}
 
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Enrollment Site</th>
@@ -134,7 +136,7 @@
             <th class="secondaryheader col-group-inperson col-group-default multiheader-inperson">Baseline Samples <span title="The count of baseline biospecimens which have been received by the Biobank does NOT include saliva samples, as these are collected as an alternative to blood samples for DNA extraction." data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle"></i></span></th>
             <th class="secondaryheader col-group-inperson multiheader-inperson">Bio&shy;specimens Site</th>
             {% for field, label in samples %}
-                <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}</th>
+                <th class="secondaryheader col-group-inperson multiheader-inperson">{{ label }}{% if field in pedsFields %} <i class="fa fa-child child-icon"></i> {% endif %}</th>
             {% endfor %}
 
             <th class="secondaryheader col-group-demographics multiheader-demographics">Age</th>

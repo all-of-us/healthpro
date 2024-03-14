@@ -367,19 +367,36 @@ class Incentive
         return $this;
     }
 
-    public function getIncentiveTypeDisplayName()
+    public function getIncentiveTypeDisplayName(): ?string
     {
         return array_search($this->incentiveType, Incentive::$incentiveTypeChoices);
     }
 
-    public function getIncentiveOccurrenceDisplayName()
+    public function getIncentiveOccurrenceDisplayName(): ?string
     {
         return array_search($this->incentiveOccurrence, Incentive::$incentiveOccurrenceChoices);
     }
 
-    public function getIncentiveAmountDisplayName()
+    public function getIncentiveAmountDisplayName(): ?string
     {
         return array_search($this->incentiveAmount, Incentive::$incentiveAmountChoices);
+    }
+
+    public function getIncentiveRecipientDisplayName(): ?string
+    {
+        if ($this->getOtherIncentiveRecipient()) {
+            return 'Other';
+        }
+        return array_search($this->Recipient, Incentive::$recipientChoices);
+    }
+
+    public function getOtherIncentiveRecipient(): ?string
+    {
+        $pos = strpos($this->Recipient, 'other,');
+        if ($pos !== false) {
+            return preg_replace('/other, /', '', $this->Recipient, 1);
+        }
+        return null;
     }
 
     public function getImport(): ?IncentiveImport
