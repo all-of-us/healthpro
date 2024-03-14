@@ -408,7 +408,8 @@ class WorkQueue
             'toggleColumn' => true,
             'csvStatusText' => 'ELIGIBLE',
             'visible' => false,
-            'group' => 'metrics'
+            'group' => 'metrics',
+            'display_na' => self::NA_PEDIATRIC
         ],
         'retentionType' => [
             'name' => 'Retention Status',
