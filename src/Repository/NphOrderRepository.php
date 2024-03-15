@@ -158,7 +158,7 @@ class NphOrderRepository extends ServiceEntityRepository
         $endDate = new \DateTime('tomorrow', new \DateTimeZone($timezone));
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitPeriod, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
+             no.orderId, no.DowntimeGenerated, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -173,7 +173,7 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitPeriod, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
+             no.orderId, no.DowntimeGenerated, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -186,7 +186,7 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitPeriod, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
+             no.orderId, no.DowntimeGenerated, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -201,7 +201,7 @@ class NphOrderRepository extends ServiceEntityRepository
         $endDate = new \DateTime('-7 days', new \DateTimeZone($timezone));
         $queryBuilder = $this->createQueryBuilder('no')
             ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitPeriod, u.email as email, no.id as hpoOrderId,
-             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
+             no.orderId, no.DowntimeGenerated, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
              ns.finalizedTs, ns.finalizedTimezoneId, ns.modifiedTs, ns.modifiedTimezoneId, ns.biobankFinalized, ns.modifyType')
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
@@ -226,5 +226,25 @@ class NphOrderRepository extends ServiceEntityRepository
             ->setParameter('modifyType', NphSample::CANCEL)
             ->setParameter('visitPeriod', $Visit);
         return $queryBuild->getQuery()->getResult();
+    }
+
+    public function getDowntimeOrders(?DateTime $startDate = null, ?DateTime $endDate = null): array
+    {
+        $queryBuilder = $this->createQueryBuilder('no')
+            ->select('no.participantId, no.biobankId, no.site, no.timepoint, no.module, no.visitPeriod, u.email as email, no.DowntimeGenerated, no.downtimeGeneratedTs, no.id as hpoOrderId,
+             no.orderId, ns.sampleCode as sampleCode, ns.sampleId as sampleId, no.createdTs, no.createdTimezoneId, ns.collectedTs, ns.collectedTimezoneId,
+             ns.finalizedTs, ns.finalizedTimezoneId, ns.biobankFinalized, ns.modifyType')
+            ->join('no.nphSamples', 'ns')
+            ->join('no.user', 'u')
+            ->where('no.DowntimeGenerated = 1');
+        if ($startDate && $endDate) {
+            $queryBuilder
+                ->andWhere('no.downtimeGeneratedTs >= :startDate')
+                ->andWhere('no.downtimeGeneratedTs <= :endDate')
+                ->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
+        }
+        $queryBuilder
+            ->addOrderBy('no.downtimeGeneratedTs', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
     }
 }
