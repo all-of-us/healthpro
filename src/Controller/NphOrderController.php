@@ -629,13 +629,22 @@ class NphOrderController extends BaseController
     }
 
     #[Route(path: '/ajax/search/aliquot', name: 'search_aliquot_id')]
-    public function giftCardAction(Request $request): JsonResponse
+    public function aliquotIdSearchAction(Request $request): JsonResponse
     {
         $aliquotId = $request->get('aliquotId');
         $aliquot = $this->em->getRepository(NphAliquot::class)->findOneBy([
             'aliquotId' => $aliquotId
         ]);
-        return $this->json(!$aliquot);
+        if ($aliquot) {
+            return $this->json(['status' => false, 'type' => 'aliquot']);
+        }
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'sampleId' => $aliquotId
+        ]);
+        if ($sample) {
+            return $this->json(['status' => false, 'type' => 'sample']);
+        }
+        return $this->json(['status' => true]);
     }
 
     #[Route(path: '/ajax/search/stool', name: 'search_stool_id')]
