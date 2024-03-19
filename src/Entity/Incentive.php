@@ -384,7 +384,19 @@ class Incentive
 
     public function getIncentiveRecipientDisplayName(): ?string
     {
+        if ($this->getOtherIncentiveRecipient()) {
+            return 'Other';
+        }
         return array_search($this->Recipient, Incentive::$recipientChoices);
+    }
+
+    public function getOtherIncentiveRecipient(): ?string
+    {
+        $pos = strpos($this->Recipient, 'other,');
+        if ($pos !== false) {
+            return preg_replace('/other, /', '', $this->Recipient, 1);
+        }
+        return null;
     }
 
     public function getImport(): ?IncentiveImport
