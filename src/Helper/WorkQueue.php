@@ -1742,6 +1742,7 @@ class WorkQueue
         'email',
         'loginPhoneNumber',
         'phoneNumber',
+        'relatedParticipants',
         'numCompletedBaselinePPIModules',
         'numCompletedPPIModules',
         'questionnaireOnTheBasicsAuthored',
