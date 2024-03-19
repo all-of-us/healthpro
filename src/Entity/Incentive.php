@@ -147,7 +147,7 @@ class Incentive
     private ?int $numberOfItems = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $OtherRecipient = null;
+    private ?string $relatedParticipantRecipient = null;
 
     public function getId(): ?int
     {
@@ -456,14 +456,14 @@ class Incentive
         return $choices;
     }
 
-    public function getOtherRecipient(): ?string
+    public function getRelatedParticipantRecipient(): ?string
     {
-        return $this->OtherRecipient;
+        return $this->relatedParticipantRecipient;
     }
 
-    public function setOtherRecipient(?string $OtherRecipient): static
+    public function setRelatedParticipantRecipient(?string $relatedParticipantRecipient): static
     {
-        $this->OtherRecipient = $OtherRecipient;
+        $this->relatedParticipantRecipient = $relatedParticipantRecipient;
 
         return $this;
     }

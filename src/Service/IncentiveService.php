@@ -164,7 +164,7 @@ class IncentiveService
         }
         if (!in_array($incentive->getRecipient(), Incentive::$recipientChoices)) {
             $incentive->setRecipient(Incentive::PEDIATRIC_GUARDIAN);
-            $incentive->setOtherRecipient($incentiveForm['recipient']->getData());
+            $incentive->setRelatedParticipantRecipient($incentiveForm['recipient']->getData());
         }
         return $incentive;
     }

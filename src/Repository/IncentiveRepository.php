@@ -145,7 +145,7 @@ class IncentiveRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i')
-            ->andWhere('i.participantId = :participantid or i.OtherRecipient = :participantid')
+            ->andWhere('i.participantId = :participantid or i.relatedParticipantRecipient = :participantid')
             ->setParameter('participantid', $participant->id);
         return $queryBuilder->getQuery()->getResult();
     }
