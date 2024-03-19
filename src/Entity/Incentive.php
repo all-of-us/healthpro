@@ -146,6 +146,9 @@ class Incentive
     #[ORM\Column(nullable: true)]
     private ?int $numberOfItems = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $OtherRecipient = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -451,5 +454,17 @@ class Incentive
             unset($choices['Pediatric Visit']);
         }
         return $choices;
+    }
+
+    public function getOtherRecipient(): ?string
+    {
+        return $this->OtherRecipient;
+    }
+
+    public function setOtherRecipient(?string $OtherRecipient): static
+    {
+        $this->OtherRecipient = $OtherRecipient;
+
+        return $this;
     }
 }
