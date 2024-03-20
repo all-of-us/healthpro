@@ -79,7 +79,23 @@ class Order
         '2PST8' => [
             'code' => '1PS08',
             'centrifuge_type' => 'fixed_angle'
-        ]
+        ],
+        '1PS4A' => [
+            'code' => 'PS04A',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PS4A' => [
+            'code' => 'PS04A',
+            'centrifuge_type' => 'fixed_angle'
+        ],
+        '1PS4B' => [
+            'code' => 'PS04B',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PS4B' => [
+            'code' => 'PS04B',
+            'centrifuge_type' => 'fixed_angle'
+        ],
     ];
 
     public static $cancelReasons = [
@@ -1614,6 +1630,12 @@ class Order
             }
             if ($test == '1PS08') {
                 $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PST8' : '1PST8';
+            }
+            if ($test == 'PS04A') {
+                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PS4A' : '1PS4A';
+            }
+            if ($test == 'PS04B') {
+                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PS4B' : '1PS4B';
             }
             $sample = [
                 'test' => $rdrTest,
