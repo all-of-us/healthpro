@@ -29,9 +29,9 @@ class Order
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
     public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', 'PS04A', 'PS04B'];
 
-    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
+    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08', 'PS04A', 'PS04B'];
 
     public static $identifierLabel = [
         'name' => 'name',
