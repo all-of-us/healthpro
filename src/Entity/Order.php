@@ -98,6 +98,13 @@ class Order
         ],
     ];
 
+    public static array $hpoToRdrSampleConversions = [
+        '1SS08' => ['fixed_angle' => '2SST8', 'swinging_bucket' => '1SST8'],
+        '1PS08' => ['fixed_angle' => '2PST8', 'swinging_bucket' => '1PST8'],
+        'PS04A' => ['fixed_angle' => '2PS4A', 'swinging_bucket' => '1PS4A'],
+        'PS04B' => ['fixed_angle' => '2PS4B', 'swinging_bucket' => '1PS4B']
+    ];
+
     public static $cancelReasons = [
         'Order created in error' => 'ORDER_CANCEL_ERROR',
         'Order created for wrong participant' => 'ORDER_CANCEL_WRONG_PARTICIPANT',
@@ -1625,17 +1632,8 @@ class Order
         foreach ($this->getModifiedRequestedSamples() as $description => $test) {
             // Convert new samples
             $rdrTest = $test;
-            if ($test == '1SS08') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2SST8' : '1SST8';
-            }
-            if ($test == '1PS08') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PST8' : '1PST8';
-            }
-            if ($test == 'PS04A') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PS4A' : '1PS4A';
-            }
-            if ($test == 'PS04B') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PS4B' : '1PS4B';
+            if (array_key_exists($test, self::$hpoToRdrSampleConversions)) {
+                $rdrTest = self::$hpoToRdrSampleConversions[$test][$this->getProcessedCentrifugeType()] ?? self::$hpoToRdrSampleConversions[$test][self::SWINGING_BUCKET];
             }
             $sample = [
                 'test' => $rdrTest,
