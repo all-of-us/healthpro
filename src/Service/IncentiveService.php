@@ -162,6 +162,10 @@ class IncentiveService
         if ($incentive->getRecipient() === Incentive::OTHER) {
             $incentive->setRecipient(Incentive::OTHER . ', ' . $incentiveForm['other_incentive_recipient']->getData());
         }
+        if (!in_array($incentiveForm['recipient']->getData(), Incentive::$recipientChoices, true) && preg_match("/P\d{9}$/", $incentive->getRecipient())) {
+            $incentive->setRecipient(Incentive::PEDIATRIC_GUARDIAN);
+            $incentive->setRelatedParticipantRecipient($incentiveForm['recipient']->getData());
+        }
         return $incentive;
     }
 }
