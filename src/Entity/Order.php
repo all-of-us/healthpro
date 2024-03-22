@@ -935,13 +935,13 @@ class Order
                 $this->currentVersion = self::INITIAL_VERSION;
                 if ($pediatricFlag && $physicalMeasurement) {
                     $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = self::PEDIATRIC_SAMPLE_VERSION . "-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                    $this->currentVersion = self::PEDIATRIC_SAMPLE_VERSION . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
                 if ($pediatricFlag && $physicalMeasurement) {
                     $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = self::PEDIATRIC_SAMPLE_VERSION . "-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                    $this->currentVersion = self::PEDIATRIC_SAMPLE_VERSION . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             }
         }
