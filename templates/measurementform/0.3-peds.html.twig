@@ -40,7 +40,7 @@
                                     {% if loop.first %}
                                         <div>
                                             <label>
-                                                <input type="checkbox" class="weight-modification-all"> Apply modification to all readings
+                                                <input type="checkbox" class="modification-all weight-modification-all" checked> Apply modification to all readings
                                             </label>
                                         </div>
                                     {% endif %}
@@ -83,7 +83,7 @@
                                     {% if loop.first %}
                                         <div>
                                             <label>
-                                                <input type="checkbox" class="height-modification-all"> Apply modification to all readings
+                                                <input type="checkbox" class="modification-all height-modification-all" checked> Apply modification to all readings
                                             </label>
                                         </div>
                                     {% endif %}
@@ -226,7 +226,7 @@
                                         {% if loop.first %}
                                             <div>
                                                 <label>
-                                                    <input type="checkbox" class="head-modification-all"> Apply modification to all readings
+                                                    <input type="checkbox" class="modification-all head-modification-all" checked> Apply modification to all readings
                                                 </label>
                                             </div>
                                         {% endif %}
@@ -278,7 +278,7 @@
                                             {% if loop.first %}
                                                 <div>
                                                     <label>
-                                                        <input type="checkbox" class="waist-modification-all"> Apply modification to all readings
+                                                        <input type="checkbox" class="modification-all waist-modification-all" checked> Apply modification to all readings
                                                     </label>
                                                 </div>
                                             {% endif %}
@@ -400,7 +400,7 @@
                                 <div class="modification-toggle text-right">
                                     <a class="small">Add protocol modification</a>
                                 </div>
-                                <div class="modification-select" style="display:none">
+                                <div class="modification-select heart-modification-select" data-modification-type=".heart-modification" style="display:none">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification'], i) }}
                                     <div class="modification-notes" style="display:none">
                                         {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-protocol-modification-notes'], i) }}
@@ -411,6 +411,13 @@
                                                 {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-blood-pressure'], i) }}
                                             {% endif %}
                                             {{ metrics.form_row_replicate(measurementForm, schema.fields['manual-heart-rate'], i) }}
+                                        </div>
+                                    {% endif %}
+                                    {% if loop.first %}
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" class="modification-all heart-modification-all" checked> Apply modification to all readings
+                                            </label>
                                         </div>
                                     {% endif %}
                                 </div>

@@ -328,7 +328,7 @@ class HelpService
     public static $confluenceResources = [
         'ops_data_api' => 'https://www.aoucollaborations.net/x/sQB4G',
         'data_dictionaries' => 'https://www.aoucollaborations.net/x/a8U_/',
-        'release_notes' => 'https://www.aoucollaborations.net/x/MQElvw'
+        'release_notes' => 'https://www.aoucollaborations.net/x/2AAs'
     ];
 
     public static array $nphResources = [

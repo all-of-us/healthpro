@@ -22,7 +22,9 @@ let viewExtension = Backbone.View.extend({
         "click .alt-units-toggle a": "enableAltUnits",
         "click .alt-units-field a": "cancelAltUnits",
         "keyup .alt-units-field input": "convertAltUnits",
-        "change .alt-units-field input": "convertAltUnits"
+        "change .alt-units-field input": "convertAltUnits",
+        "change .modification-all": "handleProtocolModificationAllCheck",
+        "click .modification-all": "handleProtocolModificationAllCheck"
     },
     inputChange: function (e) {
         this.clearServerErrors(e);
@@ -860,6 +862,31 @@ let viewExtension = Backbone.View.extend({
             }
         }
         return result;
+    },
+    handleProtocolModificationAllCheck: function (e) {
+        let block = $(e.currentTarget).closest(".modification-block");
+        let primarySelect = block.find(".modification-select select");
+        let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
+        let elements = [];
+        if ($(e.currentTarget).is(":checked")) {
+            elements = $(modificationType + "-select")
+                .find("select")
+                .not(primarySelect)
+                .val(primarySelect.val())
+                .closest(".modification-block");
+        } else {
+            elements = $(modificationType + "-select")
+                .find("select")
+                .not(primarySelect)
+                .val("")
+                .closest(".modification-block");
+        }
+        for (let i = 0; i < elements.length; i++) {
+            this.showModificationBlock($(elements[i]));
+            this.handleProtocolModificationBlock($(elements[i]));
+            this.triggerEqualize();
+            this.displayWarning($(elements[i]));
+        }
     },
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");

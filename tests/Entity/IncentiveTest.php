@@ -83,7 +83,29 @@ class IncentiveTest extends KernelTestCase
         return [
             ['adult_participant', 'Adult Participant'],
             ['pediatric_guardian', 'Pediatric Guardian'],
+            ['other, text1', 'Other'],
             ['na', '']
+        ];
+    }
+
+    /**
+     * @dataProvider incentiveOtherRecipientProvider
+     */
+    public function testGetOtherIncentiveRecipient(string $recipient, ?string $expectedDisplayName): void
+    {
+        $incentive = new Incentive();
+        $incentive->setRecipient($recipient);
+
+        $this->assertEquals($expectedDisplayName, $incentive->getOtherIncentiveRecipient());
+    }
+
+    public function incentiveOtherRecipientProvider(): array
+    {
+        return [
+            ['other, text1', 'text1'],
+            ['other, text1 text2', 'text1 text2'],
+            ['other, text1, text2', 'text1, text2'],
+            ['na', null]
         ];
     }
 }
