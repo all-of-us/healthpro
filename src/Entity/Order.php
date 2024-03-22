@@ -982,7 +982,6 @@ class Order
             $sampleId = $sample;
             if (isset($sampleInformation['icodeSwingingBucket'])) {
                 // For custom order creation (always display swinging bucket i-test codes)
-                $sampleId = $sampleInformation['icodeSwingingBucket'];
                 if (empty($this->getType()) || $this->getType() === 'diversion') {
                     if ($this->getProcessedCentrifugeType() === self::SWINGING_BUCKET) {
                         $sampleId = $sampleInformation['icodeSwingingBucket'];
