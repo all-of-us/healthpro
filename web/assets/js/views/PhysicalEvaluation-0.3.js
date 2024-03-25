@@ -615,7 +615,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 inches += parseFloat($("#alt-units-height-in").val());
             }
             val = this.inToCm(inches);
-        } else type == "alt-units-height-ftin" {
+        } else if (type == "alt-units-height-ftin") {
             var inches = 0;
             if (parseFloat($("#form_height-ft-user-entered").val())) {
                 inches += 12 * parseFloat($("#form_height-ft-user-entered").val());
