@@ -454,7 +454,16 @@
             "convert": "in",
             "help": {
                 "image": "hip.png"
-            }
+            },
+            "captureusersupplied": true
+        },
+        {
+            "name": "hip-circumference-user-entered",
+            "label": "Enter in inches (value will be stored in cm)",
+            "alternatefor": "hip-circumference",
+            "alternateunitfield": true,
+            "unit": "in",
+            "decimals": 1
         },
         {
             "name": "hip-circumference-protocol-modification",
@@ -515,7 +524,16 @@
             "convert": "in",
             "help": {
                 "image": "waist.png"
-            }
+            },
+            "captureusersupplied": true
+        },
+        {
+            "name": "waist-circumference-user-entered",
+            "label": "Enter in inches (value will be stored in cm)",
+            "alternatefor": "waist-circumference",
+            "alternateunitfield": true,
+            "unit": "in",
+            "decimals": 1
         },
         {
             "name": "waist-circumference-location",
