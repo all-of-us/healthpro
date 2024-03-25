@@ -204,7 +204,7 @@
                     "message": "Please verify that this height is correct."
                 }
             ],
-            'captureusersupplied': true
+            "captureusersupplied": true
         },
         {
             "name": "height-ft-user-entered",
