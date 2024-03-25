@@ -420,7 +420,8 @@
             "alternatefor": "hip-circumference",
             "alternateunitfield": true,
             "unit": "in",
-            "decimals": 1
+            "decimals": 1,
+            "replicates": 3
         },
         {
             "name": "hip-circumference-protocol-modification",
@@ -493,7 +494,8 @@
             "alternatefor": "waist-circumference",
             "alternateunitfield": true,
             "unit": "in",
-            "decimals": 1
+            "decimals": 1,
+            "replicates": 3
         },
         {
             "name": "waist-circumference-location",

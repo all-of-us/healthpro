@@ -59,11 +59,11 @@
     </div>
 
     {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
-        {{ self.form_row_alternate_units(definition, name, form) }}
+        {{ self.form_row_alternate_units(definition, name, form, i) }}
     {% endif %}
 {% endmacro %}
 
-{% macro form_row_alternate_units(definition, name, form) %}
+{% macro form_row_alternate_units(definition, name, form, i = -1) %}
     {% if definition.convert in ['in', 'lb', 'ftin'] %}
         {% if definition.convert == 'in' %}
             {% set label = 'inches' %}
@@ -114,7 +114,11 @@
                 {% else %}
                     {% if definition.captureusersupplied is defined and definition.captureusersupplied %}
                             <div class="input-group">
-                                {{ form_widget(form[name ~ '-user-entered']) }}
+                                {% if i > -1 %}
+                                    {{ form_widget(form[name ~ '-user-entered'][i]) }}
+                                {% else %}
+                                    {{ form_widget(form[name ~ '-user-entered']) }}
+                                {% endif %}
                                 <div class="input-group-addon">{{ definition.convert }}</div>
                             </div>
                     {% else %}
