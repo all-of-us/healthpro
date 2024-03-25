@@ -15,7 +15,7 @@ use stdClass;
 #[ORM\Entity(repositoryClass: 'App\Repository\MeasurementRepository')]
 class Measurement
 {
-    public const CURRENT_VERSION = '0.3.4';
+    public const CURRENT_VERSION = '0.3.3';
     public const BLOOD_DONOR_CURRENT_VERSION = '0.3.3-blood-donor';
     public const EHR_CURRENT_VERSION = '0.3.3-ehr';
     public const LIMIT_TEXT_SHORT = 1000;

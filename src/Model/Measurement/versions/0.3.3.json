@@ -250,7 +250,24 @@
                     "max": 228,
                     "message": "Please verify that this height is correct."
                 }
-            ]
+            ],
+            "captureusersupplied": true
+        },
+        {
+            "name": "height-ft-user-entered",
+            "label": "Enter in feet & inches (value will be stored in cm)",
+            "alternatefor": "height",
+            "alternateunitfield": true,
+            "unit": "ft",
+            "decimals": 1
+        },
+        {
+            "name": "height-in-user-entered",
+            "label": "Enter in feet & inches (value will be stored in cm)",
+            "alternatefor": "height",
+            "alternateunitfield": true,
+            "unit": "in",
+            "decimals": 1
         },
         {
             "name": "height-protocol-modification",
@@ -329,7 +346,16 @@
             "alternateunits": true,
             "help": {
                 "caption": "Help text placeholder."
-            }
+            },
+            "captureusersupplied": true
+        },
+        {
+            "name": "weight-user-entered",
+            "label": "Enter in pounds (value will be stored in kg)",
+            "alternatefor": "weight",
+            "alternateunitfield": true,
+            "unit": "lb",
+            "decimals": 1
         },
         {
             "name": "weight-prepregnancy",
@@ -428,7 +454,16 @@
             "convert": "in",
             "help": {
                 "image": "hip.png"
-            }
+            },
+            "captureusersupplied": true
+        },
+        {
+            "name": "hip-circumference-user-entered",
+            "label": "Enter in inches (value will be stored in cm)",
+            "alternatefor": "hip-circumference",
+            "alternateunitfield": true,
+            "unit": "in",
+            "decimals": 1
         },
         {
             "name": "hip-circumference-protocol-modification",
@@ -446,7 +481,7 @@
                 {
                     "val": "hip-circumference-out-of-range",
                     "message": "Deviation successfully captured. Please record the length of the tape measure in centimeters in the \"Hip Circumference\" field."
-                },   
+                },
                 {
                     "val": "refusal",
                     "message": "Deviation successfully captured."
@@ -489,7 +524,16 @@
             "convert": "in",
             "help": {
                 "image": "waist.png"
-            }
+            },
+            "captureusersupplied": true
+        },
+        {
+            "name": "waist-circumference-user-entered",
+            "label": "Enter in inches (value will be stored in cm)",
+            "alternatefor": "waist-circumference",
+            "alternateunitfield": true,
+            "unit": "in",
+            "decimals": 1
         },
         {
             "name": "waist-circumference-location",

@@ -66,7 +66,16 @@
       "alternateunits": true,
       "help": {
         "caption": "Help text placeholder."
-      }
+      },
+      "captureusersupplied": true
+    },
+    {
+      "name": "weight-user-entered",
+      "label": "Enter in pounds (value will be stored in kg)",
+      "alternatefor": "weight",
+      "alternateunitfield": true,
+      "unit": "lb",
+      "decimals": 1
     },
     {
       "name": "weight-protocol-modification",
@@ -181,7 +190,24 @@
           "max": 228,
           "message": "Please verify that the number entered is correct."
         }
-      ]
+      ],
+      "captureusersupplied": true
+    },
+    {
+      "name": "height-ft-user-entered",
+      "label": "Enter in feet & inches (value will be stored in cm)",
+      "alternatefor": "height",
+      "alternateunitfield": true,
+      "unit": "ft",
+      "decimals": 1
+    },
+    {
+      "name": "height-in-user-entered",
+      "label": "Enter in feet & inches (value will be stored in cm)",
+      "alternatefor": "height",
+      "alternateunitfield": true,
+      "unit": "in",
+      "decimals": 1
     },
     {
       "name": "height-protocol-modification",
@@ -267,7 +293,16 @@
       "convert": "in",
       "help": {
         "image": "head.png"
-      }
+      },
+      "captureusersupplied": true
+    },
+    {
+      "name": "head-circumference-user-entered",
+      "label": "Enter in inches (value will be stored in cm)",
+      "alternatefor": "head-circumference",
+      "alternateunitfield": true,
+      "unit": "in",
+      "decimals": 1
     },
     {
       "name": "head-circumference-protocol-modification",
@@ -328,7 +363,16 @@
       "convert": "in",
       "help": {
         "image": "waist.png"
-      }
+      },
+      "captureusersupplied": true
+    },
+    {
+      "name": "waist-circumference-user-entered",
+      "label": "Enter in inches (value will be stored in cm)",
+      "alternatefor": "waist-circumference",
+      "alternateunitfield": true,
+      "unit": "in",
+      "decimals": 1
     },
     {
       "name": "waist-circumference-location",
