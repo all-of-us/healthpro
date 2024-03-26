@@ -514,7 +514,7 @@ let viewExtension = Backbone.View.extend({
             input = this.$("#form_" + field + "_" + index);
             convertFieldId = "#convert-" + field + "_" + index;
         }
-        if (this.conversions[field]) {
+        if (this.conversions[field] && !this.recordUserValues[field]) {
             let val = parseFloat(input.val());
             if (val) {
                 let converted = this.convert(this.conversions[field], val);
@@ -523,6 +523,25 @@ let viewExtension = Backbone.View.extend({
                 } else {
                     this.$(convertFieldId).text("");
                 }
+            } else {
+                this.$(convertFieldId).text("");
+            }
+        } else if (this.recordUserValues[field]) {
+            let val = 0;
+            if (field == "height") {
+                let feet = parseFloat($(`#form_height-ft-user-entered`).val());
+                let inches = parseFloat($(`#form_height-in-user-entered`).val());
+                if (!isNaN(feet) && !isNaN(inches)) {
+                    val = `${feet}ft ${inches}in`;
+                }
+            } else {
+                val = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                if (!isNaN(val)) {
+                    val = `${val} ${this.conversions[field]}`;
+                }
+            }
+            if (val) {
+                this.$(convertFieldId).text("(" + val + ")");
             } else {
                 this.$(convertFieldId).text("");
             }
@@ -1022,6 +1041,17 @@ let viewExtension = Backbone.View.extend({
                 inches += inch;
             }
             val = this.inToCm(inches);
+        } else if (type == "alt-units-height-ftin") {
+            let inches = 0;
+            let ft = parseFloat($("#form_height-ft-user-entered").val());
+            if (ft) {
+                inches += 12 * ft;
+            }
+            let inch = parseFloat($("#form_height-in-user-entered").val());
+            if (inch) {
+                inches += inch;
+            }
+            val = this.inToCm(inches);
         } else {
             let unit = block.find(".input-group-addon").text();
             val = block.find("input").val();
@@ -1125,6 +1155,7 @@ let viewExtension = Backbone.View.extend({
         }
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
+        this.recordUserValues = obj.recordUserValues;
         this.finalized = obj.finalized;
         this.ageInYears = parseInt(obj.ageInYears);
         this.sexAtBirth = obj.sexAtBirth;

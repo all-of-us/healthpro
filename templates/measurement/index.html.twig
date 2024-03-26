@@ -19,7 +19,8 @@
          data-bp-systolic-height-percentile-charts="{{ bpSystolicHeightPercentileChart|json_encode }}"
          data-bp-diastolic-height-percentile-charts="{{ bpDiastolicHeightPercentileChart|json_encode }}"
          data-heart-rate-age-charts="{{ heartRateAgeCharts|json_encode }}"
-         data-z-score-charts="{{ zScoreCharts|json_encode }}">
+         data-z-score-charts="{{ zScoreCharts|json_encode }}"
+         data-record-user-values="{{ recordUserValues|json_encode|escape('html_attr') }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>

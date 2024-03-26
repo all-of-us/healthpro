@@ -66,6 +66,11 @@ class MeasurementType extends AbstractType
                 $constraints[] = new Constraints\Callback($bmiConstraint);
             }
 
+            if (isset($field->alternateunitfield, $field->alternatefor) && $field->alternateunitfield && $field->alternatefor) {
+                $attributes['id'] = 'alt-units-' . $field->alternatefor;
+                $attributes['class'] = "form-control alt-units-$field->alternatefor";
+            }
+
             if (isset($field->options)) {
                 $class = Type\ChoiceType::class;
                 unset($fieldOptions['scale']);

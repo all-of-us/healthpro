@@ -358,7 +358,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
             input = this.$("#form_" + field + "_" + index);
             convertFieldId = "#convert-" + field + "_" + index;
         }
-        if (this.conversions[field]) {
+        if (this.conversions[field] && !this.recordUserValues[field]) {
             var val = parseFloat(input.val());
             if (val) {
                 var converted = this.convert(this.conversions[field], val);
@@ -367,6 +367,24 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 } else {
                     this.$(convertFieldId).text("");
                 }
+            } else {
+                this.$(convertFieldId).text("");
+            }
+        } else if (this.recordUserValues[field]) {
+            if (field == "height") {
+                let feet = parseFloat($(`#form_height-ft-user-entered`).val());
+                let inches = parseFloat($(`#form_height-in-user-entered`).val());
+                if (!isNaN(feet) && !isNaN(inches)) {
+                    val = `${feet}ft ${inches}in`;
+                }
+            } else {
+                var val = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                if (!isNaN(val)) {
+                    val = `${val} ${this.conversions[field]}`;
+                }
+            }
+            if (val) {
+                this.$(convertFieldId).text("(" + val + ")");
             } else {
                 this.$(convertFieldId).text("");
             }
@@ -687,6 +705,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
         this.finalized = obj.finalized;
+        this.recordUserValues = obj.recordUserValues;
         this.rendered = false;
         this.hipWaistFields = ["hip-circumference", "waist-circumference"];
         this.render();
