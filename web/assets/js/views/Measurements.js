@@ -17,7 +17,8 @@ $(document).ready(function () {
         bpSystolicHeightPercentileChart: measurement.data("bp-systolic-height-percentile-charts"),
         bpDiastolicHeightPercentileChart: measurement.data("bp-diastolic-height-percentile-charts"),
         heartRateAgeCharts: measurement.data("heart-rate-age-charts"),
-        zScoreCharts: measurement.data("z-score-charts")
+        zScoreCharts: measurement.data("z-score-charts"),
+        recordUserValues: measurement.data("record-user-values"),
     });
     $("#evaluationAffixSave")
         .affix({

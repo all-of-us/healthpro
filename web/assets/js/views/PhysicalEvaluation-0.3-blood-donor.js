@@ -198,17 +198,35 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
             // replicate conversions are handled in calculateMean method
             return;
         }
-        if (this.conversions[field]) {
+        if (this.conversions[field] && !this.recordUserValues[field]) {
             var val = parseFloat(input.val());
             if (val) {
                 var converted = this.convert(this.conversions[field], val);
                 if (converted) {
-                    this.$("#convert-" + field).text("(" + converted + ")");
+                    this.$(convertFieldId).text("(" + converted + ")");
                 } else {
-                    this.$("#convert-" + field).text("");
+                    this.$(convertFieldId).text("");
                 }
             } else {
-                this.$("#convert-" + field).text("");
+                this.$(convertFieldId).text("");
+            }
+        } else if (this.recordUserValues[field]) {
+            if (field == "height") {
+                let feet = parseFloat($(`#form_height-ft-user-entered`).val());
+                let inches = parseFloat($(`#form_height-in-user-entered`).val());
+                if (!isNaN(feet) && !isNaN(inches)) {
+                    val = `${feet}ft ${inches}in`;
+                }
+            } else {
+                var val = parseFloat($(input).closest('.panel-body').find(`input.alt-units-${field}`).val())
+                if (!isNaN(val)) {
+                    val = `${val} ${this.conversions[field]}`
+                }
+            }
+            if (val) {
+                this.$(convertFieldId).text("(" + val + ")");
+            } else {
+                this.$(convertFieldId).text("");
             }
         }
     },
@@ -410,6 +428,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
     initialize: function (obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
+        this.recordUserValues = obj.recordUserValues;
         this.finalized = obj.finalized;
         this.rendered = false;
         this.render();

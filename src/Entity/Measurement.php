@@ -528,6 +528,18 @@ class Measurement
         return $conversions;
     }
 
+    public function getRecordUserValues()
+    {
+        $recordUserValues = [];
+        /** @var stdClass $metric */
+        foreach ($this->schema->fields as $metric) {
+            if (isset($metric->captureusersupplied) && $metric->captureusersupplied === true) {
+                $recordUserValues[$metric->name] = $metric->captureusersupplied;
+            }
+        }
+        return $recordUserValues;
+    }
+
     public function getLatestFormVersion()
     {
         if ($this->isBloodDonorForm()) {
