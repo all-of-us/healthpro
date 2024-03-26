@@ -527,7 +527,7 @@ let viewExtension = Backbone.View.extend({
                 this.$(convertFieldId).text("");
             }
         } else if (this.recordUserValues[field]) {
-            let val = 0
+            let val = 0;
             if (field == "height") {
                 let feet = parseFloat($(`#form_height-ft-user-entered`).val());
                 let inches = parseFloat($(`#form_height-in-user-entered`).val());
@@ -535,9 +535,9 @@ let viewExtension = Backbone.View.extend({
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                val = parseFloat($(input).closest('.panel-body').find(`input.alt-units-${field}`).val())
+                val = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
                 if (!isNaN(val)) {
-                    val = `${val} ${this.conversions[field]}`
+                    val = `${val} ${this.conversions[field]}`;
                 }
             }
             if (val) {

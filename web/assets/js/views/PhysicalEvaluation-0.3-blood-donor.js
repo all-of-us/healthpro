@@ -218,9 +218,9 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                var val = parseFloat($(input).closest('.panel-body').find(`input.alt-units-${field}`).val())
+                var val = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
                 if (!isNaN(val)) {
-                    val = `${val} ${this.conversions[field]}`
+                    val = `${val} ${this.conversions[field]}`;
                 }
             }
             if (val) {
