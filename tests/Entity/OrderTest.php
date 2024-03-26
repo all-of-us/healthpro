@@ -248,7 +248,8 @@ class OrderTest extends KernelTestCase
                 '3.2' => [
                     'sampleIds' => [
                         '1SS08' => '1SST8',
-                        'PS04A' => '1PS4A'
+                        'PS04A' => '1PS4A',
+                        'PS04B' => '1PS4B'
                     ]
                 ],
                 '4' => [
@@ -286,7 +287,8 @@ class OrderTest extends KernelTestCase
                 '3.2' => [
                     'sampleIds' => [
                         '1SS08' => '2SST8',
-                        'PS04A' => '2PS4A'
+                        'PS04A' => '2PS4A',
+                        'PS04B' => '2PS4B'
                     ]
                 ],
                 '4' => [
@@ -299,6 +301,7 @@ class OrderTest extends KernelTestCase
         ];
 
         // For HPO orders samples display text changes for only swinging bucket centrifuge type
+        // Sample id is the test code that we send to mayolink API
         foreach ($data as $centrifugeType => $values) {
             $order = $this->createOrder([
                 'createdTs' => new \DateTime('2021-01-01 08:00:00'),
@@ -349,7 +352,8 @@ class OrderTest extends KernelTestCase
             '3.2' => [
                 'sampleIds' => [
                     '1SS08' => '1SS08',
-                    'PS04A' => 'PS04A'
+                    'PS04A' => 'PS04A',
+                    'PS04B' => 'PS04B'
                 ]
             ],
             '4' => [
@@ -361,6 +365,7 @@ class OrderTest extends KernelTestCase
         ];
 
         // For DV orders samples display text is not changed regardless of centrifuge type
+        // Sample id is the test code that we send to mayolink API
         $centrifugeTypes = ['swinging_bucket', 'fixed_angle'];
         foreach ($centrifugeTypes as $centrifugeType) {
             $order = $this->createOrder([
