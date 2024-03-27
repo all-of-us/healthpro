@@ -915,6 +915,10 @@ table.table-samples td {
     color: #a94442;
 }
 
+.input-alert-warning {
+    border-color: #8a6d3a;
+}
+
 /* NPH Participant details */
 
 .no-dob-banner {
