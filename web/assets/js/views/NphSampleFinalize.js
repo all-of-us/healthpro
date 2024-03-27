@@ -103,7 +103,7 @@ $(document).ready(function () {
                                 let errorMessage =
                                     "<tr class='unique-aliquot-error alert alert-warning'><td colspan='4'><i class='fa fa-exclamation-triangle' aria-hidden='true'></i> The matrix ID entered duplicates the collection sample ID. If this was a mistake, please enter the correct matrix ID. If the matrix ID number is the same as the collection sample ID number, continue to aliquot and finalize.</td></tr>";
                                 trSelector.after(errorMessage);
-                                inputSelector.addClass('input-alert-warning');
+                                inputSelector.addClass("input-alert-warning");
                             }
                         }
                     },
@@ -120,7 +120,7 @@ $(document).ready(function () {
     let showHideUniqueAliquotError = function (tdSelector, trSelector, inputSelector) {
         tdSelector.find(".unique-aliquot-error").remove();
         trSelector.next(".unique-aliquot-error").remove();
-        inputSelector.removeClass('input-alert-warning');
+        inputSelector.removeClass("input-alert-warning");
     };
 
     let disableEnableAliquotFields = function () {
