@@ -28,10 +28,11 @@ class Order
     public const PEDIATRIC_BLOOD_SAMPLES = ['1ED04', '2ED02', '2ED04', '1ED10', '1PXR2', '1ED02'];
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
     public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
+    public const PEDIATRIC_SAMPLE_VERSION = '3.1';
 
-    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08'];
+    public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', 'PS04A', 'PS04B'];
 
-    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08'];
+    public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08', 'PS04A', 'PS04B'];
 
     public static $identifierLabel = [
         'name' => 'name',
@@ -79,7 +80,30 @@ class Order
         '2PST8' => [
             'code' => '1PS08',
             'centrifuge_type' => 'fixed_angle'
-        ]
+        ],
+        '1PS4A' => [
+            'code' => 'PS04A',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PS4A' => [
+            'code' => 'PS04A',
+            'centrifuge_type' => 'fixed_angle'
+        ],
+        '1PS4B' => [
+            'code' => 'PS04B',
+            'centrifuge_type' => 'swinging_bucket'
+        ],
+        '2PS4B' => [
+            'code' => 'PS04B',
+            'centrifuge_type' => 'fixed_angle'
+        ],
+    ];
+
+    public static array $hpoToRdrSampleConversions = [
+        '1SS08' => ['fixed_angle' => '2SST8', 'swinging_bucket' => '1SST8'],
+        '1PS08' => ['fixed_angle' => '2PST8', 'swinging_bucket' => '1PST8'],
+        'PS04A' => ['fixed_angle' => '2PS4A', 'swinging_bucket' => '1PS4A'],
+        'PS04B' => ['fixed_angle' => '2PS4B', 'swinging_bucket' => '1PS4B']
     ];
 
     public static $cancelReasons = [
@@ -911,13 +935,13 @@ class Order
                 $this->currentVersion = self::INITIAL_VERSION;
                 if ($pediatricFlag && $physicalMeasurement) {
                     $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = "{$this->currentVersion}-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                    $this->currentVersion = self::PEDIATRIC_SAMPLE_VERSION . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
                 if ($pediatricFlag && $physicalMeasurement) {
                     $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = "{$this->currentVersion}-" . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                    $this->currentVersion = self::PEDIATRIC_SAMPLE_VERSION . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
                 }
             }
         }
@@ -1609,11 +1633,8 @@ class Order
         foreach ($this->getModifiedRequestedSamples() as $description => $test) {
             // Convert new samples
             $rdrTest = $test;
-            if ($test == '1SS08') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2SST8' : '1SST8';
-            }
-            if ($test == '1PS08') {
-                $rdrTest = $this->getProcessedCentrifugeType() == self::FIXED_ANGLE ? '2PST8' : '1PST8';
+            if (array_key_exists($test, self::$hpoToRdrSampleConversions)) {
+                $rdrTest = self::$hpoToRdrSampleConversions[$test][$this->getProcessedCentrifugeType()] ?? self::$hpoToRdrSampleConversions[$test][self::SWINGING_BUCKET];
             }
             $sample = [
                 'test' => $rdrTest,

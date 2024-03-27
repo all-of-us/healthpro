@@ -44,8 +44,18 @@ class OrderTest extends KernelTestCase
         return $order;
     }
 
-    protected function getOrderData()
+    protected function getOrderData(string $version = '3.1'): array
     {
+        $collectedSamples = '["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]';
+        $processedSamples = '["1SS08","1PS08"]';
+        $processedSamplesTs = '{"1SS08":1606753560,"1PS08":1606753560}';
+        $finalizedSamples = '["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]';
+        if ($version === '3.2') {
+            $collectedSamples = '["1SS08","PS04A","PS04B","1HEP4","PS04A","1ED10","1CFD9","1PXR2","1UR10"]';
+            $processedSamples = '["1SS08","PS04A","PS04B",]';
+            $processedSamplesTs = '{"1SS08":1606753560,"PS04A":1606753560,"PS04B":1606753560}';
+            $finalizedSamples = '["1SS08","PS04A","PS04B","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]';
+        }
         return [
             'user' => $this->getUser(),
             'site' => 'test',
@@ -55,12 +65,12 @@ class OrderTest extends KernelTestCase
             'biobankId' => 'Y123456789',
             'orderId' => '0123456789',
             'mayoId' => 'WEB123456789',
-            'collectedSamples' => '["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]',
-            'processedSamples' => '["1SS08","1PS08"]',
-            'processedSamplesTs' => '{"1SS08":1606753560,"1PS08":1606753560}',
+            'collectedSamples' => $collectedSamples,
+            'processedSamples' => $processedSamples,
+            'processedSamplesTs' => $processedSamplesTs,
             'processedCentrifugeType' => 'swinging_bucket',
-            'finalizedSamples' => '["1SS08","1PS08","1HEP4","1ED04","1ED10","1CFD9","1PXR2","1UR10"]',
-            'version' => '3.1'
+            'finalizedSamples' => $finalizedSamples,
+            'version' => $version
         ];
     }
 
@@ -159,6 +169,27 @@ class OrderTest extends KernelTestCase
         // Assert processed sample codes (fixed_angle)
         $this->assertEquals('2SST8', $order->getRdrObject()->samples[0]['test']);
         $this->assertEquals('2PST8', $order->getRdrObject()->samples[1]['test']);
+
+
+        // Version 3.2
+        // HPO Order
+        $orderData = $this->getOrderData('3.2');
+        $order = $this->createOrder($orderData);
+        $order->loadSamplesSchema();
+        // Assert processed sample codes (swinging_bucket)
+        $this->assertEquals('1SST8', $order->getRdrObject()->samples[0]['test']);
+        $this->assertEquals('1PS4A', $order->getRdrObject()->samples[1]['test']);
+        $this->assertEquals('1PS4B', $order->getRdrObject()->samples[2]['test']);
+
+        // DV order
+        $orderData['type'] = 'kit';
+        $orderData['processedCentrifugeType'] = 'fixed_angle';
+        $order = $this->createOrder($orderData);
+        $order->loadSamplesSchema();
+        // Assert processed sample codes (fixed_angle)
+        $this->assertEquals('2SST8', $order->getRdrObject()->samples[0]['test']);
+        $this->assertEquals('2PS4A', $order->getRdrObject()->samples[1]['test']);
+        $this->assertEquals('2PS4B', $order->getRdrObject()->samples[2]['test']);
     }
 
     public function testEditRdrObject()
@@ -214,6 +245,13 @@ class OrderTest extends KernelTestCase
                         '1PS08' => '1PST8'
                     ]
                 ],
+                '3.2' => [
+                    'sampleIds' => [
+                        '1SS08' => '1SST8',
+                        'PS04A' => '1PS4A',
+                        'PS04B' => '1PS4B'
+                    ]
+                ],
                 '4' => [
                     'sampleIds' => [
                         '1SS08' => '1SST8',
@@ -246,6 +284,13 @@ class OrderTest extends KernelTestCase
                         '1PS08' => '2PST8'
                     ]
                 ],
+                '3.2' => [
+                    'sampleIds' => [
+                        '1SS08' => '2SST8',
+                        'PS04A' => '2PS4A',
+                        'PS04B' => '2PS4B'
+                    ]
+                ],
                 '4' => [
                     'sampleIds' => [
                         '1SS08' => '2SST8',
@@ -256,6 +301,7 @@ class OrderTest extends KernelTestCase
         ];
 
         // For HPO orders samples display text changes for only swinging bucket centrifuge type
+        // Sample id is the test code that we send to mayolink API
         foreach ($data as $centrifugeType => $values) {
             $order = $this->createOrder([
                 'createdTs' => new \DateTime('2021-01-01 08:00:00'),
@@ -303,6 +349,13 @@ class OrderTest extends KernelTestCase
                     '1PS08' => '1PS08'
                 ]
             ],
+            '3.2' => [
+                'sampleIds' => [
+                    '1SS08' => '1SS08',
+                    'PS04A' => 'PS04A',
+                    'PS04B' => 'PS04B'
+                ]
+            ],
             '4' => [
                 'sampleIds' => [
                     '1SS08' => '1SS08',
@@ -312,6 +365,7 @@ class OrderTest extends KernelTestCase
         ];
 
         // For DV orders samples display text is not changed regardless of centrifuge type
+        // Sample id is the test code that we send to mayolink API
         $centrifugeTypes = ['swinging_bucket', 'fixed_angle'];
         foreach ($centrifugeTypes as $centrifugeType) {
             $order = $this->createOrder([
@@ -581,7 +635,7 @@ class OrderTest extends KernelTestCase
         $this->em->persist($order);
         $this->em->flush();
         $params = [
-            'order_samples_version' => '3.1'
+            'order_samples_version' => '3.2'
         ];
         $order->setVersion($sampleVersion);
         $order->loadSamplesSchema($params);
@@ -594,7 +648,8 @@ class OrderTest extends KernelTestCase
             ['', '1'],
             ['2', '2'],
             ['3', '3'],
-            ['3.1', '3.1']
+            ['3.1', '3.1'],
+            ['3.2', '3.2']
         ];
     }
 

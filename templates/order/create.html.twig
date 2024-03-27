@@ -63,7 +63,7 @@
                                 {% if not participant.isPediatric %}
                                 <div class="form-group{% if not createForm.samples.vars.valid %} has-error{% endif %}">
                                     {{ form_label(createForm.samples) }}
-                                    {{ samples.form_widget(createForm.samples, false, samplesInfo, version) }}
+                                    {{ samples.form_widget(createForm.samples, false, samplesInfo, version, null, true) }}
                                     {{ form_errors(createForm.samples) }}
                                 </div>
                                 {% endif %}
