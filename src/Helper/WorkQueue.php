@@ -2597,6 +2597,8 @@ class WorkQueue
     public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
+        'PS04A' => '1st 4.5 mL PST',
+        'PS04B' => '2nd 4.5 mL PST',
         '1HEP4' => '4 mL Na-Hep',
         '1ED02' => '2 mL EDTA (1ED02)',
         '2ED02' => '2 mL EDTA (2ED02)',
@@ -2631,11 +2633,15 @@ class WorkQueue
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',
-            '1PST8' => '1PS08'
+            '1PST8' => '1PS08',
+            'PS04A' => '1PS4A',
+            'PS04B' => '1PS4B',
         ],
         [
             '1SST8' => '2SST8',
-            '1PST8' => '2PST8'
+            '1PST8' => '2PST8',
+            'PS04A' => '2PS4A',
+            'PS04B' => '2PS4B',
         ],
         [
             '1SAL' => '1SAL2'
