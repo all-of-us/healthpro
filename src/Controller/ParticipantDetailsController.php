@@ -305,6 +305,9 @@ class ParticipantDetailsController extends BaseController
         if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
             throw $this->createAccessDeniedException();
         }
+        if ($incentive && $incentive->getRecipient() == Incentive::PEDIATRIC_GUARDIAN) {
+            $incentive->setRecipient($incentive->getRelatedParticipantRecipient());
+        }
         $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => $incentiveId ? true : false, 'pediatric_participant' => $participant->isPediatric, 'participant' => $participant]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
