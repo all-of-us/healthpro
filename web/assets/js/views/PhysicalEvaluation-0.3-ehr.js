@@ -739,13 +739,13 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
         var block = $(e.currentTarget).closest(".alt-units-field");
         var type = block.find("label").attr("for");
         var val;
-        if (type === "alt-units-height") {
+        if (type === "alt-units-height-ftin") {
             var inches = 0;
-            if (parseFloat($("#alt-units-height-ft").val())) {
-                inches += 12 * parseFloat($("#alt-units-height-ft").val());
+            if (parseFloat($("#form_height-ft-user-entered").val())) {
+                inches += 12 * parseFloat($("#form_height-ft-user-entered").val());
             }
-            if (parseFloat($("#alt-units-height-in").val())) {
-                inches += parseFloat($("#alt-units-height-in").val());
+            if (parseFloat($("#form_height-in-user-entered").val())) {
+                inches += parseFloat($("#form_height-in-user-entered").val());
             }
             val = this.inToCm(inches);
         } else if (type == "alt-units-height-ftin") {
