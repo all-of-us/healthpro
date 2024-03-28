@@ -1141,6 +1141,38 @@ class WorkQueue
             'group' => 'enrollment',
             'display_na' => self::NA_PEDIATRIC
         ],
+        'PS04A' => [
+            'name' => '1st 4.5 mL PST',
+            'csvNames' => [
+                '1st 4.5 mL PST Received',
+                '1st 4.5 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PS4A',
+            'sortField' => 'sampleStatus1PS4ATime',
+            'rdrDateField' => 'sampleStatus1PS4ATime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
+        ],
+        'PS04B' => [
+            'name' => '2nd 4.5 mL PST',
+            'csvNames' => [
+                '2nd 4.5 mL PST Received',
+                '2nd 4.5 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PS4B',
+            'sortField' => 'sampleStatus1PS4BTime',
+            'rdrDateField' => 'sampleStatus1PS4BTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
+        ],
         '1HEP4' => [
             'name' => '4 mL Na-Hep',
             'csvNames' => [
@@ -1509,6 +1541,8 @@ class WorkQueue
         'orderCreatedSite',
         '1SST8',
         '1PST8',
+        'PS04A',
+        'PS04B',
         '1HEP4',
         '1ED02',
         '2ED02',
