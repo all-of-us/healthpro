@@ -1,5 +1,4 @@
 const _ = require("underscore");
-const {isNull} = require("underscore");
 
 /**
  * Physical evaluation form view
