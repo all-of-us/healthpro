@@ -1730,7 +1730,9 @@ class WorkQueue
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
         'pediatricStatus',
-        'relatedParticipants'
+        'relatedParticipants',
+        'PS04A',
+        'PS04B'
     ];
 
     public static $sortColumns = [
