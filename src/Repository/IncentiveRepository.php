@@ -141,12 +141,14 @@ class IncentiveRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getIncentivesIncludingRelated(Participant $participant)
+    public function getActiveIncentivesIncludingRelated(Participant $participant)
     {
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i')
             ->andWhere('i.participantId = :participantid or i.relatedParticipantRecipient = :participantid')
-            ->setParameter('participantid', $participant->id);
+            ->andWhere('i.cancelledTs is null')
+            ->setParameter('participantid', $participant->id)
+            ->orderBy('i.createdTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
 }
