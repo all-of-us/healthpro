@@ -17,11 +17,27 @@ class IncentiveType extends AbstractType
             $builder->getData()->getIncentiveAmount(),
             Incentive::$incentiveAmountChoices
         ) ? $builder->getData()->getIncentiveAmount() : 0;
+        $recipientChoices = Incentive::$recipientChoices;
+        $relatedParticipantChoices = [];
+        $participant = $options['participant'];
+        if ($participant && $options['pediatric_participant']) {
+            if (count($participant->relatedParticipants) > 0) {
+                unset($recipientChoices['Pediatric Guardian']);
+                foreach ($participant->relatedParticipants as $relatedParticipant) {
+                    $relatedParticipantChoices["Pediatric Guardian: ($relatedParticipant->participantId)"] = $relatedParticipant->participantId;
+                }
+                if (count($relatedParticipantChoices) > 0) {
+                    $recipientChoices = array_slice($recipientChoices, 0, 2)
+                        + $relatedParticipantChoices
+                        + array_slice($recipientChoices, 2);
+                }
+            }
+        }
 
         $builder
             ->add('recipient', Type\ChoiceType::class, [
                 'label' => 'Please select the recipient of the incentive:',
-                'choices' => Incentive::$recipientChoices,
+                'choices' => $recipientChoices,
                 'placeholder' => '-- Select Recipient --',
                 'multiple' => false,
                 'required' => true,
@@ -251,7 +267,8 @@ class IncentiveType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Incentive::class,
             'require_notes' => false,
-            'pediatric_participant' => false
+            'pediatric_participant' => false,
+            'participant' => null
         ]);
     }
 }

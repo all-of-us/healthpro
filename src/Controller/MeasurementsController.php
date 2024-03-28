@@ -280,6 +280,7 @@ class MeasurementsController extends BaseController
             'schema' => $measurement->getAssociativeSchema(),
             'warnings' => $measurement->getWarnings(),
             'conversions' => $measurement->getConversions(),
+            'recordUserValues' => $measurement->getRecordUserValues(),
             'latestVersion' => $measurement->getLatestFormVersion(),
             'showAutoModification' => $showAutoModification,
             'revertForm' => $this->createForm(MeasurementRevertType::class, null)->createView(),

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\IdVerification;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\Order;
@@ -175,10 +176,10 @@ class ParticipantDetailsController extends BaseController
         }
 
         // Incentive Form
-        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly(), 'pediatric_participant' => $participant->isPediatric]);
+        $incentiveForm = $this->createForm(IncentiveType::class, null, ['disabled' => $this->isReadOnly(), 'pediatric_participant' => $participant->isPediatric, 'participant' => $participant]);
 
         // Id Verification Form
-        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly()]);
+        $idVerificationForm = $this->createForm(IdVerificationType::class, null, ['disabled' => $this->isReadOnly(), 'pediatricParticipant' => $participant->isPediatric]);
         $idVerificationForm->handleRequest($request);
         if ($idVerificationForm->isSubmitted()) {
             if ($idVerificationForm->isValid()) {
@@ -191,7 +192,7 @@ class ParticipantDetailsController extends BaseController
                 $this->addFlash('id-verification-error', 'Invalid form');
             }
         }
-        $idVerifications = $idVerificationService->getIdVerifications($id);
+        $idVerifications = $this->em->getRepository(IdVerification::class)->findBy(['participantId' => $id], ['id' => 'DESC']);
 
         // Incentive Delete Form
         $incentiveDeleteForm = $this->createForm(IncentiveRemoveType::class, null);
@@ -212,7 +213,7 @@ class ParticipantDetailsController extends BaseController
             }
         }
 
-        $incentives = $this->em->getRepository(Incentive::class)->findBy(['participantId' => $id, 'cancelledTs' => null], ['id' => 'DESC']);
+        $incentives = $this->em->getRepository(Incentive::class)->getActiveIncentivesIncludingRelated($participant);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
@@ -304,7 +305,10 @@ class ParticipantDetailsController extends BaseController
         if ($incentive && $incentive->getSite() !== $siteService->getSiteId()) {
             throw $this->createAccessDeniedException();
         }
-        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => $incentiveId ? true : false, 'pediatric_participant' => $participant->isPediatric]);
+        if ($incentive && $incentive->getRecipient() == Incentive::PEDIATRIC_GUARDIAN) {
+            $incentive->setRecipient($incentive->getRelatedParticipantRecipient());
+        }
+        $incentiveForm = $this->createForm(IncentiveType::class, $incentive, ['require_notes' => $incentiveId ? true : false, 'pediatric_participant' => $participant->isPediatric, 'participant' => $participant]);
         $incentiveForm->handleRequest($request);
         if ($incentiveForm->isSubmitted()) {
             if ($incentiveForm->isValid()) {

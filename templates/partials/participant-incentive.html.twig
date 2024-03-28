@@ -26,7 +26,8 @@
                         {% endif %}
                     </dd>
                     <dt class="col-sm-4">Recipient</dt>
-                    <dd class="col-sm-8">{{ incentive.incentiveRecipientDisplayName|default('--') }}</dd>
+                    <dd class="col-sm-8">{{ incentive.incentiveRecipientDisplayName|default('--') }}
+                        {% if incentive.relatedParticipantRecipient %} {{ incentive.relatedParticipantRecipient }} {% endif %}</dd>
                     {% if incentive.otherIncentiveRecipient %}
                         <dt class="col-sm-4">Other Recipient</dt>
                         <dd class="col-sm-8">{{ incentive.otherIncentiveRecipient }}</dd>
@@ -42,7 +43,7 @@
                     <dt class="col-sm-4">Incentive Type</dt>
                     <dd class="col-sm-8">
                         {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
-                        {{ incentive.typeOfItem  ? ', ' ~ incentive.typeOfItem  ~ ', ' ~ incentive.numberOfItems : 'blank' }}
+                        {{ incentive.typeOfItem  ? ', ' ~ incentive.typeOfItem  ~ ', ' ~ incentive.numberOfItems : '' }}
                     </dd>
                     {% if incentive.otherIncentiveType %}
                         <dt class="col-sm-4">Other Incentive Type</dt>
@@ -124,7 +125,7 @@
             <div id="collapseOne" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
-                        {% if not readOnlyView and incentive.site == siteInfo.siteId %}
+                        {% if not readOnlyView and incentive.site == siteInfo.siteId and incentive.relatedParticipantRecipient != participant.id %}
                             <div class="float-end incentive-modify">
                                 <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                                 <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
@@ -143,7 +144,8 @@
                             <dt class="col-sm-5">Site</dt>
                             <dd class="col-sm-7">{{ siteInfo.siteDisplayName(incentive.site) }}</dd>
                             <dt class="col-sm-5">Recipient</dt>
-                            <dd class="col-sm-7">{{ incentive.incentiveRecipientDisplayName|default('--') }}</dd>
+                            <dd class="col-sm-7">{{ incentive.incentiveRecipientDisplayName|default('--') }}
+                            {% if incentive.relatedParticipantRecipient %} {{ incentive.relatedParticipantRecipient }} {% endif %}</dd>
                             {% if incentive.otherIncentiveRecipient %}
                                 <dt class="col-sm-5">Other Recipient</dt>
                                 <dd class="col-sm-7">{{ incentive.otherIncentiveRecipient }}</dd>

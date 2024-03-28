@@ -194,22 +194,45 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
     },
     calculateConversion: function (field) {
         var input = this.$(".field-" + field).find("input");
-        if (input.length > 1) {
-            // replicate conversions are handled in calculateMean method
+        if ($.inArray(field, this.hipWaistFields) === -1 && input.length > 1) {
+            // replicate conversions are handled in calculateMean method except for hip & waist circumference fields
             return;
         }
-        if (this.conversions[field]) {
-            var val = parseFloat(input.val());
+        var convertFieldId = "#convert-" + field;
+        if (index !== null) {
+            input = this.$("#form_" + field + "_" + index);
+            convertFieldId = "#convert-" + field + "_" + index;
+        }
+        let val = null;
+        if (this.recordUserValues[field]) {
+            if (field === "height") {
+                let feet = parseFloat($(`#form_height-ft-user-entered`).val());
+                let inches = parseFloat($(`#form_height-in-user-entered`).val());
+                if (!Number.isNaN(feet) && !Number.isNaN(inches)) {
+                    val = `${feet}ft ${inches}in`;
+                }
+            } else {
+                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                if (!Number.isNaN(inputVal)) {
+                    val = `${inputVal} ${this.conversions[field]}`;
+                }
+            }
+        }
+        if (this.conversions[field] && (val === null || Number.isNaN(val))) {
+            val = parseFloat(input.val());
             if (val) {
                 var converted = this.convert(this.conversions[field], val);
                 if (converted) {
-                    this.$("#convert-" + field).text("(" + converted + ")");
+                    val = converted;
                 } else {
-                    this.$("#convert-" + field).text("");
+                    val = null;
                 }
-            } else {
-                this.$("#convert-" + field).text("");
             }
+        }
+        if (val) {
+            this.$(convertFieldId).text("(" + val + ")");
+        } else {
+            this.$(convertFieldId).text("");
         }
     },
     warningConditionMet: function (warning, val) {
@@ -410,6 +433,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
     initialize: function (obj) {
         this.warnings = obj.warnings;
         this.conversions = obj.conversions;
+        this.recordUserValues = obj.recordUserValues;
         this.finalized = obj.finalized;
         this.rendered = false;
         this.render();

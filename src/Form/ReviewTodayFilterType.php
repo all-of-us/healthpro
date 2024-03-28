@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraints;
 
 class ReviewTodayFilterType extends AbstractType
 {
+    public const DATE_RANGE_LIMIT = 30;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $constraintDate = new \DateTime('today', new \DateTimeZone($options['timezone']));

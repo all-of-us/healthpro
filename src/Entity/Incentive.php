@@ -146,6 +146,9 @@ class Incentive
     #[ORM\Column(nullable: true)]
     private ?int $numberOfItems = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $relatedParticipantRecipient = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -463,5 +466,17 @@ class Incentive
             unset($choices['Pediatric Visit']);
         }
         return $choices;
+    }
+
+    public function getRelatedParticipantRecipient(): ?string
+    {
+        return $this->relatedParticipantRecipient;
+    }
+
+    public function setRelatedParticipantRecipient(?string $relatedParticipantRecipient): static
+    {
+        $this->relatedParticipantRecipient = $relatedParticipantRecipient;
+
+        return $this;
     }
 }

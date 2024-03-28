@@ -30,7 +30,7 @@
     </div>
 
     {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
-        {{ self.form_row_alternate_units(definition, name) }}
+        {{ self.form_row_alternate_units(definition, name, form) }}
     {% endif %}
 {% endmacro %}
 
@@ -59,11 +59,11 @@
     </div>
 
     {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
-        {{ self.form_row_alternate_units(definition, name) }}
+        {{ self.form_row_alternate_units(definition, name, form, i) }}
     {% endif %}
 {% endmacro %}
 
-{% macro form_row_alternate_units(definition, name) %}
+{% macro form_row_alternate_units(definition, name, form, i = -1) %}
     {% if definition.convert in ['in', 'lb', 'ftin'] %}
         {% if definition.convert == 'in' %}
             {% set label = 'inches' %}
@@ -77,27 +77,64 @@
                 <p class="text-right"><a class="small">Click here to enter in {{ label }}</a></p>
             </div>
             <div class="alt-units-field form-group" style="display:none; margin-top:15px;">
-                <label for="alt-units-{{ name }}">Enter in {{ label }} (value will be stored in {{ definition.unit }})</label>
                 {% if definition.convert == 'ftin' %}
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="alt-units-{{ name }}-ft" class="form-control alt-units-{{ name }}-ft">
-                                <div class="input-group-addon">ft</div>
+                    <label for="alt-units-{{ name }}-ftin">Enter in {{ label }} (value will be stored in {{ definition.unit }})</label>
+                    {% if definition.captureusersupplied is defined and definition.captureusersupplied %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    {% if i > -1 %}
+                                        {{ form_widget(form[name ~ '-ft-user-entered'][i]) }}
+                                    {% else %}
+                                        {{ form_widget(form[name ~ '-ft-user-entered']) }}
+                                    {% endif %}
+                                    <div class="input-group-addon">feet</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    {% if i > -1 %}
+                                        {{ form_widget(form[name ~ '-in-user-entered'][i]) }}
+                                    {% else %}
+                                        {{ form_widget(form[name ~ '-in-user-entered']) }}
+                                    {% endif %}
+                                    <div class="input-group-addon">in</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="alt-units-{{ name }}-in" class="form-control alt-units-{{ name }}-in">
-                                <div class="input-group-addon">in</div>
+                    {% else %}
+                        <label for="alt-units-{{ name }}">Enter in {{ label }} (value will be stored in {{ definition.unit }})</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" id="alt-units-{{ name }}-ft" class="form-control alt-units-{{ name }}-ft">
+                                    <div class="input-group-addon">ft</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" id="alt-units-{{ name }}-in" class="form-control alt-units-{{ name }}-in">
+                                    <div class="input-group-addon">in</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 {% else %}
-                    <div class="input-group">
-                        <input type="text" id="alt-units-{{ name }}" class="form-control">
-                        <div class="input-group-addon">{{ definition.convert }}</div>
-                    </div>
+                    {% if definition.captureusersupplied is defined and definition.captureusersupplied %}
+                            <div class="input-group">
+                                {% if i > -1 %}
+                                    {{ form_widget(form[name ~ '-user-entered'][i]) }}
+                                {% else %}
+                                    {{ form_widget(form[name ~ '-user-entered']) }}
+                                {% endif %}
+                                <div class="input-group-addon">{{ definition.convert }}</div>
+                            </div>
+                    {% else %}
+                        <div class="input-group">
+                            <input type="text" id="alt-units-{{ name }}" name="alt-units-{{ name }}]" class="form-control">
+                            <div class="input-group-addon">{{ definition.convert }}</div>
+                        </div>
+                    {% endif %}
                 {% endif %}
                 <p class="text-right"><a class="small">Cancel</a></p>
             </div>

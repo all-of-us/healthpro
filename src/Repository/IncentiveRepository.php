@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Incentive;
+use App\Helper\Participant;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -138,5 +139,16 @@ class IncentiveRepository extends ServiceEntityRepository
         return $queryBuilder
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function getActiveIncentivesIncludingRelated(Participant $participant)
+    {
+        $queryBuilder = $this->createQueryBuilder('i')
+            ->select('i')
+            ->andWhere('i.participantId = :participantid or i.relatedParticipantRecipient = :participantid')
+            ->andWhere('i.cancelledTs is null')
+            ->setParameter('participantid', $participant->id)
+            ->orderBy('i.createdTs', 'DESC');
+        return $queryBuilder->getQuery()->getResult();
     }
 }

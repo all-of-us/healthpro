@@ -75,6 +75,8 @@ $(document).ready(function () {
             let expectedBarcodePrefix = $(this).data("barcode-prefix");
             let regex = new RegExp(`^${expectedBarcodePrefix}\\d{${expectedBarcodeLength}}$`);
             let tdSelector = $(this).closest("td");
+            let trSelector = $(this).closest("tr");
+            let inputSelector = $(this);
             if (regex.test(barcode)) {
                 let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
                 aliquotTsSelector.focus();
@@ -86,13 +88,23 @@ $(document).ready(function () {
                     method: "GET",
                     data: { aliquotId: barcode },
                     success: function (response) {
-                        if (response === false) {
-                            let errorMessage =
-                                "<div class='help-block unique-aliquot-error'>Please enter a unique aliquot barcode.</div>";
-                            tdSelector.append(errorMessage).addClass("has-error");
-                        } else {
+                        if (response.status === true) {
                             tdSelector.find(".unique-aliquot-error").remove();
                             tdSelector.removeClass("has-error");
+                        } else {
+                            if (response.type === "aliquot") {
+                                showHideUniqueAliquotError(tdSelector, trSelector, inputSelector);
+                                let errorMessage =
+                                    "<div class='help-block unique-aliquot-error'>Please enter a unique aliquot barcode.</div>";
+                                tdSelector.append(errorMessage).addClass("has-error");
+                            }
+                            if (response.type === "sample") {
+                                showHideUniqueAliquotError(tdSelector, trSelector, inputSelector);
+                                let errorMessage =
+                                    "<tr class='unique-aliquot-error alert alert-warning'><td colspan='4'><i class='fa fa-exclamation-triangle' aria-hidden='true'></i> The matrix ID entered duplicates the collection sample ID. If this was a mistake, please enter the correct matrix ID. If the matrix ID number is the same as the collection sample ID number, continue to aliquot and finalize.</td></tr>";
+                                trSelector.after(errorMessage);
+                                inputSelector.addClass("input-alert-warning");
+                            }
                         }
                     },
                     error: function (xhr, status, error) {
@@ -100,10 +112,16 @@ $(document).ready(function () {
                     }
                 });
             } else {
-                tdSelector.find(".unique-aliquot-error").remove();
+                showHideUniqueAliquotError(tdSelector, trSelector, inputSelector);
             }
         }
     });
+
+    let showHideUniqueAliquotError = function (tdSelector, trSelector, inputSelector) {
+        tdSelector.find(".unique-aliquot-error").remove();
+        trSelector.next(".unique-aliquot-error").remove();
+        inputSelector.removeClass("input-alert-warning");
+    };
 
     let disableEnableAliquotFields = function () {
         let $checkboxes = $(".sample-cancel-checkbox:checkbox:enabled");

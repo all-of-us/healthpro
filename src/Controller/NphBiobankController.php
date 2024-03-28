@@ -11,6 +11,7 @@ use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
 use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
+use App\Form\ReviewTodayFilterType;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -136,6 +137,47 @@ class NphBiobankController extends BaseController
         return $this->render('/program/nph/biobank/orders-recently-modified.html.twig', [
             'samples' => $samples,
             'modifiedOrdersView' => true
+        ]);
+    }
+
+    #[Route(path: '/review/orders/downtime', name: 'nph_biobank_orders_downtime')]
+    public function ordersDowntimeAction(Request $request): Response
+    {
+        $displayMessage = null;
+        $userTimeZone = $this->getSecurityUser()->getTimeZone();
+        $todayFilterForm = $this->createForm(ReviewTodayFilterType::class, null, ['timezone' => $userTimeZone]);
+        $todayFilterForm->handleRequest($request);
+        $startDate = $endDate = null;
+        if ($todayFilterForm->isSubmitted()) {
+            if ($todayFilterForm->isValid()) {
+                $startDate = $todayFilterForm->get('start_date')->getData();
+                $displayMessage = "Displaying results for {$startDate->format('m/d/Y')}";
+                if ($todayFilterForm->get('end_date')->getData()) {
+                    $endDate = $todayFilterForm->get('end_date')->getData();
+                    $endDate->setTime(23, 59, 59);
+                    if ($startDate->diff($endDate)->days >= ReviewTodayFilterType::DATE_RANGE_LIMIT) {
+                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 30 days'));
+                    }
+                    $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
+                } else {
+                    $endDate = clone $startDate;
+                    $endDate->modify('+1 day');
+                }
+            }
+            if (!$todayFilterForm->isValid()) {
+                $todayFilterForm->addError(new FormError('Please correct the errors below'));
+                return $this->render('program/nph/biobank/orders-downtime.html.twig', [
+                    'samples' => [],
+                    'todayFilterForm' => $todayFilterForm->createView(),
+                    'displayMessage' => $displayMessage
+                ]);
+            }
+        }
+        $samples = $this->em->getRepository(NphOrder::class)->getDowntimeOrders($startDate, $endDate);
+        return $this->render('/program/nph/biobank/orders-downtime.html.twig', [
+            'samples' => $samples,
+            'todayFilterForm' => $todayFilterForm->createView(),
+            'displayMessage' => $displayMessage
         ]);
     }
 
