@@ -125,7 +125,7 @@
             <div id="collapseOne" class="panel-collapse collapse px-4" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                     {% for incentive in incentives %}
-                        {% if not readOnlyView and incentive.site == siteInfo.siteId and incentive.relatedParticipantRecipient is null %}
+                        {% if not readOnlyView and incentive.site == siteInfo.siteId and incentive.relatedParticipantRecipient != participant.id %}
                             <div class="float-end incentive-modify">
                                 <i class="fa fa-edit fa-lg incentive-amend" aria-hidden="true" data-href="{{ path('participant_incentive', { id: participant.id, incentiveId: incentive.id }) }}" data-type="amend"></i>
                                 <i class="fa fa-trash-alt fa-lg incentive-remove" aria-hidden="true" data-id="{{ incentive.id }}" data-type="remove"></i>
