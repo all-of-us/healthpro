@@ -514,37 +514,36 @@ let viewExtension = Backbone.View.extend({
             input = this.$("#form_" + field + "_" + index);
             convertFieldId = "#convert-" + field + "_" + index;
         }
-        if (this.conversions[field] && !this.recordUserValues[field]) {
-            let val = parseFloat(input.val());
-            if (val) {
-                let converted = this.convert(this.conversions[field], val);
-                if (converted) {
-                    this.$(convertFieldId).text("(" + converted + ")");
-                } else {
-                    this.$(convertFieldId).text("");
-                }
-            } else {
-                this.$(convertFieldId).text("");
-            }
-        } else if (this.recordUserValues[field]) {
-            let val = 0;
-            if (field == "height") {
+        let val = null;
+        if (this.recordUserValues[field]) {
+            if (field === "height") {
                 let feet = parseFloat($(`#form_height-ft-user-entered`).val());
                 let inches = parseFloat($(`#form_height-in-user-entered`).val());
-                if (!isNaN(feet) && !isNaN(inches)) {
+                if (!Number.isNaN(feet) && !Number.isNaN(inches)) {
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                val = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
-                if (!isNaN(val)) {
+                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                if (!Number.isNaN(inputVal)) {
                     val = `${val} ${this.conversions[field]}`;
                 }
             }
+        }
+        if (this.conversions[field] && (val === null || Number.isNaN(val))) {
+            val = parseFloat(input.val());
             if (val) {
-                this.$(convertFieldId).text("(" + val + ")");
-            } else {
-                this.$(convertFieldId).text("");
+                var converted = this.convert(this.conversions[field], val);
+                if (converted) {
+                    val = converted;
+                } else {
+                    val = null;
+                }
             }
+        }
+        if (val) {
+            this.$(convertFieldId).text("(" + val + ")");
+        } else {
+            this.$(convertFieldId).text("");
         }
     },
     warningConditionMet: function (warning, val) {
