@@ -43,7 +43,7 @@
                     <dt class="col-sm-4">Incentive Type</dt>
                     <dd class="col-sm-8">
                         {{ incentive.incentiveTypeDisplayName }}{{ incentive.giftCardType ? ', ' ~ incentive.giftCardType: '' }}
-                        {{ incentive.typeOfItem  ? ', ' ~ incentive.typeOfItem  ~ ', ' ~ incentive.numberOfItems : 'blank' }}
+                        {{ incentive.typeOfItem  ? ', ' ~ incentive.typeOfItem  ~ ', ' ~ incentive.numberOfItems : '' }}
                     </dd>
                     {% if incentive.otherIncentiveType %}
                         <dt class="col-sm-4">Other Incentive Type</dt>
