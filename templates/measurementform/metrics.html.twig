@@ -83,13 +83,21 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    {{ form_widget(form[name ~ '-ft-user-entered']) }}
+                                    {% if i > -1 %}
+                                        {{ form_widget(form[name ~ '-ft-user-entered'][i]) }}
+                                    {% else %}
+                                        {{ form_widget(form[name ~ '-ft-user-entered']) }}
+                                    {% endif %}
                                     <div class="input-group-addon">feet</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    {{ form_widget(form[name ~ '-in-user-entered']) }}
+                                    {% if i > -1 %}
+                                        {{ form_widget(form[name ~ '-in-user-entered'][i]) }}
+                                    {% else %}
+                                        {{ form_widget(form[name ~ '-in-user-entered']) }}
+                                    {% endif %}
                                     <div class="input-group-addon">in</div>
                                 </div>
                             </div>

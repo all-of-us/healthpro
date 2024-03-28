@@ -74,7 +74,8 @@
       "alternatefor": "weight",
       "alternateunitfield": true,
       "unit": "lb",
-      "decimals": 1
+      "decimals": 1,
+      "replicates": 3
     },
     {
       "name": "weight-protocol-modification",
@@ -198,7 +199,8 @@
       "alternatefor": "height",
       "alternateunitfield": true,
       "unit": "ft",
-      "decimals": 1
+      "decimals": 1,
+      "replicates": 3
     },
     {
       "name": "height-in-user-entered",
@@ -206,7 +208,8 @@
       "alternatefor": "height",
       "alternateunitfield": true,
       "unit": "in",
-      "decimals": 1
+      "decimals": 1,
+      "replicates": 3
     },
     {
       "name": "height-protocol-modification",

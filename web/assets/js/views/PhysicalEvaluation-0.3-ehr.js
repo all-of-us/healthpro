@@ -473,36 +473,36 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
             input = this.$("#form_" + field + "_" + index);
             convertFieldId = "#convert-" + field + "_" + index;
         }
-        if (this.conversions[field] && !this.recordUserValues[field]) {
-            var val = parseFloat(input.val());
-            if (val) {
-                var converted = this.convert(this.conversions[field], val);
-                if (converted) {
-                    this.$(convertFieldId).text("(" + converted + ")");
-                } else {
-                    this.$(convertFieldId).text("");
-                }
-            } else {
-                this.$(convertFieldId).text("");
-            }
-        } else if (this.recordUserValues[field]) {
-            if (field == "height") {
+        let val = null;
+        if (this.recordUserValues[field]) {
+            if (field === "height") {
                 let feet = parseFloat($(`#form_height-ft-user-entered`).val());
                 let inches = parseFloat($(`#form_height-in-user-entered`).val());
-                if (!isNaN(feet) && !isNaN(inches)) {
+                if (!Number.isNaN(feet) && !Number.isNaN(inches)) {
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                var val = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
-                if (!isNaN(val)) {
-                    val = `${val} ${this.conversions[field]}`;
+                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                if (!Number.isNaN(inputVal)) {
+                    val = `${inputVal} ${this.conversions[field]}`;
                 }
             }
+        }
+        if (this.conversions[field] && (val === null || Number.isNaN(val))) {
+            val = parseFloat(input.val());
             if (val) {
-                this.$(convertFieldId).text("(" + val + ")");
-            } else {
-                this.$(convertFieldId).text("");
+                var converted = this.convert(this.conversions[field], val);
+                if (converted) {
+                    val = converted;
+                } else {
+                    val = null;
+                }
             }
+        }
+        if (val) {
+            this.$(convertFieldId).text("(" + val + ")");
+        } else {
+            this.$(convertFieldId).text("");
         }
     },
     warningConditionMet: function (warning, val) {
@@ -739,13 +739,13 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
         var block = $(e.currentTarget).closest(".alt-units-field");
         var type = block.find("label").attr("for");
         var val;
-        if (type === "alt-units-height") {
+        if (type === "alt-units-height-ftin") {
             var inches = 0;
-            if (parseFloat($("#alt-units-height-ft").val())) {
-                inches += 12 * parseFloat($("#alt-units-height-ft").val());
+            if (parseFloat($("#form_height-ft-user-entered").val())) {
+                inches += 12 * parseFloat($("#form_height-ft-user-entered").val());
             }
-            if (parseFloat($("#alt-units-height-in").val())) {
-                inches += parseFloat($("#alt-units-height-in").val());
+            if (parseFloat($("#form_height-in-user-entered").val())) {
+                inches += parseFloat($("#form_height-in-user-entered").val());
             }
             val = this.inToCm(inches);
         } else if (type == "alt-units-height-ftin") {
