@@ -213,7 +213,7 @@ class ParticipantDetailsController extends BaseController
             }
         }
 
-        $incentives = $this->em->getRepository(Incentive::class)->getIncentivesIncludingRelated($participant);
+        $incentives = $this->em->getRepository(Incentive::class)->getActiveIncentivesIncludingRelated($participant);
 
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv' ? true : false;
