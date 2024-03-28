@@ -1816,6 +1816,8 @@ class WorkQueue
         'biospecimenSourceSite',
         'sampleStatus1SST8Time',
         'sampleStatus1PST8Time',
+        'sampleStatus1PS4ATime',
+        'sampleStatus1PS4BTime',
         'sampleStatus1HEP4Time',
         'sampleStatus1ED02Time',
         'sampleStatus2ED02Time',
@@ -2379,6 +2381,22 @@ class WorkQueue
                     'Not Received' => 'UNSET'
                 ]
             ],
+            'sampleStatus1PS4A' => [
+                'label' => '1st 4.5 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1PS4B' => [
+                'label' => '2nd 4.5 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
             'sampleStatus1HEP4' => [
                 'label' => '4 mL Na-Hep',
                 'options' => [
@@ -2493,6 +2511,8 @@ class WorkQueue
         'clinicPhysicalMeasurementsStatus',
         'sampleStatus1SST8',
         'sampleStatus1PST8',
+        'sampleStatus1PS4A',
+        'sampleStatus1PS4B',
         'sampleStatus1HEP4',
         'sampleStatus1ED02',
         'sampleStatus2ED02',
