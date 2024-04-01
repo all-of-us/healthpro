@@ -147,19 +147,21 @@
                                                                 {% endfor %}
                                                             {% endif %}
                                                             {% set displayDietColorWarning = false %}
-                                                            {% for timepointCode, timepoint in visit['visitInfo'] %}
-                                                                {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
-                                                                    {% if sampleInfo['numberSamples'] is not empty and not displayDietColorWarning %}
-                                                                        {% for sampleCode, sample in sampleInfo %}
-                                                                            {% for orderid, numberSamples in sampleInfo['numberSamples'] if not displayDietColorWarning %}
-                                                                                {% if sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['oldVisitType'] is not empty %}
-                                                                                    {% set displayDietColorWarning = true %}
-                                                                                {% endif %}
+                                                            {% if moduleNumber in [2, 3] %}
+                                                                {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                                                    {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                                                        {% if sampleInfo['numberSamples'] is not empty and not displayDietColorWarning %}
+                                                                            {% for sampleCode, sample in sampleInfo %}
+                                                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] if not displayDietColorWarning %}
+                                                                                    {% if sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['oldVisitType'] is not empty %}
+                                                                                        {% set displayDietColorWarning = true %}
+                                                                                    {% endif %}
+                                                                                {% endfor %}
                                                                             {% endfor %}
-                                                                        {% endfor %}
-                                                                    {% endif %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
                                                                 {% endfor %}
-                                                            {% endfor %}
+                                                            {% endif %}
                                                             {% if displayDietColorWarning %}
                                                                 <div class="text-discontinue pb-2">
                                                                     <i class="fa fa-exclamation-circle"></i> Samples in this visit were collected using “diet color”. All order information has been updated to now follow “diet period”.
