@@ -41,7 +41,7 @@ class ParticipantDetailsController extends BaseController
         'consentForGenomicsROR' => 'consentForGenomicsRORFilePath',
         'consentForCABoR' => 'consentForCABoRFilePath',
         'reconsentForStudyEnrollmentAuthored' => 'reconsentForStudyEnrollmentFilePath',
-        'reconsentForElectronicHealthRecordsAuthored' => 'rconsentForElectronicHealthRecordsFilePath'
+        'reconsentForElectronicHealthRecordsAuthored' => 'reconsentForElectronicHealthRecordsFilePath'
     ];
     public function __construct(
         EntityManagerInterface $em
