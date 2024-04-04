@@ -51,11 +51,18 @@
                 {% set modulePanelDisplay = 'hidden' %}
             {% endif %}
             <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
+                {% if module.moduleCreationSite is not null %}
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <h4 class="col-md-12">Collection Site: {{ siteInfo.getSiteDisplayName(module.moduleCreationSite) }}</h4>
+                        </div>
+                    </div>
+                {% endif %}
                 <div>
                     <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
                 </div>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                    {% if VisitCode != 'sampleStatusCount' %}
+                    {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
                         <div>
                             <div class="col-md-12 well-sm well" data-toggle="collapse"
                                  data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
