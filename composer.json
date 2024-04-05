@@ -48,7 +48,8 @@
         "google/cloud-secret-manager": "^1.7",
         "ext-mbstring": "*",
         "mpdf/mpdf": "^8.1",
-        "qipsius/tcpdf-bundle": "^2.0"
+        "qipsius/tcpdf-bundle": "^2.0",
+        "league/oauth2-client": "^2.7"
     },
     "config": {
         "platform": {
