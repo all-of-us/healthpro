@@ -6,10 +6,12 @@ use App\Form\MockLoginType;
 use App\Security\User;
 use App\Service\AuthService;
 use App\Service\EnvironmentService;
+use App\Service\SalesforceAuthService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -73,6 +75,19 @@ class AuthController extends BaseController
     public function loginCallback()
     {
         // This never gets executed as it's handled by guard authenticator
+        $this->addFlash('error', 'Authentication failed. Please try again.');
+        return $this->redirectToRoute('login');
+    }
+
+    #[Route(path: '/login/openid/start', name: 'login_openid_start')]
+    public function loginOpenIdStart(SalesforceAuthService $auth): Response
+    {
+        return $this->redirect($auth->getAuthorizationUrl());
+    }
+
+    #[Route(path: '/login/openid/callback', name: 'login_openid_callback')]
+    public function loginOpenIdCallback(): Response
+    {
         $this->addFlash('error', 'Authentication failed. Please try again.');
         return $this->redirectToRoute('login');
     }

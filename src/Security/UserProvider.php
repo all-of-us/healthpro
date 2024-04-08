@@ -6,6 +6,7 @@ use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
+use Google\Service\Directory\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -33,6 +34,14 @@ class UserProvider implements UserProviderInterface
     }
 
     public function loadUserByUsername($username): UserInterface
+    {
+        if ($this->requestStack->getSession()->get('loginType') === 'salesforce') {
+            return $this->loadSalesforceUser($username);
+        }
+        return $this->loadGoogleUser($username);
+    }
+
+    private function loadGoogleUser($username): UserInterface
     {
         $googleUser = $this->userService->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
@@ -86,6 +95,32 @@ class UserProvider implements UserProviderInterface
             'managegroupsnph' => $this->requestStack->getSession()->get('managegroupsnph')
         ];
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
+    }
+
+    private function loadSalesforceUser($username): UserInterface
+    {
+        $salesforceUser = $this->userService->getSalesforceUser();
+        if (!$salesforceUser || strcasecmp($salesforceUser->getEmail(), $username) !== 0) {
+            throw new AuthenticationException("User $username is not logged in!");
+        }
+
+        if ($this->requestStack->getSession()->has('googlegroups')) {
+            $groups = $this->requestStack->getSession()->get('googlegroups');
+        } else {
+            $groups = [new Group(['email' => User::SITE_PREFIX . 'aikenmed', 'name' => 'Aikenmed'])];
+            $this->requestStack->getSession()->set('googlegroups', $groups);
+            $this->requestStack->getSession()->set('managegroups', []);
+            $this->requestStack->getSession()->set('managegroupsnph', []);
+        }
+        $userInfo = $this->userService->getUserInfo($salesforceUser);
+        $sessionInfo = [
+            'site' => $this->requestStack->getSession()->get('site'),
+            'awardee' => $this->requestStack->getSession()->get('awardee'),
+            'program' => $this->requestStack->getSession()->get('program'),
+            'managegroups' => $this->requestStack->getSession()->get('managegroups'),
+            'managegroupsnph' => $this->requestStack->getSession()->get('managegroupsnph')
+        ];
+        return new User($salesforceUser, $groups, $userInfo, null, $sessionInfo);
     }
 
     public function refreshUser(UserInterface $user): UserInterface

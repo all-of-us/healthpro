@@ -2,8 +2,8 @@
 
 namespace App\Security;
 
-use App\Service\AuthService;
 use App\Service\EnvironmentService;
+use App\Service\SalesforceAuthService;
 use App\Service\UserService;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -19,20 +19,27 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Twig\Environment;
 
-class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
+class SalesforceAuthenticator extends AbstractGuardAuthenticator
 {
-    private $auth;
-    private $urlGenerator;
-    private $userService;
-    private $params;
-    private $env;
-    private $twig;
-    private $requestStack;
-    private $authEmail;
-    private $authFailureReason;
+    private SalesforceAuthService $auth;
+    private UrlGeneratorInterface $urlGenerator;
+    private UserService $userService;
+    private ContainerBagInterface $params;
+    private EnvironmentService $env;
+    private Environment $twig;
+    private RequestStack $requestStack;
+    private string $authEmail;
+    private string $authFailureReason;
 
-    public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService, Environment $twig, RequestStack $requestStack)
-    {
+    public function __construct(
+        SalesforceAuthService $auth,
+        UrlGeneratorInterface $urlGenerator,
+        ContainerBagInterface $params,
+        EnvironmentService $env,
+        UserService $userService,
+        Environment $twig,
+        RequestStack $requestStack
+    ) {
         $this->auth = $auth;
         $this->urlGenerator = $urlGenerator;
         $this->params = $params;
@@ -44,31 +51,23 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request): bool
     {
-        if ($request->attributes->get('_route') === 'login_callback' && !$this->userService->canMockLogin()) {
+        if ($request->attributes->get('_route') === 'login_openid_callback') {
             return true;
         }
         return false;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): ?string
     {
-        if (!$request->query->has('state') || !$request->query->has('state')) {
-            return null;
-        }
-        return [
-            'state' => $request->query->get('state'),
-            'code' => $request->query->get('code')
-        ];
+        // Return the authorization code obtained from the OIDC provider's callback
+        return $request->query->get('code');
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
     {
         try {
-            $user = $this->auth->processAuth($credentials['state'], $credentials['code']);
-            $this->requestStack->getSession()->set('loginType', null);
+            $user = $this->auth->processAuth($credentials);
+            $this->requestStack->getSession()->set('loginType', 'salesforce');
         } catch (Exception $e) {
             throw new AuthenticationException();
         }
@@ -78,37 +77,14 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user): bool
     {
-        if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
-            return true; // Bypass groups auth
-        }
         if (!($user instanceof User)) {
             throw new Exception('Invalid user type');
         }
-
-        $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
         $this->authEmail = $user->getUsername();
-        if (!$valid2fa) {
-            $this->authFailureReason = '2fa';
-        } elseif (empty($user->getGroups())) {
+        if (empty($user->getGroups())) {
             $this->authFailureReason = 'groups';
         }
-        return count($user->getGroups()) > 0 && $valid2fa;
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-        $template = 'error-auth.html.twig';
-        if ($this->authFailureReason === '2fa') {
-            $template = 'error-auth-2fa.html.twig';
-        } elseif ($this->authFailureReason === 'groups') {
-            $template = 'error-auth-groups.html.twig';
-        }
-        $response = new Response($this->twig->render($template, [
-            'email' => $this->authEmail,
-            'logoutUrl' => $this->auth->getGoogleLogoutUrl()
-        ]));
-        $this->requestStack->getSession()->invalidate();
-        return $response;
+        return count($user->getGroups()) > 0;
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
@@ -119,9 +95,23 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return $this->redirectToRoute('home');
     }
 
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+        $template = 'error-auth.html.twig';
+        if ($this->authFailureReason === 'groups') {
+            $template = 'error-auth-groups.html.twig';
+        }
+        $response = new Response($this->twig->render($template, [
+            'email' => $this->authEmail,
+            'logoutUrl' => ''
+        ]));
+        $this->requestStack->getSession()->invalidate();
+        return $response;
+    }
+
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
-        return $this->redirectToRoute('login');
+        return $this->redirectToRoute('login_openid_start');
     }
 
     public function supportsRememberMe(): bool
@@ -129,7 +119,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return false;
     }
 
-    private function redirectToRoute(string $route)
+    private function redirectToRoute(string $route): Response
     {
         return new RedirectResponse(
             $this->urlGenerator->generate($route)

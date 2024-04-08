@@ -44,6 +44,11 @@ class UserService
         return $this->requestStack->getSession()->get('googleUser');
     }
 
+    public function getSalesforceUser()
+    {
+        return $this->requestStack->getSession()->get('salesforceUser');
+    }
+
     public function canMockLogin()
     {
         return $this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth');
