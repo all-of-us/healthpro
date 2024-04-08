@@ -166,20 +166,10 @@
                         <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
                         {% for aliquot in aliquots %}
                             <p>
-                                {{ aliquot.container }}:
-                                {% if aliquot.expectedAliquotsDisplay is defined %}
-                                    {{ aliquot.expectedAliquotsDisplay }}
-                                {% else %}
-                                    {{ aliquot.expectedAliquots }}
-                                {% endif %}
+                                {{ aliquot.container }}: {{ aliquot.expectedAliquots }}
                                 {% if aliquot.expectedVolume %}
                                     <span style="padding: 1em"></span>
                                     Volume: {{ aliquot.expectedVolume|default('--') }} {{ aliquot.units }}
-                                {% endif %}
-                            </p>
-                            <p>
-                                {% if aliquot.expectedAliquotsDisplay is defined %}
-                                    An additional aliquot line has been added to the form in the event extra sample is available.
                                 {% endif %}
                             </p>
                         {% endfor %}

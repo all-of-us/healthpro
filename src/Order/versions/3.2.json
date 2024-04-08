@@ -19,7 +19,7 @@
             "color": "Light Green",
             "temperature": "Refrigerated",
             "specimen": "PMI PST",
-            "code": "1PSTP",
+            "code": "2PSTP",
             "prompt": "PST Centrifuge Type",
             "icodeSwingingBucket": "1PS4A",
             "icodeFixedAngle": "2PS4A"
@@ -30,7 +30,7 @@
             "color": "Light Green",
             "temperature": "Refrigerated",
             "specimen": "PMI PST",
-            "code": "1PSTP",
+            "code": "3PSTP",
             "prompt": "PST Centrifuge Type",
             "icodeSwingingBucket": "1PS4B",
             "icodeFixedAngle": "2PS4B"

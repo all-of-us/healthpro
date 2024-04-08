@@ -221,6 +221,9 @@ class WorkQueueService
         if (!empty($params['consentForStudyEnrollment'])) {
             $rdrParams['consentForStudyEnrollment'] = $params['consentForStudyEnrollment'];
         }
+        if (!empty($params['questionnaireOnDnaProgram'])) {
+            $rdrParams['questionnaireOnDnaProgram'] = $params['questionnaireOnDnaProgram'];
+        }
         if (!empty($params['consentForDvElectronicHealthRecordsSharing'])) {
             $rdrParams['consentForDvElectronicHealthRecordsSharing'] = $params['consentForDvElectronicHealthRecordsSharing'];
         }
