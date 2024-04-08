@@ -9,6 +9,7 @@ use App\Service\EnvironmentService;
 use App\Service\SalesforceAuthService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -80,9 +81,12 @@ class AuthController extends BaseController
     }
 
     #[Route(path: '/login/openid/start', name: 'login_openid_start')]
-    public function loginOpenIdStart(SalesforceAuthService $auth): Response
+    public function loginOpenIdStart(SalesforceAuthService $auth, ContainerBagInterface $params): Response
     {
-        return $this->redirect($auth->getAuthorizationUrl());
+        if ($params->has('enable_salesforce_login') && $params->get('enable_salesforce_login')) {
+            return $this->redirect($auth->getAuthorizationUrl());
+        }
+        return $this->redirectToRoute('login');
     }
 
     #[Route(path: '/login/openid/callback', name: 'login_openid_callback')]
