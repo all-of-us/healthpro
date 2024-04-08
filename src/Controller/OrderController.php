@@ -164,7 +164,9 @@ class OrderController extends BaseController
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                $order->setVersion($order->getCurrentVersion());
+                if ($session->get('siteType') !== 'dv') {
+                    $order->setVersion($order->getCurrentVersion());
+                }
                 $order->setAgeInMonths($participant->ageInMonths);
                 if ($session->get('orderType') === 'hpo') {
                     $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
@@ -172,13 +174,16 @@ class OrderController extends BaseController
                 if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
+                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false && $order->getCurrentVersion() > 3.1 && $order->getVersion() === null) {
+                    $order->setType(Order::TUBE_SELECTION_TYPE);
+                }
                 if (empty($order->getOrderId())) {
                     $order->setOrderId($this->orderService->generateId());
                 }
                 $this->em->persist($order);
                 $this->em->flush();
                 $orderId = $order->getId();
-                if ($orderId) {
+                if ($orderId && $session->get('siteType')) {
                     $this->loggerService->log(Log::ORDER_CREATE, $orderId);
                     return $this->redirectToRoute('order', [
                         'participantId' => $participant->id,
@@ -261,7 +266,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/collect', name: 'read_order_collect', methods: ['GET'])]
-    public function orderCollectAction($participantId, $orderId, Request $request)
+    public function orderCollectAction($participantId, $orderId, Request $request, Session $session)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $nextStep = ($order->getType() === 'saliva' || $order->isPediatricOrder()) ? 'finalize' : 'process';
@@ -279,38 +284,48 @@ class OrderController extends BaseController
             'em' => $this->em,
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
+            'dvSite' => $session->get('siteType') == 'dv'
         ]);
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
-            if ($type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
+            if (isset($collectForm['collectedNotes']) && $type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
+            $order->getCurrentVersion();
             if ($collectForm->isValid()) {
-                $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
-                if (!$order->isUnlocked()) {
-                    $order->setCollectedUser($this->getUserEntity());
-                    $order->setCollectedSite($this->siteService->getSiteId());
+                if ($order->getType() === Order::TUBE_SELECTION_TYPE && null !== $collectForm['orderVersion']->getData()) {
+                    $order->setVersion($collectForm['orderVersion']->getData());
+                    $order->setType(Order::ORDER_TYPE_KIT);
+                    $this->em->persist($order);
+                    $this->em->flush();
+                } else {
+                    $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
+                    if (!$order->isUnlocked()) {
+                        $order->setCollectedUser($this->getUserEntity());
+                        $order->setCollectedSite($this->siteService->getSiteId());
+                    }
+                    // Save order
+                    $this->em->persist($order);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+                    $this->addFlash('notice', 'Order collection updated');
+                    $redirectRoute = 'order_collect';
+                    if (!$wasNextStepAvailable && in_array($nextStep, $order->getAvailableSteps())) {
+                        $redirectRoute = "order_{$nextStep}";
+                    }
+                    return $this->redirectToRoute($redirectRoute, [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
                 }
-                // Save order
-                $this->em->persist($order);
-                $this->em->flush();
-                $this->loggerService->log(Log::ORDER_EDIT, $orderId);
-                $this->addFlash('notice', 'Order collection updated');
-                $redirectRoute = 'order_collect';
-                if (!$wasNextStepAvailable && in_array($nextStep, $order->getAvailableSteps())) {
-                    $redirectRoute = "order_{$nextStep}";
-                }
-                return $this->redirectToRoute($redirectRoute, [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+            } else {
+                $collectForm->addError(new FormError('Please correct the errors below'));
             }
-            $collectForm->addError(new FormError('Please correct the errors below'));
         }
         return $this->render('order/collect.html.twig', [
             'participant' => $this->orderService->getParticipant(),

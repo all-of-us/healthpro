@@ -15,6 +15,7 @@
         {{ form_errors(collectForm.collectedTs) }}
     </div>
 
+    {% if collectForm.collectedSamples is defined %}
     <div class="form-group{% if not collectForm.collectedSamples.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedSamples) }}
         {% if order.type == 'saliva' %}
@@ -24,7 +25,9 @@
         {% endif %}
         {{ form_errors(collectForm.collectedSamples) }}
     </div>
+    {% endif %}
 
+    {% if collectForm.collectedNotes is defined %}
     <div class="form-group{% if not collectForm.collectedNotes.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedNotes) }}
         <span class="toggle-help-image">
@@ -34,7 +37,7 @@
         <small class="text-warning">Comments entered in this field are transmitted to the Biobank via reconciliation reporting. Do not enter any participant identifying information here.</small>
         {{ form_errors(collectForm.collectedNotes) }}
     </div>
-
+    {% endif %}
     {{ form_rest(collectForm) }}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
         <p>
