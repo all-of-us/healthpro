@@ -86,7 +86,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/create', name: 'order_create')]
-    public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService)
+    public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService, ParameterBagInterface $params)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -165,7 +165,7 @@ class OrderController extends BaseController
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                if ($session->get('siteType') !== 'dv') {
+                if ($session->get('siteType') !== 'dv' || $params->get('order_samples_version') <= 3.1) {
                     $order->setVersion($order->getCurrentVersion());
                 }
                 $order->setAgeInMonths($participant->ageInMonths);
@@ -293,6 +293,11 @@ class OrderController extends BaseController
                 if ($request->request->has('updateTubes')) {
                     $order->setVersion($collectForm['orderVersion']->getData());
                     $order->setType(Order::ORDER_TYPE_KIT);
+                    $order->setCollectedUser(null);
+                    $order->setCollectedSite(null);
+                    $order->setCollectedTs(null);
+                    $order->setCollectedSamples(null);
+                    $order->setCollectedTimezoneId(null);
                     $this->em->persist($order);
                     $this->em->flush();
                     $this->orderService->loadSamplesSchema($order);

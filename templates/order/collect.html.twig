@@ -18,7 +18,7 @@
 
     {% if collectForm.orderVersion is defined %}
         <div class="form-group{% if not collectForm.orderVersion.vars.valid %} has-error{% endif %}">
-            {{ form_label(collectForm.orderVersion) }} <span id="tube_help_modal_toggle" class="toggle-help-text" data-id="tube_help_modal"><i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            {{ form_label(collectForm.orderVersion) }} <span class="toggle-help-text" data-id="tube_help_modal"><i id="tube_help_modal_toggle" class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             {{ form_widget(collectForm.orderVersion, { attr: {class: 'ignore-unsaved' } }) }}
             {{ form_errors(collectForm.orderVersion) }}
         </div>
@@ -78,6 +78,21 @@
                     <img src="{{ asset('img/aou/order/4ml PST.png') }}" style="height: 80px" alt="4.5mL PST Tube">
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tube_change_warning_modal" tabindex="-1" role="dialog" aria-labelledby="tube_change_warning_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="text-danger">Warning!</h4>
+                    <p>Changing the PST tube type will remove the previously collected PST tube(s) and replace them with the other PST tube type option. The new PST tube type selected must be re-checked in the list below if collected. Click the “update” button to save your changes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal_trigger_update" type="button" class="btn btn-primary">Continue</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
