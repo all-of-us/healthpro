@@ -62,7 +62,7 @@ class OrderServiceTest extends ServiceTestCase
 
         $orderData = $this->getOrderData();
         $order = $this->createOrder($orderData);
-        $order = $orderService->updateOrderTubes($order, '3.2');
+        $order = $orderService->updateOrderVersion($order, '3.2');
         $this->assertSame($order->getVersion(), '3.2');
         $this->assertSame($order->getType(), Order::ORDER_TYPE_KIT);
         $this->assertNull($order->getCollectedUser());
@@ -79,7 +79,7 @@ class OrderServiceTest extends ServiceTestCase
         $this->assertNull($order->getprocessedTimezoneId());
         $this->assertNull($order->getProcessedSamplesTs());
         $this->assertNull(($order->getProcessedSamples()));
-        $this->assertNull($order->getProcessedSamplesTs()));
+        $this->assertNull($order->getProcessedSamplesTs());
     }
 
     public function siteStatusProvider(): array

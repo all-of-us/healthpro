@@ -756,7 +756,8 @@ class OrderService
         return $this->order;
     }
 
-    public function updateOrderTubes(Order $order, string $orderVersion): Order {
+    public function updateOrderVersion(Order $order, string $orderVersion): Order
+    {
         $order->setVersion($orderVersion);
         $order->setType(Order::ORDER_TYPE_KIT);
         $order->setCollectedUser(null);
