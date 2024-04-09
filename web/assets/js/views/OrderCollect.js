@@ -10,10 +10,10 @@ $(document).ready(function () {
     $("#order_orderVersion").on("change", function () {
         let orderForm = $('form[name="order"]');
         $('<input name="updateTubes" type="hidden" value="true">').appendTo(orderForm);
-        window.addEventListener('beforeunload', function (event) {
+        window.addEventListener("beforeunload", function (event) {
             event.stopImmediatePropagation();
         });
-        window.addEventListener('unload', function (event) {
+        window.addEventListener("unload", function (event) {
             event.stopImmediatePropagation();
         });
         PMI.disabledUnsavedPrompt();

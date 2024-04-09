@@ -324,7 +324,7 @@ $(document).ready(function () {
     PMI.disabledUnsavedPrompt = function () {
         $(window).on("beforeunload", null);
         this.hasChanges = false;
-    }
+    };
 
     // Automatically enable unsaved prompt on forms with warn-unsaved class
     if ($("form").hasClass("warn-unsaved")) PMI.enableUnsavedPrompt("form.warn-unsaved");
