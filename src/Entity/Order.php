@@ -29,6 +29,7 @@ class Order
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
     public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
     public const PEDIATRIC_SAMPLE_VERSION = '3.1';
+    public const TUBE_SELECTION_TYPE = 'tubeSelect';
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', 'PS04A', 'PS04B'];
 
@@ -1110,7 +1111,7 @@ class Order
 
     public function isExpired()
     {
-        return empty($this->getFinalizedTs()) && empty($this->getVersion());
+        return empty($this->getFinalizedTs()) && empty($this->getVersion()) && $this->getType() !== self::TUBE_SELECTION_TYPE;
     }
 
     // Finalized form is only disabled when rdr_id is set
@@ -1237,7 +1238,7 @@ class Order
             'finalize' => 'Finalized',
             'print_requisition' => 'Finalized'
         ];
-        if ($this->getType() === 'kit') {
+        if ($this->getType() === 'kit' || $this->getType() === self::TUBE_SELECTION_TYPE) {
             unset($columns['print_labels']);
             unset($columns['print_requisition']);
         }
@@ -1270,7 +1271,7 @@ class Order
             'finalize' => 'Finalized',
             'print_requisition' => 'Finalized'
         ];
-        if ($this->getType() === 'kit') {
+        if ($this->getType() === 'kit' || $this->getType() === self::TUBE_SELECTION_TYPE) {
             unset($columns['print_labels']);
             unset($columns['print_requisition']);
         }

@@ -756,6 +756,29 @@ class OrderService
         return $this->order;
     }
 
+    public function updateOrderVersion(Order $order, string $orderVersion): Order
+    {
+        $order->setVersion($orderVersion);
+        $order->setType(Order::ORDER_TYPE_KIT);
+        $order->setCollectedUser(null);
+        $order->setCollectedSite(null);
+        $order->setCollectedTs(null);
+        $order->setCollectedSamples(null);
+        $order->setCollectedTimezoneId(null);
+        $order->setProcessedUser(null);
+        $order->setProcessedSite(null);
+        $order->setProcessedTs(null);
+        $order->setProcessedSamples(null);
+        $order->setProcessedCentrifugeType(null);
+        $order->setProcessedNotes(null);
+        $order->setprocessedTimezoneId(null);
+        $order->setProcessedSamplesTs(null);
+        $this->em->persist($order);
+        $this->em->flush();
+        $this->loadSamplesSchema($order);
+        return $order;
+    }
+
     public function inactiveSiteFormDisabled(): bool
     {
         if ($this->order->getStatus() === Order::ORDER_UNLOCK) {

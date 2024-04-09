@@ -19,6 +19,7 @@ use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -85,7 +86,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/create', name: 'order_create')]
-    public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService)
+    public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService, ParameterBagInterface $params)
     {
         $participant = $this->participantSummaryService->getParticipantById($participantId);
         if (!$participant) {
@@ -164,7 +165,9 @@ class OrderController extends BaseController
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                $order->setVersion($order->getCurrentVersion());
+                if ($session->get('siteType') !== 'dv' || $params->get('order_samples_version') === 3.1) {
+                    $order->setVersion($order->getCurrentVersion());
+                }
                 $order->setAgeInMonths($participant->ageInMonths);
                 if ($session->get('orderType') === 'hpo') {
                     $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
@@ -172,13 +175,16 @@ class OrderController extends BaseController
                 if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
+                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false && $order->getCurrentVersion() > 3.1 && $order->getVersion() === null) {
+                    $order->setType(Order::TUBE_SELECTION_TYPE);
+                }
                 if (empty($order->getOrderId())) {
                     $order->setOrderId($this->orderService->generateId());
                 }
                 $this->em->persist($order);
                 $this->em->flush();
                 $orderId = $order->getId();
-                if ($orderId) {
+                if ($orderId && $session->get('siteType')) {
                     $this->loggerService->log(Log::ORDER_CREATE, $orderId);
                     return $this->redirectToRoute('order', [
                         'participantId' => $participant->id,
@@ -261,7 +267,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/collect', name: 'read_order_collect', methods: ['GET'])]
-    public function orderCollectAction($participantId, $orderId, Request $request)
+    public function orderCollectAction($participantId, $orderId, Request $request, Session $session, ParameterBagInterface $params)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $nextStep = ($order->getType() === 'saliva' || $order->isPediatricOrder()) ? 'finalize' : 'process';
@@ -273,44 +279,44 @@ class OrderController extends BaseController
             ]);
         }
         $formData = $this->orderService->getOrderFormData('collected');
-        $collectForm = $this->createForm(OrderType::class, $formData, [
-            'step' => 'collected',
-            'order' => $order,
-            'em' => $this->em,
-            'timeZone' => $this->getSecurityUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
-        ]);
+        $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
             }
-            if ($type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
+            if (isset($collectForm['collectedNotes']) && $type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
             if ($collectForm->isValid()) {
-                $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
-                if (!$order->isUnlocked()) {
-                    $order->setCollectedUser($this->getUserEntity());
-                    $order->setCollectedSite($this->siteService->getSiteId());
+                if ($request->request->has('updateTubes')) {
+                    $order = $this->orderService->updateOrderVersion($order, $collectForm['collectedSamples']->getData());
+                    $formData = $this->orderService->getOrderFormData('collected');
+                    $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
+                } else {
+                    $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
+                    if (!$order->isUnlocked()) {
+                        $order->setCollectedUser($this->getUserEntity());
+                        $order->setCollectedSite($this->siteService->getSiteId());
+                    }
+                    // Save order
+                    $this->em->persist($order);
+                    $this->em->flush();
+                    $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+                    $this->addFlash('notice', 'Order collection updated');
+                    $redirectRoute = 'order_collect';
+                    if (!$wasNextStepAvailable && in_array($nextStep, $order->getAvailableSteps())) {
+                        $redirectRoute = "order_{$nextStep}";
+                    }
+                    return $this->redirectToRoute($redirectRoute, [
+                        'participantId' => $participantId,
+                        'orderId' => $orderId
+                    ]);
                 }
-                // Save order
-                $this->em->persist($order);
-                $this->em->flush();
-                $this->loggerService->log(Log::ORDER_EDIT, $orderId);
-                $this->addFlash('notice', 'Order collection updated');
-                $redirectRoute = 'order_collect';
-                if (!$wasNextStepAvailable && in_array($nextStep, $order->getAvailableSteps())) {
-                    $redirectRoute = "order_{$nextStep}";
-                }
-                return $this->redirectToRoute($redirectRoute, [
-                    'participantId' => $participantId,
-                    'orderId' => $orderId
-                ]);
+            } else {
+                $collectForm->addError(new FormError('Please correct the errors below'));
             }
-            $collectForm->addError(new FormError('Please correct the errors below'));
         }
         return $this->render('order/collect.html.twig', [
             'participant' => $this->orderService->getParticipant(),
@@ -778,6 +784,20 @@ class OrderController extends BaseController
             'weightMeasurement' => $measurement,
             'measurementData' => $measurementData,
             'measurementId' => $measurement ? $measurement->getId() : null,
+        ]);
+    }
+
+    private function createOrderCollectForm(Order $order, array $formData, Request $request, Session $session, ParameterBagInterface $params, string $step): FormInterface
+    {
+        return $this->createForm(OrderType::class, $formData, [
+            'step' => $step,
+            'order' => $order,
+            'em' => $this->em,
+            'timeZone' => $this->getSecurityUser()->getTimezone(),
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
+            'dvSite' => $session->get('siteType') == 'dv',
+            'params' => $params
         ]);
     }
 }

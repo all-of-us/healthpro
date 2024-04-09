@@ -61,7 +61,7 @@
 
 {% include 'partials/participant-dl.html.twig' %}
 
-{% if order.type == 'kit' %}
+{% if order.type == 'kit' or order.type == constant('TUBE_SELECTION_TYPE', order) %}
     {% set steps = {
         collect: ['collect', 'collected'],
         process: ['process', 'processed'],
