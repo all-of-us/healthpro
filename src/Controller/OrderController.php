@@ -291,24 +291,7 @@ class OrderController extends BaseController
             }
             if ($collectForm->isValid()) {
                 if ($request->request->has('updateTubes')) {
-                    $order->setVersion($collectForm['orderVersion']->getData());
-                    $order->setType(Order::ORDER_TYPE_KIT);
-                    $order->setCollectedUser(null);
-                    $order->setCollectedSite(null);
-                    $order->setCollectedTs(null);
-                    $order->setCollectedSamples(null);
-                    $order->setCollectedTimezoneId(null);
-                    $order->setProcessedUser(null);
-                    $order->setProcessedSite(null);
-                    $order->setProcessedTs(null);
-                    $order->setProcessedSamples(null);
-                    $order->setProcessedCentrifugeType(null);
-                    $order->setProcessedNotes(null);
-                    $order->setprocessedTimezoneId(null);
-                    $order->setProcessedSamplesTs(null);
-                    $this->em->persist($order);
-                    $this->em->flush();
-                    $this->orderService->loadSamplesSchema($order);
+                    $order = $this->orderService->updateOrderTubes($order, $collectForm['collectedSamples']->getData());
                     $formData = $this->orderService->getOrderFormData('collected');
                     $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
                 } else {
