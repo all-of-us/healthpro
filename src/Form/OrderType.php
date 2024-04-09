@@ -258,7 +258,7 @@ class OrderType extends AbstractType
                     ]
                 ]);
         }
-        if ($options['step'] === 'collected' && $options['order']->getVersion() !== null) {
+        if ($options['order']->getVersion() !== null) {
             $builder->add("{$options['step']}Notes", Type\TextareaType::class, [
                 'label' => $notesLabel,
                 'disabled' => $disabled,
