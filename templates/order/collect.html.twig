@@ -15,6 +15,15 @@
         {{ form_errors(collectForm.collectedTs) }}
     </div>
 
+
+    {% if collectForm.orderVersion is defined %}
+        <div class="form-group{% if not collectForm.orderVersion.vars.valid %} has-error{% endif %}">
+            {{ form_label(collectForm.orderVersion) }}
+            {{ form_widget(collectForm.orderVersion, { attr: {class: 'ignore-unsaved' } }) }}
+            {{ form_errors(collectForm.orderVersion) }}
+        </div>
+    {% endif %}
+
     {% if collectForm.collectedSamples is defined %}
     <div class="form-group{% if not collectForm.collectedSamples.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedSamples) }}

@@ -19,6 +19,7 @@ use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -266,7 +267,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/collect', name: 'read_order_collect', methods: ['GET'])]
-    public function orderCollectAction($participantId, $orderId, Request $request, Session $session)
+    public function orderCollectAction($participantId, $orderId, Request $request, Session $session, ParameterBagInterface $params)
     {
         $order = $this->loadOrder($participantId, $orderId);
         $nextStep = ($order->getType() === 'saliva' || $order->isPediatricOrder()) ? 'finalize' : 'process';
@@ -278,15 +279,7 @@ class OrderController extends BaseController
             ]);
         }
         $formData = $this->orderService->getOrderFormData('collected');
-        $collectForm = $this->createForm(OrderType::class, $formData, [
-            'step' => 'collected',
-            'order' => $order,
-            'em' => $this->em,
-            'timeZone' => $this->getSecurityUser()->getTimezone(),
-            'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
-            'dvSite' => $session->get('siteType') == 'dv'
-        ]);
+        $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
         $collectForm->handleRequest($request);
         if ($collectForm->isSubmitted()) {
             if ($order->isDisabled()) {
@@ -296,13 +289,15 @@ class OrderController extends BaseController
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
-            $order->getCurrentVersion();
             if ($collectForm->isValid()) {
-                if ($order->getType() === Order::TUBE_SELECTION_TYPE && null !== $collectForm['orderVersion']->getData()) {
+                if ($request->request->has('updateTubes')) {
                     $order->setVersion($collectForm['orderVersion']->getData());
                     $order->setType(Order::ORDER_TYPE_KIT);
                     $this->em->persist($order);
                     $this->em->flush();
+                    $this->orderService->loadSamplesSchema($order);
+                    $formData = $this->orderService->getOrderFormData('collected');
+                    $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
                 } else {
                     $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
                     if (!$order->isUnlocked()) {
@@ -793,6 +788,20 @@ class OrderController extends BaseController
             'weightMeasurement' => $measurement,
             'measurementData' => $measurementData,
             'measurementId' => $measurement ? $measurement->getId() : null,
+        ]);
+    }
+
+    private function createOrderCollectForm(Order $order, array $formData, Request $request, Session $session, ParameterBagInterface $params, string $step): FormInterface
+    {
+        return $this->createForm(OrderType::class, $formData, [
+            'step' => $step,
+            'order' => $order,
+            'em' => $this->em,
+            'timeZone' => $this->getSecurityUser()->getTimezone(),
+            'siteId' => $this->siteService->getSiteId(),
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
+            'dvSite' => $session->get('siteType') == 'dv',
+            'params' => $params
         ]);
     }
 }
