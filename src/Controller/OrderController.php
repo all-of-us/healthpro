@@ -305,6 +305,7 @@ class OrderController extends BaseController
                     $order->setProcessedCentrifugeType(null);
                     $order->setProcessedNotes(null);
                     $order->setprocessedTimezoneId(null);
+                    $order->setProcessedSamplesTs(null);
                     $this->em->persist($order);
                     $this->em->flush();
                     $this->orderService->loadSamplesSchema($order);
