@@ -165,7 +165,7 @@ class OrderController extends BaseController
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                if ($session->get('siteType') !== 'dv' || $params->get('order_samples_version') <= 3.1) {
+                if ($session->get('siteType') !== 'dv' || $params->get('order_samples_version') === '3.1') {
                     $order->setVersion($order->getCurrentVersion());
                 }
                 $order->setAgeInMonths($participant->ageInMonths);
