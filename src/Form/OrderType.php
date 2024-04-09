@@ -258,7 +258,7 @@ class OrderType extends AbstractType
                     ]
                 ]);
         }
-        if ($options['order']->getVersion() !== null) {
+        if ($options['order']->getType() !== Order::TUBE_SELECTION_TYPE) {
             $builder->add("{$options['step']}Notes", Type\TextareaType::class, [
                 'label' => $notesLabel,
                 'disabled' => $disabled,
