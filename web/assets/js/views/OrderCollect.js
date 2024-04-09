@@ -20,4 +20,8 @@ $(document).ready(function () {
         orderForm.attr("");
         orderForm.trigger("submit");
     });
+
+    $("#tube_help_modal_toggle").on("click", function (e) {
+        $("#tube_help_modal").modal();
+    })
 });
