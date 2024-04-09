@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use App\Entity\User;
 use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
@@ -36,7 +35,7 @@ class UserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username): UserInterface
     {
-        if ($this->requestStack->getSession()->get('loginType') === User::SALESFORCE) {
+        if ($this->requestStack->getSession()->get('loginType') === \App\Entity\User::SALESFORCE) {
             return $this->loadSalesforceUser($username);
         }
         return $this->loadGoogleUser($username);
