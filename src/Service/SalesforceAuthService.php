@@ -57,4 +57,9 @@ class SalesforceAuthService
 
         return $user;
     }
+
+    public function getLogoutUrl(): string
+    {
+        return 'https://nihallofus--ibmpoc.sandbox.lightning.force.com/secur/logout.jsp';
+    }
 }

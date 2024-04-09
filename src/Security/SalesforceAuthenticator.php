@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use App\Service\EnvironmentService;
 use App\Service\SalesforceAuthService;
 use App\Service\UserService;
@@ -68,7 +69,7 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
     {
         try {
             $user = $this->auth->processAuth($credentials);
-            $this->requestStack->getSession()->set('loginType', 'salesforce');
+            $this->requestStack->getSession()->set('loginType', User::SALESFORCE);
         } catch (Exception $e) {
             throw new AuthenticationException();
         }

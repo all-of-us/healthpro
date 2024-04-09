@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Service\AuthService;
 use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
+use App\Service\SalesforceAuthService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -157,13 +158,20 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/logout', name: 'logout')]
-    public function logoutAction(Request $request, LoggerService $loggerService, SessionInterface $session, AuthService $authService)
-    {
+    public function logoutAction(
+        Request $request,
+        LoggerService $loggerService,
+        SessionInterface $session,
+        AuthService $authService,
+        SalesforceAuthService $salesforceAuthService
+    ) {
         $timeout = $request->get('timeout');
         $loggerService->log(Log::LOGOUT);
+        $logoutUrl = $session->get('loginType') === User::SALESFORCE ? $salesforceAuthService->getLogoutUrl() :
+            $authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home');
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
+        return $this->redirect($logoutUrl);
     }
 
     #[Route(path: '/imports', name: 'imports_home')]

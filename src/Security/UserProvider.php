@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
@@ -35,10 +36,24 @@ class UserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username): UserInterface
     {
-        if ($this->requestStack->getSession()->get('loginType') === 'salesforce') {
+        if ($this->requestStack->getSession()->get('loginType') === User::SALESFORCE) {
             return $this->loadSalesforceUser($username);
         }
         return $this->loadGoogleUser($username);
+    }
+
+    public function refreshUser(UserInterface $user): UserInterface
+    {
+        if (!$user instanceof User) {
+            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
+        }
+
+        return $this->loadUserByUsername($user->getUsername());
+    }
+
+    public function supportsClass($class): bool
+    {
+        return User::class === $class;
     }
 
     private function loadGoogleUser($username): UserInterface
@@ -121,19 +136,5 @@ class UserProvider implements UserProviderInterface
             'managegroupsnph' => $this->requestStack->getSession()->get('managegroupsnph')
         ];
         return new User($salesforceUser, $groups, $userInfo, null, $sessionInfo);
-    }
-
-    public function refreshUser(UserInterface $user): UserInterface
-    {
-        if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
-        }
-
-        return $this->loadUserByUsername($user->getUsername());
-    }
-
-    public function supportsClass($class): bool
-    {
-        return User::class === $class;
     }
 }
