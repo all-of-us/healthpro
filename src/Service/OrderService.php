@@ -512,8 +512,18 @@ class OrderService
         foreach ($this->order->getCustomRequestedSamples() as $key => $value) {
             $sample = [
                 'code' => $key,
-                'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
+                'color' => $samplesInfo[$value]['color'] ?? '',
+                'number' => $samplesInfo[$value]['number'] ?? '',
+                'label' => $samplesInfo[$value]['label'] ?? '',
+                'sampleId' => $value
             ];
+            if (isset($samplesInfo[$value]['icodeSwingingBucket']) && (empty($this->order->getType()) || $this->order->getType() === Order::ORDER_TYPE_DIVERSION)) {
+                if ($this->order->getProcessedCentrifugeType() === Order::SWINGING_BUCKET) {
+                    $sample['sampleId'] = $samplesInfo[$value]['icodeSwingingBucket'];
+                } elseif ($this->order->getProcessedCentrifugeType() === Order::FIXED_ANGLE) {
+                    $sample['sampleId'] = $samplesInfo[$value]['icodeFixedAngle'];
+                }
+            }
             if (!empty($this->order->getCollectedTs())) {
                 $sample['collected_ts'] = $this->order->getCollectedTs();
             }
