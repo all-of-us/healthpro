@@ -34,7 +34,7 @@
                 <tbody>
                 {% for sample in samplesInfo %}
                     <tr>
-                        <td>{{ sample.code }}</td>
+                        <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
                         <td>
                             {% if sample.collected_checked is defined and sample.collected_ts is defined and sample.collected_ts is not empty %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
