@@ -23,14 +23,14 @@
             {% endif %}
         </div>
     </dd>
-    <dt class="col-md-6">participant-details.html.twig
+    <dt class="col-md-6">
         <div>Gender Identity</div>
     </dt>
     <dd class="col-md-6">
         <div>{{ participant.genderIdentity|default('--') }}</div>
     </dd>
     <dt class="col-md-6">
-        <div>Site</div>
+        <div>Active/Current Site</div>
     </dt>
     <dd class="col-md-6">
         <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
