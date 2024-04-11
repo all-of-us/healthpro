@@ -192,7 +192,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         var field = $(e.currentTarget).closest(".field").data("field");
         this.calculateConversion(field);
     },
-    calculateConversion: function (field) {
+    calculateConversion: function (field, index = null) {
         var input = this.$(".field-" + field).find("input");
         if ($.inArray(field, this.hipWaistFields) === -1 && input.length > 1) {
             // replicate conversions are handled in calculateMean method except for hip & waist circumference fields

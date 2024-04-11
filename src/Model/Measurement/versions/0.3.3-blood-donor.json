@@ -209,6 +209,7 @@
         {
             "name": "height-ft-user-entered",
             "label": "Enter in feet & inches (value will be stored in cm)",
+            "formField": false,
             "alternatefor": "height",
             "alternateunitfield": true,
             "unit": "ft",
@@ -217,6 +218,7 @@
         {
             "name": "height-in-user-entered",
             "label": "Enter in feet & inches (value will be stored in cm)",
+            "formField": false,
             "alternatefor": "height",
             "alternateunitfield": true,
             "unit": "in",
@@ -417,6 +419,7 @@
         {
             "name": "hip-circumference-user-entered",
             "label": "Enter in inches (value will be stored in cm)",
+            "formField": false,
             "alternatefor": "hip-circumference",
             "alternateunitfield": true,
             "unit": "in",
@@ -491,6 +494,7 @@
         {
             "name": "waist-circumference-user-entered",
             "label": "Enter in inches (value will be stored in cm)",
+            "formField": false,
             "alternatefor": "waist-circumference",
             "alternateunitfield": true,
             "unit": "in",

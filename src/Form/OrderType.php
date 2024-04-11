@@ -50,6 +50,26 @@ class OrderType extends AbstractType
         if ($options['step'] == 'collected' && $options['order']->hasBloodSample($samples)) {
             $tsLabel = 'Blood Collection Time';
         }
+        if ($options['step'] == 'collected' && (isset($options['dvSite']) && $options['dvSite'] === true)
+            && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->get('order_samples_version') > 3.1))) {
+            if ($options['order']->getVersion() === null) {
+                unset($samples);
+            }
+            $builder->add('orderVersion', Type\ChoiceType::class, [
+                'label' => 'Select PST tube(s)',
+                'choices' => [
+                    '-- Select PST Tube(s) --' => null,
+                    '8 mL PST (1 tube)' => '3.1',
+                    '4.5 mL PST (2 tubes)' => '3.2'
+                ],
+                'required' => true,
+                'multiple' => false,
+                'data' => $options['order']->getVersion(),
+                'constraints' => new Constraints\NotBlank([
+                    'message' => 'Please select tube(s) for collection'
+                ])
+            ]);
+        }
         $enabledSamples = $options['order']->getEnabledSamples($options['step']);
         $constraintDateTime = new \DateTime('+5 minutes'); // add buffer for time skew
         if ($options['step'] != 'processed') {
@@ -238,12 +258,14 @@ class OrderType extends AbstractType
                     ]
                 ]);
         }
-        $builder->add("{$options['step']}Notes", Type\TextareaType::class, [
-            'label' => $notesLabel,
-            'disabled' => $disabled,
-            'required' => false,
-            'constraints' => new Constraints\Type('string')
-        ]);
+        if ($options['order']->getType() !== Order::TUBE_SELECTION_TYPE) {
+            $builder->add("{$options['step']}Notes", Type\TextareaType::class, [
+                'label' => $notesLabel,
+                'disabled' => $disabled,
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
+            ]);
+        }
         return $builder->getForm();
     }
 
@@ -254,7 +276,9 @@ class OrderType extends AbstractType
             'order' => null,
             'em' => null,
             'timeZone' => null,
-            'siteId' => null
+            'siteId' => null,
+            'dvSite' => null,
+            'params' => null
         ]);
     }
 }

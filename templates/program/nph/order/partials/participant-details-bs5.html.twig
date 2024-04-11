@@ -1,0 +1,38 @@
+<dl class="row">
+    <dt class="col-md-6">
+        <div>Participant ID</div>
+    </dt>
+    <dd class="col-md-6">
+        <div>{{ participant.id }}</div>
+    </dd>
+    <dt class="col-md-6">
+        <div>Biobank ID</div>
+    </dt>
+    <dd class="col-md-6">
+        <div>{{ participant.biobankId }}</div>
+    </dd>
+    <dt class="col-md-6">
+        <div>DOB</div>
+    </dt>
+    <dd class="col-md-6">
+        <div>
+            {% if participant.dob %}
+                {{ participant.dob|date('n/j/Y') }}
+            {% else %}
+                <i class="text-danger fa fa-exclamation-circle"></i>
+            {% endif %}
+        </div>
+    </dd>
+    <dt class="col-md-6">
+        <div>Gender Identity</div>
+    </dt>
+    <dd class="col-md-6">
+        <div>{{ participant.genderIdentity|default('--') }}</div>
+    </dd>
+    <dt class="col-md-6">
+        <div>Active/Current Site</div>
+    </dt>
+    <dd class="col-md-6">
+        <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+    </dd>
+</dl>

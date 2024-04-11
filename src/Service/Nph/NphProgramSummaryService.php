@@ -34,6 +34,7 @@ class NphProgramSummaryService
         $combinedSummary = [];
         $orderSummaryOrder = $orderSummary['order'];
         foreach ($programSummary as $module => $moduleSummary) {
+            $moduleCreationSite = null;
             foreach ($moduleSummary as $visit => $visitSummary) {
                 foreach ($visitSummary['visitInfo'] as $timePoint => $timePointSummary) {
                     foreach ($timePointSummary['timePointInfo'] as $sampleType => $sample) {
@@ -48,6 +49,7 @@ class NphProgramSummaryService
                                 foreach ($orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] as $orderid => $orderInfo) {
                                     if (!isset($numberSamples[$orderid])) {
                                         $numberSamples[$orderid] = 0;
+                                        $moduleCreationSite = $orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode][$orderid]['orderSite'];
                                     }
                                     if ($orderInfo['sampleId'] !== null) {
                                         $numberSamples[$orderid]++;
@@ -63,6 +65,7 @@ class NphProgramSummaryService
                 }
                 $combinedSummary[$module][$visit] = ['visitInfo' => $combinedSummary[$module][$visit], 'visitDisplayName' => $visitSummary['visitDisplayName'], 'visitDiet' => $visitSummary['visitDiet']];
                 $combinedSummary[$module]['sampleStatusCount'] = $orderSummary['sampleStatusCount'][$module] ?? [];
+                $combinedSummary[$module]['moduleCreationSite'] = $moduleCreationSite;
             }
         }
         return $combinedSummary;

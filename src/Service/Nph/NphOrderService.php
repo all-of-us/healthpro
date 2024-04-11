@@ -957,7 +957,8 @@ class NphOrderService
                     'sampleGroup' => $sample->getSampleGroup(),
                     'modifyType' => $sample->getModifyType(),
                     'orderStatus' => $order->getStatus(),
-                    'oldVisitType' => $order->getVisitType()
+                    'oldVisitType' => $order->getVisitType(),
+                    'orderSite' => $order->getSite(),
                 ];
                 $statusCount[$order->getModule()][$orderId][$sampleStatus] = isset($statusCount[$order->getModule()][$orderId][$sampleStatus]) ? $statusCount[$order->getModule()][$orderId][$sampleStatus] + 1 : 1;
             }

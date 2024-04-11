@@ -15,6 +15,16 @@
         {{ form_errors(collectForm.collectedTs) }}
     </div>
 
+
+    {% if collectForm.orderVersion is defined %}
+        <div class="form-group{% if not collectForm.orderVersion.vars.valid %} has-error{% endif %}">
+            {{ form_label(collectForm.orderVersion) }} <span class="toggle-help-text" data-id="tube_help_modal"><i id="tube_help_modal_toggle" class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            {{ form_widget(collectForm.orderVersion, { attr: {class: 'ignore-unsaved' } }) }}
+            {{ form_errors(collectForm.orderVersion) }}
+        </div>
+    {% endif %}
+
+    {% if collectForm.collectedSamples is defined %}
     <div class="form-group{% if not collectForm.collectedSamples.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedSamples) }}
         {% if order.type == 'saliva' %}
@@ -24,7 +34,9 @@
         {% endif %}
         {{ form_errors(collectForm.collectedSamples) }}
     </div>
+    {% endif %}
 
+    {% if collectForm.collectedNotes is defined %}
     <div class="form-group{% if not collectForm.collectedNotes.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedNotes) }}
         <span class="toggle-help-image">
@@ -34,7 +46,7 @@
         <small class="text-warning">Comments entered in this field are transmitted to the Biobank via reconciliation reporting. Do not enter any participant identifying information here.</small>
         {{ form_errors(collectForm.collectedNotes) }}
     </div>
-
+    {% endif %}
     {{ form_rest(collectForm) }}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
         <p>
@@ -53,6 +65,39 @@
         {{ form_errors(revertForm) }}
         {{ form_end(revertForm) }}
     {% endif %}
+
+    <div class="modal fade" id="tube_help_modal" tabindex="-1" role="dialog" aria-labelledby="tube_help_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>DV KIT: PST Tube Selection</h4>
+                    <p>Select the PST tube type(s) used to collect the PST sample.</p>
+                    <h4>8 mL PST (1 Tube)</h4>
+                    <img src="{{ asset('img/aou/order/8ml PST.png') }}" style="height: 80px" alt="8mL PST Tube">
+                    <h4>4.5 mL PST (2 Tubes)</h4>
+                    <img src="{{ asset('img/aou/order/4ml PST.png') }}" style="height: 80px" alt="4.5mL PST Tube">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="tube_change_warning_modal" tabindex="-1" role="dialog" aria-labelledby="tube_change_warning_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="text-danger">Warning!</h4>
+                    <p>Changing the PST tube type will remove the previously collected PST tube(s) and replace them with the other PST tube type option. The new PST tube type selected must be re-checked in the list below if collected. Click the “update” button to save your changes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal_trigger_update" type="button" class="btn btn-primary">Continue</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block pagejs %}

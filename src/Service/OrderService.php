@@ -512,8 +512,18 @@ class OrderService
         foreach ($this->order->getCustomRequestedSamples() as $key => $value) {
             $sample = [
                 'code' => $key,
-                'color' => isset($samplesInfo[$value]['color']) ? $samplesInfo[$value]['color'] : ''
+                'color' => $samplesInfo[$value]['color'] ?? '',
+                'number' => $samplesInfo[$value]['number'] ?? '',
+                'label' => $samplesInfo[$value]['label'] ?? '',
+                'sampleId' => $value
             ];
+            if (isset($samplesInfo[$value]['icodeSwingingBucket']) && (empty($this->order->getType()) || $this->order->getType() === Order::ORDER_TYPE_DIVERSION)) {
+                if ($this->order->getProcessedCentrifugeType() === Order::SWINGING_BUCKET) {
+                    $sample['sampleId'] = $samplesInfo[$value]['icodeSwingingBucket'];
+                } elseif ($this->order->getProcessedCentrifugeType() === Order::FIXED_ANGLE) {
+                    $sample['sampleId'] = $samplesInfo[$value]['icodeFixedAngle'];
+                }
+            }
             if (!empty($this->order->getCollectedTs())) {
                 $sample['collected_ts'] = $this->order->getCollectedTs();
             }
@@ -754,6 +764,29 @@ class OrderService
             $this->order->setVersion($this->params->get('order_samples_version'));
         }
         return $this->order;
+    }
+
+    public function updateOrderVersion(Order $order, string $orderVersion): Order
+    {
+        $order->setVersion($orderVersion);
+        $order->setType(Order::ORDER_TYPE_KIT);
+        $order->setCollectedUser(null);
+        $order->setCollectedSite(null);
+        $order->setCollectedTs(null);
+        $order->setCollectedSamples(null);
+        $order->setCollectedTimezoneId(null);
+        $order->setProcessedUser(null);
+        $order->setProcessedSite(null);
+        $order->setProcessedTs(null);
+        $order->setProcessedSamples(null);
+        $order->setProcessedCentrifugeType(null);
+        $order->setProcessedNotes(null);
+        $order->setprocessedTimezoneId(null);
+        $order->setProcessedSamplesTs(null);
+        $this->em->persist($order);
+        $this->em->flush();
+        $this->loadSamplesSchema($order);
+        return $order;
     }
 
     public function inactiveSiteFormDisabled(): bool
