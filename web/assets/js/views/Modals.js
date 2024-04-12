@@ -147,11 +147,7 @@ window.PmiConfirmModal = Backbone.View.extend({
         this.$el.modal({ backdrop: "static" });
 
         // Handle bootstrap 5 modal
-        let modalOptions = {
-            backdrop: "static"
-        };
-        let modalEl = this.$el.get(0);
-        let modal = new bootstrap.Modal(modalEl, modalOptions);
+        let modal = new bootstrap.Modal(this.$el, { backdrop: "static" });
         modal.show();
     }
 });
