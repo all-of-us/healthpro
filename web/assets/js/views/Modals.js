@@ -131,6 +131,10 @@ window.PmiConfirmModal = Backbone.View.extend({
         if (this._showX) this.$(".pmi-x-out").removeClass("hidden");
         if (!this._showOk) this.$(".pmi-confirm-ok").addClass("hidden");
 
+        // Handle bootstrap 5 modal
+        if (this._showX) this.$(".pmi-x-out").removeClass("d-none");
+        if (!this._showOk) this.$(".pmi-confirm-ok").addClass("d-none");
+
         // reset the dialog class
         this.$(".modal-dialog").attr("class", "modal-dialog");
         // then add any additional classes
@@ -141,6 +145,14 @@ window.PmiConfirmModal = Backbone.View.extend({
         if (this._titleClass.length > 0) this.$(".modal-title").addClass(this._titleClass);
 
         this.$el.modal({ backdrop: "static" });
+
+        // Handle bootstrap 5 modal
+        let modalOptions = {
+            backdrop: "static"
+        };
+        let modalEl = this.$el.get(0);
+        let modal = new bootstrap.Modal(modalEl, modalOptions);
+        modal.show();
     }
 });
 
