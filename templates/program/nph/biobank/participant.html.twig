@@ -18,7 +18,7 @@
                     <div>{{ participant.biobankId }}</div>
                 </div>
                 <div class="col-md-4">
-                    <div><strong>Site</strong></div>
+                    <div><strong>Active/Current Site</strong></div>
                     <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
                 </div>
             </div>
@@ -51,11 +51,16 @@
                 {% set modulePanelDisplay = 'hidden' %}
             {% endif %}
             <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
+                {% if module.moduleCreationSite is not null %}
+                    <div class="row ms-1">
+                        <h5 class="col-md-12 font-bold aou-blue">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</h5>
+                    </div>
+                {% endif %}
                 <div>
                     <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
                 </div>
                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                    {% if VisitCode != 'sampleStatusCount' %}
+                    {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
                         <div>
                             <div class="col-md-12 well-sm well" data-toggle="collapse"
                                  data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"

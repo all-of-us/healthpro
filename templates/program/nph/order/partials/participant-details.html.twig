@@ -20,7 +20,7 @@
             <div>{{ participant.dob|date('n/j/Y') }}</div>
         </div>
         <div class="col-md-4">
-            <div><strong>Site</strong></div>
+            <div><strong>Active/Current Site</strong></div>
             <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
         </div>
     </div>
