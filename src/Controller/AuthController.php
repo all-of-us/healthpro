@@ -32,6 +32,7 @@ class AuthController extends BaseController
         }
 
         $dashboardUrl = $params->has('dashboard_url') ? $params->get('dashboard_url') : null;
+        $displaySalesForceBtn = $params->has('show_salesforce_login_btn') ? $params->get('show_salesforce_login_btn') : true;
         if ($env->isLocal() && $userService->canMockLogin()) {
             $loginForm = $this->createForm(MockLoginType::class);
 
@@ -57,12 +58,14 @@ class AuthController extends BaseController
 
             return $this->render('login.html.twig', [
                 'loginForm' => $loginForm->createView(),
-                'dashboardUrl' => $dashboardUrl
+                'dashboardUrl' => $dashboardUrl,
+                'displaySalesforceBtn' => $displaySalesForceBtn
             ]);
         }
 
         return $this->render('login.html.twig', [
-            'dashboardUrl' => $dashboardUrl
+            'dashboardUrl' => $dashboardUrl,
+            'displaySalesforceBtn' => $displaySalesForceBtn
         ]);
     }
 
