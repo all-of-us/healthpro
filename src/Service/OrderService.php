@@ -571,6 +571,7 @@ class OrderService
             $orderHistory->setType($type === Order::ORDER_REVERT ? Order::ORDER_ACTIVE : $type);
             $orderHistory->setCreatedTs(new DateTime());
             $orderHistory->setCreatedTimezoneId($this->userService->getUserEntity()->getTimezoneId());
+            $orderHistory->setSamplesVersion($this->order->getVersion());
             $this->em->persist($orderHistory);
             $this->em->flush();
             $this->loggerService->log(Log::ORDER_HISTORY_CREATE, ['id' => $orderHistory->getId(), 'type' => $orderHistory->getType()]);
@@ -631,6 +632,12 @@ class OrderService
                 }
             }
         }
+        $lastUnlockedOrderHistory = $this->em->getRepository(OrderHistory::class)->getLastOrderHistoryUnlocked($this->order->getId());
+        if ($lastUnlockedOrderHistory->getVersion !== null) {
+            $orderVersion = $lastUnlockedOrderHistory->getVersion();
+        } else {
+            $orderVersion = $this->order->getVersion();
+        }
         $status = false;
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -645,6 +652,7 @@ class OrderService
             $this->order->setProcessedNotes($processedNotes);
             $this->order->setFinalizedNotes($finalizedNotes);
             $this->order->setFedexTracking(!empty($trackingNumber) ? $trackingNumber : null);
+            $this->order->setVersion($orderVersion);
             //Update centrifuge type
             if (!empty($centrifugeType)) {
                 $this->order->setProcessedCentrifugeType($centrifugeType);
@@ -768,21 +776,76 @@ class OrderService
 
     public function updateOrderVersion(Order $order, string $orderVersion): Order
     {
+        $processedSamples = json_decode($order->getProcessedSamples(), true);
+        $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
+        $finalizedSamples = json_decode($order->getFinalizedSamples(), true);
+        $collectedSamples = json_decode($order->getCollectedSamples(), false);
+        if ($order->getVersion() === '3.1') {
+            if (!empty($collectedSamples)) {
+                in_array('1PS08', $collectedSamples) ? array_push($collectedSamples, 'PS04A', 'PS04B') : null;
+                $collectedSamples = array_diff($collectedSamples, ['1PS08']);
+                $collectedSamples = array_values($collectedSamples);
+            }
+            if (!empty($processedSamples)) {
+                in_array('1PS08', $processedSamples) ? array_push($processedSamples, 'PS04A', 'PS04B') : null;
+                $processedSamples = array_diff($processedSamples, ['1PS08']);
+                $processedSamples = array_values($processedSamples);
+            }
+            if (!empty($processedSamplesTs) && array_key_exists('1PS08', $processedSamplesTs)) {
+                $processedSamplesTs['PS04A'] = $processedSamplesTs['1PS08'];
+                $processedSamplesTs['PS04B'] = $processedSamplesTs['1PS08'];
+                unset($processedSamplesTs['1PS08']);
+            }
+            if (!empty($finalizedSamples)) {
+                in_array('1PS08', $finalizedSamples) ? array_push($finalizedSamples, 'PS04A', 'PS04B') : null;
+                $finalizedSamples = array_diff($finalizedSamples, ['1PS08']);
+                $finalizedSamples = array_values($finalizedSamples);
+            }
+        } elseif ($order->getVersion() === '3.2') {
+            if (!empty($collectedSamples)) {
+                in_array('PS04A', $collectedSamples) || in_array('PS04B', $collectedSamples) ? array_push($collectedSamples, '1PS08') : null;
+                $collectedSamples = array_diff($collectedSamples, ['PS04A', 'PS04B']);
+                $collectedSamples = array_values($collectedSamples);
+            }
+            if (!empty($processedSamples)) {
+                in_array('PS04A', $processedSamples) || in_array('PS04B', $processedSamples) ? array_push($processedSamples, '1PS08') : null;
+                $processedSamples = array_diff($processedSamples, ['PS04A', 'PS04B']);
+                $processedSamples = array_values($processedSamples);
+            }
+            if (!empty($processedSamplesTs)) {
+                if (array_key_exists('PS04A', $processedSamplesTs)) {
+                    $processedSamplesTs['1PS08'] = $processedSamplesTs['PS04A'];
+                    unset($processedSamplesTs['PS04A']);
+                }
+                if (array_key_exists('PS04B', $processedSamplesTs)) {
+                    if (array_key_exists('1PS08', $processedSamplesTs)) {
+                        $processedSamplesTs['1PS08'] = min($processedSamplesTs['1PS08'], $processedSamplesTs['PS04B']);
+                    } else {
+                        $processedSamplesTs['1PS08'] = $processedSamplesTs['PS04B'];
+                    }
+                    unset($processedSamplesTs['PS04B']);
+                }
+            }
+            if (!empty($finalizedSamples)) {
+                in_array('PS04A', $finalizedSamples) || in_array('PS04B', $finalizedSamples) ? array_push($finalizedSamples, '1PS08') : null;
+                $finalizedSamples = array_diff($finalizedSamples, ['PS04A', 'PS04B']);
+                $finalizedSamples = array_values($finalizedSamples);
+            }
+        }
         $order->setVersion($orderVersion);
         $order->setType(Order::ORDER_TYPE_KIT);
-        $order->setCollectedUser(null);
-        $order->setCollectedSite(null);
-        $order->setCollectedTs(null);
-        $order->setCollectedSamples(null);
-        $order->setCollectedTimezoneId(null);
-        $order->setProcessedUser(null);
-        $order->setProcessedSite(null);
-        $order->setProcessedTs(null);
-        $order->setProcessedSamples(null);
-        $order->setProcessedCentrifugeType(null);
-        $order->setProcessedNotes(null);
-        $order->setprocessedTimezoneId(null);
-        $order->setProcessedSamplesTs(null);
+        if (!empty($collectedSamples)) {
+            $order->setCollectedSamples(json_encode($collectedSamples));
+        }
+        if (!empty($processedSamples)) {
+            $order->setProcessedSamples(json_encode($processedSamples));
+        }
+        if (!empty($processedSamplesTs)) {
+            $order->setProcessedSamplesTs(json_encode($processedSamplesTs));
+        }
+        if (!empty($finalizedSamples)) {
+            $order->setFinalizedSamples(json_encode($finalizedSamples));
+        }
         $this->em->persist($order);
         $this->em->flush();
         $this->loadSamplesSchema($order);

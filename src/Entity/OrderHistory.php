@@ -35,6 +35,9 @@ class OrderHistory
     #[ORM\Column(type: 'integer', nullable: true)]
     private $createdTimezoneId;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $samplesVersion = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -128,5 +131,17 @@ class OrderHistory
     {
         $reasonDisplayText = array_search($this->getReason(), Order::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other (' . $this->getReason() . ')';
+    }
+
+    public function getSamplesVersion(): ?string
+    {
+        return $this->samplesVersion;
+    }
+
+    public function setSamplesVersion(?string $samplesVersion): static
+    {
+        $this->$samplesVersion = $samplesVersion;
+
+        return $this;
     }
 }
