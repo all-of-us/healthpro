@@ -140,7 +140,7 @@ class OrderHistory
 
     public function setSamplesVersion(?string $samplesVersion): static
     {
-        $this->$samplesVersion = $samplesVersion;
+        $this->samplesVersion = $samplesVersion;
 
         return $this;
     }

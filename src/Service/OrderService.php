@@ -633,8 +633,8 @@ class OrderService
             }
         }
         $lastUnlockedOrderHistory = $this->em->getRepository(OrderHistory::class)->getLastOrderHistoryUnlocked($this->order->getId());
-        if ($lastUnlockedOrderHistory->getVersion !== null) {
-            $orderVersion = $lastUnlockedOrderHistory->getVersion();
+        if ($lastUnlockedOrderHistory->getSamplesVersion() !== null) {
+            $orderVersion = $lastUnlockedOrderHistory->getSamplesVersion();
         } else {
             $orderVersion = $this->order->getVersion();
         }
