@@ -9,7 +9,7 @@ $(document).ready(function () {
         } else if (allCheckboxesNotCheckall.filter(":checked").length === allCheckboxesNotCheckall.length) {
             $("#checkall").prop("checked", true);
         }
-    })
+    });
     $("#order_collectedTs").pmiDateTimePicker();
     new PMI.views["OrderSubPage"]({
         el: $("body")
