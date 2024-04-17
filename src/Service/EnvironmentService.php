@@ -47,7 +47,8 @@ class EnvironmentService
         }
         $this->values['assetVer'] = $this->values['env'] === self::ENV_LOCAL ?
             date('YmdHis') : $this->values['release'];
-        $this->values['sessionTimeOut'] = $this->isLocal() ? 3600 * 24 : 30 * 60;
+        //$this->values['sessionTimeOut'] = $this->isLocal() ? 3600 * 24 : 30 * 60;
+        $this->values['sessionTimeOut'] = 3600 * 24;
         $this->values['sessionWarning'] = 2 * 60;
         if ($this->isLocal()) {
             putenv('DATASTORE_EMULATOR_HOST=' . self::DATASTORE_EMULATOR_HOST);
