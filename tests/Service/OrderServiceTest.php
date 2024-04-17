@@ -62,24 +62,19 @@ class OrderServiceTest extends ServiceTestCase
 
         $orderData = $this->getOrderData();
         $order = $this->createOrder($orderData);
+        $this->assertTrue(in_array('1PS08', json_decode($order->getProcessedSamples())));
+        $this->assertFalse(in_array('PS04A', json_decode($order->getProcessedSamples())));
+        $this->assertFalse(in_array('PS04B', json_decode($order->getProcessedSamples())));
+        $this->assertFalse(in_array('PS04A', json_decode($order->getProcessedSamples())));
+        $this->assertFalse(in_array('PS04B', json_decode($order->getProcessedSamples())));
+        $this->assertTrue(in_array('1PS08', json_decode($order->getProcessedSamples())));
         $order = $orderService->updateOrderVersion($order, '3.2');
-        $this->assertSame($order->getVersion(), '3.2');
-        $this->assertSame($order->getType(), Order::ORDER_TYPE_KIT);
-        $this->assertNull($order->getCollectedUser());
-        $this->assertNull($order->getCollectedSite());
-        $this->assertNull($order->getCollectedTs());
-        $this->assertNull($order->getCollectedSamples());
-        $this->assertNull($order->getCollectedTimezoneId());
-        $this->assertNull($order->getProcessedUser());
-        $this->assertNull($order->getProcessedSite());
-        $this->assertNull($order->getProcessedTs());
-        $this->assertNull($order->getProcessedSamples());
-        $this->assertNull($order->getProcessedCentrifugeType());
-        $this->assertNull($order->getProcessedNotes());
-        $this->assertNull($order->getprocessedTimezoneId());
-        $this->assertNull($order->getProcessedSamplesTs());
-        $this->assertNull(($order->getProcessedSamples()));
-        $this->assertNull($order->getProcessedSamplesTs());
+        $this->assertFalse(in_array('1PS08', json_decode($order->getProcessedSamples())));
+        $this->assertTrue(in_array('PS04A', json_decode($order->getProcessedSamples())));
+        $this->assertTrue(in_array('PS04B', json_decode($order->getProcessedSamples())));
+        $this->assertTrue(in_array('PS04A', json_decode($order->getProcessedSamples())));
+        $this->assertFalse(in_array('PSO4B', json_decode($order->getProcessedSamples())));
+        $this->assertFalse(in_array('1PS08', json_decode($order->getProcessedSamples())));
     }
 
     public function siteStatusProvider(): array

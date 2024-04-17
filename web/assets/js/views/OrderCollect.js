@@ -2,6 +2,14 @@ $(document).ready(function () {
     $("#checkall").on("change", function () {
         $("#order_collectedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));
     });
+    $("#order_collectedSamples input:checkbox").on("change", function () {
+        let allCheckboxesNotCheckall = $("#order_collectedSamples input:checkbox:enabled").not("#checkall");
+        if (!$(this).prop("checked")) {
+            $("#checkall").prop("checked", false);
+        } else if (allCheckboxesNotCheckall.filter(":checked").length === allCheckboxesNotCheckall.length) {
+            $("#checkall").prop("checked", true);
+        }
+    });
     $("#order_collectedTs").pmiDateTimePicker();
     new PMI.views["OrderSubPage"]({
         el: $("body")
