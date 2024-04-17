@@ -72,28 +72,28 @@
                 <div class="modal-content"> \
                   <div class="modal-header"> \
                     <h4 class="modal-title">' +
-                opt.title +
-                '</h4> \
+                    opt.title +
+                    '</h4> \
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> \
               </div> \
               <div class="modal-body"> \
                 <p>' +
-                opt.message +
-                "</p> \
+                    opt.message +
+                    "</p> \
                 " +
-                countdownMessage +
-                " \
+                    countdownMessage +
+                    " \
                 " +
-                coundownBarHtml +
-                ' \
+                    coundownBarHtml +
+                    ' \
               </div> \
               <div class="modal-footer"> \
                 <button id="session-timeout-dialog-logout" type="button" class="btn btn-secondary">' +
-                opt.logoutButton +
-                '</button> \
+                    opt.logoutButton +
+                    '</button> \
                 <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-bs-dismiss="modal">' +
-                opt.keepAliveButton +
-                "</button> \
+                    opt.keepAliveButton +
+                    "</button> \
               </div> \
             </div> \
           </div> \
