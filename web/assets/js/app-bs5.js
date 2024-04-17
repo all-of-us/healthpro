@@ -17,7 +17,7 @@ require("datatables.net-buttons-bs/js/buttons.bootstrap.js");
 require("jsbarcode/dist/barcodes/JsBarcode.code128.min.js");
 require("inputmask/dist/jquery.inputmask.bundle.js");
 require("bootstrap-toggle/js/bootstrap-toggle.js");
-require("./bootstrap-session-timeout.js");
+require("./bootstrap-session-timeout-bs5.js");
 require("corejs-typeahead");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
 
