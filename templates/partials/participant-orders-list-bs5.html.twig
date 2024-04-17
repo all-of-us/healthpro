@@ -52,7 +52,7 @@
                             {% set historyType = order.history.type is defined ? order.history.type : '' %}
                             {% if historyType == 'cancel' %}
                                 <span class="badge bg-danger">Cancelled</span> <span class="fs-sm d-block d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
-                            {% elseif not order.finalizedTs and not order.version %}
+                            {% elseif not order.finalizedTs and not order.version and order.type != constant('TUBE_SELECTION_TYPE', order) %}
                                 <span class="badge bg-danger">Expired</span>
                             {% elseif historyType == 'unlock' %}
                                 <span class="badge bg-primary">Unlocked for editing</span> <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created', isBiobankView) }}</span>
