@@ -148,27 +148,17 @@
                                                             <div class="card mb-2 border-0">
                                                                 <div class="card-header collapse-carat" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                                                      role="button" style="font-weight: bold">
-                                                                    Visit | {{ visit['visitDisplayName']}}
-                                                                    {% include 'program/nph/participant/partials/display-diet.html.twig' %}
+                                                                    {{ visit['visitDisplayName']}} Visit
+                                                                    <a class="btn btn-primary btn-sm ms-2" role="button"
+                                                                       href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                                        <i class="fa fa-plus-circle"></i> Generate Orders
+                                                                    </a>
                                                                 </div>
                                                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
                                                                     <div class="row">
                                                                         {% if participant.dob %}
                                                                             <br>
                                                                             <div class="{{ textDivSize }} ps-1">
-                                                                                {% if moduleNumber in [2, 3] %}
-                                                                                    {% set dietStatuses = attribute(participant, 'module' ~ moduleNumber ~ 'DietStatus')|keys %}
-                                                                                    {% for index, status in dietStatuses %}
-                                                                                        {% set index = index + 1 %}
-                                                                                        {% if index in VisitCode %}
-                                                                                            <div class="float-end text-{{ status|lower }}"
-                                                                                                 data-bs-toggle="tooltip"
-                                                                                                 title="Diet color is provided by the RTI system. Please allow time for systems to sync if changes/updates have been made to the diet color. The diet color displayed is for informational purposes only and will NOT impact orders in HPRO.">
-                                                                                                <i class="fa fa-utensils"></i> {{ status|title }} Diet
-                                                                                            </div>
-                                                                                        {% endif %}
-                                                                                    {% endfor %}
-                                                                                {% endif %}
                                                                                 {% set displayDietColorWarning = false %}
                                                                                 {% if moduleNumber in [2, 3] %}
                                                                                     {% for timepointCode, timepoint in visit['visitInfo'] %}
@@ -189,20 +179,6 @@
                                                                                     <div class="text-discontinue pb-2">
                                                                                         <i class="fa fa-exclamation-circle"></i> Samples in this visit were collected using “diet color”. All order information has been updated to now follow “diet period”.
                                                                                     </div>
-                                                                                {% endif %}
-                                                                                {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
-                                                                                    <a class="btn btn-primary btn-sm mb-2" role="button"
-                                                                                       href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                                                                        <i class="fa fa-plus-circle"></i> Generate Orders and Print Labels
-                                                                                    </a>
-                                                                                {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_DISCONTINUED') %}
-                                                                                    This diet has been discontinued. New orders cannot be generated for this diet. Canceling and editing are still permissible.
-                                                                                {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_COMPLETED') %}
-                                                                                    This diet has been completed and orders can no longer be generated. Cancelling and editing are still permissible.
-                                                                                {% elseif participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_INCOMPLETE') %}
-                                                                                    This participant has not completed this diet but has moved on to the next step. New orders cannot be generated for this diet. Canceling and editing are still permissible.
-                                                                                {% else %}
-                                                                                    This diet is not yet assigned to the participant. Orders cannot be generated until the diet is assigned.
                                                                                 {% endif %}
                                                                             </div>
                                                                             {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
