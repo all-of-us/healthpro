@@ -59,7 +59,7 @@ class OrderServiceTest extends ServiceTestCase
             static::getContainer()->get(SiteService::class),
             static::getContainer()->get(LoggerService::class),
         );
-
+        $formInterface = $this->createMock(\Symfony\Component\Form\FormInterface::class);
         $orderData = $this->getOrderData();
         $order = $this->createOrder($orderData);
         $this->assertTrue(in_array('1PS08', json_decode($order->getProcessedSamples())));
@@ -68,7 +68,7 @@ class OrderServiceTest extends ServiceTestCase
         $this->assertFalse(in_array('PS04A', json_decode($order->getProcessedSamples())));
         $this->assertFalse(in_array('PS04B', json_decode($order->getProcessedSamples())));
         $this->assertTrue(in_array('1PS08', json_decode($order->getProcessedSamples())));
-        $order = $orderService->updateOrderVersion($order, '3.2');
+        $order = $orderService->updateOrderVersion($order, '3.2', $formInterface);
         $this->assertFalse(in_array('1PS08', json_decode($order->getProcessedSamples())));
         $this->assertTrue(in_array('PS04A', json_decode($order->getProcessedSamples())));
         $this->assertTrue(in_array('PS04B', json_decode($order->getProcessedSamples())));
