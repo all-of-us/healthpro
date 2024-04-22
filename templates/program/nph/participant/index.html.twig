@@ -119,16 +119,16 @@
                                     </div>
                                     <div class="col-sm-10">
                                         <a class="float-end badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
-                                        {% if module.moduleCreationSite is not null %}
-                                            <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
-                                        {% endif %}
                                         {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
                                         <div class="tab-content" id="myTabContent">
                                             {% for dietPeriodNumber in dietPeriodNumbers %}
                                                 <div class="tab-pane fade {% if loop.first %} show active{% endif %}" id="{{ dietPeriodNumber }}">
                                                     <div class="row">
                                                         <div class="col-md-12 g-0">
-                                                            <p class="text-lg-start ms-3">NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong></p>
+                                                            <p class="text-lg-start">NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong></p>
+                                                            {% if module.moduleCreationSite is not null %}
+                                                                <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
+                                                            {% endif %}
                                                         </div>
                                                         <hr>
                                                     </div>
