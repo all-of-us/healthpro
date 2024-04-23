@@ -29,6 +29,9 @@ class NphSampleProcessingStatus
     #[ORM\Column(nullable: true)]
     private ?int $status = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $participantId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class NphSampleProcessingStatus
     public function setStatus(?int $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getParticipantId(): ?string
+    {
+        return $this->participantId;
+    }
+
+    public function setParticipantId(string $participantId): static
+    {
+        $this->participantId = $participantId;
 
         return $this;
     }
