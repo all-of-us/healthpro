@@ -10,8 +10,8 @@ class NphSampleProcessCompleteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('sampleProcessComplete', Type\HiddenType::class);
-        $builder->add('visitType', Type\HiddenType::class);
-        $builder->add('moduleNumber', Type\HiddenType::class);
+        $builder->add('status', Type\HiddenType::class);
+        $builder->add('period', Type\HiddenType::class);
+        $builder->add('module', Type\HiddenType::class);
     }
 }

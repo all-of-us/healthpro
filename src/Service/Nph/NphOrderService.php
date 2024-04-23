@@ -7,7 +7,9 @@ use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSampleProcessingStatus;
 use App\Entity\NphSite;
+use App\Entity\Order;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
 use App\Helper\NphParticipant;
@@ -919,6 +921,29 @@ class NphOrderService
             }
         }
         return $moduleStatusCount;
+    }
+
+    public function saveSampleProcessingStatus(string $participantId, array $formData): void
+    {
+        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->findBy([
+            'participantId' => $participantId,
+            'module' => $formData['module'],
+            'period' => $formData['period']
+        ]);
+
+        if (!$nphSampleProcessingStatus) {
+            $nphSampleProcessingStatus = new NphSampleProcessingStatus();
+            $nphSampleProcessingStatus->setParticipantId($participantId);
+            $nphSampleProcessingStatus->setModule($formData['module']);
+            $nphSampleProcessingStatus->setPeriod($formData['period']);
+        }
+        $nphSampleProcessingStatus->setUser($this->user);
+        $nphSampleProcessingStatus->setSite($this->site);
+        $nphSampleProcessingStatus->setStatus($formData['status']);
+        $nphSampleProcessingStatus->setModifiedTs(new \DateTime());
+        $nphSampleProcessingStatus->setModifiedTimezoneId($this->getTimezoneid());
+        $this->em->persist($nphSampleProcessingStatus);
+        $this->em->flush();
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\NphSampleProcessingStatusRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: NphSampleProcessingStatusRepository::class)]
@@ -31,6 +32,12 @@ class NphSampleProcessingStatus
 
     #[ORM\Column(length: 50)]
     private ?string $participantId = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $modifiedTs = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $modifiedTimezoneId = null;
 
     public function getId(): ?int
     {
@@ -105,6 +112,30 @@ class NphSampleProcessingStatus
     public function setParticipantId(string $participantId): static
     {
         $this->participantId = $participantId;
+
+        return $this;
+    }
+
+    public function getModifiedTs(): ?\DateTimeInterface
+    {
+        return $this->modifiedTs;
+    }
+
+    public function setModifiedTs(\DateTimeInterface $modifiedTs): static
+    {
+        $this->modifiedTs = $modifiedTs;
+
+        return $this;
+    }
+
+    public function getModifiedTimezoneId(): ?int
+    {
+        return $this->modifiedTimezoneId;
+    }
+
+    public function setModifiedTimezoneId(?int $modifiedTimezoneId): static
+    {
+        $this->modifiedTimezoneId = $modifiedTimezoneId;
 
         return $this;
     }

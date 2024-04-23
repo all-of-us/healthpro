@@ -18,13 +18,13 @@ $(document).ready(function () {
     $(".sample-process-complete-check").on("change", function () {
         let moduleNumber = $(this).attr("data-module-number");
         let visitType = $(this).attr("data-visit-type");
-        let processingComplete = "no";
-        $("#nph_sample_process_complete_moduleNumber").val(moduleNumber);
-        $("#nph_sample_process_complete_visitType").val(visitType);
+        let processingComplete = 0;
+        $("#nph_sample_process_complete_module").val(moduleNumber);
+        $("#nph_sample_process_complete_period").val(visitType);
         if ($(this).is(":checked")) {
-            processingComplete = "yes";
+            processingComplete = 1;
         }
-        $("#nph_sample_process_complete_sampleProcessComplete").val(processingComplete);
+        $("#nph_sample_process_complete_status").val(processingComplete);
         let modal = new bootstrap.Modal($("#sample_process_complete_modal"));
         modal.show();
     });

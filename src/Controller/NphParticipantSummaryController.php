@@ -73,6 +73,11 @@ class NphParticipantSummaryController extends BaseController
         $dlwSummary = $nphOrderService->generateDlwSummary($dlwCollection);
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
         $sampleProcessCompleteForm = $this->createForm(NphSampleProcessCompleteType::class, null);
+        $sampleProcessCompleteForm->handleRequest($request);
+        if ($sampleProcessCompleteForm->isSubmitted() && $sampleProcessCompleteForm->isValid()) {
+            $formData = $sampleProcessCompleteForm->getData();
+            $nphOrderService->saveSampleProcessingStatus($participantId, $formData);
+        }
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
