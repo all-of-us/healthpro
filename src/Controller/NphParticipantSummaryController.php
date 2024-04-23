@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\NphDlw;
 use App\Form\Nph\NphCrossSiteAgreeType;
+use App\Form\Nph\NphSampleProcessCompleteType;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -71,11 +72,13 @@ class NphParticipantSummaryController extends BaseController
         $dlwCollection = $this->em->getRepository(NphDlw::class)->findBy(['NphParticipant' => $participantId]);
         $dlwSummary = $nphOrderService->generateDlwSummary($dlwCollection);
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
+        $sampleProcessCompleteForm = $this->createForm(NphSampleProcessCompleteType::class, null);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
+            'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,

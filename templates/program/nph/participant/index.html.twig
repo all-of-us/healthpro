@@ -124,11 +124,21 @@
                                             {% for dietPeriodNumber in dietPeriodNumbers %}
                                                 <div class="tab-pane fade {% if loop.first %} show active{% endif %}" id="{{ dietPeriodNumber }}">
                                                     <div class="row">
-                                                        <div class="col-md-12 g-0">
+                                                        <div class="col-md-8 g-0">
                                                             <p class="text-lg-start">NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong></p>
                                                             {% if module.moduleCreationSite is not null %}
                                                                 <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
                                                             {% endif %}
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="border border-secondary-subtle ps-1 pt-1">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input sample-process-complete-check" type="checkbox" value="1" data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}">
+                                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                                        Sample Processing Complete
+                                                                    </label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <hr>
                                                     </div>
@@ -149,7 +159,7 @@
                                                                 <div class="card-header collapse-carat" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                                                      role="button" style="font-weight: bold">
                                                                     {{ visit['visitDisplayName']}} Visit
-                                                                    <a class="btn btn-primary btn-sm ms-2" role="button"
+                                                                    <a class="btn btn-primary btn-sm ms-2 generate-orders-button" role="button"
                                                                        href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                         <i class="fa fa-plus-circle"></i> Generate Orders
                                                                     </a>
@@ -293,6 +303,7 @@
         </div>
     </div>
     {% include 'partials/modals/participant-barcode.html.twig' %}
+    {% include 'program/nph/participant/partials/sample-process-complete-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-participant-summary') }}
