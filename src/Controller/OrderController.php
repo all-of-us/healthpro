@@ -293,6 +293,9 @@ class OrderController extends BaseController
                 if ($request->request->has('updateTubes')) {
                     $order = $this->orderService->updateOrderVersion($order, $collectForm['orderVersion']->getData(), $collectForm);
                     $formData = $this->orderService->getOrderFormData('collected');
+                    if ($collectForm->has('collectedTs') && !empty($collectForm->get('collectedTs')->getData())) {
+                        $formData['collectedTs'] = $collectForm->get('collectedTs')->getData();
+                    }
                     $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
                 } else {
                     $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
