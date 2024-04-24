@@ -290,7 +290,7 @@ class OrderController extends BaseController
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
             }
-            if ($collectForm->get('orderVersion')->getData() !== $order->getVersion() && !$request->request->has('updateTubes')) {
+            if (!$request->request->has('updateTubes') && ($collectForm->has('orderVersion') && $collectForm->get('orderVersion')->getData() !== $order->getVersion())) {
                 $this->orderService->updateOrderVersion($order, $collectForm['orderVersion']->getData(), $collectForm);
                 $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
                 $collectForm->handleRequest($request);
