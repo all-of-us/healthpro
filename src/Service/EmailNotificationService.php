@@ -61,7 +61,7 @@ abstract class EmailNotificationService
                         'count' => count($participants)
                     ]);
                 } else {
-                    if ($this->env->isStaging() || $this->env->isProd()) {
+                    if ($this->env->isStable() || $this->env->isProd()) {
                         $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
                         $message
                             ->setTo($result['emails'])
