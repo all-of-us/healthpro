@@ -10,7 +10,7 @@ abstract class EmailNotificationService
     protected $managerRegistry;
     protected $participantSummaryService;
     protected $loggerService;
-    protected $env;
+    protected EnvironmentService $env;
     protected $params;
     protected $twig;
     protected $siteRepository;
@@ -61,14 +61,16 @@ abstract class EmailNotificationService
                         'count' => count($participants)
                     ]);
                 } else {
-                    $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
-                    $message
-                        ->setTo($result['emails'])
-                        ->render($this->render, [
-                            $this->level => $result['id'],
-                            'participants' => $participants
-                        ])
-                        ->send();
+                    if ($this->env->isStaging() || $this->env->isProd()) {
+                        $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
+                        $message
+                            ->setTo($result['emails'])
+                            ->render($this->render, [
+                                $this->level => $result['id'],
+                                'participants' => $participants
+                            ])
+                            ->send();
+                    }
                     $this->loggerService->log($this->log, [
                         'org' => $result['id'],
                         'status' => 'Notifications sent',
