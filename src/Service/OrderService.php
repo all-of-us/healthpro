@@ -847,11 +847,6 @@ class OrderService
         if (!empty($finalizedSamples)) {
             $order->setFinalizedSamples(json_encode($finalizedSamples));
         }
-        if ($orderCollectForm->has('collectedTs') && $orderCollectForm->get('collectedTs')->getData()) {
-            $order->setCollectedTs($orderCollectForm->get('collectedTs')->getData());
-        }
-        $this->em->persist($order);
-        $this->em->flush();
         $this->loadSamplesSchema($order);
         return $order;
     }

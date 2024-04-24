@@ -6,8 +6,10 @@
 {% block title %}Collect - Order {{ order.orderId }} - {% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'collect' } %}
-
     {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+    {% if updatedTubes == true %}
+        <input type="hidden" hidden="hidden" id="tubesChanged" name="tubesChanged" value="true">
+    {% endif %}
     {{ form_errors(collectForm) }}
     <div class="form-group{% if not collectForm.collectedTs.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedTs) }}
@@ -89,7 +91,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <h4 class="text-danger">Warning!</h4>
-                    <p>Changing the PST tube type will remove the previously collected PST tube(s) and replace them with the other PST tube type option. The new PST tube type selected must be re-checked in the list below if collected. Click the “update” button to save your changes.</p>
+                    <p>Changing the PST tube type will remove the previously collected PST tube(s) and replace them with the other PST tube type option. Ensure the new PST tube type selected is checked off in the list below. Click the “update” button to save your changes.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-dismiss="modal">Go Back</button>
