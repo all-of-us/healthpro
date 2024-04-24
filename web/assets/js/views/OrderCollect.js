@@ -57,4 +57,8 @@ $(document).ready(function () {
     });
 
     checkAllToggle();
+    if ($("#tubesChanged").length > 0) {
+        PMI.enableUnsavedPrompt();
+        PMI.hasChanges = true;
+    }
 });

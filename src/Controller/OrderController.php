@@ -281,6 +281,7 @@ class OrderController extends BaseController
         $formData = $this->orderService->getOrderFormData('collected');
         $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
         $collectForm->handleRequest($request);
+        $updatedTubes = false;
         if ($collectForm->isSubmitted()) {
             if ($order->isDisabled()) {
                 throw $this->createAccessDeniedException();
@@ -288,6 +289,11 @@ class OrderController extends BaseController
             if (isset($collectForm['collectedNotes']) && $type = $this->orderService->getParticipant()->checkIdentifiers($collectForm['collectedNotes']->getData())) {
                 $label = Order::$identifierLabel[$type[0]];
                 $collectForm['collectedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
+            }
+            if ($collectForm->get('orderVersion')->getData() !== $order->getVersion() && !$request->request->has('updateTubes')) {
+                $this->orderService->updateOrderVersion($order, $collectForm['orderVersion']->getData(), $collectForm);
+                $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
+                $collectForm->handleRequest($request);
             }
             if ($collectForm->isValid()) {
                 if ($request->request->has('updateTubes')) {
@@ -297,6 +303,7 @@ class OrderController extends BaseController
                         $formData['collectedTs'] = $collectForm->get('collectedTs')->getData();
                     }
                     $collectForm = $this->createOrderCollectForm($order, $formData, $request, $session, $params, 'collected');
+                    $updatedTubes = true;
                 } else {
                     $this->orderService->setOrderUpdateFromForm('collected', $collectForm);
                     if (!$order->isUnlocked()) {
@@ -331,7 +338,8 @@ class OrderController extends BaseController
             'revertForm' => $this->createForm(OrderRevertType::class, null)->createView(),
             'readOnlyView' => $this->isReadOnly(),
             'isPediatricOrder' => $order->isPediatricOrder(),
-            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled()
+            'inactiveSiteFormDisabled' => $this->orderService->inactiveSiteFormDisabled(),
+            'updatedTubes' => $updatedTubes
         ]);
     }
 

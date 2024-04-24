@@ -847,8 +847,6 @@ class OrderService
         if (!empty($finalizedSamples)) {
             $order->setFinalizedSamples(json_encode($finalizedSamples));
         }
-        $this->em->persist($order);
-        $this->em->flush();
         $this->loadSamplesSchema($order);
         return $order;
     }
