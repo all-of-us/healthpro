@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Audit\Log;
 use App\Entity\NphDlw;
+use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Form\Nph\NphSampleProcessCompleteType;
 use App\Service\LoggerService;
@@ -78,12 +79,15 @@ class NphParticipantSummaryController extends BaseController
             $formData = $sampleProcessCompleteForm->getData();
             $nphOrderService->saveSampleProcessingStatus($participantId, $formData);
         }
+        $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)
+            ->getSampleProcessingStatusByModule($participantId, $participant->module);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
             'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
+            'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,
