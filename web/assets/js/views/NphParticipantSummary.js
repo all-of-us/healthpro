@@ -32,4 +32,9 @@ $(document).ready(function () {
     $("#sample_process_complete_continue").on("click", function () {
         $('form[name="nph_sample_process_complete"]').submit();
     });
+
+    $("#sample_process_go_back").on("click", function () {
+        let checkBoxSel = $(".sample-process-complete-check");
+        checkBoxSel.prop('checked', !checkBoxSel.prop('checked'));
+    });
 });

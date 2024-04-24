@@ -925,12 +925,7 @@ class NphOrderService
 
     public function saveSampleProcessingStatus(string $participantId, array $formData): void
     {
-        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->findBy([
-            'participantId' => $participantId,
-            'module' => $formData['module'],
-            'period' => $formData['period']
-        ]);
-
+        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
         if (!$nphSampleProcessingStatus) {
             $nphSampleProcessingStatus = new NphSampleProcessingStatus();
             $nphSampleProcessingStatus->setParticipantId($participantId);
