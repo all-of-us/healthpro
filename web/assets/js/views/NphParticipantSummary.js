@@ -19,13 +19,17 @@ $(document).ready(function () {
         let moduleNumber = $(this).attr("data-module-number");
         let visitType = $(this).attr("data-visit-type");
         let processingComplete = 0;
+        let modelBodyText = "<p>Are you sure you want to unmark the samples as processing complete?</p>";
         $("#nph_sample_process_complete_module").val(moduleNumber);
         $("#nph_sample_process_complete_period").val(visitType);
         if ($(this).is(":checked")) {
             processingComplete = 1;
+            modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>"
         }
         $("#nph_sample_process_complete_status").val(processingComplete);
-        let modal = new bootstrap.Modal($("#sample_process_complete_modal"));
+        let modelSel = $("#sample_process_complete_modal");
+        modelSel.find('.modal-body').html(modelBodyText)
+        let modal = new bootstrap.Modal(modelSel);
         modal.show();
     });
 
