@@ -3,7 +3,7 @@ $(document).ready(function () {
         $("#order_collectedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));
     });
     $("#order_collectedSamples input:checkbox").on("change", function () {
-       checkAllToggle(this);
+        checkAllToggle(this);
     });
     $("#order_collectedTs").pmiDateTimePicker();
     new PMI.views["OrderSubPage"]({

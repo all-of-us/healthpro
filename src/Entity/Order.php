@@ -1324,7 +1324,6 @@ class Order
                     break;
                 }
             }
-
         }
         return $warnings;
     }
