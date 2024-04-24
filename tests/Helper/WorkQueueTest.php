@@ -239,6 +239,7 @@ class WorkQueueTest extends ServiceTestCase
                 'sampleStatus1UR10' => 'Urine 10 mL',
                 'sampleStatus1UR90' => 'Urine 90 mL',
                 'sampleStatus1SAL' => 'Saliva',
+                'sampleStatus2SAL0' => 'Saliva (2SAL0)',
                 'NphStudyStatus' => 'Nutrition For Precision Health'
             ],
             'options' =>
@@ -524,6 +525,12 @@ class WorkQueueTest extends ServiceTestCase
                             'RECEIVED' => 'Received',
                             'UNSET' => 'Not Received',
                         ],
+                    'sampleStatus2SAL0' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
                     'NphStudyStatus' =>
                     [
                         '' => 'View All',
@@ -698,7 +705,8 @@ class WorkQueueTest extends ServiceTestCase
                 '1ED10' => '1st 10 mL EDTA',
                 '1PXR2' => 'Paxgene RNA',
                 '1UR10' => 'Urine 10 mL',
-                '1SAL' => 'Saliva'
+                '1SAL' => 'Saliva',
+                '2SAL0' => 'Saliva (2SAL0)'
             ]],
             [false, [
                 '1SST8' => '8 mL SST',
