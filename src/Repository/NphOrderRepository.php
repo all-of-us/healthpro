@@ -249,15 +249,13 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getOrderSamplesByModule(string $participantId, string $module): array
+    public function getOrderSamplesByModule(string $participantId): array
     {
         return $this->createQueryBuilder('no')
             ->select('no.module, no.visitPeriod, ns.finalizedTs, ns.modifyType')
             ->leftJoin('no.nphSamples', 'ns')
             ->where('no.participantId = :participantId')
-            ->andWhere('no.module = :module')
             ->setParameter('participantId', $participantId)
-            ->setParameter('module', $module)
             ->getQuery()
             ->getResult(Query::HYDRATE_ARRAY);
     }

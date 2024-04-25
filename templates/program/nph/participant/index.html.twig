@@ -103,17 +103,17 @@
                                             {% if moduleNumber == 1 %}
                                                 <li class="nav-item">
                                                     <a class="nav-link participant-diet-period active" aria-current="page" href="#">Module 1</a>
+                                                    {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber]['LMT']] %}
+                                                    <span class="ms-3 {{ dietPeriodStatus['class'] }}">{{ dietPeriodStatus['text'] }}</span>
                                                 </li>
                                             {% else %}
-                                                <li class="nav-item">
-                                                    <a class="nav-link participant-diet-period active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#Period1" data-period="Period1" role="tab">Diet Period 1</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link participant-diet-period" href="#" data-bs-toggle="tab" data-bs-target="#Period2" data-period="Period2" role="tab">Diet Period 2</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link participant-diet-period" href="#" data-bs-toggle="tab" data-bs-target="#Period3" data-period="Period3" role="tab">Diet Period 3</a>
-                                                </li>
+                                                {% for dietPeriod in ['Period1', 'Period2', 'Period3'] %}
+                                                    <li class="nav-item">
+                                                        <a class="nav-link participant-diet-period {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">Diet {{ dietPeriod }}</a>
+                                                        {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriod]] %}
+                                                        <span class="ms-3 {{ dietPeriodStatus['class'] }}">{{ dietPeriodStatus['text'] }}</span>
+                                                    </li>
+                                                {% endfor %}
                                             {% endif %}
                                         </ul>
                                     </div>

@@ -89,6 +89,7 @@ class NphParticipantSummaryController extends BaseController
             'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
             'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
             'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
+            'dietPeriodStatusMap' => $nphOrderService::$dietPeriodStatusMap,
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,

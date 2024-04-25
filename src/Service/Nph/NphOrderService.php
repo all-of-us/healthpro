@@ -39,6 +39,12 @@ class NphOrderService
 
     private static $placeholderSamples = ['STOOL'];
 
+    public static array $dietPeriodStatusMap = [
+        'in_progress_unfinalized' => ['text' => 'In Progress', 'class' => 'text-warning'],
+        'in_progress_finalized' => ['text' => 'In Progress', 'class' => 'text-warning'],
+        'not_started' => ['text' => 'Not Started', 'class' => 'text-muted']
+    ];
+
     public function __construct(
         EntityManagerInterface $em,
         UserService $userService,
@@ -943,26 +949,36 @@ class NphOrderService
 
     public function getModuleDietPeriodsStatus(string $participantId, string $module): array
     {
-        $dietPeriodsStatus = [
-            'Period1' => 'not_started',
-            'Period2' => 'not_started',
-            'Period3' => 'not_started'
+        $moduleDietPeriodsStatus = [
+            1 => ['LMT' => 'not_started'],
+            2 => ['Period1' => 'not_started',
+                'Period2' => 'not_started',
+                'Period3' => 'not_started'],
+            3 => ['Period1' => 'not_started',
+                'Period2' => 'not_started',
+                'Period3' => 'not_started'],
         ];
-        $orderSamplesByModule = $this->em->getRepository(NphOrder::class)->getOrderSamplesByModule($participantId, $module);
-        foreach (array_keys($dietPeriodsStatus) as $dietPeriod) {
-            foreach ($orderSamplesByModule as $orderSample) {
-                if ($dietPeriod === substr($orderSample['visitPeriod'], 0, 7)) {
-                    if ($orderSample['finalizedTs'] === null && $orderSample['modifyType'] !== 'cancel') {
-                        $dietPeriodsStatus[$dietPeriod] = 'in_progress_unfinalized';
-                        break;
-                    }
-                    if ($orderSample['finalizedTs'] !== null || $orderSample['modifyType'] === 'cancel') {
-                        $dietPeriodsStatus[$dietPeriod] = 'in_progress_finalized';
+        $orderSamplesByModule = $this->em->getRepository(NphOrder::class)->getOrderSamplesByModule($participantId);
+        foreach ($moduleDietPeriodsStatus as $module => $dietPeriodsStatus) {
+            foreach (array_keys($dietPeriodsStatus) as $dietPeriod) {
+                foreach ($orderSamplesByModule as $orderSample) {
+                    if ($module == $orderSample['module'] && $dietPeriod === substr(
+                        $orderSample['visitPeriod'],
+                        0,
+                        7
+                    )) {
+                        if ($orderSample['finalizedTs'] === null && $orderSample['modifyType'] !== 'cancel') {
+                            $moduleDietPeriodsStatus[$module][$dietPeriod] = 'in_progress_unfinalized';
+                            break;
+                        }
+                        if ($orderSample['finalizedTs'] !== null || $orderSample['modifyType'] === 'cancel') {
+                            $moduleDietPeriodsStatus[$module][$dietPeriod] = 'in_progress_finalized';
+                        }
                     }
                 }
             }
         }
-        return $dietPeriodsStatus;
+        return $moduleDietPeriodsStatus;
     }
 
     private function generateOrderSummaryArray(array $nphOrder): array
