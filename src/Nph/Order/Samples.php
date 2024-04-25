@@ -4,6 +4,14 @@ namespace App\Nph\Order;
 
 class Samples
 {
+    public const NOT_STARTED = 'not_started';
+
+    public static array $dietPeriodStatusMap = [
+        'in_progress_unfinalized' => ['text' => 'In Progress', 'class' => 'text-warning'],
+        'in_progress_finalized' => ['text' => 'In Progress', 'class' => 'text-warning'],
+        'not_started' => ['text' => 'Not Started', 'class' => 'text-muted']
+    ];
+
     public static $aliquotDocuments = [
         'blood' => [
             'title' => 'HPRO Blood Aliquoting Instructions',

@@ -7,6 +7,7 @@ use App\Entity\NphDlw;
 use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Form\Nph\NphSampleProcessCompleteType;
+use App\Nph\Order\Samples;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -89,7 +90,7 @@ class NphParticipantSummaryController extends BaseController
             'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
             'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
             'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
-            'dietPeriodStatusMap' => $nphOrderService::$dietPeriodStatusMap,
+            'dietPeriodStatusMap' => Samples::$dietPeriodStatusMap,
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,

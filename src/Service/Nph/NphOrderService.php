@@ -39,12 +39,6 @@ class NphOrderService
 
     private static $placeholderSamples = ['STOOL'];
 
-    public static array $dietPeriodStatusMap = [
-        'in_progress_unfinalized' => ['text' => 'In Progress', 'class' => 'text-warning'],
-        'in_progress_finalized' => ['text' => 'In Progress', 'class' => 'text-warning'],
-        'not_started' => ['text' => 'Not Started', 'class' => 'text-muted']
-    ];
-
     public function __construct(
         EntityManagerInterface $em,
         UserService $userService,
