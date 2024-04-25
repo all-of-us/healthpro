@@ -2,6 +2,9 @@ $(document).ready(function () {
     $("#checkall").on("change", function () {
         $("#order_collectedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));
     });
+    $("#order_collectedSamples input:checkbox").on("change", function () {
+        checkAllToggle(this);
+    });
     $("#order_collectedTs").pmiDateTimePicker();
     new PMI.views["OrderSubPage"]({
         el: $("body")
@@ -41,7 +44,21 @@ $(document).ready(function () {
         orderForm.trigger("submit");
     }
 
+    function checkAllToggle(element) {
+        let allCheckboxesNotCheckall = $("#order_collectedSamples input:checkbox:enabled").not("#checkall");
+        if (element !== undefined && !$(element).prop("checked")) {
+            $("#checkall").prop("checked", false);
+        } else if (allCheckboxesNotCheckall.filter(":checked").length === allCheckboxesNotCheckall.length) {
+            $("#checkall").prop("checked", true);
+        }
+    }
     $("#tube_help_modal_toggle").on("click", function (e) {
         $("#tube_help_modal").modal();
     });
+
+    checkAllToggle();
+    if ($("#tubesChanged").length > 0) {
+        PMI.enableUnsavedPrompt();
+        PMI.hasChanges = true;
+    }
 });
