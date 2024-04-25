@@ -102,17 +102,17 @@
                                         <ul class="nav flex-column">
                                             {% if moduleNumber == 1 %}
                                                 <li class="nav-item">
-                                                    <a class="nav-link active" aria-current="page" href="#">Module 1</a>
+                                                    <a class="nav-link participant-diet-period active" aria-current="page" href="#">Module 1</a>
                                                 </li>
                                             {% else %}
                                                 <li class="nav-item">
-                                                    <a class="nav-link active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#Period1" role="tab">Diet Period 1</a>
+                                                    <a class="nav-link participant-diet-period active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#Period1" data-period="Period1" role="tab">Diet Period 1</a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#Period2" role="tab">Diet Period 2</a>
+                                                    <a class="nav-link participant-diet-period" href="#" data-bs-toggle="tab" data-bs-target="#Period2" data-period="Period2" role="tab">Diet Period 2</a>
                                                 </li>
                                                 <li class="nav-item">
-                                                    <a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#Period3" role="tab">Diet Period 3</a>
+                                                    <a class="nav-link participant-diet-period" href="#" data-bs-toggle="tab" data-bs-target="#Period3" data-period="Period3" role="tab">Diet Period 3</a>
                                                 </li>
                                             {% endif %}
                                         </ul>
@@ -130,24 +130,22 @@
                                                                 <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
                                                             {% endif %}
                                                         </div>
-                                                        {% if moduleNumber != 1 %}
-                                                            <div class="col-md-4">
-                                                                <div class="border border-secondary-subtle ps-1 pt-1">
-                                                                    <div class="form-check">
-                                                                        {% set sampleChecked = '' %}
-                                                                        {% for sampleProcessing in sampleProcessingStatusByModule %}
-                                                                            {% if sampleProcessing.period ==  dietPeriodNumber|slice(-1) and sampleProcessing.status == 1 %}
-                                                                                {% set sampleChecked = 'checked' %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                        <input class="form-check-input sample-process-complete-check" type="checkbox" value="1" data-visit-type="{{ dietPeriodNumber|slice(-1) }}" data-module-number="{{ moduleNumber }}" {{ sampleChecked }}>
-                                                                        <label class="form-check-label" for="flexCheckDefault">
-                                                                            Sample Processing Complete
-                                                                        </label>
-                                                                    </div>
+                                                        <div class="col-md-4">
+                                                            <div class="border border-secondary-subtle ps-1 pt-1">
+                                                                <div class="form-check">
+                                                                    {% set sampleChecked = '' %}
+                                                                    {% for sampleProcessing in sampleProcessingStatusByModule %}
+                                                                        {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
+                                                                            {% set sampleChecked = 'checked' %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                    <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1" data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" {{ sampleChecked }}>
+                                                                    <label class="form-check-label" for="flexCheckDefault">
+                                                                        Sample Processing Complete
+                                                                    </label>
                                                                 </div>
                                                             </div>
-                                                        {% endif %}
+                                                        </div>
                                                         <hr>
                                                     </div>
                                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}

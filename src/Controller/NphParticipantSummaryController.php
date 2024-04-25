@@ -79,8 +79,8 @@ class NphParticipantSummaryController extends BaseController
             $formData = $sampleProcessCompleteForm->getData();
             $nphOrderService->saveSampleProcessingStatus($participantId, $formData);
         }
-        $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)
-            ->getSampleProcessingStatusByModule($participantId, $participant->module);
+        $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
@@ -88,6 +88,7 @@ class NphParticipantSummaryController extends BaseController
             'agreeForm' => $agreeForm->createView(),
             'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
             'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
+            'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,

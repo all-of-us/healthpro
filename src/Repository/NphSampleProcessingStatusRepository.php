@@ -34,12 +34,11 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
         return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus[0] : null;
     }
 
-    public function getSampleProcessingStatusByModule(string $participantId, string $module): ?array
+    public function getSampleProcessingStatusByModule(string $participantId): ?array
     {
         $nphSampleProcessingStatus = $this->createQueryBuilder('n')
             ->andWhere('n.participantId = :participantId')
-            ->andWhere('n.module = :module')
-            ->setParameters(['participantId' => $participantId, 'module' => $module])
+            ->setParameter('participantId', $participantId)
             ->getQuery()
             ->getResult()
         ;
