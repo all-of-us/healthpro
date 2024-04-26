@@ -104,14 +104,14 @@
                                                 <li class="nav-item">
                                                     <a class="nav-link participant-diet-period active" aria-current="page" href="#">Module 1</a>
                                                     {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber]['LMT']] %}
-                                                    <span class="ms-3 {{ dietPeriodStatus['class'] }}">{{ dietPeriodStatus['text'] }}</span>
+                                                    <span class="ms-3 {{ dietPeriodStatus['textClass'] }}">{{ dietPeriodStatus['text'] }}</span>
                                                 </li>
                                             {% else %}
                                                 {% for dietPeriod in ['Period1', 'Period2', 'Period3'] %}
                                                     <li class="nav-item">
                                                         <a class="nav-link participant-diet-period {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">Diet {{ dietPeriod }}</a>
                                                         {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriod]] %}
-                                                        <span class="ms-3 {{ dietPeriodStatus['class'] }}">{{ dietPeriodStatus['text'] }}</span>
+                                                        <span class="ms-3 {{ dietPeriodStatus['textClass'] }}">{{ dietPeriodStatus['text'] }}</span>
                                                     </li>
                                                 {% endfor %}
                                             {% endif %}
@@ -125,7 +125,11 @@
                                                 <div class="tab-pane fade {% if loop.first %} show active{% endif %}" id="{{ dietPeriodNumber }}">
                                                     <div class="row">
                                                         <div class="col-md-8 g-0">
-                                                            <p class="text-lg-start">NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong></p>
+                                                            {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
+                                                            <p class="text-lg-start">
+                                                                NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong>
+                                                                <span class="badge fs-6 {{ dietPeriodStatus['badgeClass'] }}">{{ dietPeriodStatus['text'] }}</span>
+                                                            </p>
                                                             {% if module.moduleCreationSite is not null %}
                                                                 <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
                                                             {% endif %}
