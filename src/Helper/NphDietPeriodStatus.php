@@ -5,6 +5,8 @@ namespace App\Helper;
 class NphDietPeriodStatus
 {
     public const NOT_STARTED = 'not_started';
+    public const IN_PROGRESS_UNFINALIZED_COMPLETE = 'in_progress_unfinalized_complete';
+    public const IN_PROGRESS_FINALIZED_COMPLETE = 'in_progress_finalized_complete';
 
     public static array $dietPeriodStatusMap = [
         'not_started' => ['text' => 'Not Started', 'textClass' => 'text-muted', 'badgeClass' => 'bg-secondary'],
