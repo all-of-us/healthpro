@@ -641,6 +641,10 @@ label.label-normal {
     color: #fff !important
 }
 
+.text-warning-orange {
+    color: #f2a02b !important;
+}
+
 .dropdown-toggle.active {
     font-weight: bold !important;
 }
