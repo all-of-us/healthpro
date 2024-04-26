@@ -29,7 +29,8 @@ $(document).ready(function () {
             modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>"
             if (dietStatus === 'in_progress_unfinalized') {
                 modelTitleText = "<span class='text-danger'>Warning!</span>";
-                modelBodyText = $("#sample_process_complete_unfinalized_message").html();
+                let moduleId = parseInt(moduleNumber) === 1 ? 'sample_process_complete_unfinalized_message_1' : "sample_process_complete_unfinalized_message";
+                modelBodyText = $("#" + moduleId).html();
             }
         }
         $("#nph_sample_process_complete_status").val(processingComplete);

@@ -91,6 +91,7 @@ class NphParticipantSummaryController extends BaseController
             'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
             'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
             'dietPeriodStatusMap' => NphDietPeriodStatus::$dietPeriodStatusMap,
+            'dietToolTipMessages' => NphDietPeriodStatus::$dietToolTipMessages,
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,

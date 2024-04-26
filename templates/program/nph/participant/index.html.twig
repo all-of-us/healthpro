@@ -102,7 +102,7 @@
                                         <ul class="nav flex-column">
                                             {% if moduleNumber == 1 %}
                                                 <li class="nav-item">
-                                                    <a class="nav-link participant-diet-period active" aria-current="page" href="#">Module 1</a>
+                                                    <a class="nav-link participant-diet-period active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#LMT" data-period="LMT" role="tab">Module 1</a>
                                                     {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber]['LMT']] %}
                                                     <span class="ms-3 {{ dietPeriodStatus['textClass'] }}">{{ dietPeriodStatus['text'] }}</span>
                                                 </li>
@@ -128,8 +128,16 @@
                                                             {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                             <p class="text-lg-start">
                                                                 NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong>
+                                                                {% set toolTipMessage = '' %}
+                                                                {% if dietPeriodStatus['toolTipStatus'] is defined %}
+                                                                    {% if moduleNumber == 1 %}
+                                                                        {% set toolTipMessage = dietToolTipMessages[dietPeriodStatus['toolTipStatus'] ~ '_1'] %}
+                                                                    {% else %}
+                                                                        {% set toolTipMessage = dietToolTipMessages[dietPeriodStatus['toolTipStatus']] %}
+                                                                    {% endif %}
+                                                                {% endif %}
                                                                 <span class="badge fs-6 {{ dietPeriodStatus['badgeClass'] }}"
-                                                                    {% if dietPeriodStatus['toolTipText'] is defined %} data-bs-toggle="tooltip" title="{{ dietPeriodStatus['toolTipText'] }}" {% endif %}>
+                                                                    {% if toolTipMessage %} data-bs-toggle="tooltip" title="{{ toolTipMessage }}" {% endif %}>
                                                                     {{ dietPeriodStatus['text'] }}
                                                                 </span>
                                                             </p>

@@ -7,6 +7,7 @@ use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSampleProcessingStatus;
 use App\Form\DlwType;
 use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
@@ -61,7 +62,8 @@ class NphOrderController extends BaseController
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
-        if (!$nphOrderService->isDietStarted($participant->{'module' . $module . 'DietPeriod'})) {
+        $dietPeriod = $module === 1 ? $visit : substr($visit, 0, 7);
+        if ($this->em->getRepository(NphSampleProcessingStatus::class)->isSampleProcessingComplete($participantId, $module, $dietPeriod)) {
             throw $this->createNotFoundException('Orders cannot be generated for this diet.');
         }
         $timePointSamples = $nphOrderService->getTimePointSamples();
@@ -244,8 +246,9 @@ class NphOrderController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $isDietStarted = $nphOrderService->isDietStarted($participant->{'module' . $order->getModule() . 'DietPeriod'});
-        $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStarted);
+        $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
+        $isSampleProcessingComplete = $this->em->getRepository(NphSampleProcessingStatus::class)->isSampleProcessingComplete($participantId, $order->getModule(), $dietPeriod);
+        $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && $isSampleProcessingComplete);
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
