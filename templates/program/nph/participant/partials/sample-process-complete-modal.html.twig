@@ -13,5 +13,17 @@
         </div>
     </div>
 </div>
+<div id="sample_process_complete_unfinalized_message" style="display: none">
+    Warning! There are <span class="font-bold">unfinalized samples</span> within this diet period. Sample processing must be finalized or canceled before marking the diet period as complete.
+    <ul>
+        <li><span class="text-decoration-underline">Aliquot and finalize</span> all samples prior to marking complete.</li>
+        <li>This includes any samples that were collected during a downtime.</li>
+        <li>For any samples that cannot be finalized, please <span class="text-decoration-underline">cancel</span> the sample(s).</li>
+    </ul>
+    <hr>
+    <p class="font-bold">Continuing with unfinalized samples may be subject to auditing. Misuse of this functionality may be reported for re-education.</p>
+    <p>User Account: {{ app.user.email|default('') }}</p>
+    <p>Date: {{ "now"|date("m/d/Y") }}</p>
+</div>
 {{ form_start(sampleProcessCompleteForm) }}
 {{ form_end(sampleProcessCompleteForm) }}

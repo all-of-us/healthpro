@@ -18,16 +18,23 @@ $(document).ready(function () {
     $(".sample-process-complete-check").on("change", function () {
         let moduleNumber = $(this).attr("data-module-number");
         let visitType = $(this).attr("data-visit-type");
+        let dietStatus = $(this).attr("data-diet-status");
         let processingComplete = 0;
+        let modelTitleText = "Confirm";
         let modelBodyText = "<p>Are you sure you want to unmark the samples as processing complete?</p>";
         $("#nph_sample_process_complete_module").val(moduleNumber);
         $("#nph_sample_process_complete_period").val(visitType);
         if ($(this).is(":checked")) {
             processingComplete = 1;
             modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>"
+            if (dietStatus === 'in_progress_unfinalized') {
+                modelTitleText = "<span class='text-danger'>Warning!</span>";
+                modelBodyText = $("#sample_process_complete_unfinalized_message").html();
+            }
         }
         $("#nph_sample_process_complete_status").val(processingComplete);
         let modelSel = $("#sample_process_complete_modal");
+        modelSel.find('.modal-title').html(modelTitleText)
         modelSel.find('.modal-body').html(modelBodyText)
         let modal = new bootstrap.Modal(modelSel);
         modal.show();

@@ -147,7 +147,8 @@
                                                                                 {% set sampleChecked = 'checked' %}
                                                                             {% endif %}
                                                                         {% endfor %}
-                                                                        <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1" data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" {{ sampleChecked }}>
+                                                                        <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
+                                                                               data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
                                                                         <label class="form-check-label" for="flexCheckDefault">
                                                                             Sample Processing Complete
                                                                         </label>
