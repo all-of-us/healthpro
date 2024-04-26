@@ -972,6 +972,20 @@ class NphOrderService
                 }
             }
         }
+        foreach ($moduleDietPeriodsStatus as $module => $moduleDietPeriods) {
+            foreach ($moduleDietPeriods as $period => $moduleDietStatus) {
+                $dietCompleteStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->findOneBy([
+                    'participantId' => $participantId,
+                    'module' => $module,
+                    'period' => $period,
+                    'status' => 1
+                ]);
+                if ($dietCompleteStatus) {
+                    $moduleDietPeriodsStatus[$module][$period] = $moduleDietStatus . '_complete';
+                }
+            }
+        }
+
         return $moduleDietPeriodsStatus;
     }
 

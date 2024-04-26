@@ -128,13 +128,16 @@
                                                             {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                             <p class="text-lg-start">
                                                                 NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong>
-                                                                <span class="badge fs-6 {{ dietPeriodStatus['badgeClass'] }}">{{ dietPeriodStatus['text'] }}</span>
+                                                                <span class="badge fs-6 {{ dietPeriodStatus['badgeClass'] }}"
+                                                                    {% if dietPeriodStatus['toolTipText'] is defined %} data-bs-toggle="tooltip" title="{{ dietPeriodStatus['toolTipText'] }}" {% endif %}>
+                                                                    {{ dietPeriodStatus['text'] }}
+                                                                </span>
                                                             </p>
                                                             {% if module.moduleCreationSite is not null %}
                                                                 <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
                                                             {% endif %}
                                                         </div>
-                                                        {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Nph\\Order\\Samples::NOT_STARTED') %}
+                                                        {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::NOT_STARTED') %}
                                                             <div class="col-md-4">
                                                                 <div class="border border-secondary-subtle ps-1 pt-1">
                                                                     <div class="form-check">
