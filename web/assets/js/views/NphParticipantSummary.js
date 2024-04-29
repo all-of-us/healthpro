@@ -59,11 +59,17 @@ $(document).ready(function () {
     $(".generate-orders-button").on("click", function (e) {
         e.preventDefault();
         let moduleNumber = $(this).data("module");
-        let periodNumber = $(this).data("period");
+        let period = $(this).data("period");
         let generateOrderLink = $(this).attr("href");
+        if (parseInt(moduleNumber) === 1) {
+            window.location.href = generateOrderLink;
+            return;
+        }
         $("#orders_generate_continue").attr("href", generateOrderLink);
-        if (parseInt(periodNumber) > 1) {
-            let previousDietPeriod = periodNumber - 1;
+        let periodNumber = parseInt(period[period.length - 1]);
+        if (periodNumber > 1) {
+            periodNumber = periodNumber - 1;
+            let previousDietPeriod = "Period" + periodNumber;
             let dietStatus = $("#diet_period_status_" + moduleNumber + "_" + previousDietPeriod).data("diet-period-status");
             if (dietStatus === 'in_progress_finalized' || dietStatus === 'in_progress_unfinalized') {
                 let modelSel = $("#generate_order_warning_message");
@@ -73,6 +79,5 @@ $(document).ready(function () {
                window.location.href = generateOrderLink;
             }
         }
-
     });
 });
