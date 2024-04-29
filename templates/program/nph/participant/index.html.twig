@@ -111,7 +111,9 @@
                                                     <li class="nav-item">
                                                         <a class="nav-link participant-diet-period {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">Diet {{ dietPeriod }}</a>
                                                         {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriod]] %}
-                                                        <span class="ms-3 {{ dietPeriodStatus['textClass'] }}">{{ dietPeriodStatus['text'] }}</span>
+                                                        <span class="ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriod] }}" id="diet_period_status_{{ moduleNumber }}_{{ dietPeriod|slice(-1) }}">
+                                                            {{ dietPeriodStatus['text'] }}
+                                                        </span>
                                                     </li>
                                                 {% endfor %}
                                             {% endif %}
@@ -184,8 +186,8 @@
                                                                      role="button" style="font-weight: bold">
                                                                     {{ visit['visitDisplayName']}} Visit
                                                                     {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
-                                                                        <a class="btn btn-primary btn-sm ms-2 generate-orders-button" role="button"
-                                                                           href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                                        <a class="btn btn-primary btn-sm ms-2 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber|slice(-1) }}"
+                                                                           role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
                                                                     {% endif %}
