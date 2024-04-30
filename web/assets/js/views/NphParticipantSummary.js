@@ -58,15 +58,15 @@ $(document).ready(function () {
 
     $(".generate-orders-button").on("click", function (e) {
         e.preventDefault();
-        let moduleNumber = $(this).data("module");
+        let moduleNumber = parseInt($(this).data("module"));
         let period = $(this).data("period");
+        let periodNumber = parseInt(period[period.length - 1]);
         let generateOrderLink = $(this).attr("href");
-        if (parseInt(moduleNumber) === 1) {
+        if (moduleNumber === 1 || periodNumber === 1) {
             window.location.href = generateOrderLink;
             return;
         }
         $("#orders_generate_continue").attr("href", generateOrderLink);
-        let periodNumber = parseInt(period[period.length - 1]);
         if (periodNumber > 1) {
             periodNumber = periodNumber - 1;
             let previousDietPeriod = "Period" + periodNumber;
