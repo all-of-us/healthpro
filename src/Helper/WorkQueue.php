@@ -2110,6 +2110,14 @@ class WorkQueue
                     'Unknown' => 'UNKNOWN',
                     'Not Completed' => 'UNSET'
                 ]
+            ],
+            'pediatricStatus' => [
+                'label' => 'Pediatric Status',
+                'options' => [
+                    'View All' => '',
+                    'Pediatric Participant' => 'SUBMITTED',
+                    'Adult Participant' => 'UNSET'
+                ]
             ]
         ],
         'Consents' => [
