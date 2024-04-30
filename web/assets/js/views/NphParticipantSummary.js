@@ -62,9 +62,24 @@ $(document).ready(function () {
         let period = $(this).data("period");
         let periodNumber = parseInt(period[period.length - 1]);
         let generateOrderLink = $(this).attr("href");
-        if (moduleNumber === 1 || periodNumber === 1) {
+        let modelBodyText = $("#generate_order_in_complete_diet").html();
+        let currentDietStatus = $("#diet_period_status_" + moduleNumber + "_" + period).data("diet-period-status");
+        let showWarning = false;
+        if (moduleNumber === 1) {
             window.location.href = generateOrderLink;
             return;
+        }
+        if (periodNumber === 1) {
+            if (currentDietStatus === 'not_started') {
+                let module1Status = $("#diet_period_status_1_LMT").data("diet-period-status");
+                if (module1Status !== "in_progress_unfinalized_complete" && module1Status !== "in_progress_finalized_complete") {
+                    modelBodyText = $("#generate_order_in_complete_module").html();
+                    showWarning = true;
+                }
+            } else {
+                window.location.href = generateOrderLink;
+                return;
+            }
         }
         $("#orders_generate_continue").attr("href", generateOrderLink);
         if (periodNumber > 1) {
@@ -72,12 +87,17 @@ $(document).ready(function () {
             let previousDietPeriod = "Period" + periodNumber;
             let dietStatus = $("#diet_period_status_" + moduleNumber + "_" + previousDietPeriod).data("diet-period-status");
             if (dietStatus === 'in_progress_finalized' || dietStatus === 'in_progress_unfinalized') {
-                let modelSel = $("#generate_order_warning_message");
-                let modal = new bootstrap.Modal(modelSel);
-                modal.show();
+                showWarning = true;
             } else {
-               window.location.href = generateOrderLink;
+                window.location.href = generateOrderLink;
+                return;
             }
+        }
+        if (showWarning) {
+            let modelSel = $("#generate_order_warning_message");
+            modelSel.find(".modal-body").html(modelBodyText);
+            let modal = new bootstrap.Modal(modelSel);
+            modal.show();
         }
     });
 });
