@@ -19,10 +19,17 @@ class NphDietPeriodStatus
             'toolTipStatus' => 'complete_unfinalized'
         ],
         'in_progress_finalized_complete' => ['text' => 'Complete', 'textClass' => 'text-success', 'badgeClass' => 'bg-success'],
+        'error_next_module_started' => [
+            'text' => 'Error',
+            'textClass' => 'text-danger',
+            'badgeClass' => 'bg-danger',
+            'toolTipStatus' => 'error_next_module_started'
+        ],
     ];
 
     public static array $dietToolTipMessages = [
         'complete_unfinalized' => 'This diet period was marked complete with unfinalized samples. Uncheck the sample processing complete box to aliquot and finalize all samples. For any samples that cannot be finalized, please cancel the sample(s). Samples left unfinalized are at risk of disposal.',
-        'complete_unfinalized_1' => 'This module was marked complete with unfinalized samples. Uncheck the sample processing complete box to aliquot and finalize all samples. For any samples that cannot be finalized, please cancel the sample(s). Samples left unfinalized are at risk of disposal.'
+        'complete_unfinalized_1' => 'This module was marked complete with unfinalized samples. Uncheck the sample processing complete box to aliquot and finalize all samples. For any samples that cannot be finalized, please cancel the sample(s). Samples left unfinalized are at risk of disposal.',
+        'error_next_module_started_1' => 'This module has not been marked as complete, but the next module has already been started. Please finalize or cancel samples within this module and mark as complete. Samples left unfinalized are at risk of disposal'
     ];
 }

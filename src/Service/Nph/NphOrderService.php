@@ -986,6 +986,11 @@ class NphOrderService
             }
         }
 
+        if ($moduleDietPeriodsStatus[$module]['Period1'] !== 'not_started' && !str_contains
+            ($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+            $moduleDietPeriodsStatus[1]['LMT'] = 'error_next_module_started';
+        }
+
         return $moduleDietPeriodsStatus;
     }
 
