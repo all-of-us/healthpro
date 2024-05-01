@@ -9,21 +9,49 @@ class NphDietPeriodStatus
     public const IN_PROGRESS_FINALIZED_COMPLETE = 'in_progress_finalized_complete';
 
     public static array $dietPeriodStatusMap = [
-        'not_started' => ['text' => 'Not Started', 'textClass' => 'text-muted', 'badgeClass' => 'bg-secondary'],
-        'in_progress_unfinalized' => ['text' => 'In Progress', 'textClass' => 'text-warning-orange', 'badgeClass' => 'bg-warning-orange'],
-        'in_progress_finalized' => ['text' => 'In Progress', 'textClass' => 'text-warning-orange', 'badgeClass' => 'bg-warning-orange'],
+        'not_started' => [
+            'text' => 'Not Started',
+            'textClass' => 'text-muted',
+            'badgeClass' => 'bg-secondary',
+            'badgeIcon' => 'fa-minus-circle',
+            'statusIcon' => 'fa-minus-circle'
+        ],
+        'in_progress_unfinalized' => [
+            'text' => 'In Progress',
+            'textClass' => 'text-warning-orange',
+            'badgeClass' => 'bg-warning-orange',
+            'badgeIcon' => 'fa-sync-alt',
+            'statusIcon' => 'fa-sync-alt'
+        ],
+        'in_progress_finalized' => [
+            'text' => 'In Progress',
+            'textClass' => 'text-warning-orange',
+            'badgeClass' => 'bg-warning-orange',
+            'badgeIcon' => 'fa-sync-alt',
+            'statusIcon' => 'fa-sync-alt'
+        ],
         'in_progress_unfinalized_complete' => [
             'text' => 'Error',
             'textClass' => 'text-danger',
             'badgeClass' => 'bg-danger',
-            'toolTipStatus' => 'complete_unfinalized'
+            'toolTipStatus' => 'complete_unfinalized',
+            'badgeIcon' => 'fa-sync-alt',
+            'statusIcon' => 'fa-sync-alt-circle'
         ],
-        'in_progress_finalized_complete' => ['text' => 'Complete', 'textClass' => 'text-success', 'badgeClass' => 'bg-success'],
+        'in_progress_finalized_complete' => [
+            'text' => 'Complete',
+            'textClass' => 'text-success',
+            'badgeClass' => 'bg-success',
+            'badgeIcon' => 'fa-check-circle',
+            'statusIcon' => 'fa-check-circle'
+        ],
         'error_next_module_started' => [
             'text' => 'Error',
             'textClass' => 'text-danger',
             'badgeClass' => 'bg-danger',
-            'toolTipStatus' => 'error_next_module_started'
+            'toolTipStatus' => 'error_next_module_started',
+            'badgeIcon' => 'fa-times',
+            'statusIcon' => 'fa-times-circle'
         ],
     ];
 
