@@ -72,7 +72,7 @@ $(document).ready(function () {
         if (periodNumber === 1) {
             if (currentDietStatus === 'not_started') {
                 let module1Status = $("#diet_period_status_1_LMT").data("diet-period-status");
-                if (module1Status !== "in_progress_unfinalized_complete" && module1Status !== "in_progress_finalized_complete") {
+                if (module1Status !== "error_in_progress_unfinalized_complete" && module1Status !== "in_progress_finalized_complete") {
                     modelBodyText = $("#generate_order_in_complete_module").html();
                     showWarning = true;
                 }

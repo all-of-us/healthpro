@@ -986,9 +986,18 @@ class NphOrderService
             }
         }
 
-        if ($moduleDietPeriodsStatus[$module]['Period1'] !== 'not_started' && !str_contains
-            ($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+        if ($moduleDietPeriodsStatus[$module]['Period1'] !== 'not_started' &&
+            !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
             $moduleDietPeriodsStatus[1]['LMT'] = 'error_next_module_started';
+        }
+
+        for ($i = 1; $i <= 2; $i++) {
+            $currentPeriod = 'Period' . $i;
+            $nextPeriod = 'Period' . ($i + 1);
+            if (!str_contains($moduleDietPeriodsStatus[$module][$currentPeriod], 'complete') &&
+                $moduleDietPeriodsStatus[$module][$nextPeriod] !== 'not_started') {
+                $moduleDietPeriodsStatus[$module][$currentPeriod] = 'error_next_diet_started';
+            }
         }
 
         return $moduleDietPeriodsStatus;

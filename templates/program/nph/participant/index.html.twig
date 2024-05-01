@@ -200,11 +200,14 @@
                                                                 <div class="card-header collapse-carat" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
                                                                      role="button" style="font-weight: bold">
                                                                     {{ visit['visitDisplayName']}} Visit
-                                                                    {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
+                                                                    {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
                                                                         <a class="btn btn-primary btn-sm ms-2 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}"
                                                                            role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
+                                                                        {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
+                                                                            <span class="text-danger"><i class="fs-4 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
+                                                                        {% endif %}
                                                                     {% endif %}
                                                                 </div>
                                                                 <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
