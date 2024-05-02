@@ -213,11 +213,11 @@
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
                                                                         {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
-                                                                            <span class="text-danger"><i class="fs-4 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
+                                                                            <span class="text-danger generate-orders-status-icon"><i class="fs-4 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
                                                                         {% endif %}
                                                                     {% endif %}
                                                                 </div>
-                                                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
+                                                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="diet-visit-type collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
                                                                     <div class="row">
                                                                         {% if participant.dob %}
                                                                             <br>
@@ -305,7 +305,7 @@
                                                                                                                 href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
                                                                                                         ID: {{ orderid }}</a></span></div>
                                                                                                         <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
-                                                                                                        <div class="d-inline-block w-15 align-top">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
+                                                                                                        <div class="d-inline-block w-15 align-top diet-visit-status">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
                                                                                                         <div class="d-inline-block w-10 align-middle">
                                                                                                             {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                                                                 {% if not loop.first %}

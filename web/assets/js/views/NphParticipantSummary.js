@@ -70,9 +70,12 @@ $(document).ready(function () {
             return;
         }
         if (periodNumber === 1) {
-            if (currentDietStatus === 'not_started') {
+            if (currentDietStatus === "not_started") {
                 let module1Status = $("#diet_period_status_1_LMT").data("diet-period-status");
-                if (module1Status !== "error_in_progress_unfinalized_complete" && module1Status !== "in_progress_finalized_complete") {
+                if (
+                    module1Status !== "error_in_progress_unfinalized_complete" &&
+                    module1Status !== "in_progress_finalized_complete"
+                ) {
                     modelBodyText = $("#generate_order_in_complete_module").html();
                     showWarning = true;
                 }
@@ -85,8 +88,10 @@ $(document).ready(function () {
         if (periodNumber > 1) {
             periodNumber = periodNumber - 1;
             let previousDietPeriod = "Period" + periodNumber;
-            let dietStatus = $("#diet_period_status_" + moduleNumber + "_" + previousDietPeriod).data("diet-period-status");
-            if (dietStatus === 'in_progress_finalized' || dietStatus === 'in_progress_unfinalized') {
+            let dietStatus = $("#diet_period_status_" + moduleNumber + "_" + previousDietPeriod).data(
+                "diet-period-status"
+            );
+            if (dietStatus === "in_progress_finalized" || dietStatus === "in_progress_unfinalized") {
                 showWarning = true;
             } else {
                 window.location.href = generateOrderLink;
@@ -98,6 +103,21 @@ $(document).ready(function () {
             modelSel.find(".modal-body").html(modelBodyText);
             let modal = new bootstrap.Modal(modelSel);
             modal.show();
+        }
+    });
+
+    $(".generate-orders-button").each(function () {
+        let $parentCard = $(this).closest(".card");
+        let $badge = $parentCard.find(".diet-visit-status .badge");
+        if (
+            $badge.hasClass("bg-primary") ||
+            $badge.hasClass("bg-success") ||
+            $badge.hasClass("bg-warning") ||
+            $badge.hasClass("bg-secondary")
+        ) {
+            $(this).next(".generate-orders-status-icon").show();
+        } else {
+            $(this).next(".generate-orders-status-icon").hide();
         }
     });
 });
