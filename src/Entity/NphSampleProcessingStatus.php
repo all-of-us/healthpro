@@ -15,26 +15,26 @@ class NphSampleProcessingStatus
     private ?int $id = null;
 
     #[ORM\Column(length: 10)]
-    private ?string $module = null;
+    private string $module;
 
     #[ORM\Column(length: 10)]
-    private ?string $period = null;
+    private string $period;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private User $user;
 
     #[ORM\Column(length: 50)]
-    private ?string $site = null;
+    private string $site;
 
     #[ORM\Column(nullable: true)]
     private ?int $status = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $participantId = null;
+    private string $participantId;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $modifiedTs = null;
+    private \DateTimeInterface $modifiedTs;
 
     #[ORM\Column(nullable: true)]
     private ?int $modifiedTimezoneId = null;
@@ -56,7 +56,7 @@ class NphSampleProcessingStatus
         return $this;
     }
 
-    public function getPeriod(): ?string
+    public function getPeriod(): string
     {
         return $this->period;
     }
@@ -73,14 +73,14 @@ class NphSampleProcessingStatus
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getSite(): ?string
+    public function getSite(): string
     {
         return $this->site;
     }
@@ -104,7 +104,7 @@ class NphSampleProcessingStatus
         return $this;
     }
 
-    public function getParticipantId(): ?string
+    public function getParticipantId(): string
     {
         return $this->participantId;
     }
@@ -116,7 +116,7 @@ class NphSampleProcessingStatus
         return $this;
     }
 
-    public function getModifiedTs(): ?\DateTimeInterface
+    public function getModifiedTs(): \DateTimeInterface
     {
         return $this->modifiedTs;
     }
