@@ -79,6 +79,9 @@ class NphParticipantSummaryController extends BaseController
         if ($sampleProcessCompleteForm->isSubmitted() && $sampleProcessCompleteForm->isValid()) {
             $formData = $sampleProcessCompleteForm->getData();
             $nphOrderService->saveSampleProcessingStatus($participantId, $formData);
+            return $this->redirectToRoute('nph_participant_summary', [
+                'participantId' => $participantId
+            ]);
         }
         $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
         $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
