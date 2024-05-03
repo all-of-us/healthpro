@@ -129,7 +129,9 @@
                                                                         {% set disabled = 'disabled' %}
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                <a class="pt-0 pb-0 nav-link participant-diet-period {{ disabled}} {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">Diet {{ dietPeriod }}</a>
+                                                                <a class="pt-0 pb-0 nav-link text-dark font-bold participant-diet-period {{ disabled}} {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">
+                                                                    Diet {{ dietPeriod|replace({'Period': 'Period '}) }}
+                                                                </a>
                                                                 <span class="pt-0 fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriod] }}" id="diet_period_status_{{ moduleNumber }}_{{ dietPeriod }}">
                                                                     {{ dietPeriodStatus['text'] }}
                                                                 </span>
@@ -150,7 +152,7 @@
                                                         <div class="col-md-8 g-0">
                                                             {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                             <p class="text-lg-start">
-                                                                NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber }}</strong>
+                                                                NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber|replace({'Period': 'Period '}) }}</strong>
                                                                 {% set toolTipMessage = '' %}
                                                                 {% if dietPeriodStatus['toolTipStatus'] is defined %}
                                                                     {% if moduleNumber == 1 %}

@@ -946,6 +946,10 @@ table.table-samples td {
     background-color: #f8f9fa;
 }
 
+.participant-diet-period.active {
+    text-decoration: underline;
+}
+
 .w-15 {
     width: 15%;
 }
