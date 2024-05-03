@@ -171,7 +171,8 @@
                                                         </div>
                                                         {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::NOT_STARTED') %}
                                                             <div class="col-md-4">
-                                                                <div class="border border-secondary-subtle ps-1 pt-1">
+                                                                {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
+                                                                <div class="border border-secondary-subtle ps-1 pt-1 {{ dietPeriodStatus['dietCardClass']|default('') }}">
                                                                     <div class="form-check">
                                                                         {% set sampleChecked = '' %}
                                                                         {% for sampleProcessing in sampleProcessingStatusByModule %}
@@ -204,16 +205,17 @@
                                                                 {% set dlwDiet = false %}
                                                             {% endif %}
                                                             <div class="card mb-2 border-0">
-                                                                <div class="card-header" style="font-weight: bold">
-                                                                    {{ visit['visitDisplayName']}} Visit
+                                                                {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
+                                                                <div class="card-header {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
+                                                                    <span class="diet-visit-status-text">{{ visit['visitDisplayName']}} Visit</span>
                                                                     {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
                                                                         <a class="btn btn-primary btn-sm ms-2 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}"
                                                                            role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
-                                                                        {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
-                                                                            <span class="text-danger generate-orders-status-icon"><i class="fs-4 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
-                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                    {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
+                                                                        <span class="text-danger diet-visit-status-icon"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
                                                                     {% endif %}
                                                                     <span class="float-end collapse-carat" role="button" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"></span>
                                                                 </div>

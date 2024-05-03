@@ -106,7 +106,7 @@ $(document).ready(function () {
         }
     });
 
-    $(".generate-orders-button").each(function () {
+    $(".diet-visit-status-text").each(function () {
         let $parentCard = $(this).closest(".card");
         let $badge = $parentCard.find(".diet-visit-status .badge");
         if (
@@ -115,9 +115,9 @@ $(document).ready(function () {
             $badge.hasClass("bg-warning") ||
             $badge.hasClass("bg-secondary")
         ) {
-            $(this).next(".generate-orders-status-icon").show();
+            $(this).next(".diet-visit-status-icon").show();
         } else {
-            $(this).next(".generate-orders-status-icon").hide();
+            $(this).next(".diet-visit-status-icon").hide();
         }
     });
 });

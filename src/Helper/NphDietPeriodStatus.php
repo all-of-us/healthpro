@@ -6,7 +6,10 @@ class NphDietPeriodStatus
 {
     public const NOT_STARTED = 'not_started';
     public const ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE = 'error_in_progress_unfinalized_complete';
+    public const IN_PROGRESS_UNFINALIZED = 'in_progress_unfinalized';
+    public const IN_PROGRESS_FINALIZED = 'in_progress_finalized';
     public const IN_PROGRESS_FINALIZED_COMPLETE = 'in_progress_finalized_complete';
+    public const ERROR_NEXT_DIET_STARTED = 'error_next_diet_started';
     public const ERROR_NEXT_MODULE_STARTED = 'error_next_module_started';
 
     public static array $dietPeriodStatusMap = [
@@ -37,14 +40,16 @@ class NphDietPeriodStatus
             'badgeClass' => 'bg-danger',
             'toolTipStatus' => 'complete_unfinalized',
             'badgeIcon' => 'fa-times',
-            'statusIcon' => 'fa-times-circle'
+            'statusIcon' => 'fa-times-circle',
+            'dietCardClass' => 'bg-success-subtle'
         ],
         'in_progress_finalized_complete' => [
             'text' => 'Complete',
             'textClass' => 'text-success',
             'badgeClass' => 'bg-success',
             'badgeIcon' => 'fa-check-circle',
-            'statusIcon' => 'fa-check-circle'
+            'statusIcon' => 'fa-check-circle',
+            'dietCardClass' => 'bg-success-subtle'
         ],
         'error_next_diet_started' => [
             'text' => 'Error',
