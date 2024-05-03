@@ -205,6 +205,7 @@ class WorkQueueTest extends ServiceTestCase
                 'enrollmentStatusV3_2' => 'Participant Status',
                 'activityStatus' => 'Activity Status',
                 'patientStatus' => 'Patient Status',
+                'pediatricStatus' => 'Pediatric Status',
                 'consentForStudyEnrollment' => 'Primary Consent',
                 'questionnaireOnDnaProgram' => 'Program Update',
                 'consentForElectronicHealthRecords' => 'EHR Consent Status',
@@ -271,6 +272,12 @@ class WorkQueueTest extends ServiceTestCase
                             'NO_ACCESS' => 'No Access',
                             'UNKNOWN' => 'Unknown',
                             'UNSET' => 'Not Completed',
+                        ],
+                    'pediatricStatus' =>
+                        [
+                            '' => 'View All',
+                            'SUBMITTED' => 'Pediatric Participant',
+                            'UNSET' => 'Adult Participant',
                         ],
                     'consentForStudyEnrollment' =>
                         [
