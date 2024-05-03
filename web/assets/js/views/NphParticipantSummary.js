@@ -24,15 +24,15 @@ $(document).ready(function () {
         let modelBodyText = "<p>Are you sure you want to unmark the samples as processing complete?</p>";
         $("#nph_sample_process_complete_module").val(moduleNumber);
         $("#nph_sample_process_complete_period").val(visitType);
-        let modifyType = 'unfinalized';
-        if (dietStatus === 'in_progress_finalized') {
-            modifyType = 'finalized';
+        let modifyType = "unfinalized";
+        if (dietStatus === "in_progress_finalized") {
+            modifyType = "finalized";
         }
         $("#nph_sample_process_complete_modifyType").val(modifyType);
         if ($(this).is(":checked")) {
             processingComplete = 1;
             modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>";
-            if (dietStatus === "in_progress_unfinalized") {
+            if (dietStatus !== "in_progress_finalized") {
                 modelTitleText = "<span class='text-danger'>Warning!</span>";
                 let moduleId =
                     parseInt(moduleNumber) === 1
