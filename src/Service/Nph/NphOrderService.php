@@ -1008,6 +1008,22 @@ class NphOrderService
         return $moduleDietPeriodsStatus;
     }
 
+    public function canGenerateOrders(string $participantId, string $module, string $dietPeriod): bool
+    {
+        $moduleDietPeriodStatus = $this->getModuleDietPeriodsStatus($participantId, $module);
+
+        // Check if the previous diet period is Period1 or the diet is a module 1 diet
+        $isPreviousDietPeriodStarted = ($module === '1' || $dietPeriod === 'Period1');
+
+        if (!$isPreviousDietPeriodStarted) {
+            $previousDietPeriodStatus = $moduleDietPeriodStatus[$module][($dietPeriod == 'Period2') ? 'Period1' : 'Period2'];
+            $isPreviousDietPeriodStarted = ($previousDietPeriodStatus != NphDietPeriodStatus::NOT_STARTED);
+        }
+        $isSampleProcessingComplete = $this->em->getRepository(NphSampleProcessingStatus::class)->isSampleProcessingComplete($participantId, $module, $dietPeriod);
+        return $isPreviousDietPeriodStarted && !$isSampleProcessingComplete;
+    }
+
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
