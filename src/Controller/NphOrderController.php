@@ -7,7 +7,6 @@ use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
-use App\Entity\NphSampleProcessingStatus;
 use App\Form\DlwType;
 use App\Form\Nph\NphOrderCollect;
 use App\Form\Nph\NphOrderType;
