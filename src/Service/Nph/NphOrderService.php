@@ -924,18 +924,20 @@ class NphOrderService
         return $moduleStatusCount;
     }
 
-    public function saveSampleProcessingStatus(string $participantId, array $formData): void
+    public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData): void
     {
         $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
         if (!$nphSampleProcessingStatus) {
             $nphSampleProcessingStatus = new NphSampleProcessingStatus();
             $nphSampleProcessingStatus->setParticipantId($participantId);
+            $nphSampleProcessingStatus->setBiobankId($biobankId);
             $nphSampleProcessingStatus->setModule($formData['module']);
             $nphSampleProcessingStatus->setPeriod($formData['period']);
         }
         $nphSampleProcessingStatus->setUser($this->user);
         $nphSampleProcessingStatus->setSite($this->site);
         $nphSampleProcessingStatus->setStatus($formData['status']);
+        $nphSampleProcessingStatus->setModifyType($formData['modifyType']);
         $nphSampleProcessingStatus->setModifiedTs(new \DateTime());
         $nphSampleProcessingStatus->setModifiedTimezoneId($this->getTimezoneid());
         $this->em->persist($nphSampleProcessingStatus);

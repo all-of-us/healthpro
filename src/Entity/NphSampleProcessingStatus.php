@@ -33,6 +33,12 @@ class NphSampleProcessingStatus
     #[ORM\Column(length: 50)]
     private string $participantId;
 
+    #[ORM\Column(length: 50)]
+    private string $biobankId;
+
+    #[ORM\Column(length: 50)]
+    private string $modifyType;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $modifiedTs;
 
@@ -112,6 +118,30 @@ class NphSampleProcessingStatus
     public function setParticipantId(string $participantId): static
     {
         $this->participantId = $participantId;
+
+        return $this;
+    }
+
+    public function getBiobankId(): string
+    {
+        return $this->biobankId;
+    }
+
+    public function setBiobankId(string $biobankId): static
+    {
+        $this->biobankId = $biobankId;
+
+        return $this;
+    }
+
+    public function getModifyType(): string
+    {
+        return $this->modifyType;
+    }
+
+    public function setModifyType(string $modifyType): static
+    {
+        $this->modifyType = $modifyType;
 
         return $this;
     }

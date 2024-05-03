@@ -13,5 +13,6 @@ class NphSampleProcessCompleteType extends AbstractType
         $builder->add('status', Type\HiddenType::class);
         $builder->add('period', Type\HiddenType::class);
         $builder->add('module', Type\HiddenType::class);
+        $builder->add('modifyType', Type\HiddenType::class);
     }
 }
