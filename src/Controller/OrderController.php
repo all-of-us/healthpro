@@ -165,7 +165,7 @@ class OrderController extends BaseController
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                if ($session->get('siteType') !== 'dv' || (float) $params->get('order_samples_version') <= 3.1) {
+                if ($session->get('siteType') !== 'dv' || $this->siteService->isDiversionPouchSite() || (float) $params->get('order_samples_version') <= 3.1) {
                     $order->setVersion($order->getCurrentVersion());
                 }
                 $order->setAgeInMonths($participant->ageInMonths);
@@ -807,7 +807,7 @@ class OrderController extends BaseController
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
-            'dvSite' => $session->get('siteType') == 'dv',
+            'dvSite' => ($session->get('siteType') == 'dv' && !$this->siteService->isDiversionPouchSite()),
             'params' => $params
         ]);
     }
