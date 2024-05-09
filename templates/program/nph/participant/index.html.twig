@@ -190,8 +190,8 @@
                                                         {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
                                                             {% if dlwSummary[moduleNumber][VisitCode] %}
                                                                 <div class="col-md-3 well well-sm right-float">
-                                                                    <div class="col-sm-12 d-flex justify-content-center">
-                                                                        <a class="text-center btn dlw-collect-button mb-2" role="button"
+                                                                    <div class="col-sm-12 d-flex justify-content-center" {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="At least one DLW order must be generated to enter DLW Dosage information." {% endif %}>
+                                                                        <a class="text-center btn dlw-collect-button mb-2 {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} disabled {% endif %}" role="button"
                                                                            href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                             Enter DLW Dosage
                                                                         </a>
@@ -203,8 +203,8 @@
                                                             {% endif %}
                                                         {% elseif dlwDiet %}
                                                             <div class="col-md-3 well well-sm right-float">
-                                                                <div class="col-sm-12 d-flex justify-content-center">
-                                                                    <a class="text-center btn dlw-collect-button align-middle inline nowrap" role="button"
+                                                                <div class="col-sm-12 d-flex justify-content-center" {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="At least one DLW order must be generated to enter DLW Dosage information." {% endif %}>
+                                                                    <a class="text-center btn dlw-collect-button align-middle inline nowrap{% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} disabled {% endif %}" role="button"
                                                                        href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                         Enter DLW Dosage
                                                                     </a>

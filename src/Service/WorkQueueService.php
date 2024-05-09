@@ -216,6 +216,13 @@ class WorkQueueService
         if (!empty($params['patientStatus']) && !empty($params['siteOrganizationId'])) {
             $rdrParams['patientStatus'] = $params['siteOrganizationId'] . ':' . $params['patientStatus'];
         }
+        if (!empty($params['pediatricStatus'])) {
+            $pediatricStatus = $params['pediatricStatus'];
+            if ($params['pediatricStatus'] === 'SUBMITTED') {
+                $pediatricStatus = 1;
+            }
+            $rdrParams['isPediatric'] = $pediatricStatus;
+        }
 
         // Participant consents tab advanced filters
         if (!empty($params['consentForStudyEnrollment'])) {
