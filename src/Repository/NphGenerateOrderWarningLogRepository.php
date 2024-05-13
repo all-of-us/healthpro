@@ -33,18 +33,4 @@ class NphGenerateOrderWarningLogRepository extends ServiceEntityRepository
         ;
         return !empty($nphGenerateOrderWarningLog) ? $nphGenerateOrderWarningLog[0] : null;
     }
-
-    public function isWarningDisplayed(string $participantId, string $module, string $period): bool
-    {
-        $nphGenerateOrderWarningLog = $this->createQueryBuilder('n')
-            ->andWhere('n.participantId = :participantId')
-            ->andWhere('n.module = :module')
-            ->andWhere('n.period = :period')
-            ->andWhere('n.status = 1')
-            ->setParameters(['participantId' => $participantId, 'module' => $module, 'period' => $period])
-            ->getQuery()
-            ->getResult()
-        ;
-        return !empty($nphGenerateOrderWarningLog);
-    }
 }
