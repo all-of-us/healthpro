@@ -89,7 +89,6 @@ $(document).ready(function () {
                 return;
             }
         }
-        $("#orders_generate_continue").attr("href", generateOrderLink);
         if (periodNumber > 1) {
             periodNumber = periodNumber - 1;
             let previousDietPeriod = "Period" + periodNumber;
@@ -104,11 +103,18 @@ $(document).ready(function () {
             }
         }
         if (showWarning) {
+            $("#nph_generate_order_warning_log_module").val(moduleNumber);
+            $("#nph_generate_order_warning_log_period").val(period);
+            $("#nph_generate_order_warning_log_redirectLink").val(generateOrderLink);
             let modelSel = $("#generate_order_warning_message");
             modelSel.find(".modal-body").html(modelBodyText);
             let modal = new bootstrap.Modal(modelSel);
             modal.show();
         }
+    });
+
+    $("#orders_generate_continue").on("click", function () {
+        $('form[name="nph_generate_order_warning_log"]').submit();
     });
 
     $(".diet-visit-status-text").each(function () {

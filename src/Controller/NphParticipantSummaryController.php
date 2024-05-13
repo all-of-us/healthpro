@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\NphDlw;
 use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphCrossSiteAgreeType;
+use App\Form\Nph\NphGenerateOrderWarningLogType;
 use App\Form\Nph\NphSampleProcessCompleteType;
 use App\Helper\NphDietPeriodStatus;
 use App\Service\LoggerService;
@@ -85,12 +86,22 @@ class NphParticipantSummaryController extends BaseController
         }
         $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
         $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
+
+        $orderGenerateWarningLogForm = $this->createForm(NphGenerateOrderWarningLogType::class, null);
+        $orderGenerateWarningLogForm->handleRequest($request);
+        if ($orderGenerateWarningLogForm->isSubmitted() && $orderGenerateWarningLogForm->isValid()) {
+            $formData = $orderGenerateWarningLogForm->getData();
+            $nphOrderService->saveGenerateOrderWarningLog($participantId, $participant->biobankId, $formData);
+            return $this->redirect($formData['redirectLink']);
+        }
+
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
             'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
+            'orderGenerateWarningLogForm' => $orderGenerateWarningLogForm->createView(),
             'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
             'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
             'dietPeriodStatusMap' => NphDietPeriodStatus::$dietPeriodStatusMap,

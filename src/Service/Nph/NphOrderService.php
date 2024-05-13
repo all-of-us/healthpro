@@ -5,6 +5,7 @@ namespace App\Service\Nph;
 use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
+use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\NphSampleProcessingStatus;
@@ -1023,6 +1024,24 @@ class NphOrderService
         }
         $isSampleProcessingComplete = $this->em->getRepository(NphSampleProcessingStatus::class)->isSampleProcessingComplete($participantId, $module, $dietPeriod);
         return $isPreviousDietPeriodStarted && !$isSampleProcessingComplete;
+    }
+
+    public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData): void
+    {
+        $nphGenerateOrderWarningLog = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLog($participantId, $formData['module'], $formData['period']);
+        if (!$nphGenerateOrderWarningLog) {
+            $nphGenerateOrderWarningLog = new NphGenerateOrderWarningLog();
+            $nphGenerateOrderWarningLog->setParticipantId($participantId);
+            $nphGenerateOrderWarningLog->setBiobankId($biobankId);
+            $nphGenerateOrderWarningLog->setModule($formData['module']);
+            $nphGenerateOrderWarningLog->setPeriod($formData['period']);
+        }
+        $nphGenerateOrderWarningLog->setUser($this->user);
+        $nphGenerateOrderWarningLog->setSite($this->site);
+        $nphGenerateOrderWarningLog->setModifiedTs(new \DateTime());
+        $nphGenerateOrderWarningLog->setModifiedTimezoneId($this->getTimezoneid());
+        $this->em->persist($nphGenerateOrderWarningLog);
+        $this->em->flush();
     }
 
 
