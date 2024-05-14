@@ -1,0 +1,83 @@
+<div class="modal fade" tabindex="-1" id="sample_process_complete_modal" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm</h5>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="sample_process_go_back" data-bs-dismiss="modal">Go Back</button>
+                <button type="button" class="btn btn-primary" id="sample_process_complete_continue">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="sample_process_complete_unfinalized_message_1" style="display: none">
+    Warning! There are <span class="font-bold">unfinalized samples</span> within this module. Sample processing must be finalized or canceled before marking the module as complete.
+    <ul>
+        <li><span class="text-decoration-underline">Aliquot and finalize</span> all samples prior to marking complete.</li>
+        <li class="ms-4">This includes any samples that were collected during a downtime.</li>
+        <li>For any samples that cannot be finalized, please <span class="text-decoration-underline">cancel</span> the sample(s).</li>
+    </ul>
+    <hr>
+    <p class="font-bold">Continuing with unfinalized samples may be subject to auditing. Misuse of this functionality may be reported for re-education.</p>
+    <p>User Account: {{ app.user.email|default('') }}</p>
+    <p>Date: {{ "now"|date("m/d/Y") }}</p>
+</div>
+<div id="sample_process_complete_unfinalized_message" style="display: none">
+    Warning! There are <span class="font-bold">unfinalized samples</span> within this diet period. Sample processing must be finalized or canceled before marking the diet period as complete.
+    <ul>
+        <li><span class="text-decoration-underline">Aliquot and finalize</span> all samples prior to marking complete.</li>
+        <li class="ms-4">This includes any samples that were collected during a downtime.</li>
+        <li>For any samples that cannot be finalized, please <span class="text-decoration-underline">cancel</span> the sample(s).</li>
+    </ul>
+    <hr>
+    <p class="font-bold">Continuing with unfinalized samples may be subject to auditing. Misuse of this functionality may be reported for re-education.</p>
+    <p>User Account: {{ app.user.email|default('') }}</p>
+    <p>Date: {{ "now"|date("m/d/Y") }}</p>
+</div>
+<div class="modal fade" tabindex="-1" id="generate_order_warning_message" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Warning!</h5>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                <a type="button" class="btn btn-primary" id="orders_generate_continue" href="#">Continue</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="generate_order_in_complete_diet" style="display: none">
+    <span class="text-danger font-bold">The previous diet period has <span class="text-decoration-underline">not</span> been marked as complete. Sample processing must be finalized or canceled before marking the diet period as complete and proceeding to the next diet period. </span>
+    <ul>
+        <li><span class="text-decoration-underline">Aliquot and finalize</span> all samples prior to marking complete.</li>
+        <li class="ms-4">This includes any samples that were collected during a downtime.</li>
+        <li>For any samples that cannot be finalized, please <span class="text-decoration-underline">cancel</span> the sample(s).</li>
+    </ul>
+    <hr>
+    <p class="font-bold">Bypassing incomplete diet periods is subject to auditing. Misuse of this functionality may be reported for re-education</p>
+    <p>User Account: {{ app.user.email|default('') }}</p>
+    <p>Date: {{ "now"|date("m/d/Y") }}</p>
+</div>
+<div id="generate_order_in_complete_module" style="display: none">
+    <span class="text-danger font-bold">The previous module has <span class="text-decoration-underline">not</span> been marked as complete. Sample processing must be finalized or canceled before marking the module as complete and proceeding to the next module. </span>
+    <ul>
+        <li><span class="text-decoration-underline">Aliquot and finalize</span> all samples prior to marking complete.</li>
+        <li class="ms-4">This includes any samples that were collected during a downtime.</li>
+        <li>For any samples that cannot be finalized, please <span class="text-decoration-underline">cancel</span> the sample(s).</li>
+    </ul>
+    <hr>
+    <p class="font-bold">Bypassing incomplete diet periods is subject to auditing. Misuse of this functionality may be reported for re-education</p>
+    <p>User Account: {{ app.user.email|default('') }}</p>
+    <p>Date: {{ "now"|date("m/d/Y") }}</p>
+</div>
+{{ form_start(sampleProcessCompleteForm) }}
+{{ form_end(sampleProcessCompleteForm) }}
+
+{{ form_start(orderGenerateWarningLogForm) }}
+{{ form_end(orderGenerateWarningLogForm) }}

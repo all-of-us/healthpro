@@ -5,11 +5,15 @@ namespace App\Service\Nph;
 use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
+use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSampleProcessingStatus;
 use App\Entity\NphSite;
+use App\Entity\Order;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
+use App\Helper\NphDietPeriodStatus;
 use App\Helper\NphParticipant;
 use App\Service\LoggerService;
 use App\Service\RdrApiService;
@@ -920,6 +924,126 @@ class NphOrderService
         }
         return $moduleStatusCount;
     }
+
+    public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData): void
+    {
+        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
+        if (!$nphSampleProcessingStatus) {
+            $nphSampleProcessingStatus = new NphSampleProcessingStatus();
+            $nphSampleProcessingStatus->setParticipantId($participantId);
+            $nphSampleProcessingStatus->setBiobankId($biobankId);
+            $nphSampleProcessingStatus->setModule($formData['module']);
+            $nphSampleProcessingStatus->setPeriod($formData['period']);
+        }
+        $nphSampleProcessingStatus->setUser($this->user);
+        $nphSampleProcessingStatus->setSite($this->site);
+        $nphSampleProcessingStatus->setStatus($formData['status']);
+        $nphSampleProcessingStatus->setModifyType($formData['modifyType']);
+        $nphSampleProcessingStatus->setModifiedTs(new \DateTime());
+        $nphSampleProcessingStatus->setModifiedTimezoneId($this->getTimezoneid());
+        $this->em->persist($nphSampleProcessingStatus);
+        $this->em->flush();
+    }
+
+    public function getModuleDietPeriodsStatus(string $participantId): array
+    {
+        $moduleDietPeriodsStatus = [
+            1 => ['LMT' => 'not_started'],
+            2 => ['Period1' => 'not_started',
+                'Period2' => 'not_started',
+                'Period3' => 'not_started'],
+            3 => ['Period1' => 'not_started',
+                'Period2' => 'not_started',
+                'Period3' => 'not_started'],
+        ];
+        $orderSamplesByModule = $this->em->getRepository(NphOrder::class)->getOrderSamplesByModule($participantId);
+        foreach ($moduleDietPeriodsStatus as $module => $dietPeriodsStatus) {
+            foreach (array_keys($dietPeriodsStatus) as $dietPeriod) {
+                foreach ($orderSamplesByModule as $orderSample) {
+                    if ($module == $orderSample['module'] && $dietPeriod === substr(
+                        $orderSample['visitPeriod'],
+                        0,
+                        7
+                    )) {
+                        if ($orderSample['finalizedTs'] === null && $orderSample['modifyType'] !== 'cancel') {
+                            $moduleDietPeriodsStatus[$module][$dietPeriod] = NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED;
+                            break;
+                        }
+                        if ($orderSample['finalizedTs'] !== null || $orderSample['modifyType'] === 'cancel') {
+                            $moduleDietPeriodsStatus[$module][$dietPeriod] = NphDietPeriodStatus::IN_PROGRESS_FINALIZED;
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($moduleDietPeriodsStatus as $module => $moduleDietPeriods) {
+            foreach ($moduleDietPeriods as $period => $moduleDietStatus) {
+                $dietCompleteStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->findOneBy([
+                    'participantId' => $participantId,
+                    'module' => $module,
+                    'period' => $period,
+                    'status' => 1
+                ]);
+                if ($dietCompleteStatus) {
+                    if ($moduleDietStatus === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
+                        $moduleDietPeriodsStatus[$module][$period] = 'error_' . $moduleDietStatus . '_complete';
+                    } else {
+                        $moduleDietPeriodsStatus[$module][$period] = $moduleDietStatus . '_complete';
+                    }
+                }
+            }
+        }
+
+        if ($moduleDietPeriodsStatus[$module]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
+            !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+            $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
+        }
+
+        for ($i = 1; $i <= 2; $i++) {
+            $currentPeriod = 'Period' . $i;
+            $nextPeriod = 'Period' . ($i + 1);
+            if (!str_contains($moduleDietPeriodsStatus[$module][$currentPeriod], 'complete') &&
+                $moduleDietPeriodsStatus[$module][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
+                $moduleDietPeriodsStatus[$module][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+            }
+        }
+
+        return $moduleDietPeriodsStatus;
+    }
+
+    public function canGenerateOrders(string $participantId, string $module, string $dietPeriod): bool
+    {
+        $moduleDietPeriodStatus = $this->getModuleDietPeriodsStatus($participantId);
+
+        // Check if the previous diet period is Period1 or the diet is a module 1 diet
+        $isPreviousDietPeriodStarted = ($module === '1' || $dietPeriod === 'Period1');
+
+        if (!$isPreviousDietPeriodStarted) {
+            $previousDietPeriodStatus = $moduleDietPeriodStatus[$module][($dietPeriod == 'Period2') ? 'Period1' : 'Period2'];
+            $isPreviousDietPeriodStarted = ($previousDietPeriodStatus != NphDietPeriodStatus::NOT_STARTED);
+        }
+        $isSampleProcessingComplete = $this->em->getRepository(NphSampleProcessingStatus::class)->isSampleProcessingComplete($participantId, $module, $dietPeriod);
+        return $isPreviousDietPeriodStarted && !$isSampleProcessingComplete;
+    }
+
+    public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData): void
+    {
+        $nphGenerateOrderWarningLog = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLog($participantId, $formData['module'], $formData['period']);
+        if (!$nphGenerateOrderWarningLog) {
+            $nphGenerateOrderWarningLog = new NphGenerateOrderWarningLog();
+            $nphGenerateOrderWarningLog->setParticipantId($participantId);
+            $nphGenerateOrderWarningLog->setBiobankId($biobankId);
+            $nphGenerateOrderWarningLog->setModule($formData['module']);
+            $nphGenerateOrderWarningLog->setPeriod($formData['period']);
+        }
+        $nphGenerateOrderWarningLog->setUser($this->user);
+        $nphGenerateOrderWarningLog->setSite($this->site);
+        $nphGenerateOrderWarningLog->setModifiedTs(new \DateTime());
+        $nphGenerateOrderWarningLog->setModifiedTimezoneId($this->getTimezoneid());
+        $this->em->persist($nphGenerateOrderWarningLog);
+        $this->em->flush();
+    }
+
 
     private function generateOrderSummaryArray(array $nphOrder): array
     {
