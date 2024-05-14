@@ -211,7 +211,13 @@
                                                                 <div class="card-header {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
                                                                     <span class="diet-visit-status-text">{{ visit['visitDisplayName']}} Visit</span>
                                                                     {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
-                                                                        <a class="btn btn-primary btn-sm ms-2 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}"
+                                                                        {% set warningDisplayed = 0 %}
+                                                                        {% for generateOrderWarningLog in generateOrderWarningLogByModule %}
+                                                                            {% if generateOrderWarningLog.period ==  dietPeriodNumber %}
+                                                                                {% set warningDisplayed = 1 %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <a class="btn btn-primary btn-sm ms-2 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}" data-warning-displayed="{{ warningDisplayed }}"
                                                                            role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>

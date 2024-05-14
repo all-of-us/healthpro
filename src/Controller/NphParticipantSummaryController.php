@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Audit\Log;
 use App\Entity\NphDlw;
+use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Form\Nph\NphGenerateOrderWarningLogType;
@@ -85,7 +86,7 @@ class NphParticipantSummaryController extends BaseController
             ]);
         }
         $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
-        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId);
 
         $orderGenerateWarningLogForm = $this->createForm(NphGenerateOrderWarningLogType::class, null);
         $orderGenerateWarningLogForm->handleRequest($request);
@@ -94,6 +95,8 @@ class NphParticipantSummaryController extends BaseController
             $nphOrderService->saveGenerateOrderWarningLog($participantId, $participant->biobankId, $formData);
             return $this->redirect($formData['redirectLink']);
         }
+        $generateOrderWarningLogByModule = $this->em->getRepository(NphGenerateOrderWarningLog::class)
+            ->getGenerateOrderWarningLogByModule($participantId);
 
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
@@ -103,6 +106,7 @@ class NphParticipantSummaryController extends BaseController
             'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
             'orderGenerateWarningLogForm' => $orderGenerateWarningLogForm->createView(),
             'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
+            'generateOrderWarningLogByModule' => $generateOrderWarningLogByModule,
             'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
             'dietPeriodStatusMap' => NphDietPeriodStatus::$dietPeriodStatusMap,
             'dietToolTipMessages' => NphDietPeriodStatus::$dietToolTipMessages,
