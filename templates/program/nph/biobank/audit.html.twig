@@ -44,7 +44,7 @@
                 <td data-order="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
                     {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
                 </td>
-                <td>{{ sample.IncompleteSamples }} Samples Incomplete {% if sample.status == 0 and sample.previousStatus == 1 %}Corrected{% else %}Bypassed{% endif %}</td>
+                <td>{{ sample.IncompleteSamples }} Samples Incomplete {% if sample.status == 0 and sample.previousStatus == 1 %}<label class="label label-success">Corrected</label>{% else %}<label class="label label-danger">Bypassed</label>{% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>
