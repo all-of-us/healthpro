@@ -79,7 +79,7 @@ class NphParticipantSummaryController extends BaseController
         $sampleProcessCompleteForm->handleRequest($request);
         if ($sampleProcessCompleteForm->isSubmitted() && $sampleProcessCompleteForm->isValid()) {
             $formData = $sampleProcessCompleteForm->getData();
-            $nphOrderService->saveSampleProcessingStatus($participantId, $participant->biobankId, $formData);
+            $nphOrderService->saveSampleProcessingStatus($participantId, $participant->biobankId, $formData, $sampleStatusCounts);
             return $this->redirectToRoute('nph_participant_summary', [
                 'participantId' => $participantId
             ]);

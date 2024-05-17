@@ -925,22 +925,20 @@ class NphOrderService
         return $moduleStatusCount;
     }
 
-    public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData): void
+    public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
     {
-        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
-        if (!$nphSampleProcessingStatus) {
-            $nphSampleProcessingStatus = new NphSampleProcessingStatus();
-            $nphSampleProcessingStatus->setParticipantId($participantId);
-            $nphSampleProcessingStatus->setBiobankId($biobankId);
-            $nphSampleProcessingStatus->setModule($formData['module']);
-            $nphSampleProcessingStatus->setPeriod($formData['period']);
-        }
+        $nphSampleProcessingStatus = new NphSampleProcessingStatus();
+        $nphSampleProcessingStatus->setParticipantId($participantId);
+        $nphSampleProcessingStatus->setBiobankId($biobankId);
+        $nphSampleProcessingStatus->setModule($formData['module']);
+        $nphSampleProcessingStatus->setPeriod($formData['period']);
         $nphSampleProcessingStatus->setUser($this->user);
         $nphSampleProcessingStatus->setSite($this->site);
         $nphSampleProcessingStatus->setStatus($formData['status']);
         $nphSampleProcessingStatus->setModifyType($formData['modifyType']);
         $nphSampleProcessingStatus->setModifiedTs(new \DateTime());
         $nphSampleProcessingStatus->setModifiedTimezoneId($this->getTimezoneid());
+        $nphSampleProcessingStatus->setIncompleteSamples($sampleStatusCounts[$formData['module']]['active']);
         $this->em->persist($nphSampleProcessingStatus);
         $this->em->flush();
     }
@@ -983,7 +981,7 @@ class NphOrderService
                     'module' => $module,
                     'period' => $period,
                     'status' => 1
-                ]);
+                ], ['modifiedTs' => 'DESC']);
                 if ($dietCompleteStatus) {
                     if ($moduleDietStatus === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
                         $moduleDietPeriodsStatus[$module][$period] = 'error_' . $moduleDietStatus . '_complete';

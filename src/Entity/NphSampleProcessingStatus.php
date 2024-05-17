@@ -45,6 +45,9 @@ class NphSampleProcessingStatus
     #[ORM\Column(nullable: true)]
     private ?int $modifiedTimezoneId = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $IncompleteSamples = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -166,6 +169,18 @@ class NphSampleProcessingStatus
     public function setModifiedTimezoneId(?int $modifiedTimezoneId): static
     {
         $this->modifiedTimezoneId = $modifiedTimezoneId;
+
+        return $this;
+    }
+
+    public function getIncompleteSamples(): ?int
+    {
+        return $this->IncompleteSamples;
+    }
+
+    public function setIncompleteSamples(?int $IncompleteSamples): static
+    {
+        $this->IncompleteSamples = $IncompleteSamples;
 
         return $this;
     }
