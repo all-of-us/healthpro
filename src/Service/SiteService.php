@@ -455,7 +455,11 @@ class SiteService
             (in_array('ROLE_NPH_ADMIN', $user->getRoles()) && $user->getSites()) ||
             (
                 in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_NPH_ADMIN', $user->getRoles())
-            )
+            ) ||
+            (in_array('ROLE_BIOBANK', $user->getRoles()) && $user->getNphSites()) ||
+            (in_array('ROLE_NPH_BIOBANK', $user->getRoles()) && $user->getSites()) ||
+            (in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles())) ||
+            (in_array('ROLE_NPH_ADMIN', $user->getRoles()) && in_array('ROLE_BIOBANK', $user->getRoles()))
         );
     }
 }
