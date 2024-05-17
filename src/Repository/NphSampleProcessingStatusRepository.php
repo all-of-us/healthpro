@@ -57,4 +57,16 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
         ;
         return !empty($nphSampleProcessingStatus);
     }
+
+    public function getAuditReport(?\DateTime $startDate, ?\DateTime $endDate): array
+    {
+        $nphSampleProcessingStatus = $this->createQueryBuilder('n');
+        if ($startDate && $endDate) {
+            $nphSampleProcessingStatus->andWhere('n.modifiedTs >= :startDate')
+                ->andWhere('n.modifiedTs <= :endDate')
+                ->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
+        }
+        $nphSampleProcessingStatus = $nphSampleProcessingStatus->getQuery()->getResult();
+        return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus : [];
+    }
 }

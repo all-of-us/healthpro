@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\NphAliquot;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
@@ -111,6 +112,27 @@ class NphBiobankController extends BaseController
             'samples' => $samples
         ]);
     }
+    #[Route(path: '/review/orders/audit', name: 'nph_biobank_orders_audit')]
+    public function auditAction(Request $request): Response
+    {
+        [$startDate, $endDate, $displayMessage, $todayFilterForm] = $this->getDateRangeFilterForm($request);
+        if ($todayFilterForm->isSubmitted()) {
+            if (!$todayFilterForm->isValid()) {
+                $todayFilterForm->addError(new FormError('Please correct the errors below'));
+                return $this->render('program/nph/biobank/audit.html.twig', [
+                    'samples' => [],
+                    'todayFilterForm' => $todayFilterForm->createView(),
+                    'displayMessage' => $displayMessage
+                ]);
+            }
+        }
+        $samples = $this->em->getRepository(NphSampleProcessingStatus::class)->getAuditReport($startDate, $endDate);
+        return $this->render('program/nph/biobank/audit.html.twig', [
+            'samples' => $samples,
+            'todayFilterForm' => $todayFilterForm->createView(),
+            'displayMessage' => $displayMessage
+        ]);
+    }
 
     #[Route(path: '/review/orders/unfinalized', name: 'nph_biobank_orders_unfinalized')]
     public function ordersUnfinalizedAction(): Response
@@ -143,27 +165,11 @@ class NphBiobankController extends BaseController
     #[Route(path: '/review/orders/downtime', name: 'nph_biobank_orders_downtime')]
     public function ordersDowntimeAction(Request $request): Response
     {
-        $displayMessage = null;
         $userTimeZone = $this->getSecurityUser()->getTimeZone();
         $todayFilterForm = $this->createForm(ReviewTodayFilterType::class, null, ['timezone' => $userTimeZone]);
         $todayFilterForm->handleRequest($request);
-        $startDate = $endDate = null;
+        [$startDate, $endDate, $displayMessage, $todayFilterForm] = $this->getDateRangeFilterForm($request);
         if ($todayFilterForm->isSubmitted()) {
-            if ($todayFilterForm->isValid()) {
-                $startDate = $todayFilterForm->get('start_date')->getData();
-                $displayMessage = "Displaying results for {$startDate->format('m/d/Y')}";
-                if ($todayFilterForm->get('end_date')->getData()) {
-                    $endDate = $todayFilterForm->get('end_date')->getData();
-                    $endDate->setTime(23, 59, 59);
-                    if ($startDate->diff($endDate)->days >= ReviewTodayFilterType::DATE_RANGE_LIMIT) {
-                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 30 days'));
-                    }
-                    $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
-                } else {
-                    $endDate = clone $startDate;
-                    $endDate->modify('+1 day');
-                }
-            }
             if (!$todayFilterForm->isValid()) {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
                 return $this->render('program/nph/biobank/orders-downtime.html.twig', [
@@ -392,5 +398,32 @@ class NphBiobankController extends BaseController
             'isFormDisabled' => $isFormDisabled,
             'visitDiet' => $nphOrderService->getVisitDiet()
         ]);
+    }
+
+    private function getDateRangeFilterForm(Request $request): array
+    {
+        $userTimeZone = $this->getSecurityUser()->getTimeZone();
+        $todayFilterForm = $this->createForm(ReviewTodayFilterType::class, null, ['timezone' => $userTimeZone]);
+        $todayFilterForm->handleRequest($request);
+        $startDate = $endDate = null;
+        $displayMessage = null;
+        if ($todayFilterForm->isSubmitted()) {
+            if ($todayFilterForm->isValid()) {
+                $startDate = $todayFilterForm->get('start_date')->getData();
+                $displayMessage = "Displaying results for {$startDate->format('m/d/Y')}";
+                if ($todayFilterForm->get('end_date')->getData()) {
+                    $endDate = $todayFilterForm->get('end_date')->getData();
+                    $endDate->setTime(23, 59, 59);
+                    if ($startDate->diff($endDate)->days >= ReviewTodayFilterType::DATE_RANGE_LIMIT) {
+                        $todayFilterForm['start_date']->addError(new FormError('Date range cannot be more than 30 days'));
+                    }
+                    $displayMessage = "Displaying results from {$startDate->format('m/d/Y')} through {$endDate->format('m/d/Y')}";
+                } else {
+                    $endDate = clone $startDate;
+                    $endDate->modify('+1 day');
+                }
+            }
+        }
+        return [$startDate, $endDate, $displayMessage, $todayFilterForm];
     }
 }
