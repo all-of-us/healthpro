@@ -40,7 +40,11 @@
                 <td>{{ sample.user.email }}</td>
                 <td>{{ sample.module }}</td>
                 <td>{{ sample.period }}</td>
-                <td>{{ sample.modifyType }}</td>
+                <td>{% if sample.modifyType == 'unfinalized' %}
+                    Diet Period marked complete before all samples finalized or cancelled.
+                {% else %}
+                    Diet Period left incomplete and started next diet period.
+                {% endif %}</td>
                 <td data-order="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
                     {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
                 </td>
