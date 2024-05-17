@@ -48,6 +48,9 @@ class NphSampleProcessingStatus
     #[ORM\Column(nullable: true)]
     private ?int $IncompleteSamples = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $PreviousStatus = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -181,6 +184,18 @@ class NphSampleProcessingStatus
     public function setIncompleteSamples(?int $IncompleteSamples): static
     {
         $this->IncompleteSamples = $IncompleteSamples;
+
+        return $this;
+    }
+
+    public function getPreviousStatus(): ?int
+    {
+        return $this->PreviousStatus;
+    }
+
+    public function setPreviousStatus(?int $PreviousStatus): static
+    {
+        $this->PreviousStatus = $PreviousStatus;
 
         return $this;
     }

@@ -36,30 +36,9 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
 
     public function getSampleProcessingStatusByModule(string $participantId): ?array
     {
-        $moduleAndTimestamps = $this->createQueryBuilder('n')
-            ->select('n.module, max(n.modifiedTs) as timestamp, n.period')
-            ->andWhere('n.participantId = :participantId')
-            ->setParameter('participantId', $participantId)
-            ->groupBy('n.module, n.period')
-            ->getQuery()
-            ->getResult();
-        $modules = [];
-        $timestamps = [];
-        $periods = [];
-        foreach ($moduleAndTimestamps as $moduleAndTimestamp) {
-            $modules[] = $moduleAndTimestamp['module'];
-            $timestamps[] = $moduleAndTimestamp['timestamp'];
-            $periods[] = $moduleAndTimestamp['period'];
-        }
         $nphSampleProcessingStatus = $this->createQueryBuilder('n')
             ->andWhere('n.participantId = :participantId')
-            ->andWhere('n.module IN (:modules)')
-            ->andWhere('n.modifiedTs IN (:timestamps)')
-            ->andWhere('n.period IN (:periods)')
             ->setParameter('participantId', $participantId)
-            ->setParameter('modules', $modules)
-            ->setParameter('timestamps', $timestamps)
-            ->setParameter('periods', $periods)
             ->getQuery()
             ->getResult();
         return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus : null;
@@ -71,8 +50,6 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
             ->andWhere('n.participantId = :participantId')
             ->andWhere('n.module = :module')
             ->andWhere('n.period = :period')
-            ->andWhere('n.status = 1')
-            ->orderBy(n.modifiedTs, 'DESC')
             ->setMaxResults(1)
             ->setParameters(['participantId' => $participantId, 'module' => $module, 'period' => $period])
             ->getQuery()

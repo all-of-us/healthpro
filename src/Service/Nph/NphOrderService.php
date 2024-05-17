@@ -927,11 +927,16 @@ class NphOrderService
 
     public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
     {
-        $nphSampleProcessingStatus = new NphSampleProcessingStatus();
-        $nphSampleProcessingStatus->setParticipantId($participantId);
-        $nphSampleProcessingStatus->setBiobankId($biobankId);
-        $nphSampleProcessingStatus->setModule($formData['module']);
-        $nphSampleProcessingStatus->setPeriod($formData['period']);
+        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
+        if (!$nphSampleProcessingStatus) {
+            $nphSampleProcessingStatus = new NphSampleProcessingStatus();
+            $nphSampleProcessingStatus->setParticipantId($participantId);
+            $nphSampleProcessingStatus->setBiobankId($biobankId);
+            $nphSampleProcessingStatus->setModule($formData['module']);
+            $nphSampleProcessingStatus->setPeriod($formData['period']);
+        } else {
+            $nphSampleProcessingStatus->setPreviousStatus($nphSampleProcessingStatus->getStatus());
+        }
         $nphSampleProcessingStatus->setUser($this->user);
         $nphSampleProcessingStatus->setSite($this->site);
         $nphSampleProcessingStatus->setStatus($formData['status']);
