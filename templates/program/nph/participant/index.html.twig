@@ -98,7 +98,7 @@
                             {% endif %}
                             <div class="tab-pane fade ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                                 <div class="row">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-2 pe-0">
                                         <ul class="nav flex-column">
                                             {% if moduleNumber == 1 %}
                                                 <li class="nav-item">
@@ -107,7 +107,7 @@
                                                         <div class="col-sm-2">
                                                             <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
                                                         </div>
-                                                        <div class="col-sm-10">
+                                                        <div class="col-sm-10 ps-0">
                                                             <a class="pt-0 pb-0 nav-link text-dark font-bold participant-diet-period active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#LMT" data-period="LMT" role="tab">Module 1</a>
                                                             <span class="fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber]['LMT'] }}" id="diet_period_status_{{ moduleNumber }}_LMT">{{ dietPeriodStatus['text'] }}</span>
                                                         </div>
@@ -121,7 +121,7 @@
                                                             <div class="col-sm-2">
                                                                 <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
                                                             </div>
-                                                            <div class="col-sm-10">
+                                                            <div class="col-sm-10 ps-0">
                                                                 {% set disabled = '' %}
                                                                 {% if dietPeriod != 'Period1' %}
                                                                     {% set previousDietPeriodStatus = moduleDietPeriodsStatus[moduleNumber][dietPeriod == 'Period2' ? 'Period1' : 'Period2'] %}
@@ -142,7 +142,7 @@
                                             {% endif %}
                                         </ul>
                                     </div>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-10 ps-0">
                                         <a class="float-end badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
                                         {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
                                         <div class="tab-content" id="myTabContent">
@@ -161,7 +161,7 @@
                                                                         {% set toolTipMessage = dietToolTipMessages[dietPeriodStatus['toolTipStatus']] %}
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                <span class="badge fs-6 {{ dietPeriodStatus['badgeClass'] }}"
+                                                                <span class="badge fs-8 {{ dietPeriodStatus['badgeClass'] }}"
                                                                     {% if toolTipMessage %} data-bs-toggle="tooltip" title="{{ toolTipMessage }}" {% endif %}>
                                                                     <i class="fa {{ dietPeriodStatus['badgeIcon'] }}"></i>
                                                                     {{ dietPeriodStatus['text'] }}
@@ -206,7 +206,7 @@
                                                                 {% set textDivSize = 'col-md-12' %}
                                                                 {% set dlwDiet = false %}
                                                             {% endif %}
-                                                            <div class="card mb-2 border-0">
+                                                            <div class="card mb-2">
                                                                 {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                                 <div class="card-header {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
                                                                     <span class="diet-visit-status-text">{{ visit['visitDisplayName']}} Visit</span>
