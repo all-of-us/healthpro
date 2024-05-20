@@ -943,7 +943,9 @@ class NphOrderService
         $nphSampleProcessingStatus->setModifyType($formData['modifyType']);
         $nphSampleProcessingStatus->setModifiedTs(new \DateTime());
         $nphSampleProcessingStatus->setModifiedTimezoneId($this->getTimezoneid());
-        $nphSampleProcessingStatus->setIncompleteSamples($sampleStatusCounts[$formData['module']]['active'] - $sampleStatusCounts[$formData['module']]['Finalized']);
+        $finalizedCount = isset($sampleStatusCounts[$formData['module']]['Finalized']) ? $sampleStatusCounts[$formData['module']]['Finalized'] : 0;
+        $activeCount = isset($sampleStatusCounts[$formData['module']]['active']) ? $sampleStatusCounts[$formData['module']]['active'] : 0;
+        $nphSampleProcessingStatus->setIncompleteSamples(max(0, $activeCount - $finalizedCount));
         $this->em->persist($nphSampleProcessingStatus);
         $this->em->flush();
     }
