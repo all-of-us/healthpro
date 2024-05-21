@@ -225,9 +225,15 @@
                                                                     {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
                                                                         <span class="text-danger diet-visit-status-icon"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
                                                                     {% endif %}
-                                                                    <span class="float-end collapse-carat collapsed fs-4" role="button" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"></span>
+                                                                    {% set sampleProcessingComplete = false %}
+                                                                    {% for sampleProcessing in sampleProcessingStatusByModule %}
+                                                                        {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
+                                                                            {% set sampleProcessingComplete = true %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                    <span class="float-end collapse-carat {% if sampleProcessingComplete %} collapsed {% endif %} fs-4" role="button" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"></span>
                                                                 </div>
-                                                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="diet-visit-type collapse card-body accordion-collapse">
+                                                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="diet-visit-type {% if sampleProcessingComplete %} collapse {% else %} show {% endif %} card-body accordion-collapse">
                                                                     <div class="row">
                                                                         {% if participant.dob %}
                                                                             <br>
