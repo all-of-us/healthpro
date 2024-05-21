@@ -162,7 +162,7 @@ div.order-row {
 .dlw-collect-bg {
     background-color: #fde8ca;
 }
-.dlw-collect-button {
+.dlw-collect-button, .dlw-collect-button:hover {
     background-color: #ff8813;
     color: white;
 }
@@ -226,4 +226,8 @@ div.order-row {
     max-height: 350px;
     display: block;
     overflow: auto
+}
+.col-sm-1-5 {
+    flex: 0 0 auto;
+    max-width: 13.5%;
 }
