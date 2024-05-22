@@ -174,14 +174,14 @@
                                                         {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::NOT_STARTED') %}
                                                             <div class="col-md-4">
                                                                 {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
-                                                                <div class="border border-secondary-subtle ps-1 pt-1 {{ dietPeriodStatus['dietCardClass']|default('') }}">
+                                                                {% set sampleChecked = '' %}
+                                                                {% for sampleProcessing in sampleProcessingStatusByModule %}
+                                                                    {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
+                                                                        {% set sampleChecked = 'checked' %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <div class="border {% if sampleChecked %} border-success {% else %} border-secondary-subtle {% endif %} ps-1 pt-1 {{ dietPeriodStatus['dietCardClass']|default('') }} sample-process-check-box">
                                                                     <div class="form-check">
-                                                                        {% set sampleChecked = '' %}
-                                                                        {% for sampleProcessing in sampleProcessingStatusByModule %}
-                                                                            {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
-                                                                                {% set sampleChecked = 'checked' %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
                                                                         <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
                                                                                data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
                                                                         <label class="form-check-label" for="flexCheckDefault">

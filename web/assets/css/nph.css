@@ -163,8 +163,8 @@ div.order-row {
     background-color: #fde8ca;
 }
 .dlw-collect-button, .dlw-collect-button:hover {
-    background-color: #ff8813;
-    color: white;
+    background-color: #ff8813 !important;
+    color: white !important;
 }
 .dlw-collect-text {
     margin-top: 8px;
@@ -230,4 +230,7 @@ div.order-row {
 .col-sm-1-5 {
     flex: 0 0 auto;
     max-width: 13.5%;
+}
+.sample-process-check-box {
+    width: 224px;
 }
