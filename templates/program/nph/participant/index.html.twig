@@ -98,7 +98,7 @@
                             {% endif %}
                             <div class="tab-pane fade ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                                 <div class="row">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-1-5 pe-0 border-end border-dark-subtle me-2">
                                         <ul class="nav flex-column">
                                             {% if moduleNumber == 1 %}
                                                 <li class="nav-item">
@@ -107,7 +107,7 @@
                                                         <div class="col-sm-2">
                                                             <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
                                                         </div>
-                                                        <div class="col-sm-10">
+                                                        <div class="col-sm-10 ps-0">
                                                             <a class="pt-0 pb-0 nav-link text-dark font-bold participant-diet-period active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#LMT" data-period="LMT" role="tab">Module 1</a>
                                                             <span class="fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber]['LMT'] }}" id="diet_period_status_{{ moduleNumber }}_LMT">{{ dietPeriodStatus['text'] }}</span>
                                                         </div>
@@ -121,7 +121,7 @@
                                                             <div class="col-sm-2">
                                                                 <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
                                                             </div>
-                                                            <div class="col-sm-10">
+                                                            <div class="col-sm-10 ps-0">
                                                                 {% set disabled = '' %}
                                                                 {% if dietPeriod != 'Period1' %}
                                                                     {% set previousDietPeriodStatus = moduleDietPeriodsStatus[moduleNumber][dietPeriod == 'Period2' ? 'Period1' : 'Period2'] %}
@@ -142,7 +142,7 @@
                                             {% endif %}
                                         </ul>
                                     </div>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-10 ps-0">
                                         <a class="float-end badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
                                         {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
                                         <div class="tab-content" id="myTabContent">
@@ -161,7 +161,7 @@
                                                                         {% set toolTipMessage = dietToolTipMessages[dietPeriodStatus['toolTipStatus']] %}
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                <span class="badge fs-6 {{ dietPeriodStatus['badgeClass'] }}"
+                                                                <span class="badge fs-8 ms-1 {{ dietPeriodStatus['badgeClass'] }}"
                                                                     {% if toolTipMessage %} data-bs-toggle="tooltip" title="{{ toolTipMessage }}" {% endif %}>
                                                                     <i class="fa {{ dietPeriodStatus['badgeIcon'] }}"></i>
                                                                     {{ dietPeriodStatus['text'] }}
@@ -174,14 +174,14 @@
                                                         {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::NOT_STARTED') %}
                                                             <div class="col-md-4">
                                                                 {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
-                                                                <div class="border border-secondary-subtle ps-1 pt-1 {{ dietPeriodStatus['dietCardClass']|default('') }}">
+                                                                {% set sampleChecked = '' %}
+                                                                {% for sampleProcessing in sampleProcessingStatusByModule %}
+                                                                    {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
+                                                                        {% set sampleChecked = 'checked' %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <div class="border {% if sampleChecked %} border-success {% else %} border-secondary-subtle {% endif %} ps-1 pt-1 {{ dietPeriodStatus['dietCardClass']|default('') }} sample-process-check-box">
                                                                     <div class="form-check">
-                                                                        {% set sampleChecked = '' %}
-                                                                        {% for sampleProcessing in sampleProcessingStatusByModule %}
-                                                                            {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
-                                                                                {% set sampleChecked = 'checked' %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
                                                                         <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
                                                                                data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
                                                                         <label class="form-check-label" for="flexCheckDefault">
@@ -191,8 +191,8 @@
                                                                 </div>
                                                             </div>
                                                         {% endif %}
-                                                        <hr>
                                                     </div>
+                                                    <hr>
                                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                                     {% if dietPeriodNumber == VisitCode|slice(0,7) %}
                                                         {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
@@ -206,10 +206,10 @@
                                                                 {% set textDivSize = 'col-md-12' %}
                                                                 {% set dlwDiet = false %}
                                                             {% endif %}
-                                                            <div class="card mb-2 border-0">
+                                                            <div class="card mb-2">
                                                                 {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
-                                                                <div class="card-header {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
-                                                                    <span class="diet-visit-status-text">{{ visit['visitDisplayName']}} Visit</span>
+                                                                <div class="card-header bg-secondary-subtle pb-0 {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
+                                                                    <span class="diet-visit-status-text fs-6 pe-2">{{ visit['visitDisplayName']}} Visit</span>
                                                                     {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
                                                                         {% set warningDisplayed = 0 %}
                                                                         {% for generateOrderWarningLog in generateOrderWarningLogByModule %}
@@ -217,7 +217,7 @@
                                                                                 {% set warningDisplayed = 1 %}
                                                                             {% endif %}
                                                                         {% endfor %}
-                                                                        <a class="btn btn-primary btn-sm ms-2 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}" data-warning-displayed="{{ warningDisplayed }}"
+                                                                        <a class="btn btn-primary btn-xs m-0 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}" data-warning-displayed="{{ warningDisplayed }}"
                                                                            role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
@@ -225,9 +225,15 @@
                                                                     {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
                                                                         <span class="text-danger diet-visit-status-icon"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
                                                                     {% endif %}
-                                                                    <span class="float-end collapse-carat" role="button" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"></span>
+                                                                    {% set sampleProcessingComplete = false %}
+                                                                    {% for sampleProcessing in sampleProcessingStatusByModule %}
+                                                                        {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
+                                                                            {% set sampleProcessingComplete = true %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                    <span class="float-end collapse-carat {% if sampleProcessingComplete %} collapsed {% endif %} fs-4" role="button" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"></span>
                                                                 </div>
-                                                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="diet-visit-type collapse card-body accordion-collapse {% if participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %} show {% endif %}">
+                                                                <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="diet-visit-type {% if sampleProcessingComplete %} collapse {% else %} show {% endif %} card-body accordion-collapse">
                                                                     <div class="row">
                                                                         {% if participant.dob %}
                                                                             <br>
@@ -302,7 +308,7 @@
                                                                                                 {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
                                                                                                 <div class="row">
                                                                                                     <div class="col-md-12">
-                                                                                                        <h5>Timepoint | {{ timepoint['timePointDisplayName'] }}</h5>
+                                                                                                        <h6>Timepoint | {{ timepoint['timePointDisplayName'] }}</h6>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             {% endif %}
@@ -335,8 +341,8 @@
                                                                             {% endif %}
                                                                         {% endfor %}
                                                                     {% endfor %}
-                                                                    {% if displayedOrderIDS is empty and participantDietStatus == constant('App\\Helper\\NphParticipant::DIET_STARTED') %}
-                                                                        <h6 class="-italic"><i>No Orders Generated</i></h6>
+                                                                    {% if displayedOrderIDS is empty %}
+                                                                        <h6 class="-italic float-start"><i>No Orders Generated</i></h6>
                                                                     {% endif %}
                                                                 </div>
                                                             </div>
