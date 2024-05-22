@@ -66,6 +66,7 @@ $(document).ready(function () {
         let moduleNumber = parseInt($(this).data("module"));
         let period = $(this).data("period");
         let periodNumber = parseInt(period[period.length - 1]);
+        let warningDisplayed = $(this).data("warning-displayed");
         let generateOrderLink = $(this).attr("href");
         let modelBodyText = $("#generate_order_in_complete_diet").html();
         let currentDietStatus = $("#diet_period_status_" + moduleNumber + "_" + period).data("diet-period-status");
@@ -95,7 +96,10 @@ $(document).ready(function () {
             let dietStatus = $("#diet_period_status_" + moduleNumber + "_" + previousDietPeriod).data(
                 "diet-period-status"
             );
-            if (dietStatus === "in_progress_finalized" || dietStatus === "in_progress_unfinalized") {
+            if (
+                !warningDisplayed &&
+                (dietStatus === "in_progress_finalized" || dietStatus === "in_progress_unfinalized")
+            ) {
                 showWarning = true;
             } else {
                 window.location.href = generateOrderLink;

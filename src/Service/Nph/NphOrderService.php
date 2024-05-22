@@ -950,7 +950,7 @@ class NphOrderService
         $this->em->flush();
     }
 
-    public function getModuleDietPeriodsStatus(string $participantId, string $module): array
+    public function getModuleDietPeriodsStatus(string $participantId): array
     {
         $moduleDietPeriodsStatus = [
             1 => ['LMT' => 'not_started'],
@@ -1018,7 +1018,7 @@ class NphOrderService
 
     public function canGenerateOrders(string $participantId, string $module, string $dietPeriod): bool
     {
-        $moduleDietPeriodStatus = $this->getModuleDietPeriodsStatus($participantId, $module);
+        $moduleDietPeriodStatus = $this->getModuleDietPeriodsStatus($participantId);
 
         // Check if the previous diet period is Period1 or the diet is a module 1 diet
         $isPreviousDietPeriodStarted = ($module === '1' || $dietPeriod === 'Period1');

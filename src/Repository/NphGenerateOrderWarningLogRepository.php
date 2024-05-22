@@ -34,6 +34,17 @@ class NphGenerateOrderWarningLogRepository extends ServiceEntityRepository
         return !empty($nphGenerateOrderWarningLog) ? $nphGenerateOrderWarningLog[0] : null;
     }
 
+    public function getGenerateOrderWarningLogByModule(string $participantId): ?array
+    {
+        $nphGenerateOrderWarningLog = $this->createQueryBuilder('n')
+            ->andWhere('n.participantId = :participantId')
+            ->setParameter('participantId', $participantId)
+            ->getQuery()
+            ->getResult()
+        ;
+        return !empty($nphGenerateOrderWarningLog) ? $nphGenerateOrderWarningLog : null;
+    }
+
     public function getAuditReport(?\DateTime $startDate, ?\DateTime $endDate): array
     {
         $query = $this->createQueryBuilder('n')
