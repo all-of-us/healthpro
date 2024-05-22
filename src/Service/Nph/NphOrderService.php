@@ -1031,8 +1031,9 @@ class NphOrderService
         return $isPreviousDietPeriodStarted && !$isSampleProcessingComplete;
     }
 
-    public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData): void
+    public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
     {
+
         $nphGenerateOrderWarningLog = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLog($participantId, $formData['module'], $formData['period']);
         if (!$nphGenerateOrderWarningLog) {
             $nphGenerateOrderWarningLog = new NphGenerateOrderWarningLog();
@@ -1044,6 +1045,9 @@ class NphOrderService
         $nphGenerateOrderWarningLog->setUser($this->user);
         $nphGenerateOrderWarningLog->setSite($this->site);
         $nphGenerateOrderWarningLog->setModifiedTs(new \DateTime());
+        $finalizedCount = $sampleStatusCounts[$formData['module']]['Finalized'] ?? 0;
+        $activeCount = $sampleStatusCounts[$formData['module']]['active'] ?? 0;
+        $nphGenerateOrderWarningLog->setIncompleteSamples(max(0, $activeCount - $finalizedCount));
         $nphGenerateOrderWarningLog->setModifiedTimezoneId($this->getTimezoneid());
         $this->em->persist($nphGenerateOrderWarningLog);
         $this->em->flush();

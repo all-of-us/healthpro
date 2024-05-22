@@ -91,7 +91,7 @@ class NphParticipantSummaryController extends BaseController
         $orderGenerateWarningLogForm->handleRequest($request);
         if ($orderGenerateWarningLogForm->isSubmitted() && $orderGenerateWarningLogForm->isValid()) {
             $formData = $orderGenerateWarningLogForm->getData();
-            $nphOrderService->saveGenerateOrderWarningLog($participantId, $participant->biobankId, $formData);
+            $nphOrderService->saveGenerateOrderWarningLog($participantId, $participant->biobankId, $formData, $sampleStatusCounts);
             return $this->redirect($formData['redirectLink']);
         }
 

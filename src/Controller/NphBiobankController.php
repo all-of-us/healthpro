@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\NphAliquot;
+use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use App\Entity\NphSampleProcessingStatus;
@@ -126,7 +127,12 @@ class NphBiobankController extends BaseController
                 ]);
             }
         }
-        $samples = $this->em->getRepository(NphSampleProcessingStatus::class)->getAuditReport($startDate, $endDate);
+        $samplesLogs = $this->em->getRepository(NphSampleProcessingStatus::class)->getAuditReport($startDate, $endDate);
+        $warningLogs = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getAuditReport($startDate, $endDate);
+        $samples = array_merge($samplesLogs, $warningLogs);
+        usort($samples, function ($a, $b) {
+            return $b->getModifiedTs() <=> $a->getModifiedTs();
+        });
         return $this->render('program/nph/biobank/audit.html.twig', [
             'samples' => $samples,
             'todayFilterForm' => $todayFilterForm->createView(),
