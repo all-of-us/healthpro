@@ -1033,7 +1033,6 @@ class NphOrderService
 
     public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
     {
-
         $nphGenerateOrderWarningLog = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLog($participantId, $formData['module'], $formData['period']);
         if (!$nphGenerateOrderWarningLog) {
             $nphGenerateOrderWarningLog = new NphGenerateOrderWarningLog();
