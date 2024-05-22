@@ -231,6 +231,7 @@ div.order-row {
     flex: 0 0 auto;
     max-width: 13.5%;
 }
-.sample-process-check-box {
-    width: 224px;
+.col-md-3-5 {
+    flex: 0 0 auto;
+    max-width: 28%;
 }
