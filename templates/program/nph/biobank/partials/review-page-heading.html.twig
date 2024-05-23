@@ -8,5 +8,6 @@
     <li role="presentation"{% if current_route == 'nph_biobank_orders_unlocked' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_unlocked') }}">Unlocked Samples</a></li>
     <li role="presentation"{% if current_route == 'nph_biobank_orders_recently_modified' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_recently_modified') }}">Recently Modified Samples</a></li>
     <li role="presentation"{% if current_route == 'nph_biobank_orders_downtime' %}class="active"{% endif %}><a href="{{ path('nph_biobank_orders_downtime') }}">Downtime Orders</a></li>
+    <li role="presentation"{% if current_route == 'nph_biobank_orders_audit' %} class="active"{% endif %}><a href="{{ path('nph_biobank_orders_audit') }}">Diet Period Audit</a></li>
 </ul>
 <br />

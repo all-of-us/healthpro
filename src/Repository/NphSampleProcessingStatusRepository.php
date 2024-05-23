@@ -40,8 +40,7 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
             ->andWhere('n.participantId = :participantId')
             ->setParameter('participantId', $participantId)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
         return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus : null;
     }
 
@@ -51,11 +50,24 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
             ->andWhere('n.participantId = :participantId')
             ->andWhere('n.module = :module')
             ->andWhere('n.period = :period')
-            ->andWhere('n.status = 1')
+            ->setMaxResults(1)
             ->setParameters(['participantId' => $participantId, 'module' => $module, 'period' => $period])
             ->getQuery()
             ->getResult()
         ;
         return !empty($nphSampleProcessingStatus);
+    }
+
+    public function getAuditReport(?\DateTime $startDate, ?\DateTime $endDate): array
+    {
+        $nphSampleProcessingStatus = $this->createQueryBuilder('n');
+        if ($startDate && $endDate) {
+            $nphSampleProcessingStatus->andWhere('n.modifiedTs >= :startDate')
+                ->andWhere('n.modifiedTs <= :endDate')
+                ->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
+        }
+        $nphSampleProcessingStatus->orderBy('n.modifiedTs', 'DESC');
+        $nphSampleProcessingStatus = $nphSampleProcessingStatus->getQuery()->getResult();
+        return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus : [];
     }
 }

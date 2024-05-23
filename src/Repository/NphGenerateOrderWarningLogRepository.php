@@ -44,4 +44,17 @@ class NphGenerateOrderWarningLogRepository extends ServiceEntityRepository
         ;
         return !empty($nphGenerateOrderWarningLog) ? $nphGenerateOrderWarningLog : null;
     }
+
+    public function getAuditReport(?\DateTime $startDate, ?\DateTime $endDate): array
+    {
+        $query = $this->createQueryBuilder('n')
+            ->select('n');
+        if ($startDate && $endDate) {
+            $query->andWhere('n.modifiedTs >= :startDate')
+                ->andWhere('n.modifiedTs <= :endDate')
+                ->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
+        }
+        $query->orderBy('n.modifiedTs', 'DESC');
+        return $query->getQuery()->getResult();
+    }
 }
