@@ -62,7 +62,7 @@ class NphOrderController extends BaseController
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $dietPeriod = $module === 1 ? $visit : substr($visit, 0, 7);
-        if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod)) {
+        if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod, $participant->module)) {
             throw $this->createNotFoundException('Orders cannot be generated for this diet.');
         }
         $timePointSamples = $nphOrderService->getTimePointSamples();
@@ -246,7 +246,7 @@ class NphOrderController extends BaseController
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
-        $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod);
+        $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
         $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
