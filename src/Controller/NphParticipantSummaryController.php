@@ -86,7 +86,7 @@ class NphParticipantSummaryController extends BaseController
             ]);
         }
         $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
-        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
 
         $orderGenerateWarningLogForm = $this->createForm(NphGenerateOrderWarningLogType::class, null);
         $orderGenerateWarningLogForm->handleRequest($request);

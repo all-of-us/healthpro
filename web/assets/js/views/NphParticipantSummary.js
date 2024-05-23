@@ -84,6 +84,9 @@ $(document).ready(function () {
                 ) {
                     modelBodyText = $("#generate_order_in_complete_module").html();
                     showWarning = true;
+                } else {
+                    window.location.href = generateOrderLink;
+                    return;
                 }
             } else {
                 window.location.href = generateOrderLink;
