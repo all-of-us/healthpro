@@ -231,3 +231,13 @@ div.order-row {
     flex: 0 0 auto;
     max-width: 13.5%;
 }
+
+.participant-diet-period a.active {
+    text-decoration: underline;
+}
+
+.participant-diet-period a.disabled {
+    cursor: not-allowed !important;
+    pointer-events: all !important;
+    opacity: 40%;
+}

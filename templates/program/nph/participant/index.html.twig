@@ -102,13 +102,13 @@
                                         <ul class="nav flex-column">
                                             {% if moduleNumber == 1 %}
                                                 <li class="nav-item">
-                                                    <div class="row">
+                                                    <div class="row participant-diet-period">
                                                         {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber]['LMT']] %}
                                                         <div class="col-sm-2">
                                                             <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
                                                         </div>
                                                         <div class="col-sm-10 ps-0">
-                                                            <a class="pt-0 pb-0 nav-link text-dark font-bold participant-diet-period active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#LMT" data-period="LMT" role="tab">Module 1</a>
+                                                            <a class="pt-0 pb-0 nav-link text-dark font-bold active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#LMT" data-period="LMT" role="tab">Module 1</a>
                                                             <span class="fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber]['LMT'] }}" id="diet_period_status_{{ moduleNumber }}_LMT">{{ dietPeriodStatus['text'] }}</span>
                                                         </div>
                                                     </div>
@@ -116,7 +116,7 @@
                                             {% else %}
                                                 {% for dietPeriod in ['Period1', 'Period2', 'Period3'] %}
                                                     <li class="nav-item">
-                                                        <div class="row mb-2">
+                                                        <div class="row mb-2 participant-diet-period">
                                                             {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriod]] %}
                                                             <div class="col-sm-2">
                                                                 <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
@@ -129,7 +129,7 @@
                                                                         {% set disabled = 'disabled' %}
                                                                     {% endif %}
                                                                 {% endif %}
-                                                                <a class="pt-0 pb-0 nav-link text-dark font-bold participant-diet-period {{ disabled}} {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">
+                                                                <a class="pt-0 pb-0 nav-link text-dark font-bold {{ disabled}} {% if loop.first %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">
                                                                     Diet {{ dietPeriod|replace({'Period': 'Period '}) }}
                                                                 </a>
                                                                 <span class="pt-0 fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriod] }}" id="diet_period_status_{{ moduleNumber }}_{{ dietPeriod }}">
