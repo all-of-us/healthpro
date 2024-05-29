@@ -204,7 +204,7 @@
                                                                 {% set textDivSize = 'col-md-12' %}
                                                                 {% set dlwDiet = false %}
                                                             {% endif %}
-                                                            <div class="card mb-2">
+                                                            <div class="card mb-2 period-diet-visits">
                                                                 {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                                 <div class="card-header bg-secondary-subtle pb-0 {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
                                                                     <span class="diet-visit-status-text fs-6 pe-2">{{ visit['visitDisplayName']}} Visit</span>
@@ -220,9 +220,7 @@
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
                                                                     {% endif %}
-                                                                    {% if 'error' in moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] %}
-                                                                        <span class="text-danger diet-visit-status-icon"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
-                                                                    {% endif %}
+                                                                    <span class="text-danger diet-visit-status-icon" id="diet_visit_status_icon_{{ VisitCode }}" style="display: none;"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
                                                                     {% set sampleProcessingComplete = false %}
                                                                     {% for sampleProcessing in sampleProcessingStatusByModule %}
                                                                         {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
@@ -319,7 +317,7 @@
                                                                                                                 href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
                                                                                                         ID: {{ orderid }}</a></span></div>
                                                                                                         <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
-                                                                                                        <div class="d-inline-block w-15 align-top diet-visit-status">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
+                                                                                                        <div class="d-inline-block w-15 align-top diet-visit-status" data-diet-visit-status="{{ sample[orderid]['orderStatus'] }}">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
                                                                                                         <div class="d-inline-block w-10 align-middle">
                                                                                                             {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
                                                                                                                 {% if not loop.first %}

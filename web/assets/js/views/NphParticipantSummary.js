@@ -138,4 +138,19 @@ $(document).ready(function () {
             $(this).next(".diet-visit-status-icon").hide();
         }
     });
+
+    $(".period-diet-visits").each(function () {
+        let $this = $(this);
+        let dietVisitStatusIcon = $this.find(".diet-visit-status-icon");
+        let dietVisitStatuses = $this.find(".diet-visit-status");
+        let displayErrorIcon = false;
+        dietVisitStatuses.each(function () {
+            if ($(this).data("diet-visit-status") !== "Finalized" && $(this).data("diet-visit-status") !== "Canceled") {
+                displayErrorIcon = true;
+                return false;
+            }
+        });
+        dietVisitStatusIcon.toggle(displayErrorIcon);
+    });
+
 });
