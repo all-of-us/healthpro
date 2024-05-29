@@ -1008,9 +1008,9 @@ class NphOrderService
         for ($i = 1; $i <= 2; $i++) {
             $currentPeriod = 'Period' . $i;
             $nextPeriod = 'Period' . ($i + 1);
-            if (!str_contains($moduleDietPeriodsStatus[$module][$currentPeriod], 'complete') &&
-                $moduleDietPeriodsStatus[$module][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
-                $moduleDietPeriodsStatus[$module][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+            if (!str_contains($moduleDietPeriodsStatus[$participantModule][$currentPeriod], 'complete') &&
+                $moduleDietPeriodsStatus[$participantModule][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
+                $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
             }
         }
 
