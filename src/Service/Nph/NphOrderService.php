@@ -1017,6 +1017,16 @@ class NphOrderService
         return $moduleDietPeriodsStatus;
     }
 
+    public function getActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule): string
+    {
+        foreach ($moduleDietPeriodStatus[$currentModule] as $dietPeriod => $status) {
+            if ($status === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
+                return $dietPeriod;
+            }
+        }
+        return 'Period1';
+    }
+
     public function canGenerateOrders(string $participantId, string $module, string $dietPeriod, string $participantModule): bool
     {
         $moduleDietPeriodStatus = $this->getModuleDietPeriodsStatus($participantId, $participantModule);
