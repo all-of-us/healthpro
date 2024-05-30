@@ -152,5 +152,4 @@ $(document).ready(function () {
         });
         dietVisitStatusIcon.toggle(displayErrorIcon);
     });
-
 });
