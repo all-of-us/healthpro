@@ -783,6 +783,48 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals($dlw->getDoseAdministered(), $dlwSummary[$dlw->getModule()][$dlw->getVisitPeriod()]);
     }
 
+    /**
+     * @dataProvider activeDietPeriodProvider
+     */
+    public function testGetActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule, string $expectedResult)
+    {
+        $result = $this->service->getActiveDietPeriod($moduleDietPeriodStatus, $currentModule);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function activeDietPeriodProvider(): array
+    {
+        return [
+            'no in-progress periods' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'error_next_module_started'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'not_started', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => 'Period1'
+            ],
+            'in-progress period exists' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'error_next_module_started'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'in_progress_unfinalized', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => 'Period2'
+            ],
+            'all periods unfinalized' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'error_next_module_started'],
+                    2 => ['Period1' => 'in_progress_unfinalized', 'Period2' => 'in_progress_unfinalized', 'Period3' => 'in_progress_unfinalized'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => 'Period1'
+            ]
+        ];
+    }
+
     private function getGuzzleResponse($data): Response
     {
         return new Response(200, ['Content-Type' => 'application/json'], $data);
