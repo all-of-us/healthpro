@@ -68,7 +68,7 @@ class NphOrderCollect extends NphOrderForm
                     'readonly' => $options['disableStoolCollectedTs']
                 ]
             ]);
-            $this->addStoolMetadataFields($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
+            $this->addStoolMetadataFields($builder, $options['timeZone'], $orderType, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
         }
 
         // Placeholder field for displaying select at least one sample error message
