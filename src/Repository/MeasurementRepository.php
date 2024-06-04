@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Measurement;
 use App\Entity\MissingNotificationLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -181,5 +182,48 @@ class MeasurementRepository extends ServiceEntityRepository
             }
         }
         return null;
+    }
+
+    public function getProtocolModificationCount($startDate, $endDate, $modificationType, $minAge, $maxAge): array{
+        $query = 'SELECT count(*) as count, q.modification as modificationType FROM
+                    (
+                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath1)) AS modification FROM evaluations where age_in_months > :minAge1 and age_in_months < :maxAge1 UNION ALL
+                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath2)) AS modification FROM evaluations where age_in_months > :minAge2 and age_in_months < :maxAge2 UNION ALL
+                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath3)) AS modification FROM evaluations where age_in_months > :minAge3 and age_in_months < :maxAge3
+                    ) q
+                    WHERE q.modification IS NOT NULL
+                    AND q.modification <> \'\'
+                    GROUP BY q.modification';
+        $em = $this->getEntityManager();
+        $stmt = $em->getConnection()->prepare($query);
+        $modificationTypeString1 = "$.\"$modificationType\"[0]";
+        $modificationTypeString2 = "$.\"$modificationType\"[1]";
+        $modificationTypeString3 = "$.\"$modificationType\"[2]";
+        $stmt->bindParam('jsonPath1', $modificationTypeString1, ParameterType::STRING);
+        $stmt->bindParam('minAge1', $minAge, ParameterType::INTEGER);
+        $stmt->bindParam('maxAge1', $maxAge, ParameterType::INTEGER);
+        $stmt->bindParam('jsonPath2', $modificationTypeString2, ParameterType::STRING);
+        $stmt->bindParam('minAge2', $minAge, ParameterType::INTEGER);
+        $stmt->bindParam('maxAge2', $maxAge, ParameterType::INTEGER);
+        $stmt->bindParam('jsonPath3', $modificationTypeString3, ParameterType::STRING);
+        $stmt->bindParam('minAge3', $minAge, ParameterType::INTEGER);
+        $stmt->bindParam('maxAge3', $maxAge, ParameterType::INTEGER);
+        $result = $stmt->executeQuery();
+        return $result->fetchAllAssociative();
+    }
+
+    public function getActiveAlertsReportData($startDate, $endDate, $minAge, $maxAge): array
+    {
+        $query = $this->createQueryBuilder('m')
+            //->andWhere('m.finalizedTs >= :startDate')
+            //->andWhere('m.finalizedTs <= :endDate')
+            ->andWhere('m.ageInMonths >= :minAge')
+            ->andWhere('m.ageInMonths <= :maxAge')
+            //->setParameter('startDate', $startDate)
+            //->setParameter('endDate', $endDate)
+            ->setParameter('minAge', $minAge)
+            ->setParameter('maxAge', $maxAge)
+            ->getQuery();
+        return $query->getResult();
     }
 }
