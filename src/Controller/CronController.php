@@ -15,6 +15,7 @@ use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\PatientStatusService;
+use App\Service\PediatricsReportService;
 use App\Service\SessionService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
@@ -217,6 +218,13 @@ class CronController extends BaseController
     public function backfillIdVerificationsRdrAction(IdVerificationService $idVerificationService): Response
     {
         $idVerificationService->backfillIdVerificationsRdr();
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/pediatrics-report', name: 'cron_pediatrics_report')]
+    public function pediatricsReportAction(PediatricsReportService $pediatricsReport): Response
+    {
+        $pediatricsReport->generateActiveAlertReport();
         return $this->json(['success' => true]);
     }
 }
