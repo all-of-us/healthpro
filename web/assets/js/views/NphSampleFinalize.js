@@ -265,18 +265,27 @@ $(document).ready(function () {
 
     $(".sample-cancel-checkbox").on("change", disableEnableAliquotFields);
 
+    const dateComparison = (value, requirement) => {
+        const inputDate = new Date(value);
+        const collectedTs = document.getElementById(requirement).value;
+        if (collectedTs) {
+            const comparisonDate = new Date(collectedTs);
+            return inputDate > comparisonDate;
+        }
+        return true;
+    };
+
     window.Parsley.addValidator("aliquotDateComparison", {
-        validateString: function (value, requirement) {
-            let inputDate = new Date(value);
-            let collectedTs = $("#" + requirement).val();
-            if (collectedTs) {
-                let comparisonDate = new Date(collectedTs);
-                return inputDate > comparisonDate;
-            }
-            return true;
-        },
+        validateString: dateComparison,
         messages: {
             en: "Aliquot time must be after collection time."
+        }
+    });
+
+    window.Parsley.addValidator("freezeDateComparison", {
+        validateString: dateComparison,
+        messages: {
+            en: "Freeze time must be after collection time."
         }
     });
 

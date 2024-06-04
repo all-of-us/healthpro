@@ -177,7 +177,7 @@ class NphOrderForm extends AbstractType
             ],
             'attr' => [
                 'class' => 'order-ts',
-                'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
+                'data-parsley-freeze-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
             ],
             'disabled' => $disabled
         ]);
