@@ -340,7 +340,11 @@ class NphOrderService
     {
         try {
             $orderType = $order->getOrderType();
+            $atLeastOneSampleIsFinalized = false;
             foreach ($order->getNphSamples() as $nphSample) {
+                if ($atLeastOneSampleIsFinalized === false) {
+                    $atLeastOneSampleIsFinalized = (bool)$nphSample->getRdrId();
+                }
                 $sampleCode = $nphSample->getSampleCode();
                 if (isset($formData[$sampleCode])) {
                     if ($formData[$sampleCode]) {
@@ -365,9 +369,9 @@ class NphOrderService
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            if ($orderType === NphOrder::TYPE_STOOL) {
+            if ($orderType === NphOrder::TYPE_STOOL && $atLeastOneSampleIsFinalized === false) {
                 $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
-                    'bowelQuality', 'freezedTs']));
+                    'bowelQuality']));
                 $this->em->persist($order);
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
