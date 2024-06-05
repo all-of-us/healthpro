@@ -201,7 +201,6 @@ class PediatricsReportService
                 $tempRow1to3[] = $alertCount;
                 $tempRow4to6[] = $alertCount;
             }
-
         }
         $index = 0;
         foreach ($tempRowAlerts as $alert) {
@@ -209,6 +208,27 @@ class PediatricsReportService
             $index++;
         }
         $this->generateCSVReport($csvData, 'Active_Alerts_Report-' . date('Ymd-His') . '.csv');
+    }
+
+    public function generateMeasurementTotalsReport(\DateTime $startDate, \DateTime $endDate): void
+    {
+        $csvData[] = array_merge(['Measurement Type'], array_keys(self::DEVIATION_AGE_RANGES));
+        $tempRow = [];
+        foreach (self::TOTALS_COUNTS_FIELDS as $field) {
+            foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
+                $measurements = $this->em->getRepository(Measurement::class)
+                    ->getMeasurementsForPediatrictotalsReport(
+                        $startDate,
+                        $endDate,
+                        $field,
+                        $ageRange[0],
+                        $ageRange[1]
+                    );
+                $tempRow[$ageText] = $measurements[0]['count(*)'];
+            }
+            $csvData[] = [$field, $tempRow['<1'], $tempRow['1-3'], $tempRow['4-6']];
+        }
+        $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
     }
 
     private function buildBlankAlertArray(): array
@@ -263,27 +283,6 @@ class PediatricsReportService
                 'pSC5' => 0
             ]
         ];
-    }
-
-    public function generateMeasurementTotalsReport(\DateTime $startDate, \DateTime $endDate): void
-    {
-        $csvData[] = array_merge(['Measurement Type'], array_keys(self::DEVIATION_AGE_RANGES));
-        $tempRow = [];
-        foreach (self::TOTALS_COUNTS_FIELDS as $field) {
-            foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
-                $measurements = $this->em->getRepository(Measurement::class)
-                    ->getMeasurementsForPediatrictotalsReport(
-                        $startDate,
-                        $endDate,
-                        $field,
-                        $ageRange[0],
-                        $ageRange[1]
-                    );
-                $tempRow[$ageText] = $measurements[0]['count(*)'];
-            }
-            $csvData[] = [$field, $tempRow['<1'], $tempRow['1-3'], $tempRow['4-6']];
-        }
-        $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
     }
 
     private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string

@@ -184,7 +184,8 @@ class MeasurementRepository extends ServiceEntityRepository
         return null;
     }
 
-    public function getProtocolModificationCount($startDate, $endDate, $modificationType, $minAge, $maxAge): array{
+    public function getProtocolModificationCount($startDate, $endDate, $modificationType, $minAge, $maxAge): array
+    {
         $query = 'SELECT count(*) as count, q.modification as modificationType FROM
                     (
                         SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath1)) AS modification FROM evaluations where age_in_months > :minAge1 and age_in_months < :maxAge1 UNION ALL
@@ -227,7 +228,8 @@ class MeasurementRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getMeasurementsForPediatrictotalsReport(\DateTime $startDate, \DateTime $endDate, string $field, int $minAge, int $maxAge) {
+    public function getMeasurementsForPediatrictotalsReport(\DateTime $startDate, \DateTime $endDate, string $field, int $minAge, int $maxAge)
+    {
         $query = '
         select count(*) from(
                  SELECT JSON_EXTRACT(data, :jsonField0) as field1,
