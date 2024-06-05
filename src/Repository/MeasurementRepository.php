@@ -215,15 +215,17 @@ class MeasurementRepository extends ServiceEntityRepository
     public function getActiveAlertsReportData($startDate, $endDate, $minAge, $maxAge): array
     {
         $query = $this->createQueryBuilder('m')
-            //->andWhere('m.finalizedTs >= :startDate')
-            //->andWhere('m.finalizedTs <= :endDate')
+            ->andWhere('m.finalizedTs >= :startDate')
+            ->andWhere('m.finalizedTs <= :endDate')
             ->andWhere('m.ageInMonths >= :minAge')
             ->andWhere('m.ageInMonths <= :maxAge')
-            //->setParameter('startDate', $startDate)
-            //->setParameter('endDate', $endDate)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
             ->setParameter('minAge', $minAge)
             ->setParameter('maxAge', $maxAge)
             ->getQuery();
         return $query->getResult();
     }
+
+    public function getMeasurement
 }

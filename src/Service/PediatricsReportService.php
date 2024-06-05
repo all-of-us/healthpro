@@ -200,6 +200,20 @@ class PediatricsReportService
         }
     }
 
+    public function generateMeasurementsReport(): void {
+        foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
+            $measurements = $this->em->getRepository(Measurement::class)
+                ->getMeasurementsReportData(
+                    new \DateTime('first day of last month'),
+                    new \DateTime('last day of last month'),
+                    $ageRange[0],
+                    $ageRange[1]
+                );
+            $csvData = $this->getMeasurementsReportCSVData($measurements);
+            $this->generateCSVReport($csvData, 'Measurements_Report-'.date('Ymd-His').'.csv');
+        }
+    }
+
     private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string {
         $heartRates = $measurementData['heart-rate'];
         $heartCentiles = [];
