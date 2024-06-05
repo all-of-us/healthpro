@@ -109,6 +109,7 @@ class PediatricsReportService
         $heartRateAgeCharts = $this->em->getRepository(HeartRateAge::class)->getChartsData();
         $alertsData = [];
         foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
+            $alertsData[$ageText] = $this->buildBlankAlertArray($ageText);
             $measurements = $this->em->getRepository(Measurement::class)
                 ->getActiveAlertsReportData(
                     new \DateTime('first day of last month'),
@@ -152,53 +153,102 @@ class PediatricsReportService
                 $bmiAlert = $this->getBMIAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $bmiChart, $participant->sexAtBirth);
                 $heightAlert = $this->getHeightAlert($measurementData, $measurement->getAgeInMonths());
                 $waistAlert = $this->getWaistAlert($measurementData, $measurement->getAgeInMonths());
-                if (!array_key_exists($ageText, $alertsData)) {
-                    $alertsData[$ageText] = [];
-                    $alertsData[$ageText]['Heart Rate'] = [];
-                    $alertsData[$ageText]['Head Circumference'] = [];
-                    $alertsData[$ageText]['Irregular Heart Rhythm'] = [];
-                    $alertsData[$ageText]['Weight'] = [];
-                    $alertsData[$ageText]['Weight for Length'] = [];
-                    $alertsData[$ageText]['BMI'] = [];
-                    $alertsData[$ageText]['Height/Length'] = [];
-                }
-                if (!array_key_exists($heartRateAlert, $alertsData[$ageText]['Heart Rate'])) {
-                    $alertsData[$ageText]['Heart Rate'][$heartRateAlert] = 0;
-                } else {
+                if (!empty($heartRateAlert)) {
                     $alertsData[$ageText]['Heart Rate'][$heartRateAlert]++;
                 }
-                if (!array_key_exists($headCircumferenceAlert, $alertsData[$ageText]['Head Circumference'])) {
-                    $alertsData[$ageText]['Head Circumference'][$headCircumferenceAlert] = 0;
-                } else {
+                if (!empty($headCircumferenceAlert)) {
                     $alertsData[$ageText]['Head Circumference'][$headCircumferenceAlert]++;
                 }
-                if (!array_key_exists($irregularHeartRhythmAlert, $alertsData[$ageText]['Irregular Heart Rhythm'])) {
-                    $alertsData[$ageText]['Irregular Heart Rhythm'][$irregularHeartRhythmAlert] = 0;
-                } else {
+                if (!empty($irregularHeartRhythmAlert)) {
                     $alertsData[$ageText]['Irregular Heart Rhythm'][$irregularHeartRhythmAlert]++;
                 }
-                if (!array_key_exists($weightAlert, $alertsData[$ageText]['Weight'])) {
-                    $alertsData[$ageText]['Weight'][$weightAlert] = 0;
-                } else {
+                if (!empty($weightAlert)) {
                     $alertsData[$ageText]['Weight'][$weightAlert]++;
                 }
-                if (!array_key_exists($weightForLengthAlert, $alertsData[$ageText]['Weight for Length'])) {
-                    $alertsData[$ageText]['Weight for Length'][$weightForLengthAlert] = 0;
-                } else {
+                if (!empty($weightForLengthAlert)) {
                     $alertsData[$ageText]['Weight for Length'][$weightForLengthAlert]++;
                 }
-                if (!array_key_exists($bmiAlert, $alertsData[$ageText]['BMI'])) {
-                    $alertsData[$ageText]['BMI'][$bmiAlert] = 0;
-                } else {
+                if (!empty($bmiAlert)) {
                     $alertsData[$ageText]['BMI'][$bmiAlert]++;
                 }
-                if (!array_key_exists($heightAlert, $alertsData[$ageText]['Height/Length'])) {
-                    $alertsData[$ageText]['Height/Length'][$heightAlert] = 0;
-                } else {
+                if (!empty($heightAlert)) {
                     $alertsData[$ageText]['Height/Length'][$heightAlert]++;
                 }
             }
         }
+        $csvData[] = array_merge(['alert'], array_keys(self::DEVIATION_AGE_RANGES));
+        $tempRowAlerts = [];
+        $tempRowUnder1 = [];
+        $tempRow1to3 = [];
+        $tempRow4to6 = [];
+        foreach ($alertsData['<1'] as $alertType => $alertData) {
+            foreach ($alertData as $alert => $alertCount) {
+                $tempRowAlerts[] = $alert;
+                $tempRowUnder1[] = $alertCount;
+                $tempRow1to3[] = $alertCount;
+                $tempRow4to6[] = $alertCount;
+            }
+
+        }
+        $index = 0;
+        foreach ($tempRowAlerts as $alert) {
+            $csvData[] = [$tempRowAlerts[$index], $tempRowUnder1[$index], $tempRow1to3[$index], $tempRow4to6[$index]];
+            $index++;
+        }
+        $this->generateCSVReport($csvData, 'Active_Alerts_Report-' . date('Ymd-His') . '.csv');
+    }
+    private function buildBlankAlertArray(): array
+    {
+        return [
+            'Heart Rate' => [
+                'pME5' => 0,
+                'pME5b' => 0,
+                'pME5c' => 0,
+                'pME5d' => 0,
+                'pME6' => 0,
+                'pME6b' => 0,
+                'pME6c' => 0,
+                'pME6d' => 0,
+                'pSC19' => 0,
+                'pSC20' => 0,
+                'pSC21' => 0,
+                'pSC22' => 0
+            ],
+            'Head Circumference' => [
+                'pME7a' => 0,
+                'pME7b' => 0,
+                'pSC10' => 0,
+                'pSC11' => 0
+            ],
+            'Irregular Heart Rhythm' => [
+                'pME8' => 0
+            ],
+            'Weight' => [
+                'pME9' => 0,
+                'pME10' => 0,
+                'pSC6' => 0,
+                'pSC7' => 0,
+                'pSC8' => 0,
+                'pSC9' => 0
+            ],
+            'Weight for Length' => [
+                'pME11' => 0,
+                'pME12' => 0
+            ],
+            'BMI' => [
+                'pME13' => 0,
+                'pME14' => 0,
+                'pSC25' => 0,
+                'pSC26' => 0
+            ],
+            'Height/Length' => [
+                'pSC1' => 0,
+                'pSC2' => 0,
+                'pSC3' => 0,
+                'pSC4' => 0,
+                'pSC5' => 0
+            ]
+        ];
     }
 
     public function generateMeasurementsReport(): void
