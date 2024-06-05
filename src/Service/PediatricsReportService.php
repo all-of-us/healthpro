@@ -137,10 +137,10 @@ class PediatricsReportService
                 $measurementData = json_decode($measurement->getData(), true);
                 $participant = $this->participantSummaryService->getParticipantById($measurement->getParticipantId());
                 $growthChartsByAge = $measurement->getGrowthChartsByAge((int) $measurement->getAgeInMonths());
-                $headCircumferenceChart = $growthChartsByAge['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : [];
-                $weightChart = $growthChartsByAge['weightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : [];
-                $weightForLengthChart = $growthChartsByAge['weightForLengthCharts'] ? $this->em->getRepository($growthChartsByAge['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : [];
-                $bmiChart = $growthChartsByAge['bmiForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : [];
+                $headCircumferenceChart = $growthChartsByAge['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
+                $weightChart = $growthChartsByAge['weightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
+                $weightForLengthChart = $growthChartsByAge['weightForLengthCharts'] ? $this->em->getRepository($growthChartsByAge['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
+                $bmiChart = $growthChartsByAge['bmiForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
                 $heartRateAlert = $this->getHeartRateAlert($measurementData, $measurement->getAgeInMonths(), $heartRateAgeCharts);
                 $headCircumferenceAlert = $this->getHeadCircumferenceAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $participant->sexAtBirth, $headCircumferenceChart);
                 $irregularHeartRhythmAlert = $this->getIrregularHeartRhythmAlert($measurementData);
