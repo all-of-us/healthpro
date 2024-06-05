@@ -128,7 +128,8 @@ class NphSampleFinalizeType extends NphOrderForm
                             })
                         ],
                         'attr' => [
-                            'class' => 'order-ts',
+                            'class' => 'order-ts aliquot-ts',
+                            'data-field-type' => 'aliquot',
                             'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                         ]
                     ],
