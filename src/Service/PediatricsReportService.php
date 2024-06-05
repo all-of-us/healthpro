@@ -91,8 +91,8 @@ class PediatricsReportService
             foreach (self::DEVIATION_FIELDS as $field) {
                 $evaluations = $this->em->getRepository(Measurement::class)
                     ->getProtocolModificationCount(
-                        new \DateTime('first day of last month'),
-                        new \DateTime('last day of last month'),
+                        $startDate,
+                        $endDate,
                         $field,
                         $ageRange[0],
                         $ageRange[1]
@@ -117,8 +117,6 @@ class PediatricsReportService
     public function generateActiveAlertReport(\DateTime $startDate, \DateTime $endDate): void
     {
         $csvData = [];
-        $bpSystolicCharts = $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData();
-        $bpDiastolicCharts = $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData();
         $heartRateAgeCharts = $this->em->getRepository(HeartRateAge::class)->getChartsData();
         $alertsData = [];
         foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
@@ -170,6 +168,9 @@ class PediatricsReportService
                 if (!empty($heightAlert)) {
                     $alertsData[$ageText]['Height/Length'][$heightAlert]++;
                 }
+                if (!empty($waistAlert)) {
+                    $alertsData[$ageText]['Waist Circumference'][$waistAlert]++;
+                }
             }
         }
         $csvData[] = array_merge(['alert'], array_keys(self::DEVIATION_AGE_RANGES));
@@ -177,7 +178,7 @@ class PediatricsReportService
         $tempRowUnder1 = [];
         $tempRow1to3 = [];
         $tempRow4to6 = [];
-        foreach ($alertsData['<1'] as $alertType => $alertData) {
+        foreach ($alertsData['<1'] as $alertData) {
             foreach ($alertData as $alert => $alertCount) {
                 $tempRowAlerts[] = $alert;
                 $tempRowUnder1[] = $alertCount;
