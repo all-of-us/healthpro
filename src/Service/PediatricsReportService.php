@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\BloodPressureDiastolicHeightPercentile;
-use App\Entity\BloodPressureSystolicHeightPercentile;
 use App\Entity\HeartRateAge;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
@@ -86,7 +84,7 @@ class PediatricsReportService
     public function generateDeviationReport(\DateTime $startDate, \DateTime $endDate): void
     {
         $evaluationsTotalData = [];
-        foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
+        foreach (self::DEVIATION_AGE_RANGES as $ageRange) {
             $newAgeRange = true;
             foreach (self::DEVIATION_FIELDS as $field) {
                 $evaluations = $this->em->getRepository(Measurement::class)
