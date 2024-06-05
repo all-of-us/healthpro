@@ -545,7 +545,8 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
         $stoolMetaData = [
             'bowelType' => 'difficult',
-            'bowelQuality' => 'normal'
+            'bowelQuality' => 'normal',
+            'freezedTs' => null
         ];
         $expectedUrineMetaData = [
             'urineColor' => 'Color 1',
@@ -553,7 +554,8 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
         $expectedStoolMetaData = [
             'bowelType' => 'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2',
-            'bowelQuality' => 'I tend to have normal formed stool - Type 3 and 4'
+            'bowelQuality' => 'I tend to have normal formed stool - Type 3 and 4',
+            'freezedTs' => null
         ];
         return [
             ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData, $expectedUrineMetaData],
