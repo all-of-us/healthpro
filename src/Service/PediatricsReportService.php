@@ -20,12 +20,24 @@ class PediatricsReportService
         '1-3' => [12, 47],
         '4-6' => [48, 72]
     ];
+
     public const DEVIATION_FIELDS = [
         'weight-protocol-modification',
         'height-protocol-modification',
         'head-circumference-protocol-modification',
         'waist-circumference-protocol-modification',
         'blood-pressure-protocol-modification'
+    ];
+
+    public const TOTALS_COUNTS_FIELDS = [
+        'blood-pressure-systolic',
+        'blood-pressure-diastolic',
+        'heart-rate',
+        'head-circumference',
+        'irregular-heart-rate',
+        'weight',
+        'height',
+        'waist-circumference'
     ];
 
     protected EntityManagerInterface $em;
@@ -50,10 +62,11 @@ class PediatricsReportService
         $this->zScores = $this->em->getRepository(ZScores::class)->getChartsData();
     }
 
-    public function generateIncentiveReport(): void
+    public function generateIncentiveReport($startDate, $endDate): void
     {
-        $incentives = $this->em->getRepository(Incentive::class)->getPediatricIncentivesForReport(new \DateTime('first day of last month'), new \DateTime('last day of last month'));
+        $incentives = $this->em->getRepository(Incentive::class)->getPediatricIncentivesForReport($startDate, $endDate);
         $csvData = $this->getIncentiveReportCSVData($incentives);
+        $this->generateCSVReport($csvData, 'Incentive_Report-' . date('Ymd-His') . '.csv');
     }
 
     public function getIncentiveReportCSVData($incentives)
@@ -197,6 +210,7 @@ class PediatricsReportService
         }
         $this->generateCSVReport($csvData, 'Active_Alerts_Report-' . date('Ymd-His') . '.csv');
     }
+
     private function buildBlankAlertArray(): array
     {
         return [
@@ -251,19 +265,25 @@ class PediatricsReportService
         ];
     }
 
-    public function generateMeasurementsReport(): void
+    public function generateMeasurementTotalsReport($startDate, $endDate): void
     {
-        foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
-            $measurements = $this->em->getRepository(Measurement::class)
-                ->getMeasurementsReportData(
-                    new \DateTime('first day of last month'),
-                    new \DateTime('last day of last month'),
-                    $ageRange[0],
-                    $ageRange[1]
-                );
-            $csvData = $this->getMeasurementsReportCSVData($measurements);
-            $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
+        $csvData[] = array_merge(['Measurement Type'], array_keys(self::DEVIATION_AGE_RANGES));
+        $tempRow = [];
+        foreach (self::TOTALS_COUNTS_FIELDS as $field) {
+            foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
+                $measurements = $this->em->getRepository(Measurement::class)
+                    ->getMeasurementsForPediatrictotalsReport(
+                        $startDate,
+                        $endDate,
+                        $field,
+                        $ageRange[0],
+                        $ageRange[1]
+                    );
+                $tempRow[$ageText] = $measurements[0]['count(*)'];
+            }
+            $csvData[] = [$field, $tempRow['<1'], $tempRow['1-3'], $tempRow['4-6']];
         }
+        $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
     }
 
     private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string

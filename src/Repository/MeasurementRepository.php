@@ -227,7 +227,7 @@ class MeasurementRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getMeasurementsForPediatrictotalsReport($startDate, $endDate, $field, $minAge, $maxAge) {
+    public function getMeasurementsForPediatrictotalsReport(\DateTime $startDate, \DateTime $endDate, string $field, int $minAge, int $maxAge) {
         $query = '
         select count(*) from(
                  SELECT JSON_EXTRACT(data, :jsonField0) as field1,
@@ -238,19 +238,20 @@ class MeasurementRepository extends ServiceEntityRepository
                    and finalized_ts <= :endDate
                    and age_in_months >= :minAge
                    and age_in_months <= :maxAge
-                   and (field1 is not null or field2 is not null or field3 is not null)
              ) jsonvalues
         where field1 is not null or field2 is not null or field3 is not null';
         $fieldString0 = "$.\"$field\"[0]";
         $fieldString1 = "$.\"$field\"[1]";
         $fieldString2 = "$.\"$field\"[2]";
+        $startTime = $startDate->format('Y-m-d');
+        $endTime = $endDate->format('Y-m-d');
         $em = $this->getEntityManager();
         $stmt = $em->getConnection()->prepare($query);
         $stmt->bindParam('jsonField0', $fieldString0, ParameterType::STRING);
         $stmt->bindParam('jsonField1', $fieldString1, ParameterType::STRING);
         $stmt->bindParam('jsonField2', $fieldString2, ParameterType::STRING);
-        $stmt->bindParam('startDate', $startDate, ParameterType::STRING);
-        $stmt->bindParam('endDate', $endDate, ParameterType::STRING);
+        $stmt->bindParam('startDate', $startTime, ParameterType::STRING);
+        $stmt->bindParam('endDate', $endTime, ParameterType::STRING);
         $stmt->bindParam('minAge', $minAge, ParameterType::INTEGER);
         $stmt->bindParam('maxAge', $maxAge, ParameterType::INTEGER);
         $result = $stmt->executeQuery();
