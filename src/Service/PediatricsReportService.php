@@ -60,7 +60,7 @@ class PediatricsReportService
     {
         $csvData = [];
         $csvData[] = ['Participant ID', 'Date Created', 'Site', 'Recipient', 'Date of Service', 'Incentive Occurrence',
-            'Incentive Type', 'Gift Card Type', 'Appreciation Item Type', 'Appreciation Item Count', 'Incentive Amount', 'Declined'];;
+            'Incentive Type', 'Gift Card Type', 'Appreciation Item Type', 'Appreciation Item Count', 'Incentive Amount', 'Declined'];
         foreach ($incentives as $incentive) {
             $csvData[] = [$incentive['participantId'], $incentive['createdTs']->format('Y-m-d H:i:s'), $incentive['site'],
                 $incentive['recipient'], $incentive['incentiveDateGiven']->format('Y-m-d'), $incentive['incentiveOccurrence'],
@@ -82,7 +82,8 @@ class PediatricsReportService
                         new \DateTime('last day of last month'),
                         $field,
                         $ageRange[0],
-                        $ageRange[1]);
+                        $ageRange[1]
+                    );
                 if ($newAgeRange) {
                     $evaluationsTotalData[] = ["Protocol Deviations for age ranges {$ageRange[0]} to ${ageRange[1]} for field $field"];
                     $evaluationsTotalData[] = ['Modification Type', 'Count'];
@@ -97,7 +98,7 @@ class PediatricsReportService
                 }
             }
         }
-        $this->generateCSVReport($evaluationsTotalData, 'Protocol_Deviations_Report-'.date('Ymd-His').'.csv');
+        $this->generateCSVReport($evaluationsTotalData, 'Protocol_Deviations_Report-' . date('Ymd-His') . '.csv');
     }
 
     public function generateActiveAlertReport(): void
@@ -121,7 +122,7 @@ class PediatricsReportService
             foreach ($measurements as $measurement) {
                 $measurementData = json_decode($measurement->getData(), true);
                 $participant = $this->participantSummaryService->getParticipantById($measurement->getParticipantId());
-                $growthChartsByAge = $measurement->getGrowthChartsByAge((int)$measurement->getAgeInMonths());
+                $growthChartsByAge = $measurement->getGrowthChartsByAge((int) $measurement->getAgeInMonths());
                 $headCircumferenceChart = null;
                 if ($growthChartsByAge['headCircumferenceForAgeCharts'] !== null) {
                     $headCircumferenceChart = $this->em->getRepository($growthChartsByAge['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth);
@@ -200,7 +201,8 @@ class PediatricsReportService
         }
     }
 
-    public function generateMeasurementsReport(): void {
+    public function generateMeasurementsReport(): void
+    {
         foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
             $measurements = $this->em->getRepository(Measurement::class)
                 ->getMeasurementsReportData(
@@ -210,11 +212,12 @@ class PediatricsReportService
                     $ageRange[1]
                 );
             $csvData = $this->getMeasurementsReportCSVData($measurements);
-            $this->generateCSVReport($csvData, 'Measurements_Report-'.date('Ymd-His').'.csv');
+            $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
         }
     }
 
-    private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string {
+    private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string
+    {
         $heartRates = $measurementData['heart-rate'];
         $heartCentiles = [];
         foreach ($heartRateAgeCharts as $heartRateAgeChart) {
@@ -234,10 +237,10 @@ class PediatricsReportService
                 }
             }
             if ($heartRateOver200 > 0) {
-                return "pME5";
+                return 'pME5';
             }
             if ($heartRateOver175 > 1) {
-                return "pME5b";
+                return 'pME5b';
             }
         }
         if ($ageInMonths > 1 && $ageInMonths < 6) {
@@ -248,10 +251,10 @@ class PediatricsReportService
                 }
             }
             if ($heartRateOver175 > 1) {
-                return "pME5c";
+                return 'pME5c';
             }
             if ($heartRateOver175 > 0) {
-                return "pME5d";
+                return 'pME5d';
             }
         }
         $centile1Count = 0;
@@ -266,15 +269,15 @@ class PediatricsReportService
         }
         switch ($centile99Count) {
             case 2:
-                return "pME6";
+                return 'pME6';
             case 1:
-                return "pME6b";
+                return 'pME6b';
         }
         switch ($centile1Count) {
             case 2:
-                return "pME6c";
+                return 'pME6c';
             case 1:
-                return "pME6d";
+                return 'pME6d';
         }
         if ($ageInMonths <= 35) {
             $heartRateLessThan85 = 0;
@@ -288,10 +291,10 @@ class PediatricsReportService
                 }
             }
             if ($heartRateLessThan85 >= 1) {
-                return "pSC19";
+                return 'pSC19';
             }
             if ($heartRateOver205 >= 1) {
-                return "pSC20";
+                return 'pSC20';
             }
         } elseif ($ageInMonths > 35 && $ageInMonths <= 83) {
             $heartRateLessThan60 = 0;
@@ -305,10 +308,10 @@ class PediatricsReportService
                 }
             }
             if ($heartRateLessThan60 >= 1) {
-                return "pSC19";
+                return 'pSC19';
             }
             if ($heartRateOver200 >= 1) {
-                return "pSC20";
+                return 'pSC20';
             }
         } elseif ($ageInMonths > 83) {
             $heartRateLessThan50 = 0;
@@ -322,15 +325,16 @@ class PediatricsReportService
                 }
             }
             if ($heartRateLessThan50 >= 1) {
-                return "pSC21";
+                return 'pSC21';
             }
             if ($heartRateOver140 >= 1) {
-                return "pSC22";
+                return 'pSC22';
             }
         }
         return '';
     }
-    private function getHeadCircumferenceAlert(Measurement $measurement, array $measurementData, float $ageInMonths, int $sex, ?array $growthChartsByAge = null): string {
+    private function getHeadCircumferenceAlert(Measurement $measurement, array $measurementData, float $ageInMonths, int $sex, ?array $growthChartsByAge = null): string
+    {
         $headCircumferences = array_key_exists('head-circumference', $measurementData) ? $measurementData['head-circumference'] : [];
         $headCircumferenceChart = [];
         if ($growthChartsByAge !== null) {
@@ -361,7 +365,6 @@ class PediatricsReportService
                     return 'pME7a';
                 }
             }
-
         } else {
             foreach ($headCircumferences as $headCircumference) {
                 if ($headCircumference < 29) {
@@ -374,7 +377,8 @@ class PediatricsReportService
         }
         return '';
     }
-    private function getIrregularHeartRhythmAlert(array $measurementData): string {
+    private function getIrregularHeartRhythmAlert(array $measurementData): string
+    {
         foreach ($measurementData['irregular-heart-rate'] as $irregularHeartRate) {
             if ($irregularHeartRate) {
                 return 'pME8';
@@ -434,7 +438,8 @@ class PediatricsReportService
         }
         return '';
     }
-    private function getWeightForLengthAlert(Measurement $measurement, array $measurementData, array $growthChartsByAge, int $sex):string  {
+    private function getWeightForLengthAlert(Measurement $measurement, array $measurementData, array $growthChartsByAge, int $sex): string
+    {
         $weights = array_key_exists('weight', $measurementData) ? $measurementData['weight'] : [];
         $heights = array_key_exists('height', $measurementData) ? $measurementData['height'] : [];
         if (count($heights) === 0) {
@@ -471,7 +476,8 @@ class PediatricsReportService
         }
         return '';
     }
-    private function getBMIAlert(Measurement $measurement, array $measurementData, float $ageInMonths, array $growthChartsByAge, int $sex): string {
+    private function getBMIAlert(Measurement $measurement, array $measurementData, float $ageInMonths, array $growthChartsByAge, int $sex): string
+    {
         $weights = array_key_exists('weight', $measurementData) ? $measurementData['weight'] : [];
         $heights = array_key_exists('height', $measurementData) ? $measurementData['height'] : [];
         $bmiChart = [];
@@ -554,7 +560,8 @@ class PediatricsReportService
         }
         return '';
     }
-    private function getWaistAlert(array $measurementData, float $ageInMonths): string {
+    private function getWaistAlert(array $measurementData, float $ageInMonths): string
+    {
         $waistCircumferences = array_key_exists('waist-circumference', $measurementData) ? $measurementData['waist-circumference'] : [];
         foreach ($waistCircumferences as $waistCircumference) {
             if ($ageInMonths >= 24 && $ageInMonths <= 83) {
