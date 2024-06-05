@@ -232,9 +232,12 @@ class CronController extends BaseController
         if ($params->has('endDate')) {
             $endDate = new \DateTime($params->get('endDate'));
         } else {
-            $endDate = new \DateTime('today');
+            $endDate = new \DateTime('last day of last month');
         }
         $pediatricsReport->generateMeasurementTotalsReport($startDate, $endDate);
+        $pediatricsReport->generateActiveAlertReport($startDate, $endDate);
+        $pediatricsReport->generateDeviationReport($startDate, $endDate);
+        $pediatricsReport->generateIncentiveReport($startDate, $endDate);
         return $this->json(['success' => true]);
     }
 }

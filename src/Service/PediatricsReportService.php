@@ -62,14 +62,14 @@ class PediatricsReportService
         $this->zScores = $this->em->getRepository(ZScores::class)->getChartsData();
     }
 
-    public function generateIncentiveReport($startDate, $endDate): void
+    public function generateIncentiveReport(\DateTime $startDate, \DateTime $endDate): void
     {
         $incentives = $this->em->getRepository(Incentive::class)->getPediatricIncentivesForReport($startDate, $endDate);
         $csvData = $this->getIncentiveReportCSVData($incentives);
         $this->generateCSVReport($csvData, 'Incentive_Report-' . date('Ymd-His') . '.csv');
     }
 
-    public function getIncentiveReportCSVData($incentives)
+    public function getIncentiveReportCSVData(array $incentives)
     {
         $csvData = [];
         $csvData[] = ['Participant ID', 'Date Created', 'Site', 'Recipient', 'Date of Service', 'Incentive Occurrence',
@@ -83,7 +83,7 @@ class PediatricsReportService
         return $csvData;
     }
 
-    public function generateDeviationReport(): void
+    public function generateDeviationReport(\DateTime $startDate, \DateTime $endDate): void
     {
         $evaluationsTotalData = [];
         foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
@@ -114,7 +114,7 @@ class PediatricsReportService
         $this->generateCSVReport($evaluationsTotalData, 'Protocol_Deviations_Report-' . date('Ymd-His') . '.csv');
     }
 
-    public function generateActiveAlertReport(): void
+    public function generateActiveAlertReport(\DateTime $startDate, \DateTime $endDate): void
     {
         $csvData = [];
         $bpSystolicCharts = $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData();
@@ -125,8 +125,8 @@ class PediatricsReportService
             $alertsData[$ageText] = $this->buildBlankAlertArray($ageText);
             $measurements = $this->em->getRepository(Measurement::class)
                 ->getActiveAlertsReportData(
-                    new \DateTime('first day of last month'),
-                    new \DateTime('last day of last month'),
+                    $startDate,
+                    $endDate,
                     $ageRange[0],
                     $ageRange[1]
                 );
@@ -265,7 +265,7 @@ class PediatricsReportService
         ];
     }
 
-    public function generateMeasurementTotalsReport($startDate, $endDate): void
+    public function generateMeasurementTotalsReport(\DateTime $startDate, \DateTime $endDate): void
     {
         $csvData[] = array_merge(['Measurement Type'], array_keys(self::DEVIATION_AGE_RANGES));
         $tempRow = [];
@@ -646,16 +646,15 @@ class PediatricsReportService
         return '';
     }
 
-    private function generateCSVReport($csvData, $csvTitle)
+    private function generateCSVReport(array $csvData, string $csvTitle)
     {
         // Create a temporary stream to hold the CSV data
-        //$tempStream = fopen('php://temp', 'w');
-        $tempStream = fopen('test.csv', 'w');
+        $tempStream = fopen('php://temp', 'w');
 
         foreach ($csvData as $row) {
             fputcsv($tempStream, $row);
         }
-        //$bucketName = $this->env->isProd() ? self::BUCKET_NAME_PROD : self::BUCKET_NAME_STABLE;
-        //$this->gcsBucketService->uploadFile($bucketName, $tempStream, $csvTitle);
+        $bucketName = $this->env->isProd() ? self::BUCKET_NAME_PROD : self::BUCKET_NAME_STABLE;
+        $this->gcsBucketService->uploadFile($bucketName, $tempStream, $csvTitle);
     }
 }
