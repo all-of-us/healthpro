@@ -343,7 +343,7 @@ class NphOrderService
             $atLeastOneSampleIsFinalized = false;
             foreach ($order->getNphSamples() as $nphSample) {
                 if ($atLeastOneSampleIsFinalized === false) {
-                    $atLeastOneSampleIsFinalized = (bool)$nphSample->getRdrId();
+                    $atLeastOneSampleIsFinalized = (bool) $nphSample->getRdrId();
                 }
                 $sampleCode = $nphSample->getSampleCode();
                 if (isset($formData[$sampleCode])) {

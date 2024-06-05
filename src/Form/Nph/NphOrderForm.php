@@ -154,7 +154,7 @@ class NphOrderForm extends AbstractType
         $builder->add('bowelType', Type\ChoiceType::class, $bowelTypeOptions);
         $builder->add('bowelQuality', Type\ChoiceType::class, $bowelQualityOptions);
         if ($formType === self::FORM_FINALIZE_TYPE) {
-            $builder->add("freezedTs", Type\DateTimeType::class, [
+            $builder->add('freezedTs', Type\DateTimeType::class, [
                 'required' => true,
                 'label' => 'Freeze Time',
                 'widget' => 'single_text',

@@ -246,7 +246,7 @@ $(document).ready(function () {
         let fieldTs = new Date($(this).val());
         let fieldType = $(this).data("field-type");
         let differenceCheck = 2;
-        if (fieldType === 'freeze') {
+        if (fieldType === "freeze") {
             differenceCheck = 72;
         }
         let difference = Math.abs(fieldTs.getTime() - orderCollectedTs.getTime()) / (60 * 60 * 1000);
