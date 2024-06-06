@@ -394,4 +394,9 @@ class BiobankController extends BaseController
             'canViewOrders' => $participant->status || $participant->editExistingOnly
         ]);
     }
+
+    public function auditReport(): Response
+    {
+        return $this->render('biobank/orders-today.html.twig');
+    }
 }

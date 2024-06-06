@@ -7,6 +7,7 @@ use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -246,5 +247,16 @@ class NphOrderRepository extends ServiceEntityRepository
         $queryBuilder
             ->addOrderBy('no.downtimeGeneratedTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getOrderSamplesByModule(string $participantId): array
+    {
+        return $this->createQueryBuilder('no')
+            ->select('no.module, no.visitPeriod, ns.finalizedTs, ns.modifyType')
+            ->leftJoin('no.nphSamples', 'ns')
+            ->where('no.participantId = :participantId')
+            ->setParameter('participantId', $participantId)
+            ->getQuery()
+            ->getResult(Query::HYDRATE_ARRAY);
     }
 }

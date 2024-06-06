@@ -162,9 +162,9 @@ div.order-row {
 .dlw-collect-bg {
     background-color: #fde8ca;
 }
-.dlw-collect-button {
-    background-color: #ff8813;
-    color: white;
+.dlw-collect-button, .dlw-collect-button:hover {
+    background-color: #ff8813 !important;
+    color: white !important;
 }
 .dlw-collect-text {
     margin-top: 8px;
@@ -226,4 +226,18 @@ div.order-row {
     max-height: 350px;
     display: block;
     overflow: auto
+}
+.col-sm-1-5 {
+    flex: 0 0 auto;
+    max-width: 13.5%;
+}
+
+.participant-diet-period a.active {
+    text-decoration: underline;
+}
+
+.participant-diet-period a.disabled {
+    cursor: not-allowed !important;
+    pointer-events: all !important;
+    opacity: 40%;
 }

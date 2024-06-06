@@ -67,7 +67,8 @@ class OrderType extends AbstractType
                 'data' => $options['order']->getVersion(),
                 'constraints' => new Constraints\NotBlank([
                     'message' => 'Please select tube(s) for collection'
-                ])
+                ]),
+                'disabled' => $disabled
             ]);
         }
         $enabledSamples = $options['order']->getEnabledSamples($options['step']);

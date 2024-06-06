@@ -13,6 +13,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\FormInterface;
 
 class OrderService
 {
@@ -774,7 +775,7 @@ class OrderService
         return $this->order;
     }
 
-    public function updateOrderVersion(Order $order, string $orderVersion): Order
+    public function updateOrderVersion(Order $order, string $orderVersion, FormInterface $orderCollectForm): Order
     {
         $processedSamples = json_decode($order->getProcessedSamples(), true);
         $processedSamplesTs = json_decode($order->getProcessedSamplesTs(), true);
@@ -846,8 +847,6 @@ class OrderService
         if (!empty($finalizedSamples)) {
             $order->setFinalizedSamples(json_encode($finalizedSamples));
         }
-        $this->em->persist($order);
-        $this->em->flush();
         $this->loadSamplesSchema($order);
         return $order;
     }

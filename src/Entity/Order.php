@@ -50,7 +50,7 @@ class Order
 
     public static $sst = ['1SST8', '1SS08'];
 
-    public static $pst = ['1PST8', '1PS08'];
+    public static $pst = ['1PST8', '1PS08', 'PS04A', 'PS04B'];
 
     public static $sampleMessageLabels = [
         '1SST8' => 'sst',
@@ -58,7 +58,9 @@ class Order
         '1PST8' => 'pst',
         '1PS08' => 'pst',
         '1SAL' => 'sal',
-        '1SAL2' => 'sal'
+        '1SAL2' => 'sal',
+        'PS04A' => 'pst',
+        'PS04B' => 'pst'
     ];
 
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
@@ -1315,8 +1317,12 @@ class Order
                 $warnings['sst'] = 'Processing Time is Greater than 4 hours after Collection';
             }
             //Check if PST processing time is greater than 4 hrs after collection time
-            if (!empty($pst) && !empty($processedSamplesTs[$pst[0]]) && $processedSamplesTs[$pst[0]] > $collectedTs->getTimestamp()) {
-                $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+
+            foreach ($pst as $sample) {
+                if (!empty($processedSamplesTs[$sample]) && $processedSamplesTs[$sample] > $collectedTs->getTimestamp()) {
+                    $warnings['pst'] = 'Processing Time is Greater than 4 hours after Collection';
+                    break;
+                }
             }
         }
         return $warnings;

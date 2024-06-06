@@ -33,6 +33,7 @@ class NphProgramSummaryService
     {
         $combinedSummary = [];
         $orderSummaryOrder = $orderSummary['order'];
+        $dlwGenerated = false;
         foreach ($programSummary as $module => $moduleSummary) {
             $moduleCreationSite = null;
             foreach ($moduleSummary as $visit => $visitSummary) {
@@ -54,6 +55,9 @@ class NphProgramSummaryService
                                     if ($orderInfo['sampleId'] !== null) {
                                         $numberSamples[$orderid]++;
                                     }
+                                    if ($dlwGenerated === false && str_contains($visit, 'DLW')) {
+                                        $dlwGenerated = true;
+                                    }
                                 }
                             }
                             $combinedSummary[$module][$visit][$timePoint][$sampleType][$sampleCode] = $orderSummaryOrder[$module][$visit][$timePoint][$sampleType][$sampleCode] ?? [];
@@ -64,8 +68,12 @@ class NphProgramSummaryService
                     $combinedSummary[$module][$visit][$timePoint] = ['timePointInfo' => $combinedSummary[$module][$visit][$timePoint], 'timePointDisplayName' => $visitSummary['visitInfo'][$timePoint]['timePointDisplayName']];
                 }
                 $combinedSummary[$module][$visit] = ['visitInfo' => $combinedSummary[$module][$visit], 'visitDisplayName' => $visitSummary['visitDisplayName'], 'visitDiet' => $visitSummary['visitDiet']];
+                if (str_contains($visit, 'DLW')) {
+                    $combinedSummary[$module][$visit]['dlwGenerated'] = $dlwGenerated;
+                }
                 $combinedSummary[$module]['sampleStatusCount'] = $orderSummary['sampleStatusCount'][$module] ?? [];
                 $combinedSummary[$module]['moduleCreationSite'] = $moduleCreationSite;
+                $dlwGenerated = false;
             }
         }
         return $combinedSummary;
