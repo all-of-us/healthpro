@@ -151,4 +151,18 @@ class IncentiveRepository extends ServiceEntityRepository
             ->orderBy('i.createdTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
+
+    public function getPediatricIncentivesForReport(\DateTime $startDate, \DateTime $endDate)
+    {
+        $queryBuild = $this->createQueryBuilder('i')
+            ->select('i.participantId, i.createdTs, i.site, i.Recipient, i.incentiveDateGiven,
+            i.incentiveOccurrence, i.incentiveType, i.giftCardType, i.typeOfItem, i.numberOfItems,
+            i.incentiveAmount, i.declined')
+            ->orWhere('i.Recipient in (:recipients)')
+            ->orWhere('i.incentiveOccurrence = :incentive_occurrence')
+            ->setParameter('incentive_occurrence', Incentive::PEDIATRIC_VISIT)
+            ->setParameter('recipients', [Incentive::PEDIATRIC_GUARDIAN, Incentive::PEDIATRIC_PARTICIPANT, Incentive::OTHER])
+            ->getQuery();
+        return $queryBuild->getResult();
+    }
 }

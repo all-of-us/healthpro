@@ -15,6 +15,7 @@ use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\PatientStatusService;
+use App\Service\PediatricsReportService;
 use App\Service\SessionService;
 use App\Service\SiteSyncService;
 use App\Service\WithdrawalNotificationService;
@@ -217,6 +218,26 @@ class CronController extends BaseController
     public function backfillIdVerificationsRdrAction(IdVerificationService $idVerificationService): Response
     {
         $idVerificationService->backfillIdVerificationsRdr();
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/pediatrics-report', name: 'cron_pediatrics_report')]
+    public function pediatricsReportAction(PediatricsReportService $pediatricsReport, ParameterBagInterface $params): Response
+    {
+        if ($params->has('startDate')) {
+            $startDate = new \DateTime($params->get('startDate'));
+        } else {
+            $startDate = new \DateTime('first day of 3 months ago');
+        }
+        if ($params->has('endDate')) {
+            $endDate = new \DateTime($params->get('endDate'));
+        } else {
+            $endDate = new \DateTime('last day of last month');
+        }
+        $pediatricsReport->generateMeasurementTotalsReport($startDate, $endDate);
+        $pediatricsReport->generateActiveAlertReport($startDate, $endDate);
+        $pediatricsReport->generateDeviationReport($startDate, $endDate);
+        $pediatricsReport->generateIncentiveReport($startDate, $endDate);
         return $this->json(['success' => true]);
     }
 }
