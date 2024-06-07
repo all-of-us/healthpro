@@ -56,7 +56,7 @@ $(document).ready(function () {
     $("#sample_process_go_back").on("click", function () {
         let moduleNumber = $(".nav-item.participant-module.active").data("modulenumber");
         let moduleSel = $("#ModuleGroup" + moduleNumber);
-        let period = moduleSel.find(".nav-link.participant-diet-period.active").data("period");
+        let period = moduleSel.find(".nav-link.diet-period-label.active").data("period");
         let checkBoxSel = moduleSel.find("#sample_process_complete_check_" + period);
         checkBoxSel.prop("checked", !checkBoxSel.prop("checked"));
     });
