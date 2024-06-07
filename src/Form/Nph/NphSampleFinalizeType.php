@@ -26,7 +26,7 @@ class NphSampleFinalizeType extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_STOOL) {
-            $this->addStoolMetadataFields($builder, $disableMetadataFields);
+            $this->addStoolMetadataFields($builder, $options['timeZone'], $sample, $disableMetadataFields);
         }
 
         if ($orderType === NphOrder::TYPE_24URINE) {
@@ -128,7 +128,8 @@ class NphSampleFinalizeType extends NphOrderForm
                             })
                         ],
                         'attr' => [
-                            'class' => 'order-ts',
+                            'class' => 'order-ts aliquot-ts',
+                            'data-field-type' => 'aliquot',
                             'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                         ]
                     ],

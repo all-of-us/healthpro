@@ -340,7 +340,11 @@ class NphOrderService
     {
         try {
             $orderType = $order->getOrderType();
+            $atLeastOneSampleIsFinalized = false;
             foreach ($order->getNphSamples() as $nphSample) {
+                if ($atLeastOneSampleIsFinalized === false) {
+                    $atLeastOneSampleIsFinalized = (bool) $nphSample->getRdrId();
+                }
                 $sampleCode = $nphSample->getSampleCode();
                 if (isset($formData[$sampleCode])) {
                     if ($formData[$sampleCode]) {
@@ -365,7 +369,7 @@ class NphOrderService
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            if ($orderType === NphOrder::TYPE_STOOL) {
+            if ($orderType === NphOrder::TYPE_STOOL && $atLeastOneSampleIsFinalized === false) {
                 $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                     'bowelQuality']));
                 $this->em->persist($order);
@@ -428,7 +432,11 @@ class NphOrderService
         $metadata = [];
         foreach ($metaDataTypes as $metaDataType) {
             if (!empty($formData[$metaDataType])) {
-                $metadata[$metaDataType] = $formData[$metaDataType];
+                if ($metaDataType === 'freezedTs') {
+                    $metadata[$metaDataType] = $formData[$metaDataType]->getTimestamp();
+                } else {
+                    $metadata[$metaDataType] = $formData[$metaDataType];
+                }
             }
         }
         return !empty($metadata) ? json_encode($metadata) : null;
@@ -441,6 +449,7 @@ class NphOrderService
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
+            $metadata['freezedTs'] = $metadata['freezedTs'] ?? null;
         } elseif ($order->getOrderType() === NPHOrder::TYPE_URINE || $order->getOrderType() === NPHOrder::TYPE_24URINE) {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
@@ -536,6 +545,11 @@ class NphOrderService
                 }
                 if (!empty($orderMetadata['bowelQuality'])) {
                     $sampleData['bowelQuality'] = $orderMetadata['bowelQuality'];
+                }
+                if (!empty($orderMetadata['freezedTs'])) {
+                    $freezedTs = new \DateTime();
+                    $freezedTs->setTimestamp($orderMetadata['freezedTs']);
+                    $sampleData['freezedTs'] = $freezedTs;
                 }
             }
         }
@@ -1197,7 +1211,7 @@ class NphOrderService
             $this->saveNphSampleFinalizedInfo($sample, $collectedTs, $notes, null, $biobankFinalization);
 
             // Update order metadata
-            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
+            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality', 'freezedTs']));
             $this->em->persist($order);
             $this->em->flush();
 
