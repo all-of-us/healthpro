@@ -332,7 +332,7 @@ class SiteService
     public function canSwitchProgram(): bool
     {
         $user = $this->userService->getUser();
-        return $user && (($user->getNphSites() && $user->getSites()) || $this->hasMultipleBiobankRoles());
+        return $user && (($user->getNphSites() && $user->getSites()) || $this->hasCrossProgramRoles());
     }
 
     public function autoSwitchSite(): bool
@@ -355,7 +355,7 @@ class SiteService
                 $autoSwitch = true;
             }
         }
-        if (count($sites) === 0 && $this->hasMultipleBiobankRoles()) {
+        if (count($sites) === 0) {
             $autoSwitch = true;
         }
         return $autoSwitch;
@@ -446,9 +446,20 @@ class SiteService
         return true;
     }
 
-    private function hasMultipleBiobankRoles(): bool
+    private function hasCrossProgramRoles(): bool
     {
         $user = $this->userService->getUser();
-        return $user && in_array('ROLE_BIOBANK', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles());
+        return $user && (
+            (in_array('ROLE_BIOBANK', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles())) ||
+            (in_array('ROLE_ADMIN', $user->getRoles()) && $user->getNphSites()) ||
+            (in_array('ROLE_NPH_ADMIN', $user->getRoles()) && $user->getSites()) ||
+            (
+                in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_NPH_ADMIN', $user->getRoles())
+            ) ||
+            (in_array('ROLE_BIOBANK', $user->getRoles()) && $user->getNphSites()) ||
+            (in_array('ROLE_NPH_BIOBANK', $user->getRoles()) && $user->getSites()) ||
+            (in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles())) ||
+            (in_array('ROLE_NPH_ADMIN', $user->getRoles()) && in_array('ROLE_BIOBANK', $user->getRoles()))
+        );
     }
 }
