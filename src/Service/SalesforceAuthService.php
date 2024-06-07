@@ -14,10 +14,12 @@ class SalesforceAuthService
 {
     private RequestStack $requestStack;
     private GenericProvider $provider;
+    private ContainerBagInterface $params;
 
     public function __construct(RequestStack $requestStack, ContainerBagInterface $params)
     {
         $this->requestStack = $requestStack;
+        $this->params = $params;
         $this->provider = new GenericProvider([
             'clientId' => $params->get('salesforce_client_id'),
             'clientSecret' => $params->get('salesforce_client_secret'),
@@ -60,6 +62,6 @@ class SalesforceAuthService
 
     public function getLogoutUrl(): string
     {
-        return 'https://nihallofus--ibmpoc.sandbox.lightning.force.com/secur/logout.jsp';
+        return $this->params->get('salesforce_url_logout');
     }
 }
