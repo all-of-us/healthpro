@@ -41,8 +41,7 @@ class DefaultController extends BaseController
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
         }
-        if (($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER')) || ($this->isGranted('ROLE_AWARDEE') &&
-                $this->isGranted('ROLE_DV_ADMIN'))) {
+        if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
         } elseif ($this->isGranted('ROLE_AWARDEE')) {
             return $this->redirectToRoute('workqueue_index');
@@ -50,10 +49,7 @@ class DefaultController extends BaseController
             return $this->redirectToRoute('problem_reports');
         } elseif ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('admin_home');
-        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS') || $this->isGranted('ROLE_NPH_BIOBANK')) {
-            if ($program === User::PROGRAM_NPH) {
-                return $this->redirectToRoute('nph_biobank_home');
-            }
+        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
             return $this->redirectToRoute('biobank_home');
         } elseif ($this->isGranted('ROLE_READ_ONLY')) {
             return $this->redirectToRoute('read_home');

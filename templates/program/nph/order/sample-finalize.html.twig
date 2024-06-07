@@ -286,6 +286,16 @@
                             Changing the questions for this stool sample will update the questions for all other associated stool samples within the order.
                         </span>
                         <hr>
+                        <div class="form-group {% if not sampleFinalizeForm['freezedTs'].vars.valid %} has-error{% endif %}">
+                            {{ form_label(sampleFinalizeForm['freezedTs']) }}
+                            {{ form_widget(sampleFinalizeForm['freezedTs']) }}
+                            {{ form_errors(sampleFinalizeForm['freezedTs']) }}
+                        </div>
+                        <div class="text-warning">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Changing the freeze time for this stool sample will update the freeze time for all other associated stool samples within the order.
+                        </div>
+                        <hr>
                     {% endif %}
                     <div class="panel-heading text-warning bg-warning" id="aliquotTimeWarning" hidden="hidden">
                         <p><i class="fa fa-warning"></i> Please ensure collection and aliquot times are correct.</p>
@@ -293,6 +303,14 @@
                             <li>As a general guideline, samples should be aliquoted within 2 hours of collection.</li>
                             <li>Double check the AM/PM selection for each time.</li>
                             <li>If the times entered are correct, you may continue with finalization.</li>
+                        </ul>
+                    </div>
+                    <div class="panel-heading text-warning bg-warning" id="freezeTimeWarning" hidden="hidden">
+                        <p><i class="fa fa-warning"></i> Please ensure the Collection Time and Freeze Time are correct.</p>
+                        <ul>
+                            <li>As a general guideline, the Freeze Time should be less than 72 hours after Collection Time.</li>
+                            <li>Double check the AM/PM selection for each time.</li>
+                            <li>If the times entered are correct, please enter the reason why the Freeze Time is greater than 72 hours from collection in the notes below. You may continue with finalization.</li>
                         </ul>
                     </div>
                     <span></span>

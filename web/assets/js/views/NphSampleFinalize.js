@@ -240,20 +240,25 @@ $(document).ready(function () {
         });
     }
 
-    $(".order-ts").on("dp.change", function (event) {
+    $(".aliquot-ts, .freeze-ts").on("dp.change", function (event) {
         let collectedTsSelector = $('input[id*="CollectedTs"]');
         let orderCollectedTs = new Date(collectedTsSelector.val());
-        let aliquotTs = new Date($(this).val());
-        let difference = Math.abs(aliquotTs.getTime() - orderCollectedTs.getTime()) / (60 * 60 * 1000);
-        if (difference > 2) {
+        let fieldTs = new Date($(this).val());
+        let fieldType = $(this).data("field-type");
+        let differenceCheck = 2;
+        if (fieldType === "freeze") {
+            differenceCheck = 72;
+        }
+        let difference = Math.abs(fieldTs.getTime() - orderCollectedTs.getTime()) / (60 * 60 * 1000);
+        if (difference > differenceCheck) {
             $(this).addClass("date-range-warning");
             collectedTsSelector.addClass("date-range-warning");
-            $("#aliquotTimeWarning").show();
+            $("#" + fieldType + "TimeWarning").show();
         } else {
             $(this).removeClass("date-range-warning");
             collectedTsSelector.removeClass("date-range-warning");
             if ($("td.has-warning>input.order-ts").length === 0) {
-                $("#aliquotTimeWarning").hide();
+                $("#" + fieldType + "TimeWarning").hide();
             }
         }
         clearServerErrors(event);
@@ -265,18 +270,27 @@ $(document).ready(function () {
 
     $(".sample-cancel-checkbox").on("change", disableEnableAliquotFields);
 
+    const dateComparison = (value, requirement) => {
+        const inputDate = new Date(value);
+        const collectedTs = document.getElementById(requirement).value;
+        if (collectedTs) {
+            const comparisonDate = new Date(collectedTs);
+            return inputDate > comparisonDate;
+        }
+        return true;
+    };
+
     window.Parsley.addValidator("aliquotDateComparison", {
-        validateString: function (value, requirement) {
-            let inputDate = new Date(value);
-            let collectedTs = $("#" + requirement).val();
-            if (collectedTs) {
-                let comparisonDate = new Date(collectedTs);
-                return inputDate > comparisonDate;
-            }
-            return true;
-        },
+        validateString: dateComparison,
         messages: {
             en: "Aliquot time must be after collection time."
+        }
+    });
+
+    window.Parsley.addValidator("freezeDateComparison", {
+        validateString: dateComparison,
+        messages: {
+            en: "Freeze time must be after collection time."
         }
     });
 

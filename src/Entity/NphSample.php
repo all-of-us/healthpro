@@ -521,6 +521,11 @@ class NphSample
         if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL) {
             $sampleData['bowelMovement'] = $samplesMetadata['bowelType'] ?? null;
             $sampleData['bowelMovementQuality'] = $samplesMetadata['bowelQuality'] ?? null;
+            if ($samplesMetadata['freezedTs']) {
+                $freezedTs = new \DateTime();
+                $freezedTs->setTimestamp($samplesMetadata['freezedTs']);
+                $sampleData['freezed'] = $freezedTs->format('Y-m-d\TH:i:s\Z');
+            }
         }
         return $sampleData;
     }

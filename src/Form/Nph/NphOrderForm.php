@@ -125,8 +125,10 @@ class NphOrderForm extends AbstractType
 
     protected function addStoolMetadataFields(
         FormBuilderInterface $builder,
+        string $timeZone,
+        string $sample,
         bool $disabled = false,
-        string $formType = self::FORM_FINALIZE_TYPE
+        string $formType = self::FORM_FINALIZE_TYPE,
     ): void {
         $required = $formType === self::FORM_FINALIZE_TYPE;
         $bowelTypeOptions = [
@@ -151,6 +153,37 @@ class NphOrderForm extends AbstractType
         }
         $builder->add('bowelType', Type\ChoiceType::class, $bowelTypeOptions);
         $builder->add('bowelQuality', Type\ChoiceType::class, $bowelQualityOptions);
+        if ($formType === self::FORM_FINALIZE_TYPE) {
+            $builder->add('freezedTs', Type\DateTimeType::class, [
+                'required' => true,
+                'label' => 'Freeze Time',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => $timeZone,
+                'constraints' => [
+                    new Constraints\LessThanOrEqual([
+                        'value' => new \DateTime('+5 minutes'),
+                        'message' => 'Timestamp cannot be in the future'
+                    ]),
+                    new Constraints\Callback(function ($value, $context) use ($sample) {
+                        $formData = $context->getRoot()->getData();
+                        if (!empty($formData["{$sample}CollectedTs"]) && !empty($value)) {
+                            if ($value <= $formData["{$sample}CollectedTs"]) {
+                                $context->buildViolation('Freeze time must be after collection time')->addViolation();
+                            }
+                        }
+                    })
+                ],
+                'attr' => [
+                    'class' => 'order-ts freeze-ts',
+                    'data-field-type' => 'freeze',
+                    'data-parsley-freeze-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
+                ],
+                'disabled' => $disabled
+            ]);
+        }
     }
 
     protected function addUrineTotalCollectionVolume(
