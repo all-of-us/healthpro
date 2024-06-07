@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use App\Service\EnvironmentService;
 use App\Service\SalesforceAuthService;
 use App\Service\UserService;
 use Exception;
@@ -25,7 +24,6 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
     private UrlGeneratorInterface $urlGenerator;
     private UserService $userService;
     private ContainerBagInterface $params;
-    private EnvironmentService $env;
     private Environment $twig;
     private RequestStack $requestStack;
     private string $authEmail;
@@ -35,7 +33,6 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
         SalesforceAuthService $auth,
         UrlGeneratorInterface $urlGenerator,
         ContainerBagInterface $params,
-        EnvironmentService $env,
         UserService $userService,
         Environment $twig,
         RequestStack $requestStack
@@ -43,7 +40,6 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
         $this->auth = $auth;
         $this->urlGenerator = $urlGenerator;
         $this->params = $params;
-        $this->env = $env;
         $this->userService = $userService;
         $this->twig = $twig;
         $this->requestStack = $requestStack;

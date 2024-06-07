@@ -26,7 +26,7 @@ trait ResponseSecurityHeadersTrait
 
             . " img-src www.google-analytics.com 'self' data:;" // allow Google Analytcs, self, and data: urls for img src
 
-            . " frame-ancestors 'self' nihallofus--ibmpoc.sandbox.my.salesforce.com nihallofus--ibmpoc--c.sandbox.vf.force.com nihallofus--ibmpoc.sandbox.lightning.force.com"; // accomplishes the same as the X-Frame-Options header above
+            . " frame-ancestors 'self' nihallofus--ibmdev.sandbox.my.salesforce.com nihallofus--ibmdev--c.sandbox.vf.force.com nihallofus--ibmdev.sandbox.lightning.force.com"; // accomplishes the same as the X-Frame-Options header above
 
         $response->headers->set('Content-Security-Policy', $contentSecurityPolicy);
 
