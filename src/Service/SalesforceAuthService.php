@@ -21,13 +21,13 @@ class SalesforceAuthService
         $this->requestStack = $requestStack;
         $this->params = $params;
         $this->provider = new GenericProvider([
-            'clientId' => $params->get('salesforce_client_id'),
-            'clientSecret' => $params->get('salesforce_client_secret'),
-            'redirectUri' => $params->get('salesforce_redirect_uri'),
-            'urlAuthorize' => $params->get('salesforce_url_authorize'),
-            'urlAccessToken' => $params->get('salesforce_url_access_token'),
-            'urlResourceOwnerDetails' => $params->get('salesforce_url_resource_owner_details'),
-            'scopes' => $params->get('salesforce_scopes')
+            'clientId' => $this->getParams('salesforce_client_id'),
+            'clientSecret' => $this->getParams('salesforce_client_secret'),
+            'redirectUri' => $this->getParams('salesforce_redirect_uri'),
+            'urlAuthorize' => $this->getParams('salesforce_url_authorize'),
+            'urlAccessToken' => $this->getParams('salesforce_url_access_token'),
+            'urlResourceOwnerDetails' => $this->getParams('salesforce_url_resource_owner_details'),
+            'scopes' => $this->getParams('salesforce_scopes')
         ]);
     }
 
@@ -62,6 +62,11 @@ class SalesforceAuthService
 
     public function getLogoutUrl(): string
     {
-        return $this->params->get('salesforce_url_logout');
+        return $this->getParams('salesforce_url_logout');
+    }
+
+    private function getParams($field): string|null
+    {
+        return $this->params->has($field) ? $this->params->get($field) : null;
     }
 }
