@@ -1041,11 +1041,11 @@ class NphOrderService
         return 'Period1';
     }
 
-    public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): int
+    public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): string
     {
         $module1DietStatus = $moduleDietPeriodStatus[1]['LMT'];
         if (in_array($module1DietStatus, [NphDietPeriodStatus::NOT_STARTED, NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED])) {
-            return 1;
+            return '1';
         }
         return $currentModule;
     }
