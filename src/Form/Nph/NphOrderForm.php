@@ -128,9 +128,11 @@ class NphOrderForm extends AbstractType
         string $timeZone,
         string $sample,
         bool $disabled = false,
+        bool $disableFreezeTs = false,
         string $formType = self::FORM_FINALIZE_TYPE,
     ): void {
         $required = $formType === self::FORM_FINALIZE_TYPE;
+        $disableFreezeTsField = $disabled || $disableFreezeTs;
         $bowelTypeOptions = [
             'label' => 'Describe the bowel movement for this collection',
             'required' => $required,
@@ -155,7 +157,7 @@ class NphOrderForm extends AbstractType
         $builder->add('bowelQuality', Type\ChoiceType::class, $bowelQualityOptions);
         if ($formType === self::FORM_FINALIZE_TYPE) {
             $builder->add('freezedTs', Type\DateTimeType::class, [
-                'required' => true,
+                'required' => !$disableFreezeTs,
                 'label' => 'Freeze Time',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
@@ -181,7 +183,7 @@ class NphOrderForm extends AbstractType
                     'data-field-type' => 'freeze',
                     'data-parsley-freeze-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                 ],
-                'disabled' => $disabled
+                'disabled' => $disableFreezeTsField
             ]);
         }
     }
