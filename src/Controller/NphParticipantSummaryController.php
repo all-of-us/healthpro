@@ -99,6 +99,7 @@ class NphParticipantSummaryController extends BaseController
             ->getGenerateOrderWarningLogByModule($participantId);
 
         $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
+        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
 
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
@@ -111,6 +112,7 @@ class NphParticipantSummaryController extends BaseController
             'generateOrderWarningLogByModule' => $generateOrderWarningLogByModule,
             'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
             'activeDietPeriod' => $activeDietPeriod,
+            'activeModule' => $activeModule,
             'dietPeriodStatusMap' => NphDietPeriodStatus::$dietPeriodStatusMap,
             'dietToolTipMessages' => NphDietPeriodStatus::$dietToolTipMessages,
             'cacheEnabled' => $cacheEnabled,

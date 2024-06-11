@@ -827,6 +827,39 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
     }
 
+    /**
+     * @dataProvider activeModuleProvider
+     */
+    public function testGetActiveModule(array $moduleDietPeriodStatus, string $currentModule, $expectedResult)
+    {
+        $result = $this->service->getActiveModule($moduleDietPeriodStatus, $currentModule);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function activeModuleProvider(): array
+    {
+        return [
+            'in progress module 1' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'in_progress_unfinalized'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'not_started', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => '1'
+            ],
+            'not started module 1' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'not_started'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'in_progress_unfinalized', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => '1'
+            ]
+        ];
+    }
+
     private function getGuzzleResponse($data): Response
     {
         return new Response(200, ['Content-Type' => 'application/json'], $data);

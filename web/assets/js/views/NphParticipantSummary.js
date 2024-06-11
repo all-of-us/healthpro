@@ -124,32 +124,24 @@ $(document).ready(function () {
         $('form[name="nph_generate_order_warning_log"]').submit();
     });
 
-    $(".diet-visit-status-text").each(function () {
-        let $parentCard = $(this).closest(".card");
-        let $badge = $parentCard.find(".diet-visit-status .badge");
-        if (
-            $badge.hasClass("bg-primary") ||
-            $badge.hasClass("bg-success") ||
-            $badge.hasClass("bg-warning") ||
-            $badge.hasClass("bg-secondary")
-        ) {
-            $(this).next(".diet-visit-status-icon").show();
-        } else {
-            $(this).next(".diet-visit-status-icon").hide();
-        }
-    });
-
     $(".period-diet-visits").each(function () {
         let $this = $(this);
+        let dietVisitStatusText = $this.find(".diet-visit-status-text");
         let dietVisitStatusIcon = $this.find(".diet-visit-status-icon");
         let dietVisitStatuses = $this.find(".diet-visit-status");
+        let dietPeriodStatus = dietVisitStatusText.data("diet-period-status");
         let displayErrorIcon = false;
-        dietVisitStatuses.each(function () {
-            if ($(this).data("diet-visit-status") !== "Finalized" && $(this).data("diet-visit-status") !== "Canceled") {
-                displayErrorIcon = true;
-                return false;
-            }
-        });
+        if (dietPeriodStatus !== "in_progress_unfinalized") {
+            dietVisitStatuses.each(function () {
+                if (
+                    $(this).data("diet-visit-status") !== "Finalized" &&
+                    $(this).data("diet-visit-status") !== "Canceled"
+                ) {
+                    displayErrorIcon = true;
+                    return false;
+                }
+            });
+        }
         dietVisitStatusIcon.toggle(displayErrorIcon);
     });
 });
