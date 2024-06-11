@@ -248,6 +248,7 @@ class NphOrderController extends BaseController
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
         $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
         $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
+        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getRdrId(), $sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
@@ -256,7 +257,7 @@ class NphOrderController extends BaseController
                 $isFormDisabled, 'nphSample' => $sample, 'disableMetadataFields' =>
                 $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
                 $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(),
-                'module' => $order->getModule()
+                'module' => $order->getModule(), 'disableFreezeTs' => $isFreezeTsDisabled
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
@@ -337,7 +338,8 @@ class NphOrderController extends BaseController
             'biobankView' => false,
             'isFormDisabled' => $isFormDisabled,
             'visitDiet' => $nphOrderService->getVisitDiet(),
-            'order' => $order
+            'order' => $order,
+            'isFreezeTsDisabled' => $isFreezeTsDisabled
         ]);
     }
 

@@ -26,7 +26,7 @@ class NphSampleFinalizeType extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_STOOL) {
-            $this->addStoolMetadataFields($builder, $options['timeZone'], $sample, $disableMetadataFields);
+            $this->addStoolMetadataFields($builder, $options['timeZone'], $sample, $disableMetadataFields, $options['disableFreezeTs']);
         }
 
         if ($orderType === NphOrder::TYPE_24URINE) {
@@ -289,7 +289,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'disableMetadataFields' => null,
             'disableStoolCollectedTs' => null,
             'orderCreatedTs' => null,
-            'module' => null
+            'module' => null,
+            'disableFreezeTs' => null
         ]);
     }
 

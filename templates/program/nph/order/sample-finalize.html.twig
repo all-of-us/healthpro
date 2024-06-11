@@ -288,6 +288,11 @@
                         <hr>
                         <div class="form-group {% if not sampleFinalizeForm['freezedTs'].vars.valid %} has-error{% endif %}">
                             {{ form_label(sampleFinalizeForm['freezedTs']) }}
+                            {% if isFreezeTsDisabled %}
+                                <i class="fas fa-exclamation-circle text-danger"
+                                   title="This sample was collected prior to the Freeze Time implementation. Freeze Time may not be entered for this sample."
+                                   data-toggle="tooltip" data-container="body"></i>
+                            {% endif %}
                             {{ form_widget(sampleFinalizeForm['freezedTs']) }}
                             {{ form_errors(sampleFinalizeForm['freezedTs']) }}
                         </div>
