@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Service\AuthService;
 use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\SalesforceAuthService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,7 +31,7 @@ class DefaultController extends BaseController
 
     #[Route(path: '/', name: 'home')]
     #[Route(path: '/nph', name: 'nph_home')]
-    public function index(Request $request, ContextTemplateService $contextTemplate)
+    public function index(Request $request, ContextTemplateService $contextTemplate, PpscApiService $ppscApiService)
     {
         $program = $request->getSession()->get('program');
         if ($program === User::PROGRAM_NPH && $request->attributes->get('_route') === self::HPO_HOME_ROUTE) {
@@ -40,6 +41,10 @@ class DefaultController extends BaseController
         if ($checkTimeZone && !$this->getSecurityUser()->getTimezone()) {
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
+        }
+        if ($this->isGranted('ROLE_USER') && $request->getSession()->get('ppscRequestId') && $request->getSession()->get('ppscLandingPage') === 'in_person_enrollment') {
+            $requestDetails = $ppscApiService->getRequestDetailsById($request->getSession()->get('ppscRequestId'));
+            return $this->redirectToRoute('ppsc_participant', ['id' => $requestDetails['Participant_ID__c']]);
         }
         if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));

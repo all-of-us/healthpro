@@ -132,10 +132,8 @@ class UserProvider implements UserProviderInterface
         if ($this->requestStack->getSession()->has('googlegroups')) {
             $groups = $this->requestStack->getSession()->get('googlegroups');
         } else {
-            $requestDetails = $this->ppscApiService->get('getRequestDetails', ['requestId' => $this->requestStack->getSession()->get('ppscRequestId')]);
-            $responseBody = $requestDetails->getBody();
-            $requestDetailsData = json_decode($responseBody->getContents(), true);
-            $siteId = $requestDetailsData[0]['Site_ID__c'];
+            $requestDetails = $this->ppscApiService->getRequestDetailsById($this->requestStack->getSession()->get('ppscRequestId'));
+            $siteId = $requestDetails['Site_ID__c'];
             $groups = [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId])];
             $this->requestStack->getSession()->set('googlegroups', $groups);
             $this->requestStack->getSession()->set('managegroups', []);

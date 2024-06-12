@@ -41,4 +41,19 @@ class PpscApiService
         $params['json'] = $body;
         return $this->client->request('PATCH', $this->endpoint . $path, $params);
     }
+
+    public function getRequestDetailsById($requestId)
+    {
+        $requestDetails = $this->client->request('GET', $this->endpoint . 'getRequestDetails', ['query' => ['requestId' => $requestId]]);
+        $responseBody = $requestDetails->getBody();
+        $requestDetailsData = json_decode($responseBody->getContents(), true);
+        return $requestDetailsData[0];
+    }
+
+    public function getParticipantById($participantId)
+    {
+        $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', ['query' => ['participantId' => $participantId]]);
+        $responseBody = $response->getBody();
+        return json_decode($responseBody->getContents(), true);
+    }
 }

@@ -1,0 +1,15 @@
+{% set bootstrapVersion = 5 %}
+{% extends 'render-base.html.twig' %}
+{% block title %}In Person Enrollment - {% endblock %}
+{% block bodycontainer %}container-fluid px-5{% endblock %}
+{% block body %}
+    {% import 'macros/display-text.html.twig' as macros %}
+<div class="row">
+    <div class="col-sm-6">
+        {% include 'program/hpo/ppsc/partials/participant-measurement-list.html.twig' %}
+    </div>
+    <div class="col-sm-6">
+        {% include 'program/hpo/ppsc/partials/participant-orders-list.html.twig' %}
+    </div>
+</div>
+{% endblock %}
