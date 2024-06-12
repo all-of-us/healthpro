@@ -92,6 +92,21 @@ class AuthController extends BaseController
         return $this->redirectToRoute('login');
     }
 
+    #[Route(path: '/salesforce', name: 'login_salesforce_request_id')]
+    public function loginSalesforceRequestId(
+        SalesforceAuthService $auth,
+        ContainerBagInterface $params,
+        Request $request,
+        SessionInterface $session): Response
+    {
+        $session->set('ppscRequestId', $request->query->get('requestId'));
+        $session->set('ppscLandingPage', $request->query->get('page'));
+        if ($params->has('enable_salesforce_login') && $params->get('enable_salesforce_login')) {
+            return $this->redirect($auth->getAuthorizationUrl());
+        }
+        return $this->redirectToRoute('login');
+    }
+
     #[Route(path: '/login/openid/callback', name: 'login_openid_callback')]
     public function loginOpenIdCallback(): Response
     {
