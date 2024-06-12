@@ -35,8 +35,7 @@ class HpoPpscController extends BaseController
             'participant' => $participant,
             'orders' => $orders,
             'measurements' => $measurements,
-            'evaluationUrl' => $evaluationUrl,
-            'participantId' => $id
+            'evaluationUrl' => $evaluationUrl
         ]);
     }
 }

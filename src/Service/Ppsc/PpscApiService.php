@@ -2,6 +2,7 @@
 
 namespace App\Service\Ppsc;
 
+use App\Helper\PpscParticipant;
 use App\HttpClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -19,41 +20,30 @@ class PpscApiService
         $this->client = new HttpClient(['cookies' => true]);
     }
 
-    public function get($path, $params = [])
+    public function getRequestDetailsById($requestId): \stdClass|null
     {
-        return $this->client->request('GET', $this->endpoint . $path, ['query' => $params]);
+        try {
+            $response = $this->client->request('GET', $this->endpoint . 'getRequestDetails', ['query' => ['requestId' => $requestId]]);
+            $requestDetailsData = json_decode($response->getBody()->getContents());
+            return $requestDetailsData ? $requestDetailsData[0] : null;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
     }
 
-    public function post($path, $body, $params = [])
+    public function getParticipantById($participantId): PpscParticipant|null
     {
-        $params['json'] = $body;
-        return $this->client->request('POST', $this->endpoint . $path, $params);
-    }
-
-    public function put($path, $body, $params = [])
-    {
-        $params['json'] = $body;
-        return $this->client->request('PUT', $this->endpoint . $path, $params);
-    }
-
-    public function patch($path, $body, $params = [])
-    {
-        $params['json'] = $body;
-        return $this->client->request('PATCH', $this->endpoint . $path, $params);
-    }
-
-    public function getRequestDetailsById($requestId)
-    {
-        $requestDetails = $this->client->request('GET', $this->endpoint . 'getRequestDetails', ['query' => ['requestId' => $requestId]]);
-        $responseBody = $requestDetails->getBody();
-        $requestDetailsData = json_decode($responseBody->getContents(), true);
-        return $requestDetailsData[0];
-    }
-
-    public function getParticipantById($participantId)
-    {
-        $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', ['query' => ['participantId' => $participantId]]);
-        $responseBody = $response->getBody();
-        return json_decode($responseBody->getContents(), true);
+        try {
+            $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', ['query' => ['participantId' => $participantId]]);
+            $participant = json_decode($response->getBody()->getContents());
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+        if ($participant) {
+            return new PpscParticipant($participant);
+        }
+        return null;
     }
 }

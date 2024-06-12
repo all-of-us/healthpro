@@ -10,12 +10,12 @@
 
 <div class="card">
     <div class="card-header">
-        {% if participant['isPediatric'] %}
-            <a href="{{ path('order_check_pediatric', { participantId: participantId }) }}"
+        {% if participant.isPediatric %}
+            <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}"
                class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank
                 Order</a>
         {% else %}
-            <a href="{{ path('order_check', { participantId: participantId }) }}"
+            <a href="{{ path('order_check', { participantId: participant.id }) }}"
                class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank
                 Order</a>
         {% endif %}
@@ -29,7 +29,7 @@
                 {% if type is not defined and loop.index == 6 %}
                     <div id="order-overflow">
                 {% endif %}
-                <a href="{{ path('order', { participantId: participantId, orderId: order.id }) }}"
+                <a href="{{ path('order', { participantId: participant.id, orderId: order.id }) }}"
                    class="text-start btn btn-block btn-lg border w-100  {% if orderId is defined and order.id == orderId %} btn-warning {% else %} {% endif %}">
                     <div class="row">
                         <div class="col-sm-6 border-end">
