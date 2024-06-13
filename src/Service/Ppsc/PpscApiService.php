@@ -8,22 +8,60 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PpscApiService
 {
-    protected $client;
-    protected $endpoint = 'http://nih-norc-participant-prc-api.usg-w1.gov.cloudhub.io/dev/prc/v1/api/';
+    private ParameterBagInterface $params;
+    private HttpClient $client;
+    private string|null $tokenUrl;
+    private string|null $clientId;
+    private string|null $clientSecret;
+    private string|null $grantType;
+    private string|null $accessToken = null;
+    private string|null $endpoint;
 
     public function __construct(ParameterBagInterface $params)
     {
-        // Load endpoint from configuration
-        if ($params->has('ppsc_endpoint')) {
-            $this->endpoint = $params->get('norc_endpoint');
-        }
+        $this->params = $params;
         $this->client = new HttpClient(['cookies' => true]);
+        $this->endpoint = $this->getParams('ppsc_endpoint');
+        $this->tokenUrl = $this->getParams('ppsc_token_url');
+        $this->clientId = $this->getParams('ppsc_client_id');
+        $this->clientSecret = $this->getParams('ppsc_client_secret');
+        $this->grantType = $this->getParams('ppsc_grant_type');
+    }
+
+    private function getAccessToken(): string|null
+    {
+        if ($this->accessToken) {
+            return $this->accessToken;
+        }
+        try {
+            $response = $this->client->request('POST', $this->tokenUrl, [
+                'form_params' => [
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'grant_type' => $this->grantType
+                ]
+            ]);
+            $data = json_decode($response->getBody(), true);
+            if (isset($data['access_token'])) {
+                $this->accessToken = $data['access_token'];
+                return $this->accessToken;
+            } else {
+                return null;
+            }
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
     }
 
     public function getRequestDetailsById($requestId): \stdClass|null
     {
         try {
-            $response = $this->client->request('GET', $this->endpoint . 'getRequestDetails', ['query' => ['requestId' => $requestId]]);
+            $token = $this->getAccessToken();
+            $response = $this->client->request('GET', $this->endpoint . 'getRequestDetails', [
+                'headers' => ['Authorization' => 'Bearer ' . $token],
+                'query' => ['requestId' => $requestId]
+            ]);
             $requestDetailsData = json_decode($response->getBody()->getContents());
             return $requestDetailsData ? $requestDetailsData[0] : null;
         } catch (\Exception $e) {
@@ -35,7 +73,11 @@ class PpscApiService
     public function getParticipantById($participantId): PpscParticipant|null
     {
         try {
-            $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', ['query' => ['participantId' => $participantId]]);
+            $token = $this->getAccessToken();
+            $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', [
+                'headers' => ['Authorization' => 'Bearer ' . $token],
+                'query' => ['participantId' => $participantId]
+            ]);
             $participant = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
             error_log($e->getMessage());
@@ -45,5 +87,10 @@ class PpscApiService
             return new PpscParticipant($participant);
         }
         return null;
+    }
+
+    private function getParams($field): string|null
+    {
+        return $this->params->has($field) ? $this->params->get($field) : null;
     }
 }
