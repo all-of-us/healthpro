@@ -269,6 +269,9 @@ class PediatricsReportService
 
     private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string
     {
+        if (!array_key_exists('heart-rate', $measurementData)) {
+            return '';
+        }
         $heartRates = $measurementData['heart-rate'];
         $heartCentiles = [];
         foreach ($heartRateAgeCharts as $heartRateAgeChart) {
@@ -386,7 +389,10 @@ class PediatricsReportService
     }
     private function getHeadCircumferenceAlert(Measurement $measurement, array $measurementData, float $ageInMonths, int $sex, ?array $growthChartsByAge = null): string
     {
-        $headCircumferences = array_key_exists('head-circumference', $measurementData) ? $measurementData['head-circumference'] : [];
+        if (!array_key_exists('head-circumference', $measurementData)) {
+            return '';
+        }
+        $headCircumferences = $measurementData['head-circumference'];
         $headCircumferenceChart = [];
         if ($growthChartsByAge !== null) {
             foreach ($growthChartsByAge as $growthChart) {
@@ -430,6 +436,9 @@ class PediatricsReportService
     }
     private function getIrregularHeartRhythmAlert(array $measurementData): string
     {
+        if (!array_key_exists('irregular-heart-rate', $measurementData)) {
+            return '';
+        }
         foreach ($measurementData['irregular-heart-rate'] as $irregularHeartRate) {
             if ($irregularHeartRate) {
                 return 'pME8';
@@ -439,7 +448,10 @@ class PediatricsReportService
     }
     private function getWeightAlert(Measurement $measurement, array $measurementData, float $ageInMonths, array $growthChartsByAge, int $sex): string
     {
-        $weights = array_key_exists('weight', $measurementData) ? $measurementData['weight'] : [];
+        if (!array_key_exists('weight', $measurementData)) {
+            return '';
+        }
+        $weights = $measurementData['weight'];
         $weightChart = [];
         if ($growthChartsByAge !== null) {
             foreach ($growthChartsByAge as $growthChart) {
