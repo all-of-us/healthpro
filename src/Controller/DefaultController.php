@@ -10,7 +10,6 @@ use App\Service\AuthService;
 use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
 use App\Service\Ppsc\PpscApiService;
-use App\Service\SalesforceAuthService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -163,16 +162,17 @@ class DefaultController extends BaseController
         Request $request,
         LoggerService $loggerService,
         SessionInterface $session,
-        AuthService $authService,
-        SalesforceAuthService $salesforceAuthService
+        AuthService $authService
     ) {
         $timeout = $request->get('timeout');
         $loggerService->log(Log::LOGOUT);
-        $logoutUrl = $session->get('loginType') === User::SALESFORCE ? $salesforceAuthService->getLogoutUrl() :
-            $authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home');
+        $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        return $this->redirect($logoutUrl);
+        if ($isSalesforceUser) {
+            return $this->redirectToRoute('login');
+        }
+        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
     #[Route(path: '/imports', name: 'imports_home')]
