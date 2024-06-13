@@ -1,0 +1,95 @@
+{% set bootstrapVersion = bootstrapVersion|default(3) %}
+<!doctype html>
+<html lang="en">
+<head>
+    {% include 'base-head.html.twig' %}
+    <title>{% block title %}{% endblock %}HealthPro</title>
+</head>
+<body>
+{% include LoadProgramTemplate('ppsc/navbar.html.twig') %}
+<div class="{% block bodycontainer %}container{% endblock %}">
+    {% if bootstrapVersion == 5 %} <br> {% endif %}
+    {% if global_notices is defined and global_notices|length > 0 %}
+        {% for notice in global_notices %}
+            <div class="alert alert-warning">
+                {{ notice.message|raw }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if bootstrapVersion == 5 %}
+        <div>
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <div class="alert alert-info alert-dismissible fade show text-center" role="alert">
+                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('success') %}
+                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div id="flash-notices">
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('success') %}
+                <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block body %}{% endblock %}
+</div>
+
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+    {% include bootstrapVersion == 5 ? 'partials/modals/site-select-bs5.html.twig' : 'partials/modals/site-select.html.twig' %}
+    <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" id="helpModalBs5">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="modal fade" id="notificationsModal" tabindex="-1" role="dialog" aria-labelledby="notificationsModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+{#The hidden-* and visible-* classes no longer exist in Bootstrap 5 so using display classes accordingly#}
+<div id="is-xs" class="visible-xs d-block d-sm-none"></div>
+{% include 'base-body.html.twig' %}
+
+{{ encore_entry_script_tags(bootstrapVersion == 5 ? 'app5' : 'app') }}
+
+{% block pagejs %}{% endblock %}
+</body>
+</html>

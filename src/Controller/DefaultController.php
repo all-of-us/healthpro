@@ -43,6 +43,9 @@ class DefaultController extends BaseController
         }
         if ($this->isGranted('ROLE_USER') && $request->getSession()->get('ppscRequestId') && $request->getSession()->get('ppscLandingPage') === 'in_person_enrollment') {
             $requestDetails = $ppscApiService->getRequestDetailsById($request->getSession()->get('ppscRequestId'));
+            if (empty($requestDetails->Participant_ID__c)) {
+                throw $this->createNotFoundException('Participant not found.');
+            }
             return $this->redirectToRoute('ppsc_participant', ['id' => $requestDetails->Participant_ID__c]);
         }
         if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
