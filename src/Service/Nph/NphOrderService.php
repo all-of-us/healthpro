@@ -1034,7 +1034,8 @@ class NphOrderService
     public function getActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule): string
     {
         foreach ($moduleDietPeriodStatus[$currentModule] as $dietPeriod => $status) {
-            if ($status === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
+            if (!in_array($status, [NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE, NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE]) &&
+                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
                 return $dietPeriod;
             }
         }
@@ -1044,7 +1045,8 @@ class NphOrderService
     public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): string
     {
         $module1DietStatus = $moduleDietPeriodStatus[1]['LMT'];
-        if (in_array($module1DietStatus, [NphDietPeriodStatus::NOT_STARTED, NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED])) {
+        if (in_array($module1DietStatus, [NphDietPeriodStatus::NOT_STARTED,
+            NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED])) {
             return '1';
         }
         return $currentModule;
