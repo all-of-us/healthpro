@@ -25,14 +25,14 @@ $(document).ready(function () {
         $("#nph_sample_process_complete_module").val(moduleNumber);
         $("#nph_sample_process_complete_period").val(visitType);
         let modifyType = "unfinalized";
-        if (dietStatus === "in_progress_finalized") {
+        if (dietStatus === "in_progress_finalized" || dietStatus === "error_next_diet_started_finalized") {
             modifyType = "finalized";
         }
         $("#nph_sample_process_complete_modifyType").val(modifyType);
         if ($(this).is(":checked")) {
             processingComplete = 1;
             modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>";
-            if (dietStatus !== "in_progress_finalized") {
+            if (dietStatus !== "in_progress_finalized" && dietStatus !== "error_next_diet_started_finalized") {
                 modelTitleText = "<span class='text-danger'>Warning!</span>";
                 let moduleId =
                     parseInt(moduleNumber) === 1
