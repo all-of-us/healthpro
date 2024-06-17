@@ -1013,12 +1013,6 @@ class NphOrderService
             }
         }
 
-        if ($participantModule > 1 &&
-            $moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
-            !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
-            $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
-        }
-
         for ($i = 1; $i <= 2; $i++) {
             $currentPeriod = 'Period' . $i;
             $nextPeriod = 'Period' . ($i + 1);
@@ -1032,18 +1026,31 @@ class NphOrderService
             }
         }
 
+        if ($participantModule > 1 &&
+            $moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
+            !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+            $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
+        }
+
         return $moduleDietPeriodsStatus;
     }
 
     public function getActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule): string
     {
+        $completedCount = 0;
         foreach ($moduleDietPeriodStatus[$currentModule] as $dietPeriod => $status) {
             if (!in_array($status, [NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE, NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE]) &&
-                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
+                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
                 return $dietPeriod;
             }
+            if (str_contains($status, 'complete')) {
+                $completedCount++;
+            }
         }
-        return 'Period1';
+        if ($completedCount === 3) {
+            return NphDietPeriodStatus::PERIOD3;
+        }
+        return NphDietPeriodStatus::PERIOD1;
     }
 
     public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): string
