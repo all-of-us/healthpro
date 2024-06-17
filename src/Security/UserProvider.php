@@ -33,8 +33,7 @@ class UserProvider implements UserProviderInterface
         EnvironmentService $env,
         ParameterBagInterface $params,
         PpscApiService $ppscApiService
-    )
-    {
+    ) {
         $this->userService = $userService;
         $this->requestStack = $requestStack;
         $this->googleGroups = $googleGroups;

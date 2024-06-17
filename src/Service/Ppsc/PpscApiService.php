@@ -28,32 +28,6 @@ class PpscApiService
         $this->grantType = $this->getParams('ppsc_grant_type');
     }
 
-    private function getAccessToken(): string|null
-    {
-        if ($this->accessToken) {
-            return $this->accessToken;
-        }
-        try {
-            $response = $this->client->request('POST', $this->tokenUrl, [
-                'form_params' => [
-                    'client_id' => $this->clientId,
-                    'client_secret' => $this->clientSecret,
-                    'grant_type' => $this->grantType
-                ]
-            ]);
-            $data = json_decode($response->getBody(), true);
-            if (isset($data['access_token'])) {
-                $this->accessToken = $data['access_token'];
-                return $this->accessToken;
-            } else {
-                return null;
-            }
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
-        }
-    }
-
     public function getRequestDetailsById($requestId): \stdClass|null
     {
         try {
@@ -87,6 +61,31 @@ class PpscApiService
             return new PpscParticipant($participant);
         }
         return null;
+    }
+
+    private function getAccessToken(): string|null
+    {
+        if ($this->accessToken) {
+            return $this->accessToken;
+        }
+        try {
+            $response = $this->client->request('POST', $this->tokenUrl, [
+                'form_params' => [
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                    'grant_type' => $this->grantType
+                ]
+            ]);
+            $data = json_decode($response->getBody(), true);
+            if (isset($data['access_token'])) {
+                $this->accessToken = $data['access_token'];
+                return $this->accessToken;
+            }
+            return null;
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
     }
 
     private function getParams($field): string|null

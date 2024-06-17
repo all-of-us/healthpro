@@ -97,8 +97,8 @@ class AuthController extends BaseController
         SalesforceAuthService $auth,
         ContainerBagInterface $params,
         Request $request,
-        SessionInterface $session): Response
-    {
+        SessionInterface $session
+    ): Response {
         $session->set('ppscRequestId', $request->query->get('requestId'));
         $session->set('ppscLandingPage', $request->query->get('page'));
         if ($params->has('enable_salesforce_login') && $params->get('enable_salesforce_login')) {
