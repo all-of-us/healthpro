@@ -1039,7 +1039,7 @@ class NphOrderService
     {
         foreach ($moduleDietPeriodStatus[$currentModule] as $dietPeriod => $status) {
             if (!in_array($status, [NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE, NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE]) &&
-                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
+                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
                 return $dietPeriod;
             }
         }
