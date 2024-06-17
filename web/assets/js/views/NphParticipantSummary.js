@@ -144,4 +144,8 @@ $(document).ready(function () {
         }
         dietVisitStatusIcon.toggle(displayErrorIcon);
     });
+
+    if ($("#1VisitLMT").find(".no-orders-generate").length > 0) {
+        $("#sample_process_box_LMT").hide();
+    }
 });

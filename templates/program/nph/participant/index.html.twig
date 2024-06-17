@@ -180,7 +180,7 @@
                                                                         {% set sampleChecked = 'checked' %}
                                                                     {% endif %}
                                                                 {% endfor %}
-                                                                <div class="btn-group btn-group-toggle">
+                                                                <div class="btn-group btn-group-toggle" id="sample_process_box_{{ dietPeriodNumber }}">
                                                                     <label class="btn btn-sm {% if sampleChecked %} btn-success {% else %} btn-outline-success {% endif %}">
                                                                         <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
                                                                            data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
@@ -338,7 +338,7 @@
                                                                         {% endfor %}
                                                                     {% endfor %}
                                                                     {% if displayedOrderIDS is empty %}
-                                                                        <h6 class="-italic float-start"><i>No Orders Generated</i></h6>
+                                                                        <h6 class="-italic float-start"><i class="no-orders-generate">No Orders Generated</i></h6>
                                                                     {% endif %}
                                                                 </div>
                                                             </div>
