@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class PpscApiService
 {
     private ParameterBagInterface $params;
-    private HttpClient $client;
+    public HttpClient $client;
     private string|null $tokenUrl;
     private string|null $clientId;
     private string|null $clientSecret;
@@ -63,7 +63,7 @@ class PpscApiService
         return null;
     }
 
-    private function getAccessToken(): string|null
+    public function getAccessToken(): string|null
     {
         if ($this->accessToken) {
             return $this->accessToken;
@@ -76,7 +76,7 @@ class PpscApiService
                     'grant_type' => $this->grantType
                 ]
             ]);
-            $data = json_decode($response->getBody(), true);
+            $data = json_decode($response->getBody()->getContents(), true);
             if (isset($data['access_token'])) {
                 $this->accessToken = $data['access_token'];
                 return $this->accessToken;
