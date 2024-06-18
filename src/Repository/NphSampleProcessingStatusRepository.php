@@ -50,6 +50,7 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
             ->andWhere('n.participantId = :participantId')
             ->andWhere('n.module = :module')
             ->andWhere('n.period = :period')
+            ->andWhere('n.status = 1')
             ->setMaxResults(1)
             ->setParameters(['participantId' => $participantId, 'module' => $module, 'period' => $period])
             ->getQuery()
