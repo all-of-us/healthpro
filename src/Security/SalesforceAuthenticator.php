@@ -65,6 +65,7 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
         try {
             $user = $this->auth->processAuth($credentials);
             $this->requestStack->getSession()->set('loginType', \App\Entity\User::SALESFORCE);
+            $this->requestStack->getSession()->set('program', \App\Entity\User::PROGRAM_HPO);
         } catch (Exception $e) {
             throw new AuthenticationException();
         }
