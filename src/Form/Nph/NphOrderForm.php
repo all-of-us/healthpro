@@ -182,7 +182,7 @@ class NphOrderForm extends AbstractType
                     'class' => 'order-ts freeze-ts',
                     'data-field-type' => 'freeze',
                     'data-parsley-freeze-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs",
-                    'data-parsley-required-message' => "Freeze time is required"
+                    'data-parsley-required-message' => 'Freeze time is required'
                 ],
                 'disabled' => $disableFreezeTsField
             ]);
