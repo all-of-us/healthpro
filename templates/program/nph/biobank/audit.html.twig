@@ -39,7 +39,7 @@
                 <td>{{ sample.biobankId }}</td>
                 <td>{{ sample.user.email }}</td>
                 <td>{{ sample.module }}</td>
-                <td>{{ sample.period }}</td>
+                <td>{{ sample.period|replace({"Period": "Period "}) }}</td>
                 <td>
                 {% if sample.modifyType is not defined %}
                     Diet Period marked complete before all samples finalized or cancelled.
@@ -56,8 +56,10 @@
                         <label class="label label-danger">Bypassed</label>
                     {% elseif sample.status == 0 and sample.previousStatus == 1 %}
                         <label class="label label-success">Corrected</label>
-                    {% else %}
+                    {% elseif sample.InconmpleteSamples > 0 %}
                         <label class="label label-danger">Bypassed</label>
+                    {% else %}
+                        <label class="label label-success">Corrected</label>
                     {% endif %}</td>
             </tr>
         {% endfor %}
