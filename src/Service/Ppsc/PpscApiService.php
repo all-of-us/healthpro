@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PpscApiService
 {
-    private ParameterBagInterface $params;
     public HttpClient $client;
+    private ParameterBagInterface $params;
     private string|null $tokenUrl;
     private string|null $clientId;
     private string|null $clientSecret;
