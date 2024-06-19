@@ -19,12 +19,6 @@
                             <a href="{{ path('login_start') }}">
                                 <img src="/assets/img/login/sign-in-with-google.svg" alt="Sign in with Google" />
                             </a>
-                            {% if displaySalesforceBtn %}
-                                <br><br>
-                                <a href="{{ path('login_openid_start') }}" class="btn btn-primary btn-lg">
-                                    Sign in with Salesforce
-                                </a>
-                            {% endif %}
                         </div>
                     {% else %}
                         <div class="text-left">

@@ -60,11 +60,6 @@ class SalesforceAuthService
         return $user;
     }
 
-    public function getLogoutUrl(): string
-    {
-        return $this->getParams('salesforce_url_logout');
-    }
-
     private function getParams($field): string|null
     {
         return $this->params->has($field) ? $this->params->get($field) : null;

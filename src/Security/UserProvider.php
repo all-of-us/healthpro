@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\UserService;
 use Google\Service\Directory\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -22,15 +23,24 @@ class UserProvider implements UserProviderInterface
     private $mockGoogleGroups;
     private $env;
     private $params;
+    private $ppscApiService;
 
-    public function __construct(UserService $userService, RequestStack $requestStack, GoogleGroupsService $googleGroups, MockGoogleGroupsService $mockGoogleGroups, EnvironmentService $env, ParameterBagInterface $params)
-    {
+    public function __construct(
+        UserService $userService,
+        RequestStack $requestStack,
+        GoogleGroupsService $googleGroups,
+        MockGoogleGroupsService $mockGoogleGroups,
+        EnvironmentService $env,
+        ParameterBagInterface $params,
+        PpscApiService $ppscApiService
+    ) {
         $this->userService = $userService;
         $this->requestStack = $requestStack;
         $this->googleGroups = $googleGroups;
         $this->mockGoogleGroups = $mockGoogleGroups;
         $this->env = $env;
         $this->params = $params;
+        $this->ppscApiService = $ppscApiService;
     }
 
     public function loadUserByUsername($username): UserInterface
@@ -121,7 +131,9 @@ class UserProvider implements UserProviderInterface
         if ($this->requestStack->getSession()->has('googlegroups')) {
             $groups = $this->requestStack->getSession()->get('googlegroups');
         } else {
-            $groups = [new Group(['email' => User::SITE_PREFIX . 'aikenmed', 'name' => 'Aikenmed'])];
+            $requestDetails = $this->ppscApiService->getRequestDetailsById($this->requestStack->getSession()->get('ppscRequestId'));
+            $siteId = $requestDetails->Site_ID__c ?? null;
+            $groups = $siteId ? [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId])] : [];
             $this->requestStack->getSession()->set('googlegroups', $groups);
             $this->requestStack->getSession()->set('managegroups', []);
             $this->requestStack->getSession()->set('managegroupsnph', []);

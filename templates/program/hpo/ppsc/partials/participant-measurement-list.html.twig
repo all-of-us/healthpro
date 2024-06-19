@@ -1,0 +1,67 @@
+{% set readOnlyView = readOnlyView|default(false) %}
+<div class="card">
+    <div class="card-header">
+        {% set evaluationUrl = evaluationUrl is defined ? evaluationUrl : 'measurement' %}
+        <a href="{{ path(evaluationUrl, { participantId: participant.id }) }}"
+           class="btn btn-primary btn-sm border float-end">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> New Physical Measurements
+        </a>
+        <h6><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h6>
+    </div>
+    <div class="card-body in-person-card">
+        {% if measurements|length == 0 %}
+            <small class="text-secondary">No Records Found</small>
+        {% else %}
+            {% for measurement in measurements %}
+                {% if type is not defined and loop.index == 6 %}
+                    <div id="evaluation-overflow">
+                {% endif %}
+                {% if readOnly is defined %}
+                    <div class="text-start btn btn-block btn-lg border w-100 btn-readonly">
+                {% else %}
+                    {% set measurementRoute = readOnlyView ? 'read_measurement' : 'measurement' %}
+                    <a href="{{ path(measurementRoute, { participantId: participant.id, measurementId: measurement.id }) }}" class="text-start btn btn-block btn-lg border text-dark w-100 {% if evalId is defined and measurement.id == evalId %} btn-warning {% else %} {% endif %}">
+                {% endif %}
+                <strong class="fs-6 text-muted">{{ measurement.createdTs|date('D n/j/Y', app.user.timezone) }}</strong>
+                <br>
+                <small class="text-muted">
+                    <small class="fs-xs">Status</small><br>
+                    {% set historyType = measurement.history.type is defined ? measurement.history.type : '' %}
+                    {% if historyType == 'cancel' %}
+                        <span class="badge bg-danger">Cancelled</span> <span
+                            class="fs-sm">{{ measurement.history.createdTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    {% elseif measurement.rdrId is empty and measurement.parentId is empty %}
+                        <span class="badge bg-secondary">Saved &amp; Unfinalized</span> <span
+                            class="fs-sm">{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    {% elseif measurement.rdrId and measurement.parentId %}
+                        <span class="badge bg-success">Edited &amp; Finalized</span> <span
+                            class="fs-sm">{{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    {% elseif measurement.rdrId %}
+                        <span class="badge bg-success">Finalized</span> <span
+                            class="fs-sm">{{ measurement.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    {% elseif measurement.parentId and measurement.rdrId is empty %}
+                        <span class="badge bg-warning">Edited &amp; Unfinalized</span> <span
+                            class="fs-sm">{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    {% endif %}
+                </small>
+                {% if measurement.isPediatricForm %}
+                    <div class="float-end">
+                        <i class="fa fa-child child-icon" data-bs-toggle="tooltip" aria-label="Pediatric Participant"
+                           data-bs-original-title="Pediatric Participant"></i>
+                    </div>
+                {% endif %}
+                {% if readOnly is defined %}
+                    </div> {# close .btn-readonly div above #}
+                {% else %}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            {% if type is not defined and measurements|length > 5 %}
+                </div> {# close .evaluation-overflow div above #}
+                <a href="#" class="btn btn-block btn-lg border w-100" id="evaluation-overflow-show">
+                    <i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Show all
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
