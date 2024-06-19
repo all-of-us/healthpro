@@ -166,7 +166,7 @@ class NphOrderForm extends AbstractType
                 'view_timezone' => $timeZone,
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
-                        'value' => new \DateTime('+5 minutes'),
+                        'value' => new \DateTime('now'),
                         'message' => 'Timestamp cannot be in the future'
                     ]),
                     new Constraints\Callback(function ($value, $context) use ($sample) {
@@ -220,7 +220,7 @@ class NphOrderForm extends AbstractType
         return [
             new Constraints\Type('datetime'),
             new Constraints\LessThanOrEqual([
-                'value' => new \DateTime('+5 minutes'), // add buffer for time skew
+                'value' => new \DateTime('now'),
                 'message' => 'Time cannot be in the future'
             ])
         ];
