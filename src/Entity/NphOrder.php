@@ -379,7 +379,7 @@ class NphOrder
     public function isFreezeTsDisabled(string|null $rdrId, string|null $modifyType): bool
     {
         if ($rdrId || $modifyType === NphSample::UNLOCK) {
-            return empty($this->getMetadataArray()['freezeTs']);
+            return empty($this->getMetadataArray()['freezedTs']);
         }
         return false;
     }
