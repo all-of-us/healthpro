@@ -219,7 +219,7 @@ class NphOrderForm extends AbstractType
         return [
             new Constraints\Type('datetime'),
             new Constraints\LessThanOrEqual([
-                'value' => new \DateTime('now'), // add buffer for time skew
+                'value' => new \DateTime('now'),
                 'message' => 'Time cannot be in the future'
             ])
         ];
