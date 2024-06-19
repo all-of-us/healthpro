@@ -109,7 +109,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         'label' => false,
                         'constraints' => [
                             new Constraints\LessThanOrEqual([
-                                'value' => new \DateTime('+5 minutes'),
+                                'value' => new \DateTime('now'),
                                 'message' => 'Timestamp cannot be in the future'
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $sample) {
