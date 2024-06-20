@@ -41,8 +41,8 @@ class NphDietPeriodStatusService
                 $participantData = $participantData[0];
                 $participantId = $participantData->getParticipantId();
                 $module = $participantData->getModule();
-                $visitType = $participantData->getVisitType();
-                $orders = $this->em->getRepository(NphOrder::class)->findBy(['participantId' => $participantId, 'module' => $module, 'visitType' => $visitType]);
+                $visitPeriod = $this->extractPeriod($participantData->getVisitPeriod());
+                $orders = $this->em->getRepository(NphOrder::class)->getOrdersByParticipantAndPeriod($participantId, $module, $visitPeriod);
                 $isDietComplete = !empty($orders) ? 1 : 0;
                 foreach ($orders as $order) {
                     $samples = $order->getNphSamples();
@@ -56,19 +56,19 @@ class NphDietPeriodStatusService
                 $cronNphSampleProcessingStatusLog = new CronNphSampleProcessingStatusLog();
                 $cronNphSampleProcessingStatusLog->setParticipantId($participantId);
                 $cronNphSampleProcessingStatusLog->setModule($module);
-                $cronNphSampleProcessingStatusLog->setPeriod($visitType);
+                $cronNphSampleProcessingStatusLog->setPeriod($visitPeriod);
                 $cronNphSampleProcessingStatusLog->setStatus($isDietComplete);
                 $this->em->persist($cronNphSampleProcessingStatusLog);
                 $this->em->flush();
                 $this->loggerService->log(Log::CRON_NPH_SAMPLE_PROCESSING_LOG_CREATE, $cronNphSampleProcessingStatusLog->getId());
                 if ($isDietComplete) {
-                    $hasSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $module, $visitType);
+                    $hasSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $module, $visitPeriod);
                     if (empty($hasSampleProcessingStatus)) {
                         $nphSampleProcessingStatus = new NphSampleProcessingStatus();
                         $nphSampleProcessingStatus->setParticipantId($participantId);
                         $nphSampleProcessingStatus->setBiobankId($participantData->getBiobankId());
                         $nphSampleProcessingStatus->setModule($module);
-                        $nphSampleProcessingStatus->setPeriod($visitType);
+                        $nphSampleProcessingStatus->setPeriod($visitPeriod);
                         $nphSampleProcessingStatus->setUser($this->getUser());
                         $nphSampleProcessingStatus->setSite($participantData->getSite());
                         $nphSampleProcessingStatus->setStatus(1);
@@ -81,6 +81,7 @@ class NphDietPeriodStatusService
                         $this->loggerService->log(Log::NPH_SAMPLE_PROCESSING_STATUS_CREATE, $nphSampleProcessingStatus->getId());
                     }
                 }
+                $this->em->refresh($cronNphSampleProcessingStatusLog);
             }
         }
     }
@@ -88,5 +89,14 @@ class NphDietPeriodStatusService
     private function getUser(): ?UserEntity
     {
         return $this->em->getRepository(UserEntity::class)->findOneBy(['email' => self::DEFAULT_USER_EMAIL]);
+    }
+
+    private function extractPeriod(string|null $visitPeriod): string|null
+    {
+        $pattern = '/(Period[123]|LMT)/';
+        if (preg_match($pattern, $visitPeriod, $matches)) {
+            return $matches[0];
+        }
+        return null;
     }
 }
