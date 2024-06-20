@@ -259,4 +259,28 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult(Query::HYDRATE_ARRAY);
     }
+
+    public function getParticipantNotInCronSampleProcessingStatusLog(string $backfillTs): array
+    {
+        return $this->createQueryBuilder('no')
+            ->leftJoin('App\Entity\CronNphSampleProcessingStatusLog', 'cnspsl', 'WITH', 'no.participantId = cnspsl.participantId AND no.module = cnspsl.module AND no.visitPeriod LIKE CONCAT(cnspsl.period, \'%\')')
+            ->where('no.createdTs < :backfillTs')
+            ->andWhere('cnspsl.participantId IS NULL')
+            ->setParameter('backfillTs', $backfillTs)
+            ->orderBy('no.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getOrdersByParticipantAndPeriod(string $participantId, string $module, string $visitPeriod): array
+    {
+        return $this->createQueryBuilder('no')
+            ->where('no.participantId = :participantId')
+            ->andWhere('no.module = :module')
+            ->andWhere('no.visitPeriod LIKE :visitPeriod')
+            ->setParameters(['participantId' => $participantId, 'module' => $module, 'visitPeriod' => $visitPeriod . '%'])
+            ->getQuery()
+            ->getResult();
+    }
 }
