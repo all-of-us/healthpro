@@ -14,7 +14,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NphDietPeriodStatusService
 {
-    private const DEFAULT_USER_EMAIL = 'gwendolyn.raynor@pmi-ops.org';
     private const DEFAULT_BACKFILL_TS = '2022-06-20';
     private const DEFAULT_BACKFILL_LIMIT = 10;
     private EntityManagerInterface $em;
@@ -91,7 +90,8 @@ class NphDietPeriodStatusService
 
     private function getUser(): ?UserEntity
     {
-        return $this->em->getRepository(UserEntity::class)->findOneBy(['email' => self::DEFAULT_USER_EMAIL]);
+        $backfillUser = $this->params->get('nph_diet_complete_backfill_user');
+        return $this->em->getRepository(UserEntity::class)->findOneBy(['email' => $backfillUser]);
     }
 
     private function extractPeriod(string|null $visitPeriod): string|null
