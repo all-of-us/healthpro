@@ -262,13 +262,11 @@ class NphOrderRepository extends ServiceEntityRepository
 
     public function getParticipantNotInCronSampleProcessingStatusLog(string $backfillTs): array
     {
-        $backfillTsObject = new DateTime($backfillTs);
         return $this->createQueryBuilder('no')
             ->leftJoin('App\Entity\CronNphSampleProcessingStatusLog', 'cnspsl', 'WITH', 'no.participantId = cnspsl.participantId AND no.module = cnspsl.module AND no.visitPeriod LIKE CONCAT(cnspsl.period, \'%\')')
-            // phpstan-ignore-next-line
-            ->where('no.createdTs < :backfillTsObject')
+            ->where('no.createdTs < :backfillTs')
             ->andWhere('cnspsl.participantId IS NULL')
-            ->setParameter('backfillTsObject', $backfillTsObject)
+            ->setParameter('backfillTs', $backfillTs)
             ->orderBy('no.id', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
