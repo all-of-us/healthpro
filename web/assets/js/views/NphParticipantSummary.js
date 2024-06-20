@@ -21,7 +21,7 @@ $(document).ready(function () {
         let dietStatus = $(this).attr("data-diet-status");
         let processingComplete = 0;
         let modelTitleText = "Confirm";
-        let modelBodyText = "<p>Are you sure you want to unmark the samples as processing complete?</p>";
+        let modelBodyText = "<p>Are you sure you want to unmark the sample processing as complete?</p>";
         $("#nph_sample_process_complete_module").val(moduleNumber);
         $("#nph_sample_process_complete_period").val(visitType);
         let modifyType = "unfinalized";
@@ -31,7 +31,7 @@ $(document).ready(function () {
         $("#nph_sample_process_complete_modifyType").val(modifyType);
         if ($(this).is(":checked")) {
             processingComplete = 1;
-            modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>";
+            modelBodyText = "<p>Are you sure you want to mark the sample processing as complete?</p>";
             if (dietStatus !== "in_progress_finalized" && dietStatus !== "error_next_diet_started_finalized") {
                 modelTitleText = "<span class='text-danger'>Warning!</span>";
                 let moduleId =
