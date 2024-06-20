@@ -264,9 +264,9 @@ class NphOrderRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('no')
             ->leftJoin('App\Entity\CronNphSampleProcessingStatusLog', 'cnspsl', 'WITH', 'no.participantId = cnspsl.participantId AND no.module = cnspsl.module AND no.visitPeriod LIKE CONCAT(cnspsl.period, \'%\')')
-            ->where('no.createdTs < :createdTs')
+            ->where('no.createdTs < :backfillTs')
             ->andWhere('cnspsl.participantId IS NULL')
-            ->setParameter('createdTs', $backfillTs)
+            ->setParameter('backfillTs', $backfillTs)
             ->orderBy('no.id', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
