@@ -33,6 +33,7 @@ class NphDietPeriodStatusService
     public function backfillDietPeriodCompleteStatus(): void
     {
         $backfillTs = $this->params->has('nph_diet_complete_backfill_ts') ? $this->params->get('nph_diet_complete_backfill_ts') : self::DEFAULT_BACKFILL_TS;
+
         $backfillLimit = $this->params->has('nph_diet_complete_backfill_limit') ? $this->params->get('nph_diet_complete_backfill_limit') : self::DEFAULT_BACKFILL_LIMIT;
         for ($i = 0; $i < $backfillLimit; $i++) {
             $participantData = $this->em->getRepository(NphOrder::class)->getParticipantNotInCronSampleProcessingStatusLog($backfillTs);
