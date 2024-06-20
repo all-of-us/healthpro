@@ -64,7 +64,8 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
         if ($startDate && $endDate) {
             $nphSampleProcessingStatus->andWhere('n.modifiedTs >= :startDate')
                 ->andWhere('n.modifiedTs <= :endDate')
-                ->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
+                ->andWhere('n.modifyType <> :finalizedType and n.previousStatus is not null')
+                ->setParameters(['startDate' => $startDate, 'endDate' => $endDate, 'finalizedType' => 'finalized']);
         }
         $nphSampleProcessingStatus->orderBy('n.modifiedTs', 'DESC');
         $nphSampleProcessingStatus = $nphSampleProcessingStatus->getQuery()->getResult();
