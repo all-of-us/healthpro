@@ -628,6 +628,10 @@ label.label-normal {
     background-color: #ffffff !important;
 }
 
+.bg-warning-orange {
+    background-color: #f2a02b !important;
+}
+
 .badge-light {
     color: #212529;
     background-color: #f8f9fa;
@@ -635,6 +639,10 @@ label.label-normal {
 
 .text-white {
     color: #fff !important
+}
+
+.text-warning-orange {
+    color: #f2a02b !important;
 }
 
 .dropdown-toggle.active {

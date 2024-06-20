@@ -5,11 +5,15 @@ namespace App\Service\Nph;
 use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
+use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
+use App\Entity\NphSampleProcessingStatus;
 use App\Entity\NphSite;
+use App\Entity\Order;
 use App\Entity\User;
 use App\Form\Nph\NphOrderForm;
+use App\Helper\NphDietPeriodStatus;
 use App\Helper\NphParticipant;
 use App\Service\LoggerService;
 use App\Service\RdrApiService;
@@ -336,7 +340,11 @@ class NphOrderService
     {
         try {
             $orderType = $order->getOrderType();
+            $atLeastOneSampleIsFinalized = false;
             foreach ($order->getNphSamples() as $nphSample) {
+                if ($atLeastOneSampleIsFinalized === false) {
+                    $atLeastOneSampleIsFinalized = (bool) $nphSample->getRdrId();
+                }
                 $sampleCode = $nphSample->getSampleCode();
                 if (isset($formData[$sampleCode])) {
                     if ($formData[$sampleCode]) {
@@ -361,7 +369,7 @@ class NphOrderService
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            if ($orderType === NphOrder::TYPE_STOOL) {
+            if ($orderType === NphOrder::TYPE_STOOL && $atLeastOneSampleIsFinalized === false) {
                 $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                     'bowelQuality']));
                 $this->em->persist($order);
@@ -424,7 +432,11 @@ class NphOrderService
         $metadata = [];
         foreach ($metaDataTypes as $metaDataType) {
             if (!empty($formData[$metaDataType])) {
-                $metadata[$metaDataType] = $formData[$metaDataType];
+                if ($metaDataType === 'freezedTs') {
+                    $metadata[$metaDataType] = $formData[$metaDataType]->getTimestamp();
+                } else {
+                    $metadata[$metaDataType] = $formData[$metaDataType];
+                }
             }
         }
         return !empty($metadata) ? json_encode($metadata) : null;
@@ -437,6 +449,7 @@ class NphOrderService
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
+            $metadata['freezedTs'] = $metadata['freezedTs'] ?? null;
         } elseif ($order->getOrderType() === NPHOrder::TYPE_URINE || $order->getOrderType() === NPHOrder::TYPE_24URINE) {
             $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
@@ -532,6 +545,11 @@ class NphOrderService
                 }
                 if (!empty($orderMetadata['bowelQuality'])) {
                     $sampleData['bowelQuality'] = $orderMetadata['bowelQuality'];
+                }
+                if (!empty($orderMetadata['freezedTs'])) {
+                    $freezedTs = new \DateTime();
+                    $freezedTs->setTimestamp($orderMetadata['freezedTs']);
+                    $sampleData['freezedTs'] = $freezedTs;
                 }
             }
         }
@@ -921,6 +939,168 @@ class NphOrderService
         return $moduleStatusCount;
     }
 
+    public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
+    {
+        $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
+        if (!$nphSampleProcessingStatus) {
+            $nphSampleProcessingStatus = new NphSampleProcessingStatus();
+            $nphSampleProcessingStatus->setParticipantId($participantId);
+            $nphSampleProcessingStatus->setBiobankId($biobankId);
+            $nphSampleProcessingStatus->setModule($formData['module']);
+            $nphSampleProcessingStatus->setPeriod($formData['period']);
+        } else {
+            $nphSampleProcessingStatus->setPreviousStatus($nphSampleProcessingStatus->getStatus());
+        }
+        $nphSampleProcessingStatus->setUser($this->user);
+        $nphSampleProcessingStatus->setSite($this->site);
+        $nphSampleProcessingStatus->setStatus($formData['status']);
+        $nphSampleProcessingStatus->setModifyType($formData['modifyType']);
+        $nphSampleProcessingStatus->setModifiedTs(new \DateTime());
+        $nphSampleProcessingStatus->setModifiedTimezoneId($this->getTimezoneid());
+        $finalizedCount = isset($sampleStatusCounts[$formData['module']]['Finalized']) ? $sampleStatusCounts[$formData['module']]['Finalized'] : 0;
+        $activeCount = isset($sampleStatusCounts[$formData['module']]['active']) ? $sampleStatusCounts[$formData['module']]['active'] : 0;
+        $nphSampleProcessingStatus->setIncompleteSamples(max(0, $activeCount - $finalizedCount));
+        $this->em->persist($nphSampleProcessingStatus);
+        $this->em->flush();
+    }
+
+    public function getModuleDietPeriodsStatus(string $participantId, string $participantModule): array
+    {
+        $moduleDietPeriodsStatus = [
+            1 => ['LMT' => 'not_started'],
+            2 => ['Period1' => 'not_started',
+                'Period2' => 'not_started',
+                'Period3' => 'not_started'],
+            3 => ['Period1' => 'not_started',
+                'Period2' => 'not_started',
+                'Period3' => 'not_started'],
+        ];
+        $orderSamplesByModule = $this->em->getRepository(NphOrder::class)->getOrderSamplesByModule($participantId);
+        foreach ($moduleDietPeriodsStatus as $module => $dietPeriodsStatus) {
+            foreach (array_keys($dietPeriodsStatus) as $dietPeriod) {
+                foreach ($orderSamplesByModule as $orderSample) {
+                    if ($module == $orderSample['module'] && $dietPeriod === substr(
+                        $orderSample['visitPeriod'],
+                        0,
+                        7
+                    )) {
+                        if ($orderSample['finalizedTs'] === null && $orderSample['modifyType'] !== 'cancel') {
+                            $moduleDietPeriodsStatus[$module][$dietPeriod] = NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED;
+                            break;
+                        }
+                        if ($orderSample['finalizedTs'] !== null || $orderSample['modifyType'] === 'cancel') {
+                            $moduleDietPeriodsStatus[$module][$dietPeriod] = NphDietPeriodStatus::IN_PROGRESS_FINALIZED;
+                        }
+                    }
+                }
+            }
+        }
+        foreach ($moduleDietPeriodsStatus as $module => $moduleDietPeriods) {
+            foreach ($moduleDietPeriods as $period => $moduleDietStatus) {
+                $dietCompleteStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->findOneBy([
+                    'participantId' => $participantId,
+                    'module' => $module,
+                    'period' => $period,
+                    'status' => 1
+                ], ['modifiedTs' => 'DESC']);
+                if ($dietCompleteStatus) {
+                    if ($moduleDietStatus === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
+                        $moduleDietPeriodsStatus[$module][$period] = 'error_' . $moduleDietStatus . '_complete';
+                    } else {
+                        $moduleDietPeriodsStatus[$module][$period] = $moduleDietStatus . '_complete';
+                    }
+                }
+            }
+        }
+
+        if ($participantModule > 1) {
+            for ($i = 1; $i <= 2; $i++) {
+                $currentPeriod = 'Period' . $i;
+                $nextPeriod = 'Period' . ($i + 1);
+                if (!str_contains($moduleDietPeriodsStatus[$participantModule][$currentPeriod], 'complete') &&
+                    $moduleDietPeriodsStatus[$participantModule][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
+                    if ($moduleDietPeriodsStatus[$participantModule][$currentPeriod] === NphDietPeriodStatus::IN_PROGRESS_FINALIZED) {
+                        $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED_FINALIZED;
+                    } else {
+                        $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+                    }
+                }
+            }
+
+            if ($moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
+                !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+                $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
+            }
+        }
+
+        return $moduleDietPeriodsStatus;
+    }
+
+    public function getActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule): string
+    {
+        $completedCount = 0;
+        foreach ($moduleDietPeriodStatus[$currentModule] as $dietPeriod => $status) {
+            if (!in_array($status, [NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE, NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE]) &&
+                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
+                return $dietPeriod;
+            }
+            if (str_contains($status, 'complete')) {
+                $completedCount++;
+            }
+        }
+        if ($completedCount === 3) {
+            return NphDietPeriodStatus::PERIOD3;
+        }
+        return NphDietPeriodStatus::PERIOD1;
+    }
+
+    public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): string
+    {
+        $module1DietStatus = $moduleDietPeriodStatus[1]['LMT'];
+        if (in_array($module1DietStatus, [NphDietPeriodStatus::NOT_STARTED,
+            NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED])) {
+            return '1';
+        }
+        return $currentModule;
+    }
+
+    public function canGenerateOrders(string $participantId, string $module, string $dietPeriod, string $participantModule): bool
+    {
+        $moduleDietPeriodStatus = $this->getModuleDietPeriodsStatus($participantId, $participantModule);
+
+        // Check if the previous diet period is Period1 or the diet is a module 1 diet
+        $isPreviousDietPeriodStarted = ($module === '1' || $dietPeriod === 'Period1');
+
+        if (!$isPreviousDietPeriodStarted) {
+            $previousDietPeriodStatus = $moduleDietPeriodStatus[$module][($dietPeriod == 'Period2') ? 'Period1' : 'Period2'];
+            $isPreviousDietPeriodStarted = ($previousDietPeriodStatus != NphDietPeriodStatus::NOT_STARTED);
+        }
+        $isSampleProcessingComplete = $this->em->getRepository(NphSampleProcessingStatus::class)->isSampleProcessingComplete($participantId, $module, $dietPeriod);
+        return $isPreviousDietPeriodStarted && !$isSampleProcessingComplete;
+    }
+
+    public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
+    {
+        $nphGenerateOrderWarningLog = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLog($participantId, $formData['module'], $formData['period']);
+        if (!$nphGenerateOrderWarningLog) {
+            $nphGenerateOrderWarningLog = new NphGenerateOrderWarningLog();
+            $nphGenerateOrderWarningLog->setParticipantId($participantId);
+            $nphGenerateOrderWarningLog->setBiobankId($biobankId);
+            $nphGenerateOrderWarningLog->setModule($formData['module']);
+            $nphGenerateOrderWarningLog->setPeriod($formData['period']);
+        }
+        $nphGenerateOrderWarningLog->setUser($this->user);
+        $nphGenerateOrderWarningLog->setSite($this->site);
+        $nphGenerateOrderWarningLog->setModifiedTs(new \DateTime());
+        $finalizedCount = $sampleStatusCounts[$formData['module']]['Finalized'] ?? 0;
+        $activeCount = $sampleStatusCounts[$formData['module']]['active'] ?? 0;
+        $nphGenerateOrderWarningLog->setIncompleteSamples(max(0, $activeCount - $finalizedCount));
+        $nphGenerateOrderWarningLog->setModifiedTimezoneId($this->getTimezoneid());
+        $this->em->persist($nphGenerateOrderWarningLog);
+        $this->em->flush();
+    }
+
+
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
@@ -1054,7 +1234,7 @@ class NphOrderService
             $this->saveNphSampleFinalizedInfo($sample, $collectedTs, $notes, null, $biobankFinalization);
 
             // Update order metadata
-            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality']));
+            $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType', 'bowelQuality', 'freezedTs']));
             $this->em->persist($order);
             $this->em->flush();
 

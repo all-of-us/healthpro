@@ -26,7 +26,7 @@ class NphSampleFinalizeType extends NphOrderForm
         }
 
         if ($orderType === NphOrder::TYPE_STOOL) {
-            $this->addStoolMetadataFields($builder, $disableMetadataFields);
+            $this->addStoolMetadataFields($builder, $options['timeZone'], $sample, $disableMetadataFields, $options['disableFreezeTs']);
         }
 
         if ($orderType === NphOrder::TYPE_24URINE) {
@@ -109,7 +109,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         'label' => false,
                         'constraints' => [
                             new Constraints\LessThanOrEqual([
-                                'value' => new \DateTime('+5 minutes'),
+                                'value' => new \DateTime('now'),
                                 'message' => 'Timestamp cannot be in the future'
                             ]),
                             new Constraints\Callback(function ($value, $context) use ($aliquotCode, $aliquot, $sample) {
@@ -128,7 +128,8 @@ class NphSampleFinalizeType extends NphOrderForm
                             })
                         ],
                         'attr' => [
-                            'class' => 'order-ts',
+                            'class' => 'order-ts aliquot-ts',
+                            'data-field-type' => 'aliquot',
                             'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                         ]
                     ],
@@ -288,7 +289,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'disableMetadataFields' => null,
             'disableStoolCollectedTs' => null,
             'orderCreatedTs' => null,
-            'module' => null
+            'module' => null,
+            'disableFreezeTs' => null
         ]);
     }
 

@@ -23,18 +23,18 @@ class NphOrder
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
     public const VISIT_DISPLAY_NAME_MAPPER = [
         'LMT' => 'LMT',
-        'Period1Diet' => 'Diet Period 1 - Diet',
-        'Period1DLW' => 'Diet Period 1 - DLW',
-        'Period1DSMT' => 'Diet Period 1 - DSMT',
-        'Period1LMT' => 'Diet Period 1 - LMT',
-        'Period2Diet' => 'Diet Period 2 - Diet',
-        'Period2DLW' => 'Diet Period 2 - DLW',
-        'Period2DSMT' => 'Diet Period 2 - DSMT',
-        'Period2LMT' => 'Diet Period 2 - LMT',
-        'Period3Diet' => 'Diet Period 3 - Diet',
-        'Period3DLW' => 'Diet Period 3 - DLW',
-        'Period3DSMT' => 'Diet Period 3 - DSMT',
-        'Period3LMT' => 'Diet Period 3 - LMT',
+        'Period1Diet' => 'Diet',
+        'Period1DLW' => 'DLW',
+        'Period1DSMT' => 'DSMT',
+        'Period1LMT' => 'LMT',
+        'Period2Diet' => 'Diet',
+        'Period2DLW' => 'DLW',
+        'Period2DSMT' => 'DSMT',
+        'Period2LMT' => 'LMT',
+        'Period3Diet' => 'Diet',
+        'Period3DLW' => 'DLW',
+        'Period3DSMT' => 'DSMT',
+        'Period3LMT' => 'LMT',
     ];
     private const TIMEPOINT_DISPLAY_NAME_MAPPER = [
         'day0' => 'Day 0',
@@ -372,6 +372,14 @@ class NphOrder
             if ($nphSample->getRdrId()) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public function isFreezeTsDisabled(string|null $rdrId, string|null $modifyType): bool
+    {
+        if ($rdrId || $modifyType === NphSample::UNLOCK) {
+            return empty($this->getMetadataArray()['freezedTs']);
         }
         return false;
     }

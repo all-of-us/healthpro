@@ -4,7 +4,12 @@ namespace App\Controller;
 
 use App\Audit\Log;
 use App\Entity\NphDlw;
+use App\Entity\NphGenerateOrderWarningLog;
+use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphCrossSiteAgreeType;
+use App\Form\Nph\NphGenerateOrderWarningLogType;
+use App\Form\Nph\NphSampleProcessCompleteType;
+use App\Helper\NphDietPeriodStatus;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -71,11 +76,45 @@ class NphParticipantSummaryController extends BaseController
         $dlwCollection = $this->em->getRepository(NphDlw::class)->findBy(['NphParticipant' => $participantId]);
         $dlwSummary = $nphOrderService->generateDlwSummary($dlwCollection);
         $cacheEnabled = $params->has('rdr_disable_cache') ? !$params->get('rdr_disable_cache') : true;
+        $sampleProcessCompleteForm = $this->createForm(NphSampleProcessCompleteType::class, null);
+        $sampleProcessCompleteForm->handleRequest($request);
+        if ($sampleProcessCompleteForm->isSubmitted() && $sampleProcessCompleteForm->isValid()) {
+            $formData = $sampleProcessCompleteForm->getData();
+            $nphOrderService->saveSampleProcessingStatus($participantId, $participant->biobankId, $formData, $sampleStatusCounts);
+            return $this->redirectToRoute('nph_participant_summary', [
+                'participantId' => $participantId
+            ]);
+        }
+        $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
+
+        $orderGenerateWarningLogForm = $this->createForm(NphGenerateOrderWarningLogType::class, null);
+        $orderGenerateWarningLogForm->handleRequest($request);
+        if ($orderGenerateWarningLogForm->isSubmitted() && $orderGenerateWarningLogForm->isValid()) {
+            $formData = $orderGenerateWarningLogForm->getData();
+            $nphOrderService->saveGenerateOrderWarningLog($participantId, $participant->biobankId, $formData, $sampleStatusCounts);
+            return $this->redirect($formData['redirectLink']);
+        }
+        $generateOrderWarningLogByModule = $this->em->getRepository(NphGenerateOrderWarningLog::class)
+            ->getGenerateOrderWarningLogByModule($participantId);
+
+        $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
+        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
+
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
             'hasNoParticipantAccess' => $hasNoParticipantAccess,
             'agreeForm' => $agreeForm->createView(),
+            'sampleProcessCompleteForm' => $sampleProcessCompleteForm->createView(),
+            'orderGenerateWarningLogForm' => $orderGenerateWarningLogForm->createView(),
+            'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
+            'generateOrderWarningLogByModule' => $generateOrderWarningLogByModule,
+            'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
+            'activeDietPeriod' => $activeDietPeriod,
+            'activeModule' => $activeModule,
+            'dietPeriodStatusMap' => NphDietPeriodStatus::$dietPeriodStatusMap,
+            'dietToolTipMessages' => NphDietPeriodStatus::$dietToolTipMessages,
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,

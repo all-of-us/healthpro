@@ -7,6 +7,7 @@ use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -246,5 +247,40 @@ class NphOrderRepository extends ServiceEntityRepository
         $queryBuilder
             ->addOrderBy('no.downtimeGeneratedTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getOrderSamplesByModule(string $participantId): array
+    {
+        return $this->createQueryBuilder('no')
+            ->select('no.module, no.visitPeriod, ns.finalizedTs, ns.modifyType')
+            ->leftJoin('no.nphSamples', 'ns')
+            ->where('no.participantId = :participantId')
+            ->setParameter('participantId', $participantId)
+            ->getQuery()
+            ->getResult(Query::HYDRATE_ARRAY);
+    }
+
+    public function getParticipantNotInCronSampleProcessingStatusLog(string $backfillTs): array
+    {
+        return $this->createQueryBuilder('no')
+            ->leftJoin('App\Entity\CronNphSampleProcessingStatusLog', 'cnspsl', 'WITH', 'no.participantId = cnspsl.participantId AND no.module = cnspsl.module AND no.visitPeriod LIKE CONCAT(cnspsl.period, \'%\')')
+            ->where('no.createdTs < :backfillTs')
+            ->andWhere('cnspsl.participantId IS NULL')
+            ->setParameter('backfillTs', $backfillTs)
+            ->orderBy('no.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getOrdersByParticipantAndPeriod(string $participantId, string $module, string $visitPeriod): array
+    {
+        return $this->createQueryBuilder('no')
+            ->where('no.participantId = :participantId')
+            ->andWhere('no.module = :module')
+            ->andWhere('no.visitPeriod LIKE :visitPeriod')
+            ->setParameters(['participantId' => $participantId, 'module' => $module, 'visitPeriod' => $visitPeriod . '%'])
+            ->getQuery()
+            ->getResult();
     }
 }

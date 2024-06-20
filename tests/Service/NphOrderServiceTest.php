@@ -545,7 +545,8 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
         $stoolMetaData = [
             'bowelType' => 'difficult',
-            'bowelQuality' => 'normal'
+            'bowelQuality' => 'normal',
+            'freezedTs' => null
         ];
         $expectedUrineMetaData = [
             'urineColor' => 'Color 1',
@@ -553,7 +554,8 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
         $expectedStoolMetaData = [
             'bowelType' => 'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2',
-            'bowelQuality' => 'I tend to have normal formed stool - Type 3 and 4'
+            'bowelQuality' => 'I tend to have normal formed stool - Type 3 and 4',
+            'freezedTs' => null
         ];
         return [
             ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', $urineMetaData, $expectedUrineMetaData],
@@ -781,6 +783,81 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertArrayHasKey($dlw->getModule(), $dlwSummary);
         $this->assertArrayHasKey($dlw->getVisitPeriod(), $dlwSummary[$dlw->getModule()]);
         $this->assertEquals($dlw->getDoseAdministered(), $dlwSummary[$dlw->getModule()][$dlw->getVisitPeriod()]);
+    }
+
+    /**
+     * @dataProvider activeDietPeriodProvider
+     */
+    public function testGetActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule, string $expectedResult)
+    {
+        $result = $this->service->getActiveDietPeriod($moduleDietPeriodStatus, $currentModule);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function activeDietPeriodProvider(): array
+    {
+        return [
+            'no in-progress periods' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'error_next_module_started'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'not_started', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => 'Period1'
+            ],
+            'in-progress period exists' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'error_next_module_started'],
+                    2 => ['Period1' => 'error_next_diet_started', 'Period2' => 'in_progress_unfinalized', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => 'Period2'
+            ],
+            'all periods unfinalized' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'error_next_module_started'],
+                    2 => ['Period1' => 'in_progress_unfinalized', 'Period2' => 'in_progress_unfinalized', 'Period3' => 'in_progress_unfinalized'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => 'Period1'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider activeModuleProvider
+     */
+    public function testGetActiveModule(array $moduleDietPeriodStatus, string $currentModule, $expectedResult)
+    {
+        $result = $this->service->getActiveModule($moduleDietPeriodStatus, $currentModule);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function activeModuleProvider(): array
+    {
+        return [
+            'in progress module 1' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'in_progress_unfinalized'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'not_started', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => '1'
+            ],
+            'not started module 1' => [
+                'moduleDietPeriodStatus' => [
+                    1 => ['LMT' => 'not_started'],
+                    2 => ['Period1' => 'not_started', 'Period2' => 'in_progress_unfinalized', 'Period3' => 'not_started'],
+                    3 => ['Period1' => 'error_next_diet_started', 'Period2' => 'error_next_diet_started', 'Period3' => 'in_progress_unfinalized']
+                ],
+                'currentModule' => '2',
+                'expectedResult' => '1'
+            ]
+        ];
     }
 
     private function getGuzzleResponse($data): Response
