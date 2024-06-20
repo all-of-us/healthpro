@@ -10,26 +10,33 @@ use App\Entity\NphSampleProcessingStatus;
 use App\Entity\User as UserEntity;
 use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NphDietPeriodStatusService
 {
     private const DEFAULT_USER_EMAIL = 'gwendolyn.raynor@pmi-ops.org';
-    private const LIMIT = 10;
-    private $em;
-    private $loggerService;
+    private const DEFAULT_BACKFILL_TS = '2022-06-20';
+    private const DEFAULT_BACKFILL_LIMIT = 10;
+    private EntityManagerInterface $em;
+    private LoggerService $loggerService;
+    private ParameterBagInterface $params;
 
     public function __construct(
         EntityManagerInterface $em,
         LoggerService $loggerService,
+        ParameterBagInterface $params
     ) {
         $this->em = $em;
         $this->loggerService = $loggerService;
+        $this->params = $params;
     }
 
-    public function backfillDietPeriodCompleteStatus()
+    public function backfillDietPeriodCompleteStatus(): void
     {
-        for ($i = 0; $i < self::LIMIT; $i++) {
-            $participantData = $this->em->getRepository(NphOrder::class)->getParticipantNotInCronSampleProcessingStatusLog();
+        $backfillTs = $this->params->has('nph_diet_complete_backfill_ts') ? $this->params->get('nph_diet_complete_backfill_ts') : self::DEFAULT_BACKFILL_TS;
+        $backfillLimit = $this->params->has('nph_diet_complete_backfill_limit') ? $this->params->get('nph_diet_complete_backfill_limit') : self::DEFAULT_BACKFILL_LIMIT;
+        for ($i = 0; $i < $backfillLimit; $i++) {
+            $participantData = $this->em->getRepository(NphOrder::class)->getParticipantNotInCronSampleProcessingStatusLog($backfillTs);
             if (!empty($participantData[0])) {
                 $participantData = $participantData[0];
                 $participantId = $participantData->getParticipantId();
