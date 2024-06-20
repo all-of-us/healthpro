@@ -1013,23 +1013,24 @@ class NphOrderService
             }
         }
 
-        for ($i = 1; $i <= 2; $i++) {
-            $currentPeriod = 'Period' . $i;
-            $nextPeriod = 'Period' . ($i + 1);
-            if (!str_contains($moduleDietPeriodsStatus[$participantModule][$currentPeriod], 'complete') &&
-                $moduleDietPeriodsStatus[$participantModule][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
-                if ($moduleDietPeriodsStatus[$participantModule][$currentPeriod] === NphDietPeriodStatus::IN_PROGRESS_FINALIZED) {
-                    $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED_FINALIZED;
-                } else {
-                    $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+        if ($participantModule > 1) {
+            for ($i = 1; $i <= 2; $i++) {
+                $currentPeriod = 'Period' . $i;
+                $nextPeriod = 'Period' . ($i + 1);
+                if (!str_contains($moduleDietPeriodsStatus[$participantModule][$currentPeriod], 'complete') &&
+                    $moduleDietPeriodsStatus[$participantModule][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
+                    if ($moduleDietPeriodsStatus[$participantModule][$currentPeriod] === NphDietPeriodStatus::IN_PROGRESS_FINALIZED) {
+                        $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED_FINALIZED;
+                    } else {
+                        $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+                    }
                 }
             }
-        }
 
-        if ($participantModule > 1 &&
-            $moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
-            !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
-            $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
+            if ($moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
+                !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+                $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
+            }
         }
 
         return $moduleDietPeriodsStatus;
