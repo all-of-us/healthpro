@@ -265,6 +265,7 @@ class NphOrderRepository extends ServiceEntityRepository
         $backfillTsObject = new DateTime($backfillTs);
         return $this->createQueryBuilder('no')
             ->leftJoin('App\Entity\CronNphSampleProcessingStatusLog', 'cnspsl', 'WITH', 'no.participantId = cnspsl.participantId AND no.module = cnspsl.module AND no.visitPeriod LIKE CONCAT(cnspsl.period, \'%\')')
+            // phpstan-ignore-next-line
             ->where('no.createdTs < :backfillTsObject')
             ->andWhere('cnspsl.participantId IS NULL')
             ->setParameter('backfillTsObject', $backfillTsObject)
