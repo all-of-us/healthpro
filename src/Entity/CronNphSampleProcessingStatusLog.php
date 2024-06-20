@@ -13,13 +13,13 @@ class CronNphSampleProcessingStatusLog
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $participantId = null;
+    private string $participantId;
 
     #[ORM\Column(length: 10)]
-    private ?string $module = null;
+    private string $module;
 
     #[ORM\Column(length: 10)]
-    private ?string $period = null;
+    private string $period;
 
     #[ORM\Column(nullable: true)]
     private ?int $status = null;

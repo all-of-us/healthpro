@@ -42,6 +42,9 @@ class NphDietPeriodStatusService
                 $participantId = $participantData->getParticipantId();
                 $module = $participantData->getModule();
                 $visitPeriod = $this->extractPeriod($participantData->getVisitPeriod());
+                if (empty($visitPeriod)) {
+                    continue;
+                }
                 $orders = $this->em->getRepository(NphOrder::class)->getOrdersByParticipantAndPeriod($participantId, $module, $visitPeriod);
                 $isDietComplete = !empty($orders) ? 1 : 0;
                 foreach ($orders as $order) {
