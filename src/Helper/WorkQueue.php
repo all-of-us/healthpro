@@ -86,6 +86,15 @@ class WorkQueue
             'group' => 'details',
             'default' => true
         ],
+        'hasCoreData' => [
+            'name' => 'Core Data Status',
+            'rdrField' => 'hasCoreData',
+            'sortField' => 'hasCoreData',
+            'toggleColumn' => true,
+            'group' => 'details',
+            'method' => 'getCoreDataStatus',
+            'csvMethod' => 'csvCoreDataStatus'
+        ],
         'coreParticipant' => [
             'name' => 'Core Participant Date',
             'rdrDateField' => 'enrollmentStatusCoreV3_2Time',
@@ -1438,6 +1447,7 @@ class WorkQueue
         'participantId',
         'biobankId',
         'participantStatus',
+        'hasCoreData',
         'activityStatus',
         'withdrawalReason',
         'pediatricStatus',
@@ -1593,6 +1603,7 @@ class WorkQueue
         'participantId',
         'biobankId',
         'participantStatus',
+        'hasCoreData',
         'coreParticipant',
         'withdrawalStatus',
         'withdrawalReason',
@@ -1707,6 +1718,7 @@ class WorkQueue
         'participantId',
         'biobankId',
         'enrollmentStatusV3_2',
+        'hasCoreData',
         'withdrawalAuthored',
         'withdrawalReason',
         'isPediatric',
@@ -2117,6 +2129,14 @@ class WorkQueue
                     'View All' => '',
                     'Pediatric Participant' => 'SUBMITTED',
                     'Adult Participant' => 'UNSET'
+                ]
+            ],
+            'hasCoreData' => [
+                'label' => 'Has Core Data',
+                'options' => [
+                    'View All' => '',
+                    'Has Core Data' => '1',
+                    'Does Not Have Core Data' => '0'
                 ]
             ]
         ],
@@ -3016,6 +3036,19 @@ class WorkQueue
             default:
                 return '';
         }
+    }
+
+    public static function getCoreDataStatus($coreDataStatus)
+    {
+        if ($coreDataStatus) {
+            return self::HTML_SUCCESS . ' Has Core Data';
+        }
+        return self::HTML_DANGER . ' Does Not Have Core Data';
+    }
+
+    public static function csvCoreDataStatus($coreDataStatus)
+    {
+        return $coreDataStatus ? 'Has Core Data' : 'Does Not Have Core Data';
     }
 
     public static function displayProgramUpdate($consentCohort, $questionnaireOnDnaProgram, $questionnaireOnDnaProgramAuthored, $userTimezone)
