@@ -50,6 +50,7 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
             ->andWhere('n.participantId = :participantId')
             ->andWhere('n.module = :module')
             ->andWhere('n.period = :period')
+            ->andWhere('n.status = 1')
             ->setMaxResults(1)
             ->setParameters(['participantId' => $participantId, 'module' => $module, 'period' => $period])
             ->getQuery()
@@ -60,12 +61,14 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
 
     public function getAuditReport(?\DateTime $startDate, ?\DateTime $endDate): array
     {
-        $nphSampleProcessingStatus = $this->createQueryBuilder('n');
+        $nphSampleProcessingStatus = $this->createQueryBuilder('n')
+        ->andWhere('n.modifyType <> :finalizedType and n.PreviousStatus is not null');
         if ($startDate && $endDate) {
             $nphSampleProcessingStatus->andWhere('n.modifiedTs >= :startDate')
                 ->andWhere('n.modifiedTs <= :endDate')
                 ->setParameters(['startDate' => $startDate, 'endDate' => $endDate]);
         }
+        $nphSampleProcessingStatus->setParameter('finalizedType', 'finalized');
         $nphSampleProcessingStatus->orderBy('n.modifiedTs', 'DESC');
         $nphSampleProcessingStatus = $nphSampleProcessingStatus->getQuery()->getResult();
         return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus : [];

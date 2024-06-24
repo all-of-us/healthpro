@@ -1013,18 +1013,23 @@ class NphOrderService
             }
         }
 
-        if ($participantModule > 1 &&
-            $moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
-            !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
-            $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
-        }
+        if ($participantModule > 1) {
+            for ($i = 1; $i <= 2; $i++) {
+                $currentPeriod = 'Period' . $i;
+                $nextPeriod = 'Period' . ($i + 1);
+                if (!str_contains($moduleDietPeriodsStatus[$participantModule][$currentPeriod], 'complete') &&
+                    $moduleDietPeriodsStatus[$participantModule][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
+                    if ($moduleDietPeriodsStatus[$participantModule][$currentPeriod] === NphDietPeriodStatus::IN_PROGRESS_FINALIZED) {
+                        $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED_FINALIZED;
+                    } else {
+                        $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+                    }
+                }
+            }
 
-        for ($i = 1; $i <= 2; $i++) {
-            $currentPeriod = 'Period' . $i;
-            $nextPeriod = 'Period' . ($i + 1);
-            if (!str_contains($moduleDietPeriodsStatus[$participantModule][$currentPeriod], 'complete') &&
-                $moduleDietPeriodsStatus[$participantModule][$nextPeriod] !== NphDietPeriodStatus::NOT_STARTED) {
-                $moduleDietPeriodsStatus[$participantModule][$currentPeriod] = NphDietPeriodStatus::ERROR_NEXT_DIET_STARTED;
+            if ($moduleDietPeriodsStatus[$participantModule]['Period1'] !== NphDietPeriodStatus::NOT_STARTED &&
+                !str_contains($moduleDietPeriodsStatus[1]['LMT'], 'complete')) {
+                $moduleDietPeriodsStatus[1]['LMT'] = NphDietPeriodStatus::ERROR_NEXT_MODULE_STARTED;
             }
         }
 
@@ -1033,12 +1038,30 @@ class NphOrderService
 
     public function getActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule): string
     {
+        $completedCount = 0;
         foreach ($moduleDietPeriodStatus[$currentModule] as $dietPeriod => $status) {
-            if ($status === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
+            if (!in_array($status, [NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE, NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE]) &&
+                in_array($status, [NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED, NphDietPeriodStatus::NOT_STARTED])) {
                 return $dietPeriod;
             }
+            if (str_contains($status, 'complete')) {
+                $completedCount++;
+            }
         }
-        return 'Period1';
+        if ($completedCount === 3) {
+            return NphDietPeriodStatus::PERIOD3;
+        }
+        return NphDietPeriodStatus::PERIOD1;
+    }
+
+    public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): string
+    {
+        $module1DietStatus = $moduleDietPeriodStatus[1]['LMT'];
+        if (in_array($module1DietStatus, [NphDietPeriodStatus::NOT_STARTED,
+            NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED, NphDietPeriodStatus::IN_PROGRESS_FINALIZED])) {
+            return '1';
+        }
+        return $currentModule;
     }
 
     public function canGenerateOrders(string $participantId, string $module, string $dietPeriod, string $participantModule): bool

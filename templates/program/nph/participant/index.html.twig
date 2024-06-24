@@ -76,7 +76,7 @@
                 <div class="col-md-12" role="tabpanel">
                     <ul class="nav nav-tabs" role="tablist">
                         {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
-                            {% if participant.module == moduleNumber %}
+                            {% if activeModule == moduleNumber %}
                                 {% set tabActive = 'active' %}
                             {% else %}
                                 {% set tabActive = '' %}
@@ -91,7 +91,7 @@
                 <div class="col-sm-12 participant-modules tab-content">
                     {% if participant.nphPairedSiteSuffix == app.session.get('site').id %}
                         {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
-                            {% if participant.module == moduleNumber %}
+                            {% if activeModule == moduleNumber %}
                                 {% set modulePanelDisplay = 'show active' %}
                             {% else %}
                                 {% set modulePanelDisplay = '' %}
@@ -180,7 +180,7 @@
                                                                         {% set sampleChecked = 'checked' %}
                                                                     {% endif %}
                                                                 {% endfor %}
-                                                                <div class="btn-group btn-group-toggle">
+                                                                <div class="btn-group btn-group-toggle" id="sample_process_box_{{ dietPeriodNumber }}">
                                                                     <label class="btn btn-sm {% if sampleChecked %} btn-success {% else %} btn-outline-success {% endif %}">
                                                                         <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
                                                                            data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
@@ -207,7 +207,7 @@
                                                             <div class="card mb-2 period-diet-visits">
                                                                 {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                                 <div class="card-header bg-secondary-subtle pb-0 {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
-                                                                    <span class="diet-visit-status-text fs-6 pe-2">{{ visit['visitDisplayName']}} Visit</span>
+                                                                    <span class="diet-visit-status-text fs-6 pe-2" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}">{{ visit['visitDisplayName']}} Visit</span>
                                                                     {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
                                                                         {% set warningDisplayed = 0 %}
                                                                         {% for generateOrderWarningLog in generateOrderWarningLogByModule %}
@@ -338,7 +338,7 @@
                                                                         {% endfor %}
                                                                     {% endfor %}
                                                                     {% if displayedOrderIDS is empty %}
-                                                                        <h6 class="-italic float-start"><i>No Orders Generated</i></h6>
+                                                                        <h6 class="-italic float-start"><i class="no-orders-generate">No Orders Generated</i></h6>
                                                                     {% endif %}
                                                                 </div>
                                                             </div>

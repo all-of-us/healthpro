@@ -21,18 +21,18 @@ $(document).ready(function () {
         let dietStatus = $(this).attr("data-diet-status");
         let processingComplete = 0;
         let modelTitleText = "Confirm";
-        let modelBodyText = "<p>Are you sure you want to unmark the samples as processing complete?</p>";
+        let modelBodyText = "<p>Are you sure you want to unmark the sample processing as complete?</p>";
         $("#nph_sample_process_complete_module").val(moduleNumber);
         $("#nph_sample_process_complete_period").val(visitType);
         let modifyType = "unfinalized";
-        if (dietStatus === "in_progress_finalized") {
+        if (dietStatus === "in_progress_finalized" || dietStatus === "error_next_diet_started_finalized") {
             modifyType = "finalized";
         }
         $("#nph_sample_process_complete_modifyType").val(modifyType);
         if ($(this).is(":checked")) {
             processingComplete = 1;
-            modelBodyText = "<p>Are you sure you want mark the samples as processing complete?</p>";
-            if (dietStatus !== "in_progress_finalized") {
+            modelBodyText = "<p>Are you sure you want to mark the sample processing as complete?</p>";
+            if (dietStatus !== "in_progress_finalized" && dietStatus !== "error_next_diet_started_finalized") {
                 modelTitleText = "<span class='text-danger'>Warning!</span>";
                 let moduleId =
                     parseInt(moduleNumber) === 1
@@ -124,32 +124,28 @@ $(document).ready(function () {
         $('form[name="nph_generate_order_warning_log"]').submit();
     });
 
-    $(".diet-visit-status-text").each(function () {
-        let $parentCard = $(this).closest(".card");
-        let $badge = $parentCard.find(".diet-visit-status .badge");
-        if (
-            $badge.hasClass("bg-primary") ||
-            $badge.hasClass("bg-success") ||
-            $badge.hasClass("bg-warning") ||
-            $badge.hasClass("bg-secondary")
-        ) {
-            $(this).next(".diet-visit-status-icon").show();
-        } else {
-            $(this).next(".diet-visit-status-icon").hide();
-        }
-    });
-
     $(".period-diet-visits").each(function () {
         let $this = $(this);
+        let dietVisitStatusText = $this.find(".diet-visit-status-text");
         let dietVisitStatusIcon = $this.find(".diet-visit-status-icon");
         let dietVisitStatuses = $this.find(".diet-visit-status");
+        let dietPeriodStatus = dietVisitStatusText.data("diet-period-status");
         let displayErrorIcon = false;
-        dietVisitStatuses.each(function () {
-            if ($(this).data("diet-visit-status") !== "Finalized" && $(this).data("diet-visit-status") !== "Canceled") {
-                displayErrorIcon = true;
-                return false;
-            }
-        });
+        if (dietPeriodStatus !== "in_progress_unfinalized") {
+            dietVisitStatuses.each(function () {
+                if (
+                    $(this).data("diet-visit-status") !== "Finalized" &&
+                    $(this).data("diet-visit-status") !== "Canceled"
+                ) {
+                    displayErrorIcon = true;
+                    return false;
+                }
+            });
+        }
         dietVisitStatusIcon.toggle(displayErrorIcon);
     });
+
+    if ($("#1VisitLMT").find(".no-orders-generate").length > 0) {
+        $("#sample_process_box_LMT").hide();
+    }
 });

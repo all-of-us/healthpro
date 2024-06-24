@@ -11,7 +11,7 @@
         <div class="today-filter text-center">
             {{ form_rest(todayFilterForm) }}
             <div class="form-group">
-                <a href="{{ path('nph_biobank_orders_downtime') }}" class="btn btn-default">Reset</a>
+                <a href="{{ path('nph_biobank_orders_audit') }}" class="btn btn-default">Reset</a>
             </div>
         </div>
         {{ form_end(todayFilterForm) }}
@@ -19,7 +19,7 @@
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
-    <table class="table table-bordered table-small" data-default-sort-column="3">
+    <table class="table table-bordered table-small" data-default-sort-column="6">
         <thead>
         <tr>
             <th>Site</th>
@@ -39,7 +39,7 @@
                 <td>{{ sample.biobankId }}</td>
                 <td>{{ sample.user.email }}</td>
                 <td>{{ sample.module }}</td>
-                <td>{{ sample.period }}</td>
+                <td>{{ sample.period|replace({"Period": "Period "}) }}</td>
                 <td>
                 {% if sample.modifyType is not defined %}
                     Diet Period marked complete before all samples finalized or cancelled.
@@ -56,8 +56,10 @@
                         <label class="label label-danger">Bypassed</label>
                     {% elseif sample.status == 0 and sample.previousStatus == 1 %}
                         <label class="label label-success">Corrected</label>
-                    {% else %}
+                    {% elseif sample.IncompleteSamples > 0 %}
                         <label class="label label-danger">Bypassed</label>
+                    {% else %}
+                        <label class="label label-success">Corrected</label>
                     {% endif %}</td>
             </tr>
         {% endfor %}

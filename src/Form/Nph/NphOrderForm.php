@@ -128,9 +128,11 @@ class NphOrderForm extends AbstractType
         string $timeZone,
         string $sample,
         bool $disabled = false,
+        bool $disableFreezeTs = false,
         string $formType = self::FORM_FINALIZE_TYPE,
     ): void {
         $required = $formType === self::FORM_FINALIZE_TYPE;
+        $disableFreezeTsField = $disabled || $disableFreezeTs;
         $bowelTypeOptions = [
             'label' => 'Describe the bowel movement for this collection',
             'required' => $required,
@@ -155,7 +157,7 @@ class NphOrderForm extends AbstractType
         $builder->add('bowelQuality', Type\ChoiceType::class, $bowelQualityOptions);
         if ($formType === self::FORM_FINALIZE_TYPE) {
             $builder->add('freezedTs', Type\DateTimeType::class, [
-                'required' => true,
+                'required' => !$disableFreezeTs,
                 'label' => 'Freeze Time',
                 'widget' => 'single_text',
                 'format' => 'M/d/yyyy h:mm a',
@@ -164,7 +166,7 @@ class NphOrderForm extends AbstractType
                 'view_timezone' => $timeZone,
                 'constraints' => [
                     new Constraints\LessThanOrEqual([
-                        'value' => new \DateTime('+5 minutes'),
+                        'value' => new \DateTime('now'),
                         'message' => 'Timestamp cannot be in the future'
                     ]),
                     new Constraints\Callback(function ($value, $context) use ($sample) {
@@ -179,9 +181,10 @@ class NphOrderForm extends AbstractType
                 'attr' => [
                     'class' => 'order-ts freeze-ts',
                     'data-field-type' => 'freeze',
-                    'data-parsley-freeze-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
+                    'data-parsley-freeze-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs",
+                    'data-parsley-required-message' => 'Freeze time is required'
                 ],
-                'disabled' => $disabled
+                'disabled' => $disableFreezeTsField
             ]);
         }
     }
@@ -217,7 +220,7 @@ class NphOrderForm extends AbstractType
         return [
             new Constraints\Type('datetime'),
             new Constraints\LessThanOrEqual([
-                'value' => new \DateTime('+5 minutes'), // add buffer for time skew
+                'value' => new \DateTime('now'),
                 'message' => 'Time cannot be in the future'
             ])
         ];
