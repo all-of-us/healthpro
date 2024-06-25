@@ -16,6 +16,7 @@ use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\ParticipantSummaryService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -32,6 +33,7 @@ class MeasurementsController extends BaseController
     protected $siteService;
     protected $params;
     protected $helpService;
+    protected $ppscApiService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -40,7 +42,8 @@ class MeasurementsController extends BaseController
         LoggerService $loggerService,
         SiteService $siteService,
         ParameterBagInterface $params,
-        HelpService $helpService
+        HelpService $helpService,
+        PpscApiService $ppscApiService,
     ) {
         parent::__construct($em);
         $this->measurementService = $measurementService;
@@ -49,25 +52,20 @@ class MeasurementsController extends BaseController
         $this->siteService = $siteService;
         $this->params = $params;
         $this->helpService = $helpService;
+        $this->ppscApiService = $ppscApiService;
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
     #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}', name: 'read_measurement', methods: ['GET'])]
     public function measurementsAction($participantId, $measurementId, Request $request)
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
         $type = $request->query->get('type');
         if ($participant->isPediatric && $participant->pediatricMeasurementsVersionType && !$type) {
             $type = $participant->pediatricMeasurementsVersionType;
-        }
-        if (!$this->measurementService->canEdit(
-            $measurementId,
-            $participant
-        ) || $this->siteService->isTestSite() || ($participant->activityStatus === 'deactivated' && empty($measurementId))) {
-            throw $this->createAccessDeniedException();
         }
         if ($measurementId) {
             $measurement = $this->em->getRepository(Measurement::class)->getMeasurement($measurementId, $participantId);
