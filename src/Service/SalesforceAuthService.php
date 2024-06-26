@@ -54,7 +54,7 @@ class SalesforceAuthService
         // Get user details from the OIDC provider
         $resourceOwner = $this->getResourceOwner($accessToken);
         $userDetails = $resourceOwner->toArray();
-        $user = new SalesforceUser($userDetails['user_id'], $userDetails['email']);
+        $user = new SalesforceUser($userDetails['user_id'], $userDetails['email'], $userDetails['zoneinfo'] ?? null);
         $this->requestStack->getSession()->set('salesforceUser', $user);
 
         return $user;
