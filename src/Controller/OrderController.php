@@ -176,7 +176,7 @@ class OrderController extends BaseController
                     $order->setType('diversion');
                 }
                 if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false && $params->get('order_samples_version_dv') > 3.1) {
-                    $order->setVersion($params->get('order_samples_version_dv'));
+                    $order->setVersion(null);
                     $order->setType(Order::TUBE_SELECTION_TYPE);
                 }
                 if (empty($order->getOrderId())) {
