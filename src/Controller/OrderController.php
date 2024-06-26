@@ -167,6 +167,8 @@ class OrderController extends BaseController
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
                 if ($session->get('siteType') !== 'dv' || (float) $params->get('order_samples_version') <= 3.1) {
                     $order->setVersion($order->getCurrentVersion());
+                } elseif ($session->get('siteType') === 'dv' && $params->has('order_samples_version_dv') && (float)$params->get('order_samples_version_dv') <= 3.1) {
+                    $order->setVersion($params->get('order_samples_version_dv'));
                 }
                 $order->setAgeInMonths($participant->ageInMonths);
                 if ($session->get('orderType') === 'hpo') {
