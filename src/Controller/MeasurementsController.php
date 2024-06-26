@@ -299,15 +299,12 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/modify/{type}', name: 'measurement_modify', defaults: ['measurementId' => null])]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/modify/{type}', name: 'measurement_modify', defaults: ['measurementId' => null])]
     public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
-            throw $this->createAccessDeniedException();
         }
         $measurement = $this->em->getRepository(Measurement::class)->getMeasurement($measurementId, $participantId);
         if (!$measurement) {
@@ -370,15 +367,12 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/revert', name: 'measurement_revert')]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/revert', name: 'measurement_revert')]
     public function measurementRevertAction($participantId, $measurementId, Request $request)
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
-            throw $this->createAccessDeniedException();
         }
         $measurement = $this->em->getRepository(Measurement::class)->getMeasurement($measurementId, $participantId);
         if (!$measurement) {
@@ -399,16 +393,13 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/summary', name: 'measurement_summary')]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/summary', name: 'measurement_summary')]
     #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}/summary', name: 'read_measurement_summary')]
     public function measurementsSummaryAction($participantId, $measurementId)
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$this->measurementService->canEdit($measurementId, $participant) || $this->siteService->isTestSite()) {
-            throw $this->createAccessDeniedException();
         }
 
         $measurement = $this->em->getRepository(Measurement::class)->find($measurementId);
@@ -427,18 +418,15 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/blood/donor/check', name: 'measurement_blood_donor_check')]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/blood/donor/check', name: 'measurement_blood_donor_check')]
     public function measurementBloodDonorCheckAction($participantId, Request $request)
     {
         if (!$this->measurementService->requireBloodDonorCheck()) {
             throw $this->createAccessDeniedException();
         }
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$participant->status || $this->siteService->isTestSite() || ($participant->activityStatus === 'deactivated')) {
-            throw $this->createAccessDeniedException();
         }
         $bloodDonorCheckForm = $this->get('form.factory')->createNamed('form', MeasurementBloodDonorCheckType::class);
         $bloodDonorCheckForm->handleRequest($request);
@@ -460,14 +448,14 @@ class MeasurementsController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/fhir', name: 'measurement_fhir')]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/fhir', name: 'measurement_fhir')]
     public function measurementFhirAction($participantId, $measurementId, Request $request, EnvironmentService $env)
     {
         $isTest = $request->query->has('test');
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();
         }
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -507,13 +495,13 @@ class MeasurementsController extends BaseController
         return $response;
     }
 
-    #[Route(path: '/participant/{participantId}/measurements/{measurementId}/rdr', name: 'measurement_rdr')]
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/rdr', name: 'measurement_rdr')]
     public function measurementRdrAction($participantId, $measurementId, EnvironmentService $env)
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();
         }
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
