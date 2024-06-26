@@ -848,6 +848,8 @@ class OrderService
             $order->setFinalizedSamples(json_encode($finalizedSamples));
         }
         $this->loadSamplesSchema($order);
+        $this->em->persist($order);
+        $this->em->flush();
         return $order;
     }
 
