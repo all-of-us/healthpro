@@ -51,7 +51,7 @@ class OrderType extends AbstractType
             $tsLabel = 'Blood Collection Time';
         }
         if ($options['step'] == 'collected' && (isset($options['dvSite']) && $options['dvSite'] === true)
-            && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->get('order_samples_version_dv') > 3.1))) {
+            && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->has('order_samples_version_dv') && $options['params']->get('order_samples_version_dv') > 3.1))) {
             if ($options['order']->getVersion() === null) {
                 unset($samples);
             }
