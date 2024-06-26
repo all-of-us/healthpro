@@ -33,7 +33,7 @@ class MeasurementsController extends BaseController
     protected $siteService;
     protected $params;
     protected $helpService;
-    protected $ppscApiService;
+    protected PpscApiService $ppscApiService;
 
     public function __construct(
         EntityManagerInterface $em,

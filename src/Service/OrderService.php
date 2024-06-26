@@ -8,7 +8,7 @@ use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\Site;
 use App\Entity\User;
-use App\Helper\Participant;
+use App\Helper\PpscParticipant;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
@@ -50,7 +50,7 @@ class OrderService
         $this->loggerService = $loggerService;
     }
 
-    public function loadSamplesSchema($order, Participant $participant = null, Measurement $physicalMeasurement = null)
+    public function loadSamplesSchema($order, PpscParticipant $participant = null, Measurement $physicalMeasurement = null)
     {
         $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order']);
         $this->order = $order;
