@@ -49,8 +49,8 @@ class ParticipantDetailsController extends BaseController
         parent::__construct($em);
     }
 
-    #[Route(path: '/participant/{id}', name: 'participant')]
-    #[Route(path: '/read/participant/{id}', name: 'read_participant', methods: ['GET'])]
+    #[Route(path: '/participant/{id}', name: 'rdr_participant')]
+    #[Route(path: '/read/participant/{id}', name: 'rdr_read_participant', methods: ['GET'])]
     public function participantDetailsAction(
         $id,
         Request $request,

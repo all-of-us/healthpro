@@ -46,7 +46,7 @@ class DefaultController extends BaseController
             if (empty($requestDetails->Participant_ID__c)) {
                 throw $this->createNotFoundException('Participant not found.');
             }
-            return $this->redirectToRoute('ppsc_participant', ['id' => $requestDetails->Participant_ID__c]);
+            return $this->redirectToRoute('participant', ['id' => $requestDetails->Participant_ID__c]);
         }
         if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));

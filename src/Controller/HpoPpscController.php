@@ -18,7 +18,8 @@ class HpoPpscController extends BaseController
         parent::__construct($em);
     }
 
-    #[Route(path: '/ppsc/participant/{id}', name: 'ppsc_participant')]
+    #[Route(path: '/ppsc/participant/{id}', name: 'participant')]
+    #[Route(path: '/read/participant/{id}', name: 'read_participant', methods: ['GET'])]
     public function ppscParticipantDetailsAction(
         $id,
         PpscApiService $ppscApiService,
