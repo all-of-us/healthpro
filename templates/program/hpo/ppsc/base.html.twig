@@ -1,4 +1,7 @@
 {% set bootstrapVersion = bootstrapVersion|default(3) %}
+{% set isActiveSite = app.session.get('siteEntity') ? app.session.get('siteEntity').status : 0 %}
+{% set readOnlyRoute = app.request.attributes.get('_route') starts with 'read_' %}
+{% set displayInactiveSiteBanner = not readOnlyRoute and not isActiveSite  %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,7 +9,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-{% include LoadProgramTemplate('ppsc/navbar.html.twig') %}
+{% include LoadProgramTemplate(bootstrapVersion == 5 ? 'ppsc/navbar-bs5.html.twig' : 'ppsc/navbar.html.twig') %}
 <div class="{% block bodycontainer %}container{% endblock %}">
     {% if bootstrapVersion == 5 %} <br> {% endif %}
     {% if global_notices is defined and global_notices|length > 0 %}
