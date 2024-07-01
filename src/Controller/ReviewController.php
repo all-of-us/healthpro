@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/review')]
+#[Route(path: '/ppsc/review')]
 class ReviewController extends BaseController
 {
     public const DATE_RANGE_LIMIT = 30;

@@ -41,12 +41,17 @@ class DefaultController extends BaseController
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
         }
-        if ($this->isGranted('ROLE_USER') && $request->getSession()->get('ppscRequestId') && $request->getSession()->get('ppscLandingPage') === 'in_person_enrollment') {
-            $requestDetails = $ppscApiService->getRequestDetailsById($request->getSession()->get('ppscRequestId'));
-            if (empty($requestDetails->Participant_ID__c)) {
-                throw $this->createNotFoundException('Participant not found.');
+        if ($this->isGranted('ROLE_USER') && $request->getSession()->get('ppscRequestId')) {
+            if ($request->getSession()->get('ppscLandingPage') === 'in_person_enrollment') {
+                $requestDetails = $ppscApiService->getRequestDetailsById($request->getSession()->get('ppscRequestId'));
+                if (empty($requestDetails->Participant_ID__c)) {
+                    throw $this->createNotFoundException('Participant not found.');
+                }
+                return $this->redirectToRoute('participant', ['id' => $requestDetails->Participant_ID__c]);
             }
-            return $this->redirectToRoute('participant', ['id' => $requestDetails->Participant_ID__c]);
+            if ($request->getSession()->get('ppscLandingPage') === 'daily_review') {
+                return $this->redirectToRoute('review_today');
+            }
         }
         if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
