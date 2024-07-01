@@ -16,14 +16,6 @@
         <dt>Gender Identity</dt>
         <dd>{{ participant.genderIdentity|default('--') }}</dd>
     {% endif %}
-    <dt>Participant Status</dt>
-    <dd>{{ participant.enrollmentStatus|default('--') }}
-        {% if participant.isCoreParticipant and  participant.enrollmentStatusCoreStoredSampleTime is not empty %}
-            ({{ participant.enrollmentStatusCoreStoredSampleTime|date('n/j/Y', app.user.timezone) }})
-        {% elseif participant.isCoreMinusPMParticipant and  participant.enrollmentStatusCoreMinusPMTime is not empty %}
-            ({{ participant.enrollmentStatusCoreMinusPMTime|date('n/j/Y', app.user.timezone) }})
-        {% endif %}
-    </dd>
     {% if app.session.get('siteType') == 'dv' or is_granted('ROLE_AWARDEE_SCRIPPS') %}
         <dt>Participant Origination</dt>
         <dd>{{ participant.participantOrigin|default('--') }}</dd>
