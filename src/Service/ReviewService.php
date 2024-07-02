@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Measurement;
 use App\Entity\Order;
+use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ReviewService
@@ -14,8 +15,9 @@ class ReviewService
         'processed_ts' => 'Processed',
         'finalized_ts' => 'Finalized'
     ];
-    protected $em;
-    protected $participantSummaryService;
+    protected EntityManagerInterface $em;
+    protected ParticipantSummaryService $participantSummaryService;
+    protected PpscApiService $ppscApiService;
 
     protected static $measurementsStatus = [
         'created_ts' => 'Created',
@@ -33,10 +35,14 @@ class ReviewService
         'idVerificationsCount' => 0
     ];
 
-    public function __construct(EntityManagerInterface $em, ParticipantSummaryService $participantSummaryService)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        ParticipantSummaryService $participantSummaryService,
+        PpscApiService $ppscApiService
+    ) {
         $this->em = $em;
         $this->participantSummaryService = $participantSummaryService;
+        $this->ppscApiService = $ppscApiService;
     }
 
     public function getTodayParticipants($startTime, $endTime, $site = null)
@@ -141,7 +147,7 @@ class ReviewService
     {
         $count = 0;
         foreach ($results as $key => $result) {
-            $results[$key]['participant'] = $this->participantSummaryService->getParticipantById($result['participant_id']);
+            $results[$key]['participant'] = $this->ppscApiService->getParticipantById($result['participant_id']);
             if (++$count >= 5) {
                 break;
             }

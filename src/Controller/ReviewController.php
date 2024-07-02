@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Form\ReviewTodayFilterType;
 use App\Repository\MeasurementRepository;
 use App\Repository\OrderRepository;
-use App\Service\ParticipantSummaryService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\ReviewService;
 use App\Service\SiteService;
 use DateTime;
@@ -20,20 +20,20 @@ class ReviewController extends BaseController
 {
     public const DATE_RANGE_LIMIT = 30;
 
-    protected $participantSummaryService;
+    protected PpscApiService $ppscApiService;
 
-    protected $reviewService;
+    protected ReviewService $reviewService;
 
-    protected $siteService;
+    protected SiteService $siteService;
 
     public function __construct(
-        ParticipantSummaryService $participantSummaryService,
+        PpscApiService $ppscApiService,
         ReviewService $reviewService,
         SiteService $siteService,
         EntityManagerInterface $em
     ) {
         parent::__construct($em);
-        $this->participantSummaryService = $participantSummaryService;
+        $this->ppscApiService = $ppscApiService;
         $this->reviewService = $reviewService;
         $this->siteService = $siteService;
     }
@@ -94,7 +94,7 @@ class ReviewController extends BaseController
         // Preload first 5 names
         $count = 0;
         foreach (array_keys($participants) as $id) {
-            $participants[$id]['participant'] = $this->participantSummaryService->getParticipantById($id);
+            $participants[$id]['participant'] = $this->ppscApiService->getParticipantById($id);
             if (++$count >= 5) {
                 break;
             }
@@ -177,7 +177,7 @@ class ReviewController extends BaseController
             return $this->json(null);
         }
 
-        $participant = $this->participantSummaryService->getParticipantById($id);
+        $participant = $this->ppscApiService->getParticipantById($id);
         if (!$participant) {
             return $this->json(null);
         }
