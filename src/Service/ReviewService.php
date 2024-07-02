@@ -78,14 +78,6 @@ class ReviewService
                     $participants[$participantId]['physicalMeasurements'][] = $row;
                     $participants[$participantId]['physicalMeasurementsCount']++;
                     break;
-                case 'incentive':
-                    $participants[$participantId]['incentives'][] = $row;
-                    $participants[$participantId]['incentivesCount']++;
-                    break;
-                case 'idVerification':
-                    $participants[$participantId]['idVerifications'][] = $row;
-                    $participants[$participantId]['idVerificationsCount']++;
-                    break;
             }
         }
 
@@ -188,25 +180,7 @@ class ReviewService
             'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
             'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
             'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
-        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.incentive_date_given, null, null, null, null, null, null, ' .
-            'null, ' .
-            'null, ' .
-            'null, ' .
-            'null ' .
-            'FROM incentive i ' .
-            'WHERE i.site = :site ' .
-            'AND i.incentive_date_given >= :incentiveStartTime ' .
-            'AND i.incentive_date_given < :endTime ';
-        $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
-            'null, ' .
-            'null, ' .
-            'null, ' .
-            'null ' .
-            'FROM id_verification idv ' .
-            'WHERE idv.site = :site ' .
-            'AND idv.created_ts >= :startTime ' .
-            'AND idv.created_ts < :endTime ';
-        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) UNION ($idVerificationsQuery) ORDER BY latest_ts DESC";
+        $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
         return $this->em->getConnection()->fetchAll($query, [
             'startTime' => $startTime,
