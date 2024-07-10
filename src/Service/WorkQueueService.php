@@ -253,6 +253,10 @@ class WorkQueueService
             $rdrParams['participantId'] = substr($params['participantId'], 1);
         }
 
+        if (isset($params['hasCoreData'])) {
+            $rdrParams['hasCoreData'] = $params['hasCoreData'];
+        }
+
         if (!empty($params['ageRange']) || WorkQueue::hasDateFields($params)) {
             $rdrParams = http_build_query($rdrParams, '', '&', PHP_QUERY_RFC3986);
         }
