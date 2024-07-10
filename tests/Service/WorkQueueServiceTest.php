@@ -302,6 +302,8 @@ class WorkQueueServiceTest extends ServiceTestCase
             '0',
             '',
             '0',
+            '',
+            '0',
             ''
         ], $row);
     }
