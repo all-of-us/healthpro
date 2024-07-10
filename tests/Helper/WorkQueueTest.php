@@ -206,6 +206,7 @@ class WorkQueueTest extends ServiceTestCase
                 'activityStatus' => 'Activity Status',
                 'patientStatus' => 'Patient Status',
                 'pediatricStatus' => 'Pediatric Status',
+                'hasCoreData' => 'Has Core Data',
                 'consentForStudyEnrollment' => 'Primary Consent',
                 'questionnaireOnDnaProgram' => 'Program Update',
                 'consentForElectronicHealthRecords' => 'EHR Consent Status',
@@ -278,6 +279,12 @@ class WorkQueueTest extends ServiceTestCase
                             '' => 'View All',
                             'SUBMITTED' => 'Pediatric Participant',
                             'UNSET' => 'Adult Participant',
+                        ],
+                    'hasCoreData' =>
+                        [
+                            '' => 'View All',
+                            '1' => 'Has Core Data',
+                            '0' => 'Does Not Have Core Data',
                         ],
                     'consentForStudyEnrollment' =>
                         [
