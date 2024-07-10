@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Measurement;
 use App\Entity\Order;
+use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ReviewService
@@ -14,8 +15,9 @@ class ReviewService
         'processed_ts' => 'Processed',
         'finalized_ts' => 'Finalized'
     ];
-    protected $em;
-    protected $participantSummaryService;
+    protected EntityManagerInterface $em;
+    protected ParticipantSummaryService $participantSummaryService;
+    protected PpscApiService $ppscApiService;
 
     protected static $measurementsStatus = [
         'created_ts' => 'Created',
@@ -33,10 +35,14 @@ class ReviewService
         'idVerificationsCount' => 0
     ];
 
-    public function __construct(EntityManagerInterface $em, ParticipantSummaryService $participantSummaryService)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        ParticipantSummaryService $participantSummaryService,
+        PpscApiService $ppscApiService
+    ) {
         $this->em = $em;
         $this->participantSummaryService = $participantSummaryService;
+        $this->ppscApiService = $ppscApiService;
     }
 
     public function getTodayParticipants($startTime, $endTime, $site = null)
@@ -71,14 +77,6 @@ class ReviewService
                     }
                     $participants[$participantId]['physicalMeasurements'][] = $row;
                     $participants[$participantId]['physicalMeasurementsCount']++;
-                    break;
-                case 'incentive':
-                    $participants[$participantId]['incentives'][] = $row;
-                    $participants[$participantId]['incentivesCount']++;
-                    break;
-                case 'idVerification':
-                    $participants[$participantId]['idVerifications'][] = $row;
-                    $participants[$participantId]['idVerificationsCount']++;
                     break;
             }
         }
@@ -141,7 +139,7 @@ class ReviewService
     {
         $count = 0;
         foreach ($results as $key => $result) {
-            $results[$key]['participant'] = $this->participantSummaryService->getParticipantById($result['participant_id']);
+            $results[$key]['participant'] = $this->ppscApiService->getParticipantById($result['participant_id']);
             if (++$count >= 5) {
                 break;
             }
@@ -182,25 +180,7 @@ class ReviewService
             'AND ((e.created_ts >= :startTime AND e.created_ts < :endTime) ' .
             'OR (e.finalized_ts >= :startTime AND e.finalized_ts < :endTime) ' .
             'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
-        $incentivesQuery = 'SELECT i.participant_id, \'incentive\' as type, i.id, null, null, null, null, i.incentive_date_given, null, null, null, null, null, null, ' .
-            'null, ' .
-            'null, ' .
-            'null, ' .
-            'null ' .
-            'FROM incentive i ' .
-            'WHERE i.site = :site ' .
-            'AND i.incentive_date_given >= :incentiveStartTime ' .
-            'AND i.incentive_date_given < :endTime ';
-        $idVerificationsQuery = 'SELECT idv.participant_id, \'idVerification\' as type, idv.id, null, null, null, null, idv.created_ts, null, null, null, null, null, null, ' .
-            'null, ' .
-            'null, ' .
-            'null, ' .
-            'null ' .
-            'FROM id_verification idv ' .
-            'WHERE idv.site = :site ' .
-            'AND idv.created_ts >= :startTime ' .
-            'AND idv.created_ts < :endTime ';
-        $query = "($ordersQuery) UNION ($measurementsQuery) UNION ($incentivesQuery) UNION ($idVerificationsQuery) ORDER BY latest_ts DESC";
+        $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
         return $this->em->getConnection()->fetchAll($query, [
             'startTime' => $startTime,
