@@ -156,7 +156,6 @@ class WorkQueue
             'method' => 'getPediatricStatus',
             'csvMethod' => 'getPediatricStatus',
             'toggleColumn' => true,
-            'orderable' => false,
             'default' => true,
             'group' => 'details'
         ],
