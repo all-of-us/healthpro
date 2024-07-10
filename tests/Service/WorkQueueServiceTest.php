@@ -136,6 +136,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             'P100000001',
             'Y100000001',
             'Participant + EHR Consent',
+            'Does Not Have Core Data',
             '',
             '0',
             '',
@@ -297,7 +298,11 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             'Adult Participant',
-            'N/A'
+            'N/A',
+            '0',
+            '',
+            '0',
+            ''
         ], $row);
     }
 
