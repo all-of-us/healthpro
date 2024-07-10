@@ -79,7 +79,7 @@ class MeasurementService
     public function createMeasurement($fhir)
     {
         try {
-            $response = $this->ppscApiService->post("/physical_measurement", $fhir);
+            $response = $this->ppscApiService->post('/physical_measurement', $fhir);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->sf_measurments_id)) {
                 return $result->sf_measurments_id;
