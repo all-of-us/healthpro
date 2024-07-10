@@ -71,6 +71,20 @@ $(document).ready(function () {
         $("#order_finalizedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));
         showHideConfirmEmptyOrderCheck();
     });
+
+    $("#order_finalizedSamples input:checkbox").on("change", function () {
+        checkAllToggle(this);
+    });
+
+    function checkAllToggle(element) {
+        let allCheckboxesNotCheckall = $("#order_finalizedSamples input:checkbox:enabled").not("#checkall");
+        if (element !== undefined && !$(element).prop("checked")) {
+            $("#checkall").prop("checked", false);
+        } else if (allCheckboxesNotCheckall.filter(":checked").length === allCheckboxesNotCheckall.length) {
+            $("#checkall").prop("checked", true);
+        }
+    }
+
     $("#order_finalizedTs").pmiDateTimePicker();
 
     new PMI.views["OrderSubPage"]({

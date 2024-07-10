@@ -206,6 +206,7 @@ class WorkQueueTest extends ServiceTestCase
                 'activityStatus' => 'Activity Status',
                 'patientStatus' => 'Patient Status',
                 'pediatricStatus' => 'Pediatric Status',
+                'hasCoreData' => 'Has Core Data',
                 'consentForStudyEnrollment' => 'Primary Consent',
                 'questionnaireOnDnaProgram' => 'Program Update',
                 'consentForElectronicHealthRecords' => 'EHR Consent Status',
@@ -228,6 +229,8 @@ class WorkQueueTest extends ServiceTestCase
                 'clinicPhysicalMeasurementsStatus' => 'Phys Measurements',
                 'sampleStatus1SST8' => '8 mL SST',
                 'sampleStatus1PST8' => '8 mL PST',
+                'sampleStatus1PS4A' => '1st 4.5 mL PST',
+                'sampleStatus1PS4B' => '2nd 4.5 mL PST',
                 'sampleStatus1HEP4' => '4 mL Na-Hep',
                 'sampleStatus1ED02' => '2 mL EDTA (1ED02)',
                 'sampleStatus2ED02' => '2 mL EDTA (2ED02)',
@@ -278,6 +281,12 @@ class WorkQueueTest extends ServiceTestCase
                             '' => 'View All',
                             'SUBMITTED' => 'Pediatric Participant',
                             'UNSET' => 'Adult Participant',
+                        ],
+                    'hasCoreData' =>
+                        [
+                            '' => 'View All',
+                            '1' => 'Has Core Data',
+                            '0' => 'Does Not Have Core Data',
                         ],
                     'consentForStudyEnrollment' =>
                         [
@@ -447,7 +456,18 @@ class WorkQueueTest extends ServiceTestCase
                             'RECEIVED' => 'Received',
                             'UNSET' => 'Not Received',
                         ],
-
+                    'sampleStatus1PS4A' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
+                    'sampleStatus1PS4B' =>
+                        [
+                            '' => 'View All',
+                            'RECEIVED' => 'Received',
+                            'UNSET' => 'Not Received',
+                        ],
                     'sampleStatus1HEP4' =>
                         [
                             '' => 'View All',
@@ -710,6 +730,8 @@ class WorkQueueTest extends ServiceTestCase
             [false, [
                 '1SST8' => '8 mL SST',
                 '1PST8' => '8 mL PST',
+                'PS04A' => '1st 4.5 mL PST',
+                'PS04B' => '2nd 4.5 mL PST',
                 '1HEP4' => '4 mL Na-Hep',
                 '1ED02' => '2 mL EDTA (1ED02)',
                 '1ED04' => '4 mL EDTA (1ED04)',
