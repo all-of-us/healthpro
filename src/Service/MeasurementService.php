@@ -76,7 +76,7 @@ class MeasurementService
         $measurement->loadFromAObject($finalizedUserEmail, $finalizedSite);
     }
 
-    public function createMeasurement($participantId, $fhir)
+    public function createMeasurement($fhir)
     {
         try {
             $response = $this->ppscApiService->post("/physical_measurement", $fhir);
@@ -253,7 +253,7 @@ class MeasurementService
             }
         }
         $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $parentRdrId);
-        $rdrId = $this->createMeasurement($this->measurement->getParticipantId(), $fhir);
+        $rdrId = $this->createMeasurement($fhir);
         if (!empty($rdrId)) {
             $this->measurement->setRdrId($rdrId);
             $this->em->persist($this->measurement);

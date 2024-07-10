@@ -4,6 +4,7 @@ namespace App\Service\Ppsc;
 
 use App\Helper\PpscParticipant;
 use App\HttpClient;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PpscApiService
@@ -88,7 +89,7 @@ class PpscApiService
         }
     }
 
-    public function post($path, $body, $params = [])
+    public function post(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
         $token = $this->getAccessToken();
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
