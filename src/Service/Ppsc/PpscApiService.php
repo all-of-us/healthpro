@@ -88,6 +88,14 @@ class PpscApiService
         }
     }
 
+    public function post($path, $body, $params = [])
+    {
+        $token = $this->getAccessToken();
+        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+        $params['json'] = $body;
+        return $this->client->request('POST', $this->endpoint . $path, $params);
+    }
+
     private function getParams($field): string|null
     {
         return $this->params->has($field) ? $this->params->get($field) : null;
