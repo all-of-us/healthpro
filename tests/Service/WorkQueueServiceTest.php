@@ -298,7 +298,11 @@ class WorkQueueServiceTest extends ServiceTestCase
             '',
             '',
             'Adult Participant',
-            'N/A'
+            'N/A',
+            '0',
+            '',
+            '0',
+            ''
         ], $row);
     }
 

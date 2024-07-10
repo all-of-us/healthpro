@@ -1149,6 +1149,38 @@ class WorkQueue
             'group' => 'enrollment',
             'display_na' => self::NA_PEDIATRIC
         ],
+        'PS04A' => [
+            'name' => '1st 4.5 mL PST',
+            'csvNames' => [
+                '1st 4.5 mL PST Received',
+                '1st 4.5 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PS4A',
+            'sortField' => 'sampleStatus1PS4ATime',
+            'rdrDateField' => 'sampleStatus1PS4ATime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
+        ],
+        'PS04B' => [
+            'name' => '2nd 4.5 mL PST',
+            'csvNames' => [
+                '2nd 4.5 mL PST Received',
+                '2nd 4.5 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PS4B',
+            'sortField' => 'sampleStatus1PS4BTime',
+            'rdrDateField' => 'sampleStatus1PS4BTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
+        ],
         '1HEP4' => [
             'name' => '4 mL Na-Hep',
             'csvNames' => [
@@ -1518,6 +1550,8 @@ class WorkQueue
         'orderCreatedSite',
         '1SST8',
         '1PST8',
+        'PS04A',
+        'PS04B',
         '1HEP4',
         '1ED02',
         '2ED02',
@@ -1706,7 +1740,9 @@ class WorkQueue
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
         'pediatricStatus',
-        'relatedParticipants'
+        'relatedParticipants',
+        'PS04A',
+        'PS04B'
     ];
 
     public static $sortColumns = [
@@ -1791,6 +1827,8 @@ class WorkQueue
         'biospecimenSourceSite',
         'sampleStatus1SST8Time',
         'sampleStatus1PST8Time',
+        'sampleStatus1PS4ATime',
+        'sampleStatus1PS4BTime',
         'sampleStatus1HEP4Time',
         'sampleStatus1ED02Time',
         'sampleStatus2ED02Time',
@@ -2370,6 +2408,22 @@ class WorkQueue
                     'Not Received' => 'UNSET'
                 ]
             ],
+            'sampleStatus1PS4A' => [
+                'label' => '1st 4.5 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1PS4B' => [
+                'label' => '2nd 4.5 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
             'sampleStatus1HEP4' => [
                 'label' => '4 mL Na-Hep',
                 'options' => [
@@ -2484,6 +2538,8 @@ class WorkQueue
         'clinicPhysicalMeasurementsStatus',
         'sampleStatus1SST8',
         'sampleStatus1PST8',
+        'sampleStatus1PS4A',
+        'sampleStatus1PS4B',
         'sampleStatus1HEP4',
         'sampleStatus1ED02',
         'sampleStatus2ED02',
@@ -2624,6 +2680,8 @@ class WorkQueue
     public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
+        'PS04A' => '1st 4.5 mL PST',
+        'PS04B' => '2nd 4.5 mL PST',
         '1HEP4' => '4 mL Na-Hep',
         '1ED02' => '2 mL EDTA (1ED02)',
         '2ED02' => '2 mL EDTA (2ED02)',
@@ -2658,11 +2716,15 @@ class WorkQueue
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',
-            '1PST8' => '1PS08'
+            '1PST8' => '1PS08',
+            'PS04A' => '1PS4A',
+            'PS04B' => '1PS4B',
         ],
         [
             '1SST8' => '2SST8',
-            '1PST8' => '2PST8'
+            '1PST8' => '2PST8',
+            'PS04A' => '2PS4A',
+            'PS04B' => '2PS4B',
         ],
         [
             '1SAL' => '1SAL2'
