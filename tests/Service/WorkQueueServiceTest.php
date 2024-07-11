@@ -271,6 +271,7 @@ class WorkQueueServiceTest extends ServiceTestCase
             '1/12/2022 1:09 pm',
             'bannerdesert',
             '7/26/2022 3:00 pm',
+            '',
             '7/22/2022',
             1,
             '8/1/2022',
