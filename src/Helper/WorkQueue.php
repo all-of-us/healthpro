@@ -1028,6 +1028,7 @@ class WorkQueue
             'name' => 'Remote ID Verification',
             'csvName' => 'Remote ID Verification Date',
             'rdrField' => 'remoteIdVerifiedOn',
+            'sortField' => 'remoteIdVerifiedOn',
             'method' => 'displayDateStatus',
             'userTimezone' => true,
             'htmlClass' => 'text-center',
@@ -1850,6 +1851,7 @@ class WorkQueue
         'site',
         'organization',
         'onsiteIdVerificationTime',
+        'remoteIdVerifiedOn',
         'participantIncentives',
         'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsFinalizedTime',
@@ -1879,7 +1881,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'consentForNphModule1Authored'
+        'consentForNphModule1Authored',
     ];
 
     public static $consentSortColumns = [
