@@ -101,7 +101,9 @@ class OrderController extends BaseController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        if ($participant->isPediatric) {
+            $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        }
         if ($physicalMeasurement) {
             $measurementService->load($physicalMeasurement, $participant);
         }
