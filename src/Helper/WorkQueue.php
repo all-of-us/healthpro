@@ -1024,6 +1024,19 @@ class WorkQueue
             'csvFormatDate' => true,
             'group' => 'enrollment'
         ],
+        'remoteIdVerifiedOn' => [
+            'name' => 'Remote ID Verification',
+            'csvName' => 'Remote ID Verification Date',
+            'rdrField' => 'remoteIdVerifiedOn',
+            'sortField' => 'remoteIdVerifiedOn',
+            'method' => 'displayDateStatus',
+            'userTimezone' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'csvFormatDate' => true,
+            'group' => 'enrollment'
+        ],
         'participantIncentive' => [
             'name' => 'Incentive',
             'csvName' => 'Incentive Date',
@@ -1557,6 +1570,7 @@ class WorkQueue
         'pairedSite',
         'pairedOrganization',
         'onsiteIdVerificationTime',
+        'remoteIdVerifiedOn',
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsStatus',
@@ -1761,6 +1775,7 @@ class WorkQueue
         'PS04A',
         'PS04B',
         '2SAL0',
+        'remoteIdVerifiedOn'
     ];
 
     public static $sortColumns = [
@@ -1836,6 +1851,7 @@ class WorkQueue
         'site',
         'organization',
         'onsiteIdVerificationTime',
+        'remoteIdVerifiedOn',
         'participantIncentives',
         'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsFinalizedTime',
