@@ -1028,7 +1028,6 @@ class WorkQueue
             'name' => 'Remote ID Verification',
             'csvName' => 'Remote ID Verification Date',
             'rdrField' => 'remoteIdVerifiedOn',
-            'sortField' => 'remoteIdVerifiedOn',
             'method' => 'displayDateStatus',
             'userTimezone' => true,
             'htmlClass' => 'text-center',
