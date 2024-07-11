@@ -147,8 +147,11 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getMostRecentFinalizedNonNullWeight($participantId): Measurement|null
+    public function getMostRecentFinalizedNonNullWeight(string $participantId, bool $isPediatric): Measurement|null
     {
+        if (!$isPediatric) {
+            return null;
+        }
         $parentIds = $this->createQueryBuilder('m')
             ->select('m.parentId')
             ->where('m.parentId is not null')

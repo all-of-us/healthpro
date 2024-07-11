@@ -1,0 +1,45 @@
+{
+    "version": "5",
+    "notes": "Pediatric Updated Saliva Tubes, 5 < 16.4 Kg",
+    "samplesInformation": {
+        "1ED02": {
+            "number": 1,
+            "label": "2mL EDTA",
+            "temperature": "Refrigerated",
+            "color": "Lavender",
+            "specimen": "2mL EDTA"
+        },
+        "2ED04": {
+            "number": 2,
+            "label": "4mL EDTA",
+            "temperature": "Refrigerated",
+            "color": "Lavender",
+            "specimen": "4mL EDTA"
+        },
+        "1UR10": {
+            "number": 1,
+            "label": "Urine 10 mL",
+            "color": "Yellow",
+            "temperature": "Refrigerated",
+            "specimen": "Urine 10 mL",
+            "labelCount": 2
+        }
+    },
+    "salivaSamplesInformation": {
+        "1SAL2": {
+            "label": "Saliva [1SAL2]",
+            "temperature": "Refrigerated",
+            "specimen": "PMI Saliva, FDA Kit",
+            "color": "Clear",
+            "identifier": "OGD-500"
+        },
+        "2SAL0": {
+            "label": "Saliva [2SAL0]",
+            "temperature": "Refrigerated",
+            "specimen": "PMI Saliva, FDA Kit",
+            "color": "Clear",
+            "identifier": "OCD-100 Sponge Assisted Device"
+        }
+    },
+    "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide both the 4 mL EDTA tube and the 10 mL EDTA tube."
+}
