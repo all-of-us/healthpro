@@ -9,6 +9,7 @@ use App\Entity\OrderHistory;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Helper\PpscParticipant;
+use App\Service\Ppsc\PpscApiService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
@@ -22,6 +23,7 @@ class OrderService
     public const ORDER_EDIT_STATUS = 'AMENDED';
 
     protected $rdrApiService;
+    protected PpscApiService $ppscApiService;
     protected $params;
     protected $em;
     protected $mayolinkOrderService;
@@ -34,6 +36,7 @@ class OrderService
 
     public function __construct(
         RdrApiService $rdrApiService,
+        PpscApiService $ppscApiService,
         ParameterBagInterface $params,
         EntityManagerInterface $em,
         MayolinkOrderService $mayolinkOrderService,
@@ -42,6 +45,7 @@ class OrderService
         LoggerService $loggerService
     ) {
         $this->rdrApiService = $rdrApiService;
+        $this->ppscApiService = $ppscApiService;
         $this->params = $params;
         $this->em = $em;
         $this->mayolinkOrderService = $mayolinkOrderService;
@@ -67,13 +71,13 @@ class OrderService
         return $this->participant;
     }
 
-    public function createOrder($participantId, $orderObject)
+    public function createOrder(\stdClass $orderObject): string|bool
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder", $orderObject);
+            $response = $this->ppscApiService->post("/bioBankOrder", $orderObject);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
+            if (is_object($result) && isset($result->sf_biobank_id)) {
+                return $result->sf_biobank_id;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
@@ -469,7 +473,7 @@ class OrderService
     public function createRdrOrder()
     {
         $orderRdrObject = $this->order->getRdrObject();
-        $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
+        $rdrId = $this->createOrder($orderRdrObject);
         if (!$rdrId) {
             // Check for rdr id conflict error code
             if ($this->rdrApiService->getLastErrorCode() === 409) {
