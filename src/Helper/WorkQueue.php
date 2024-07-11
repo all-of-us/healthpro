@@ -86,6 +86,15 @@ class WorkQueue
             'group' => 'details',
             'default' => true
         ],
+        'hasCoreData' => [
+            'name' => 'Core Data Status',
+            'rdrField' => 'hasCoreData',
+            'sortField' => 'hasCoreData',
+            'toggleColumn' => true,
+            'group' => 'details',
+            'method' => 'getCoreDataStatus',
+            'csvMethod' => 'csvCoreDataStatus'
+        ],
         'coreParticipant' => [
             'name' => 'Core Participant Date',
             'rdrDateField' => 'enrollmentStatusCoreV3_2Time',
@@ -147,7 +156,6 @@ class WorkQueue
             'method' => 'getPediatricStatus',
             'csvMethod' => 'getPediatricStatus',
             'toggleColumn' => true,
-            'orderable' => false,
             'default' => true,
             'group' => 'details'
         ],
@@ -1154,6 +1162,38 @@ class WorkQueue
             'group' => 'enrollment',
             'display_na' => self::NA_PEDIATRIC
         ],
+        'PS04A' => [
+            'name' => '1st 4.5 mL PST',
+            'csvNames' => [
+                '1st 4.5 mL PST Received',
+                '1st 4.5 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PS4A',
+            'sortField' => 'sampleStatus1PS4ATime',
+            'rdrDateField' => 'sampleStatus1PS4ATime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
+        ],
+        'PS04B' => [
+            'name' => '2nd 4.5 mL PST',
+            'csvNames' => [
+                '2nd 4.5 mL PST Received',
+                '2nd 4.5 mL PST Received Date'
+            ],
+            'rdrField' => 'sampleStatus1PS4B',
+            'sortField' => 'sampleStatus1PS4BTime',
+            'rdrDateField' => 'sampleStatus1PS4BTime',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_PEDIATRIC
+        ],
         '1HEP4' => [
             'name' => '4 mL Na-Hep',
             'csvNames' => [
@@ -1340,6 +1380,22 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
+        '2SAL0' => [
+            'name' => 'Saliva (2SAL0)',
+            'csvNames' => [
+                'Saliva (2SAL0) Received',
+                'Saliva (2SAL0) Received Date'
+            ],
+            'rdrField' => 'sampleStatus2SAL0',
+            'sortField' => 'sampleStatus2SAL0Time',
+            'rdrDateField' => 'sampleStatus2SAL0Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_ADULT
+        ],
         'sample1SAL2CollectionMethod' => [
             'name' => 'Saliva Collection',
             'rdrField' => 'sample1SAL2CollectionMethod'
@@ -1451,6 +1507,7 @@ class WorkQueue
         'participantId',
         'biobankId',
         'participantStatus',
+        'hasCoreData',
         'activityStatus',
         'withdrawalReason',
         'pediatricStatus',
@@ -1523,6 +1580,8 @@ class WorkQueue
         'orderCreatedSite',
         '1SST8',
         '1PST8',
+        'PS04A',
+        'PS04B',
         '1HEP4',
         '1ED02',
         '2ED02',
@@ -1535,6 +1594,7 @@ class WorkQueue
         '1UR10',
         '1UR90',
         '1SAL',
+        '2SAL0',
         'age',
         'sex',
         'genderIdentity',
@@ -1607,6 +1667,7 @@ class WorkQueue
         'participantId',
         'biobankId',
         'participantStatus',
+        'hasCoreData',
         'coreParticipant',
         'withdrawalStatus',
         'withdrawalReason',
@@ -1711,6 +1772,9 @@ class WorkQueue
         'enrollmentStatusPmbEligibleV3_2Time',
         'pediatricStatus',
         'relatedParticipants',
+        'PS04A',
+        'PS04B',
+        '2SAL0',
         'remoteIdVerifiedOn',
     ];
 
@@ -1722,6 +1786,7 @@ class WorkQueue
         'participantId',
         'biobankId',
         'enrollmentStatusV3_2',
+        'hasCoreData',
         'withdrawalAuthored',
         'withdrawalReason',
         'isPediatric',
@@ -1795,6 +1860,8 @@ class WorkQueue
         'biospecimenSourceSite',
         'sampleStatus1SST8Time',
         'sampleStatus1PST8Time',
+        'sampleStatus1PS4ATime',
+        'sampleStatus1PS4BTime',
         'sampleStatus1HEP4Time',
         'sampleStatus1ED02Time',
         'sampleStatus2ED02Time',
@@ -1807,6 +1874,7 @@ class WorkQueue
         'sampleStatus1UR10Time',
         'sampleStatus1UR90Time',
         'sampleStatus1SALTime',
+        'sampleStatus2SAL0Time',
         'dateOfBirth',
         'sex',
         'genderIdentity',
@@ -2133,6 +2201,14 @@ class WorkQueue
                     'Pediatric Participant' => 'SUBMITTED',
                     'Adult Participant' => 'UNSET'
                 ]
+            ],
+            'hasCoreData' => [
+                'label' => 'Has Core Data',
+                'options' => [
+                    'View All' => '',
+                    'Has Core Data' => '1',
+                    'Does Not Have Core Data' => '0'
+                ]
             ]
         ],
         'Consents' => [
@@ -2366,6 +2442,22 @@ class WorkQueue
                     'Not Received' => 'UNSET'
                 ]
             ],
+            'sampleStatus1PS4A' => [
+                'label' => '1st 4.5 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
+            'sampleStatus1PS4B' => [
+                'label' => '2nd 4.5 mL PST',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
+            ],
             'sampleStatus1HEP4' => [
                 'label' => '4 mL Na-Hep',
                 'options' => [
@@ -2461,6 +2553,14 @@ class WorkQueue
                     'Received' => 'RECEIVED',
                     'Not Received' => 'UNSET'
                 ]
+            ],
+            'sampleStatus2SAL0' => [
+                'label' => 'Saliva (2SAL0)',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
             ]
         ],
         'Ancillary Studies' => [
@@ -2480,6 +2580,8 @@ class WorkQueue
         'clinicPhysicalMeasurementsStatus',
         'sampleStatus1SST8',
         'sampleStatus1PST8',
+        'sampleStatus1PS4A',
+        'sampleStatus1PS4B',
         'sampleStatus1HEP4',
         'sampleStatus1ED02',
         'sampleStatus2ED02',
@@ -2491,7 +2593,8 @@ class WorkQueue
         'sampleStatus1PXR2',
         'sampleStatus1UR10',
         'sampleStatus1UR90',
-        'sampleStatus1SAL'
+        'sampleStatus1SAL',
+        'sampleStatus2SAL0',
     ];
 
     public static $filterDateFieldLabels = [
@@ -2620,6 +2723,8 @@ class WorkQueue
     public static $samples = [
         '1SST8' => '8 mL SST',
         '1PST8' => '8 mL PST',
+        'PS04A' => '1st 4.5 mL PST',
+        'PS04B' => '2nd 4.5 mL PST',
         '1HEP4' => '4 mL Na-Hep',
         '1ED02' => '2 mL EDTA (1ED02)',
         '2ED02' => '2 mL EDTA (2ED02)',
@@ -2631,7 +2736,8 @@ class WorkQueue
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
         '1UR90' => 'Urine 90 mL',
-        '1SAL' => 'Saliva'
+        '1SAL' => 'Saliva',
+        '2SAL0' => 'Saliva (2SAL0)'
     ];
 
     public static array $pedsSamples = [
@@ -2642,23 +2748,29 @@ class WorkQueue
         '1ED10' => '1st 10 mL EDTA',
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
-        '1SAL' => 'Saliva'
+        '1SAL' => 'Saliva',
+        '2SAL0' => 'Saliva (2SAL0)'
     ];
 
     public static array $pedsOnlyFields = [
         'EnvironmentalExposures',
         '2ED02',
-        '2ED04'
+        '2ED04',
+        '2SAL0'
     ];
 
     public static $samplesAlias = [
         [
             '1SST8' => '1SS08',
-            '1PST8' => '1PS08'
+            '1PST8' => '1PS08',
+            'PS04A' => '1PS4A',
+            'PS04B' => '1PS4B',
         ],
         [
             '1SST8' => '2SST8',
-            '1PST8' => '2PST8'
+            '1PST8' => '2PST8',
+            'PS04A' => '2PS4A',
+            'PS04B' => '2PS4B',
         ],
         [
             '1SAL' => '1SAL2'
@@ -3031,6 +3143,19 @@ class WorkQueue
             default:
                 return '';
         }
+    }
+
+    public static function getCoreDataStatus($coreDataStatus)
+    {
+        if ($coreDataStatus) {
+            return self::HTML_SUCCESS . ' Has Core Data';
+        }
+        return self::HTML_DANGER . ' Does Not Have Core Data';
+    }
+
+    public static function csvCoreDataStatus($coreDataStatus)
+    {
+        return $coreDataStatus ? 'Has Core Data' : 'Does Not Have Core Data';
     }
 
     public static function displayProgramUpdate($consentCohort, $questionnaireOnDnaProgram, $questionnaireOnDnaProgramAuthored, $userTimezone)

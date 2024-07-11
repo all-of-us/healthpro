@@ -52,7 +52,7 @@ class OrderService
 
     public function loadSamplesSchema($order, Participant $participant = null, Measurement $physicalMeasurement = null)
     {
-        $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order']);
+        $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order', 'pediatric_order_samples_version']);
         $this->order = $order;
         $this->order->loadSamplesSchema($params, $participant, $physicalMeasurement);
     }
@@ -848,6 +848,8 @@ class OrderService
             $order->setFinalizedSamples(json_encode($finalizedSamples));
         }
         $this->loadSamplesSchema($order);
+        $this->em->persist($order);
+        $this->em->flush();
         return $order;
     }
 

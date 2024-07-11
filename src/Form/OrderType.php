@@ -51,7 +51,7 @@ class OrderType extends AbstractType
             $tsLabel = 'Blood Collection Time';
         }
         if ($options['step'] == 'collected' && (isset($options['dvSite']) && $options['dvSite'] === true)
-            && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->get('order_samples_version') > 3.1))) {
+            && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->has('order_samples_version_dv') && $options['params']->get('order_samples_version_dv') > 3.1))) {
             if ($options['order']->getVersion() === null) {
                 unset($samples);
             }
@@ -267,6 +267,26 @@ class OrderType extends AbstractType
                 'constraints' => new Constraints\Type('string')
             ]);
         }
+        if ($options['order']->getType() == Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && $options['order']->getVersion() > 3.1) {
+            $choices = [];
+            $choices['-- Select Saliva Sample Type --'] = 0;
+            foreach ($options['order']->getSalivaSamplesInformation() as $tube) {
+                $choices["{$tube['sampleId']} - {$tube['identifier']}"] = $tube['sampleId'];
+            }
+            $collected = json_decode($options['order']->getCollectedSamples());
+            if (empty($collected)) {
+                $collected = 0;
+            } else {
+                $collected = $collected[0];
+            }
+            $builder->add('salivaTubeSelection', Type\ChoiceType::class, [
+                'label' => 'Select Saliva Sample Type',
+                'choices' => $choices,
+                'required' => true,
+                'multiple' => false,
+                'data' => $collected,
+            ]);
+        }
         return $builder->getForm();
     }
 
@@ -279,7 +299,8 @@ class OrderType extends AbstractType
             'timeZone' => null,
             'siteId' => null,
             'dvSite' => null,
-            'params' => null
+            'params' => null,
+            'isPediatricOrder' => false
         ]);
     }
 }

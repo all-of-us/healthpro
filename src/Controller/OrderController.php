@@ -101,8 +101,8 @@ class OrderController extends BaseController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
-        if ($physicalMeasurement) {
+        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
+        if ($physicalMeasurement !== null) {
             $measurementService->load($physicalMeasurement, $participant);
         }
         $order = new Order();
@@ -167,6 +167,8 @@ class OrderController extends BaseController
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
                 if ($session->get('siteType') !== 'dv' || (float) $params->get('order_samples_version') <= 3.1) {
                     $order->setVersion($order->getCurrentVersion());
+                } elseif ($session->get('siteType') === 'dv' && $params->has('order_samples_version_dv') && (float) $params->get('order_samples_version_dv') <= 3.1) {
+                    $order->setVersion($params->get('order_samples_version_dv'));
                 }
                 $order->setAgeInMonths($participant->ageInMonths);
                 if ($session->get('orderType') === 'hpo') {
@@ -175,7 +177,8 @@ class OrderController extends BaseController
                 if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
-                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false && $order->getCurrentVersion() > 3.1 && $order->getVersion() === null) {
+                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false && $params->has('order_samples_version_dv') && (float) $params->get('order_samples_version_dv') > 3.1) {
+                    $order->setVersion(null);
                     $order->setType(Order::TUBE_SELECTION_TYPE);
                 }
                 if (empty($order->getOrderId())) {
@@ -782,7 +785,7 @@ class OrderController extends BaseController
         if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
         if ($measurement) {
             $measurementService->load($measurement, $participant);
             $measurementData = $measurement->getSummary();
@@ -808,7 +811,8 @@ class OrderController extends BaseController
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
             'dvSite' => $session->get('siteType') == 'dv',
-            'params' => $params
+            'params' => $params,
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 }
