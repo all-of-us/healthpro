@@ -1775,7 +1775,7 @@ class WorkQueue
         'PS04A',
         'PS04B',
         '2SAL0',
-        'remoteIdVerifiedOn',
+        'remoteIdVerifiedOn'
     ];
 
     public static $sortColumns = [
@@ -1881,7 +1881,7 @@ class WorkQueue
         'genderIdentity',
         'race',
         'education',
-        'consentForNphModule1Authored',
+        'consentForNphModule1Authored'
     ];
 
     public static $consentSortColumns = [
