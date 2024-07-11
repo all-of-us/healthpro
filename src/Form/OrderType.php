@@ -279,13 +279,13 @@ class OrderType extends AbstractType
             } else {
                 $collected = $collected[0];
             }
-          $builder->add('salivaTubeSelection', Type\ChoiceType::class, [
-              'label' => 'Select Saliva Sample Type',
-              'choices' => $choices,
-              'required' => true,
-              'multiple' => false,
-              'data' => $collected,
-          ]);
+            $builder->add('salivaTubeSelection', Type\ChoiceType::class, [
+                'label' => 'Select Saliva Sample Type',
+                'choices' => $choices,
+                'required' => true,
+                'multiple' => false,
+                'data' => $collected,
+            ]);
         }
         return $builder->getForm();
     }
