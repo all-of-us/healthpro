@@ -147,7 +147,7 @@ class MeasurementRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getMostRecentFinalizedNonNullWeight(int $participantId, bool $isPediatric): Measurement|null
+    public function getMostRecentFinalizedNonNullWeight(string $participantId, bool $isPediatric): Measurement|null
     {
         if (!$isPediatric) {
             return null;

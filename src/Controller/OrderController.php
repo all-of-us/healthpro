@@ -785,7 +785,7 @@ class OrderController extends BaseController
         if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
         if ($measurement) {
             $measurementService->load($measurement, $participant);
             $measurementData = $measurement->getSummary();
