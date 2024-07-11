@@ -1695,7 +1695,6 @@ class WorkQueue
         'CopeVaccineMinute4',
         'enrollmentSite',
         'onsiteIdVerificationTime',
-        'remoteIdVerifiedOn',
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'reconsentForStudyEnrollmentAuthored',
@@ -1711,7 +1710,8 @@ class WorkQueue
         'enrollmentStatusParticipantPlusEhrV3_2Time',
         'enrollmentStatusPmbEligibleV3_2Time',
         'pediatricStatus',
-        'relatedParticipants'
+        'relatedParticipants',
+        'remoteIdVerifiedOn',
     ];
 
     public static $sortColumns = [
