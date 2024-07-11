@@ -24,11 +24,12 @@ class Order
     public const ORDER_STEP_FINALIZED = 'finalized';
     public const ORDER_TYPE_KIT = 'kit';
     public const ORDER_TYPE_DIVERSION = 'diversion';
+    public const ORDER_TYPE_SALIVA = 'saliva';
     public const PEDIATRIC_ORDER_STRING = 'ped';
     public const PEDIATRIC_BLOOD_SAMPLES = ['1ED04', '2ED02', '2ED04', '1ED10', '1PXR2', '1ED02'];
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
-    public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2'];
-    public const PEDIATRIC_SAMPLE_VERSION = '3.1';
+    public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2', '2SAL0'];
+    public const PEDIATRIC_SAMPLE_VERSION = '3.2';
     public const TUBE_SELECTION_TYPE = 'tubeSelect';
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', 'PS04A', 'PS04B'];

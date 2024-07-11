@@ -10,6 +10,11 @@
     {% if updatedTubes == true %}
         <input type="hidden" hidden="hidden" id="tubesChanged" name="tubesChanged" value="true">
     {% endif %}
+    {% if order.type == constant('ORDER_TYPE_SALIVA', order) and order.pediatricOrder %}
+        {% set salivaTubeSelect = true %}
+    {% else %}
+        {% set salivaTubeSelect = false %}
+    {% endif %}
     {{ form_errors(collectForm) }}
     <div class="form-group{% if not collectForm.collectedTs.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedTs) }}
@@ -17,7 +22,13 @@
         {{ form_errors(collectForm.collectedTs) }}
     </div>
 
-
+    {% if salivaTubeSelect %}
+        <div class="form-group">
+        {{ form_label(collectForm.salivaTubeSelection) }}
+        {{ form_widget(collectForm.salivaTubeSelection) }}
+        {{ form_errors(collectForm.salivaTubeSelection) }}
+        </div>
+    {% endif %}
     {% if collectForm.orderVersion is defined %}
         <div class="form-group{% if not collectForm.orderVersion.vars.valid %} has-error{% endif %}">
             {{ form_label(collectForm.orderVersion) }} <span class="toggle-help-text" data-id="tube_help_modal"><i id="tube_help_modal_toggle" class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
@@ -27,7 +38,7 @@
     {% endif %}
 
     {% if collectForm.collectedSamples is defined %}
-    <div class="form-group{% if not collectForm.collectedSamples.vars.valid %} has-error{% endif %}">
+    <div id="collectedSamplesFormGroup" {% if salivaTubeSelect %} hidden="hidden" {% endif %} class="form-group{% if not collectForm.collectedSamples.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedSamples) }}
         {% if order.type == 'saliva' %}
             {{ form_widget(collectForm.collectedSamples) }}
@@ -39,7 +50,7 @@
     {% endif %}
 
     {% if collectForm.collectedNotes is defined %}
-    <div class="form-group{% if not collectForm.collectedNotes.vars.valid %} has-error{% endif %}">
+    <div id="collectedNotesFormGroup" {% if salivaTubeSelect %} hidden="hidden" {% endif %} class="form-group{% if not collectForm.collectedNotes.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.collectedNotes) }}
         <span class="toggle-help-image">
             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
@@ -96,6 +107,40 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-dismiss="modal">Go Back</button>
                     <button id="modal_trigger_update" type="button" class="btn btn-primary">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="saliva_tube_change_warning_modal" tabindex="-1" role="dialog" aria-labelledby="tube_change_warning_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4 class="text-danger">Warning!</h4>
+                    <p>Changing the Saliva tube type will remove the previously collected saliva tube and replace it with the other saliva tube type option. Ensure the new saliva tube type selected is checked off in the list below if collected. Click the “update” button to save your changes.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Go Back</button>
+                    <button id="salive_tube_modal_trigger_update" type="button" class="btn btn-primary">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="salive_tube_help_modal" tabindex="-1" role="dialog" aria-labelledby="tube_help_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>Pediatric Saliva Selection</h4>
+                    <h5>Select which saliva kit will be used to collect the saliva sample.</h5>
+                    <p>When selecting the appropriate saliva collection kit (OGD-500 or OCD-100 sponge assisted device) to collect pediatric participant saliva use best clinical judgment on which kit fits each individual participant needs. Multiple factors (participant age, ability, etc…) will factor into saliva kit decision.</p>
+                    <h4>8 mL PST (1 Tube)</h4>
+                    <img src="{{ asset('img/aou/order/OGD-500.jpg') }}" style="height: 180px" alt="OGD-500 Tube">
+                    <h4>4.5 mL PST (2 Tubes)</h4>
+                    <img src="{{ asset('img/aou/order/OCD-100.jpg') }}" style="height: 50px" alt="OCD-100 Tube">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

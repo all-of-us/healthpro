@@ -811,7 +811,8 @@ class OrderController extends BaseController
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
             'dvSite' => $session->get('siteType') == 'dv',
-            'params' => $params
+            'params' => $params,
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 }

@@ -57,8 +57,28 @@ $(document).ready(function () {
     });
 
     checkAllToggle();
+    toggleSalivaTubes($("#order_salivaTubeSelection"));
     if ($("#tubesChanged").length > 0) {
         PMI.enableUnsavedPrompt();
         PMI.hasChanges = true;
+    }
+
+    $("#order_salivaTubeSelection").on("change", function () {
+        toggleSalivaTubes($(this));
+        $("#saliva_tube_change_warning_modal").modal();
+    })
+
+    $("#salive_tube_modal_trigger_update").on("click", function () {
+        $("#saliva_tube_change_warning_modal").modal("hide");
+        TriggerTubeUpdate();
+    })
+
+    function toggleSalivaTubes() {
+        let selectedValue = $("#order_salivaTubeSelection").val();
+        let checkboxDiv = $(`input[value="${selectedValue}"]`).parents('div.checkbox')
+        checkboxDiv.show();
+        checkboxDiv.siblings().hide();
+        $("#collectedSamplesFormGroup").show();
+        $("#collectedNotesFormGroup").show();
     }
 });
