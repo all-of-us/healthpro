@@ -64,15 +64,27 @@ $(document).ready(function () {
     }
 
     $("#order_salivaTubeSelection").on("change", function () {
-        toggleSalivaTubes($(this));
-        $("#saliva_tube_change_warning_modal").modal();
+        if ($("#order_collectedSamples").find("input:checkbox:checked").length > 0) {
+            $("#saliva_tube_change_warning_modal").modal("show");
+        } else {
+            toggleSalivaTubes($(this));
+        }
     });
 
-    $("#salive_tube_modal_trigger_update").on("click", function () {
+    $("#saliva_tube_modal_trigger_update").on("click", function () {
         $("#saliva_tube_change_warning_modal").modal("hide");
-        TriggerTubeUpdate();
+        $("#order_collectedSamples").find("input:checkbox:checked").prop("checked", false);
+        toggleSalivaTubes($("#order_salivaTubeSelection"));
     });
 
+    $("#order_salivaTubeSelection").on("focus", function () {
+        $(this).data("previousValue", $(this).val());
+    });
+
+    $("#rollback_saliva_selection").on("click", function () {
+        $("#saliva_tube_change_warning_modal").modal("hide");
+        $("#order_salivaTubeSelection").val($("#order_salivaTubeSelection").data("previousValue"));
+    });
     function toggleSalivaTubes() {
         let selectedValue = $("#order_salivaTubeSelection").val();
         let checkboxDiv = $(`input[value="${selectedValue}"]`).parents("div.checkbox");
