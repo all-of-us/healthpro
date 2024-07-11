@@ -1786,7 +1786,6 @@ class WorkQueue
         'site',
         'organization',
         'onsiteIdVerificationTime',
-        'remoteIdVerifiedOn',
         'participantIncentives',
         'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsFinalizedTime',
