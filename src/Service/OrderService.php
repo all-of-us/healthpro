@@ -74,7 +74,7 @@ class OrderService
     public function createOrder(\stdClass $orderObject): string|bool
     {
         try {
-            $response = $this->ppscApiService->post("/bioBankOrder", $orderObject);
+            $response = $this->ppscApiService->post('/bioBankOrder', $orderObject);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->sf_biobank_id)) {
                 return $result->sf_biobank_id;
