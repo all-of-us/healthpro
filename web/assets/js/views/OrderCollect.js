@@ -96,4 +96,8 @@ $(document).ready(function () {
         $("#collectedSamplesFormGroup").show();
         $("#collectedNotesFormGroup").show();
     }
+
+    $("#show_saliva_tube_help_modal").on("click", function () {
+        $("#saliva_tube_help_modal").modal();
+    });
 });
