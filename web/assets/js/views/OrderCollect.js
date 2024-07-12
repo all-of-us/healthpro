@@ -87,10 +87,17 @@ $(document).ready(function () {
     });
     function toggleSalivaTubes() {
         let selectedValue = $("#order_salivaTubeSelection").val();
+        if (selectedValue === "0") {
+            return;
+        }
         let checkboxDiv = $(`input[value="${selectedValue}"]`).parents("div.checkbox");
         checkboxDiv.show();
         checkboxDiv.siblings().hide();
         $("#collectedSamplesFormGroup").show();
         $("#collectedNotesFormGroup").show();
     }
+
+    $("#show_saliva_tube_help_modal").on("click", function () {
+        $("#saliva_tube_help_modal").modal();
+    });
 });

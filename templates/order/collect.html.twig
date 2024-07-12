@@ -25,6 +25,9 @@
     {% if salivaTubeSelect %}
         <div class="form-group">
         {{ form_label(collectForm.salivaTubeSelection) }}
+        <span class="help-icon">
+            <i class="fa fa-question-circle" aria-hidden="true" id="show_saliva_tube_help_modal"></i><span class="sr-only">Help</span>
+        </span>
         {{ form_widget(collectForm.salivaTubeSelection) }}
         {{ form_errors(collectForm.salivaTubeSelection) }}
         </div>
@@ -127,7 +130,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="salive_tube_help_modal" tabindex="-1" role="dialog" aria-labelledby="tube_help_modal">
+    <div class="modal fade" id="saliva_tube_help_modal" tabindex="-1" role="dialog" aria-labelledby="tube_help_modal">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
