@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Service\LoggerService;
 use App\Service\MayolinkOrderService;
 use App\Service\OrderService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -25,6 +26,7 @@ class OrderServiceTest extends ServiceTestCase
 
         $orderService = new OrderService(
             static::getContainer()->get(RdrApiService::class),
+            static::getContainer()->get(PpscApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),
             $this->createMock(MayolinkOrderService::class),
@@ -52,6 +54,7 @@ class OrderServiceTest extends ServiceTestCase
     {
         $orderService = new OrderService(
             static::getContainer()->get(RdrApiService::class),
+            static::getContainer()->get(PpscApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),
             $this->createMock(MayolinkOrderService::class),
