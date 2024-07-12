@@ -97,7 +97,7 @@ $(document).ready(function () {
         $("#collectedNotesFormGroup").show();
     }
 
-    $('#show_saliva_tube_help_modal').on('click', function () {
-        $('#saliva_tube_help_modal').modal();
-    })
+    $("#show_saliva_tube_help_modal").on("click", function () {
+        $("#saliva_tube_help_modal").modal();
+    });
 });

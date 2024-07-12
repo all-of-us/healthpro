@@ -50,6 +50,9 @@ class OrderType extends AbstractType
         if ($options['step'] == 'collected' && $options['order']->hasBloodSample($samples)) {
             $tsLabel = 'Blood Collection Time';
         }
+        if ($options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
+            $tsLabel = 'Collection Time';
+        }
         if ($options['step'] === 'finalized' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
             $collectedSample = json_decode($options['order']->getCollectedSamples(), false);
             $samples = array_filter($samples, static function ($sample) use ($collectedSample) {
