@@ -462,7 +462,8 @@ class OrderController extends BaseController
             'em' => $this->em,
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
+            'isPediatricOrder' => $order->isPediatricOrder()
         ]);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {

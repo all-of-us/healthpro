@@ -50,6 +50,12 @@ class OrderType extends AbstractType
         if ($options['step'] == 'collected' && $options['order']->hasBloodSample($samples)) {
             $tsLabel = 'Blood Collection Time';
         }
+        if ($options['step'] === 'finalized' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
+            $collectedSample = json_decode($options['order']->getCollectedSamples(), false);
+            $samples = array_filter($samples, static function ($sample) use ($collectedSample) {
+                return $sample === $collectedSample[0];
+            });
+        }
         if ($options['step'] == 'collected' && (isset($options['dvSite']) && $options['dvSite'] === true)
             && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->has('order_samples_version_dv') && $options['params']->get('order_samples_version_dv') > 3.1))) {
             if ($options['order']->getVersion() === null) {
@@ -267,7 +273,7 @@ class OrderType extends AbstractType
                 'constraints' => new Constraints\Type('string')
             ]);
         }
-        if ($options['order']->getType() == Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && $options['order']->getVersion() > 3.1) {
+        if ($options['order']->getType() == Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
             $choices = [];
             $choices['-- Select Saliva Sample Type --'] = 0;
             foreach ($options['order']->getSalivaSamplesInformation() as $tube) {
