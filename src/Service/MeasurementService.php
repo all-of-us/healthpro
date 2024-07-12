@@ -11,6 +11,7 @@ use App\Entity\MeasurementHistory;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Entity\ZScores;
+use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,6 +22,7 @@ class MeasurementService
     protected $requestStack;
     protected $userService;
     protected $rdrApiService;
+    protected PpscApiService $ppscApiService;
     protected $siteService;
     protected $params;
     protected $measurement;
@@ -31,6 +33,7 @@ class MeasurementService
         RequestStack $requestStack,
         UserService $userService,
         RdrApiService $rdrApiService,
+        PpscApiService $ppscApiService,
         SiteService $siteService,
         ParameterBagInterface $params,
         LoggerService $loggerService
@@ -39,6 +42,7 @@ class MeasurementService
         $this->requestStack = $requestStack;
         $this->userService = $userService;
         $this->rdrApiService = $rdrApiService;
+        $this->ppscApiService = $ppscApiService;
         $this->siteService = $siteService;
         $this->params = $params;
         $this->loggerService = $loggerService;
@@ -72,13 +76,13 @@ class MeasurementService
         $measurement->loadFromAObject($finalizedUserEmail, $finalizedSite);
     }
 
-    public function createMeasurement($participantId, $fhir)
+    public function createMeasurement($fhir)
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/PhysicalMeasurements", $fhir);
+            $response = $this->ppscApiService->post('/physical_measurement', $fhir);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
+            if (is_object($result) && isset($result->sf_measurments_id)) {
+                return $result->sf_measurments_id;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
@@ -249,7 +253,7 @@ class MeasurementService
             }
         }
         $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $parentRdrId);
-        $rdrId = $this->createMeasurement($this->measurement->getParticipantId(), $fhir);
+        $rdrId = $this->createMeasurement($fhir);
         if (!empty($rdrId)) {
             $this->measurement->setRdrId($rdrId);
             $this->em->persist($this->measurement);

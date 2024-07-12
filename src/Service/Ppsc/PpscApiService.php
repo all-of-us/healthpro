@@ -4,6 +4,7 @@ namespace App\Service\Ppsc;
 
 use App\Helper\PpscParticipant;
 use App\HttpClient;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PpscApiService
@@ -86,6 +87,14 @@ class PpscApiService
             error_log($e->getMessage());
             return null;
         }
+    }
+
+    public function post(string $path, \stdClass $body, array $params = []): ResponseInterface
+    {
+        $token = $this->getAccessToken();
+        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+        $params['json'] = $body;
+        return $this->client->request('POST', $this->endpoint . $path, $params);
     }
 
     private function getParams($field): string|null
