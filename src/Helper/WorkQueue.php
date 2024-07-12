@@ -1024,6 +1024,19 @@ class WorkQueue
             'csvFormatDate' => true,
             'group' => 'enrollment'
         ],
+        'remoteIdVerifiedOn' => [
+            'name' => 'Remote ID Verification',
+            'csvName' => 'Remote ID Verification Date',
+            'rdrField' => 'remoteIdVerifiedOn',
+            'sortField' => 'remoteIdVerifiedOn',
+            'method' => 'displayDateStatus',
+            'userTimezone' => true,
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'visible' => false,
+            'csvFormatDate' => true,
+            'group' => 'enrollment'
+        ],
         'participantIncentive' => [
             'name' => 'Incentive',
             'csvName' => 'Incentive Date',
@@ -1367,6 +1380,22 @@ class WorkQueue
             'visible' => false,
             'group' => 'enrollment'
         ],
+        '2SAL0' => [
+            'name' => 'Saliva (2SAL0)',
+            'csvNames' => [
+                'Saliva (2SAL0) Received',
+                'Saliva (2SAL0) Received Date'
+            ],
+            'rdrField' => 'sampleStatus2SAL0',
+            'sortField' => 'sampleStatus2SAL0Time',
+            'rdrDateField' => 'sampleStatus2SAL0Time',
+            'htmlClass' => 'text-center',
+            'toggleColumn' => true,
+            'type' => 'sample',
+            'visible' => false,
+            'group' => 'enrollment',
+            'display_na' => self::NA_ADULT
+        ],
         'sample1SAL2CollectionMethod' => [
             'name' => 'Saliva Collection',
             'rdrField' => 'sample1SAL2CollectionMethod'
@@ -1541,6 +1570,7 @@ class WorkQueue
         'pairedSite',
         'pairedOrganization',
         'onsiteIdVerificationTime',
+        'remoteIdVerifiedOn',
         'participantIncentive',
         'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsStatus',
@@ -1564,6 +1594,7 @@ class WorkQueue
         '1UR10',
         '1UR90',
         '1SAL',
+        '2SAL0',
         'age',
         'sex',
         'genderIdentity',
@@ -1742,7 +1773,9 @@ class WorkQueue
         'pediatricStatus',
         'relatedParticipants',
         'PS04A',
-        'PS04B'
+        'PS04B',
+        '2SAL0',
+        'remoteIdVerifiedOn'
     ];
 
     public static $sortColumns = [
@@ -1818,6 +1851,7 @@ class WorkQueue
         'site',
         'organization',
         'onsiteIdVerificationTime',
+        'remoteIdVerifiedOn',
         'participantIncentives',
         'selfReportedPhysicalMeasurementsStatus',
         'clinicPhysicalMeasurementsFinalizedTime',
@@ -1841,6 +1875,7 @@ class WorkQueue
         'sampleStatus1UR10Time',
         'sampleStatus1UR90Time',
         'sampleStatus1SALTime',
+        'sampleStatus2SAL0Time',
         'dateOfBirth',
         'sex',
         'genderIdentity',
@@ -2519,6 +2554,14 @@ class WorkQueue
                     'Received' => 'RECEIVED',
                     'Not Received' => 'UNSET'
                 ]
+            ],
+            'sampleStatus2SAL0' => [
+                'label' => 'Saliva (2SAL0)',
+                'options' => [
+                    'View All' => '',
+                    'Received' => 'RECEIVED',
+                    'Not Received' => 'UNSET'
+                ]
             ]
         ],
         'Ancillary Studies' => [
@@ -2551,7 +2594,8 @@ class WorkQueue
         'sampleStatus1PXR2',
         'sampleStatus1UR10',
         'sampleStatus1UR90',
-        'sampleStatus1SAL'
+        'sampleStatus1SAL',
+        'sampleStatus2SAL0',
     ];
 
     public static $filterDateFieldLabels = [
@@ -2693,7 +2737,8 @@ class WorkQueue
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
         '1UR90' => 'Urine 90 mL',
-        '1SAL' => 'Saliva'
+        '1SAL' => 'Saliva',
+        '2SAL0' => 'Saliva (2SAL0)'
     ];
 
     public static array $pedsSamples = [
@@ -2704,13 +2749,15 @@ class WorkQueue
         '1ED10' => '1st 10 mL EDTA',
         '1PXR2' => 'Paxgene RNA',
         '1UR10' => 'Urine 10 mL',
-        '1SAL' => 'Saliva'
+        '1SAL' => 'Saliva',
+        '2SAL0' => 'Saliva (2SAL0)'
     ];
 
     public static array $pedsOnlyFields = [
         'EnvironmentalExposures',
         '2ED02',
-        '2ED04'
+        '2ED04',
+        '2SAL0'
     ];
 
     public static $samplesAlias = [

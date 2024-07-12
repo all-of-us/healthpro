@@ -353,6 +353,11 @@ label.label-normal {
     color: #337ab7;
 }
 
+.help-icon {
+    cursor: pointer;
+    color: #337ab7;
+}
+
 .view-details .panel-heading div:after {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
@@ -590,7 +595,7 @@ label.label-normal {
 .wq-main-columns {
     column-width: 200px;
     width: 1350px;
-    height: 500px;
+    height: 525px;
     padding: 20px;
 }
 
