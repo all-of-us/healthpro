@@ -246,7 +246,7 @@
       }
     },
     "STOOL": {
-      "label": "Stool",
+      "label": "Stool Kit 1",
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
@@ -290,6 +290,52 @@
       "type": "stool",
       "identifier": "ST4-K",
       "typeDisplayName": "Stool Kit 1"
+    },
+    "STOOL2": {
+      "label": "Stool Kit 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "placeholder": true,
+      "identifier": "Stool",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST5": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST1-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST6": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST2-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST7": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST3-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST8": {
+      "label": "DNA/RNA Shield Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST4-K",
+      "typeDisplayName": "Stool Kit 2"
     },
     "URINE24": {
       "label": "24 Hour Urine",

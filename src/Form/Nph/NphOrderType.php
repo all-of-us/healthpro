@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Constraints;
 class NphOrderType extends AbstractType
 {
     private const STOOL_ST1 = 'ST1';
+    private const STOOL_KIT_FIELD = 'stoolKit';
+    private const STOOL_KIT_FIELD_2 = 'stoolKit2';
     private const TISSUE_CONSENT_SAMPLES = ['HAIR', 'NAILB', 'NAILL'];
     private const CONSENT_DISABLE_SAMPLE_ATTR = [
         'disabled' => true,
@@ -32,38 +34,14 @@ class NphOrderType extends AbstractType
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
         $isStoolKitDisabled = !empty($ordersData['stoolKit']);
+        $ordersKitData = $isStoolKitDisabled ? $ordersData['stoolKit'] : null;
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === self::STOOL_ST1) {
-                    $stoolKitAttributes = [
-                        'class' => 'stool-id',
-                        'placeholder' => 'Scan Kit ID',
-                        'disabled' => $isStoolKitDisabled,
-                        'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
-                        'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE,
-                        'data-stool-type' => 'kit'
-                    ];
-                    if ($isStoolKitDisabled) {
-                        $stoolKitAttributes['value'] = $ordersData['stoolKit'];
-                    }
-                    $builder->add('stoolKit', Type\TextType::class, [
-                        'label' => 'Stool Kit ID',
-                        'required' => false,
-                        'constraints' => [
-                            new Constraints\Type('string'),
-                            new Constraints\Regex([
-                                'pattern' => self::STOOL_KIT_ID_PATTERN,
-                                'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
-                            ]),
-                            new Constraints\Callback(function ($value, $context) {
-                                $formData = $context->getRoot()->getData();
-                                if ($this->isStoolChecked($formData) && empty($value)) {
-                                    $context->buildViolation('Please enter Stool KIT ID')->addViolation();
-                                }
-                            })
-                        ],
-                        'attr' => $stoolKitAttributes
-                    ]);
+                    $this->addStoolKitField($builder, $isStoolKitDisabled, $ordersKitData, self::STOOL_KIT_FIELD);
+                }
+                if ($options['module'] === '3') {
+                    $this->addStoolKitField($builder, $isStoolKitDisabled, $ordersKitData, self::STOOL_KIT_FIELD_2);
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
                     $stoolTubeAttributes = [
@@ -201,5 +179,38 @@ class NphOrderType extends AbstractType
             }
         }
         return false;
+    }
+
+    private function addStoolKitField(&$builder, $isStoolKitDisabled, $stoolKitData, $fieldName): void
+    {
+        $stoolKitAttributes = [
+            'class' => 'stool-id',
+            'placeholder' => 'Scan Kit ID',
+            'disabled' => $isStoolKitDisabled,
+            'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
+            'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE,
+            'data-stool-type' => 'kit'
+        ];
+        if ($isStoolKitDisabled) {
+            $stoolKitAttributes['value'] = $stoolKitData;
+        }
+        $builder->add($fieldName, Type\TextType::class, [
+            'label' => 'Stool Kit ID',
+            'required' => false,
+            'constraints' => [
+                new Constraints\Type('string'),
+                new Constraints\Regex([
+                    'pattern' => self::STOOL_KIT_ID_PATTERN,
+                    'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
+                ]),
+                new Constraints\Callback(function ($value, $context) {
+                    $formData = $context->getRoot()->getData();
+                    if ($this->isStoolChecked($formData) && empty($value)) {
+                        $context->buildViolation('Please enter Stool KIT ID')->addViolation();
+                    }
+                })
+            ],
+            'attr' => $stoolKitAttributes
+        ]);
     }
 }
