@@ -12,6 +12,7 @@ $(document).ready(function () {
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
         const SAMPLE_STOOL = "STOOL";
+        const SAMPLE_STOOL_2 = "STOOL2";
         let samples = orderCreateSelector.data("samples");
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
@@ -27,8 +28,8 @@ $(document).ready(function () {
                 .each(function () {
                     if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                         let sample = $(this).val();
-                        if (sample === SAMPLE_STOOL) {
-                            let stoolKitSelector = $("#nph_order_stoolKit");
+                        if (sample === SAMPLE_STOOL || sample === SAMPLE_STOOL_2) {
+                            let stoolKitSelector = sample === SAMPLE_STOOL ? $("#nph_order_stoolKit") : $("#nph_order_stoolKit2");
                             if (stoolKitSelector.val()) {
                                 let stoolKitSamples = "";
                                 stoolSamples.forEach(function (stoolSample) {
@@ -42,7 +43,7 @@ $(document).ready(function () {
                                 if (stoolKitSamples) {
                                     addTimePointSamples(
                                         timePoints[timePoint],
-                                        "Stool: KIT ID " + stoolKitSelector.val() + stoolKitSamples + ""
+                                        samples[sample] + ": KIT ID " + stoolKitSelector.val() + stoolKitSamples + ""
                                     );
                                 }
                             }

@@ -17,6 +17,8 @@ class NphOrderType extends AbstractType
     private const STOOL_ST1 = 'ST1';
     private const STOOL_KIT_FIELD = 'stoolKit';
     private const STOOL_KIT_FIELD_2 = 'stoolKit2';
+    private const STOOL_KIT_TUBES = ['ST1', 'ST2', 'ST3', 'ST4'];
+    private const STOOL_KIT_TUBES_2 = ['ST5', 'ST6', 'ST7', 'ST8'];
     private const TISSUE_CONSENT_SAMPLES = ['HAIR', 'NAILB', 'NAILL'];
     private const CONSENT_DISABLE_SAMPLE_ATTR = [
         'disabled' => true,
@@ -57,6 +59,7 @@ class NphOrderType extends AbstractType
                     if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
                         $stoolTubeAttributes['value'] = $ordersData[$sampleCode];
                     }
+                    $stoolKitField = in_array($sampleCode, self::STOOL_KIT_TUBES) ? self::STOOL_KIT_FIELD : self::STOOL_KIT_FIELD_2;
                     $builder->add($sampleCode, Type\TextType::class, [
                         'label' => $sample,
                         'required' => false,
@@ -66,9 +69,9 @@ class NphOrderType extends AbstractType
                                 'pattern' => self::STOOL_BARCODE_ID_PATTERN,
                                 'message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE
                             ]),
-                            new Constraints\Callback(function ($value, $context) {
+                            new Constraints\Callback(function ($value, $context) use ($stoolKitField) {
                                 $formData = $context->getRoot()->getData();
-                                if ($this->isStoolChecked($formData) && empty($value)) {
+                                if ($this->isStoolChecked($formData, $stoolKitField) && empty($value)) {
                                     $context->buildViolation('Please enter Stool Tube ID')->addViolation();
                                 }
                             })
@@ -165,13 +168,14 @@ class NphOrderType extends AbstractType
         ]);
     }
 
-    private function isStoolChecked(array $formData): bool
+    private function isStoolChecked(array $formData, string $fieldName): bool
     {
+        $sampleStool = $fieldName === self::STOOL_KIT_FIELD ? NphSample::SAMPLE_STOOL : NphSample::SAMPLE_STOOL_2;
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
                 if (in_array($timePoint, NphSample::STOOL_TIMEPOINTS)) {
                     foreach ($samples as $sample) {
-                        if ($sample === NphSample::SAMPLE_STOOL) {
+                        if ($sample === $sampleStool) {
                             return true;
                         }
                     }
@@ -203,9 +207,9 @@ class NphOrderType extends AbstractType
                     'pattern' => self::STOOL_KIT_ID_PATTERN,
                     'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
                 ]),
-                new Constraints\Callback(function ($value, $context) {
+                new Constraints\Callback(function ($value, $context) use ($fieldName) {
                     $formData = $context->getRoot()->getData();
-                    if ($this->isStoolChecked($formData) && empty($value)) {
+                    if ($this->isStoolChecked($formData, $fieldName) && empty($value)) {
                         $context->buildViolation('Please enter Stool KIT ID')->addViolation();
                     }
                 })
