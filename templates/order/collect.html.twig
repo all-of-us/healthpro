@@ -23,7 +23,7 @@
     </div>
 
     {% if salivaTubeSelect %}
-        <div class="form-group">
+        <div class="form-group{% if not collectForm.salivaTubeSelection.vars.valid %} has-error{% endif %}">
         {{ form_label(collectForm.salivaTubeSelection) }}
         <span class="help-icon">
             <i class="fa fa-question-circle" aria-hidden="true" id="show_saliva_tube_help_modal"></i><span class="sr-only">Help</span>
