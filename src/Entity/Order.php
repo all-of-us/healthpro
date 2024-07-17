@@ -22,6 +22,7 @@ class Order
     public const ORDER_REVERT = 'revert';
     public const INITIAL_VERSION = '1';
     public const ORDER_STEP_FINALIZED = 'finalized';
+    public const ORDER_STEP_COLLECTED = 'collected';
     public const ORDER_TYPE_KIT = 'kit';
     public const ORDER_TYPE_DIVERSION = 'diversion';
     public const ORDER_TYPE_SALIVA = 'saliva';
@@ -63,7 +64,7 @@ class Order
         'PS04B' => 'pst'
     ];
 
-    public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2'];
+    public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2', '2SAL0'];
 
     public static $urineSamples = ['1UR10', '1UR90'];
 

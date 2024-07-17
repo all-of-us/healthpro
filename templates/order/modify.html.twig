@@ -33,8 +33,17 @@
                 </thead>
                 <tbody>
                 {% for sample in samplesInfo %}
+                    {% set skipSample = false %}
+                    {% if sample.sampleId not in order.getCollectedSamples and order.isPediatricOrder and '3.2' in order.getVersion %}
+                        {% set skipSample = true %}
+                    {% endif %}
+                    {% if not skipSample %}
                     <tr>
-                        <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
+                        {% if order.getCollectedSamples and order.isPediatricOrder and '3.2' in order.getVersion %}
+                            <td>{{ sample.label }}</td>
+                        {% else %}
+                            <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
+                        {% endif %}
                         <td>
                             {% if sample.collected_checked is defined and sample.collected_ts is defined and sample.collected_ts is not empty %}
                                 <i class="fa fa-check text-success" aria-hidden="true"></i>
@@ -64,6 +73,7 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                 {% endfor %}
                 </tbody>
             </table>
