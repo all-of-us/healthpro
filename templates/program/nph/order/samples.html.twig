@@ -55,8 +55,8 @@
 {% endmacro %}
 
 {% macro displayStoolSection(sample, orderForm, stoolKitField, stoolSamples, stoolTubes, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) %}
-    <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample, {'attr': {'class': 'stool-checkbox'}}) }} {{ sample.vars.label }}</label></div>
-    <div class="stool-text-fields">
+    <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample, {'attr': {'class': stoolKitField ~ '-checkbox'}}) }} {{ sample.vars.label }}</label></div>
+    <div class="{{ stoolKitField }}-text-fields">
         <div class="stool-input stool-samples-box bg-light {% if not orderForm[stoolKitField].vars.valid %} has-error {% endif %}">
             {{ form_label(orderForm[stoolKitField]) }}
             {% set break = false %}

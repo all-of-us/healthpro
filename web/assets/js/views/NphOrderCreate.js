@@ -100,23 +100,27 @@ $(document).ready(function () {
     });
 
     let disableEnableStoolFields = function () {
-        let stoolCheckboxSel = $(".stool-checkbox");
-        if (!stoolCheckboxSel.prop("disabled")) {
-            let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
-            if (isStoolBoxChecked) {
-                $(".stool-text-fields input").prop("disabled", false);
-            } else {
-                $(".stool-text-fields input").prop("disabled", true).val("");
-                $(".stool-text-fields .has-error").removeClass("has-error");
-                $(".stool-text-fields span.help-block ul li").remove();
-                $(".stool-unique-error").html("");
+        let stoolKitFields = ["stoolKit", "stoolKit2"];
+        stoolKitFields.forEach(function (stoolKitField) {
+            let stoolCheckboxSel = $("." + stoolKitField + "-checkbox");
+            if (!stoolCheckboxSel.prop("disabled")) {
+                let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
+                if (isStoolBoxChecked) {
+                    $("." + stoolKitField + "-text-fields input").prop("disabled", false);
+                } else {
+                    $("." + stoolKitField + "-text-fields input").prop("disabled", true).val("");
+                    $("." + stoolKitField + "-text-fields .has-error").removeClass("has-error");
+                    $("." + stoolKitField + "-text-fields span.help-block ul li").remove();
+                    $(".stool-unique-error").html("");
+                }
             }
-        }
+        });
+
     };
 
     disableEnableStoolFields();
 
-    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on("change", function () {
+    $(".stoolKit-checkbox, .stoolKit2-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on("change", function () {
         disableEnableStoolFields();
         $("form[name='nph_order']").parsley().reset();
     });
