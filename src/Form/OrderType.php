@@ -299,6 +299,11 @@ class OrderType extends AbstractType
                 'multiple' => false,
                 'data' => $collected,
                 'disabled' => $disabled,
+                'constraints' => new Constraints\Callback(function ($value, $context) {
+                    if ($value === 0) {
+                        $context->buildViolation('Please select a saliva tube type')->addViolation();
+                    }
+                })
             ]);
         }
         return $builder->getForm();
