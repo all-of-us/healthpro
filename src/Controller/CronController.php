@@ -242,6 +242,74 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
+    #[Route(path: '/pediatrics-report-measurement-totals', name: 'cron_pediatrics_report_measurement_totals')]
+    public function pediatricsReportMeasurementTotalsReportAction(PediatricsReportService $pediatricsReport, ParameterBagInterface $params): Response
+    {
+        if ($params->has('startDate')) {
+            $startDate = new \DateTime($params->get('startDate'));
+        } else {
+            $startDate = new \DateTime('first day of 3 months ago');
+        }
+        if ($params->has('endDate')) {
+            $endDate = new \DateTime($params->get('endDate'));
+        } else {
+            $endDate = new \DateTime('last day of last month');
+        }
+        $pediatricsReport->generateMeasurementTotalsReport($startDate, $endDate);
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/pediatrics-report-active-alerts', name: 'cron_pediatrics_report_active_alerts')]
+    public function pediatricsReportActiveAlertsReportAction(PediatricsReportService $pediatricsReport, ParameterBagInterface $params): Response
+    {
+        if ($params->has('startDate')) {
+            $startDate = new \DateTime($params->get('startDate'));
+        } else {
+            $startDate = new \DateTime('first day of 3 months ago');
+        }
+        if ($params->has('endDate')) {
+            $endDate = new \DateTime($params->get('endDate'));
+        } else {
+            $endDate = new \DateTime('last day of last month');
+        }
+        $pediatricsReport->generateActiveAlertReport($startDate, $endDate);
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/pediatrics-report-deviations', name: 'cron_pediatrics_report_deviations')]
+    public function pediatricsReportDeviationsReportAction(PediatricsReportService $pediatricsReport, ParameterBagInterface $params): Response
+    {
+        if ($params->has('startDate')) {
+            $startDate = new \DateTime($params->get('startDate'));
+        } else {
+            $startDate = new \DateTime('first day of 3 months ago');
+        }
+        if ($params->has('endDate')) {
+            $endDate = new \DateTime($params->get('endDate'));
+        } else {
+            $endDate = new \DateTime('last day of last month');
+        }
+        $pediatricsReport->generateDeviationReport($startDate, $endDate);
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/pediatrics-report-incentives', name: 'cron_pediatrics_report_incentives')]
+    public function pediatricsReportIncentivesReportAction(PediatricsReportService $pediatricsReport, ParameterBagInterface $params): Response
+    {
+        if ($params->has('startDate')) {
+            $startDate = new \DateTime($params->get('startDate'));
+        } else {
+            $startDate = new \DateTime('first day of 3 months ago');
+        }
+        if ($params->has('endDate')) {
+            $endDate = new \DateTime($params->get('endDate'));
+        } else {
+            $endDate = new \DateTime('last day of last month');
+        }
+        $pediatricsReport->generateIncentiveReport($startDate, $endDate);
+        return $this->json(['success' => true]);
+    }
+
     #[Route(path: '/backfill-nph-diets-complete-status', name: 'cron_backfill_nph_orders_complete_status')]
     public function backfillNphOrdersCompleteStatus(NphDietPeriodStatusService $nphDietPeriodStatusService): Response
     {
