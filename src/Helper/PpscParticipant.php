@@ -14,7 +14,7 @@ class PpscParticipant
     public string|null $awardee;
     public string|null $organization;
     public string|null $site;
-    public string|null $isPediatric;
+    public bool $isPediatric = false;
     public string|null $genderIdentity;
     public string|null $middleName;
     public string|null $lastName;
@@ -145,7 +145,9 @@ class PpscParticipant
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
         $this->site = $participant->site ?? null;
-        $this->isPediatric = $participant->isPediatric ?? null;
+        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
+            $this->isPediatric = true;
+        }
         $this->genderIdentity = $participant->GenderIdentity ?? null;
         $this->middleName = $participant->MiddleName ?? null;
         $this->lastName = $participant->LastName ?? null;
