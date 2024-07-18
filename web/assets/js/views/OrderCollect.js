@@ -90,6 +90,7 @@ $(document).ready(function () {
     function toggleSalivaTubes() {
         let selectedValue = $("#order_salivaTubeSelection").val();
         if (selectedValue === "0") {
+            $("#collectedSamplesFormGroup").hide();
             return;
         }
         let checkboxDiv = $(`input[value="${selectedValue}"]`).parents("div.checkbox");
