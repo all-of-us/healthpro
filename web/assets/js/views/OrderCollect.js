@@ -64,6 +64,8 @@ $(document).ready(function () {
     }
 
     $("#order_salivaTubeSelection").on("change", function () {
+        $(this).closest('.has-error').removeClass('has-error');
+        $(this).siblings('.help-block').children().remove()
         if ($("#order_collectedSamples").find("input:checkbox:checked").length > 0) {
             $("#saliva_tube_change_warning_modal").modal("show");
         } else {
@@ -99,5 +101,10 @@ $(document).ready(function () {
 
     $("#show_saliva_tube_help_modal").on("click", function () {
         $("#saliva_tube_help_modal").modal();
+    });
+
+    $('input:checkbox').on('change', function () {
+        $(this).closest('.has-error').removeClass('has-error');
+        $(this).parents('#collectedSamplesFormGroup').children('.help-block').children().remove()
     });
 });
