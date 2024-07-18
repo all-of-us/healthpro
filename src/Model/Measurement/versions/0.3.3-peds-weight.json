@@ -75,7 +75,8 @@
       "alternatefor": "weight",
       "alternateunitfield": true,
       "unit": "lb",
-      "decimals": 1
+      "decimals": 1,
+      "replicates": 3
     },
     {
       "name": "weight-protocol-modification",

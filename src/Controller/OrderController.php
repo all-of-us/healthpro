@@ -101,8 +101,8 @@ class OrderController extends BaseController
         } else {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
-        if ($physicalMeasurement) {
+        $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
+        if ($physicalMeasurement !== null) {
             $measurementService->load($physicalMeasurement, $participant);
         }
         $order = new Order();
@@ -462,7 +462,8 @@ class OrderController extends BaseController
             'em' => $this->em,
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
-            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled()
+            'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
+            'isPediatricOrder' => $order->isPediatricOrder()
         ]);
         $finalizeForm->handleRequest($request);
         if ($finalizeForm->isSubmitted()) {
@@ -785,7 +786,7 @@ class OrderController extends BaseController
         if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
-        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id);
+        $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
         if ($measurement) {
             $measurementService->load($measurement, $participant);
             $measurementData = $measurement->getSummary();
@@ -811,7 +812,8 @@ class OrderController extends BaseController
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
             'dvSite' => $session->get('siteType') == 'dv',
-            'params' => $params
+            'params' => $params,
+            'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
     }
 }

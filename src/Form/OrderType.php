@@ -50,7 +50,23 @@ class OrderType extends AbstractType
         if ($options['step'] == 'collected' && $options['order']->hasBloodSample($samples)) {
             $tsLabel = 'Blood Collection Time';
         }
-        if ($options['step'] == 'collected' && (isset($options['dvSite']) && $options['dvSite'] === true)
+        if ($options['step'] === 'finalized' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
+            $collectedSample = json_decode($options['order']->getCollectedSamples(), false);
+            $samples = array_filter($samples, static function ($sample) use ($collectedSample) {
+                if (!empty($collectedSample)) {
+                    return $sample === $collectedSample[0];
+                }
+                return true;
+            });
+        }
+        if (($options['step'] === Order::ORDER_STEP_COLLECTED or $options['step'] === Order::ORDER_STEP_FINALIZED) && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
+            $salivaSamples = $options['order']->getSalivaSamplesInformation();
+            foreach ($samples as $sampleName => $sampleCode) {
+                $samples["$sampleName - {$salivaSamples[$sampleCode]['identifier']}"] = $sampleCode;
+                unset($samples[$sampleName]);
+            }
+        }
+        if ($options['step'] === Order::ORDER_STEP_COLLECTED && (isset($options['dvSite']) && $options['dvSite'] === true)
             && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->has('order_samples_version_dv') && $options['params']->get('order_samples_version_dv') > 3.1))) {
             if ($options['order']->getVersion() === null) {
                 unset($samples);
@@ -127,6 +143,11 @@ class OrderType extends AbstractType
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled,
+                'constraints' => new Constraints\Callback(function ($value, $context) use ($options) {
+                    if (empty($value) && $options['step'] === 'collected' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && $context->getRoot()->get('salivaTubeSelection')->getData() !== 0) {
+                        $context->buildViolation('Please select at least one sample for collection')->addViolation();
+                    }
+                }),
                 'choice_attr' => function ($val) use ($enabledSamples, $options) {
                     $attr = [];
                     if ($options['step'] === 'finalized') {
@@ -267,6 +288,32 @@ class OrderType extends AbstractType
                 'constraints' => new Constraints\Type('string')
             ]);
         }
+        if ($options['step'] === Order::ORDER_STEP_COLLECTED && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
+            $choices = [];
+            $choices['-- Select Saliva Sample Type --'] = 0;
+            foreach ($options['order']->getSalivaSamplesInformation() as $tube) {
+                $choices["{$tube['sampleId']} - {$tube['identifier']}"] = $tube['sampleId'];
+            }
+            $collected = json_decode($options['order']->getCollectedSamples());
+            if (empty($collected)) {
+                $collected = 0;
+            } else {
+                $collected = $collected[0];
+            }
+            $builder->add('salivaTubeSelection', Type\ChoiceType::class, [
+                'label' => 'Select Saliva Sample Type',
+                'choices' => $choices,
+                'required' => true,
+                'multiple' => false,
+                'data' => $collected,
+                'disabled' => $disabled,
+                'constraints' => new Constraints\Callback(function ($value, $context) {
+                    if ($value === 0) {
+                        $context->buildViolation('Please select a saliva tube type')->addViolation();
+                    }
+                })
+            ]);
+        }
         return $builder->getForm();
     }
 
@@ -279,7 +326,8 @@ class OrderType extends AbstractType
             'timeZone' => null,
             'siteId' => null,
             'dvSite' => null,
-            'params' => null
+            'params' => null,
+            'isPediatricOrder' => false
         ]);
     }
 }

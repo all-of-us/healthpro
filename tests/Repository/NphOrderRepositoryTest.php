@@ -183,6 +183,8 @@ class NphOrderRepositoryTest extends RepositoryTestCase
     public function testGetDowntimeOrders(): void
     {
         $this->nphOrder->setDowntimeGenerated(true);
+        $this->em->persist($this->nphOrder);
+        $this->em->flush();
         $samples = $this->repo->getDowntimeOrders();
         foreach ($samples as $sample) {
             $this->assertSame(true, $sample['DowntimeGenerated']);
