@@ -144,7 +144,7 @@ class OrderType extends AbstractType
                 'required' => false,
                 'disabled' => $samplesDisabled,
                 'constraints' => new Constraints\Callback(function ($value, $context) use ($options) {
-                    if (empty($value) && $options['step'] === 'collected' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder']) {
+                    if (empty($value) && $options['step'] === 'collected' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && $context->getRoot()->get('salivaTubeSelection')->getData() !== 0) {
                         $context->buildViolation('Please select at least one sample for collection')->addViolation();
                     }
                 }),
