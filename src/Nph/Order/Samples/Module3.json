@@ -296,7 +296,7 @@
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool",
+      "type": "stool2",
       "placeholder": true,
       "identifier": "Stool",
       "typeDisplayName": "Stool Kit 2"
@@ -306,7 +306,7 @@
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool",
+      "type": "stool2",
       "identifier": "ST1-K",
       "typeDisplayName": "Stool Kit 2"
     },
@@ -315,7 +315,7 @@
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool",
+      "type": "stool2",
       "identifier": "ST2-K",
       "typeDisplayName": "Stool Kit 2"
     },
@@ -324,7 +324,7 @@
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool",
+      "type": "stool2",
       "identifier": "ST3-K",
       "typeDisplayName": "Stool Kit 2"
     },
@@ -333,7 +333,7 @@
       "color": "Yellow",
       "temperature": "Refrigerated",
       "specimen": "Stool",
-      "type": "stool",
+      "type": "stool2",
       "identifier": "ST4-K",
       "typeDisplayName": "Stool Kit 2"
     },

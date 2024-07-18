@@ -39,7 +39,7 @@ class NphOrderService
     private $user;
     private $site;
 
-    private static $placeholderSamples = ['STOOL'];
+    private static $placeholderSamples = ['STOOL', 'STOOL2'];
 
     public function __construct(
         EntityManagerInterface $em,
@@ -269,8 +269,16 @@ class NphOrderService
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit'], $formData['downtime_generated'], $formData['createdTs']);
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData, NphSample::SAMPLE_STOOL), NphOrder::TYPE_STOOL, $formData['stoolKit'], $formData['downtime_generated'], $formData['createdTs']);
             foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
+                if (!empty($formData[$stoolSample])) {
+                    $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
+                }
+            }
+        }
+        if (!empty($formData['stoolKit2'])) {
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData, NphSample::SAMPLE_STOOL_2), NphOrder::TYPE_STOOL_2, $formData['stoolKit2'], $formData['downtime_generated'], $formData['createdTs']);
+            foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL_2) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
                 }
@@ -1150,10 +1158,10 @@ class NphOrderService
         return $returnArray;
     }
 
-    private function getStoolTimePoint(array $formData): ?string
+    private function getStoolTimePoint(array $formData, string $sampleStool): ?string
     {
         foreach (array_keys($this->getTimePoints()) as $timePoint) {
-            if (in_array(NphSample::SAMPLE_STOOL, $formData[$timePoint])) {
+            if (in_array($sampleStool, $formData[$timePoint])) {
                 return $timePoint;
             }
         }

@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints;
 class NphOrderType extends AbstractType
 {
     private const STOOL_ST1 = 'ST1';
+    private const STOOL_ST5 = 'ST5';
     private const STOOL_KIT_FIELD = 'stoolKit';
     private const STOOL_KIT_FIELD_2 = 'stoolKit2';
     private const STOOL_KIT_TUBES = ['ST1', 'ST2', 'ST3', 'ST4'];
@@ -37,29 +38,36 @@ class NphOrderType extends AbstractType
         $timePoints = $options['timePoints'];
         $isStoolKitDisabled = !empty($ordersData['stoolKit']);
         $ordersKitData = $isStoolKitDisabled ? $ordersData['stoolKit'] : null;
+        $isStoolKit2Disabled = !empty($ordersData['stoolKit2']);
+        $ordersKit2Data = $isStoolKit2Disabled ? $ordersData['stoolKit2'] : null;
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === self::STOOL_ST1) {
                     $this->addStoolKitField($builder, $isStoolKitDisabled, $ordersKitData, self::STOOL_KIT_FIELD);
                 }
-                if ($options['module'] === '3') {
-                    $this->addStoolKitField($builder, $isStoolKitDisabled, $ordersKitData, self::STOOL_KIT_FIELD_2);
+                if ($sampleCode === self::STOOL_ST5) {
+                    $this->addStoolKitField($builder, $isStoolKit2Disabled, $ordersKit2Data, self::STOOL_KIT_FIELD_2);
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
+                    $disableStoolKit = $isStoolKitDisabled;
+                    $stoolKitField = self::STOOL_KIT_FIELD;
+                    if (in_array($sampleCode, self::STOOL_KIT_TUBES_2)) {
+                        $disableStoolKit = $isStoolKit2Disabled;
+                        $stoolKitField = self::STOOL_KIT_FIELD_2;
+                    }
                     $stoolTubeAttributes = [
                         'class' => 'stool-id tube-id',
                         'placeholder' => 'Scan Tube',
-                        'disabled' => $isStoolKitDisabled,
+                        'disabled' => $disableStoolKit,
                         'data-parsley-pattern' => self::STOOL_BARCODE_ID_PATTERN,
                         'data-parsley-pattern-message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE,
                         'data-parsley-unique' => $sampleCode,
                         'data-parsley-unique-message' => 'Please enter unique Stool Tube IDs.',
                         'data-stool-type' => 'tube'
                     ];
-                    if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
+                    if ($disableStoolKit && isset($ordersData[$sampleCode])) {
                         $stoolTubeAttributes['value'] = $ordersData[$sampleCode];
                     }
-                    $stoolKitField = in_array($sampleCode, self::STOOL_KIT_TUBES) ? self::STOOL_KIT_FIELD : self::STOOL_KIT_FIELD_2;
                     $builder->add($sampleCode, Type\TextType::class, [
                         'label' => $sample,
                         'required' => false,

@@ -29,10 +29,15 @@ $(document).ready(function () {
                     if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                         let sample = $(this).val();
                         if (sample === SAMPLE_STOOL || sample === SAMPLE_STOOL_2) {
-                            let stoolKitSelector = sample === SAMPLE_STOOL ? $("#nph_order_stoolKit") : $("#nph_order_stoolKit2");
+                            let stoolKitSelector = $("#nph_order_stoolKit");
+                            let stoolTubeSamples = ['ST1', 'ST2', 'ST3', 'ST4'];
+                            if (sample === SAMPLE_STOOL_2) {
+                                stoolKitSelector = $("#nph_order_stoolKit2");
+                                stoolTubeSamples = ['ST5', 'ST6', 'ST7', 'ST8'];
+                            }
                             if (stoolKitSelector.val()) {
                                 let stoolKitSamples = "";
-                                stoolSamples.forEach(function (stoolSample) {
+                                stoolTubeSamples.forEach(function (stoolSample) {
                                     let stoolInputSelector = $("#nph_order_" + stoolSample);
                                     if (stoolInputSelector.val()) {
                                         stoolKitSamples +=

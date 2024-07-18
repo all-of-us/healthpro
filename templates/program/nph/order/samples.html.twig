@@ -12,7 +12,7 @@
         {% if sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL') %}
             {{ _self.displayStoolSection(sample, orderForm, 'stoolKit', stoolSamples, stoolTubes1, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) }}
         {% elseif sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL_2') %}
-            {{ _self.displayStoolSection(sample, orderForm, 'stoolKit2', stoolSamples, stoolTubes2, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) }}
+            {{ _self.displayStoolSection(sample, orderForm, 'stoolKit2', ['ST5', 'ST6', 'ST7', 'ST8'], stoolTubes2, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) }}
         {% else %}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                 <div class="checkbox">
