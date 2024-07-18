@@ -60,7 +60,7 @@ class PDFService
                                 );
                             }
                             $sampleId = $sample['sampleId'];
-                            if (($sampleType === 'stool'|| $sampleType === 'stool2') && $stoolPrinted === false) {
+                            if (($sampleType === 'stool' || $sampleType === 'stool2') && $stoolPrinted === false) {
                                 $sample['identifier'] = 'ST-KIT';
                                 $sampleId = $sample['orderId'];
                                 $stoolPrinted = true;

@@ -30,10 +30,10 @@ $(document).ready(function () {
                         let sample = $(this).val();
                         if (sample === SAMPLE_STOOL || sample === SAMPLE_STOOL_2) {
                             let stoolKitSelector = $("#nph_order_stoolKit");
-                            let stoolTubeSamples = ['ST1', 'ST2', 'ST3', 'ST4'];
+                            let stoolTubeSamples = ["ST1", "ST2", "ST3", "ST4"];
                             if (sample === SAMPLE_STOOL_2) {
                                 stoolKitSelector = $("#nph_order_stoolKit2");
-                                stoolTubeSamples = ['ST5', 'ST6', 'ST7', 'ST8'];
+                                stoolTubeSamples = ["ST5", "ST6", "ST7", "ST8"];
                             }
                             if (stoolKitSelector.val()) {
                                 let stoolKitSamples = "";
@@ -114,22 +114,26 @@ $(document).ready(function () {
                 if (isStoolBoxChecked) {
                     $("." + stoolKitField + "-text-fields input").prop("disabled", false);
                 } else {
-                    $("." + stoolKitField + "-text-fields input").prop("disabled", true).val("");
+                    $("." + stoolKitField + "-text-fields input")
+                        .prop("disabled", true)
+                        .val("");
                     $("." + stoolKitField + "-text-fields .has-error").removeClass("has-error");
                     $("." + stoolKitField + "-text-fields span.help-block ul li").remove();
                     $(".stool-unique-error").html("");
                 }
             }
         });
-
     };
 
     disableEnableStoolFields();
 
-    $(".stoolKit-checkbox, .stoolKit2-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on("change", function () {
-        disableEnableStoolFields();
-        $("form[name='nph_order']").parsley().reset();
-    });
+    $(".stoolKit-checkbox, .stoolKit2-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on(
+        "change",
+        function () {
+            disableEnableStoolFields();
+            $("form[name='nph_order']").parsley().reset();
+        }
+    );
 
     if (
         $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length
