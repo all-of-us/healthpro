@@ -519,7 +519,7 @@ class NphSample
             $sampleData['color'] = $samplesMetadata['urineColor'] ?? null;
             $sampleData['clarity'] = $samplesMetadata['urineClarity'] ?? null;
         }
-        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL) {
+        if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL || $this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL_2) {
             $sampleData['bowelMovement'] = $samplesMetadata['bowelType'] ?? null;
             $sampleData['bowelMovementQuality'] = $samplesMetadata['bowelQuality'] ?? null;
             if ($samplesMetadata['freezedTs']) {

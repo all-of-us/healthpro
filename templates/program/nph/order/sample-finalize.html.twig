@@ -184,11 +184,15 @@
                     </a>
                     <div class="collapse in" id="aliquot_instructions">
                         <div class="text-right">
-                            <a class="pull-right" href="{{ path('aliquot_instructions_file', { id: order.orderType }) }}" target="_blank">
+                            {% set sampleOrderType = order.orderType %}
+                            {% if sampleOrderType == 'stool2' %}
+                                {% set sampleOrderType = 'stool' %}
+                            {% endif %}
+                            <a class="pull-right" href="{{ path('aliquot_instructions_file', { id: sampleOrderType}) }}" target="_blank">
                                 <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download
                             </a>
                         </div>
-                        <iframe class="pdf" name="pdf" src="{{ path('aliquot_instructions_file', { id: order.orderType  }) }}#view=FitH"></iframe>
+                        <iframe class="pdf" name="pdf" src="{{ path('aliquot_instructions_file', { id: sampleOrderType  }) }}#view=FitH"></iframe>
                     </div>
                 </div>
             </div>
@@ -219,7 +223,7 @@
                         {{ form_label(sampleFinalizeForm[sampleCode ~ 'CollectedTs'], null, {'label_attr': {'class': 'required'}}) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
                         {{ form_errors(sampleFinalizeForm[sampleCode ~'CollectedTs']) }}
-                        {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') %}
+                        {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2') %}
                             <span class="text-warning">
                                 <i class="fa fa-exclamation-triangle"></i>
                                 Changing the collection time for this stool sample will update the collection time for all other associated stool samples within the order.
@@ -264,7 +268,7 @@
                         </div>
                         <hr>
                     {% endif %}
-                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') %}
+                    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2') %}
                         <label>
                             Bristol Stool Chart Questions
                             <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">

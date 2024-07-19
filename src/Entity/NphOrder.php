@@ -72,7 +72,8 @@ class NphOrder
             '24urine' => '24 Hour Urine',
             'urineDlw' => 'Urine DLW',
             'saliva3' => 'Saliva',
-            'stool' => 'Stool Kit 1'
+            'stool' => 'Stool Kit 1',
+            'stool2' => 'Stool Kit 2'
         ],
     ];
 

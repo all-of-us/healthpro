@@ -365,7 +365,8 @@ class NphOrderService
                     if ($formData[$sampleCode]) {
                         $nphSample->setCollectedUser($this->user);
                         $nphSample->setCollectedSite($this->site);
-                        $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                        $collectedTs = $orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2 ?
+                            $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
                         $nphSample->setCollectedTs($collectedTs);
                         $nphSample->setCollectedTimezoneId($this->getTimezoneid());
                         $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
@@ -384,7 +385,7 @@ class NphOrderService
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            if ($orderType === NphOrder::TYPE_STOOL && $atLeastOneSampleIsFinalized === false) {
+            if (($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) && $atLeastOneSampleIsFinalized === false) {
                 $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                     'bowelQuality']));
                 $this->em->persist($order);
@@ -401,12 +402,12 @@ class NphOrderService
     {
         $orderCollectionData = [];
         $orderType = $order->getOrderType();
-        if ($orderType === NphOrder::TYPE_STOOL) {
+        if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $orderCollectionData[$orderType . 'CollectedTs'] = $order->getCollectedTs();
         }
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
-            if ($orderType !== NphOrder::TYPE_STOOL) {
+            if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2) {
                 $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
             }
             if ($nphSample->getCollectedTs()) {
@@ -428,7 +429,7 @@ class NphOrderService
                 }
             }
         }
-        if ($order->getOrderType() === 'stool') {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             if ($order->getMetadata()) {
                 $metadata = json_decode($order->getMetadata(), true);
                 if (!empty($metadata['bowelType'])) {
@@ -460,7 +461,7 @@ class NphOrderService
     public function getSamplesMetadata(NphOrder $order): array
     {
         $metadata = [];
-        if ($order->getOrderType() === 'stool') {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
@@ -524,7 +525,7 @@ class NphOrderService
     public function saveFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
     {
         $order = $sample->getNphOrder();
-        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             return $this->saveStoolSampleFinalization($formData, $sample, $biobankFinalization);
         }
         return $this->saveSampleFinalization($formData, $sample);
@@ -551,7 +552,7 @@ class NphOrderService
                 }
             }
         }
-        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             $sampleData[$sampleCode . 'CollectedTs'] = $order->getCollectedTs();
             if ($order->getMetadata()) {
                 $orderMetadata = json_decode($order->getMetadata(), true);
@@ -1271,6 +1272,7 @@ class NphOrderService
             }
             throw new \Exception('Failed sending to RDR');
         } catch (\Exception $e) {
+            throw $e;
             $connection->rollback();
         }
         return false;

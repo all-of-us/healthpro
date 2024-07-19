@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\NphOrder;
 use App\Helper\NphParticipant;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
@@ -60,11 +61,12 @@ class PDFService
                                 );
                             }
                             $sampleId = $sample['sampleId'];
-                            if (($sampleType === 'stool' || $sampleType === 'stool2') && $stoolPrinted === false) {
+                            if (($sampleType === NphOrder::TYPE_STOOL || $sampleType === NphOrder::TYPE_STOOL_2) &&
+                                $stoolPrinted === false) {
                                 $sample['identifier'] = 'ST-KIT';
                                 $sampleId = $sample['orderId'];
                                 $stoolPrinted = true;
-                            } elseif (($sampleType === 'stool' || $sampleType === 'stool2') && $stoolPrinted === true) {
+                            } elseif (($sampleType === NphOrder::TYPE_STOOL || $sampleType === NphOrder::TYPE_STOOL_2) && $stoolPrinted === true) {
                                 continue;
                             }
                             $visit = $sample['visitDisplayName'];
