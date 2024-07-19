@@ -145,16 +145,23 @@ class NphOrderService
             $this->visit,
             $this->module
         );
-        $addStoolKit = true;
+        $addStoolKit = $addStoolKit2 = true;
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
                 if ($sample->getModifyType() !== NphSample::CANCEL) {
-                    if (in_array($sample->getSampleCode(), $this->getSamplesByType('stool'))) {
+                    if (in_array($sample->getSampleCode(), $this->getSamplesByType(NphOrder::TYPE_STOOL))) {
                         if ($addStoolKit) {
                             $ordersData['stoolKit'] = $order->getOrderId();
                             $ordersData[$order->getTimepoint()][] = NphSample::SAMPLE_STOOL;
                             $addStoolKit = false;
+                        }
+                        $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
+                    } elseif (in_array($sample->getSampleCode(), $this->getSamplesByType(NphOrder::TYPE_STOOL_2))) {
+                        if ($addStoolKit2) {
+                            $ordersData['stoolKit2'] = $order->getOrderId();
+                            $ordersData[$order->getTimepoint()][] = NphSample::SAMPLE_STOOL_2;
+                            $addStoolKit2 = false;
                         }
                         $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
                     } else {
