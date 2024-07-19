@@ -407,7 +407,7 @@
                     </div>
                     <p>
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and biobankView) or isFormDisabled %}
+                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2')) and biobankView) or isFormDisabled %}
                                     disabled
                                 {% endif %}>
                             Mark as Finalized
