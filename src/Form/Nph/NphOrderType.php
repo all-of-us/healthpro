@@ -38,8 +38,8 @@ class NphOrderType extends AbstractType
         $timePoints = $options['timePoints'];
         $isStoolKitDisabled = !empty($ordersData['stoolKit']);
         $ordersKitData = $isStoolKitDisabled ? $ordersData['stoolKit'] : null;
-        $isStoolKit2Disabled = !empty($ordersData['stoolKit2']);
-        $ordersKit2Data = $isStoolKit2Disabled ? $ordersData['stoolKit2'] : null;
+        $isStoolKit2Disabled = !$isStoolKitDisabled || !empty($ordersData['stoolKit2']);
+        $ordersKit2Data = !empty($ordersData['stoolKit2']) ? $ordersData['stoolKit2'] : null;
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === self::STOOL_ST1) {
@@ -52,7 +52,7 @@ class NphOrderType extends AbstractType
                     $disableStoolKit = $isStoolKitDisabled;
                     $stoolKitField = self::STOOL_KIT_FIELD;
                     if (in_array($sampleCode, self::STOOL_KIT_TUBES_2)) {
-                        $disableStoolKit = $isStoolKit2Disabled;
+                        $disableStoolKit = !$isStoolKitDisabled || $isStoolKit2Disabled;
                         $stoolKitField = self::STOOL_KIT_FIELD_2;
                     }
                     $stoolTubeAttributes = [
@@ -119,6 +119,10 @@ class NphOrderType extends AbstractType
                             default:
                                 break;
                         }
+                    } elseif ($val === NphSample::SAMPLE_STOOL_2 && empty($ordersData['stoolKit'])) {
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                        $attr['checked'] = true;
                     }
                     return $attr;
                 }
