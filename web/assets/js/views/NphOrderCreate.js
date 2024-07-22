@@ -235,6 +235,9 @@ $(document).ready(function () {
         let type = $(this).data("stool-type");
         let stoolId = $(this).val();
         let divSelector = $(this).closest("div");
+        if (stoolId) {
+            $(this).siblings(".help-block").find("ul li").remove();
+        }
         if (stoolId && $(this).parsley().isValid()) {
             $.ajax({
                 url: "/nph/ajax/search/stool",
