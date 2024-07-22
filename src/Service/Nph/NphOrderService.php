@@ -823,7 +823,7 @@ class NphOrderService
                 break;
             }
         }
-        if (empty($formData['stoolKit'])) {
+        if (empty($formData['stoolKit']) && empty($formData['stoolKit2'])) {
             if ($hasSample === false) {
                 $formErrors[] = [
                     'field' => 'checkAll',
@@ -832,17 +832,23 @@ class NphOrderService
                 return $formErrors;
             }
         } else {
+            $stoolKitField = 'stoolKit';
+            $stoolType = NphOrder::TYPE_STOOL;
+            if (!empty($formData['stoolKit2'])) {
+                $stoolKitField = 'stoolKit2';
+                $stoolType = NphOrder::TYPE_STOOL_2;
+            }
             $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
-                'orderId' => $formData['stoolKit']
+                'orderId' => $formData[$stoolKitField]
             ]);
             if ($nphOrder) {
                 $formErrors[] = [
-                    'field' => 'stoolKit',
+                    'field' => $stoolKitField,
                     'message' => 'This Kit ID has already been used for another order'
                 ];
             }
             $totalStoolTubes = [];
-            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+            foreach ($this->getSamplesByType($stoolType) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $totalStoolTubes[] = $formData[$stoolSample];
                     $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
