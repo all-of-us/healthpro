@@ -376,9 +376,16 @@ class NphOrder
         return false;
     }
 
-    public function isFreezeTsDisabled(string|null $rdrId, string|null $modifyType): bool
+    public function isFreezeTsDisabled(string|null $modifyType): bool
     {
-        if ($rdrId || $modifyType === NphSample::UNLOCK) {
+        $atLeastOneSampleIsFinalized = false;
+        foreach ($this->nphSamples as $nphSample) {
+            if ($nphSample->getRdrId()) {
+                $atLeastOneSampleIsFinalized = true;
+                break;
+            }
+        }
+        if ($atLeastOneSampleIsFinalized || $modifyType === NphSample::UNLOCK) {
             return empty($this->getMetadataArray()['freezedTs']);
         }
         return false;

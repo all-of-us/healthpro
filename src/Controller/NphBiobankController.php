@@ -315,7 +315,7 @@ class NphBiobankController extends BaseController
         $isDietStartedOrCompleted = $nphOrderService->isDietStartedOrCompleted($participant->{'module' . $order->getModule() . 'DietPeriod'});
         $isSampleDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStartedOrCompleted);
         $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $isSampleDisabled : true;
-        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getRdrId(), $sample->getModifyType()) : false;
+        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
