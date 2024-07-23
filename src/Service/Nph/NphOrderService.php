@@ -1278,7 +1278,6 @@ class NphOrderService
             }
             throw new \Exception('Failed sending to RDR');
         } catch (\Exception $e) {
-            throw $e;
             $connection->rollback();
         }
         return false;

@@ -18,7 +18,6 @@ class NphOrderType extends AbstractType
     private const STOOL_ST5 = 'ST5';
     private const STOOL_KIT_FIELD = 'stoolKit';
     private const STOOL_KIT_FIELD_2 = 'stoolKit2';
-    private const STOOL_KIT_TUBES = ['ST1', 'ST2', 'ST3', 'ST4'];
     private const STOOL_KIT_TUBES_2 = ['ST5', 'ST6', 'ST7', 'ST8'];
     private const TISSUE_CONSENT_SAMPLES = ['HAIR', 'NAILB', 'NAILL'];
     private const CONSENT_DISABLE_SAMPLE_ATTR = [
