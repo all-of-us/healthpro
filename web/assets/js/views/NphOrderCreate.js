@@ -12,6 +12,7 @@ $(document).ready(function () {
         orderReviewSelector.show();
         $("#order_review_table tbody").html("");
         const SAMPLE_STOOL = "STOOL";
+        const SAMPLE_STOOL_2 = "STOOL2";
         let samples = orderCreateSelector.data("samples");
         let timePoints = orderCreateSelector.data("time-points");
         let nailSamples = orderCreateSelector.data("nail-samples");
@@ -27,11 +28,16 @@ $(document).ready(function () {
                 .each(function () {
                     if ($(this).prop("checked") === true && $(this).prop("disabled") === false) {
                         let sample = $(this).val();
-                        if (sample === SAMPLE_STOOL) {
+                        if (sample === SAMPLE_STOOL || sample === SAMPLE_STOOL_2) {
                             let stoolKitSelector = $("#nph_order_stoolKit");
+                            let stoolTubeSamples = ["ST1", "ST2", "ST3", "ST4"];
+                            if (sample === SAMPLE_STOOL_2) {
+                                stoolKitSelector = $("#nph_order_stoolKit2");
+                                stoolTubeSamples = ["ST5", "ST6", "ST7", "ST8"];
+                            }
                             if (stoolKitSelector.val()) {
                                 let stoolKitSamples = "";
-                                stoolSamples.forEach(function (stoolSample) {
+                                stoolTubeSamples.forEach(function (stoolSample) {
                                     let stoolInputSelector = $("#nph_order_" + stoolSample);
                                     if (stoolInputSelector.val()) {
                                         stoolKitSamples +=
@@ -42,7 +48,7 @@ $(document).ready(function () {
                                 if (stoolKitSamples) {
                                     addTimePointSamples(
                                         timePoints[timePoint],
-                                        "Stool: KIT ID " + stoolKitSelector.val() + stoolKitSamples + ""
+                                        samples[sample] + ": KIT ID " + stoolKitSelector.val() + stoolKitSamples + ""
                                     );
                                 }
                             }
@@ -100,26 +106,34 @@ $(document).ready(function () {
     });
 
     let disableEnableStoolFields = function () {
-        let stoolCheckboxSel = $(".stool-checkbox");
-        if (!stoolCheckboxSel.prop("disabled")) {
-            let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
-            if (isStoolBoxChecked) {
-                $(".stool-text-fields input").prop("disabled", false);
-            } else {
-                $(".stool-text-fields input").prop("disabled", true).val("");
-                $(".stool-text-fields .has-error").removeClass("has-error");
-                $(".stool-text-fields span.help-block ul li").remove();
-                $(".stool-unique-error").html("");
+        let stoolKitFields = ["stoolKit", "stoolKit2"];
+        stoolKitFields.forEach(function (stoolKitField) {
+            let stoolCheckboxSel = $("." + stoolKitField + "-checkbox");
+            if (!stoolCheckboxSel.prop("disabled")) {
+                let isStoolBoxChecked = stoolCheckboxSel.prop("checked");
+                if (isStoolBoxChecked) {
+                    $("." + stoolKitField + "-text-fields input").prop("disabled", false);
+                } else {
+                    $("." + stoolKitField + "-text-fields input")
+                        .prop("disabled", true)
+                        .val("");
+                    $("." + stoolKitField + "-text-fields .has-error").removeClass("has-error");
+                    $("." + stoolKitField + "-text-fields span.help-block ul li").remove();
+                    $(".stool-unique-error").html("");
+                }
             }
-        }
+        });
     };
 
     disableEnableStoolFields();
 
-    $(".stool-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on("change", function () {
-        disableEnableStoolFields();
-        $("form[name='nph_order']").parsley().reset();
-    });
+    $(".stoolKit-checkbox, .stoolKit2-checkbox, #timepoint_preLMT, #timepoint_preDSMT, #nph_order_checkAll").on(
+        "change",
+        function () {
+            disableEnableStoolFields();
+            $("form[name='nph_order']").parsley().reset();
+        }
+    );
 
     if (
         $(".timepoint-samples input:checkbox").length === $(".timepoint-samples input:checkbox:disabled:checked").length
@@ -221,6 +235,9 @@ $(document).ready(function () {
         let type = $(this).data("stool-type");
         let stoolId = $(this).val();
         let divSelector = $(this).closest("div");
+        if (stoolId) {
+            $(this).siblings(".help-block").find("ul li").remove();
+        }
         if (stoolId && $(this).parsley().isValid()) {
             $.ajax({
                 url: "/nph/ajax/search/stool",
@@ -248,4 +265,8 @@ $(document).ready(function () {
             divSelector.removeClass("unique-error");
         }
     });
+
+    if ($(".stoolKit2-checkbox").is(":checked")) {
+        $("#stoolKit2Samples").collapse("show");
+    }
 });

@@ -22,7 +22,7 @@ class NphOrderCollect extends NphOrderForm
                 'required' => false,
                 'constraints' => [
                     new Constraints\Callback(function ($value, $context) use ($sampleCode, $orderType) {
-                        if ($orderType !== NphOrder::TYPE_STOOL && $value === false && !empty($context->getRoot()
+                        if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2 && $value === false && !empty($context->getRoot()
                             ["{$sampleCode}CollectedTs"]->getData())) {
                             $context->buildViolation('Collected sample required')->addViolation();
                         }
@@ -45,7 +45,7 @@ class NphOrderCollect extends NphOrderForm
             $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields']);
         }
 
-        if ($orderType === NphOrder::TYPE_STOOL) {
+        if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $constraints = $this->getDateTimeConstraints();
             array_push(
                 $constraints,

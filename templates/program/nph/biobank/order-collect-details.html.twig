@@ -95,7 +95,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if order.orderType == constant('TYPE_STOOL', order) %}
+            {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
                 <hr>
                 <h4>
                     Bristol Stool Chart Questions

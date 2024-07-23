@@ -39,7 +39,7 @@ class NphOrderService
     private $user;
     private $site;
 
-    private static $placeholderSamples = ['STOOL'];
+    private static $placeholderSamples = ['STOOL', 'STOOL2'];
 
     public function __construct(
         EntityManagerInterface $em,
@@ -145,16 +145,23 @@ class NphOrderService
             $this->visit,
             $this->module
         );
-        $addStoolKit = true;
+        $addStoolKit = $addStoolKit2 = true;
         foreach ($orders as $order) {
             $samples = $order->getNphSamples();
             foreach ($samples as $sample) {
                 if ($sample->getModifyType() !== NphSample::CANCEL) {
-                    if (in_array($sample->getSampleCode(), $this->getSamplesByType('stool'))) {
+                    if (in_array($sample->getSampleCode(), $this->getSamplesByType(NphOrder::TYPE_STOOL))) {
                         if ($addStoolKit) {
                             $ordersData['stoolKit'] = $order->getOrderId();
                             $ordersData[$order->getTimepoint()][] = NphSample::SAMPLE_STOOL;
                             $addStoolKit = false;
+                        }
+                        $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
+                    } elseif (in_array($sample->getSampleCode(), $this->getSamplesByType(NphOrder::TYPE_STOOL_2))) {
+                        if ($addStoolKit2) {
+                            $ordersData['stoolKit2'] = $order->getOrderId();
+                            $ordersData[$order->getTimepoint()][] = NphSample::SAMPLE_STOOL_2;
+                            $addStoolKit2 = false;
                         }
                         $ordersData[$sample->getSampleCode()] = $sample->getSampleId();
                     } else {
@@ -269,8 +276,16 @@ class NphOrderService
         }
         // For stool kit samples
         if (!empty($formData['stoolKit'])) {
-            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData), NphOrder::TYPE_STOOL, $formData['stoolKit'], $formData['downtime_generated'], $formData['createdTs']);
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData, NphSample::SAMPLE_STOOL), NphOrder::TYPE_STOOL, $formData['stoolKit'], $formData['downtime_generated'], $formData['createdTs']);
             foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL) as $stoolSample) {
+                if (!empty($formData[$stoolSample])) {
+                    $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
+                }
+            }
+        }
+        if (!empty($formData['stoolKit2'])) {
+            $nphOrder = $this->createOrder($this->getStoolTimePoint($formData, NphSample::SAMPLE_STOOL_2), NphOrder::TYPE_STOOL_2, $formData['stoolKit2'], $formData['downtime_generated'], $formData['createdTs']);
+            foreach ($this->getSamplesByType(NphOrder::TYPE_STOOL_2) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $this->createSample($stoolSample, $nphOrder, $sampleGroup, $formData[$stoolSample]);
                 }
@@ -350,7 +365,8 @@ class NphOrderService
                     if ($formData[$sampleCode]) {
                         $nphSample->setCollectedUser($this->user);
                         $nphSample->setCollectedSite($this->site);
-                        $collectedTs = $orderType === NphOrder::TYPE_STOOL ? $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                        $collectedTs = $orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2 ?
+                            $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
                         $nphSample->setCollectedTs($collectedTs);
                         $nphSample->setCollectedTimezoneId($this->getTimezoneid());
                         $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
@@ -369,7 +385,7 @@ class NphOrderService
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
             }
-            if ($orderType === NphOrder::TYPE_STOOL && $atLeastOneSampleIsFinalized === false) {
+            if (($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) && $atLeastOneSampleIsFinalized === false) {
                 $order->setMetadata($this->jsonEncodeMetadata($formData, ['bowelType',
                     'bowelQuality']));
                 $this->em->persist($order);
@@ -386,12 +402,12 @@ class NphOrderService
     {
         $orderCollectionData = [];
         $orderType = $order->getOrderType();
-        if ($orderType === NphOrder::TYPE_STOOL) {
+        if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $orderCollectionData[$orderType . 'CollectedTs'] = $order->getCollectedTs();
         }
         foreach ($order->getNphSamples() as $nphSample) {
             $sampleCode = $nphSample->getSampleCode();
-            if ($orderType !== NphOrder::TYPE_STOOL) {
+            if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2) {
                 $orderCollectionData[$sampleCode . 'CollectedTs'] = $nphSample->getCollectedTs();
             }
             if ($nphSample->getCollectedTs()) {
@@ -413,7 +429,7 @@ class NphOrderService
                 }
             }
         }
-        if ($order->getOrderType() === 'stool') {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             if ($order->getMetadata()) {
                 $metadata = json_decode($order->getMetadata(), true);
                 if (!empty($metadata['bowelType'])) {
@@ -445,7 +461,7 @@ class NphOrderService
     public function getSamplesMetadata(NphOrder $order): array
     {
         $metadata = [];
-        if ($order->getOrderType() === 'stool') {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             $metadata = json_decode($order->getMetadata(), true);
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
@@ -509,7 +525,7 @@ class NphOrderService
     public function saveFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
     {
         $order = $sample->getNphOrder();
-        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             return $this->saveStoolSampleFinalization($formData, $sample, $biobankFinalization);
         }
         return $this->saveSampleFinalization($formData, $sample);
@@ -536,7 +552,7 @@ class NphOrderService
                 }
             }
         }
-        if ($order->getOrderType() === NphOrder::TYPE_STOOL) {
+        if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             $sampleData[$sampleCode . 'CollectedTs'] = $order->getCollectedTs();
             if ($order->getMetadata()) {
                 $orderMetadata = json_decode($order->getMetadata(), true);
@@ -807,7 +823,7 @@ class NphOrderService
                 break;
             }
         }
-        if (empty($formData['stoolKit'])) {
+        if (empty($formData['stoolKit']) && empty($formData['stoolKit2'])) {
             if ($hasSample === false) {
                 $formErrors[] = [
                     'field' => 'checkAll',
@@ -816,17 +832,23 @@ class NphOrderService
                 return $formErrors;
             }
         } else {
+            $stoolKitField = 'stoolKit';
+            $stoolType = NphOrder::TYPE_STOOL;
+            if (!empty($formData['stoolKit2'])) {
+                $stoolKitField = 'stoolKit2';
+                $stoolType = NphOrder::TYPE_STOOL_2;
+            }
             $nphOrder = $this->em->getRepository(NphOrder::class)->findOneBy([
-                'orderId' => $formData['stoolKit']
+                'orderId' => $formData[$stoolKitField]
             ]);
             if ($nphOrder) {
                 $formErrors[] = [
-                    'field' => 'stoolKit',
+                    'field' => $stoolKitField,
                     'message' => 'This Kit ID has already been used for another order'
                 ];
             }
             $totalStoolTubes = [];
-            foreach ($this->getSamplesByType('stool') as $stoolSample) {
+            foreach ($this->getSamplesByType($stoolType) as $stoolSample) {
                 if (!empty($formData[$stoolSample])) {
                     $totalStoolTubes[] = $formData[$stoolSample];
                     $nphSample = $this->em->getRepository(NphSample::class)->findOneBy([
@@ -1150,10 +1172,10 @@ class NphOrderService
         return $returnArray;
     }
 
-    private function getStoolTimePoint(array $formData): ?string
+    private function getStoolTimePoint(array $formData, string $sampleStool): ?string
     {
         foreach (array_keys($this->getTimePoints()) as $timePoint) {
-            if (in_array(NphSample::SAMPLE_STOOL, $formData[$timePoint])) {
+            if (in_array($sampleStool, $formData[$timePoint])) {
                 return $timePoint;
             }
         }

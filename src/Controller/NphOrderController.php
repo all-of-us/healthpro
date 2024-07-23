@@ -68,11 +68,12 @@ class NphOrderController extends BaseController
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $ordersData = $nphOrderService->getExistingOrdersData();
+        $stoolSamples = array_merge($nphOrderService->getSamplesByType('stool'), $nphOrderService->getSamplesByType('stool2'));
         $oderForm = $this->createForm(
             NphOrderType::class,
             $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
-                $nphOrderService->getSamplesByType('stool'),
+                $stoolSamples,
                 'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
                 'module' => $module, 'userTimezone' => $this->getSecurityUser()->getTimezone()]
         );
@@ -111,7 +112,7 @@ class NphOrderController extends BaseController
             'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'stoolSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_STOOL),
+            'stoolSamples' => $stoolSamples,
             'nailSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_NAIL),
             'bloodSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_BLOOD),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),

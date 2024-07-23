@@ -108,7 +108,7 @@
             </div>
         </div>
     {% endif %}
-    {% if order.orderType == 'stool' %}
+    {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2') %}
         <hr>
         <h4>
             Bristol Stool Chart Questions
