@@ -122,7 +122,7 @@ class NphOrderType extends AbstractType
                     } elseif ($val === NphSample::SAMPLE_STOOL_2 && empty($ordersData['stoolKit'])) {
                         $attr['disabled'] = true;
                         $attr['class'] = 'sample-disabled';
-                        $attr['checked'] = true;
+                        $attr['checked'] = false;
                     }
                     return $attr;
                 }

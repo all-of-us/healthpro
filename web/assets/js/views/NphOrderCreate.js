@@ -265,4 +265,8 @@ $(document).ready(function () {
             divSelector.removeClass("unique-error");
         }
     });
+
+    if ($(".stoolKit2-checkbox").is(":checked")) {
+        $("#stoolKit2Samples").collapse("show");
+    }
 });

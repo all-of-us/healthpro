@@ -63,10 +63,10 @@
             <span class="toggle-help-image" data-toggle="modal" data-target="#optional_stool_kit_modal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
-            <span class="collapse-carat collapsed" role="button" data-toggle="collapse" data-target="#3VisitPeriod1Diet" aria-expanded="false"></span>
+            <span class="collapse-carat collapsed" role="button" data-toggle="collapse" data-target="#stoolKit2Samples" aria-expanded="false"></span>
         {% endif %}
     </div>
-    <div class="{{ stoolKitField }}-text-fields {% if stoolKitField == 'stoolKit2' %} collapse {% endif %}" {% if stoolKitField == 'stoolKit2' %} id="3VisitPeriod1Diet" aria-expanded="false" {% endif %}>
+    <div class="{{ stoolKitField }}-text-fields {% if stoolKitField == 'stoolKit2' %} collapse {% endif %}" {% if stoolKitField == 'stoolKit2' %} id="stoolKit2Samples" aria-expanded="false" {% endif %}>
         <div class="stool-input stool-samples-box bg-light {% if not orderForm[stoolKitField].vars.valid %} has-error {% endif %}">
             {{ form_label(orderForm[stoolKitField]) }}
             {% set break = false %}
@@ -83,7 +83,7 @@
             <div class="stool-unique-error"></div>
         </div>
         {% for tubeType in stoolTubes %}
-            <div class="stool-samples-box {% if stoolKitField == 'stoolKit2' and orderForm['stoolKit2'].vars.attr.disabled %} bg-light {% else %} stool-samples-box-{{ loop.index }} {% endif %}">
+            <div class="stool-samples-box {% if stoolKitField == 'stoolKit2' and orderForm['stoolKit2'].vars.attr.disabled and orderForm['stoolKit2'].vars.data is empty %} bg-light {% else %} stool-samples-box-{{ loop.index }} {% endif %}">
                 <label>{{ tubeType.label }}</label>
                 {% for stoolSample in stoolSamples %}
                     {% if stoolSample in tubeType.tubes %}
