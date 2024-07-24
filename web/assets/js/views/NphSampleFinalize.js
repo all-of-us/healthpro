@@ -131,6 +131,12 @@ $(document).ready(function () {
         });
     };
 
+    let handleSampleCancel = function (element) {
+        disableEnableAliquotFields();
+        let aliquotTsId = $(element).attr("data-aliquot-ts-id");
+        $("#nph_sample_finalize_" + aliquotTsId).parsley().validate();
+    };
+
     function calculateGlycerolVolume(sampleVolumeField, glycerolVolumeField, index) {
         let totalVolumeField = $(`#totalVol${index}`);
         let sampleVolume = $(sampleVolumeField).val() ? parseFloat($(sampleVolumeField).val()) * 1000 : 0;
@@ -268,7 +274,9 @@ $(document).ready(function () {
 
     $(".aliquot-volume").trigger("keyup");
 
-    $(".sample-cancel-checkbox").on("change", disableEnableAliquotFields);
+    $(".sample-cancel-checkbox").on("change", function () {
+        handleSampleCancel(this);
+    });
 
     const dateComparison = (value, requirement, parsleyFieldInstance) => {
         if (parsleyFieldInstance.$element.is(':disabled') || parsleyFieldInstance.$element.is('[readonly]')) {

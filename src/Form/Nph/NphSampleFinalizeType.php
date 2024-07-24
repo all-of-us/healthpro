@@ -248,7 +248,7 @@ class NphSampleFinalizeType extends NphOrderForm
         $nphSample = $options['nphSample'];
         if ($nphSample->getModifyType() === NphSample::UNLOCK) {
             $finalizedAliquots = $nphSample->getNphAliquots();
-            foreach ($finalizedAliquots as $finalizedAliquot) {
+            foreach ($finalizedAliquots as $key => $finalizedAliquot) {
                 $builder->add(
                     "cancel_{$finalizedAliquot->getAliquotCode()}_{$finalizedAliquot->getAliquotId()}",
                     Type\CheckboxType::class,
@@ -258,7 +258,8 @@ class NphSampleFinalizeType extends NphOrderForm
                         'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
                         'attr' => [
                             'class' => 'sample-cancel-checkbox',
-                        ]
+                            'data-aliquot-ts-id' => "{$finalizedAliquot->getAliquotCode()}AliquotTs_{$key}"
+                         ]
                     ]
                 );
                 $builder->add(
