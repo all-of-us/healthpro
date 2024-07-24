@@ -134,7 +134,9 @@ $(document).ready(function () {
     let handleSampleCancel = function (element) {
         disableEnableAliquotFields();
         let aliquotTsId = $(element).attr("data-aliquot-ts-id");
-        $("#nph_sample_finalize_" + aliquotTsId).parsley().validate();
+        $("#nph_sample_finalize_" + aliquotTsId)
+            .parsley()
+            .validate();
     };
 
     function calculateGlycerolVolume(sampleVolumeField, glycerolVolumeField, index) {
@@ -279,7 +281,7 @@ $(document).ready(function () {
     });
 
     const dateComparison = (value, requirement, parsleyFieldInstance) => {
-        if (parsleyFieldInstance.$element.is(':disabled') || parsleyFieldInstance.$element.is('[readonly]')) {
+        if (parsleyFieldInstance.$element.is(":disabled") || parsleyFieldInstance.$element.is("[readonly]")) {
             return true;
         }
         const inputDate = new Date(value);
