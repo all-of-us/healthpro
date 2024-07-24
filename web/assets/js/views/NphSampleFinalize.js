@@ -270,7 +270,10 @@ $(document).ready(function () {
 
     $(".sample-cancel-checkbox").on("change", disableEnableAliquotFields);
 
-    const dateComparison = (value, requirement) => {
+    const dateComparison = (value, requirement, parsleyFieldInstance) => {
+        if (parsleyFieldInstance.$element.is(':disabled') || parsleyFieldInstance.$element.is('[readonly]')) {
+            return true;
+        }
         const inputDate = new Date(value);
         const collectedTs = document.getElementById(requirement).value;
         if (collectedTs) {

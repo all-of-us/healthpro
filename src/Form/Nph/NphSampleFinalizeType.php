@@ -120,6 +120,10 @@ class NphSampleFinalizeType extends NphOrderForm
                                 if ($condition && empty($value)) {
                                     $context->buildViolation('Aliquot time is required')->addViolation();
                                 }
+                                $aliquotId = $formData[$aliquotCode][$key];
+                                if (!empty($formData["cancel_{$aliquotCode}_{$aliquotId}"]) || isset($formData["restore_{$aliquotCode}_{$aliquotId}"])) {
+                                    return;
+                                }
                                 if (!empty($formData["{$sample}CollectedTs"]) && !empty($value)) {
                                     if ($value <= $formData["{$sample}CollectedTs"]) {
                                         $context->buildViolation('Aliquot time must be after collection time')->addViolation();
