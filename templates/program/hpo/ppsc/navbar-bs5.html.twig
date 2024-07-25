@@ -1,13 +1,10 @@
-<nav class="navbar navbar-expand-lg navbar-inverse">
+<nav class="navbar navbar-expand-sm navbar-inverse">
     <div class="container-fluid">
         <a class="navbar-brand" href="#" {% if siteInfo.canSwitchProgram %}
             data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
             <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#pmi-navbar-collapse" aria-controls="pmi-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
+        <div class="navbar-collapse" id="pmi-navbar-collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link navbar-brand " href="#">
@@ -15,7 +12,7 @@
                     </a>
                 </li>
             </ul>
-            <ul class="nav navbar-nav">
+            <ul class="navbar-nav">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     {% if app.session.get('site') %}
                         <li class="nav-item">
