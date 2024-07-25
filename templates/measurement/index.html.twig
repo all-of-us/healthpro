@@ -34,7 +34,6 @@
                     New Physical Measurements
                 {% endif %}
                 <small>
-                    <a href="{{ path(participantRoute, { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a>
                     {% if participant.isPediatric %}
                         <i class="fa fa-child child-icon" title="Pediatric Participant" data-toggle="tooltip"></i>
                     {% endif %}
@@ -51,7 +50,6 @@
                 {% endif %}
             </h2>
         </div>
-        {% include 'partials/participant-dl.html.twig' %}
         {% if displayInactiveSiteBanner %}
             {{ macros.displayInactiveSiteBanner('pmb', 3) }}
         {% endif %}
