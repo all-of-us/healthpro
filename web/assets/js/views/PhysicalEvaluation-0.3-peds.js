@@ -906,7 +906,7 @@ let viewExtension = Backbone.View.extend({
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
         let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
-        let modificationId = block.find(".modification-select select").attr('id');
+        let modificationId = block.find(".modification-select select").attr("id");
         let isFirstModification = modificationId.endsWith("_0");
         if ($(modificationType + "-all").is(":checked") && isFirstModification) {
             let elements = $(modificationType + "-select")
