@@ -53,7 +53,10 @@ class OrderType extends AbstractType
         if ($options['step'] === 'finalized' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
             $collectedSample = json_decode($options['order']->getCollectedSamples(), false);
             $samples = array_filter($samples, static function ($sample) use ($collectedSample) {
-                return $sample === $collectedSample[0];
+                if (!empty($collectedSample)) {
+                    return $sample === $collectedSample[0];
+                }
+                return true;
             });
         }
         if (($options['step'] === Order::ORDER_STEP_COLLECTED or $options['step'] === Order::ORDER_STEP_FINALIZED) && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && substr($options['order']->getVersion(), 0, 3) > 3.1) {
@@ -140,6 +143,11 @@ class OrderType extends AbstractType
                 'choices' => $samples,
                 'required' => false,
                 'disabled' => $samplesDisabled,
+                'constraints' => new Constraints\Callback(function ($value, $context) use ($options) {
+                    if (empty($value) && $options['step'] === 'collected' && $options['order']->getType() === Order::ORDER_TYPE_SALIVA && $options['isPediatricOrder'] && $context->getRoot()->get('salivaTubeSelection')->getData() !== 0) {
+                        $context->buildViolation('Please select at least one sample for collection')->addViolation();
+                    }
+                }),
                 'choice_attr' => function ($val) use ($enabledSamples, $options) {
                     $attr = [];
                     if ($options['step'] === 'finalized') {

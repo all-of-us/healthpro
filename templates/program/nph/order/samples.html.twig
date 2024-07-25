@@ -1,43 +1,18 @@
 {% macro form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds, participantId, module, visit, samplesStatus, downtimeSamples) %}
     {% set formField = orderForm[timePoint] %}
+    {% set stoolTubes1 = [
+        {'label': '95% Ethanol Tubes (2)', 'tubes': ['ST1', 'ST2']},
+        {'label': 'DNA/RNA Shield Tubes (2)', 'tubes': ['ST3', 'ST4']}
+    ] %}
+    {% set stoolTubes2 = [
+        {'label': '95% Ethanol Tubes (2)', 'tubes': ['ST5', 'ST6']},
+        {'label': 'DNA/RNA Shield Tubes (2)', 'tubes': ['ST7', 'ST8']}
+    ] %}
     {% for sample in formField.children %}
         {% if sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL') %}
-            <div class="checkbox"><label for="{{ sample.vars.id }}">{{ form_widget(sample, {'attr': {'class': 'stool-checkbox'}}) }} {{ sample.vars.label }}</label></div>
-            <div class="stool-text-fields">
-                <div class="stool-input stool-samples-box bg-light {% if not orderForm.stoolKit.vars.valid %} has-error {% endif %}">
-                    {{ form_label(orderForm.stoolKit) }}
-                    {% set break = false %}
-                    {% for stoolSample in stoolSamples%}
-                        {% if samplesOrderIds[timePoint][stoolSample] is defined and not break %}
-                            {% if samplesStatus[timePoint][stoolSample] == 'Created' %}
-                                {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
-                                {% set break = true %}
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    {{ form_widget(orderForm.stoolKit) }}
-                    {{ form_errors(orderForm.stoolKit) }}
-                    <div class="stool-unique-error"></div>
-                </div>
-                {% set stoolTubes = [
-                    {'label': '95% Ethanol Tubes (2)', 'tubes': ['ST1', 'ST2']},
-                    {'label': 'DNA/RNA Shield Tubes (2)', 'tubes': ['ST3', 'ST4']}
-                ] %}
-                {% for tubeType in stoolTubes %}
-                    <div class="stool-samples-box stool-samples-box-{{ loop.index }}">
-                        <label>{{ tubeType.label }}</label>
-                        {% for stoolSample in stoolSamples %}
-                            {% if stoolSample in tubeType.tubes %}
-                                <div class="stool-input stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
-                                    {{ form_widget(orderForm[stoolSample]) }}
-                                    {{ form_errors(orderForm[stoolSample]) }}
-                                    <div class="stool-unique-error"></div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            </div>
+            {{ _self.displayStoolSection(sample, orderForm, 'stoolKit', stoolSamples, stoolTubes1, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) }}
+        {% elseif sample.vars.value == constant('App\\Entity\\NphSample::SAMPLE_STOOL_2') %}
+            {{ _self.displayStoolSection(sample, orderForm, 'stoolKit2', ['ST5', 'ST6', 'ST7', 'ST8'], stoolTubes2, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) }}
         {% else %}
             {% if samplesOrderIds[timePoint][sample.vars.value] is defined %}
                 <div class="checkbox">
@@ -77,4 +52,49 @@
     {% if downtimeGeneratedOrders['sampleInfo']|length > 0 and timePoint in downtimeGeneratedOrders['sampleInfo']|keys and downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] %}
         <sup>{{ downtimeGeneratedOrders['sampleInfo'][timePoint][sample.vars.value] }}</sup>
     {% endif %}
+{% endmacro %}
+
+{% macro displayStoolSection(sample, orderForm, stoolKitField, stoolSamples, stoolTubes, samplesOrderIds, samplesStatus, participantId, module, visit, timePoint) %}
+    <div class="checkbox">
+        <label for="{{ sample.vars.id }}">
+            {{ form_widget(sample, {'attr': {'class': stoolKitField ~ '-checkbox'}}) }} {{ sample.vars.label }}
+        </label>
+        {% if stoolKitField == 'stoolKit2' %}
+            <span class="toggle-help-image" data-toggle="modal" data-target="#optional_stool_kit_modal">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+            </span>
+            <span class="collapse-carat collapsed" role="button" data-toggle="collapse" data-target="#stoolKit2Samples" aria-expanded="false"></span>
+        {% endif %}
+    </div>
+    <div class="{{ stoolKitField }}-text-fields {% if stoolKitField == 'stoolKit2' %} collapse {% endif %}" {% if stoolKitField == 'stoolKit2' %} id="stoolKit2Samples" aria-expanded="false" {% endif %}>
+        <div class="stool-input stool-samples-box bg-light {% if not orderForm[stoolKitField].vars.valid %} has-error {% endif %}">
+            {{ form_label(orderForm[stoolKitField]) }}
+            {% set break = false %}
+            {% for stoolSample in stoolSamples %}
+                {% if samplesOrderIds[timePoint][stoolSample] is defined and not break %}
+                    {% if samplesStatus[timePoint][stoolSample] == 'Created' %}
+                        {{ _self.displayReprintButton(samplesOrderIds[timePoint][stoolSample], participantId, module, visit, samplesStatus[timePoint][stoolSample]) }}
+                        {% set break = true %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {{ form_widget(orderForm[stoolKitField]) }}
+            {{ form_errors(orderForm[stoolKitField]) }}
+            <div class="stool-unique-error"></div>
+        </div>
+        {% for tubeType in stoolTubes %}
+            <div class="stool-samples-box {% if stoolKitField == 'stoolKit2' and orderForm['stoolKit2'].vars.attr.disabled and orderForm['stoolKit2'].vars.data is empty %} bg-light {% else %} stool-samples-box-{{ loop.index }} {% endif %}">
+                <label>{{ tubeType.label }}</label>
+                {% for stoolSample in stoolSamples %}
+                    {% if stoolSample in tubeType.tubes %}
+                        <div class="stool-input stool-sub-samples {% if not orderForm[stoolSample].vars.valid %} has-error {% endif %}">
+                            {{ form_widget(orderForm[stoolSample]) }}
+                            {{ form_errors(orderForm[stoolSample]) }}
+                            <div class="stool-unique-error"></div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 {% endmacro %}

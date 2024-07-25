@@ -52,7 +52,7 @@ class NphOrderForm extends AbstractType
         bool $disabled = false,
         string $formType = self::FORM_FINALIZE_TYPE
     ): void {
-        if ($formType === self::FORM_FINALIZE_TYPE || $options['orderType'] !== NphOrder::TYPE_STOOL) {
+        if ($formType === self::FORM_FINALIZE_TYPE || ($options['orderType'] !== NphOrder::TYPE_STOOL && $options['orderType'] !== NphOrder::TYPE_STOOL_2)) {
             $constraints = $this->getDateTimeConstraints();
             if ($formType === self::FORM_COLLECT_TYPE) {
                 $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {

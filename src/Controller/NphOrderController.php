@@ -68,11 +68,12 @@ class NphOrderController extends BaseController
         $timePointSamples = $nphOrderService->getTimePointSamples();
         $timePoints = $nphOrderService->getTimePoints();
         $ordersData = $nphOrderService->getExistingOrdersData();
+        $stoolSamples = array_merge($nphOrderService->getSamplesByType('stool'), $nphOrderService->getSamplesByType('stool2'));
         $oderForm = $this->createForm(
             NphOrderType::class,
             $ordersData,
             ['timePointSamples' => $timePointSamples, 'timePoints' => $timePoints, 'stoolSamples' =>
-                $nphOrderService->getSamplesByType('stool'),
+                $stoolSamples,
                 'module1tissueCollectConsent' => $participant->module1TissueConsentStatus,
                 'module' => $module, 'userTimezone' => $this->getSecurityUser()->getTimezone()]
         );
@@ -111,7 +112,7 @@ class NphOrderController extends BaseController
             'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'stoolSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_STOOL),
+            'stoolSamples' => $stoolSamples,
             'nailSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_NAIL),
             'bloodSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_BLOOD),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
@@ -248,7 +249,7 @@ class NphOrderController extends BaseController
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
         $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
         $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
-        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getRdrId(), $sample->getModifyType()) : false;
+        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,
