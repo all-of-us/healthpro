@@ -7,6 +7,7 @@ use App\Entity\Order;
 use App\Service\MeasurementService;
 use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -22,10 +23,12 @@ class HpoPpscController extends BaseController
     #[Route(path: '/read/participant/{id}', name: 'read_participant', methods: ['GET'])]
     public function ppscParticipantDetailsAction(
         $id,
+        Request $request,
         PpscApiService $ppscApiService,
         MeasurementService $measurementService,
     ): Response {
-        $participant = $ppscApiService->getParticipantById($id);
+        $refresh = $request->query->get('refresh');
+        $participant = $ppscApiService->getParticipantById($id, $refresh);
         if (!$participant) {
             throw $this->createNotFoundException();
         }
