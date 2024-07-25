@@ -882,6 +882,9 @@ let viewExtension = Backbone.View.extend({
         return result;
     },
     handleProtocolModificationAllCheck: function (e) {
+        if (!$(e.currentTarget).is(":checked")) {
+            return;
+        }
         let block = $(e.currentTarget).closest(".modification-block");
         let primarySelect = block.find(".modification-select select");
         let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
@@ -891,12 +894,6 @@ let viewExtension = Backbone.View.extend({
                 .find("select")
                 .not(primarySelect)
                 .val(primarySelect.val())
-                .closest(".modification-block");
-        } else {
-            elements = $(modificationType + "-select")
-                .find("select")
-                .not(primarySelect)
-                .val("")
                 .closest(".modification-block");
         }
         for (let i = 0; i < elements.length; i++) {
@@ -909,7 +906,9 @@ let viewExtension = Backbone.View.extend({
     handleProtocolModification: function (e) {
         let block = $(e.currentTarget).closest(".modification-block");
         let modificationType = $(e.currentTarget).parents(".modification-select").data("modification-type");
-        if ($(modificationType + "-all").is(":checked")) {
+        let modificationId = block.find(".modification-select select").attr('id');
+        let isFirstModification = modificationId.endsWith("_0");
+        if ($(modificationType + "-all").is(":checked") && isFirstModification) {
             let elements = $(modificationType + "-select")
                 .find("select")
                 .not(e.currentTarget)
