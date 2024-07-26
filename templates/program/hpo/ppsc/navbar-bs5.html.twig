@@ -4,26 +4,17 @@
             data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
             <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
         </a>
+        {% set site = '' %}
+        {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site').id is defined %}
+            {% set site = app.session.get('site').id %}
+        {% endif %}
         <div class="navbar-collapse" id="pmi-navbar-collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link navbar-brand " href="#">
+                    <a class="nav-link navbar-brand" href="#" data-site-name="{{ site }}">
                         HealthPro
                     </a>
                 </li>
-            </ul>
-            <ul class="navbar-nav">
-                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                    {% if app.session.get('site') %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" title="Current site">
-                                <i class="fa fa-hospital-o" aria-hidden="true"></i>
-                                {% if isCurrentProgramHpo() and not siteInfo.activeSite(app.session.get('site').id) %} (Inactive) {% endif %}
-                                {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endif %}
             </ul>
         </div>
     </div>
