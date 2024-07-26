@@ -11,7 +11,7 @@ class PpscParticipant
     public string|null $sex;
     public string|null $deceasedStatus;
     public string|null $biospecimenSourceSite;
-    public \DateTime|null $dob;
+    public \DateTime|null $dob = null;
     public string|null $awardee;
     public string|null $organization;
     public string|null $site;
@@ -141,6 +141,14 @@ class PpscParticipant
             return;
         }
         $this->id = $participant->Participant_ID__c ?? '';
+        // Set dob to DateTime object
+        if (isset($participant->dob)) {
+            try {
+                $this->dob = new \DateTime($participant->dob);
+            } catch (\Exception $e) {
+                $this->dob = null;
+            }
+        }
         $this->ageRange = $participant->ageRange ?? null;
         $this->race = $participant->race ?? null;
         $this->sex = $participant->sex ?? null;
@@ -158,14 +166,6 @@ class PpscParticipant
         $this->firstName = $participant->FirstName ?? null;
         $this->biobankId = $participant->BioBank_ID__c ?? null;
         $this->enablePediatricEnrollment = $participant->Enable_Pediatric_Enrollment__c ?? null;
-        // Set dob to DateTime object
-        if (isset($participant->dob)) {
-            try {
-                $this->dob = new \DateTime($participant->dob);
-            } catch (\Exception $e) {
-                $this->dob = null;
-            }
-        }
         $this->age = $this->getAge();
         $this->ageInMonths = $this->getAgeInMonths();
         $this->sexAtBirth = match ($participant->sex ?? null) {
