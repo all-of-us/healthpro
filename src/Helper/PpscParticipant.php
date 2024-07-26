@@ -4,6 +4,7 @@ namespace App\Helper;
 
 class PpscParticipant
 {
+    public \DateTime|null $cacheTime;
     public string $id;
     public string|null $ageRange;
     public string|null $race;
@@ -44,6 +45,10 @@ class PpscParticipant
     public function __construct(?\stdClass $ppscParticipant = null)
     {
         if (is_object($ppscParticipant)) {
+            if (!empty($ppscParticipant->cacheTime)) {
+                $this->cacheTime = $ppscParticipant->cacheTime;
+                unset($ppscParticipant->cacheTime);
+            }
             $this->parsePPscParticipant($ppscParticipant);
         }
     }
