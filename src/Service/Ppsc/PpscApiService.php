@@ -48,7 +48,7 @@ class PpscApiService
         }
     }
 
-    public function getParticipantById(string $participantId, ?bool $refresh = null): PpscParticipant|null
+    public function getParticipantById(string $participantId, ?string $refresh = null): PpscParticipant|null
     {
         $participant = false;
         $cacheKey = 'ppsc_participant_' . $participantId;
