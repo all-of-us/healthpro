@@ -86,12 +86,16 @@
         {{ form_errors(finalizeForm.finalizedNotes) }}
     </div>
     {{ form_rest(finalizeForm) }}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.disabled and not readOnlyView and not inactiveSiteFormDisabled  %}
         <p>
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized
             </button>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
+    {% else %}
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
     {% endif %}
     {{ form_end(finalizeForm) }}
     {% if order.status == 'unlock' %}

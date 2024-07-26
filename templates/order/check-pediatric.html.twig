@@ -185,10 +185,10 @@
             Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.  If the participant can provide adult samples, saliva and urine collection is permissible and can be initiated by selecting Continue.
             </span>
         </div>
-        <div id="continue" style="display:none;">
-            <br/>
+        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        <div class="pull-left order-check-cancel" id="continue" style="display:none;">
             <p>
-                <button type="submit" class="btn btn-primary">Continue</button>
+                <button type="submit" class="btn btn-primary">Continue asdf</button>
             </p>
         </div>
         <input type="hidden" class="sampleTypes" id="blood" name="show-blood-tubes" value="no"/>

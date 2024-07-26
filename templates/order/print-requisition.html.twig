@@ -40,6 +40,8 @@
                     This order was finalized as an empty order and was not submitted to the Biobank. If this was done in error, create a new order with the original order information and please submit a Support Center ticket to the Biobank with the 2 order IDs.
                 </div>
             {% endif %}
+            {% set routePrefix = readOnlyView ? 'read_' : '' %}
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
         </div>
     </div>
 {% endblock %}

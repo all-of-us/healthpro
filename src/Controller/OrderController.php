@@ -774,12 +774,9 @@ class OrderController extends BaseController
     #[Route(path: '/ppsc/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
     public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
         if ($measurement) {
