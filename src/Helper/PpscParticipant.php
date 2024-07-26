@@ -146,7 +146,6 @@ class PpscParticipant
         $this->sex = $participant->sex ?? null;
         $this->deceasedStatus = $participant->deceasedStatus ?? null;
         $this->biospecimenSourceSite = $participant->biospecimenSourceSite ?? null;
-        $this->dob = $participant->dob ?? null;
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
         $this->site = $participant->site ?? null;
