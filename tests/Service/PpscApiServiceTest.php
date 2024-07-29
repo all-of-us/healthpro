@@ -52,7 +52,7 @@ class PpscApiServiceTest extends ServiceTestCase
             ->getMock();
         $ppscApiService->client = $mockClient;
         $ppscApiService->method('getAccessToken')->willReturn('test_access_token');
-        $result = $ppscApiService->getParticipantById('P000000123');
+        $result = $ppscApiService->getParticipantById('P000000123', '1');
         $this->assertInstanceOf(PpscParticipant::class, $result);
         $this->assertEquals('P000000123', $result->id);
         $this->assertEquals('John', $result->firstName);
@@ -91,7 +91,7 @@ class PpscApiServiceTest extends ServiceTestCase
 
     private function getMockPpscParticipantData(): string
     {
-        return '{"ageRange": null, "race": null, "sex": null, "deceasedStatus": null, "biospecimenSourceSite": null, "site": null, "dob": null, "organization": null, "isPediatric": null, "GenderIdentity": null, "MiddleName": null, "LastName": "Qualtrics", "FirstName": "John", "BioBank_ID__c": "T000000156", "Participant_ID__c": "P000000123", "Enable_Pediatric_Enrollment__c": null}';
+        return '{"ageRange": null, "race": null, "sex": null, "deceasedStatus": null, "biospecimenSourceSite": null, "site": null, "dob": null, "organization": null, "isPediatric": null, "genderIdentity": null, "middleName": null, "lastName": "Qualtrics", "firstName": "John", "biobankId": "T000000156", "participantId": "P000000123"}';
     }
 
     private function getMockPostData(): string
