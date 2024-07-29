@@ -21,7 +21,6 @@ class PpscParticipant
     public string|null $lastName;
     public string|null $firstName;
     public string|null $biobankId;
-    public string|null $enablePediatricEnrollment;
     public string|null $pediatricMeasurementsVersionType;
     public string|null $gender;
     public int|null $age;
@@ -140,7 +139,7 @@ class PpscParticipant
         if (!is_object($participant)) {
             return;
         }
-        $this->id = $participant->Participant_ID__c ?? '';
+        $this->id = $participant->participantId ?? '';
         // Set dob to DateTime object
         if (isset($participant->dob)) {
             try {
@@ -160,12 +159,11 @@ class PpscParticipant
         if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
             $this->isPediatric = true;
         }
-        $this->genderIdentity = $participant->GenderIdentity ?? null;
-        $this->middleName = $participant->MiddleName ?? null;
-        $this->lastName = $participant->LastName ?? null;
-        $this->firstName = $participant->FirstName ?? null;
-        $this->biobankId = $participant->BioBank_ID__c ?? null;
-        $this->enablePediatricEnrollment = $participant->Enable_Pediatric_Enrollment__c ?? null;
+        $this->genderIdentity = $participant->genderIdentity ?? null;
+        $this->middleName = $participant->middleName ?? null;
+        $this->lastName = $participant->lastName ?? null;
+        $this->firstName = $participant->firstName ?? null;
+        $this->biobankId = $participant->biobankId ?? null;
         $this->age = $this->getAge();
         $this->ageInMonths = $this->getAgeInMonths();
         $this->sexAtBirth = match ($participant->sex ?? null) {
