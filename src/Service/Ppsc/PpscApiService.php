@@ -41,7 +41,7 @@ class PpscApiService
                 'query' => ['requestId' => $requestId]
             ]);
             $requestDetailsData = json_decode($response->getBody()->getContents());
-            return $requestDetailsData ? $requestDetailsData[0] : null;
+            return $requestDetailsData ?? null;
         } catch (\Exception $e) {
             error_log($e->getMessage());
             return null;

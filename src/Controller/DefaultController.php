@@ -44,10 +44,10 @@ class DefaultController extends BaseController
         if ($this->isGranted('ROLE_USER') && $request->getSession()->get('ppscRequestId')) {
             if ($request->getSession()->get('ppscLandingPage') === 'in_person_enrollment') {
                 $requestDetails = $ppscApiService->getRequestDetailsById($request->getSession()->get('ppscRequestId'));
-                if (empty($requestDetails->Participant_ID__c)) {
+                if (empty($requestDetails->participantId)) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                return $this->redirectToRoute('participant', ['id' => $requestDetails->Participant_ID__c]);
+                return $this->redirectToRoute('participant', ['id' => $requestDetails->participantId]);
             }
             if ($request->getSession()->get('ppscLandingPage') === 'daily_review') {
                 return $this->redirectToRoute('review_today');
