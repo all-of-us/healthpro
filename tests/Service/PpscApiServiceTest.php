@@ -86,7 +86,7 @@ class PpscApiServiceTest extends ServiceTestCase
 
     private function getMockPpscRequestIdData(): string
     {
-        return '[{"siteId": "test", "participantId": "P000000123"}]';
+        return '{"siteId": "test", "participantId": "P000000123"}';
     }
 
     private function getMockPpscParticipantData(): string
