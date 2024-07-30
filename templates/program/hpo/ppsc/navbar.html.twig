@@ -1,36 +1,19 @@
 <nav class="navbar navbar-default navbar-inverse navbar">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#pmi-navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <ul class="nav navbar-nav">
                 <a class="navbar-brand dropdown-toggle" href="#">
                     <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
                 </a>
+                {% set site = '' %}
+                {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site').id is defined %}
+                    {% set site = app.session.get('site').id %}
+                {% endif %}
                 <li>
-                    <a class="navbar-brand " href="#">
+                    <a class="navbar-brand " href="#" data-site-name="{{ site }}">
                         HealthPro
                     </a>
                 </li>
-            </ul>
-        </div>
-        <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
-            <ul class="nav navbar-nav navbar-right">
-                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                    {% if app.session.get('site') %}
-                        <li>
-                            <a href="#" title="Current site">
-                                <i class="fa fa-hospital-o" aria-hidden="true"></i>
-                                {% if isCurrentProgramHpo() and not siteInfo.activeSite(app.session.get('site').id) %} (Inactive) {% endif %}
-                                {{ app.session.get('siteEntity').name|default(app.session.get('site').name) }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endif %}
             </ul>
         </div>
     </div>

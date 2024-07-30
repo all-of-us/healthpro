@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PpscApiService
 {
+    public const CACHE_TIME = 300;
+    public const DS_CLEAN_UP_LIMIT = 500;
+
     public HttpClient $client;
     private ParameterBagInterface $params;
     private string|null $tokenUrl;
@@ -38,25 +41,50 @@ class PpscApiService
                 'query' => ['requestId' => $requestId]
             ]);
             $requestDetailsData = json_decode($response->getBody()->getContents());
-            return $requestDetailsData ? $requestDetailsData[0] : null;
+            return $requestDetailsData ?? null;
         } catch (\Exception $e) {
             error_log($e->getMessage());
             return null;
         }
     }
 
-    public function getParticipantById($participantId): PpscParticipant|null
+    public function getParticipantById(string $participantId, ?string $refresh = null): PpscParticipant|null
     {
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', [
-                'headers' => ['Authorization' => 'Bearer ' . $token],
-                'query' => ['participantId' => $participantId]
-            ]);
-            $participant = json_decode($response->getBody()->getContents());
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
+        $participant = false;
+        $cacheKey = 'ppsc_participant_' . $participantId;
+        $cacheEnabled = $this->params->has('ppsc_disable_cache') ? !$this->params->get('ppsc_disable_cache') : true;
+        $cacheTime = $this->params->has('ppsc_cache_time') ? intval($this->params->get('ppsc_cache_time')) : self::CACHE_TIME;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->has('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
+        if ($cacheEnabled && !$refresh) {
+            try {
+                $cacheItem = $cache->getItem($cacheKey);
+                if ($cacheItem->isHit()) {
+                    $participant = $cacheItem->get();
+                }
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+            }
+        }
+        if (!$participant) {
+            try {
+                $token = $this->getAccessToken();
+                $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', [
+                    'headers' => ['Authorization' => 'Bearer ' . $token],
+                    'query' => ['participantId' => $participantId]
+                ]);
+                $participant = json_decode($response->getBody()->getContents());
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+                return null;
+            }
+            if ($participant && $cacheEnabled) {
+                $participant->cacheTime = new \DateTime();
+                $cacheItem = $cache->getItem($cacheKey);
+                $cacheItem->expiresAfter($cacheTime);
+                $cacheItem->set($participant);
+                $cache->save($cacheItem);
+            }
         }
         if ($participant) {
             return new PpscParticipant($participant);

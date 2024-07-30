@@ -73,6 +73,8 @@
                     Save and mark as collected
                 {% endif %}
             </button>
+            {% set routePrefix = readOnlyView ? 'read_' : '' %}
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
     {% endif %}
     {{ form_end(collectForm) }}

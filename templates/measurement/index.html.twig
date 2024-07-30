@@ -34,7 +34,6 @@
                     New Physical Measurements
                 {% endif %}
                 <small>
-                    <a href="{{ path(participantRoute, { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a>
                     {% if participant.isPediatric %}
                         <i class="fa fa-child child-icon" title="Pediatric Participant" data-toggle="tooltip"></i>
                     {% endif %}
@@ -44,14 +43,13 @@
                         <button type="submit" class="btn btn-sm btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
                     {% endif %}
                     {% if measurement.canCancel %}
-                        <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel</a>
+                        <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Form</a>
                     {% elseif measurement.canRestore %}
                         <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'restore' }) }}" class="btn btn-sm btn-success">Restore</a>
                     {% endif %}
                 {% endif %}
             </h2>
         </div>
-        {% include 'partials/participant-dl.html.twig' %}
         {% if displayInactiveSiteBanner %}
             {{ macros.displayInactiveSiteBanner('pmb', 3) }}
         {% endif %}
@@ -137,7 +135,7 @@
 
         {% if measurement and measurement.rdrId %}
             <p>
-                <a href="{{ path(participantRoute, { id: participant.id }) }}" class="btn btn-default">Return to participant</a>
+                <a href="{{ path(participantRoute, { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
             </p>
         {% else %}
             <p>

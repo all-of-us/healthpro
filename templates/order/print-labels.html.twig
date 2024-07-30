@@ -29,6 +29,8 @@
                 </div>
                 <div class="text-center">
                     <a href="{{ path(orderRoute ~ 'collect', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-primary">Next</a>
+                    {% set routePrefix = readOnlyView ? 'read_' : '' %}
+                    <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
                     <br><br>
                 </div>
             {% else %}

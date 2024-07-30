@@ -14,7 +14,6 @@
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
         {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
-        <small><a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 </div>
 <p class="lead">
@@ -58,8 +57,6 @@
         {% endif %}
     {% endif %}
 </p>
-
-{% include 'partials/participant-dl.html.twig' %}
 
 {% if order.type == 'kit' or order.type == constant('TUBE_SELECTION_TYPE', order) %}
     {% set steps = {

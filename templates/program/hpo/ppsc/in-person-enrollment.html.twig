@@ -3,7 +3,21 @@
 {% block title %}In Person Enrollment - {% endblock %}
 {% block bodycontainer %}container-fluid px-5{% endblock %}
 {% block body %}
-    {% import 'macros/display-text.html.twig' as macros %}
+{% import 'macros/display-text.html.twig' as macros %}
+{% if cacheEnabled %}
+    <div class="row mb-2">
+        <div class="col-md-12">
+            <div class="float-end">
+                <small>Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}</small>
+                <a href="{{ path('participant', { id: participant.id, refresh: 1 }) }}"
+                   class="btn btn-primary btn-xs">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                    Refresh
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
 <div class="row">
     <div class="col-sm-6">
         {% include 'program/hpo/ppsc/partials/participant-measurement-list.html.twig' %}
@@ -12,4 +26,8 @@
         {% include 'program/hpo/ppsc/partials/participant-orders-list.html.twig' %}
     </div>
 </div>
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('participant') }}
 {% endblock %}

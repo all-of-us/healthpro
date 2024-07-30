@@ -4,13 +4,14 @@ namespace App\Helper;
 
 class PpscParticipant
 {
+    public \DateTime|null $cacheTime;
     public string $id;
     public string|null $ageRange;
     public string|null $race;
     public string|null $sex;
     public string|null $deceasedStatus;
     public string|null $biospecimenSourceSite;
-    public \DateTime|null $dob;
+    public \DateTime|null $dob = null;
     public string|null $awardee;
     public string|null $organization;
     public string|null $site;
@@ -20,7 +21,6 @@ class PpscParticipant
     public string|null $lastName;
     public string|null $firstName;
     public string|null $biobankId;
-    public string|null $enablePediatricEnrollment;
     public string|null $pediatricMeasurementsVersionType;
     public string|null $gender;
     public int|null $age;
@@ -44,6 +44,10 @@ class PpscParticipant
     public function __construct(?\stdClass $ppscParticipant = null)
     {
         if (is_object($ppscParticipant)) {
+            if (!empty($ppscParticipant->cacheTime)) {
+                $this->cacheTime = $ppscParticipant->cacheTime;
+                unset($ppscParticipant->cacheTime);
+            }
             $this->parsePPscParticipant($ppscParticipant);
         }
     }
@@ -135,25 +139,7 @@ class PpscParticipant
         if (!is_object($participant)) {
             return;
         }
-        $this->id = $participant->Participant_ID__c ?? '';
-        $this->ageRange = $participant->ageRange ?? null;
-        $this->race = $participant->race ?? null;
-        $this->sex = $participant->sex ?? null;
-        $this->deceasedStatus = $participant->deceasedStatus ?? null;
-        $this->biospecimenSourceSite = $participant->biospecimenSourceSite ?? null;
-        $this->dob = $participant->dob ?? null;
-        $this->awardee = $participant->awardee ?? null;
-        $this->organization = $participant->organization ?? null;
-        $this->site = $participant->site ?? null;
-        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
-            $this->isPediatric = true;
-        }
-        $this->genderIdentity = $participant->GenderIdentity ?? null;
-        $this->middleName = $participant->MiddleName ?? null;
-        $this->lastName = $participant->LastName ?? null;
-        $this->firstName = $participant->FirstName ?? null;
-        $this->biobankId = $participant->BioBank_ID__c ?? null;
-        $this->enablePediatricEnrollment = $participant->Enable_Pediatric_Enrollment__c ?? null;
+        $this->id = $participant->participantId ?? '';
         // Set dob to DateTime object
         if (isset($participant->dob)) {
             try {
@@ -162,6 +148,22 @@ class PpscParticipant
                 $this->dob = null;
             }
         }
+        $this->ageRange = $participant->ageRange ?? null;
+        $this->race = $participant->race ?? null;
+        $this->sex = $participant->sex ?? null;
+        $this->deceasedStatus = $participant->deceasedStatus ?? null;
+        $this->biospecimenSourceSite = $participant->biospecimenSourceSite ?? null;
+        $this->awardee = $participant->awardee ?? null;
+        $this->organization = $participant->organization ?? null;
+        $this->site = $participant->site ?? null;
+        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
+            $this->isPediatric = true;
+        }
+        $this->genderIdentity = $participant->genderIdentity ?? null;
+        $this->middleName = $participant->middleName ?? null;
+        $this->lastName = $participant->lastName ?? null;
+        $this->firstName = $participant->firstName ?? null;
+        $this->biobankId = $participant->biobankId ?? null;
         $this->age = $this->getAge();
         $this->ageInMonths = $this->getAgeInMonths();
         $this->sexAtBirth = match ($participant->sex ?? null) {

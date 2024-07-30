@@ -681,6 +681,9 @@ table.table-samples td {
 .submission-label {
     margin-right: 10px;
 }
+.order-check-cancel {
+    margin-right: 8px;
+}
 
 /* Help */
 .help-footer {
