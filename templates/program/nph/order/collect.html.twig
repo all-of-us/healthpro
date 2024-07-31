@@ -40,7 +40,7 @@
                 <thead>
                 <tr>
                     <th>Collection Sample</th>
-                    {% if order.orderType != constant('TYPE_STOOL', order) %}
+                    {% if order.orderType != constant('TYPE_STOOL', order) and order.orderType != constant('TYPE_STOOL_2', order) %}
                         <th>Collection Time</th>
                     {% endif %}
                     {% if order.orderType == constant('TYPE_24URINE', order) %}
