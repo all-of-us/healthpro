@@ -123,6 +123,11 @@ class EnvironmentService
         return self::$timezoneOptions;
     }
 
+    public function getPpscEnv($ppscEnv): ?string
+    {
+        return $ppscEnv ?: self::$hpoPpscDefaultEnvs[$this->values['env']];
+    }
+
     protected function loadConfiguration($override = [])
     {
         // default two-factor setting
@@ -164,10 +169,5 @@ class EnvironmentService
         foreach ($override as $key => $val) {
             $this->configuration[$key] = $val;
         }
-    }
-
-    public function getPpscEnv($ppscEnv): ?string
-    {
-        return $ppscEnv ?: self::$hpoPpscDefaultEnvs[$this->values['env']];
     }
 }

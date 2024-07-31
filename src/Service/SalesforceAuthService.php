@@ -67,7 +67,7 @@ class SalesforceAuthService
 
     private function getParams($field): string|null
     {
-        $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'),);
+        $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'));
         return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
     }
 }
