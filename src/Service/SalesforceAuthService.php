@@ -9,25 +9,21 @@ use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SalesforceAuthService
 {
     private RequestStack $requestStack;
     private GenericProvider $provider;
     private ContainerBagInterface $params;
-    private SessionInterface $session;
     private EnvironmentService $env;
 
     public function __construct(
         RequestStack $requestStack,
         ContainerBagInterface $params,
-        SessionInterface $session,
         EnvironmentService $env
     ) {
         $this->requestStack = $requestStack;
         $this->params = $params;
-        $this->session = $session;
         $this->env = $env;
         $this->provider = new GenericProvider([
             'clientId' => $this->getParams('salesforce_client_id'),
@@ -71,7 +67,7 @@ class SalesforceAuthService
 
     private function getParams($field): string|null
     {
-        $ppscEnv = $this->env->getPpscEnv($this->session->get('ppscEnv'));
+        $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'),);
         return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
     }
 }
