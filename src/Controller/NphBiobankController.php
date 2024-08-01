@@ -312,10 +312,11 @@ class NphBiobankController extends BaseController
         $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $isDietStartedOrCompleted = $nphOrderService->isDietStartedOrCompleted($participant->{'module' . $order->getModule() . 'DietPeriod'});
-        $isSampleDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$isDietStartedOrCompleted);
-        $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $isSampleDisabled : true;
-        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
+        $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
+        $canGenerateOrders = $nphOrderService->canGenerateOrders($participant->id, $order->getModule(), $dietPeriod, $participant->module);
+        $isSampleDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
+        $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2 ? $isSampleDisabled : true;
+        $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2 ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
             $sampleData,

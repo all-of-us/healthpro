@@ -15,6 +15,10 @@ use Symfony\Component\Validator\Constraints;
 class NphOrderType extends AbstractType
 {
     private const STOOL_ST1 = 'ST1';
+    private const STOOL_ST5 = 'ST5';
+    private const STOOL_KIT_FIELD = 'stoolKit';
+    private const STOOL_KIT_FIELD_2 = 'stoolKit2';
+    private const STOOL_KIT_TUBES_2 = ['ST5', 'ST6', 'ST7', 'ST8'];
     private const TISSUE_CONSENT_SAMPLES = ['HAIR', 'NAILB', 'NAILL'];
     private const CONSENT_DISABLE_SAMPLE_ATTR = [
         'disabled' => true,
@@ -32,51 +36,35 @@ class NphOrderType extends AbstractType
         $timePointSamples = $options['timePointSamples'];
         $timePoints = $options['timePoints'];
         $isStoolKitDisabled = !empty($ordersData['stoolKit']);
+        $ordersKitData = $isStoolKitDisabled ? $ordersData['stoolKit'] : null;
+        $isStoolKit2Disabled = !$isStoolKitDisabled || !empty($ordersData['stoolKit2']);
+        $ordersKit2Data = !empty($ordersData['stoolKit2']) ? $ordersData['stoolKit2'] : null;
         foreach ($timePointSamples as $timePoint => $samples) {
             foreach ($samples as $sampleCode => $sample) {
                 if ($sampleCode === self::STOOL_ST1) {
-                    $stoolKitAttributes = [
-                        'class' => 'stool-id',
-                        'placeholder' => 'Scan Kit ID',
-                        'disabled' => $isStoolKitDisabled,
-                        'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
-                        'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE,
-                        'data-stool-type' => 'kit'
-                    ];
-                    if ($isStoolKitDisabled) {
-                        $stoolKitAttributes['value'] = $ordersData['stoolKit'];
-                    }
-                    $builder->add('stoolKit', Type\TextType::class, [
-                        'label' => 'Stool Kit ID',
-                        'required' => false,
-                        'constraints' => [
-                            new Constraints\Type('string'),
-                            new Constraints\Regex([
-                                'pattern' => self::STOOL_KIT_ID_PATTERN,
-                                'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
-                            ]),
-                            new Constraints\Callback(function ($value, $context) {
-                                $formData = $context->getRoot()->getData();
-                                if ($this->isStoolChecked($formData) && empty($value)) {
-                                    $context->buildViolation('Please enter Stool KIT ID')->addViolation();
-                                }
-                            })
-                        ],
-                        'attr' => $stoolKitAttributes
-                    ]);
+                    $this->addStoolKitField($builder, $isStoolKitDisabled, $ordersKitData, self::STOOL_KIT_FIELD);
+                }
+                if ($sampleCode === self::STOOL_ST5) {
+                    $this->addStoolKitField($builder, $isStoolKit2Disabled, $ordersKit2Data, self::STOOL_KIT_FIELD_2);
                 }
                 if (in_array($sampleCode, $options['stoolSamples'])) {
+                    $disableStoolKit = $isStoolKitDisabled;
+                    $stoolKitField = self::STOOL_KIT_FIELD;
+                    if (in_array($sampleCode, self::STOOL_KIT_TUBES_2)) {
+                        $disableStoolKit = !$isStoolKitDisabled || $isStoolKit2Disabled;
+                        $stoolKitField = self::STOOL_KIT_FIELD_2;
+                    }
                     $stoolTubeAttributes = [
                         'class' => 'stool-id tube-id',
                         'placeholder' => 'Scan Tube',
-                        'disabled' => $isStoolKitDisabled,
+                        'disabled' => $disableStoolKit,
                         'data-parsley-pattern' => self::STOOL_BARCODE_ID_PATTERN,
                         'data-parsley-pattern-message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE,
                         'data-parsley-unique' => $sampleCode,
                         'data-parsley-unique-message' => 'Please enter unique Stool Tube IDs.',
                         'data-stool-type' => 'tube'
                     ];
-                    if ($isStoolKitDisabled && isset($ordersData[$sampleCode])) {
+                    if ($disableStoolKit && isset($ordersData[$sampleCode])) {
                         $stoolTubeAttributes['value'] = $ordersData[$sampleCode];
                     }
                     $builder->add($sampleCode, Type\TextType::class, [
@@ -88,9 +76,9 @@ class NphOrderType extends AbstractType
                                 'pattern' => self::STOOL_BARCODE_ID_PATTERN,
                                 'message' => self::STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE
                             ]),
-                            new Constraints\Callback(function ($value, $context) {
+                            new Constraints\Callback(function ($value, $context) use ($stoolKitField) {
                                 $formData = $context->getRoot()->getData();
-                                if ($this->isStoolChecked($formData) && empty($value)) {
+                                if ($this->isStoolChecked($formData, $stoolKitField) && empty($value)) {
                                     $context->buildViolation('Please enter Stool Tube ID')->addViolation();
                                 }
                             })
@@ -130,6 +118,10 @@ class NphOrderType extends AbstractType
                             default:
                                 break;
                         }
+                    } elseif ($val === NphSample::SAMPLE_STOOL_2 && empty($ordersData['stoolKit'])) {
+                        $attr['disabled'] = true;
+                        $attr['class'] = 'sample-disabled';
+                        $attr['checked'] = false;
                     }
                     return $attr;
                 }
@@ -187,13 +179,14 @@ class NphOrderType extends AbstractType
         ]);
     }
 
-    private function isStoolChecked(array $formData): bool
+    private function isStoolChecked(array $formData, string $fieldName): bool
     {
+        $sampleStool = $fieldName === self::STOOL_KIT_FIELD ? NphSample::SAMPLE_STOOL : NphSample::SAMPLE_STOOL_2;
         foreach ($formData as $timePoint => $samples) {
             if (!empty($samples) && is_array($samples)) {
                 if (in_array($timePoint, NphSample::STOOL_TIMEPOINTS)) {
                     foreach ($samples as $sample) {
-                        if ($sample === NphSample::SAMPLE_STOOL) {
+                        if ($sample === $sampleStool) {
                             return true;
                         }
                     }
@@ -201,5 +194,38 @@ class NphOrderType extends AbstractType
             }
         }
         return false;
+    }
+
+    private function addStoolKitField(&$builder, $isStoolKitDisabled, $stoolKitData, $fieldName): void
+    {
+        $stoolKitAttributes = [
+            'class' => 'stool-id',
+            'placeholder' => 'Scan Kit ID',
+            'disabled' => $isStoolKitDisabled,
+            'data-parsley-pattern' => self::STOOL_KIT_ID_PATTERN,
+            'data-parsley-pattern-message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE,
+            'data-stool-type' => 'kit'
+        ];
+        if ($isStoolKitDisabled) {
+            $stoolKitAttributes['value'] = $stoolKitData;
+        }
+        $builder->add($fieldName, Type\TextType::class, [
+            'label' => 'Stool Kit ID',
+            'required' => false,
+            'constraints' => [
+                new Constraints\Type('string'),
+                new Constraints\Regex([
+                    'pattern' => self::STOOL_KIT_ID_PATTERN,
+                    'message' => self::STOOL_KIT_ID_PATTERN_ERROR_MESSAGE
+                ]),
+                new Constraints\Callback(function ($value, $context) use ($fieldName) {
+                    $formData = $context->getRoot()->getData();
+                    if ($this->isStoolChecked($formData, $fieldName) && empty($value)) {
+                        $context->buildViolation('Please enter Stool KIT ID')->addViolation();
+                    }
+                })
+            ],
+            'attr' => $stoolKitAttributes
+        ]);
     }
 }

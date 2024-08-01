@@ -22,7 +22,7 @@
             {{ form_errors(orderCollectForm) }}
             <div class="row">
                 <div class="col-sm-6">
-                    {% if order.orderType == constant('TYPE_STOOL', order) %}
+                    {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
                         <div class="form-group {% if not orderCollectForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
                             {{ form_label(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
                             {{ form_widget(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
@@ -40,7 +40,7 @@
                 <thead>
                 <tr>
                     <th>Collection Sample</th>
-                    {% if order.orderType != constant('TYPE_STOOL', order) %}
+                    {% if order.orderType != constant('TYPE_STOOL', order) and order.orderType != constant('TYPE_STOOL_2', order) %}
                         <th>Collection Time</th>
                     {% endif %}
                     {% if order.orderType == constant('TYPE_24URINE', order) %}
@@ -156,7 +156,7 @@
                     </div>
                 </div>
             {% endif %}
-            {% if order.orderType == constant('TYPE_STOOL', order) %}
+            {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
                 <hr>
                 <h4>
                     Bristol Stool Chart Questions
