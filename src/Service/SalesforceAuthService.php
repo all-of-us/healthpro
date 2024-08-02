@@ -15,11 +15,16 @@ class SalesforceAuthService
     private RequestStack $requestStack;
     private GenericProvider $provider;
     private ContainerBagInterface $params;
+    private EnvironmentService $env;
 
-    public function __construct(RequestStack $requestStack, ContainerBagInterface $params)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        ContainerBagInterface $params,
+        EnvironmentService $env
+    ) {
         $this->requestStack = $requestStack;
         $this->params = $params;
+        $this->env = $env;
         $this->provider = new GenericProvider([
             'clientId' => $this->getParams('salesforce_client_id'),
             'clientSecret' => $this->getParams('salesforce_client_secret'),
@@ -62,6 +67,7 @@ class SalesforceAuthService
 
     private function getParams($field): string|null
     {
-        return $this->params->has($field) ? $this->params->get($field) : null;
+        $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'));
+        return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
     }
 }

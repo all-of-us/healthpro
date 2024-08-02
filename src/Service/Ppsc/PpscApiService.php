@@ -4,8 +4,10 @@ namespace App\Service\Ppsc;
 
 use App\Helper\PpscParticipant;
 use App\HttpClient;
+use App\Service\EnvironmentService;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class PpscApiService
 {
@@ -14,6 +16,8 @@ class PpscApiService
 
     public HttpClient $client;
     private ParameterBagInterface $params;
+    private SessionInterface $session;
+    private EnvironmentService $env;
     private string|null $tokenUrl;
     private string|null $clientId;
     private string|null $clientSecret;
@@ -21,9 +25,11 @@ class PpscApiService
     private string|null $accessToken = null;
     private string|null $endpoint;
 
-    public function __construct(ParameterBagInterface $params)
+    public function __construct(ParameterBagInterface $params, SessionInterface $session, EnvironmentService $env)
     {
         $this->params = $params;
+        $this->session = $session;
+        $this->env = $env;
         $this->client = new HttpClient(['cookies' => true]);
         $this->endpoint = $this->getParams('ppsc_endpoint');
         $this->tokenUrl = $this->getParams('ppsc_token_url');
@@ -127,6 +133,7 @@ class PpscApiService
 
     private function getParams($field): string|null
     {
-        return $this->params->has($field) ? $this->params->get($field) : null;
+        $ppscEnv = $this->env->getPpscEnv($this->session->get('ppscEnv'));
+        return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
     }
 }
