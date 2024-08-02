@@ -321,20 +321,16 @@ class NphBiobankController extends BaseController
             NphSampleFinalizeType::class,
             $sampleData,
             ['sample' => $sampleCode, 'orderType' => $order->getOrderType(), 'timeZone' => $this->getSecurityUser()
-                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
-                $isFormDisabled, 'nphSample' => $sample, 'disableMetadataFields' =>
-                $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
-                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(), 'disableFreezeTs' => $isFreezeTsDisabled
+                ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' => false, 'nphSample' => $sample,
+                'disableMetadataFields' => $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
+                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(), 'disableFreezeTs' => $isFreezeTsDisabled, 'biobankView' => true, 'isFormDisabled' => $isFormDisabled
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
-            if ($sample->isDisabled()) {
-                throw $this->createAccessDeniedException();
-            }
             $formData = $sampleData = $sampleFinalizeForm->getData();
             if (!empty($nphOrderService->getAliquots($sampleCode))) {
-                if ($sample->getModifyType() !== NphSample::UNLOCK && $nphOrderService->hasAtLeastOneAliquotSample(
+                if ($nphOrderService->hasAtLeastOneAliquotSample(
                     $formData,
                     $sampleCode
                 ) === false) {

@@ -528,7 +528,7 @@ class NphOrderService
         if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             return $this->saveStoolSampleFinalization($formData, $sample, $biobankFinalization);
         }
-        return $this->saveSampleFinalization($formData, $sample);
+        return $this->saveSampleFinalization($formData, $sample, $biobankFinalization);
     }
 
     public function getExistingSampleData(NphSample $sample): array
@@ -1206,13 +1206,14 @@ class NphOrderService
         return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
     }
 
-    private function saveSampleFinalization(array $formData, NphSample $sample): bool
+    private function saveSampleFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
-            $this->saveSampleFinalizationData($formData, $sample);
-            if (!$this->sendToRdr($sample)) {
+            $this->saveSampleFinalizationData($formData, $sample, $biobankFinalization);
+            $modifyType = $biobankFinalization ? NphSample::UNLOCK : null;
+            if (!$this->sendToRdr($sample, $modifyType)) {
                 throw new \Exception('Failed sending to RDR');
             }
             $connection->commit();
@@ -1283,7 +1284,7 @@ class NphOrderService
         return false;
     }
 
-    private function saveSampleFinalizationData(array $formData, NphSample $sample): void
+    private function saveSampleFinalizationData(array $formData, NphSample $sample, bool $biobankFinalization = false): void
     {
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();
@@ -1295,7 +1296,7 @@ class NphOrderService
         if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $sample->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
             $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity', 'totalCollectionVolume']);
         }
-        $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata);
+        $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata, $biobankFinalization);
 
         // Aliquot status is only set while editing a sample
         if ($sampleModifyType === NphSample::UNLOCK) {
