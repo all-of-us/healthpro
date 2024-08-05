@@ -422,7 +422,7 @@
                         {% endif %}
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
-                    {% if sample.modifyType == 'unlock' %}
+                    {% if sample.modifyType == 'unlock' and not biobankView %}
                         <div class="pull-right">
                             {{ form_start(revertForm, { 'action': path('nph_sample_revert', { participantId: participant.id, orderId: order.id, sampleId: sample.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
                             {{ form_errors(revertForm) }}
