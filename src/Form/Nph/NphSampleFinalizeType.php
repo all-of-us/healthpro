@@ -259,7 +259,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
+                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() === NphSample::CANCEL,
                         'attr' => [
                             'class' => 'sample-cancel-checkbox',
                             'data-aliquot-ts-id' => "{$finalizedAliquot->getAliquotCode()}AliquotTs_{$key}"
@@ -272,7 +272,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() !== NphSample::CANCEL
                     ]
                 );
             }
