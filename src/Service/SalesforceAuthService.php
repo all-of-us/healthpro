@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class SalesforceAuthService
 {
     private RequestStack $requestStack;
-    private GenericProvider $provider;
+    private ?GenericProvider $provider = null;
     private ContainerBagInterface $params;
     private EnvironmentService $env;
 
@@ -25,30 +25,21 @@ class SalesforceAuthService
         $this->requestStack = $requestStack;
         $this->params = $params;
         $this->env = $env;
-        $this->provider = new GenericProvider([
-            'clientId' => $this->getParams('salesforce_client_id'),
-            'clientSecret' => $this->getParams('salesforce_client_secret'),
-            'redirectUri' => $this->getParams('salesforce_redirect_uri'),
-            'urlAuthorize' => $this->getParams('salesforce_url_authorize'),
-            'urlAccessToken' => $this->getParams('salesforce_url_access_token'),
-            'urlResourceOwnerDetails' => $this->getParams('salesforce_url_resource_owner_details'),
-            'scopes' => $this->getParams('salesforce_scopes')
-        ]);
     }
 
     public function getAuthorizationUrl(): ?string
     {
-        return $this->provider->getAuthorizationUrl();
+        return $this->getProvider()->getAuthorizationUrl();
     }
 
     public function getAccessToken($code): AccessTokenInterface|AccessToken
     {
-        return $this->provider->getAccessToken('authorization_code', ['code' => $code]);
+        return $this->getProvider()->getAccessToken('authorization_code', ['code' => $code]);
     }
 
     public function getResourceOwner($token): ResourceOwnerInterface
     {
-        return $this->provider->getResourceOwner($token);
+        return $this->getProvider()->getResourceOwner($token);
     }
 
     public function processAuth($credentials): SalesforceUser
@@ -69,5 +60,21 @@ class SalesforceAuthService
     {
         $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'));
         return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
+    }
+
+    private function getProvider(): GenericProvider
+    {
+        if ($this->provider === null) {
+            $this->provider = new GenericProvider([
+                'clientId' => $this->getParams('salesforce_client_id'),
+                'clientSecret' => $this->getParams('salesforce_client_secret'),
+                'redirectUri' => $this->getParams('salesforce_redirect_uri'),
+                'urlAuthorize' => $this->getParams('salesforce_url_authorize'),
+                'urlAccessToken' => $this->getParams('salesforce_url_access_token'),
+                'urlResourceOwnerDetails' => $this->getParams('salesforce_url_resource_owner_details'),
+                'scopes' => $this->getParams('salesforce_scopes')
+            ]);
+        }
+        return $this->provider;
     }
 }
