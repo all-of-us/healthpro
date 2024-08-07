@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#sample_finalize_btn").on("click", function (e) {
+    $("#sample_finalize_btn, #sample_refinalize_btn").on("click", function (e) {
         e.preventDefault();
         if ($(".sample-finalize-form").parsley().validate()) {
             $("#confirmation_modal").modal("show");

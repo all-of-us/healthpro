@@ -95,6 +95,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $idData,
+                    'disabled' => $options['isFormDisabled']
                 ]);
 
                 $builder->add("{$aliquotCode}AliquotTs", Type\CollectionType::class, [
@@ -141,6 +142,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $tsData,
+                    'disabled' => $options['isFormDisabled']
                 ]);
                 if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
                     foreach ($aliquot['metadataFields'] as $metadataField) {
@@ -181,6 +183,7 @@ class NphSampleFinalizeType extends NphOrderForm
                             'allow_add' => true,
                             'allow_delete' => true,
                             'data' => $metadataValue,
+                            'disabled' => $options['isFormDisabled']
                         ]);
                     }
                 }
@@ -240,7 +243,8 @@ class NphSampleFinalizeType extends NphOrderForm
                     'data' => $volumeData,
                     'attr' => [
                         'readonly' => $aliquot['expectedVolume'] === null
-                    ]
+                    ],
+                    'disabled' => $options['isFormDisabled']
                 ]);
             }
         }
@@ -255,7 +259,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
+                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() === NphSample::CANCEL,
                         'attr' => [
                             'class' => 'sample-cancel-checkbox',
                             'data-aliquot-ts-id' => "{$finalizedAliquot->getAliquotCode()}AliquotTs_{$key}"
@@ -268,7 +272,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() !== NphSample::CANCEL
                     ]
                 );
             }
@@ -295,7 +299,9 @@ class NphSampleFinalizeType extends NphOrderForm
             'disableStoolCollectedTs' => null,
             'orderCreatedTs' => null,
             'module' => null,
-            'disableFreezeTs' => null
+            'disableFreezeTs' => null,
+            'biobankView' => null,
+            'isFormDisabled' => false
         ]);
     }
 

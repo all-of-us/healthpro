@@ -4,13 +4,13 @@
         {% if biobankView %}
             <i class="fa fa-exclamation-circle"></i>
             <strong class="warning-text">
-                Finalized
+                {{ sample.modifyType == 'edited' and sample.biobankFinalized ? 'Refinalized' : 'Finalized' }}
                 by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                 on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
             </strong>
         {% else %}
             <strong>
-                Finalized
+                {{ sample.modifyType == 'edited' and sample.biobankFinalized ? 'Refinalized' : 'Finalized' }}
                 by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                 on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
             </strong>
