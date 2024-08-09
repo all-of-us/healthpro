@@ -160,10 +160,10 @@ class OrderController extends BaseController
                 $order->setBiobankId($participant->biobankId);
                 $order->setCreatedTs(new \DateTime());
                 $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                if ($session->get('siteType') !== 'dv' || (float) $params->get('order_samples_version') <= 3.1) {
-                    $order->setVersion($order->getCurrentVersion());
-                } elseif ($session->get('siteType') === 'dv' && $params->has('order_samples_version_dv') && (float) $params->get('order_samples_version_dv') <= 3.1) {
+                if ($session->get('siteType') === 'dv' && $params->has('order_samples_version_dv')) {
                     $order->setVersion($params->get('order_samples_version_dv'));
+                } else {
+                    $order->setVersion($order->getCurrentVersion());
                 }
                 $order->setAgeInMonths($participant->ageInMonths);
                 if ($session->get('orderType') === 'hpo') {
@@ -172,7 +172,9 @@ class OrderController extends BaseController
                 if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
                     $order->setType('diversion');
                 }
-                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false && $params->has('order_samples_version_dv') && (float) $params->get('order_samples_version_dv') > 3.1) {
+                $disableTubeSelect = $params->has('order_disable_dv_tube_select') && $params->get('order_disable_dv_tube_select');
+                if (!$disableTubeSelect and $session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false &&
+                    $params->has('order_samples_version_dv') && (float) $params->get('order_samples_version_dv') > 3.1) {
                     $order->setVersion(null);
                     $order->setType(Order::TUBE_SELECTION_TYPE);
                 }
@@ -272,6 +274,18 @@ class OrderController extends BaseController
         $wasNextStepAvailable = in_array($nextStep, $order->getAvailableSteps());
         if (!in_array('collect', $order->getAvailableSteps())) {
             return $this->redirectToRoute('order', [
+                'participantId' => $participantId,
+                'orderId' => $orderId
+            ]);
+        }
+        $disableTubeSelect = $params->has('order_disable_dv_tube_select') && $params->get('order_disable_dv_tube_select');
+        if ($session->get('siteType') === 'dv' && $order->getVersion() === null && $disableTubeSelect) {
+            $order->setVersion($params->get('order_samples_version_dv'));
+            $order->setType(Order::ORDER_TYPE_KIT);
+            $this->em->persist($order);
+            $this->em->flush();
+            $this->loggerService->log(Log::ORDER_EDIT, $orderId);
+            return $this->redirectToRoute('order_collect', [
                 'participantId' => $participantId,
                 'orderId' => $orderId
             ]);

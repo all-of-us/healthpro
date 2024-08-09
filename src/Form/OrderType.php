@@ -66,7 +66,9 @@ class OrderType extends AbstractType
                 unset($samples[$sampleName]);
             }
         }
-        if ($options['step'] === Order::ORDER_STEP_COLLECTED && (isset($options['dvSite']) && $options['dvSite'] === true)
+        $disableTubeSelect = isset($options['params']) && $options['params']->has('order_disable_dv_tube_select') && $options['params']->get('order_disable_dv_tube_select');
+        if (!$disableTubeSelect
+            && $options['step'] === Order::ORDER_STEP_COLLECTED && (isset($options['dvSite']) && $options['dvSite'] === true)
             && ($options['order']->getType() === Order::TUBE_SELECTION_TYPE || (isset($options['params']) && $options['params']->has('order_samples_version_dv') && $options['params']->get('order_samples_version_dv') > 3.1))) {
             if ($options['order']->getVersion() === null) {
                 unset($samples);

@@ -330,7 +330,7 @@
                             <tr>
                                 <td class="col-md-4 required aliquot-tube-td" id="aliquot-tube">Matrix Aliquot Tube/Aliquot Container</td>
                                 <td class="col-md-4 required">Aliquot Time</td>
-                                <td class="col-md-2 required">Volume</td>
+                                <td class="col-md-2 {% if order.orderType != constant('App\\Entity\\NphOrder::TYPE_HAIR') and order.orderType != constant('App\\Entity\\NphOrder::TYPE_NAIL') %} required {% endif %}">Volume</td>
                                 <td class="col-md-1"></td>
                                 {% if sample.modifyType == constant('UNLOCK', sample) %}
                                     <td class="col-md-1">Remove&nbsp;&nbsp;Restore</td>
@@ -417,9 +417,12 @@
                         {% else %}
                             <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                         {% endif %}
+                        {% if isFormDisabled and biobankView  %}
+                            <button type="submit" class="btn btn-success pull-right" id="sample_refinalize_btn">Resubmit</button>
+                        {% endif %}
                     </p>
                     {{ form_end(sampleFinalizeForm) }}
-                    {% if sample.modifyType == 'unlock' %}
+                    {% if sample.modifyType == 'unlock' and not biobankView %}
                         <div class="pull-right">
                             {{ form_start(revertForm, { 'action': path('nph_sample_revert', { participantId: participant.id, orderId: order.id, sampleId: sample.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
                             {{ form_errors(revertForm) }}

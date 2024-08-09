@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class HpoPpscController extends BaseController
@@ -27,7 +28,8 @@ class HpoPpscController extends BaseController
         Request $request,
         PpscApiService $ppscApiService,
         MeasurementService $measurementService,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        SessionInterface $session,
     ): Response {
         $refresh = $request->query->get('refresh');
         $participant = $ppscApiService->getParticipantById($id, $refresh);
@@ -38,12 +40,14 @@ class HpoPpscController extends BaseController
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
         $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';
         $cacheEnabled = $params->has('ppsc_disable_cache') ? !$params->get('ppsc_disable_cache') : true;
+        $isDVType = $session->get('siteType') === 'dv';
         return $this->render('/program/hpo/ppsc/in-person-enrollment.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'measurements' => $measurements,
             'evaluationUrl' => $evaluationUrl,
-            'cacheEnabled' => $cacheEnabled
+            'cacheEnabled' => $cacheEnabled,
+            'isDVType' => $isDVType
         ]);
     }
 }
