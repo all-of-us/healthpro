@@ -417,8 +417,8 @@
                         {% else %}
                             <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                         {% endif %}
-                        {% if isFormDisabled and biobankView  %}
-                            <button type="submit" class="btn btn-success pull-right" id="sample_refinalize_btn">Resubmit</button>
+                        {% if biobankView  %}
+                            <button type="submit" class="btn btn-success pull-right" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
                         {% endif %}
                     </p>
                     {{ form_end(sampleFinalizeForm) }}

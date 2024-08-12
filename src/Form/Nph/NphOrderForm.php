@@ -90,7 +90,7 @@ class NphOrderForm extends AbstractType
             'label' => 'Notes',
             'required' => false,
             'constraints' => new Constraints\Type('string'),
-            'disabled' => !$options['biobankView'] && $disabled
+            'disabled' => $disabled
         ]);
     }
 

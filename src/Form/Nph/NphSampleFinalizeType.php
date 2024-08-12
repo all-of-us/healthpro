@@ -16,7 +16,9 @@ class NphSampleFinalizeType extends NphOrderForm
         $sample = $options['sample'];
         $orderType = $options['orderType'];
 
-        $this->addCollectedTimeAndNoteFields($builder, $options, $sample);
+        $disableBiobankNotesField = $options['biobankView'] && empty($options['nphSample']->getRdrId());
+
+        $this->addCollectedTimeAndNoteFields($builder, $options, $sample, $disableBiobankNotesField);
 
         $disableMetadataFields = $options['disableMetadataFields'] && $options['nphSample']->getModifyType() !==
             NphSample::UNLOCK;
