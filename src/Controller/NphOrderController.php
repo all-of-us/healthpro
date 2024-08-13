@@ -340,7 +340,8 @@ class NphOrderController extends BaseController
             'isFormDisabled' => $isFormDisabled,
             'visitDiet' => $nphOrderService->getVisitDiet(),
             'order' => $order,
-            'isFreezeTsDisabled' => $isFreezeTsDisabled
+            'isFreezeTsDisabled' => $isFreezeTsDisabled,
+            'allowResubmit' => false
         ]);
     }
 

@@ -83,14 +83,14 @@ class NphOrderForm extends AbstractType
                     'readonly' => $options['disableStoolCollectedTs'],
                     'data-parsley-custom-date-comparison' => $orderCreatedTs->format('m/d/Y g:i A')
                 ],
-                'disabled' => $options['isFormDisabled'] || $disabled
+                'disabled' => $disabled
             ]);
         }
         $builder->add("{$sample}Notes", Type\TextareaType::class, [
             'label' => 'Notes',
             'required' => false,
             'constraints' => new Constraints\Type('string'),
-            'disabled' => !$options['biobankView'] && $disabled
+            'disabled' => $disabled
         ]);
     }
 
