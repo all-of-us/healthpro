@@ -1451,7 +1451,7 @@ class NphOrderService
                     $sample->setModifiedSite($sample->getFinalizedSite());
                     $sample->setModifyReason(NphSample::BIOBANK_MODIFY_REASON);
                 } else {
-                    $sample->setModifiedSite($this->site);
+                    $sample->setModifiedSite($this->site ?? $sample->getFinalizedSite());
                 }
                 $sample->setModifiedTs(new DateTime());
                 $sample->setModifiedTimezoneId($this->getTimezoneid());

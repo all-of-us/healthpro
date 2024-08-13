@@ -412,6 +412,7 @@
                         </button>
                         {% if biobankView %}
                             <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                            <button type="button" class="btn btn-success pull-right" disabled>Resubmit</button>
                         {% else %}
                             <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                         {% endif %}

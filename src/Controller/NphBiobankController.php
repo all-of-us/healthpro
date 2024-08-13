@@ -427,7 +427,7 @@ class NphBiobankController extends BaseController
             'isFormDisabled' => $isFormDisabled,
             'visitDiet' => $nphOrderService->getVisitDiet(),
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
-            'allowResubmit' => $isFormDisabled
+            'allowResubmit' => $isFormDisabled && $sample->getModifyType() !== NphSample::UNLOCK
         ]);
     }
 
