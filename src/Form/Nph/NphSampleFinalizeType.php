@@ -16,9 +16,7 @@ class NphSampleFinalizeType extends NphOrderForm
         $sample = $options['sample'];
         $orderType = $options['orderType'];
 
-        $disableBiobankNotesField = $options['biobankView'] && empty($options['nphSample']->getRdrId());
-
-        $this->addCollectedTimeAndNoteFields($builder, $options, $sample, $disableBiobankNotesField);
+        $this->addCollectedTimeAndNoteFields($builder, $options, $sample);
 
         $disableMetadataFields = $options['disableMetadataFields'] && $options['nphSample']->getModifyType() !==
             NphSample::UNLOCK;
@@ -97,7 +95,6 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $idData,
-                    'disabled' => $options['isFormDisabled']
                 ]);
 
                 $builder->add("{$aliquotCode}AliquotTs", Type\CollectionType::class, [
@@ -144,7 +141,6 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $tsData,
-                    'disabled' => $options['isFormDisabled']
                 ]);
                 if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
                     foreach ($aliquot['metadataFields'] as $metadataField) {
@@ -185,7 +181,6 @@ class NphSampleFinalizeType extends NphOrderForm
                             'allow_add' => true,
                             'allow_delete' => true,
                             'data' => $metadataValue,
-                            'disabled' => $options['isFormDisabled']
                         ]);
                     }
                 }
@@ -247,7 +242,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'attr' => [
                         'readonly' => $aliquot['expectedVolume'] === null
                     ],
-                    'disabled' => $options['isFormDisabled'] || $isHairOrNailOrder
+                    'disabled' => $isHairOrNailOrder
                 ]);
             }
         }
@@ -262,11 +257,11 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() === NphSample::CANCEL,
+                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
                         'attr' => [
                             'class' => 'sample-cancel-checkbox',
                             'data-aliquot-ts-id' => "{$finalizedAliquot->getAliquotCode()}AliquotTs_{$key}"
-                         ]
+                        ]
                     ]
                 );
                 $builder->add(
@@ -275,7 +270,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
                     ]
                 );
             }
@@ -303,8 +298,7 @@ class NphSampleFinalizeType extends NphOrderForm
             'orderCreatedTs' => null,
             'module' => null,
             'disableFreezeTs' => null,
-            'biobankView' => null,
-            'isFormDisabled' => false
+            'biobankView' => false
         ]);
     }
 
