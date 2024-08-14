@@ -2207,8 +2207,8 @@ class WorkQueue
                 'label' => 'Has Core Data',
                 'options' => [
                     'View All' => '',
-                    'Has Core Data' => '1',
-                    'Does Not Have Core Data' => '0'
+                    'Has Core Data' => 'YES',
+                    'Does Not Have Core Data' => 'NO'
                 ]
             ]
         ],
