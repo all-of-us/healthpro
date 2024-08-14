@@ -6,13 +6,23 @@
             <strong class="warning-text">
                 {{ sample.modifyType == 'edited' and sample.biobankFinalized ? 'Refinalized' : 'Finalized' }}
                 by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
-                on {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
+                on
+                {% if sample.biobankFinalized %}
+                    {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
+                {% else %}
+                    {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
+                {% endif %}
             </strong>
         {% else %}
             <strong>
                 {{ sample.modifyType == 'edited' and sample.biobankFinalized ? 'Refinalized' : 'Finalized' }}
                 by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
-                on {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                on
+                {% if sample.biobankFinalized %}
+                    {{ sample.modifiedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                {% else %}
+                    {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                {% endif %}
             </strong>
         {% endif %}
     </div>

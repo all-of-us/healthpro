@@ -1245,9 +1245,7 @@ class NphOrderService
             if ($notes) {
                 $sample->setFinalizedNotes($notes);
             }
-            if (!$sample->getBiobankFinalized()) {
-                $sample->setBiobankFinalized(true);
-            }
+            $sample->setBiobankFinalized(true);
             $this->em->persist($sample);
             $this->em->flush();
             if (!$this->sendToRdr($sample, NphSample::UNLOCK, true)) {
@@ -1381,9 +1379,7 @@ class NphOrderService
         if ($sampleMetadata) {
             $sample->setSampleMetadata($sampleMetadata);
         }
-        if (!$sample->getBiobankFinalized()) {
-            $sample->setBiobankFinalized($biobankFinalization);
-        }
+        $sample->setBiobankFinalized($biobankFinalization);
         $this->em->persist($sample);
         $this->em->flush();
     }
