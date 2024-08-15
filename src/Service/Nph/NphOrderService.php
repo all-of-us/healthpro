@@ -528,7 +528,12 @@ class NphOrderService
         if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
             return $this->saveStoolSampleFinalization($formData, $sample, $biobankFinalization);
         }
-        return $this->saveSampleFinalization($formData, $sample);
+        return $this->saveSampleFinalization($formData, $sample, $biobankFinalization);
+    }
+
+    public function saveReFinalization(?string $notes, NphSample $sample): bool
+    {
+        return $this->saveSampleReFinalization($notes, $sample);
     }
 
     public function getExistingSampleData(NphSample $sample): array
@@ -695,7 +700,7 @@ class NphOrderService
         return $this->hasDuplicateIds($totalAliquotCodes);
     }
 
-    public function getRdrObject(NphOrder $order, NphSample $sample, string $type = 'create'): \stdClass
+    public function getRdrObject(NphOrder $order, NphSample $sample, string $type = 'create', bool $biobankUser = false): \stdClass
     {
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $order->getParticipantId();
@@ -764,11 +769,19 @@ class NphOrderService
         ];
         $obj->notes = $notes;
         if ($type === 'amend') {
-            $obj->amendedReason = $sample->getModifyReason();
-            $obj->amendedInfo = $this->getUserSiteData(
-                $sample->getModifiedUser() ? $sample->getModifiedUser()->getEmail() : $this->user->getEmail(),
-                NphSite::getSiteIdWithPrefix($sample->getModifiedSite() ?? $this->site)
-            );
+            if ($biobankUser) {
+                $obj->amendedReason = NphSample::BIOBANK_MODIFY_REASON;
+                $obj->amendedInfo = $this->getUserSiteData(
+                    $this->user->getEmail(),
+                    NphSite::getSiteIdWithPrefix($sample->getFinalizedSite())
+                );
+            } else {
+                $obj->amendedReason = $sample->getModifyReason();
+                $obj->amendedInfo = $this->getUserSiteData(
+                    $sample->getModifiedUser() ? $sample->getModifiedUser()->getEmail() : $this->user->getEmail(),
+                    NphSite::getSiteIdWithPrefix($sample->getModifiedSite() ?? $this->site)
+                );
+            }
         }
         return $obj;
     }
@@ -1206,13 +1219,36 @@ class NphOrderService
         return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
     }
 
-    private function saveSampleFinalization(array $formData, NphSample $sample): bool
+    private function saveSampleFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
-            $this->saveSampleFinalizationData($formData, $sample);
-            if (!$this->sendToRdr($sample)) {
+            $this->saveSampleFinalizationData($formData, $sample, $biobankFinalization);
+            $modifyType = $biobankFinalization ? NphSample::UNLOCK : null;
+            if (!$this->sendToRdr($sample, $modifyType)) {
+                throw new \Exception('Failed sending to RDR');
+            }
+            $connection->commit();
+            return true;
+        } catch (\Exception $e) {
+            $connection->rollback();
+            return false;
+        }
+    }
+
+    private function saveSampleReFinalization(?string $notes, NphSample $sample): bool
+    {
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            if ($notes) {
+                $sample->setFinalizedNotes($notes);
+            }
+            $sample->setBiobankFinalized(true);
+            $this->em->persist($sample);
+            $this->em->flush();
+            if (!$this->sendToRdr($sample, NphSample::UNLOCK, true)) {
                 throw new \Exception('Failed sending to RDR');
             }
             $connection->commit();
@@ -1283,7 +1319,7 @@ class NphOrderService
         return false;
     }
 
-    private function saveSampleFinalizationData(array $formData, NphSample $sample): void
+    private function saveSampleFinalizationData(array $formData, NphSample $sample, bool $biobankFinalization = false): void
     {
         $sampleModifyType = $sample->getModifyType();
         $sampleCode = $sample->getSampleCode();
@@ -1295,7 +1331,7 @@ class NphOrderService
         if ($sample->getNphOrder()->getOrderType() === NphOrder::TYPE_URINE || $sample->getNphOrder()->getOrderType() === NphOrder::TYPE_24URINE) {
             $sampleMetadata = $this->jsonEncodeMetadata($formData, ['urineColor', 'urineClarity', 'totalCollectionVolume']);
         }
-        $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata);
+        $this->saveNphSampleFinalizedInfo($sample, $formData["{$sampleCode}CollectedTs"], $formData["{$sampleCode}Notes"], $sampleMetadata, $biobankFinalization);
 
         // Aliquot status is only set while editing a sample
         if ($sampleModifyType === NphSample::UNLOCK) {
@@ -1343,9 +1379,7 @@ class NphOrderService
         if ($sampleMetadata) {
             $sample->setSampleMetadata($sampleMetadata);
         }
-        if (!$sample->getBiobankFinalized()) {
-            $sample->setBiobankFinalized($biobankFinalization);
-        }
+        $sample->setBiobankFinalized($biobankFinalization);
         $this->em->persist($sample);
         $this->em->flush();
     }
@@ -1400,19 +1434,26 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
-    private function sendToRdr(NphSample $sample, $modifyType = null): bool
+    private function sendToRdr(NphSample $sample, ?string $modifyType = null, bool $biobankUser = false): bool
     {
         $order = $sample->getNphOrder();
         $modifyType = $modifyType ?? $sample->getModifyType();
         if ($modifyType === NphSample::UNLOCK) {
-            $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend');
+            $sampleRdrObject = $this->getRdrObject($order, $sample, 'amend', $biobankUser);
             if ($this->editRdrSample($order->getParticipantId(), $sample->getRdrId(), $sampleRdrObject)) {
                 $sample->setModifyType(NphSample::EDITED);
                 $sample->setModifiedUser($this->user);
-                $sample->setModifiedSite($this->site);
+                if ($biobankUser) {
+                    $sample->setModifiedSite($sample->getFinalizedSite());
+                    $sample->setModifyReason(NphSample::BIOBANK_MODIFY_REASON);
+                } else {
+                    $sample->setModifiedSite($this->site ?? $sample->getFinalizedSite());
+                }
                 $sample->setModifiedTs(new DateTime());
+                $sample->setModifiedTimezoneId($this->getTimezoneid());
                 $this->em->persist($sample);
                 $this->em->flush();
+                $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
                 return true;
             }
         } else {
@@ -1423,6 +1464,7 @@ class NphOrderService
                 $sample->setRdrId($rdrId);
                 $this->em->persist($sample);
                 $this->em->flush();
+                $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
                 return true;
             }
         }

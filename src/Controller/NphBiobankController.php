@@ -10,6 +10,7 @@ use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphSampleFinalizeType;
 use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyType;
+use App\Form\Nph\NphSampleResubmitType;
 use App\Form\Nph\NphSampleRevertType;
 use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
@@ -324,17 +325,14 @@ class NphBiobankController extends BaseController
                 ->getTimezone(), 'aliquots' => $nphOrderService->getAliquots($sampleCode), 'disabled' =>
                 $isFormDisabled, 'nphSample' => $sample, 'disableMetadataFields' =>
                 $order->isMetadataFieldDisabled(), 'disableStoolCollectedTs' => $sample->getModifyType() !== NphSample::UNLOCK &&
-                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(), 'disableFreezeTs' => $isFreezeTsDisabled
+                $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs(), 'disableFreezeTs' => $isFreezeTsDisabled, 'biobankView' => true,
             ]
         );
         $sampleFinalizeForm->handleRequest($request);
         if ($sampleFinalizeForm->isSubmitted()) {
-            if ($sample->isDisabled()) {
-                throw $this->createAccessDeniedException();
-            }
             $formData = $sampleData = $sampleFinalizeForm->getData();
             if (!empty($nphOrderService->getAliquots($sampleCode))) {
-                if ($sample->getModifyType() !== NphSample::UNLOCK && $nphOrderService->hasAtLeastOneAliquotSample(
+                if ($nphOrderService->hasAtLeastOneAliquotSample(
                     $formData,
                     $sampleCode
                 ) === false) {
@@ -390,9 +388,32 @@ class NphBiobankController extends BaseController
             }
         }
 
+        //Biobank Resubmit
+        $notesData[$sampleCode . 'Notes'] = $sampleData[$sampleCode . 'Notes'] ?? null;
+        $sampleResubmitForm = $this->createForm(NphSampleResubmitType::class, $notesData, ['sample' => $sampleCode]);
+        $sampleResubmitForm->handleRequest($request);
+        if ($sampleResubmitForm->isSubmitted()) {
+            $formData = $sampleResubmitForm->getData();
+            if ($sampleResubmitForm->isValid()) {
+                if ($nphOrderService->saveReFinalization($formData[$sampleCode . 'Notes'], $sample)) {
+                    $this->addFlash('success', 'Sample finalized');
+                    return $this->redirectToRoute('nph_biobank_sample_finalize', [
+                        'biobankId' => $participant->biobankId,
+                        'orderId' => $orderId,
+                        'sampleId' => $sampleId
+                    ]);
+                }
+                $this->addFlash('error', 'Failed finalizing sample. Please try again.');
+                $this->em->refresh($sample);
+            } else {
+                $sampleResubmitForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
+            'sampleResubmitForm' => $sampleResubmitForm->createView(),
             'sample' => $sample,
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
@@ -405,7 +426,8 @@ class NphBiobankController extends BaseController
             'biobankView' => true,
             'isFormDisabled' => $isFormDisabled,
             'visitDiet' => $nphOrderService->getVisitDiet(),
-            'isFreezeTsDisabled' => $isFreezeTsDisabled
+            'isFreezeTsDisabled' => $isFreezeTsDisabled,
+            'allowResubmit' => $isFormDisabled && $sample->getModifyType() !== NphSample::UNLOCK
         ]);
     }
 

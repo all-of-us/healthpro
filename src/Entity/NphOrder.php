@@ -20,6 +20,7 @@ class NphOrder
     public const TYPE_URINE = 'urine';
     public const TYPE_24URINE = '24urine';
     public const TYPE_NAIL = 'nail';
+    public const TYPE_HAIR = 'hair';
     public const TYPE_DLW = 'urineDlw';
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
     public const VISIT_DISPLAY_NAME_MAPPER = [
@@ -416,6 +417,9 @@ class NphOrder
         }
         if (isset($statusCount['Collected']) && $statusCount['Collected'] === $sampleCount) {
             return 'Collected';
+        }
+        if (isset($statusCount['Biobank Finalized']) && $statusCount['Biobank Finalized'] === $sampleCount) {
+            return 'Finalized';
         }
         if ((isset($statusCount['Finalized']) && isset($statusCount['Biobank Finalized'])) && ($statusCount['Finalized'] + $statusCount['Biobank Finalized'] === $sampleCount)) {
             return 'Finalized';

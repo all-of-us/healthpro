@@ -330,7 +330,7 @@
                             <tr>
                                 <td class="col-md-4 required aliquot-tube-td" id="aliquot-tube">Matrix Aliquot Tube/Aliquot Container</td>
                                 <td class="col-md-4 required">Aliquot Time</td>
-                                <td class="col-md-2 required">Volume</td>
+                                <td class="col-md-2 {% if order.orderType != constant('App\\Entity\\NphOrder::TYPE_HAIR') and order.orderType != constant('App\\Entity\\NphOrder::TYPE_NAIL') %} required {% endif %}">Volume</td>
                                 <td class="col-md-1"></td>
                                 {% if sample.modifyType == constant('UNLOCK', sample) %}
                                     <td class="col-md-1">Remove&nbsp;&nbsp;Restore</td>
@@ -400,26 +400,36 @@
                     {% endif %}
                     <div style="display: none">{{ form_widget(sampleFinalizeForm['aliquotError']) }}</div>
                     <hr>
-                    <div class="form-group">
+                    <div class="form-group" {% if allowResubmit %} style="display: none" {% endif %}>
                         {{ form_label(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                         {{ form_errors(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                     </div>
-                    <p>
+                    {% if not allowResubmit %}
                         <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2')) and biobankView) or isFormDisabled %}
-                                    disabled
-                                {% endif %}>
+                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2')) and biobankView) or isFormDisabled %}disabled{% endif %}>
                             Mark as Finalized
                         </button>
                         {% if biobankView %}
                             <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                            <button type="button" class="btn btn-success pull-right" disabled>Resubmit</button>
                         {% else %}
                             <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                         {% endif %}
-                    </p>
+                    {% endif %}
                     {{ form_end(sampleFinalizeForm) }}
-                    {% if sample.modifyType == 'unlock' %}
+
+                    {% if allowResubmit %}
+                        <p>
+                            {{ form_start(sampleResubmitForm) }}
+                            {{ form_end(sampleResubmitForm) }}
+                            <button type="button" class="btn btn-primary" disabled>Mark as Finalized</button>
+                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
+                            <button type="button" class="btn btn-success pull-right" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
+                        </p>
+                    {% endif %}
+
+                    {% if sample.modifyType == 'unlock' and not biobankView %}
                         <div class="pull-right">
                             {{ form_start(revertForm, { 'action': path('nph_sample_revert', { participantId: participant.id, orderId: order.id, sampleId: sample.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
                             {{ form_errors(revertForm) }}
@@ -431,6 +441,7 @@
         </div>
     </div>
     {% include 'program/nph/order/partials/sample-finalize-confirmation-modal.html.twig' %}
+    {% include 'program/nph/order/partials/sample-finalize-confirmation-resubmit-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}

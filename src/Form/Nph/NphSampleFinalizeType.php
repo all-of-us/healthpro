@@ -227,6 +227,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         'message' => $errorMessage
                     ]);
                 }
+                $isHairOrNailOrder = $options['orderType'] === NphOrder::TYPE_HAIR || $options['orderType'] === NphOrder::TYPE_NAIL;
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
@@ -240,7 +241,8 @@ class NphSampleFinalizeType extends NphOrderForm
                     'data' => $volumeData,
                     'attr' => [
                         'readonly' => $aliquot['expectedVolume'] === null
-                    ]
+                    ],
+                    'disabled' => $isHairOrNailOrder
                 ]);
             }
         }
@@ -259,7 +261,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         'attr' => [
                             'class' => 'sample-cancel-checkbox',
                             'data-aliquot-ts-id' => "{$finalizedAliquot->getAliquotCode()}AliquotTs_{$key}"
-                         ]
+                        ]
                     ]
                 );
                 $builder->add(
@@ -295,7 +297,8 @@ class NphSampleFinalizeType extends NphOrderForm
             'disableStoolCollectedTs' => null,
             'orderCreatedTs' => null,
             'module' => null,
-            'disableFreezeTs' => null
+            'disableFreezeTs' => null,
+            'biobankView' => false
         ]);
     }
 
