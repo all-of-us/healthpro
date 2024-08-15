@@ -215,6 +215,6 @@ class PpscParticipant
         if (!$site) {
             return null;
         }
-        return str_replace(User::SITE_PREFIX, "", $site);
+        return str_replace(User::SITE_PREFIX, '', $site);
     }
 }
