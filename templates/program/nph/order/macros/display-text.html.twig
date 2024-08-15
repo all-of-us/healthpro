@@ -68,8 +68,13 @@
         {% else %}
             {% set biobank = '' %}
         {% endif %}
-        {{ nphSample.modifyType == constant('App\\Entity\\NphSample::EDITED') ? 'Edited and ' ~ biobank ~'Finalized' : 'Aliquoted and ' ~ biobank ~' Finalized' }}
-        {{ _self.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}
+        {% if nphSample.modifyType == constant('App\\Entity\\NphSample::EDITED') %}
+            {{ 'Edited and ' ~ biobank ~'Finalized' }}
+            {{ _self.displayDateAndTimezone(nphSample.modifiedTs, nphSample.modifiedTimezoneId) }}
+        {% else %}
+            {{ 'Aliquoted and ' ~ biobank ~' Finalized' }}
+            {{ _self.displayDateAndTimezone(nphSample.finalizedTs, nphSample.finalizedTimezoneId) }}
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
