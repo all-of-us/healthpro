@@ -2,6 +2,8 @@
 
 namespace App\Helper;
 
+use App\Security\User;
+
 class PpscParticipant
 {
     public \DateTime|null $cacheTime;
@@ -152,11 +154,11 @@ class PpscParticipant
         $this->race = $participant->race ?? null;
         $this->sex = $participant->sex ?? null;
         $this->deceasedStatus = $participant->deceasedStatus ?? null;
-        $this->biospecimenSourceSite = $participant->biospecimenSourceSite ?? null;
+        $this->biospecimenSourceSite = $this->getSiteId($participant->biospecimenSourceSite);
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
-        $this->site = $participant->site ?? null;
-        if (isset($participant->isPediatric) && $participant->isPediatric !== 'UNSET' && $participant->isPediatric) {
+        $this->site = $this->getSiteId($participant->site);
+        if ($participant->isPediatric == 1) {
             $this->isPediatric = true;
         }
         $this->genderIdentity = $participant->genderIdentity ?? null;
@@ -167,8 +169,8 @@ class PpscParticipant
         $this->age = $this->getAge();
         $this->ageInMonths = $this->getAgeInMonths();
         $this->sexAtBirth = match ($participant->sex ?? null) {
-            'SexAtBirth_Male' => 1,
-            'SexAtBirth_Female' => 2,
+            'Male' => 1,
+            'Female' => 2,
             default => 0,
         };
         if ($this->isPediatric) {
@@ -184,10 +186,10 @@ class PpscParticipant
         }
         // Map gender identity to gender options for MayoLINK.
         switch ($this->genderIdentity ?? null) {
-            case 'GenderIdentity_Woman':
+            case 'Women':
                 $this->gender = 'F';
                 break;
-            case 'GenderIdentity_Man':
+            case 'Man':
                 $this->gender = 'M';
                 break;
             default:
@@ -206,5 +208,13 @@ class PpscParticipant
         $yearsInMonths = $diff->y * 12;
         $months = $diff->m;
         return $yearsInMonths + $months;
+    }
+
+    private function getSiteId($site): string|null
+    {
+        if (!$site) {
+            return null;
+        }
+        return str_replace(User::SITE_PREFIX, "", $site);
     }
 }
