@@ -227,7 +227,6 @@ class NphSampleFinalizeType extends NphOrderForm
                         'message' => $errorMessage
                     ]);
                 }
-                $isHairOrNailOrder = $options['orderType'] === NphOrder::TYPE_HAIR || $options['orderType'] === NphOrder::TYPE_NAIL;
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
@@ -238,11 +237,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'required' => false,
                     'allow_add' => true,
                     'allow_delete' => true,
-                    'data' => $volumeData,
-                    'attr' => [
-                        'readonly' => $aliquot['expectedVolume'] === null
-                    ],
-                    'disabled' => $isHairOrNailOrder
+                    'data' => $volumeData
                 ]);
             }
         }
@@ -322,6 +317,7 @@ class NphSampleFinalizeType extends NphOrderForm
         if (isset($aliquot['warningMaxVolume'])) {
             $volumeAttributes['data-warning-max-volume'] = $aliquot['warningMaxVolume'];
         }
+        $volumeAttributes['disabled'] = $aliquot['expectedVolume'] === null;
         return $volumeAttributes;
     }
 }
