@@ -1,14 +1,23 @@
 $(document).ready(function () {
-    $("#sample_finalize_btn, #sample_refinalize_btn").on("click", function (e) {
+    $("#sample_finalize_btn").on("click", function (e) {
         e.preventDefault();
         if ($(".sample-finalize-form").parsley().validate()) {
             $("#confirmation_modal").modal("show");
         }
     });
 
+    $("#sample_refinalize_btn").on("click", function (e) {
+        $("#confirmation_resubmit_modal").modal("show");
+    });
+
     $("#confirm_finalize_btn").on("click", function () {
         $("#confirmation_modal").modal("hide");
         $("form[name='nph_sample_finalize']").submit();
+    });
+
+    $("#confirm_resubmit_btn").on("click", function () {
+        $("#confirmation_resubmit_modal").modal("hide");
+        $("form[name='nph_sample_resubmit']").submit();
     });
 
     $(document).on("click", ".add-aliquot-widget", function () {

@@ -88,8 +88,7 @@ class NphOrderCollect extends NphOrderForm
             'disableMetadataFields' => null,
             'disableStoolCollectedTs' => null,
             'orderCreatedTs' => null,
-            'biobankView' => null,
-            'isFormDisabled' => false
+            'biobankView' => false
         ]);
     }
 }

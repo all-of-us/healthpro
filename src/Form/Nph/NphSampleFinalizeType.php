@@ -95,7 +95,6 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $idData,
-                    'disabled' => $options['isFormDisabled']
                 ]);
 
                 $builder->add("{$aliquotCode}AliquotTs", Type\CollectionType::class, [
@@ -142,7 +141,6 @@ class NphSampleFinalizeType extends NphOrderForm
                     'allow_add' => true,
                     'allow_delete' => true,
                     'data' => $tsData,
-                    'disabled' => $options['isFormDisabled']
                 ]);
                 if (isset($aliquot['collectMetadata']) && $aliquot['collectMetadata']) {
                     foreach ($aliquot['metadataFields'] as $metadataField) {
@@ -183,7 +181,6 @@ class NphSampleFinalizeType extends NphOrderForm
                             'allow_add' => true,
                             'allow_delete' => true,
                             'data' => $metadataValue,
-                            'disabled' => $options['isFormDisabled']
                         ]);
                     }
                 }
@@ -230,7 +227,6 @@ class NphSampleFinalizeType extends NphOrderForm
                         'message' => $errorMessage
                     ]);
                 }
-                $isHairOrNailOrder = $options['orderType'] === NphOrder::TYPE_HAIR || $options['orderType'] === NphOrder::TYPE_NAIL;
                 $builder->add("{$aliquotCode}Volume", Type\CollectionType::class, [
                     'entry_type' => Type\TextType::class,
                     'label' => 'Volume',
@@ -241,11 +237,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'required' => false,
                     'allow_add' => true,
                     'allow_delete' => true,
-                    'data' => $volumeData,
-                    'attr' => [
-                        'readonly' => $aliquot['expectedVolume'] === null
-                    ],
-                    'disabled' => $options['isFormDisabled'] || $isHairOrNailOrder
+                    'data' => $volumeData
                 ]);
             }
         }
@@ -260,11 +252,11 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() === NphSample::CANCEL,
+                        'disabled' => $finalizedAliquot->getStatus() === NphSample::CANCEL,
                         'attr' => [
                             'class' => 'sample-cancel-checkbox',
                             'data-aliquot-ts-id' => "{$finalizedAliquot->getAliquotCode()}AliquotTs_{$key}"
-                         ]
+                        ]
                     ]
                 );
                 $builder->add(
@@ -273,7 +265,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     [
                         'label' => false,
                         'required' => false,
-                        'disabled' => $options['isFormDisabled'] || $finalizedAliquot->getStatus() !== NphSample::CANCEL
+                        'disabled' => $finalizedAliquot->getStatus() !== NphSample::CANCEL
                     ]
                 );
             }
@@ -301,8 +293,7 @@ class NphSampleFinalizeType extends NphOrderForm
             'orderCreatedTs' => null,
             'module' => null,
             'disableFreezeTs' => null,
-            'biobankView' => null,
-            'isFormDisabled' => false
+            'biobankView' => false
         ]);
     }
 
@@ -326,6 +317,7 @@ class NphSampleFinalizeType extends NphOrderForm
         if (isset($aliquot['warningMaxVolume'])) {
             $volumeAttributes['data-warning-max-volume'] = $aliquot['warningMaxVolume'];
         }
+        $volumeAttributes['disabled'] = $aliquot['expectedVolume'] === null;
         return $volumeAttributes;
     }
 }

@@ -286,8 +286,8 @@ class WorkQueueTest extends ServiceTestCase
                     'hasCoreData' =>
                         [
                             '' => 'View All',
-                            '1' => 'Has Core Data',
-                            '0' => 'Does Not Have Core Data',
+                            'YES' => 'Has Core Data',
+                            'NO' => 'Does Not Have Core Data',
                         ],
                     'consentForStudyEnrollment' =>
                         [
