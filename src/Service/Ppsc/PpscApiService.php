@@ -42,9 +42,8 @@ class PpscApiService
     {
         try {
             $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'getRequestDetails', [
-                'headers' => ['Authorization' => 'Bearer ' . $token],
-                'query' => ['requestId' => $requestId]
+            $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
+                'headers' => ['Authorization' => 'Bearer ' . $token]
             ]);
             $requestDetailsData = json_decode($response->getBody()->getContents());
             return $requestDetailsData ?? null;
@@ -75,9 +74,8 @@ class PpscApiService
         if (!$participant) {
             try {
                 $token = $this->getAccessToken();
-                $response = $this->client->request('GET', $this->endpoint . 'getParticipantDetails', [
-                    'headers' => ['Authorization' => 'Bearer ' . $token],
-                    'query' => ['participantId' => $participantId]
+                $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
+                    'headers' => ['Authorization' => 'Bearer ' . $token]
                 ]);
                 $participant = json_decode($response->getBody()->getContents());
             } catch (\Exception $e) {
