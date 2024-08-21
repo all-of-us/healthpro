@@ -22,6 +22,7 @@ class PpscApiService
     private string|null $clientId;
     private string|null $clientSecret;
     private string|null $grantType;
+    private string|null $scope;
     private string|null $accessToken = null;
     private string|null $endpoint;
 
@@ -36,6 +37,7 @@ class PpscApiService
         $this->clientId = $this->getParams('ppsc_client_id');
         $this->clientSecret = $this->getParams('ppsc_client_secret');
         $this->grantType = $this->getParams('ppsc_grant_type');
+        $this->scope = $this->getParams('ppsc_scope');
     }
 
     public function getRequestDetailsById($requestId): \stdClass|null
@@ -103,10 +105,13 @@ class PpscApiService
         }
         try {
             $response = $this->client->request('POST', $this->tokenUrl, [
+                'headers' => [
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Authorization' => 'Basic ' . base64_encode("{$this->clientId}:{$this->clientSecret}")
+                ],
                 'form_params' => [
-                    'client_id' => $this->clientId,
-                    'client_secret' => $this->clientSecret,
-                    'grant_type' => $this->grantType
+                    'grant_type' => $this->grantType,
+                    'scope' => $this->scope
                 ]
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
