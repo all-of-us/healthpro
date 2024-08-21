@@ -15,6 +15,7 @@ use App\Form\Nph\NphSampleRevertType;
 use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Form\ReviewTodayFilterType;
+use App\Helper\NphDietPeriodStatus;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -208,9 +209,21 @@ class NphBiobankController extends BaseController
         $nphOrderInfo = $nphOrderService->getParticipantOrderSummary($participant->id);
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
         $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo, $nphProgramSummary);
+        $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participant->id);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participant->id, $participant->module);
+        $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
+        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
+        $generateOrderWarningLogByModule = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLogByModule($participant->id);
         return $this->render('program/nph/biobank/participant.html.twig', [
             'participant' => $participant,
-            'programSummaryAndOrderInfo' => $combined
+            'programSummaryAndOrderInfo' => $combined,
+            'moduleDietPeriodsStatus' => $moduleDietPeriodsStatus,
+            'sampleProcessingStatusByModule' => $sampleProcessingStatusByModule,
+            'generateOrderWarningLogByModule' => $generateOrderWarningLogByModule,
+            'activeDietPeriod' => $activeDietPeriod,
+            'activeModule' => $activeModule,
+            'dietPeriodStatusMap' => NphDietPeriodStatus::$dietPeriodStatusMap,
+            'dietToolTipMessages' => NphDietPeriodStatus::$dietToolTipMessages,
         ]);
     }
 
