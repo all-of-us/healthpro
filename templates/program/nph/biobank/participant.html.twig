@@ -52,7 +52,7 @@
                     {% endif %}
                     <div class="tab-pane fade ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
                         <div class="row">
-                            <div class="col-sm-1-5 pe-0 border-end border-dark-subtle me-2">
+                            <div class="col-sm-1-5 pe-0 border-end border-dark-subtle me-4">
                                 <ul class="nav flex-column">
                                     {% if moduleNumber == 1 %}
                                         <li class="nav-item">
@@ -102,7 +102,7 @@
                                     {% for dietPeriodNumber in dietPeriodNumbers %}
                                         <div class="tab-pane fade {% if dietPeriodNumber == 'LMT' or dietPeriodNumber == activeDietPeriod %} show active{% endif %}" id="{{ dietPeriodNumber }}">
                                             <div class="row">
-                                                <div class="col-md-8 g-0">
+                                                <div class="col-md-8">
                                                     {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                     <p class="text-lg-start">
                                                         NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber|replace({'Period': 'Period '}) }}</strong>
@@ -218,7 +218,7 @@
                                                                                                 <div class="clearfix w-100">
                                                                                                     <div class="d-inline-block w-10 align-top"><span >{{ sample[orderid]['createDate'] }}</span></div>
                                                                                                     <div class="d-inline-block w-25 align-top"><span><a
-                                                                                                                    href="{{ path('nph_order_collect', {participantId: participant.id, orderId: sample[orderid]['healthProOrderId']}) }}">Order
+                                                                                                                    href="{{ path('nph_biobank_order_collect', {biobankId: participant.biobankId, orderId: sample[orderid]['healthProOrderId']}) }}">Order
                                                                                                             ID: {{ orderid }}</a></span></div>
                                                                                                     <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
                                                                                                     <div class="d-inline-block w-15 align-top diet-visit-status" data-diet-visit-status="{{ sample[orderid]['orderStatus'] }}">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
