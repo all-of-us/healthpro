@@ -304,39 +304,6 @@ class BiobankController extends BaseController
         ]);
     }
 
-    #[Route(path: '/review/quanum-orders/today', name: 'biobank_quanum_orders_today')]
-    public function quanumOrdersTodayAction(Request $request, EnvironmentService $env): Response
-    {
-        // Get beginning of today (at midnight) in user's timezone
-        $startString = 'today';
-        // Allow overriding start time to test in non-prod environments
-        if (!$env->isProd() && intval($request->query->get('days')) > 0) {
-            $startString = '-' . intval($request->query->get('days')) . ' days';
-        }
-        $startTime = new DateTime($startString, new \DateTimeZone($this->getSecurityUser()->getTimezone()));
-        $today = $startTime->format('Y-m-d');
-        $endDate = (new DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
-
-        $quanumOrders = $this->orderService->getOrders([
-            'startDate' => $today,
-            'endDate' => $endDate,
-            'origin' => 'careevolution',
-            'page' => '1',
-            'pageSize' => '1000'
-        ]);
-        $orders = [];
-        foreach ($quanumOrders as $quanumOrder) {
-            if ($quanumOrder->origin === 'careevolution') {
-                $order = new Order();
-                $this->orderService->loadSamplesSchema($order);
-                $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
-            }
-        }
-        return $this->render('biobank/orders-quanum-today.html.twig', [
-            'orders' => $orders
-        ]);
-    }
-
     #[Route(path: '/review/orders/unfinalized', name: 'biobank_orders_unfinalized')]
     public function ordersUnfinalizedAction(): Response
     {
