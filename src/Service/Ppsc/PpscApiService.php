@@ -98,6 +98,24 @@ class PpscApiService
         return null;
     }
 
+    public function getParticipantByBiobankId(string $biobankId): PpscParticipant|null
+    {
+        try {
+            $token = $this->getAccessToken();
+            $response = $this->client->request('GET', $this->endpoint . 'participants?bioBankId=' . $biobankId, [
+                'headers' => ['Authorization' => 'Bearer ' . $token]
+            ]);
+            $participant = json_decode($response->getBody()->getContents());
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+        if ($participant) {
+            return new PpscParticipant($participant);
+        }
+        return null;
+    }
+
     public function getAccessToken(): string|null
     {
         if ($this->accessToken) {

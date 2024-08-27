@@ -28,6 +28,7 @@ class PpscParticipant
     public int|null $age;
     public int|null $ageInMonths;
     public int|null $sexAtBirth;
+    public string|null $isAIAN;
 
     private static array $pediatricWeightBreakpoints = [
         9999,
@@ -154,7 +155,9 @@ class PpscParticipant
         $this->race = $participant->race ?? null;
         $this->sex = $participant->sex ?? null;
         $this->deceasedStatus = $participant->deceasedStatus ?? null;
-        $this->biospecimenSourceSite = $this->getSiteId($participant->biospecimenSourceSite);
+        if (isset($participant->biospecimenSourceSite)) {
+            $this->biospecimenSourceSite = $this->getSiteId($participant->biospecimenSourceSite);
+        }
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
         $this->site = $this->getSiteId($participant->site);
@@ -166,6 +169,10 @@ class PpscParticipant
         $this->lastName = $participant->lastName ?? null;
         $this->firstName = $participant->firstName ?? null;
         $this->biobankId = $participant->biobankId ?? null;
+        if (!$this->biobankId) {
+            $this->biobankId = $participant->bioBankId ?? null;
+        }
+
         $this->age = $this->getAge();
         $this->ageInMonths = $this->getAgeInMonths();
         $this->sexAtBirth = match ($participant->sex ?? null) {
@@ -196,6 +203,7 @@ class PpscParticipant
                 $this->gender = 'U';
                 break;
         }
+        $this->isAIAN = $participant->aian ?? null;
     }
 
     private function getAgeInMonths(): int|null

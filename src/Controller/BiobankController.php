@@ -13,6 +13,7 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
 use App\Service\ParticipantSummaryService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\ReviewService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +27,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class BiobankController extends BaseController
 {
     protected $participantSummaryService;
+    protected PpscApiService $ppscApiService;
     protected $orderService;
     protected $loggerService;
     protected $params;
@@ -33,12 +35,14 @@ class BiobankController extends BaseController
     public function __construct(
         EntityManagerInterface $em,
         ParticipantSummaryService $participantSummaryService,
+        PpscApiService $ppscApiService,
         OrderService $orderService,
         LoggerService $loggerService,
         ParameterBagInterface $params
     ) {
         parent::__construct($em);
         $this->participantSummaryService = $participantSummaryService;
+        $this->ppscApiService = $ppscApiService;
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
         $this->params = $params;
@@ -58,10 +62,10 @@ class BiobankController extends BaseController
         $idForm->handleRequest($request);
         if ($idForm->isSubmitted() && $idForm->isValid()) {
             $searchParameters = $idForm->getData();
-            $searchResults = $this->participantSummaryService->search($searchParameters);
-            if (!empty($searchResults)) {
+            $participant = $this->ppscApiService->getParticipantByBiobankId($searchParameters['biobankId']);
+            if (!empty($participant)) {
                 return $this->redirectToRoute('biobank_participant', [
-                    'biobankId' => $searchResults[0]->biobankId
+                    'biobankId' => $participant->biobankId
                 ]);
             }
             $this->addFlash('error', 'Biobank ID not found');
@@ -122,13 +126,9 @@ class BiobankController extends BaseController
     #[Route(path: '/{biobankId}/order/{orderId}', name: 'biobank_order')]
     public function orderAction(string $biobankId, int $orderId, Request $request, BiobankOrderFinalizeNotificationService $biobankOrderFinalizeNotificationService): Response
     {
-        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
+        $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
         if (empty($participant)) {
             throw $this->createNotFoundException();
-        }
-        $participant = $participant[0];
-        if (!($participant->status || $participant->editExistingOnly)) {
-            throw $this->createAccessDeniedException();
         }
         $order = $this->em->getRepository(Order::class)->find($orderId);
         if (empty($order)) {
@@ -266,11 +266,10 @@ class BiobankController extends BaseController
     #[Route(path: '/{biobankId}/quanum-order/{orderId}', name: 'biobank_quanum_order')]
     public function quanumOrderAction(string $biobankId, string $orderId): Response
     {
-        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
+        $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
         if (!$participant) {
             throw $this->createNotFoundException('404');
         }
-        $participant = $participant[0];
 
         $order = new Order();
         $this->orderService->loadSamplesSchema($order);
@@ -368,11 +367,10 @@ class BiobankController extends BaseController
     #[Route(path: '/{biobankId}', name: 'biobank_participant')]
     public function participantAction(string $biobankId): Response
     {
-        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
+        $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
         if (empty($participant)) {
             throw $this->createNotFoundException();
         }
-        $participant = $participant[0];
 
         // Internal Orders
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participant->id], ['id' => 'desc']);
@@ -391,7 +389,7 @@ class BiobankController extends BaseController
             'participant' => $participant,
             'orders' => $orders,
             'biobankView' => true,
-            'canViewOrders' => $participant->status || $participant->editExistingOnly
+            'canViewOrders' => true
         ]);
     }
 
