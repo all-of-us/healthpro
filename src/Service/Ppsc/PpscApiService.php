@@ -144,12 +144,35 @@ class PpscApiService
         }
     }
 
+    public function get(string $path, array $params = []): ResponseInterface
+    {
+        $token = $this->getAccessToken();
+        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+        return $this->client->request('GET', $this->endpoint . $path, $params);
+    }
+
     public function post(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
         $token = $this->getAccessToken();
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('POST', $this->endpoint . $path, $params);
+    }
+
+    public function put(string $path, \stdClass $body, array $params = []): ResponseInterface
+    {
+        $token = $this->getAccessToken();
+        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+        $params['json'] = $body;
+        return $this->client->request('PUT', $this->endpoint . $path, $params);
+    }
+
+    public function patch(string $path, \stdClass $body, array $params = []): ResponseInterface
+    {
+        $token = $this->getAccessToken();
+        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+        $params['json'] = $body;
+        return $this->client->request('PATCH', $this->endpoint . $path, $params);
     }
 
     private function getParams($field): string|null

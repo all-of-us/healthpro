@@ -79,10 +79,10 @@ class MeasurementService
     public function createMeasurement($fhir)
     {
         try {
-            $response = $this->ppscApiService->post('/physical_measurement', $fhir);
+            $response = $this->ppscApiService->post('physical-measurements', $fhir);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->sf_measurments_id)) {
-                return $result->sf_measurments_id;
+            if (is_object($result) && isset($result->drcId)) {
+                return $result->drcId;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
@@ -174,7 +174,7 @@ class MeasurementService
     public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
     {
         try {
-            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}", $measurementJson);
+            $response = $this->ppscApiService->patch("physical-measurements/{$measurementId}", $measurementJson);
             $result = json_decode($response->getBody()->getContents());
 
             // Check RDR response
