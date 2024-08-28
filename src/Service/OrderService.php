@@ -90,9 +90,7 @@ class OrderService
     {
         try {
             $response = $this->ppscApiService->put("biobank-orders/{$this->order->getRdrId()}", $orderObject);
-            $result = json_decode($response->getBody()->getContents());
-            error_log(print_r($result, true));
-            if (is_object($result) && isset($result->status) && $result->status === 'success') {
+            if ($response->getStatusCode() === 200) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -137,10 +135,8 @@ class OrderService
     public function cancelRestoreOrder($type, $orderObject)
     {
         try {
-            $response = $this->ppscApiService->patch("/biobank-orders/{$this->order->getRdrId()}", $orderObject);
-            $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+            $response = $this->ppscApiService->patch("biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            if ($response->getStatusCode() === 200) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -153,7 +149,7 @@ class OrderService
     public function getOrder($participantId, $orderId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder/{$orderId}");
+            $response = $this->ppscApiService->get("biobank-orders/{$orderId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
