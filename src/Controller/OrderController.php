@@ -825,7 +825,7 @@ class OrderController extends BaseController
             'timeZone' => $this->getSecurityUser()->getTimezone(),
             'siteId' => $this->siteService->getSiteId(),
             'disabled' => $this->isReadOnly() || $this->orderService->inactiveSiteFormDisabled(),
-            'dvSite' => $session->get('siteType') == 'dv',
+            'dvSite' => $session->get('siteType') === 'dv' && !$this->siteService->isDiversionPouchSite(),
             'params' => $params,
             'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
