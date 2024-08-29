@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/nph/biobank/base.html.twig' %}
 
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
@@ -5,12 +6,12 @@
 {% block title %} Participant Details {% endblock %}
 
 {% block body %}
-    <div class="page-header row participant-name">
+    <div class="page-header row participant-name border-bottom">
         <h2>
             <i class="fa fa-user" aria-hidden="true"></i> Participant Details
         </h2>
     </div>
-    <div class="page-header row participant-information">
+    <div class="page-header row participant-information mt-2 border-bottom">
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-3">
@@ -24,103 +25,244 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12" role="tabpanel">
-        <ul class="nav nav-tabs" role="tablist">
-            {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
-                {% if participant.module == moduleNumber %}
-                    {% set tabActive = 'active' %}
-                {% else %}
-                    {% set tabActive = '' %}
-                {% endif %}
-                <li role="presentation" class="participant-module {{ tabActive }}"
-                    data-moduleNumber="{{ moduleNumber }}"><a>NPH
-                        Module {{ moduleNumber }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="col-sm-2 participant-activity-div">
-        <ul class="nav nav-pills">
-            <li role="presentation" class="participant-activity active"><a>Collections</a></li>
-        </ul>
-    </div>
-    <div class="col-sm-10 participant-modules">
-        {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
-            {% if participant.module == moduleNumber %}
-                {% set modulePanelDisplay = '' %}
-            {% else %}
-                {% set modulePanelDisplay = 'hidden' %}
-            {% endif %}
-            <div class="ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
-                {% if module.moduleCreationSite is not null %}
-                    <div class="row ms-1">
-                        <h5 class="col-md-12 font-bold aou-blue">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</h5>
-                    </div>
-                {% endif %}
-                <div>
-                    <h4 class="col-md-12 participant-module-header">NPH Module {{ moduleNumber }} Collections</h4>
-                </div>
-                {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                    {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
-                        <div>
-                            <div class="col-md-12 well-sm well" data-toggle="collapse"
-                                 data-target="#{{ moduleNumber }}Visit{{ VisitCode }}"
-                                 role="button" style="font-weight: bold">
-                                Visit {{ visit['visitDisplayName'] }}
-                                <span class="caret" style="float: right; margin: 9px 0;"></span>
-                            </div>
-                            <div style="margin-bottom: 20px;" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="collapse in">
-                                <span style="display: inline-block"></span>
-                                {% set displayedOrderIDS = [] %}
-                                {% set displayedTimePointHeaders = [] %}
-                                {% for timepointCode, timepoint in visit['visitInfo'] %}
-                                    {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
-                                        {% if sampleInfo['numberSamples'] is not empty %}
-                                            {% for sampleCode, sample in sampleInfo %}
-                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] %}
-                                                    {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
-                                                        {% if timepointCode not in displayedTimePointHeaders %}
-                                                            {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
-                                                            <h4>Timepoint | {{ timepoint['timePointDisplayName'] }}</h4>
+
+    {% if participant.module %}
+        <div class="row mt-2">
+            <div class="col-md-12" role="tabpanel">
+                <ul class="nav nav-tabs" role="tablist">
+                    {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                        {% if activeModule == moduleNumber %}
+                            {% set tabActive = 'active' %}
+                        {% else %}
+                            {% set tabActive = '' %}
+                        {% endif %}
+                        <li role="presentation" class="nav-item participant-module {{ tabActive }}" data-bs-toggle="tab" data-bs-target="#ModuleGroup{{ moduleNumber }}" data-moduleNumber="{{ moduleNumber }}" type="button" role="tab"><a class="nav-link">NPH
+                                Module {{ moduleNumber }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 participant-modules tab-content">
+                {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                    {% if activeModule == moduleNumber %}
+                        {% set modulePanelDisplay = 'show active' %}
+                    {% else %}
+                        {% set modulePanelDisplay = '' %}
+                    {% endif %}
+                    <div class="tab-pane fade ModuleGroup {{ modulePanelDisplay }}" id="ModuleGroup{{ moduleNumber }}">
+                        <div class="row">
+                            <div class="col-sm-1-5 pe-0 border-end border-dark-subtle me-4">
+                                <ul class="nav flex-column">
+                                    {% if moduleNumber == 1 %}
+                                        <li class="nav-item">
+                                            <div class="row participant-diet-period">
+                                                {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber]['LMT']] %}
+                                                <div class="col-sm-2">
+                                                    <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
+                                                </div>
+                                                <div class="col-sm-10 ps-0">
+                                                    <a class="pt-0 pb-0 nav-link diet-period-label text-dark font-bold active" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#LMT" data-period="LMT" role="tab">Module 1</a>
+                                                    <span class="fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber]['LMT'] }}" id="diet_period_status_{{ moduleNumber }}_LMT">{{ dietPeriodStatus['text'] }}</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% else %}
+                                        {% for dietPeriod in ['Period1', 'Period2', 'Period3'] %}
+                                            <li class="nav-item">
+                                                <div class="row mb-2 participant-diet-period">
+                                                    {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriod]] %}
+                                                    <div class="col-sm-2">
+                                                        <i class="fs-4 fa {{ dietPeriodStatus['statusIcon'] }} {{ dietPeriodStatus['textClass'] }} }}"></i>
+                                                    </div>
+                                                    <div class="col-sm-10 ps-0">
+                                                        {% set disabled = '' %}
+                                                        {% if dietPeriod != 'Period1' %}
+                                                            {% set previousDietPeriodStatus = moduleDietPeriodsStatus[moduleNumber][dietPeriod == 'Period2' ? 'Period1' : 'Period2'] %}
+                                                            {% if previousDietPeriodStatus == constant('App\\Helper\\NphDietPeriodStatus::NOT_STARTED') %}
+                                                                {% set disabled = 'disabled' %}
+                                                            {% endif %}
                                                         {% endif %}
-                                                        {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
-                                                        <div class="well well-sm order-row">
-                                                            <div class="clearfix">
-                                                                <div class="col-sm-2">{{ sample[orderid]['createDate'] }}</div>
-                                                                <div class="col-sm-3">
-                                                                    <a href="{{ path('nph_biobank_order_collect', {biobankId: participant.biobankId, orderId: sample[orderid]['healthProOrderId']}) }}">
-                                                                        Order ID: {{ orderid }}
-                                                                    </a>
-                                                                </div>
-                                                                <div class="col-sm-2">{{ sample[orderid]['sampleTypeDisplayName'] }}</div>
-                                                                {{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}
-                                                                {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
-                                                                    {% if not loop.first %}
-                                                                        <div class="col-sm-9"></div>
+                                                        <a class="pt-0 pb-0 nav-link diet-period-label text-dark font-bold {{ disabled}} {% if dietPeriod == activeDietPeriod %} active {% endif %}" aria-current="page" href="#" data-bs-toggle="tab" data-bs-target="#{{ dietPeriod }}" data-period="{{ dietPeriod }}" role="tab">
+                                                            Diet {{ dietPeriod|replace({'Period': 'Period '}) }}
+                                                        </a>
+                                                        <span class="pt-0 fs-xs ms-3 {{ dietPeriodStatus['textClass'] }}" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriod] }}" id="diet_period_status_{{ moduleNumber }}_{{ dietPeriod }}">
+                                                                        {{ dietPeriodStatus['text'] }}
+                                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="col-sm-10 ps-0">
+                                {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
+                                <div class="tab-content" id="myTabContent">
+                                    {% for dietPeriodNumber in dietPeriodNumbers %}
+                                        <div class="tab-pane fade {% if dietPeriodNumber == 'LMT' or dietPeriodNumber == activeDietPeriod %} show active{% endif %}" id="{{ dietPeriodNumber }}">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
+                                                    <p class="text-lg-start">
+                                                        NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber|replace({'Period': 'Period '}) }}</strong>
+                                                        {% set toolTipMessage = '' %}
+                                                        {% if dietPeriodStatus['toolTipStatus'] is defined %}
+                                                            {% if moduleNumber == 1 %}
+                                                                {% set toolTipMessage = dietToolTipMessages[dietPeriodStatus['toolTipStatus'] ~ '_1'] %}
+                                                            {% else %}
+                                                                {% set toolTipMessage = dietToolTipMessages[dietPeriodStatus['toolTipStatus']] %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        <span class="badge fs-8 ms-1 {{ dietPeriodStatus['badgeClass'] }}"
+                                                                        {% if toolTipMessage %} data-bs-toggle="tooltip" title="{{ toolTipMessage }}" {% endif %}>
+                                                                        <i class="fa {{ dietPeriodStatus['badgeIcon'] }}"></i>
+                                                                        {{ dietPeriodStatus['text'] }}
+                                                                    </span>
+                                                    </p>
+                                                    {% if module.moduleCreationSite is not null %}
+                                                        <p class="aou-blue font-bold">Collection Site: {{ siteInfo.getNphSiteDisplayName(module.moduleCreationSite) }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
+                                                {% if dietPeriodNumber == VisitCode|slice(0,7) %}
+                                                    {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
+                                                        {% set visitDiet = visit['visitDiet'] %}
+                                                        {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}
+                                                        {% set participantDietStatus =  attribute(participant, moduleDietStatus)[visitDiet] is defined ? attribute(participant, moduleDietStatus)[visitDiet] : '' %}
+                                                        {% if moduleNumber == 3 and VisitCode in ['Period1DLW', 'Period2DLW', 'Period3DLW'] %}
+                                                            {% set textDivSize = 'col-md-9' %}
+                                                            {% set dlwDiet = true %}
+                                                        {% else %}
+                                                            {% set textDivSize = 'col-md-12' %}
+                                                            {% set dlwDiet = false %}
+                                                        {% endif %}
+                                                        <div class="card mb-2 period-diet-visits">
+                                                            {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
+                                                            <div class="card-header bg-secondary-subtle pb-0 {{ dietPeriodStatus['dietCardClass']|default('') }}" style="font-weight: bold">
+                                                                <span class="diet-visit-status-text fs-6 pe-2" data-diet-period-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}">{{ visit['visitDisplayName']}} Visit</span>
+                                                                {% if moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::ERROR_IN_PROGRESS_UNFINALIZED_COMPLETE') and moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] != constant('App\\Helper\\NphDietPeriodStatus::IN_PROGRESS_FINALIZED_COMPLETE') %}
+                                                                    {% set warningDisplayed = 0 %}
+                                                                    {% for generateOrderWarningLog in generateOrderWarningLogByModule %}
+                                                                        {% if generateOrderWarningLog.period ==  dietPeriodNumber %}
+                                                                            {% set warningDisplayed = 1 %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                                <span class="text-danger diet-visit-status-icon" id="diet_visit_status_icon_{{ VisitCode }}" style="display: none;"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
+                                                                {% set sampleProcessingComplete = false %}
+                                                                {% for sampleProcessing in sampleProcessingStatusByModule %}
+                                                                    {% if sampleProcessing.period ==  dietPeriodNumber and sampleProcessing.status == 1 %}
+                                                                        {% set sampleProcessingComplete = true %}
                                                                     {% endif %}
-                                                                    <div class="col-sm-3 float-right">
-                                                                        ({{ sampleStatusCount }}
-                                                                        / {{ sampleInfo['numberSamples'][orderid] }}
-                                                                        ) {{ sampleStatus }}
-                                                                    </div>
                                                                 {% endfor %}
+                                                                <span class="float-end collapse-carat {% if sampleProcessingComplete %} collapsed {% endif %} fs-4" role="button" data-bs-toggle="collapse" data-bs-target="#{{ moduleNumber }}Visit{{ VisitCode }}"></span>
+                                                            </div>
+                                                            <div style="margin-bottom: 20px" id="{{ moduleNumber }}Visit{{ VisitCode }}" class="diet-visit-type {% if sampleProcessingComplete %} collapse {% else %} show {% endif %} card-body accordion-collapse">
+                                                                <div class="row">
+                                                                    {% if participant.dob %}
+                                                                        <br>
+                                                                        <div class="{{ textDivSize }} ps-1">
+                                                                            {% set displayDietColorWarning = false %}
+                                                                            {% if moduleNumber in [2, 3] %}
+                                                                                {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                                                                    {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                                                                        {% if sampleInfo['numberSamples'] is not empty and not displayDietColorWarning %}
+                                                                                            {% for sampleCode, sample in sampleInfo %}
+                                                                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] if not displayDietColorWarning %}
+                                                                                                    {% if sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['oldVisitType'] is not empty %}
+                                                                                                        {% set displayDietColorWarning = true %}
+                                                                                                    {% endif %}
+                                                                                                {% endfor %}
+                                                                                            {% endfor %}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                            {% if displayDietColorWarning %}
+                                                                                <div class="text-discontinue pb-2">
+                                                                                    <i class="fa fa-exclamation-circle"></i> Samples in this visit were collected using “diet color”. All order information has been updated to now follow “diet period”.
+                                                                                </div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <div class="{{ textDivSize }}">
+                                                                                    <span class="alert alert-danger no-dob-banner">
+                                                                                        <i class="text-danger fa fa-exclamation-circle"></i>
+                                                                                        DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
+                                                                                    </span>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                                {% set displayedOrderIDS = [] %}
+                                                                {% set displayedTimePointHeaders = [] %}
+                                                                {% for timepointCode, timepoint in visit['visitInfo'] %}
+                                                                    {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
+                                                                        {% if sampleInfo['numberSamples'] is not empty %}
+                                                                            {% for sampleCode, sample in sampleInfo %}
+                                                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] %}
+                                                                                    {% if sample is iterable and sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['healthProOrderId'] not in displayedOrderIDS %}
+                                                                                        {% if timepointCode not in displayedTimePointHeaders %}
+                                                                                            {% set displayedTimePointHeaders = displayedTimePointHeaders|merge([timepointCode]) %}
+                                                                                            <div class="row">
+                                                                                                <div class="col-md-12">
+                                                                                                    <h6>Timepoint | {{ timepoint['timePointDisplayName'] }}</h6>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        {% endif %}
+                                                                                        {% set displayedOrderIDS = displayedOrderIDS|merge([sample[orderid]['healthProOrderId']]) %}
+                                                                                        <div class="card mb-2">
+                                                                                            <div class="card-header">
+                                                                                                <div class="clearfix w-100">
+                                                                                                    <div class="d-inline-block w-10 align-top"><span >{{ sample[orderid]['createDate'] }}</span></div>
+                                                                                                    <div class="d-inline-block w-25 align-top"><span><a
+                                                                                                                    href="{{ path('nph_biobank_order_collect', {biobankId: participant.biobankId, orderId: sample[orderid]['healthProOrderId']}) }}">Order
+                                                                                                            ID: {{ orderid }}</a></span></div>
+                                                                                                    <div class="d-inline-block w-15 align-top"><span>{{ sample[orderid]['sampleTypeDisplayName'] }}</span></div>
+                                                                                                    <div class="d-inline-block w-15 align-top diet-visit-status" data-diet-visit-status="{{ sample[orderid]['orderStatus'] }}">{{ macros.generateStatusLabel(sample[orderid]['orderStatus']) }}</div>
+                                                                                                    <div class="d-inline-block w-10 align-middle">
+                                                                                                        {% for sampleStatus, sampleStatusCount in programSummaryAndOrderInfo[moduleNumber]['sampleStatusCount'][orderid]|sort %}
+                                                                                                            {% if not loop.first %}
+                                                                                                                <span></span>
+                                                                                                            {% endif %}
+                                                                                                            <span>({{ sampleStatusCount }}
+                                                                                                            / {{ sampleInfo['numberSamples'][orderid] }}) {{ sampleStatus }}
+                                                                                                                </span>
+                                                                                                        {% endfor %}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            {% endfor %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endfor %}
+                                                                {% if displayedOrderIDS is empty %}
+                                                                    <h6 class="-italic float-start"><i class="no-orders-generate">No Orders Generated</i></h6>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     {% endif %}
-                                                {% endfor %}
+                                                {% endif %}
                                             {% endfor %}
-                                        {% endif %}
+                                        </div>
                                     {% endfor %}
-                                {% endfor %}
-                                {% if displayedOrderIDS is empty %}
-                                    <h4>No Orders Generated</h4>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
-                    {% endif %}
+                    </div>
                 {% endfor %}
-            </div>
-        {% endfor %}
-    </div>
+        </div>
+        </div>
+    {% else %}
+        <div class="col-md-12">
+            <br><p class="alert alert-danger">Participant did not consented.</p>
+        </div>
+    {% endif %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-participant-summary') }}
