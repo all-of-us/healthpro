@@ -13,8 +13,10 @@
                 {% endif %}
                 <dt>Biobank ID</dt>
                 <dd>{{ participant.biobankId }}</dd>
-                <dt>Paired Awardee</dt>
-                <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+                {% if participant.awardee %}
+                    <dt>Paired Awardee</dt>
+                    <dd>{{ siteInfo.awardeeDisplayName(participant.awardee) }}</dd>
+                {% endif %}
                 <dt>Paired Site</dt>
                 <dd>{{ participant.site ? siteInfo.siteDisplayName(participant.siteSuffix) : '(not paired)' }}</dd>
                 <dt>AI/AN</dt>
