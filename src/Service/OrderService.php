@@ -18,10 +18,6 @@ use Symfony\Component\Form\FormInterface;
 
 class OrderService
 {
-    public const ORDER_CANCEL_STATUS = 'CANCELLED';
-    public const ORDER_RESTORE_STATUS = 'UNSET';
-    public const ORDER_EDIT_STATUS = 'AMENDED';
-
     protected $rdrApiService;
     protected PpscApiService $ppscApiService;
     protected $params;
@@ -132,7 +128,7 @@ class OrderService
         return [];
     }
 
-    public function cancelRestoreOrder($type, $orderObject)
+    public function cancelRestoreOrder($orderObject)
     {
         try {
             $response = $this->ppscApiService->patch("biobank-orders/{$this->order->getRdrId()}", $orderObject);
@@ -209,7 +205,7 @@ class OrderService
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
-        return $this->cancelRestoreOrder($type, $order);
+        return $this->cancelRestoreOrder($order);
     }
 
     public function getCancelRestoreRdrObject($type, $reason)
