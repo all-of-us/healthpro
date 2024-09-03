@@ -160,7 +160,7 @@ class PpscParticipant
         }
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
-        $this->site = $this->getSiteId($participant->site);
+        $this->site = $participant->site ?? null;
         if ($participant->isPediatric == 1) {
             $this->isPediatric = true;
         }
@@ -216,13 +216,5 @@ class PpscParticipant
         $yearsInMonths = $diff->y * 12;
         $months = $diff->m;
         return $yearsInMonths + $months;
-    }
-
-    private function getSiteId($site): string|null
-    {
-        if (!$site) {
-            return null;
-        }
-        return str_replace(User::SITE_PREFIX, '', $site);
     }
 }
