@@ -2,8 +2,6 @@
 
 namespace App\Helper;
 
-use App\Security\User;
-
 class PpscParticipant
 {
     public \DateTime|null $cacheTime;
