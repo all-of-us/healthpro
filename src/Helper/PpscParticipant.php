@@ -2,6 +2,8 @@
 
 namespace App\Helper;
 
+use App\Security\User;
+
 class PpscParticipant
 {
     public \DateTime|null $cacheTime;
@@ -214,5 +216,13 @@ class PpscParticipant
         $yearsInMonths = $diff->y * 12;
         $months = $diff->m;
         return $yearsInMonths + $months;
+    }
+
+    private function getSiteId($site): string|null
+    {
+        if (!$site) {
+            return null;
+        }
+        return str_replace(User::SITE_PREFIX, '', $site);
     }
 }
