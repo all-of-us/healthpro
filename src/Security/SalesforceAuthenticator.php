@@ -97,7 +97,7 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
     {
         $template = 'error-auth.html.twig';
         if ($this->authFailureReason === 'groups') {
-            $template = 'error-auth-groups.html.twig';
+            $template = 'error-auth-salesforce-groups.html.twig';
         }
         $response = new Response($this->twig->render($template, [
             'email' => $this->authEmail,

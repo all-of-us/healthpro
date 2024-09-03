@@ -18,10 +18,6 @@ use Symfony\Component\Form\FormInterface;
 
 class OrderService
 {
-    public const ORDER_CANCEL_STATUS = 'CANCELLED';
-    public const ORDER_RESTORE_STATUS = 'UNSET';
-    public const ORDER_EDIT_STATUS = 'AMENDED';
-
     protected $rdrApiService;
     protected PpscApiService $ppscApiService;
     protected $params;
@@ -74,7 +70,7 @@ class OrderService
     public function createOrder(\stdClass $orderObject): string|bool
     {
         try {
-            $response = $this->ppscApiService->post('/bioBankOrder', $orderObject);
+            $response = $this->ppscApiService->post('biobank-orders', $orderObject);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->healthProOrderId)) {
                 return $result->healthProOrderId;
@@ -89,14 +85,8 @@ class OrderService
     public function editOrder($orderObject)
     {
         try {
-            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->put(
-                "rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}",
-                $orderObject,
-                ['headers' => ['If-Match' => $result->meta->versionId]]
-            );
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
+            $response = $this->ppscApiService->put("biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            if ($response->getStatusCode() === 200) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -138,18 +128,11 @@ class OrderService
         return [];
     }
 
-    public function cancelRestoreOrder($type, $orderObject)
+    public function cancelRestoreOrder($orderObject)
     {
         try {
-            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->patch(
-                "rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}",
-                $orderObject,
-                ['headers' => ['If-Match' => $result->meta->versionId]]
-            );
-            $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+            $response = $this->ppscApiService->patch("biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            if ($response->getStatusCode() === 200) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -162,7 +145,7 @@ class OrderService
     public function getOrder($participantId, $orderId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder/{$orderId}");
+            $response = $this->ppscApiService->get("biobank-orders/{$orderId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -222,7 +205,7 @@ class OrderService
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
-        return $this->cancelRestoreOrder($type, $order);
+        return $this->cancelRestoreOrder($order);
     }
 
     public function getCancelRestoreRdrObject($type, $reason)

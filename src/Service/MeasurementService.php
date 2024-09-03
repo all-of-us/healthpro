@@ -79,10 +79,10 @@ class MeasurementService
     public function createMeasurement($fhir)
     {
         try {
-            $response = $this->ppscApiService->post('/physical_measurement', $fhir);
+            $response = $this->ppscApiService->post('physical-measurements', $fhir);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->sf_measurments_id)) {
-                return $result->sf_measurments_id;
+            if (is_object($result) && isset($result->drcId)) {
+                return $result->drcId;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
@@ -94,7 +94,7 @@ class MeasurementService
     public function getMeasurmeent($participantId, $measurementId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}");
+            $response = $this->rdrApiService->get("physical-measurements/{$measurementId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -174,17 +174,9 @@ class MeasurementService
     public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
     {
         try {
-            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}", $measurementJson);
-            $result = json_decode($response->getBody()->getContents());
-
-            // Check RDR response
-            $rdrStatus = $type === Measurement::EVALUATION_CANCEL ? Measurement::EVALUATION_CANCEL_STATUS : Measurement::EVALUATION_RESTORE_STATUS;
-            if (is_object($result) && is_array($result->entry)) {
-                foreach ($result->entry as $entries) {
-                    if (strtolower($entries->resource->resourceType) === 'composition') {
-                        return $entries->resource->status === $rdrStatus ? true : false;
-                    }
-                }
+            $response = $this->ppscApiService->patch("physical-measurements/{$measurementId}", $measurementJson);
+            if ($response->getStatusCode() === 200) {
+                return true;
             }
         } catch (\Exception $e) {
             $this->rdrApiService->logException($e);
