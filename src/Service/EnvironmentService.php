@@ -32,7 +32,8 @@ class EnvironmentService
         'local' => 'dev',
         'dev' => 'dev',
         'staging' => 'qa',
-        'stable' => 'uat',
+        'beta' => 'uat',
+        'stable' => 'stable',
         'prod' => 'prod'
     ];
 
