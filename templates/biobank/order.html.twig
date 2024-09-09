@@ -59,7 +59,7 @@
 
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation">
+            <li role="presentation" class="active">
                 <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">
                     {% if order.collectedTs is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
@@ -88,7 +88,7 @@
         </ul>
         <br />
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane" id="collect">
+            <div role="tabpanel" class="tab-pane active" id="collect">
                 {% include 'biobank/partials/biobank-order-details.html.twig' with { type: 'collected' } %}
             </div>
             {% if order.type != 'saliva' %}

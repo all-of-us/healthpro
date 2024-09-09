@@ -94,7 +94,7 @@
             {% for sample in samplesInfoText %}
                 {% if (type == 'processed' and sample.process is defined) or (type != 'processed') %}
                     <tr>
-                        <td>{{ sample.code }}</td>
+                        <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
                         <td>{{ sample.color }}</td>
                         <td>
                             {% if attribute(order, type~'Ts') %}
