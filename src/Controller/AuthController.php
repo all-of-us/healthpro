@@ -90,6 +90,8 @@ class AuthController extends BaseController
         Request $request,
         SessionInterface $session
     ): Response {
+        $this->get('security.token_storage')->setToken(null);
+        $session->invalidate();
         $session->set('ppscRequestId', $request->query->get('requestId'));
         $session->set('ppscLandingPage', $request->query->get('page'));
         $session->set('ppscEnv', $request->query->get('env'));
