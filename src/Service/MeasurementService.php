@@ -94,7 +94,7 @@ class MeasurementService
     public function getMeasurmeent($participantId, $measurementId)
     {
         try {
-            $response = $this->rdrApiService->get("physical-measurements/{$measurementId}");
+            $response = $this->ppscApiService->get("physical-measurements/{$measurementId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;

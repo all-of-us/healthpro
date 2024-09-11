@@ -95,6 +95,7 @@ class AuthController extends BaseController
         $session->set('ppscRequestId', $request->query->get('requestId'));
         $session->set('ppscLandingPage', $request->query->get('page'));
         $session->set('ppscEnv', $request->query->get('env'));
+        $session->set('ppscPortal', $request->query->get('portal'));
         if ($params->has('enable_salesforce_login') && $params->get('enable_salesforce_login')) {
             return $this->redirect($auth->getAuthorizationUrl());
         }

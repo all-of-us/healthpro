@@ -26,8 +26,8 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
     private ContainerBagInterface $params;
     private Environment $twig;
     private RequestStack $requestStack;
-    private string $authEmail;
-    private string $authFailureReason;
+    private string $authEmail = '';
+    private string $authFailureReason = '';
 
     public function __construct(
         SalesforceAuthService $auth,
