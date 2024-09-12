@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SalesforceAuthService
 {
+    public const PPSC_PORTAL_STAFF = 'staff';
+
     private RequestStack $requestStack;
     private ?GenericProvider $provider = null;
     private ContainerBagInterface $params;
@@ -59,7 +61,12 @@ class SalesforceAuthService
     private function getParams($field): string|null
     {
         $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'));
-        return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
+        $ppscPortal = $this->requestStack->getSession()->get('ppscPortal');
+        $paramField = $ppscEnv . '_' . $field;
+        if ($ppscPortal === self::PPSC_PORTAL_STAFF) {
+            $paramField = $ppscEnv . '_' . $ppscPortal . '_' . $field;
+        }
+        return $this->params->has($paramField) ? $this->params->get($paramField) : null;
     }
 
     private function getProvider(): GenericProvider
