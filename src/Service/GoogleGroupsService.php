@@ -69,9 +69,9 @@ class GoogleGroupsService
             $nextToken = $groupsCollection->getNextPageToken();
         } while ($nextToken);
 
-        // Remove hpo site and awardee groups
+        // Only keep admin & biobank user groups
         $googleGroups = array_filter($groups, function ($group) {
-            return !str_starts_with($group->email, User::SITE_PREFIX) && !str_starts_with($group->email, User::AWARDEE_PREFIX);
+            return str_starts_with($group->email, User::ADMIN_GROUP) || str_starts_with($group->email, User::BIOBANK_GROUP);
         });
 
         return array_values($googleGroups);
