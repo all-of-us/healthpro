@@ -71,8 +71,9 @@ class GoogleGroupsService
 
         // Only keep HPO admin & biobank user groups and all NPH groups
         $googleGroups = array_filter($groups, function ($group) {
-            return str_starts_with($group->email, User::ADMIN_GROUP) || str_starts_with($group->email,
-                    User::BIOBANK_GROUP) || str_starts_with($group->email, User::NPH_TYPE);
+            return str_starts_with($group->email, User::ADMIN_GROUP) ||
+                str_starts_with($group->email, User::BIOBANK_GROUP) ||
+                str_starts_with($group->email, User::NPH_TYPE);
         });
 
         return array_values($googleGroups);
