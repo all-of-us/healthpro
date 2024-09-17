@@ -87,27 +87,6 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    #[Route(path: '/ehr-withdrawal', name: 'cron_ehr_withdrawal')]
-    public function ehrWithdrawal(EhrWithdrawalNotificationService $ehrWithdrawalNotificationService): Response
-    {
-        $ehrWithdrawalNotificationService->sendEmails();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/withdrawal', name: 'cron_withdrawal')]
-    public function withdrawalAction(WithdrawalNotificationService $withdrawalNotificationService): Response
-    {
-        $withdrawalNotificationService->sendEmails();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/deactivate', name: 'cron_deactivate')]
-    public function deactivateAction(DeactivateNotificationService $deactivateNotificationService): Response
-    {
-        $deactivateNotificationService->sendEmails();
-        return $this->json(['success' => true]);
-    }
-
     #[Route(path: '/missing-measurements-orders', name: 'cron_missing_measurements_orders')]
     public function missingMeasurementsOrdersAction(MissingMeasurementsAndOrdersNotificationService $missingMeasurementsAndOrdersNotificationService): Response
     {
