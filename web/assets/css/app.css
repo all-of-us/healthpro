@@ -303,6 +303,9 @@ label.label-normal {
 #problem-details {
     margin: 20px auto;
 }
+.blood-donor-cancel {
+    margin-left: 8px;
+}
 
 /* Participant page */
 #order-overflow, #evaluation-overflow, #problem-overflow, #comment-overflow {

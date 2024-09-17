@@ -1,26 +1,12 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Physical Measurements Blood Donor Check- {% endblock %}
 {% block body %}
     <div>
         <div class="page-header">
             <h2>
                 <i class="fa fa-clipboard" aria-hidden="true"></i> New Physical Measurements
-                <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
             </h2>
         </div>
-
-        <dl class="dl-horizontal">
-            <dt>Name</dt>
-            <dd>{{ participant.lastName }}, {{ participant.firstName }}</dd>
-            <dt>Participant ID</dt>
-            <dd>{{ participant.id }}</dd>
-            <dt>DOB</dt>
-            <dd>{{ participant.dob ? participant.dob|date('n/j/Y') }}</dd>
-            <dt>Gender Identity</dt>
-            <dd>{{ participant.genderIdentity }}</dd>
-            <dt>Paired Awardee</dt>
-            <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
-        </dl>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -42,7 +28,14 @@
                     {{ form_row(bloodDonorCheckForm.bloodDonorType) }}
                 </div>
 
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default blood-donor-cancel" type="button">Cancel</a>
+
+                <div class="pull-left">
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </div>
+
                 {{ form_rest(bloodDonorCheckForm) }}
+
                 {{ form_end(bloodDonorCheckForm) }}
             </div>
         </div>

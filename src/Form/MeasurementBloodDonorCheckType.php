@@ -39,9 +39,6 @@ class MeasurementBloodDonorCheckType extends AbstractType
                         $context->buildViolation('Please select an option')->addViolation();
                     }
                 })
-            ])
-            ->add('Continue', Type\SubmitType::class, [
-                'attr' => ['class' => 'btn btn-primary'],
             ]);
     }
 }
