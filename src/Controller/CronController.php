@@ -5,9 +5,7 @@ namespace App\Controller;
 use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
 use App\Service\BiobankNightlyReportService;
-use App\Service\DeactivateNotificationService;
 use App\Service\DeceasedNotificationService;
-use App\Service\EhrWithdrawalNotificationService;
 use App\Service\HFHRepairService;
 use App\Service\IdVerificationImportService;
 use App\Service\IdVerificationService;
@@ -19,7 +17,6 @@ use App\Service\PatientStatusService;
 use App\Service\PediatricsReportService;
 use App\Service\SessionService;
 use App\Service\SiteSyncService;
-use App\Service\WithdrawalNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -84,27 +81,6 @@ class CronController extends BaseController
         ]);
         $application->run($input, new NullOutput());
 
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/ehr-withdrawal', name: 'cron_ehr_withdrawal')]
-    public function ehrWithdrawal(EhrWithdrawalNotificationService $ehrWithdrawalNotificationService): Response
-    {
-        $ehrWithdrawalNotificationService->sendEmails();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/withdrawal', name: 'cron_withdrawal')]
-    public function withdrawalAction(WithdrawalNotificationService $withdrawalNotificationService): Response
-    {
-        $withdrawalNotificationService->sendEmails();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/deactivate', name: 'cron_deactivate')]
-    public function deactivateAction(DeactivateNotificationService $deactivateNotificationService): Response
-    {
-        $deactivateNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
