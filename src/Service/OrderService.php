@@ -584,6 +584,11 @@ class OrderService
     {
         // Get order object from RDR
         $object = $this->getOrder($this->participant->id, $this->order->getRdrId());
+
+        if ($object === false) {
+            return false;
+        }
+
         //Update samples
         if (!empty($object->samples)) {
             foreach ($object->samples as $sample) {
