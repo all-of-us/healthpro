@@ -9,7 +9,7 @@ jobs:
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
 
     docker:
-    - image: cimg/php:8.1.17-node
+    - image: cimg/php:8.2.21-node
     - image: mysql:5.7
       environment:
         MYSQL_ROOT_PASSWORD: passw0rd
