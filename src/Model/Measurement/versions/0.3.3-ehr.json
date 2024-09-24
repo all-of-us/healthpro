@@ -250,7 +250,8 @@
                     "max": 228,
                     "message": "Please verify that this height is correct."
                 }
-            ]
+            ],
+            "captureusersupplied": true
         },
         {
             "name": "height-protocol-modification",
