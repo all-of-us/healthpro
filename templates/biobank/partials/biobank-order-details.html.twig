@@ -94,8 +94,12 @@
             {% for sample in samplesInfoText %}
                 {% if (type == 'processed' and sample.process is defined) or (type != 'processed') %}
                     <tr>
-                        <td>{{ sample.code }}</td>
-                        <td>{{ sample.color }}</td>
+                        {% if order.type != constant('ORDER_TYPE_SALIVA', order) %}
+                            <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
+                            <td>{{ sample.color }}</td>
+                        {% else %}
+                            <td>{{ sample.label }}</td>
+                        {% endif %}
                         <td>
                             {% if attribute(order, type~'Ts') %}
                                 {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
