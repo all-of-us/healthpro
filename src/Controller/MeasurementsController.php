@@ -142,7 +142,7 @@ class MeasurementsController extends BaseController
                             } else {
                                 $fhir = $measurement->getFhir($now);
                             }
-                            if ($rdrEvalId = $this->measurementService->createMeasurement($fhir)) {
+                            if ($rdrEvalId = $this->measurementService->createMeasurement($participant->id, $fhir)) {
                                 $measurement->setRdrId($rdrEvalId);
                                 $measurement->setFhirVersion(Fhir::CURRENT_VERSION);
                             } else {

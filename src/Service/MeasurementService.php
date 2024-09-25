@@ -76,10 +76,10 @@ class MeasurementService
         $measurement->loadFromAObject($finalizedUserEmail, $finalizedSite);
     }
 
-    public function createMeasurement($fhir)
+    public function createMeasurement($participantId, $fhir)
     {
         try {
-            $response = $this->ppscApiService->post('physical-measurements', $fhir);
+            $response = $this->ppscApiService->post("participants/{$participantId}/physical-measurements", $fhir);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->drcId)) {
                 return $result->drcId;
@@ -94,7 +94,7 @@ class MeasurementService
     public function getMeasurmeent($participantId, $measurementId)
     {
         try {
-            $response = $this->ppscApiService->get("physical-measurements/{$measurementId}");
+            $response = $this->ppscApiService->get("participants/{$participantId}/physical-measurements/{$measurementId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -174,7 +174,7 @@ class MeasurementService
     public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
     {
         try {
-            $response = $this->ppscApiService->patch("physical-measurements/{$measurementId}", $measurementJson);
+            $response = $this->ppscApiService->patch("participants/{$participantId}/physical-measurements/{$measurementId}", $measurementJson);
             if ($response->getStatusCode() === 200) {
                 return true;
             }
@@ -245,7 +245,7 @@ class MeasurementService
             }
         }
         $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $parentRdrId);
-        $rdrId = $this->createMeasurement($fhir);
+        $rdrId = $this->createMeasurement($this->measurement->getParticipantId(), $fhir);
         if (!empty($rdrId)) {
             $this->measurement->setRdrId($rdrId);
             $this->em->persist($this->measurement);
