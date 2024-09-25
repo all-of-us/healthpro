@@ -24,12 +24,9 @@
             {{ form_widget(form[name]) }}
         {% endif %}
         {{ form_errors(form[name]) }}
-
-        {% if definition.alternateunits is defined and definition.alternateunits %}
-        {% endif %}
     </div>
 
-    {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
+    {% if definition.alternateunits is defined and definition.alternateunits %}
         {{ self.form_row_alternate_units(definition, name, form) }}
     {% endif %}
 {% endmacro %}
@@ -58,7 +55,7 @@
         {{ form_errors(form[name][i]) }}
     </div>
 
-    {% if not form[name].vars.disabled and definition.alternateunits is defined and definition.alternateunits %}
+    {% if definition.alternateunits is defined and definition.alternateunits %}
         {{ self.form_row_alternate_units(definition, name, form, i) }}
     {% endif %}
 {% endmacro %}
