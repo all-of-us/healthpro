@@ -889,7 +889,7 @@ class NphOrderService
         return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
     }
 
-    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit): NphDlw
+    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit, bool $updateModifiedTs = true): NphDlw
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -897,8 +897,10 @@ class NphOrderService
             $formData->setNphParticipant($participantId);
             $formData->setModule($module);
             $formData->setVisitPeriod($visit);
-            $formData->setModifiedTimezoneId($this->getTimezoneid());
-            $formData->setModifiedTs(new DateTime());
+            if ($updateModifiedTs) {
+                $formData->setModifiedTimezoneId($this->getTimezoneid());
+                $formData->setModifiedTs(new DateTime());
+            }
             $formData->setUser($this->user);
             $this->em->persist($formData);
             $this->em->flush();
