@@ -615,7 +615,11 @@ class NphOrderController extends BaseController
         $dlwForm->handleRequest($request);
         if ($dlwForm->isSubmitted()) {
             if ($dlwForm->isValid()) {
-                $dlwObject = $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
+                try {
+                    $dlwObject = $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
+                } catch (\Exception $e) {
+                    $this->addFlash($e->getMessage());
+                }
                 $disabled = true;
             } else {
                 $disabled = false;

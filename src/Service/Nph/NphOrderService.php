@@ -746,20 +746,6 @@ class NphOrderService
         $samplesMetadata = $this->getSamplesMetadata($order);
         $obj->sample = $sample->getRdrSampleObj($sampleIdentifier, $sampleDescription, $samplesMetadata);
         $aliquotsInfo = $this->getAliquots($sample->getSampleCode());
-        if ($order->getModule() === '3' && $order->getOrderType() === $order::TYPE_DLW) {
-            $dlwInfo = $this->em->getRepository(NphDlw::class)->findOneBy(['module' => $order->getModule(), 'visitPeriod'
-            => $order->getVisitPeriod(), 'NphParticipant' => $order->getParticipantId()]);
-            if ($dlwInfo) {
-                $obj->sample = array_merge($obj->sample, [
-                    'dlwDose' => [
-                    'batchid' => $dlwInfo->getDoseBatchId(),
-                    'participantweight' => $dlwInfo->getParticipantWeight(),
-                    'dose' => $dlwInfo->getActualDose(),
-                    'calculateddose' => ($dlwInfo->getParticipantWeight() * 1.5),
-                    'doseAdministered' => $dlwInfo->getDoseAdministered()->format('Y-m-d\TH:i:s\Z')
-                ]]);
-            }
-        }
         if ($aliquotsInfo) {
             $obj->aliquots = $sample->getRdrAliquotsSampleObj($aliquotsInfo);
         }
@@ -905,14 +891,28 @@ class NphOrderService
 
     public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit): NphDlw
     {
-        $formData->setNphParticipant($participantId);
-        $formData->setModule($module);
-        $formData->setVisitPeriod($visit);
-        $formData->setModifiedTimezoneId($this->getTimezoneid());
-        $formData->setModifiedTs(new DateTime());
-        $formData->setUser($this->user);
-        $this->em->persist($formData);
-        $this->em->flush();
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $formData->setNphParticipant($participantId);
+            $formData->setModule($module);
+            $formData->setVisitPeriod($visit);
+            $formData->setModifiedTimezoneId($this->getTimezoneid());
+            $formData->setModifiedTs(new DateTime());
+            $formData->setUser($this->user);
+            $this->em->persist($formData);
+            $this->em->flush();
+        } catch (\Exception $e) {
+            $connection->rollBack();
+            throw new \Exception('Unable to save DLW collection');
+        }
+        try {
+            $this->sendDLWToRdr($formData);
+        } catch (\Exception $e) {
+            $connection->rollBack();
+            throw new \Exception('Unable to save DLW collection in RDR Please try Again');
+        }
+        $connection->commit();
         return $formData;
     }
 
@@ -1469,6 +1469,66 @@ class NphOrderService
             }
         }
         return false;
+    }
+
+    private function sendDLWToRdr(NphDlw $dlw): bool
+    {
+        $dlwRDRObject = $this->getDLWRDRObject($dlw);
+        if ($dlw->getRdrId()) {
+            $this->editRDRDlw($dlw->getNphParticipant(), $dlw->getRdrId(), $dlwRDRObject);
+            $this->loggerService->log(Log::NPH_DLW_RDR_CREATE, $dlw->getRdrId());
+        } else {
+            $rdrId = $this->createRDRDlw($dlw->getNphParticipant(), $dlwRDRObject);
+            $dlw->setRdrId($rdrId);
+            $this->em->persist($dlw);
+            $this->em->flush();
+            $this->loggerService->log(Log::NPH_DLW_RDR_UPDATE, $dlw->getRdrId());
+        }
+        return false;
+    }
+
+    private function createRDRDlw(string $participantId, \stdClass $rdrDlwObject): ?string {
+        try {
+            $response = $this->rdrApiService->post("rdr/v1/api/v1/nph/Participant/{$participantId}/DlwDosage", $rdrDlwObject);
+            $result = json_decode($response->getBody()->getContents());
+            if ($result) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return null;
+        }
+        return null;
+    }
+
+    private function editRDRDlw(string $participantId, string $rdrId, \stdClass $rdrDlwObject) {
+        try {
+            $response = $this->rdrApiService->put(
+                "rdr/v1/api/v1/nph/Participant/{$participantId}/DlwDosage/{$rdrId}",
+                $rdrDlwObject
+            );
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->rdrApiService->logException($e);
+            return false;
+        }
+        return false;
+    }
+
+    private function getDLWRDRObject(NphDlw $dlw): \stdClass
+    {
+        $object = new \stdClass();
+        $object->module = $dlw->getModule();
+        $object->visitperiod = $dlw->getVisitPeriod();
+        $object->batchid = $dlw->getDoseBatchId();
+        $object->participantweight = $dlw->getParticipantWeight();
+        $object->dose = $dlw->getActualDose();
+        $object->calculateddose = $dlw->getParticipantWeight() * 1.5;
+        $object->dosetime = $dlw->getDoseAdministered()->format('Y-m-d\TH:i:s\Z');
+        return $object;
     }
 
     private function createRdrSample(string $participantId, \stdClass $sampleObject): ?string
