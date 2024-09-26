@@ -31,7 +31,6 @@ class NphOrderServiceTest extends ServiceTestCase
         $siteService = static::$container->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
         $mockRdrApiService = $this->createMock(RdrApiService::class);
-        $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('post')->willReturn($this->returnCallback(
             function ($arg) {
                 if ($arg === "rdr/v1/api/v1/nph/Participant/P0000000003/DlwDosage") {
