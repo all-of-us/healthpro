@@ -19,10 +19,6 @@ class NphDlwBackfillService
 
     public function backfillNphDlw()
     {
-        /**
-         * @var $dlws array
-         * @var $dlw NphDlw
-         */
         $dlws = $this->em->getRepository(NphDlw::class)->getDlwWithMissingRdrId(25);
         foreach ($dlws as $dlw) {
             $this->nphOrderService->saveDlwCollection($dlw, $dlw->getNphParticipant(), $dlw->getModule(), $dlw->getVisitPeriod(), false);
