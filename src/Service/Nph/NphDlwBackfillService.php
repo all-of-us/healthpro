@@ -4,7 +4,6 @@ namespace App\Service\Nph;
 
 use App\Entity\NphDlw;
 use App\Repository\NphDlwRepository;
-use App\Service\Nph\NphOrderService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class NphDlwBackfillService
@@ -18,7 +17,8 @@ class NphDlwBackfillService
         $this->nphOrderService = $nphOrderService;
     }
 
-    public function backfillNphDlw() {
+    public function backfillNphDlw()
+    {
         /**
          * @var $dlws array
          * @var $dlw NphDlw
