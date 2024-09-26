@@ -3,19 +3,16 @@
 namespace App\Service\Nph;
 
 use App\Entity\NphDlw;
-use App\Repository\NphDlwRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class NphDlwBackfillService
 {
     protected EntityManagerInterface $em;
-    protected NphDlwRepository $NphDlwRepository;
     protected NphOrderService $nphOrderService;
 
-    public function __construct(EntityManagerInterface $em, NphDlwRepository $dlwRepository, NphOrderService $nphOrderService)
+    public function __construct(EntityManagerInterface $em, NphOrderService $nphOrderService)
     {
         $this->em = $em;
-        $this->NphDlwRepository = $dlwRepository;
         $this->nphOrderService = $nphOrderService;
     }
 
