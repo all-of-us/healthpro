@@ -1487,7 +1487,8 @@ class NphOrderService
         return false;
     }
 
-    private function createRDRDlw(string $participantId, \stdClass $rdrDlwObject): ?string {
+    private function createRDRDlw(string $participantId, \stdClass $rdrDlwObject): ?string
+    {
         try {
             $response = $this->rdrApiService->post("rdr/v1/api/v1/nph/Participant/{$participantId}/DlwDosage", $rdrDlwObject);
             $result = json_decode($response->getBody()->getContents());
@@ -1501,7 +1502,8 @@ class NphOrderService
         return null;
     }
 
-    private function editRDRDlw(string $participantId, string $rdrId, \stdClass $rdrDlwObject) {
+    private function editRDRDlw(string $participantId, string $rdrId, \stdClass $rdrDlwObject)
+    {
         try {
             $response = $this->rdrApiService->put(
                 "rdr/v1/api/v1/nph/Participant/{$participantId}/DlwDosage/{$rdrId}",
