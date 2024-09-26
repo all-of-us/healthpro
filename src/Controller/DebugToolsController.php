@@ -137,7 +137,7 @@ class DebugToolsController extends BaseController
                     $orderRdrObject = $order->getRdrObject();
 
                     // Send order to RDR
-                    if ($rdrId = $orderService->createOrder($orderRdrObject)) {
+                    if ($rdrId = $orderService->createOrder($order->getParticipantId(), $orderRdrObject)) {
                         $updateOrder = $repository->find($order->getId());
                         $updateOrder->setRdrId($rdrId);
                         $this->em->flush();
