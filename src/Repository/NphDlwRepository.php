@@ -38,4 +38,12 @@ class NphDlwRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function getDlwWithMissingRdrId(int $limit): array
+    {
+        $queryBuilder = $this->createQueryBuilder('nd')
+            ->where('nd.rdrId is null')
+            ->setMaxResults($limit);
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

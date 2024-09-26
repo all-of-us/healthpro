@@ -15,6 +15,7 @@ use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\Nph\NphDietPeriodStatusService;
+use App\Service\Nph\NphDlwBackfillService;
 use App\Service\PatientStatusService;
 use App\Service\PediatricsReportService;
 use App\Service\SessionService;
@@ -314,6 +315,13 @@ class CronController extends BaseController
     public function backfillNphOrdersCompleteStatus(NphDietPeriodStatusService $nphDietPeriodStatusService): Response
     {
         $nphDietPeriodStatusService->backfillDietPeriodCompleteStatus();
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/backfill-nph-dlw', name: 'cron_backfill_nph_dlw')]
+    public function backfillNphDlw(NphDlwBackfillService $backfill)
+    {
+        $backfill->backfillNphDlw();
         return $this->json(['success' => true]);
     }
 }
