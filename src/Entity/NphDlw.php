@@ -49,7 +49,7 @@ class NphDlw
     private ?string $visitPeriod = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $rdr_id = null;
+    private ?string $rdrId = null;
 
     public function getId(): int
     {
@@ -190,12 +190,12 @@ class NphDlw
 
     public function getRdrId(): ?string
     {
-        return $this->rdr_id;
+        return $this->rdrId;
     }
 
-    public function setRdrId(?string $rdr_id): static
+    public function setRdrId(?string $rdrId): static
     {
-        $this->rdr_id = $rdr_id;
+        $this->rdrId = $rdrId;
 
         return $this;
     }
