@@ -8,7 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class NphDlwBackfillService
 {
-    private \App\Service\Nph\NphOrderService $nphOrderService;
+    protected EntityManagerInterface $em;
+    protected NphDlwRepository $NphDlwRepository;
+    protected NphOrderService $nphOrderService;
 
     public function __construct(EntityManagerInterface $em, NphDlwRepository $dlwRepository, NphOrderService $nphOrderService)
     {
