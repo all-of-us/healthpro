@@ -49,7 +49,7 @@ class MeasurementQueueService
             $this->measurementService->load($measurement, $participant);
             $fhir = $measurement->getFhir($measurement->getFinalizedTs(), $measurementQueue->getOldRdrId());
             $now = new \DateTime();
-            if ($rdrMeasurementId = $this->measurementService->createMeasurement($fhir)) {
+            if ($rdrMeasurementId = $this->measurementService->createMeasurement($measurement->getParticipantId(), $fhir)) {
                 $measurement->setRdrId($rdrMeasurementId);
                 $measurement->setFhirVersion(Fhir::CURRENT_VERSION);
                 $this->em->persist($measurement);
