@@ -618,7 +618,7 @@ class NphOrderController extends BaseController
                 try {
                     $dlwObject = $nphOrderService->saveDlwCollection($dlwForm->getData(), $participantId, $module, $visit);
                 } catch (\Exception $e) {
-                    $this->addFlash($e->getMessage());
+                    $this->addFlash('error', $e->getMessage());
                 }
                 $disabled = true;
             } else {
