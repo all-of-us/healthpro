@@ -62,7 +62,7 @@ class NphDlwBackfillService
     private function editRDRDlw(string $participantId, string $rdrId, \stdClass $rdrDlwObject): void
     {
         try {
-            $response = $this->rdrApiService->put(
+            $this->rdrApiService->put(
                 "rdr/v1/api/v1/nph/Participant/{$participantId}/DlwDosage/{$rdrId}",
                 $rdrDlwObject
             );
