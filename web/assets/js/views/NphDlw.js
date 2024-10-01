@@ -26,6 +26,10 @@ $(document).ready(function () {
         );
     });
 
+    $("input").on('change', function () {
+        $(this).siblings('.help-block').remove();
+    })
+
     function calculateDose() {
         let weight = $("input#dlw_participantWeight").val();
         let dosage = weight * 1.5;
