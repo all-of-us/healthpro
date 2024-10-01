@@ -12,9 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
-use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 class DlwType extends AbstractType
 {
@@ -128,7 +128,7 @@ class DlwType extends AbstractType
                     'data-parsley-required-message' => self::DOSE_DATE_TIME_REQUIRED
                 ],
                 'view_timezone' => $options['timezone'],
-                'constraints' =>[
+                'constraints' => [
                     new Type('datetime'),
                     new LessThanOrEqual([
                         'value' => $constraintDate,
