@@ -34,7 +34,7 @@ class DlwType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $constraintDate = new \DateTime('today', new \DateTimeZone($options['timezone']));
+        $constraintDate = new \DateTime('now', new \DateTimeZone($options['timezone']));
         $builder
             ->add('doseBatchId', TextType::class, [
                 'label' => 'Dose Batch ID',
