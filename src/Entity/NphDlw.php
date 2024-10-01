@@ -48,6 +48,9 @@ class NphDlw
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $visitPeriod = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $rdrId = null;
+
     public function getId(): int
     {
         return $this->id;
@@ -181,6 +184,18 @@ class NphDlw
     public function setVisitPeriod(?string $visitPeriod): static
     {
         $this->visitPeriod = $visitPeriod;
+
+        return $this;
+    }
+
+    public function getRdrId(): ?string
+    {
+        return $this->rdrId;
+    }
+
+    public function setRdrId(?string $rdrId): static
+    {
+        $this->rdrId = $rdrId;
 
         return $this;
     }
