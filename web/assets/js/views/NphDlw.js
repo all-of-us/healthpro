@@ -22,7 +22,7 @@ $(document).ready(function () {
         $("input[readonly=readonly]").prop("readonly", "");
         $("#dlw_calculatedDose").prop("readonly", "readonly");
         $("#form_edit").replaceWith(
-            '<button type="submit" class="btn btn-primary" id="form_submit" formnovalidate>Save</button>'
+            '<button type="submit" class="btn btn-primary" id="form_submit">Save</button>'
         );
     });
 
