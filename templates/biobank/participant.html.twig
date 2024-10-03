@@ -13,6 +13,8 @@
                 {% endif %}
                 <dt>Biobank ID</dt>
                 <dd>{{ participant.biobankId }}</dd>
+                <dt>Paired Organization</dt>
+                <dd>{{ participant.organization ? siteInfo.getOrganizationDisplayName(participant.organization) : '(not paired)' }}</dd>
                 <dt>AI/AN</dt>
                 <dd>
                     {% if participant.isAIAN %}
