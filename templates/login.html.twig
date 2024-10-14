@@ -32,12 +32,7 @@
                         </div>
                     {% endif %}
 
-                    {% if dashboardUrl %}
-                        <hr />
-                        <div class="links">
-                            <i class="fas fa-chart-line fa-fw"></i> <a href="{{ dashboardUrl }}">HealthPro Dashboards</a>
-                        </div>
-                    {% endif %}
+                    <hr />
                     <div class="links">
                         <i class="fas fa-exclamation-triangle fa-fw"></i> <a href="{{ report_technical_issue_url }}" target="_blank">Report a Technical Issue</a>
                     </div>
@@ -45,25 +40,21 @@
                 <div id="login-carousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner" role="listbox">
                         <div class="item active">
-                            <img src="{{ asset('img/login/carousel/LogoHPRO.jpg') }}" alt="HealthPro">
-                        </div>
-                        <div class="item">
-                            <img src="{{ asset('img/login/carousel/LogoNPH.jpg') }}" alt="Nutrition for Precision Health">
+                            <img src="{{ asset('img/login/nph-new-logo.jpg') }}" alt="Nutrition for Precision Health">
                         </div>
                     </div>
                 </div>
                 <div id="login-help">
-                    <h4>AoU Support</h4>
-                    <p><a href="tel:844-842-2854">844-842-2854</a> or <a href="mailto:help@joinallofus.org">help@joinallofus.org</a></p>
-                    <br>
                     <h4>NPH Support</h4>
-                    <p><a href="https://redcapedc.rti.org/nph/surveys/?s=ED7KXY7DRF4JTFP3">NPH Help Desk</a> Or<br>
+                    <p><a href="https://redcapedc.rti.org/nph/surveys/?s=ED7KXY7DRF4JTFP3">NPH Help Desk</a> <br>Or<br>
                         <a href="mailto:NPH-Helpdesk@nutritionforprecisionhealth.org">NPH-Helpdesk@nutritionforprecisionhealth.org</a></p>
                 </div>
             </div>
         </div>
     </div>
     <div id="login-copyright">
+        <img src="{{ asset('img/login/logo-aou.svg') }}" width="150" height="100" alt="HealthPro">
+        <br>
         <em>All of Us</em> and the <em>All of Us</em> logo are service marks of the U.S. Department of Health and Human Services.
     </div>
     {% block pagejs %}
