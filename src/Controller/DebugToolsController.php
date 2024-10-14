@@ -91,7 +91,7 @@ class DebugToolsController extends BaseController
                     $fhir = $measurement->getFhir($measurement->getFinalizedTs(), $parentRdrId);
 
                     // Send measurements to RDR
-                    if ($rdrEvalId = $measurementsService->createMeasurement($fhir)) {
+                    if ($rdrEvalId = $measurementsService->createMeasurement($measurement->getParticipantId(), $fhir)) {
                         $updateMeasurement = $repository->find($measurement->getId());
                         $updateMeasurement->setRdrId($rdrEvalId);
                         $updateMeasurement->setFhirVersion(Fhir::CURRENT_VERSION);
@@ -137,7 +137,7 @@ class DebugToolsController extends BaseController
                     $orderRdrObject = $order->getRdrObject();
 
                     // Send order to RDR
-                    if ($rdrId = $orderService->createOrder($orderRdrObject)) {
+                    if ($rdrId = $orderService->createOrder($order->getParticipantId(), $orderRdrObject)) {
                         $updateOrder = $repository->find($order->getId());
                         $updateOrder->setRdrId($rdrId);
                         $this->em->flush();

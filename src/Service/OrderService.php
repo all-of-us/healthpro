@@ -67,10 +67,10 @@ class OrderService
         return $this->participant;
     }
 
-    public function createOrder(\stdClass $orderObject): string|bool
+    public function createOrder(string $participantId, \stdClass $orderObject): string|bool
     {
         try {
-            $response = $this->ppscApiService->post('biobank-orders', $orderObject);
+            $response = $this->ppscApiService->post("participants/{$participantId}/biobank-orders", $orderObject);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->healthProOrderId)) {
                 return $result->healthProOrderId;
@@ -85,7 +85,7 @@ class OrderService
     public function editOrder($orderObject)
     {
         try {
-            $response = $this->ppscApiService->put("biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            $response = $this->ppscApiService->put("participants/{$this->participant->id}/biobank-orders/{$this->order->getRdrId()}", $orderObject);
             if ($response->getStatusCode() === 200) {
                 return true;
             }
@@ -131,7 +131,7 @@ class OrderService
     public function cancelRestoreOrder($orderObject)
     {
         try {
-            $response = $this->ppscApiService->patch("biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            $response = $this->ppscApiService->patch("participants/{$this->participant->id}/biobank-orders/{$this->order->getRdrId()}", $orderObject);
             if ($response->getStatusCode() === 200) {
                 return true;
             }
@@ -145,7 +145,7 @@ class OrderService
     public function getOrder($participantId, $orderId)
     {
         try {
-            $response = $this->ppscApiService->get("biobank-orders/{$orderId}");
+            $response = $this->ppscApiService->get("participants/{$participantId}/biobank-orders/{$orderId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
@@ -456,7 +456,7 @@ class OrderService
     public function createRdrOrder()
     {
         $orderRdrObject = $this->order->getRdrObject();
-        $rdrId = $this->createOrder($orderRdrObject);
+        $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
         if (!$rdrId) {
             // Check for rdr id conflict error code
             if ($this->rdrApiService->getLastErrorCode() === 409) {
