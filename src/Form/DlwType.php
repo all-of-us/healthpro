@@ -12,7 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
 
 class DlwType extends AbstractType
 {
@@ -32,6 +34,7 @@ class DlwType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $constraintDate = new \DateTime('now', new \DateTimeZone($options['timezone']));
         $builder
             ->add('doseBatchId', TextType::class, [
                 'label' => 'Dose Batch ID',
@@ -125,7 +128,13 @@ class DlwType extends AbstractType
                     'data-parsley-required-message' => self::DOSE_DATE_TIME_REQUIRED
                 ],
                 'view_timezone' => $options['timezone'],
-                'constraints' => new NotBlank(['message' => self::DOSE_DATE_TIME_REQUIRED])
+                'constraints' => [
+                    new Type('datetime'),
+                    new LessThanOrEqual([
+                        'value' => $constraintDate,
+                        'message' => 'Date cannot be in the future'
+                    ])
+                ]
             ])
             ->add('calculatedDose', null, ['attr' => ['readonly' => true], 'mapped' => false]);
     }
@@ -135,7 +144,7 @@ class DlwType extends AbstractType
         $resolver->setDefaults([
             'data_class' => NphDlw::class,
             'allow_extra_fields' => true,
-            'timezone' => 'UTC',
+            'timezone' => 'UTC'
         ]);
     }
 
