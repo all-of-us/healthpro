@@ -1,20 +1,29 @@
 <nav class="navbar navbar-default navbar-inverse navbar">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <ul class="nav navbar-nav">
-                <a class="navbar-brand dropdown-toggle" href="#">
-                    <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+        <ul class="nav navbar-nav navbar-header">
+            <a class="navbar-brand dropdown-toggle" href="#">
+                <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+            </a>
+            <li>
+                <a class="navbar-brand " href="#">
+                    HealthPro
                 </a>
-                {% set site = '' %}
-                {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site').id is defined %}
-                    {% set site = app.session.get('site').id %}
-                {% endif %}
-                <li>
-                    <a class="navbar-brand " href="#" data-site-name="{{ site }}">
-                        HealthPro
-                    </a>
-                </li>
-            </ul>
-        </div>
+            </li>
+        </ul>
+        {% set site = '' %}
+        {% set siteName = '' %}
+        {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site') is defined %}
+            {% if app.session.get('site').id is defined %}
+                {% set site = app.session.get('site').id %}
+            {% endif %}
+            {% if app.session.get('siteEntity').name is defined %}
+                {% set siteName = app.session.get('siteEntity').name %}
+            {% elseif app.session.get('site').name is defined %}
+                {% set siteName = app.session.get('site').name %}
+            {% endif %}
+        {% endif %}
+        <span class="navbar-text navbar-right navbar-site-name" data-site-name="{{ site }}">
+            {{ siteName }}
+        </span>
     </div>
 </nav>

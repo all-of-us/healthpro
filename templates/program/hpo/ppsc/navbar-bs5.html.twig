@@ -4,18 +4,29 @@
             data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
             <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
         </a>
-        {% set site = '' %}
-        {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site').id is defined %}
-            {% set site = app.session.get('site').id %}
-        {% endif %}
         <div class="navbar-collapse" id="pmi-navbar-collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link navbar-brand" href="#" data-site-name="{{ site }}">
+                    <a class="nav-link navbar-brand" href="#">
                         HealthPro
                     </a>
                 </li>
             </ul>
+            {% set site = '' %}
+            {% set siteName = '' %}
+            {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site') is defined %}
+                {% if app.session.get('site').id is defined %}
+                    {% set site = app.session.get('site').id %}
+                {% endif %}
+                {% if app.session.get('siteEntity').name is defined %}
+                    {% set siteName = app.session.get('siteEntity').name %}
+                {% elseif app.session.get('site').name is defined %}
+                    {% set siteName = app.session.get('site').name %}
+                {% endif %}
+            {% endif %}
+            <span class="navbar-text" data-site-name="{{ site }}">
+                {{ siteName }}
+            </span>
         </div>
     </div>
 </nav>
