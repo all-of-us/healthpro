@@ -12,21 +12,7 @@
                     </a>
                 </li>
             </ul>
-            {% set site = '' %}
-            {% set siteName = '' %}
-            {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site') is defined %}
-                {% if app.session.get('site').id is defined %}
-                    {% set site = app.session.get('site').id %}
-                {% endif %}
-                {% if app.session.get('siteEntity').name is defined %}
-                    {% set siteName = app.session.get('siteEntity').name %}
-                {% elseif app.session.get('site').name is defined %}
-                    {% set siteName = app.session.get('site').name %}
-                {% endif %}
-            {% endif %}
-            <span class="navbar-text" data-site-name="{{ site }}">
-                {{ siteName }}
-            </span>
+            {% include 'program/hpo/ppsc/partials/set-site-variables.html.twig' with { 'bootstrapVersion' : bootstrapVersion } %}
         </div>
     </div>
 </nav>
