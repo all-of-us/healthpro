@@ -26,6 +26,12 @@
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
         {% endif %}
         <div class="page-header">
+            <h4>
+                <a href="{{ path(participantRoute, { id: participant.id }) }}">
+                    <i class="fas fa-arrow-left fa-lg"></i> Return to In-Person Enrollment
+                </a>
+            </h4>
+            <br>
             <h2>
                 <i class="fa fa-clipboard" aria-hidden="true"></i>
                 {% if measurement.id %}
