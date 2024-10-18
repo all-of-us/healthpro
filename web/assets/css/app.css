@@ -55,6 +55,9 @@ label.control-label.required::after {
 .nav-tabs li.active a {
     font-weight: bold;
 }
+.navbar-site-name {
+    margin-right: 2px;
+}
 .text-center img.img-responsive {
     margin-left: auto;
     margin-right: auto;
