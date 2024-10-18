@@ -19,7 +19,6 @@
                 <th>Collected</th>
                 <th>Processed</th>
                 <th>Finalized</th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -27,7 +26,7 @@
                 {% set isPediatricForm = "ped" in order.version %}
                 <tr>
                     <td>
-                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant_id }}</a>
+                        {{ order.participant_id }}
                         {% if isPediatricForm %}
                             <i class="fa fa-child child-icon"></i>
                         {% endif %}
@@ -35,7 +34,7 @@
                     {% if order.participant is defined %}
                         <td class="align-middle">
                             {% if order.participant %}
-                                <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a>
+                                {{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}
                             {% else %}
                                 {{ missingName }}
                             {% endif %}
@@ -47,7 +46,7 @@
                         </td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                        {{ order.order_id }}
                     </td>
                     <td>
                         <nobr>{{ order.orderStatus }}</nobr>
@@ -67,11 +66,6 @@
                         {% else %}
                             <i class="fa fa-times text-danger" aria-hidden="true"></i>
                             <span class="badge">Unlocked</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if order.h_type != 'unlock' %}
-                            <a href="{{ path('order_modify', { participantId: order.participant_id, orderId: order.id, type: 'cancel' }) }}" class="btn btn-xs btn-danger">Cancel Order</a>
                         {% endif %}
                     </td>
                 </tr>
