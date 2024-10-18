@@ -22,6 +22,6 @@
 {% macro displayLink(entity, field, participantId, idType) %}
   {% if entity %}
     {% set idType = entity['type'] == 'order' ? 'orderId' : 'measurementId' %}
-      <a href="{{ path(entity['type'], { participantId: participantId, (idType): entity['id'] }) }}">{{ entity[field] }}</a>
+      {{ entity[field] }}
   {% endif %}
 {% endmacro %}

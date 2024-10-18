@@ -59,7 +59,7 @@
                 <tr>
                     {% if i == 0 %}
                         <td {{ rowSpan }} class="align-middle" data-participant-id="{{ id }}">
-                            <a href="{{ path('participant', { id: id }) }}" class="participant-id">{{ id }}</a>
+                            {{ id }}
                             {% if isPediatricParticipant %}
                                 <i class="fa fa-child child-icon"></i>
                             {% endif %}
@@ -67,7 +67,7 @@
                         {% if participant.participant is defined %}
                             <td {{ rowSpan }} class="align-middle">
                                 {% if participant.participant %}
-                                    <a href="{{ path('participant', { id: id }) }}">{{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}</a>
+                                    {{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}
                                 {% else %}
                                     {{ missingName }}
                                 {% endif %}

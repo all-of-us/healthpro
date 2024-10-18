@@ -27,7 +27,7 @@
                 {% set isPediatricForm = "ped" in order.version %}
                 <tr>
                     <td>
-                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant_id }}</a>
+                        {{ order.participant_id }}
                         {% if isPediatricForm %}
                             <i class="fa fa-child child-icon"></i>
                         {% endif %}
@@ -35,7 +35,7 @@
                     {% if order.participant is defined %}
                         <td class="align-middle">
                             {% if order.participant %}
-                                <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}</a>
+                                {{ order.participant.lastName|default('') }}, {{ order.participant.firstName|default('') }}
                             {% else %}
                                 {{ missingName }}
                             {% endif %}
@@ -47,7 +47,7 @@
                         </td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('order', { participantId: order.participant_id, orderId: order.id }) }}">{{ order.order_id }}</a>
+                        {{ order.order_id }}
                     </td>
                     <td>
                         {{ today.displayDate(order, 'created_ts') }}
