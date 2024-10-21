@@ -313,11 +313,6 @@ class Participant
             $this->statusReason = 'basics';
         }
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_3') {
-            if (!$this->isPediatric && isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
-                $this->status = false;
-                $this->editExistingOnly = true;
-                $this->statusReason = 'genomics';
-            }
             if ((empty($this->siteType) || $this->siteType === 'hpo') && isset($participant->consentForElectronicHealthRecords) && !in_array($participant->consentForElectronicHealthRecords, ['SUBMITTED', 'SUBMITTED_INVALID', 'SUBMITTED_NOT_VALIDATED'])) {
                 $this->status = false;
                 $this->editExistingOnly = true;
@@ -326,11 +321,6 @@ class Participant
         }
         if (!$this->isPediatric && isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_2') {
             if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
-                if (isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
-                    $this->status = false;
-                    $this->editExistingOnly = true;
-                    $this->statusReason = 'genomics';
-                }
                 if (isset($participant->questionnaireOnDnaProgram) && $participant->questionnaireOnDnaProgram !== 'SUBMITTED') {
                     $this->status = false;
                     $this->editExistingOnly = true;
@@ -341,11 +331,6 @@ class Participant
 
         if (isset($participant->consentCohort) && $participant->consentCohort === 'COHORT_1') {
             if (isset($participant->clinicPhysicalMeasurementsStatus) && isset($participant->samplesToIsolateDNA) && ($participant->clinicPhysicalMeasurementsStatus !== 'COMPLETED' || $participant->samplesToIsolateDNA !== 'RECEIVED')) {
-                if (!$this->isPediatric && isset($participant->consentForGenomicsROR) && $participant->consentForGenomicsROR === 'UNSET') {
-                    $this->status = false;
-                    $this->editExistingOnly = true;
-                    $this->statusReason = 'genomics';
-                }
                 if (isset($participant->consentForStudyEnrollmentAuthored) && !empty($this->cohortOneLaunchTime) && $participant->consentForStudyEnrollmentAuthored <= $this->cohortOneLaunchTime) {
                     $this->status = false;
                     $this->editExistingOnly = true;
