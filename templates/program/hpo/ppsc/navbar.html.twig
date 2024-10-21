@@ -1,20 +1,15 @@
 <nav class="navbar navbar-default navbar-inverse navbar">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <ul class="nav navbar-nav">
-                <a class="navbar-brand dropdown-toggle" href="#">
-                    <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+        <ul class="nav navbar-nav navbar-header">
+            <a class="navbar-brand dropdown-toggle" href="#">
+                <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+            </a>
+            <li>
+                <a class="navbar-brand " href="#">
+                    HealthPro
                 </a>
-                {% set site = '' %}
-                {% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site').id is defined %}
-                    {% set site = app.session.get('site').id %}
-                {% endif %}
-                <li>
-                    <a class="navbar-brand " href="#" data-site-name="{{ site }}">
-                        HealthPro
-                    </a>
-                </li>
-            </ul>
-        </div>
+            </li>
+        </ul>
+        {% include 'program/hpo/ppsc/partials/display-site-name.html.twig' with { 'bootstrapVersion' : bootstrapVersion } %}
     </div>
 </nav>
