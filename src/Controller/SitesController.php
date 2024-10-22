@@ -81,6 +81,7 @@ class SitesController extends BaseController
                     $this->addFlash('success', 'Site updated.');
                 } else {
                     $site = $form->getData();
+                    $site->setWorkqueueDownload(SiteType::FULL_DATA_ACCESS);
                     $this->em->persist($site);
                     $this->em->flush();
                     $loggerService->log(Log::SITE_ADD, $site->getId());
