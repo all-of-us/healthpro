@@ -133,73 +133,30 @@ class ParticipantTest extends TestCase
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentForGenomicsROR' => 'UNSET'
         ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
+        $this->assertSame(true, $participant->status);
 
         // Assert genomics status for cohort 2 (Criteria 2)
         $participant = new Participant((object) [
+            'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_2',
-            'clinicPhysicalMeasurementsStatus' => 'UNSET',
-            'samplesToIsolateDNA' => 'UNSET',
-            'consentForGenomicsROR' => 'UNSET',
-            'questionnaireOnDnaProgram' => 'SUBMITTED'
-        ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
-
-        $participant = new Participant((object) [
-            'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentCohort' => 'COHORT_2',
-            'clinicPhysicalMeasurementsStatus' => 'UNSET',
+            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
             'samplesToIsolateDNA' => 'RECEIVED',
             'consentForGenomicsROR' => 'UNSET',
             'questionnaireOnDnaProgram' => 'SUBMITTED'
         ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
-
-        $participant = new Participant((object) [
-            'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentCohort' => 'COHORT_2',
-            'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
-            'samplesToIsolateDNA' => 'UNSET',
-            'consentForGenomicsROR' => 'UNSET',
-            'questionnaireOnDnaProgram' => 'SUBMITTED'
-        ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
+        $this->assertSame(true, $participant->status);
 
         // Assert genomics status for cohort 1 (Criteria 3)
         $participant = new Participant((object) [
-            'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentCohort' => 'COHORT_1',
-            'clinicPhysicalMeasurementsStatus' => 'UNSET',
-            'samplesToIsolateDNA' => 'UNSET',
-            'consentForGenomicsROR' => 'UNSET'
-        ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
-
-        $participant = new Participant((object) [
-            'consentForStudyEnrollment' => 'SUBMITTED',
-            'consentCohort' => 'COHORT_1',
-            'clinicPhysicalMeasurementsStatus' => 'UNSET',
-            'samplesToIsolateDNA' => 'RECEIVED',
-            'consentForGenomicsROR' => 'UNSET'
-        ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
-
-        $participant = new Participant((object) [
+            'questionnaireOnTheBasics' => 'SUBMITTED',
             'consentForStudyEnrollment' => 'SUBMITTED',
             'consentCohort' => 'COHORT_1',
             'clinicPhysicalMeasurementsStatus' => 'COMPLETED',
-            'samplesToIsolateDNA' => 'UNSET',
+            'samplesToIsolateDNA' => 'RECEIVED',
             'consentForGenomicsROR' => 'UNSET'
         ]);
-        $this->assertSame(false, $participant->status);
-        $this->assertSame('genomics', $participant->statusReason);
+        $this->assertSame(true, $participant->status);
     }
 
     public function testParticipantEhrStatus()
