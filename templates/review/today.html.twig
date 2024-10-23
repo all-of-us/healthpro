@@ -55,7 +55,7 @@
             {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount, participant.idVerificationsCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
-                {% set isPediatricParticipant = participant.participant is defined and participant.participant.isPediatric ? true : false %}
+                {% set isPediatricParticipant = participant.participant is defined and participant.participant is not empty and participant.participant.isPediatric ? true : false %}
                 <tr>
                     {% if i == 0 %}
                         <td {{ rowSpan }} class="align-middle" data-participant-id="{{ id }}">
