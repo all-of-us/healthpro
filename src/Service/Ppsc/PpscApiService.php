@@ -116,6 +116,20 @@ class PpscApiService
         return null;
     }
 
+    public function getRawParticipantById(string $participantId): array|null
+    {
+        try {
+            $token = $this->getAccessToken();
+            $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
+                'headers' => ['Authorization' => 'Bearer ' . $token]
+            ]);
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
     public function getAccessToken(): string|null
     {
         if ($this->accessToken) {

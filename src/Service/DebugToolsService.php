@@ -2,24 +2,24 @@
 
 namespace App\Service;
 
+use App\Service\Ppsc\PpscApiService;
 use GuzzleHttp\Exception\ClientException;
 
 class DebugToolsService
 {
-    private $api;
+    private PpscApiService $api;
 
-    public function __construct(RdrApiService $api)
+    public function __construct(PpscApiService $api)
     {
         $this->api = $api;
     }
 
-    public function getParticipantById($participantId)
+    public function getParticipantById($participantId): array|null
     {
         try {
-            $response = $this->api->get(sprintf('rdr/v1/Participant/%s/Summary', $participantId));
-            return json_decode($response->getBody(), true);
+            return $this->api->getRawParticipantById($participantId);
         } catch (ClientException $e) {
-            return false;
+            return null;
         }
     }
 }
