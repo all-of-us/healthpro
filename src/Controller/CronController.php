@@ -70,21 +70,6 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    #[Route(path: '/sites-email-sync', name: 'cron_sites_email')]
-    public function sitesEmailSync(KernelInterface $kernel): Response
-    {
-        $application = new Application($kernel);
-        $application->setAutoExit(false);
-
-        $input = new ArrayInput([
-            'command' => 'pmi:sitesync:emails',
-            'limit' => 100,
-        ]);
-        $application->run($input, new NullOutput());
-
-        return $this->json(['success' => true]);
-    }
-
     #[Route(path: '/missing-measurements-orders', name: 'cron_missing_measurements_orders')]
     public function missingMeasurementsOrdersAction(MissingMeasurementsAndOrdersNotificationService $missingMeasurementsAndOrdersNotificationService): Response
     {
