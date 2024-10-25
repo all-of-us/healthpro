@@ -11,7 +11,6 @@ use App\Service\IdVerificationImportService;
 use App\Service\IdVerificationService;
 use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
-use App\Service\MissingMeasurementsAndOrdersNotificationService;
 use App\Service\Nph\NphDietPeriodStatusService;
 use App\Service\Nph\NphDlwBackfillService;
 use App\Service\PatientStatusService;
@@ -63,13 +62,6 @@ class CronController extends BaseController
         }
         $siteSyncService->syncAwardees();
         $siteSyncService->syncOrganizations();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/missing-measurements-orders', name: 'cron_missing_measurements_orders')]
-    public function missingMeasurementsOrdersAction(MissingMeasurementsAndOrdersNotificationService $missingMeasurementsAndOrdersNotificationService): Response
-    {
-        $missingMeasurementsAndOrdersNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
