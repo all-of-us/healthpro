@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
 use App\Service\BiobankNightlyReportService;
-use App\Service\DeceasedNotificationService;
 use App\Service\HFHRepairService;
 use App\Service\IdVerificationImportService;
 use App\Service\IdVerificationService;
@@ -33,14 +32,6 @@ class CronController extends BaseController
     #[Route(path: '/ping-test', name: 'cron_ping_test')]
     public function pingTestAction()
     {
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/deceased/{deceasedStatus}', name: 'cron_deceased')]
-    public function index(DeceasedNotificationService $deceasedNotificationService, $deceasedStatus): Response
-    {
-        $deceasedNotificationService->setDeceasedStatusType($deceasedStatus);
-        $deceasedNotificationService->sendEmails();
         return $this->json(['success' => true]);
     }
 
