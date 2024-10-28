@@ -6,13 +6,10 @@ use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
 use App\Service\BiobankNightlyReportService;
 use App\Service\HFHRepairService;
-use App\Service\IdVerificationImportService;
 use App\Service\IdVerificationService;
-use App\Service\IncentiveImportService;
 use App\Service\MeasurementQueueService;
 use App\Service\Nph\NphDietPeriodStatusService;
 use App\Service\Nph\NphDlwBackfillService;
-use App\Service\PatientStatusService;
 use App\Service\PediatricsReportService;
 use App\Service\SessionService;
 use App\Service\SiteSyncService;
@@ -71,20 +68,6 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    #[Route(path: '/delete-unconfirmed-patient-status-import-data', name: 'cron_delete_unconfirmed_patient_status_import_data')]
-    public function deleteUnconfimedPatientStatusImportDataAction(PatientStatusService $patientStatusService)
-    {
-        $patientStatusService->deleteUnconfirmedImportData();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/send-patient-status-rdr', name: 'cron_send_patient_status_rdr')]
-    public function sendPatientStatusToRdrAction(PatientStatusService $patientStatusService)
-    {
-        $patientStatusService->sendPatientStatusToRdr();
-        return $this->json(['success' => true]);
-    }
-
     #[Route(path: '/resend-measurements-rdr', name: 'cron_resend_measurements_rdr')]
     public function resendMeasurementsToRdrAction(MeasurementQueueService $measurementQueueService)
     {
@@ -111,34 +94,6 @@ class CronController extends BaseController
             }
         }
         $this->em->flush();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/send-incentives-rdr', name: 'cron_send_incentives_rdr')]
-    public function sendIncentivesToRdrAction(IncentiveImportService $incentiveImportService)
-    {
-        $incentiveImportService->sendIncentivesToRdr();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/delete-unconfirmed-incentives-import-data', name: 'cron_delete_unconfirmed_incentives_import_data')]
-    public function deleteUnconfimedIncentivesImportDataAction(IncentiveImportService $incentiveImportService)
-    {
-        $incentiveImportService->deleteUnconfirmedImportData();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/send-id-verifications-rdr', name: 'cron_send_id_verifications_rdr')]
-    public function sendIdVerificationsToRdrAction(IdVerificationImportService $idVerificationImportService)
-    {
-        $idVerificationImportService->sendIdVerificationsToRdr();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/delete-unconfirmed-id-verifications-import-data', name: 'cron_delete_unconfirmed_id_verifications_import_data')]
-    public function deleteUnconfimedIdVerificationsImportDataAction(IdVerificationImportService $idVerificationImportService)
-    {
-        $idVerificationImportService->deleteUnconfirmedImportData();
         return $this->json(['success' => true]);
     }
 
