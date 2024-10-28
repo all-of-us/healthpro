@@ -124,9 +124,6 @@
                         <li><a data-href="{{ reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
                     {% endif %}
                 {% endif %}
-                {% if is_granted('ROLE_MANAGE_USERS') and app.session.get('program') is not null %}
-                    <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-                {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
