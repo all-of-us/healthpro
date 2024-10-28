@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Audit\Log;
-use App\Entity\FeatureNotification;
-use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
 use App\Service\AuthService;
 use App\Service\ContextTemplateService;
@@ -187,43 +185,6 @@ class DefaultController extends BaseController
     public function importsIndex()
     {
         return $this->render('imports/index.html.twig');
-    }
-
-    #[Route(path: '/notification/{id}', name: 'notification_details')]
-    public function notificationDetails($id)
-    {
-        $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
-        $this->createFeatureNotificationUserMap($featureNotification);
-        return $this->render('notifications-modal.html.twig', [
-            'notification' => $featureNotification
-        ]);
-    }
-
-    #[Route(path: '/notifications/mark/read', name: 'notifications_mark_read')]
-    public function notificationsMarkRead(): JsonResponse
-    {
-        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
-
-        foreach ($activeNotifications as $activeNotification) {
-            $this->createFeatureNotificationUserMap($activeNotification);
-        }
-        return $this->json(['success' => true]);
-    }
-
-    private function createFeatureNotificationUserMap($featureNotification): void
-    {
-        $featureNotificationUserMap = $this->em->getRepository(FeatureNotificationUserMap::class)->findOneBy([
-            'featureNotification' => $featureNotification,
-            'user' => $this->getUserEntity()
-        ]);
-        if ($featureNotificationUserMap === null) {
-            $featureNotificationUserMap = new FeatureNotificationUserMap();
-            $featureNotificationUserMap->setFeatureNotification($featureNotification);
-            $featureNotificationUserMap->setUser($this->getUserEntity());
-            $featureNotificationUserMap->setCreatedTs(new \DateTime());
-            $this->em->persist($featureNotificationUserMap);
-            $this->em->flush();
-        }
     }
 
     private function getHomeRedirectRoute(string $program): string
