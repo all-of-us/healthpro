@@ -126,15 +126,6 @@
 
                     {% if app.session.get('program') is not null %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-bell" aria-hidden="true"></i>
-                                {% if notifications_count > 0 %}
-                                    <span class="badge badge-notify" id="notifications_count">{{ notifications_count }}</span>
-                                {% endif %}
-                            </a>
-                            {% include '/partials/notifications-dropdown-bs5.html.twig' %}
-                        </li>
-                        <li class="nav-item dropdown">
                             <a href="{{ path('help_home') }}" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ path('help_videos') }}"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
