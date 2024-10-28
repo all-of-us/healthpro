@@ -9,7 +9,6 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\SiteSyncService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
@@ -81,6 +80,7 @@ class SitesController extends BaseController
                     $this->addFlash('success', 'Site updated.');
                 } else {
                     $site = $form->getData();
+                    $site->setWorkqueueDownload(SiteType::FULL_DATA_ACCESS);
                     $this->em->persist($site);
                     $this->em->flush();
                     $loggerService->log(Log::SITE_ADD, $site->getId());
@@ -97,45 +97,6 @@ class SitesController extends BaseController
             'site' => $site,
             'siteForm' => $form->createView()
         ]);
-    }
-
-    #[Route(path: '/site/{id}/emails', name: 'admin_site_emails')]
-    public function siteAdminEmails(SiteRepository $siteRepository, EnvironmentService $env, SiteSyncService $siteSyncService, int $id)
-    {
-        $site = $siteRepository->find($id);
-        if (!$site) {
-            throw $this->createNotFoundException('Site not found.');
-        }
-        try {
-            $emails = join(', ', $siteSyncService->getSiteAdminEmails($site));
-        } catch (Exception $e) {
-            $this->addFlash('error', sprintf(
-                'Unable to retrieve email for %s (%s)',
-                $site->getName(),
-                $site->getSiteId(),
-            ));
-            return $this->redirectToRoute('admin_sites');
-        }
-
-        if (!$env->isProd() && !$env->isLocal()) {
-            $this->addFlash('error', sprintf(
-                'Cannot update emails in this environment. Value would have been: %s',
-                $emails ? $emails : '(empty)'
-            ));
-            return $this->redirectToRoute('admin_sites');
-        }
-
-        $site->setEmail($emails);
-        $this->em->persist($site);
-        $this->em->flush();
-
-        $this->addFlash('success', sprintf(
-            '%s (%s) email updated to: %s',
-            $site->getName(),
-            $site->getSiteId(),
-            $emails ? $emails : '(empty)'
-        ));
-        return $this->redirectToRoute('admin_sites');
     }
 
     #[Route(path: '/sync', name: 'admin_siteSync')]

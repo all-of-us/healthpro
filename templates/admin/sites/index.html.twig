@@ -32,12 +32,8 @@
                 <th>Type</th>
                 <th>Site Type</th>
                 <th>DV Module Configuration</th>
-                <th>Email</th>
-                <th>Program</th>
                 <th>Centrifuge type</th>
-                <th>Work Queue Download</th>
                 <th>EHR modification protocol</th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -53,12 +49,8 @@
                     <td>{{ site.type }}</td>
                     <td>{{ site.siteType }}</td>
                     <td>{{ site.type == 'DV' ? macros.displayChoiceText(site.dvModule, siteChoices['dv_module']) : 'N/A' }}</td>
-                    <td>{{ site.email|length > 30 ? site.email|slice(0, 30) ~ '...' : site.email }}</td>
-                    <td>{{ site.awardee }}</td>
                     <td>{{ site.centrifugeType ? macros.displayChoiceText(site.centrifugeType, siteChoices['centrifuge_type']) }}</td>
-                    <td>{{ macros.displayChoiceText(site.workqueueDownload, siteChoices['workqueue_download']) }}</td>
                     <td>{{ macros.displayChoiceText(site.ehrModificationProtocol, siteChoices['ehr_modification_protocol']) }}</td>
-                    <td><a href="{{ path('admin_site_emails', { id: site.id }) }}" class="btn btn-xs btn-default" data-toggle="tooltip" title="Sync Site Email with Google"><i class="fa fa-envelope fa-fw"></i><i class="fa fa-refresh fa-fw"></i></a></td>
                 </tr>
             {% endfor %}
             </tbody>
