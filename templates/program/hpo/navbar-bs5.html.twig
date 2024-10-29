@@ -120,22 +120,6 @@
                             </li>
                         {% endif %}
                     {% endif %}
-
-                    {% if app.session.get('program') is not null %}
-                        <li class="nav-item dropdown">
-                            <a href="{{ path('help_home') }}" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('help_videos') }}"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
-                                <li><a class="dropdown-item" href="{{ path('help_faq') }}"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</a></li>
-                                <li><a class="dropdown-item" href="{{ path('help_sop') }}"><i class="fa fa-file-text-o" aria-hidden="true"></i> All of Us℠ SOPs</a></li>
-                                <li><a class="dropdown-item" href="{{ confluenceResources.ops_data_api }}" target="_blank"><i class="fa fa-files-o" aria-hidden="true"></i> OpsData API Resources</a></li>
-                                <li><a class="dropdown-item" href="{{ confluenceResources.data_dictionaries }}" target="_blank"><i class="fa fa-table" aria-hidden="true"></i> HealthPro Data Dictionaries</a></li>
-                                <li><a class="dropdown-item" href="{{ confluenceResources.release_notes }}" target="_blank"><i class="fa fa-sticky-note" aria-hidden="true"></i> HealthPro Release Notes</a></li>
-                                <li><a class="dropdown-item" href="{{ feedback_url }}" target="_blank"><i class="fa fa-comment-dots" aria-hidden="true"></i> Submit Feedback</a></li>
-                                <li><a class="dropdown-item" href="{{ report_technical_issue_url }}" target="_blank"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Report Technical Issue</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
                     <li class="nav-item dropdown">
                         <a href="{{ path('settings') }}" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }}</a>
                         <ul class="dropdown-menu">
