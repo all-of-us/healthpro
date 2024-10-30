@@ -35,15 +35,6 @@
                 </a>
             </div>
         {% endif %}
-        {% if (is_granted('ROLE_USER') and app.session.get('site') and app.session.get('siteEntity') and app.session.get('siteEntity').organization) or (is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees) %}
-            <div class="col-sm-6 col-md-4">
-                <a href="{{ path('workqueue_index') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-table" aria-hidden="true"></i>
-                    Work Queues
-                    <div class="description">View, sort, and filter key enrollment information for all participants paired at your site.</div>
-                </a>
-            </div>
-        {% endif %}
         {% if is_granted('ROLE_DV_ADMIN')%}
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('problem_reports') }}" class="btn btn-lg btn-block border w-100 text-dark">

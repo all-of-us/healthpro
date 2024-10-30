@@ -113,12 +113,6 @@
                                 <li><a href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
                             </ul>
                         </li>
-                        {% if app.session.get('siteEntity') and app.session.get('siteEntity').organization %}
-                            <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
-                        {% endif %}
-                    {% endif %}
-                    {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees %}
-                        <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
                     {% endif %}
                     {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
                         <li><a data-href="{{ reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
