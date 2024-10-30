@@ -51,18 +51,15 @@ class DefaultController extends BaseController
                 return $this->redirectToRoute('review_today');
             }
         }
+        if ($program === User::PROGRAM_HPO) {
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_home');
+            } elseif ($this->isGranted('ROLE_BIOBANK')) {
+                return $this->redirectToRoute('biobank_home');
+            }
+        }
         if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
-        } elseif ($this->isGranted('ROLE_AWARDEE')) {
-            return $this->redirectToRoute('workqueue_index');
-        } elseif ($this->isGranted('ROLE_DV_ADMIN')) {
-            return $this->redirectToRoute('problem_reports');
-        } elseif ($this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_home');
-        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
-            return $this->redirectToRoute('biobank_home');
-        } elseif ($this->isGranted('ROLE_READ_ONLY')) {
-            return $this->redirectToRoute('read_home');
         }
         throw $this->createAccessDeniedException();
     }

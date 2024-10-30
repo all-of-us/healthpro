@@ -18,8 +18,7 @@ $(document).ready(function () {
             if (data) {
                 const { lastName, firstName, isPediatric } = data;
                 if (lastName && firstName) {
-                    const a = $("<span>")
-                        .text(lastName + ", " + firstName);
+                    const a = $("<span>").text(lastName + ", " + firstName);
                     td.append(a);
                 }
                 if (isPediatric) {
