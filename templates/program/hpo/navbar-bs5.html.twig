@@ -88,9 +88,6 @@
                             </ul>
                         </li>
                     {% endif %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
-                        <li class="nav-item"><a data-href="{{ reportKitUrl }}" class="nav-link external-link">Report Kit Problem</a></li>
-                    {% endif %}
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav">

@@ -44,15 +44,6 @@
                 </a>
             </div>
         {% endif %}
-        {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
-            <div class="col-sm-6 col-md-4">
-                <a data-href="{{ reportKitUrl }}" class="btn btn-lg btn-block external-link border w-100 text-dark">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                    Report Kit Problem
-                    <div class="description">Enter an issue identified with a DV biospecimen kit.</div>
-                </a>
-            </div>
-        {% endif %}
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4">
                 <a href="{{ path('imports_home') }}" class="btn btn-lg btn-block border w-100 text-dark">
