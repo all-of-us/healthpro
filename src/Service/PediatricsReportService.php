@@ -6,6 +6,7 @@ use App\Entity\HeartRateAge;
 use App\Entity\Incentive;
 use App\Entity\Measurement;
 use App\Entity\ZScores;
+use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class PediatricsReportService
@@ -42,7 +43,7 @@ class PediatricsReportService
     protected GcsBucketService $gcsBucketService;
     protected EnvironmentService $env;
     protected MeasurementService $measurementService;
-    protected ParticipantSummaryService $participantSummaryService;
+    protected PpscApiService $ppscApiService;
     protected array $zScores;
 
     public function __construct(
@@ -50,12 +51,12 @@ class PediatricsReportService
         GcsBucketService $gcsBucketService,
         EnvironmentService $env,
         MeasurementService $measurementService,
-        ParticipantSummaryService $participantSummaryService
+        PpscApiService $ppscApiService
     ) {
         $this->em = $em;
         $this->measurementService = $measurementService;
         $this->gcsBucketService = $gcsBucketService;
-        $this->participantSummaryService = $participantSummaryService;
+        $this->ppscApiService = $ppscApiService;
         $this->env = $env;
         $this->zScores = $this->em->getRepository(ZScores::class)->getChartsData();
     }
@@ -131,7 +132,7 @@ class PediatricsReportService
              */
             foreach ($measurements as $measurement) {
                 $measurementData = json_decode($measurement->getData(), true);
-                $participant = $this->participantSummaryService->getParticipantById($measurement->getParticipantId());
+                $participant = $this->ppscApiService->getParticipantById($measurement->getParticipantId());
                 $growthChartsByAge = $measurement->getGrowthChartsByAge((int) $measurement->getAgeInMonths());
                 $headCircumferenceChart = $growthChartsByAge['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
                 $weightChart = $growthChartsByAge['weightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line

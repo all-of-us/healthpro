@@ -15,7 +15,6 @@ use App\Service\EnvironmentService;
 use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
-use App\Service\ParticipantSummaryService;
 use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +27,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class MeasurementsController extends BaseController
 {
     protected $measurementService;
-    protected $participantSummaryService;
     protected $loggerService;
     protected $siteService;
     protected $params;
@@ -38,7 +36,6 @@ class MeasurementsController extends BaseController
     public function __construct(
         EntityManagerInterface $em,
         MeasurementService $measurementService,
-        ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
         SiteService $siteService,
         ParameterBagInterface $params,
@@ -47,7 +44,6 @@ class MeasurementsController extends BaseController
     ) {
         parent::__construct($em);
         $this->measurementService = $measurementService;
-        $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
         $this->params = $params;

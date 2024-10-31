@@ -16,7 +16,6 @@ class ReviewService
         'finalized_ts' => 'Finalized'
     ];
     protected EntityManagerInterface $em;
-    protected ParticipantSummaryService $participantSummaryService;
     protected PpscApiService $ppscApiService;
 
     protected static $measurementsStatus = [
@@ -37,11 +36,9 @@ class ReviewService
 
     public function __construct(
         EntityManagerInterface $em,
-        ParticipantSummaryService $participantSummaryService,
         PpscApiService $ppscApiService
     ) {
         $this->em = $em;
-        $this->participantSummaryService = $participantSummaryService;
         $this->ppscApiService = $ppscApiService;
     }
 

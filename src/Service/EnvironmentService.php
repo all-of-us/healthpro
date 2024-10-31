@@ -29,7 +29,7 @@ class EnvironmentService
     ];
 
     public static array $hpoPpscDefaultEnvs = [
-        'local' => 'dev',
+        'local' => 'qa',
         'dev' => 'dev',
         'staging' => 'qa',
         'beta' => 'uat',

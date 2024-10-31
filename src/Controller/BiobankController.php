@@ -12,7 +12,6 @@ use App\Service\BiobankOrderFinalizeNotificationService;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
-use App\Service\ParticipantSummaryService;
 use App\Service\Ppsc\PpscApiService;
 use App\Service\ReviewService;
 use DateTime;
@@ -26,7 +25,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/biobank')]
 class BiobankController extends BaseController
 {
-    protected $participantSummaryService;
     protected PpscApiService $ppscApiService;
     protected $orderService;
     protected $loggerService;
@@ -34,14 +32,12 @@ class BiobankController extends BaseController
 
     public function __construct(
         EntityManagerInterface $em,
-        ParticipantSummaryService $participantSummaryService,
         PpscApiService $ppscApiService,
         OrderService $orderService,
         LoggerService $loggerService,
         ParameterBagInterface $params
     ) {
         parent::__construct($em);
-        $this->participantSummaryService = $participantSummaryService;
         $this->ppscApiService = $ppscApiService;
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
@@ -97,23 +93,6 @@ class BiobankController extends BaseController
                     'biobankId' => $order->getBiobankId(),
                     'orderId' => $order->getId()
                 ]);
-            }
-            // Quanum Orders
-            $order = new Order();
-            $this->orderService->loadSamplesSchema($order);
-            $quanumOrders = $this->orderService->getOrders([
-                'kitId' => $id,
-                'origin' => 'careevolution'
-            ]);
-            if (isset($quanumOrders[0])) {
-                $order = $this->orderService->loadFromJsonObject($quanumOrders[0]);
-                $participant = $this->participantSummaryService->getParticipantById($order->getParticipantId());
-                if ($participant->biobankId) {
-                    return $this->redirectToRoute('biobank_quanum_order', [
-                        'biobankId' => $participant->biobankId,
-                        'orderId' => $order->getRdrId()
-                    ]);
-                }
             }
             $this->addFlash('error', 'Order ID not found');
         }
@@ -260,26 +239,6 @@ class BiobankController extends BaseController
             'samplesInfo' => $order->getSamplesInformation(),
             'version' => $order->getVersion(),
             'collectedSamples' => $collectedSamples ?: null
-        ]);
-    }
-
-    #[Route(path: '/{biobankId}/quanum-order/{orderId}', name: 'biobank_quanum_order')]
-    public function quanumOrderAction(string $biobankId, string $orderId): Response
-    {
-        $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
-        if (!$participant) {
-            throw $this->createNotFoundException('404');
-        }
-
-        $order = new Order();
-        $this->orderService->loadSamplesSchema($order);
-        $quanumOrder = $this->orderService->getOrder($participant->id, $orderId);
-        $order = $this->orderService->loadFromJsonObject($quanumOrder);
-        return $this->render('biobank/order-quanum.html.twig', [
-            'participant' => $participant,
-            'samplesInfoText' => $this->orderService->getCustomSamplesInfo(),
-            'currentStep' => 'finalize',
-            'order' => $order
         ]);
     }
 
