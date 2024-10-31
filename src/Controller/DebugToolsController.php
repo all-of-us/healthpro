@@ -5,9 +5,7 @@ namespace App\Controller;
 use App\Form\DebugParticipantLookupType;
 use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
-use App\Service\PatientStatusService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -48,23 +46,5 @@ class DebugToolsController extends BaseController
         return $this->render('admin/debug/participant.html.twig', [
             'participant' => $participant
         ]);
-    }
-
-    #[Route(path: '/patientstatus/{participantId}/organization/{organizationId}/json-rdr', name: 'admin_debug_patient_status_json_rdr')]
-    public function patientStatusRdrJsonAction($participantId, $organizationId, PatientStatusService $patientStatusService)
-    {
-        $object = $patientStatusService->getPatientStatus($participantId, $organizationId);
-        $response = new JsonResponse($object);
-        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
-        return $response;
-    }
-
-    #[Route(path: '/patientstatus/{participantId}/organization/{organizationId}/history/json-rdr', name: 'admin_debug_patient_status_history_json_rdr')]
-    public function patientStatusHistoryRdrJsonAction($participantId, $organizationId, PatientStatusService $patientStatusService)
-    {
-        $object = $patientStatusService->getPatientStatusHistory($participantId, $organizationId);
-        $response = new JsonResponse($object);
-        $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
-        return $response;
     }
 }
