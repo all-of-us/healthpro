@@ -4,51 +4,6 @@
     <div class="page-header pb-1 mt-5 mb-4 border-bottom">
         <h2>Welcome!</h2>
     </div>
-    <div class="row home-menu row-equal-height">
-        {% if is_granted('ROLE_USER') and app.session.get('site') %}
-            <div class="col-sm-6 col-md-4">
-                <a href="{{ path('review_today') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-list" aria-hidden="true"></i>
-                    Daily Review
-                    <div class="description">Review Physical Measurement and Biobank orders that were created today, are unfinalized, or were recently modified.</div>
-                </a>
-            </div>
-            <div class="col-sm-6 col-md-4">
-                <a href="{{ path('on_site_id_verification') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-clipboard-list" aria-hidden="true"></i>
-                    On-Site Details Reporting
-                    <div class="description">Audit and report on ID Verification, Incentive Tracking, and Patient Status.</div>
-                </a>
-            </div>
-        {% endif %}
-        {% if is_granted('ROLE_DV_ADMIN')%}
-            <div class="col-sm-6 col-md-4">
-                <a href="{{ path('problem_reports') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                    Problem Reports
-                    <div class="description">View all documented unanticipated problems.</div>
-                </a>
-            </div>
-        {% endif %}
-        {% if is_granted('ROLE_USER') and app.session.get('site') %}
-            <div class="col-sm-6 col-md-4">
-                <a href="{{ path('imports_home') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-upload" aria-hidden="true"></i>
-                    Imports
-                    <div class="description">Upload .csv files of participant Patient Status, Incentive Tracking, and ID Verification in bulk.</div>
-                </a>
-            </div>
-        {% endif %}
-        {% if is_granted('ROLE_USER') and app.session.get('site') %}
-            <div class="col-sm-6 col-md-4 position-relative" id="deceased_report_block">
-                <a href="{{ path('deceased_reports_index') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-hourglass-o" aria-hidden="true"></i>
-                    Deceased Participants
-                    <div class="description">Review participants reported as deceased.</div>
-                </a>
-            </div>
-        {% endif %}
-    </div>
 {% endblock %}
 
 {% block pagejs %}

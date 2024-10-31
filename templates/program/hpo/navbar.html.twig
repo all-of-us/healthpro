@@ -95,20 +95,6 @@
             {% endif %}
         </div>
         <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
-            <ul class="nav navbar-nav">
-                {% if not currentRoleNav %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') %}
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ path('review_today') }}"><i class="fa fa-list" aria-hidden="true"></i> Daily Review</a></li>
-                                <li><a href="{{ path('deceased_reports_index') }}"><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participants</a></li>
-                                <li><a href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endif %}
-            </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     {% if not currentRoleNav %}

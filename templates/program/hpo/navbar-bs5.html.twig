@@ -70,18 +70,6 @@
                         </ul>
                     </li>
                 {% endif %}
-                {% if not currentRoleNav %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('review_today') }}"><i class="fa fa-list" aria-hidden="true"></i> Daily Review</a></li>
-                                <li><a class="dropdown-item" href="{{ path('deceased_reports_index') }}"><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participants</a></li>
-                                <li><a class="dropdown-item" href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endif %}
             </ul>
             <ul class="nav navbar-nav">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
