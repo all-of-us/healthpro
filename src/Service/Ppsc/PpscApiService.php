@@ -6,6 +6,7 @@ use App\Helper\PpscParticipant;
 use App\HttpClient;
 use App\Service\EnvironmentService;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -25,12 +26,16 @@ class PpscApiService
     private string|null $scope;
     private string|null $accessToken = null;
     private string|null $endpoint;
+    protected LoggerInterface $logger;
+    protected $lastError;
+    protected $lastErrorCode;
 
-    public function __construct(ParameterBagInterface $params, SessionInterface $session, EnvironmentService $env)
+    public function __construct(ParameterBagInterface $params, SessionInterface $session, EnvironmentService $env, LoggerInterface $logger)
     {
         $this->params = $params;
         $this->session = $session;
         $this->env = $env;
+        $this->logger = $logger;
         $this->client = new HttpClient(['cookies' => true]);
         $this->endpoint = $this->getParams('ppsc_endpoint');
         $this->tokenUrl = $this->getParams('ppsc_token_url');
@@ -193,5 +198,33 @@ class PpscApiService
     {
         $ppscEnv = $this->env->getPpscEnv($this->session->get('ppscEnv'));
         return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
+    }
+
+    public function logException(\Exception $e)
+    {
+        $this->lastError = $e->getMessage();
+        if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+            $this->logger->critical($e->getMessage());
+            $response = $e->getResponse();
+            $responseCode = $response->getStatusCode();
+            $contents = $response->getBody()->getContents();
+            $this->logger->info("Response code: {$responseCode}");
+            $this->logger->info("Response body: {$contents}");
+            $this->lastError = $contents;
+            $this->lastErrorCode = $responseCode;
+        } else {
+            // No response - request probably timed out
+            $this->logger->error($e->getMessage());
+        }
+    }
+
+    public function getLastError()
+    {
+        return $this->lastError;
+    }
+
+    public function getLastErrorCode()
+    {
+        return $this->lastErrorCode;
     }
 }

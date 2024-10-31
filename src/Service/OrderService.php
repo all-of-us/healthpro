@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormInterface;
 
 class OrderService
 {
-    protected $rdrApiService;
     protected PpscApiService $ppscApiService;
     protected $params;
     protected $em;
@@ -31,7 +30,6 @@ class OrderService
     protected $participant;
 
     public function __construct(
-        RdrApiService $rdrApiService,
         PpscApiService $ppscApiService,
         ParameterBagInterface $params,
         EntityManagerInterface $em,
@@ -40,7 +38,6 @@ class OrderService
         SiteService $siteService,
         LoggerService $loggerService
     ) {
-        $this->rdrApiService = $rdrApiService;
         $this->ppscApiService = $ppscApiService;
         $this->params = $params;
         $this->em = $em;
@@ -76,7 +73,7 @@ class OrderService
                 return $result->healthProOrderId;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -90,7 +87,7 @@ class OrderService
                 return true;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -99,13 +96,14 @@ class OrderService
     public function getOrdersByParticipant($participantId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
+            // Currently, PPSC API doesn't support this
+            $response = $this->ppscApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->data)) {
                 return $result->data;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return [];
         }
         return [];
@@ -114,7 +112,8 @@ class OrderService
     public function getOrders(array $query = []): array
     {
         try {
-            $response = $this->rdrApiService->get('rdr/v1/BiobankOrder', [
+            // Currently, PPSC API doesn't support this
+            $response = $this->ppscApiService->get('rdr/v1/BiobankOrder', [
                 'query' => $query
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -122,7 +121,7 @@ class OrderService
                 return $result->data;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return [];
         }
         return [];
@@ -136,7 +135,7 @@ class OrderService
                 return true;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -151,7 +150,7 @@ class OrderService
                 return $result;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -459,7 +458,7 @@ class OrderService
         $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
         if (!$rdrId) {
             // Check for rdr id conflict error code
-            if ($this->rdrApiService->getLastErrorCode() === 409) {
+            if ($this->ppscApiService->getLastErrorCode() === 409) {
                 $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->order->getMayoId());
                 // Check if order exists in RDR
                 if (!empty($rdrOrder) && $rdrOrder->id === $this->order->getMayoId()) {

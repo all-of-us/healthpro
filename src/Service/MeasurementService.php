@@ -21,7 +21,6 @@ class MeasurementService
     protected $em;
     protected $requestStack;
     protected $userService;
-    protected $rdrApiService;
     protected PpscApiService $ppscApiService;
     protected $siteService;
     protected $params;
@@ -32,7 +31,6 @@ class MeasurementService
         EntityManagerInterface $em,
         RequestStack $requestStack,
         UserService $userService,
-        RdrApiService $rdrApiService,
         PpscApiService $ppscApiService,
         SiteService $siteService,
         ParameterBagInterface $params,
@@ -41,7 +39,6 @@ class MeasurementService
         $this->em = $em;
         $this->requestStack = $requestStack;
         $this->userService = $userService;
-        $this->rdrApiService = $rdrApiService;
         $this->ppscApiService = $ppscApiService;
         $this->siteService = $siteService;
         $this->params = $params;
@@ -85,7 +82,7 @@ class MeasurementService
                 return $result->drcId;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -100,7 +97,7 @@ class MeasurementService
                 return $result;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -156,7 +153,7 @@ class MeasurementService
     public function cancelRestoreRdrMeasurement($type, $reason)
     {
         $measurementRdrObject = $this->getCancelRestoreRdrObject($type, $reason);
-        return $this->cancelRestoreMeasurement($type, $this->measurement->getParticipantId(), $this->measurement->getRdrId(), $measurementRdrObject);
+        return $this->cancelRestoreMeasurement($this->measurement->getParticipantId(), $this->measurement->getRdrId(), $measurementRdrObject);
     }
 
     public function getCancelRestoreRdrObject($type, $reason)
@@ -171,7 +168,7 @@ class MeasurementService
         return $obj;
     }
 
-    public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
+    public function cancelRestoreMeasurement($participantId, $measurementId, $measurementJson)
     {
         try {
             $response = $this->ppscApiService->patch("participants/{$participantId}/physical-measurements/{$measurementId}", $measurementJson);
@@ -179,7 +176,7 @@ class MeasurementService
                 return true;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -257,7 +254,7 @@ class MeasurementService
 
     public function getLastError()
     {
-        return $this->rdrApiService->getLastError();
+        return $this->ppscApiService->getLastError();
     }
 
     public function inactiveSiteFormDisabled(): bool

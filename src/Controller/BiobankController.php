@@ -301,16 +301,6 @@ class BiobankController extends BaseController
         // Internal Orders
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participant->id], ['id' => 'desc']);
 
-        // Quanum Orders
-        $quanumOrders = $this->orderService->getOrdersByParticipant($participant->id);
-
-        foreach ($quanumOrders as $quanumOrder) {
-            if ($quanumOrder->origin === 'careevolution') {
-                $order = new Order();
-                $this->orderService->loadSamplesSchema($order);
-                $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
-            }
-        }
         return $this->render('biobank/participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
