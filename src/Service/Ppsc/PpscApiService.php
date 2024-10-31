@@ -16,6 +16,9 @@ class PpscApiService
     public const DS_CLEAN_UP_LIMIT = 500;
 
     public HttpClient $client;
+    protected LoggerInterface $logger;
+    protected $lastError;
+    protected $lastErrorCode;
     private ParameterBagInterface $params;
     private SessionInterface $session;
     private EnvironmentService $env;
@@ -26,9 +29,6 @@ class PpscApiService
     private string|null $scope;
     private string|null $accessToken = null;
     private string|null $endpoint;
-    protected LoggerInterface $logger;
-    protected $lastError;
-    protected $lastErrorCode;
 
     public function __construct(ParameterBagInterface $params, SessionInterface $session, EnvironmentService $env, LoggerInterface $logger)
     {
@@ -194,12 +194,6 @@ class PpscApiService
         return $this->client->request('PATCH', $this->endpoint . $path, $params);
     }
 
-    private function getParams($field): string|null
-    {
-        $ppscEnv = $this->env->getPpscEnv($this->session->get('ppscEnv'));
-        return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
-    }
-
     public function logException(\Exception $e)
     {
         $this->lastError = $e->getMessage();
@@ -226,5 +220,11 @@ class PpscApiService
     public function getLastErrorCode()
     {
         return $this->lastErrorCode;
+    }
+
+    private function getParams($field): string|null
+    {
+        $ppscEnv = $this->env->getPpscEnv($this->session->get('ppscEnv'));
+        return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
     }
 }
