@@ -73,13 +73,6 @@
                 {% if not currentRoleNav %}
                     {% if is_granted('ROLE_USER') and app.session.get('site') %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lookup</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('participants') }}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
-                                <li><a class="dropdown-item" href="{{ path('orders') }}"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Order Lookup</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ path('review_today') }}"><i class="fa fa-list" aria-hidden="true"></i> Daily Review</a></li>

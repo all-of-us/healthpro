@@ -7,13 +7,6 @@
     <div class="row home-menu row-equal-height">
         {% if is_granted('ROLE_USER') and app.session.get('site') %}
             <div class="col-sm-6 col-md-4">
-                <a href="{{ path('participants') }}" class="btn btn-lg btn-block border w-100 text-dark">
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                    Participant Lookup
-                    <div class="description">Search for participants by first name, last name, and date of birth, PID, email, or phone number.</div>
-                </a>
-            </div>
-            <div class="col-sm-6 col-md-4">
                 <a href="{{ path('orders') }}" class="btn btn-lg btn-block border w-100 text-dark">
                     <i class="fa fa-medkit" aria-hidden="true"></i>
                     Order Lookup
