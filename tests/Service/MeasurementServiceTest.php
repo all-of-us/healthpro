@@ -74,7 +74,6 @@ class MeasurementServiceTest extends ServiceTestCase
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(RequestStack::class),
             static::getContainer()->get(UserService::class),
-            static::getContainer()->get(RdrApiService::class),
             static::getContainer()->get(PpscApiService::class),
             $mockSiteService,
             static::getContainer()->get(ParameterBagInterface::class),
