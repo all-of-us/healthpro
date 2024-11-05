@@ -168,12 +168,13 @@ class DefaultController extends BaseController
         AuthService $authService
     ) {
         $timeout = $request->get('timeout');
+        $source = $request->get('source');
         $loggerService->log(Log::LOGOUT);
         $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        if ($isSalesforceUser) {
-            return $this->redirectToRoute('login');
+        if ($isSalesforceUser || $source === 'ppsc') {
+            return $this->render('logout.html.twig');
         }
         return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
