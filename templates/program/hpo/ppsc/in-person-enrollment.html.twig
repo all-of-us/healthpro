@@ -11,9 +11,6 @@
 </div>
 {% if cacheEnabled %}
     <div class="row mb-2">
-        <div class="page-header pb-1 mb-2 border-bottom">
-            <h2>In-Person Enrollment</h2>
-        </div>
         <div class="col-md-12">
             <div class="float-end">
                 <small>Last updated: {{ participant.cacheTime ? participant.cacheTime|date('g:ia', app.user.timezone) }}</small>
