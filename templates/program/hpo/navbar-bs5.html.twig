@@ -70,34 +70,6 @@
                         </ul>
                     </li>
                 {% endif %}
-                {% if not currentRoleNav %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lookup</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('participants') }}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
-                                <li><a class="dropdown-item" href="{{ path('orders') }}"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Order Lookup</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('review_today') }}"><i class="fa fa-list" aria-hidden="true"></i> Daily Review</a></li>
-                                <li><a class="dropdown-item" href="{{ path('deceased_reports_index') }}"><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participants</a></li>
-                                <li><a class="dropdown-item" href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
-                            </ul>
-                        </li>
-                        {% if app.session.get('siteEntity') and app.session.get('siteEntity').organization %}
-                            <li class="nav-item"><a class="nav-link" href="{{ path('workqueue_index') }}">Work Queues</a></li>
-                        {% endif %}
-                    {% endif %}
-                    {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees %}
-                        <li class="nav-item"><a class="nav-link" href="{{ path('workqueue_index') }}">Work Queues</a></li>
-                    {% endif %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
-                        <li class="nav-item"><a data-href="{{ reportKitUrl }}" class="nav-link external-link">Report Kit Problem</a></li>
-                    {% endif %}
-                {% endif %}
             </ul>
             <ul class="nav navbar-nav">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}

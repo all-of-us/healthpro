@@ -25,7 +25,6 @@ class OrderServiceTest extends ServiceTestCase
         $mockSiteService->method('isActiveSite')->willReturn($isActiveSite);
 
         $orderService = new OrderService(
-            static::getContainer()->get(RdrApiService::class),
             static::getContainer()->get(PpscApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),
@@ -53,7 +52,6 @@ class OrderServiceTest extends ServiceTestCase
     public function testUpdateOrderTubes(): void
     {
         $orderService = new OrderService(
-            static::getContainer()->get(RdrApiService::class),
             static::getContainer()->get(PpscApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),

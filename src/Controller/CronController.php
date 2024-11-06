@@ -6,8 +6,6 @@ use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
 use App\Service\BiobankNightlyReportService;
 use App\Service\HFHRepairService;
-use App\Service\IdVerificationService;
-use App\Service\MeasurementQueueService;
 use App\Service\Nph\NphDietPeriodStatusService;
 use App\Service\Nph\NphDlwBackfillService;
 use App\Service\PediatricsReportService;
@@ -68,13 +66,6 @@ class CronController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    #[Route(path: '/resend-measurements-rdr', name: 'cron_resend_measurements_rdr')]
-    public function resendMeasurementsToRdrAction(MeasurementQueueService $measurementQueueService)
-    {
-        $measurementQueueService->resendMeasurementsToRdr();
-        return $this->json(['success' => true]);
-    }
-
     #[Route(path: '/backfill-order-processed-time', name: 'backfill_order_processed_time')]
     public function backfillOrderProcessedTimeAction(ParameterBagInterface $params)
     {
@@ -108,13 +99,6 @@ class CronController extends BaseController
     public function biobonkNightlyReport(BiobankNightlyReportService $biobankNightlyReportService): Response
     {
         $biobankNightlyReportService->generateNightlyReport();
-        return $this->json(['success' => true]);
-    }
-
-    #[Route(path: '/backfill-id-verifications-rdr', name: 'cron_backfill_id_verifications_rdr')]
-    public function backfillIdVerificationsRdrAction(IdVerificationService $idVerificationService): Response
-    {
-        $idVerificationService->backfillIdVerificationsRdr();
         return $this->json(['success' => true]);
     }
 

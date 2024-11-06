@@ -14,7 +14,6 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
-use App\Service\ParticipantSummaryService;
 use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,7 +32,6 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 class OrderController extends BaseController
 {
     protected $orderService;
-    protected $participantSummaryService;
     protected $loggerService;
     protected $siteService;
     protected PpscApiService $ppscApiService;
@@ -41,14 +39,12 @@ class OrderController extends BaseController
     public function __construct(
         EntityManagerInterface $em,
         OrderService $orderService,
-        ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
         SiteService $siteService,
         PpscApiService $ppscApiService,
     ) {
         parent::__construct($em);
         $this->orderService = $orderService;
-        $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
         $this->ppscApiService = $ppscApiService;
