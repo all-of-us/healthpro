@@ -10,12 +10,14 @@
 
 <div class="card">
     <div class="card-header">
-        {% set orderCheckRoute = 'order_check' %}
-        {% if participant.isPediatric %}
-            {% set orderCheckRoute = 'order_check_pediatric' %}
-        {% endif %}
-        {% if not (isDVType and participant.isPediatric) %}
-            <a href="{{ path(orderCheckRoute, { participantId: participant.id }) }}" class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank Order</a>
+        {% if isActiveSite %}
+            {% set orderCheckRoute = 'order_check' %}
+            {% if participant.isPediatric %}
+                {% set orderCheckRoute = 'order_check_pediatric' %}
+            {% endif %}
+            {% if not (isDVType and participant.isPediatric) %}
+                <a href="{{ path(orderCheckRoute, { participantId: participant.id }) }}" class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank Order</a>
+            {% endif %}
         {% endif %}
         <h6><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h6>
     </div>
