@@ -64,6 +64,7 @@
     </div>
     {% endif %}
     {{ form_rest(collectForm) }}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled and order.type != constant('TUBE_SELECTION_TYPE', order) %}
         <p>
             <button type="submit" class="btn btn-primary" name="save">
@@ -73,9 +74,10 @@
                     Save and mark as collected
                 {% endif %}
             </button>
-            {% set routePrefix = readOnlyView ? 'read_' : '' %}
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
+    {% else %}
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
     {% endif %}
     {{ form_end(collectForm) }}
     {% if order.status == 'unlock' %}

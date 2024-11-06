@@ -155,9 +155,9 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/timeout', name: 'timeout')]
-    public function timeoutAction()
+    public function timeoutAction(Request $request)
     {
-        return $this->render('timeout.html.twig');
+        return $this->render('timeout.html.twig', ['source' => $request->get('source')]);
     }
 
     #[Route(path: '/logout', name: 'logout')]
@@ -168,12 +168,16 @@ class DefaultController extends BaseController
         AuthService $authService
     ) {
         $timeout = $request->get('timeout');
+        $source = $request->get('source');
         $loggerService->log(Log::LOGOUT);
         $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        if ($isSalesforceUser) {
-            return $this->redirectToRoute('login');
+        if ($isSalesforceUser || $source === 'ppsc') {
+            if ($timeout) {
+                return $this->redirect('timeout?source=ppsc');
+            }
+            return $this->render('logout.html.twig');
         }
         return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }

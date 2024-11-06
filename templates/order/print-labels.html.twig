@@ -42,6 +42,7 @@
                         {{ errorMessage|default('Error loading labels.') }}
                     </div>
                 </div>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
             {% endif %}
         </div>
     </div>

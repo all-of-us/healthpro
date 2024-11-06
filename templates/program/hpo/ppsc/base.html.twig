@@ -1,7 +1,7 @@
 {% set bootstrapVersion = bootstrapVersion|default(3) %}
 {% set isActiveSite = app.session.get('siteEntity') ? app.session.get('siteEntity').status : 0 %}
 {% set readOnlyRoute = app.request.attributes.get('_route') starts with 'read_' %}
-{% set displayInactiveSiteBanner = not readOnlyRoute and not isActiveSite  %}
+{% set displayInactiveSiteBanner = not isActiveSite  %}
 <!doctype html>
 <html lang="en">
 <head>

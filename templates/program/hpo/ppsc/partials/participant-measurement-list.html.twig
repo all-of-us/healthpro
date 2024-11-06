@@ -1,11 +1,13 @@
 {% set readOnlyView = readOnlyView|default(false) %}
 <div class="card">
     <div class="card-header">
-        {% set evaluationUrl = evaluationUrl is defined ? evaluationUrl : 'measurement' %}
-        <a href="{{ path(evaluationUrl, { participantId: participant.id }) }}"
-           class="btn btn-primary btn-sm border float-end">
-            <i class="fa fa-plus-circle" aria-hidden="true"></i> New Physical Measurements
-        </a>
+        {% if isActiveSite %}
+            {% set evaluationUrl = evaluationUrl is defined ? evaluationUrl : 'measurement' %}
+            <a href="{{ path(evaluationUrl, { participantId: participant.id }) }}"
+               class="btn btn-primary btn-sm border float-end">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> New Physical Measurements
+            </a>
+        {% endif %}
         <h6><i class="fa fa-clipboard" aria-hidden="true"></i> Physical Measurements</h6>
     </div>
     <div class="card-body in-person-card">

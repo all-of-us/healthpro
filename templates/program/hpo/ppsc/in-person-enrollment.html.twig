@@ -4,6 +4,11 @@
 {% block bodycontainer %}container-fluid px-5{% endblock %}
 {% block body %}
 {% import 'macros/display-text.html.twig' as macros %}
+<div class="row mb-2">
+    <div class="page-header pb-1 mb-2 border-bottom">
+        <h2>In-Person Enrollment</h2>
+    </div>
+</div>
 {% if cacheEnabled %}
     <div class="row mb-2">
         <div class="page-header pb-1 mb-2 border-bottom">
@@ -20,6 +25,9 @@
             </div>
         </div>
     </div>
+{% endif %}
+{% if displayInactiveSiteBanner %}
+    {{ macros.displayInactiveSiteBanner('pmb', 5) }}
 {% endif %}
 <div class="row">
     <div class="col-sm-6">
