@@ -28,6 +28,15 @@ class EnvironmentService
         'Pacific/Honolulu' => 'Hawaii Time'
     ];
 
+    public static array $hpoPpscDefaultEnvs = [
+        'local' => 'qa',
+        'dev' => 'dev',
+        'staging' => 'qa',
+        'beta' => 'uat',
+        'stable' => 'uat',
+        'prod' => 'prod'
+    ];
+
     protected $name;
 
     public function __construct(array $values = [])
@@ -113,6 +122,11 @@ class EnvironmentService
     public function getTimeZones()
     {
         return self::$timezoneOptions;
+    }
+
+    public function getPpscEnv($ppscEnv): ?string
+    {
+        return $ppscEnv ?: self::$hpoPpscDefaultEnvs[$this->values['env']];
     }
 
     protected function loadConfiguration($override = [])

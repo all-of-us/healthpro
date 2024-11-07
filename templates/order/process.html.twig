@@ -1,4 +1,4 @@
-{% extends 'render-base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% import 'macros/form-render.html.twig' as formRender %}
 {% if order.type != 'saliva' %}
@@ -38,7 +38,7 @@
         {{ form_errors(processForm.processedNotes) }}
     </div>
     {{ form_rest(processForm) }}
-
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
         <p>
             <button type="submit" class="btn btn-primary">
@@ -48,7 +48,10 @@
                     Save and mark as processed
                 {% endif %}
             </button>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
+    {% else %}
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
     {% endif %}
     {{ form_end(processForm) }}
     {% if order.status == 'unlock' %}

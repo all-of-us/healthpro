@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Security\User;
 use Google\Client as GoogleClient;
 use Google\Service\Directory as GoogleDirectory;
 use Google\Service\Directory\Member as GoogleMember;
@@ -68,7 +69,14 @@ class GoogleGroupsService
             $nextToken = $groupsCollection->getNextPageToken();
         } while ($nextToken);
 
-        return $groups;
+        // Only keep HPO admin & biobank user groups and all NPH groups
+        $googleGroups = array_filter($groups, function ($group) {
+            return str_starts_with($group->email, User::ADMIN_GROUP) ||
+                str_starts_with($group->email, User::BIOBANK_GROUP) ||
+                str_starts_with($group->email, User::NPH_TYPE);
+        });
+
+        return array_values($googleGroups);
     }
 
     /**

@@ -8,7 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Validation;
 
 class SiteType extends AbstractType
 {
@@ -32,14 +31,9 @@ class SiteType extends AbstractType
             'Fixed Angle' => self::FIXED_ANGLE,
             'Swinging Bucket' => self::SWINGING_BUCKET
         ],
-        'workqueue_download' => [
-            'Full Data Access' => self::FULL_DATA_ACCESS,
-            'Limited Data Access (No PII)' => self::LIMITED_DATA_ACCESS,
-            'Download Disabled' => self::DOWNLOAD_DISABLED
-        ],
         'ehr_modification_protocol' => [
-            'Yes' => 1,
-            'No' => 0
+            'No' => 0,
+            'Yes' => 1
         ]
     ];
 
@@ -112,38 +106,6 @@ class SiteType extends AbstractType
         }
 
         $builder
-            ->add('email', Type\TextType::class, [
-                'label' => 'Email address(es)',
-                'required' => false,
-                'constraints' => [
-                    new Constraints\Type('string'),
-                    new Constraints\Length(['max' => 512]),
-                    new Constraints\Callback(function ($list, $context) {
-                        $list = trim($list);
-                        if (empty($list)) {
-                            return;
-                        }
-                        $emails = explode(',', $list);
-                        $validator = Validation::createValidator();
-                        foreach ($emails as $email) {
-                            $email = trim($email);
-                            $errors = $validator->validate($email, new Constraints\Email());
-                            if (count($errors) > 0) {
-                                $context
-                                    ->buildViolation('Must be a comma-separated list of valid email addresses')
-                                    ->addViolation();
-                                break;
-                            }
-                        }
-                    })
-                ],
-                'disabled' => $options['isDisabled'] && $options['isProd'],
-            ])
-            ->add('awardee', Type\TextType::class, [
-                'label' => 'Program (e.g. STSI)',
-                'required' => false,
-                'constraints' => new Constraints\Type('string')
-            ])
             ->add('centrifuge_type', Type\ChoiceType::class, [
                 'label' => 'Centrifuge type',
                 'required' => false,
@@ -151,19 +113,9 @@ class SiteType extends AbstractType
                 'multiple' => false,
                 'placeholder' => '-- Select centrifuge type --'
             ])
-            ->add('workqueue_download', Type\ChoiceType::class, [
-                'label' => 'Work Queue Download',
-                'required' => true,
-                'choices' => self::$siteChoices['workqueue_download'],
-                'multiple' => false,
-                'constraints' => [
-                    new Constraints\NotBlank(),
-                    new Constraints\Type('string')
-                ]
-            ])
             ->add('ehr_modification_protocol', Type\ChoiceType::class, [
                 'label' => 'EHR modification protocol',
-                'required' => false,
+                'required' => true,
                 'choices' => self::$siteChoices['ehr_modification_protocol'],
                 'multiple' => false
             ]);

@@ -15,10 +15,12 @@ security:
             guard:
                 authenticators:
                     - App\Security\GoogleGroupsAuthenticator
+                    - App\Security\SalesforceAuthenticator
+                entry_point: App\Security\GoogleGroupsAuthenticator
 
     # Note: The *first* access control that matches will be used
     access_control:
-        - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout), roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout|salesforce), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/nph($|\/)$, roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK, ROLE_NPH_ADMIN] }

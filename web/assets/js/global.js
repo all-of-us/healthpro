@@ -118,28 +118,6 @@ $(document).ready(function () {
     }
 
     /*************************************************************************
-     * Display system usage agreement when user first logs in
-     ************************************************************************/
-    if (!PMI.isUsageAgreed) {
-        new PmiConfirmModal({
-            title: "FISMA MODERATE ENVIRONMENT",
-            dialogClass: "modal-lg",
-            titleClass: "text-danger",
-            isHTML: true,
-            msg: pmiGetTpl("pmiSystemUsageTpl")(),
-            btnTextTrue: "Agree",
-            onTrue: function (modal) {
-                $.post(PMI.path.agreeUsage, {
-                    csrf_token: modal.$("#csrf_token").val()
-                });
-            },
-            onFalse: function () {
-                window.location = PMI.path.logout;
-            }
-        });
-    }
-
-    /*************************************************************************
      * Plugin for making panels (or other single-element inside a column)
      * in Bootstrap rows equal heights
      *
@@ -396,4 +374,26 @@ $(document).ready(function () {
             });
         }
     });
+
+    /*************************************************************************
+     * Display system usage agreement when user first logs in
+     ************************************************************************/
+    if (!PMI.isUsageAgreed) {
+        new PmiConfirmModal({
+            title: "FISMA MODERATE ENVIRONMENT",
+            dialogClass: "modal-lg",
+            titleClass: "text-danger",
+            isHTML: true,
+            msg: pmiGetTpl("pmiSystemUsageTpl")(),
+            btnTextTrue: "Agree",
+            onTrue: function (modal) {
+                $.post(PMI.path.agreeUsage, {
+                    csrf_token: modal.$("#csrf_token").val()
+                });
+            },
+            onFalse: function () {
+                window.location = PMI.path.logout;
+            }
+        });
+    }
 });

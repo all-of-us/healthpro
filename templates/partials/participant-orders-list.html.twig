@@ -22,7 +22,7 @@
         <h3 class="panel-title"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Orders</h3>
     </div>
     <div class="panel-body">
-        {% if (readOnly is defined or biobankView is defined or participant.isSuspended or participant.editExistingOnly) and orders|length == 0 %}
+        {% if (readOnly is defined or biobankView is defined) and orders|length == 0 %}
             <small class="text-warning">No Records Found</small>
         {% else %}
             {% for order in orders %}

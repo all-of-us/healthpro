@@ -1,0 +1,22 @@
+{% set site = '' %}
+{% set siteName = '' %}
+{% if is_granted('IS_AUTHENTICATED_FULLY') and app.session.get('site') is defined %}
+    {% if app.session.get('site').id is defined %}
+        {% set site = app.session.get('site').id %}
+    {% endif %}
+    {% if app.session.get('siteEntity').name is defined %}
+        {% set siteName = app.session.get('siteEntity').name %}
+    {% elseif app.session.get('site').name is defined %}
+        {% set siteName = app.session.get('site').name %}
+    {% endif %}
+{% endif %}
+
+{% if bootstrapVersion == 5 %}
+    <span class="navbar-text" data-site-name="{{ site }}">
+        {% if not isActiveSite %} (Inactive) {% endif %} {{ siteName }}
+    </span>
+{% else %}
+    <span class="navbar-text navbar-right navbar-site-name" data-site-name="{{ site }}">
+        {% if not isActiveSite %} (Inactive) {% endif %} {{ siteName }}
+    </span>
+{% endif %}

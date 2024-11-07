@@ -19,7 +19,7 @@
 
 <div class="card">
     <div class="card-header">
-        {% if isActiveSite and type is not defined  and readOnly is not defined and biobankView is not defined and not participant.isSuspended and participant.status and not readOnlyView %}
+        {% if isActiveSite and type is not defined  and readOnly is not defined and biobankView is not defined and participant.status and not readOnlyView %}
             {% set orderCheckRoute = 'order_check' %}
             {% if participant.isPediatric %}
                 {% set orderCheckRoute = 'order_check_pediatric' %}

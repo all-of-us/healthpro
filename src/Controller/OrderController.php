@@ -14,7 +14,7 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
-use App\Service\ParticipantSummaryService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -32,27 +32,27 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 class OrderController extends BaseController
 {
     protected $orderService;
-    protected $participantSummaryService;
     protected $loggerService;
     protected $siteService;
+    protected PpscApiService $ppscApiService;
 
     public function __construct(
         EntityManagerInterface $em,
         OrderService $orderService,
-        ParticipantSummaryService $participantSummaryService,
         LoggerService $loggerService,
-        SiteService $siteService
+        SiteService $siteService,
+        PpscApiService $ppscApiService,
     ) {
         parent::__construct($em);
         $this->orderService = $orderService;
-        $this->participantSummaryService = $participantSummaryService;
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
+        $this->ppscApiService = $ppscApiService;
     }
 
     public function loadOrder($participantId, $orderId)
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
@@ -63,21 +63,15 @@ class OrderController extends BaseController
         }
         $this->orderService->setParticipant($participant);
         $this->orderService->loadSamplesSchema($order);
-        if (!$this->orderService->canEdit() || $this->siteService->isTestSite()) {
-            throw $this->createAccessDeniedException();
-        }
         return $order;
     }
 
-    #[Route(path: '/participant/{participantId}/order/check', name: 'order_check')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/check', name: 'order_check')]
     public function orderCheck($participantId, RequestStack $requestStack): Response
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         return $this->render('order/check.html.twig', [
             'participant' => $participant,
@@ -85,15 +79,12 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/create', name: 'order_create')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/create', name: 'order_create')]
     public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService, ParameterBagInterface $params)
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$participant->status || $this->siteService->isTestSite() || ($session->get('siteType') === 'dv' && $request->request->has('saliva')) || $participant->activityStatus === 'deactivated') {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if ($request->request->has('show-blood-tubes') && $request->request->has('show-saliva-tubes')) {
             $showBloodTubes = $request->request->get('show-blood-tubes') === 'yes' ? true : false;
@@ -217,7 +208,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/print/labels', name: 'order_print_labels')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/print/labels', name: 'order_print_labels')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/print/labels', name: 'read_order_print_labels')]
     public function orderPrintLabelsAction($participantId, $orderId): Response
     {
@@ -247,7 +238,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/labels/pdf', name: 'order_labels_pdf')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/labels/pdf', name: 'order_labels_pdf')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/labels/pdf', name: 'read_order_labels_pdf')]
     public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
@@ -270,7 +261,7 @@ class OrderController extends BaseController
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/collect', name: 'read_order_collect', methods: ['GET'])]
     public function orderCollectAction($participantId, $orderId, Request $request, Session $session, ParameterBagInterface $params)
     {
@@ -360,7 +351,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/process', name: 'order_process')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/process', name: 'order_process')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/process', name: 'read_order_process', methods: ['GET'])]
     public function orderProcessAction($participantId, $orderId, Request $request)
     {
@@ -457,7 +448,7 @@ class OrderController extends BaseController
     }
 
     // @ToDo - Replace SessionInterface with Symfony\Component\HttpFoundation\Session
-    #[Route(path: '/participant/{participantId}/order/{orderId}/finalize', name: 'order_finalize')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/finalize', name: 'order_finalize')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/finalize', name: 'read_order_finalize', methods: ['GET'])]
     public function orderFinalizeAction($participantId, $orderId, Request $request, Session $session)
     {
@@ -597,7 +588,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/print/requisition', name: 'order_print_requisition')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/print/requisition', name: 'order_print_requisition')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/print/requisition', name: 'read_order_print_requisition')]
     public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
     {
@@ -626,7 +617,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'order_requisition_pdf')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'order_requisition_pdf')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'read_order_requisition_pdf')]
     public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
     {
@@ -648,7 +639,7 @@ class OrderController extends BaseController
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/modify/{type}', name: 'order_modify')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/modify/{type}', name: 'order_modify')]
     public function orderModifyAction($participantId, $orderId, $type, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -718,7 +709,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/revert', name: 'order_revert')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/revert', name: 'order_revert')]
     public function orderRevertAction($participantId, $orderId, Request $request)
     {
         $order = $this->loadOrder($participantId, $orderId);
@@ -741,7 +732,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/json-response', name: 'order_json')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/json-response', name: 'order_json')]
     public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
@@ -762,7 +753,7 @@ class OrderController extends BaseController
         return $response;
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}', name: 'order')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}', name: 'order')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}', name: 'read_order')]
     public function orderAction($participantId, $orderId)
     {
@@ -780,7 +771,7 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/{orderId}/biobank/summary', name: 'biobank_summary')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/biobank/summary', name: 'biobank_summary')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/biobank/summary', name: 'read_biobank_summary')]
     public function biobankSummaryAction($participantId, $orderId)
     {
@@ -790,15 +781,12 @@ class OrderController extends BaseController
         ]);
     }
 
-    #[Route(path: '/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
+    #[Route(path: '/ppsc/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
     public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
     {
-        $participant = $this->participantSummaryService->getParticipantById($participantId);
+        $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
-        }
-        if (!$participant->status || $this->siteService->isTestSite() || $participant->activityStatus === 'deactivated') {
-            throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
         if ($measurement) {

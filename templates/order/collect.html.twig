@@ -1,4 +1,4 @@
-{% extends 'render-base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% if order.type != 'saliva' %}
     {% form_theme collectForm 'form/simple_checkbox.html.twig' %}
@@ -64,6 +64,7 @@
     </div>
     {% endif %}
     {{ form_rest(collectForm) }}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled and order.type != constant('TUBE_SELECTION_TYPE', order) %}
         <p>
             <button type="submit" class="btn btn-primary" name="save">
@@ -73,7 +74,10 @@
                     Save and mark as collected
                 {% endif %}
             </button>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
+    {% else %}
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
     {% endif %}
     {{ form_end(collectForm) }}
     {% if order.status == 'unlock' %}

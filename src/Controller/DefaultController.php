@@ -3,12 +3,11 @@
 namespace App\Controller;
 
 use App\Audit\Log;
-use App\Entity\FeatureNotification;
-use App\Entity\FeatureNotificationUserMap;
 use App\Entity\User;
 use App\Service\AuthService;
 use App\Service\ContextTemplateService;
 use App\Service\LoggerService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +28,7 @@ class DefaultController extends BaseController
 
     #[Route(path: '/', name: 'home')]
     #[Route(path: '/nph', name: 'nph_home')]
-    public function index(Request $request, ContextTemplateService $contextTemplate)
+    public function index(Request $request, ContextTemplateService $contextTemplate, PpscApiService $ppscApiService)
     {
         $program = $request->getSession()->get('program');
         if ($program === User::PROGRAM_NPH && $request->attributes->get('_route') === self::HPO_HOME_ROUTE) {
@@ -40,18 +39,27 @@ class DefaultController extends BaseController
             $this->addFlash('error', 'Please select your current time zone');
             return $this->redirectToRoute('settings');
         }
+        if ($this->isGranted('ROLE_USER') && $request->getSession()->get('ppscRequestId')) {
+            if ($request->getSession()->get('ppscLandingPage') === 'in_person_enrollment') {
+                $requestDetails = $ppscApiService->getRequestDetailsById($request->getSession()->get('ppscRequestId'));
+                if (empty($requestDetails->participantId)) {
+                    throw $this->createNotFoundException('Participant not found.');
+                }
+                return $this->redirectToRoute('participant', ['id' => $requestDetails->participantId]);
+            }
+            if ($request->getSession()->get('ppscLandingPage') === 'daily_review') {
+                return $this->redirectToRoute('review_today');
+            }
+        }
+        if ($program === User::PROGRAM_HPO) {
+            if ($this->isGranted('ROLE_ADMIN')) {
+                return $this->redirectToRoute('admin_home');
+            } elseif ($this->isGranted('ROLE_BIOBANK')) {
+                return $this->redirectToRoute('biobank_home');
+            }
+        }
         if ($this->isGranted('ROLE_USER') || $this->isGranted('ROLE_NPH_USER') || $this->isGranted('ROLE_NPH_ADMIN') || $this->isGranted('ROLE_NPH_BIOBANK')) {
             return $this->render($contextTemplate->GetProgramTemplate('index.html.twig'));
-        } elseif ($this->isGranted('ROLE_AWARDEE')) {
-            return $this->redirectToRoute('workqueue_index');
-        } elseif ($this->isGranted('ROLE_DV_ADMIN')) {
-            return $this->redirectToRoute('problem_reports');
-        } elseif ($this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_home');
-        } elseif ($this->isGranted('ROLE_BIOBANK') || $this->isGranted('ROLE_SCRIPPS')) {
-            return $this->redirectToRoute('biobank_home');
-        } elseif ($this->isGranted('ROLE_READ_ONLY')) {
-            return $this->redirectToRoute('read_home');
         }
         throw $this->createAccessDeniedException();
     }
@@ -147,18 +155,30 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/timeout', name: 'timeout')]
-    public function timeoutAction()
+    public function timeoutAction(Request $request)
     {
-        return $this->render('timeout.html.twig');
+        return $this->render('timeout.html.twig', ['source' => $request->get('source')]);
     }
 
     #[Route(path: '/logout', name: 'logout')]
-    public function logoutAction(Request $request, LoggerService $loggerService, SessionInterface $session, AuthService $authService)
-    {
+    public function logoutAction(
+        Request $request,
+        LoggerService $loggerService,
+        SessionInterface $session,
+        AuthService $authService
+    ) {
         $timeout = $request->get('timeout');
+        $source = $request->get('source');
         $loggerService->log(Log::LOGOUT);
+        $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
+        if ($isSalesforceUser || $source === 'ppsc') {
+            if ($timeout) {
+                return $this->redirect('timeout?source=ppsc');
+            }
+            return $this->render('logout.html.twig');
+        }
         return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
@@ -166,43 +186,6 @@ class DefaultController extends BaseController
     public function importsIndex()
     {
         return $this->render('imports/index.html.twig');
-    }
-
-    #[Route(path: '/notification/{id}', name: 'notification_details')]
-    public function notificationDetails($id)
-    {
-        $featureNotification = $this->em->getRepository(FeatureNotification::class)->find($id);
-        $this->createFeatureNotificationUserMap($featureNotification);
-        return $this->render('notifications-modal.html.twig', [
-            'notification' => $featureNotification
-        ]);
-    }
-
-    #[Route(path: '/notifications/mark/read', name: 'notifications_mark_read')]
-    public function notificationsMarkRead(): JsonResponse
-    {
-        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
-
-        foreach ($activeNotifications as $activeNotification) {
-            $this->createFeatureNotificationUserMap($activeNotification);
-        }
-        return $this->json(['success' => true]);
-    }
-
-    private function createFeatureNotificationUserMap($featureNotification): void
-    {
-        $featureNotificationUserMap = $this->em->getRepository(FeatureNotificationUserMap::class)->findOneBy([
-            'featureNotification' => $featureNotification,
-            'user' => $this->getUserEntity()
-        ]);
-        if ($featureNotificationUserMap === null) {
-            $featureNotificationUserMap = new FeatureNotificationUserMap();
-            $featureNotificationUserMap->setFeatureNotification($featureNotification);
-            $featureNotificationUserMap->setUser($this->getUserEntity());
-            $featureNotificationUserMap->setCreatedTs(new \DateTime());
-            $this->em->persist($featureNotificationUserMap);
-            $this->em->flush();
-        }
     }
 
     private function getHomeRedirectRoute(string $program): string

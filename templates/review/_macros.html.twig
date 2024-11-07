@@ -1,7 +1,11 @@
 {% macro displayDate(entity, dateType) %}
   {% if entity %}
     {% if entity[dateType] %}
-      <span {% if entity['type'] is defined %}data-date-type="{{ entity['type'] ~ '_' ~ dateType }}"{% endif %}>
+      {% set columnDateType = dateType %}
+      {% if dateType == 'h_created_ts' %}
+        {% set columnDateType = 'finalized_ts' %}
+      {% endif %}
+      <span {% if entity['type'] is defined %}data-date-type="{{ entity['type'] ~ '_' ~ columnDateType }}"{% endif %}>
         {% if 'now'|date('Y-m-d', app.user.timezone) == entity[dateType]|date('Y-m-d', app.user.timezone) %}
         {# previously displayed only time if date is today. leaving this here in case we want to display something different in the future #}
         {{ entity[dateType]|date('n/j/Y g:ia', app.user.timezone) }}
@@ -18,6 +22,6 @@
 {% macro displayLink(entity, field, participantId, idType) %}
   {% if entity %}
     {% set idType = entity['type'] == 'order' ? 'orderId' : 'measurementId' %}
-      <a href="{{ path(entity['type'], { participantId: participantId, (idType): entity['id'] }) }}">{{ entity[field] }}</a>
+      {{ entity[field] }}
   {% endif %}
 {% endmacro %}

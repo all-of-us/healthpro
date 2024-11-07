@@ -36,6 +36,7 @@ $(document).ready(function () {
 
     function hideAllCheckedQuestions(element) {
         $(element).closest("div.question").nextAll().hide().find("input:checked").prop("checked", false);
+        $("#order_check_cancel").show();
         hideAllWarnings(element);
     }
     function hideAllWarnings(element) {

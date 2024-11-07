@@ -1,0 +1,15 @@
+<nav class="navbar navbar-default navbar-inverse navbar">
+    <div class="container-fluid">
+        <ul class="nav navbar-nav navbar-header">
+            <a class="navbar-brand dropdown-toggle" href="#">
+                <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+            </a>
+            <li>
+                <a class="navbar-brand " href="#">
+                    HealthPro
+                </a>
+            </li>
+        </ul>
+        {% include 'program/hpo/ppsc/partials/display-site-name.html.twig' with { 'bootstrapVersion' : bootstrapVersion } %}
+    </div>
+</nav>

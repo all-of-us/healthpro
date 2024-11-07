@@ -61,6 +61,9 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
     },
     displayEhrDate: function () {
         var self = this;
+        if (self.finalized) {
+            return;
+        }
         var sourceFields = [
             "blood-pressure-source",
             "height-source",

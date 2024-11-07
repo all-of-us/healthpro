@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Helper\Participant;
+use App\Helper\PpscParticipant;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -925,7 +925,7 @@ class Order
         return $this;
     }
 
-    public function loadSamplesSchema($params = [], Participant $participant = null, Measurement $physicalMeasurement = null)
+    public function loadSamplesSchema($params = [], PpscParticipant $participant = null, Measurement $physicalMeasurement = null)
     {
         $this->currentVersion = $this->getVersion();
         if ($participant) {

@@ -12,7 +12,7 @@ use App\Service\BiobankOrderFinalizeNotificationService;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
-use App\Service\ParticipantSummaryService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\ReviewService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,20 +25,20 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/biobank')]
 class BiobankController extends BaseController
 {
-    protected $participantSummaryService;
+    protected PpscApiService $ppscApiService;
     protected $orderService;
     protected $loggerService;
     protected $params;
 
     public function __construct(
         EntityManagerInterface $em,
-        ParticipantSummaryService $participantSummaryService,
+        PpscApiService $ppscApiService,
         OrderService $orderService,
         LoggerService $loggerService,
         ParameterBagInterface $params
     ) {
         parent::__construct($em);
-        $this->participantSummaryService = $participantSummaryService;
+        $this->ppscApiService = $ppscApiService;
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
         $this->params = $params;
@@ -58,10 +58,10 @@ class BiobankController extends BaseController
         $idForm->handleRequest($request);
         if ($idForm->isSubmitted() && $idForm->isValid()) {
             $searchParameters = $idForm->getData();
-            $searchResults = $this->participantSummaryService->search($searchParameters);
-            if (!empty($searchResults)) {
+            $participant = $this->ppscApiService->getParticipantByBiobankId($searchParameters['biobankId']);
+            if (!empty($participant)) {
                 return $this->redirectToRoute('biobank_participant', [
-                    'biobankId' => $searchResults[0]->biobankId
+                    'biobankId' => $participant->biobankId
                 ]);
             }
             $this->addFlash('error', 'Biobank ID not found');
@@ -94,23 +94,6 @@ class BiobankController extends BaseController
                     'orderId' => $order->getId()
                 ]);
             }
-            // Quanum Orders
-            $order = new Order();
-            $this->orderService->loadSamplesSchema($order);
-            $quanumOrders = $this->orderService->getOrders([
-                'kitId' => $id,
-                'origin' => 'careevolution'
-            ]);
-            if (isset($quanumOrders[0])) {
-                $order = $this->orderService->loadFromJsonObject($quanumOrders[0]);
-                $participant = $this->participantSummaryService->getParticipantById($order->getParticipantId());
-                if ($participant->biobankId) {
-                    return $this->redirectToRoute('biobank_quanum_order', [
-                        'biobankId' => $participant->biobankId,
-                        'orderId' => $order->getRdrId()
-                    ]);
-                }
-            }
             $this->addFlash('error', 'Order ID not found');
         }
 
@@ -122,13 +105,9 @@ class BiobankController extends BaseController
     #[Route(path: '/{biobankId}/order/{orderId}', name: 'biobank_order')]
     public function orderAction(string $biobankId, int $orderId, Request $request, BiobankOrderFinalizeNotificationService $biobankOrderFinalizeNotificationService): Response
     {
-        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
+        $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
         if (empty($participant)) {
             throw $this->createNotFoundException();
-        }
-        $participant = $participant[0];
-        if (!($participant->status || $participant->editExistingOnly)) {
-            throw $this->createAccessDeniedException();
         }
         $order = $this->em->getRepository(Order::class)->find($orderId);
         if (empty($order)) {
@@ -263,27 +242,6 @@ class BiobankController extends BaseController
         ]);
     }
 
-    #[Route(path: '/{biobankId}/quanum-order/{orderId}', name: 'biobank_quanum_order')]
-    public function quanumOrderAction(string $biobankId, string $orderId): Response
-    {
-        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
-        if (!$participant) {
-            throw $this->createNotFoundException('404');
-        }
-        $participant = $participant[0];
-
-        $order = new Order();
-        $this->orderService->loadSamplesSchema($order);
-        $quanumOrder = $this->orderService->getOrder($participant->id, $orderId);
-        $order = $this->orderService->loadFromJsonObject($quanumOrder);
-        return $this->render('biobank/order-quanum.html.twig', [
-            'participant' => $participant,
-            'samplesInfoText' => $this->orderService->getCustomSamplesInfo(),
-            'currentStep' => 'finalize',
-            'order' => $order
-        ]);
-    }
-
     #[Route(path: '/review/orders/today', name: 'biobank_orders_today')]
     public function ordersTodayAction(Request $request, EnvironmentService $env, ReviewService $reviewService): Response
     {
@@ -301,39 +259,6 @@ class BiobankController extends BaseController
         $orders = $reviewService->getTodayOrders($today);
 
         return $this->render('biobank/orders-today.html.twig', [
-            'orders' => $orders
-        ]);
-    }
-
-    #[Route(path: '/review/quanum-orders/today', name: 'biobank_quanum_orders_today')]
-    public function quanumOrdersTodayAction(Request $request, EnvironmentService $env): Response
-    {
-        // Get beginning of today (at midnight) in user's timezone
-        $startString = 'today';
-        // Allow overriding start time to test in non-prod environments
-        if (!$env->isProd() && intval($request->query->get('days')) > 0) {
-            $startString = '-' . intval($request->query->get('days')) . ' days';
-        }
-        $startTime = new DateTime($startString, new \DateTimeZone($this->getSecurityUser()->getTimezone()));
-        $today = $startTime->format('Y-m-d');
-        $endDate = (new DateTime('today', new \DateTimezone('UTC')))->format('Y-m-d');
-
-        $quanumOrders = $this->orderService->getOrders([
-            'startDate' => $today,
-            'endDate' => $endDate,
-            'origin' => 'careevolution',
-            'page' => '1',
-            'pageSize' => '1000'
-        ]);
-        $orders = [];
-        foreach ($quanumOrders as $quanumOrder) {
-            if ($quanumOrder->origin === 'careevolution') {
-                $order = new Order();
-                $this->orderService->loadSamplesSchema($order);
-                $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
-            }
-        }
-        return $this->render('biobank/orders-quanum-today.html.twig', [
             'orders' => $orders
         ]);
     }
@@ -368,30 +293,19 @@ class BiobankController extends BaseController
     #[Route(path: '/{biobankId}', name: 'biobank_participant')]
     public function participantAction(string $biobankId): Response
     {
-        $participant = $this->participantSummaryService->search(['biobankId' => $biobankId]);
+        $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
         if (empty($participant)) {
             throw $this->createNotFoundException();
         }
-        $participant = $participant[0];
 
         // Internal Orders
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participant->id], ['id' => 'desc']);
 
-        // Quanum Orders
-        $quanumOrders = $this->orderService->getOrdersByParticipant($participant->id);
-
-        foreach ($quanumOrders as $quanumOrder) {
-            if ($quanumOrder->origin === 'careevolution') {
-                $order = new Order();
-                $this->orderService->loadSamplesSchema($order);
-                $orders[] = $this->orderService->loadFromJsonObject($quanumOrder);
-            }
-        }
         return $this->render('biobank/participant.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'biobankView' => true,
-            'canViewOrders' => $participant->status || $participant->editExistingOnly
+            'canViewOrders' => true
         ]);
     }
 

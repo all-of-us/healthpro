@@ -20,6 +20,7 @@ class User
     public const PROGRAM_NPH = 'nph';
     public const PROGRAM_HPO = 'hpo';
     public const PROGRAMS = ['hpo', 'nph'];
+    public const SALESFORCE = 'salesforce';
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
