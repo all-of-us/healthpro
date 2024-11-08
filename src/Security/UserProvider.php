@@ -129,9 +129,9 @@ class UserProvider implements UserProviderInterface
             throw new AuthenticationException("User $username is not logged in!");
         }
 
-        if ($this->requestStack->getSession()->has('googlegroups')) {
-            $groups = $this->requestStack->getSession()->get('googlegroups');
-        } else {
+        $groups = $this->requestStack->getSession()->get('googlegroups', []);
+
+        if (!$groups) {
             $requestDetails = $this->ppscApiService->getRequestDetailsById($this->requestStack->getSession()->get('ppscRequestId'));
             $siteId = $requestDetails->siteId ?? null;
             $groups = $siteId ? [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId])] : [];
