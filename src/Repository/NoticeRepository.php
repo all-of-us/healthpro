@@ -46,6 +46,15 @@ class NoticeRepository extends ServiceEntityRepository
 
     private static function patternToRegex($pattern)
     {
+        $specialCases = [
+            '/ppsc/participant/p' => '/^\/ppsc\/participant\/[^\/]+$/i'
+        ];
+
+        // if pattern matches a special case, return the corresponding regex
+        if (isset($specialCases[$pattern])) {
+            return $specialCases[$pattern];
+        }
+
         // temporarily change wildcard asterisks to % to avoid escaping
         $regex = str_replace('*', '%', $pattern);
         // escape pattern for regex
