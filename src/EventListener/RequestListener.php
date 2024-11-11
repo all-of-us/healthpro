@@ -3,8 +3,6 @@
 namespace App\EventListener;
 
 use App\Audit\Log;
-use App\Entity\FeatureNotification;
-use App\Entity\FeatureNotificationUserMap;
 use App\Entity\Notice;
 use App\Entity\User;
 use App\Service\LoggerService;
@@ -80,8 +78,6 @@ class RequestListener
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
         }
-
-        $this->checkFeatureNotifications();
     }
 
     public function onKernelFinishRequest()
@@ -139,24 +135,6 @@ class RequestListener
         }
 
         $this->twig->addGlobal('global_notices', $activeNotices);
-    }
-
-    private function checkFeatureNotifications(): void
-    {
-        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
-        $this->twig->addGlobal('global_notifications', $activeNotifications);
-
-        $userNotificationIds = $activeNotifications ? $this->em->getRepository(FeatureNotificationUserMap::class)
-            ->getUserNotificationIds($this->userService->getUserEntity()) : null;
-        $this->twig->addGlobal('user_notification_ids', $userNotificationIds);
-
-        $notificationsCount = 0;
-        foreach ($activeNotifications as $activeNotification) {
-            if (!in_array($activeNotification->getId(), $userNotificationIds)) {
-                $notificationsCount++;
-            }
-        }
-        $this->twig->addGlobal('notifications_count', $notificationsCount);
     }
 
     private function checkProgramSelect()

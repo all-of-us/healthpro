@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User as UserEntity;
 use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
@@ -128,9 +129,9 @@ class UserProvider implements UserProviderInterface
             throw new AuthenticationException("User $username is not logged in!");
         }
 
-        if ($this->requestStack->getSession()->has('googlegroups')) {
-            $groups = $this->requestStack->getSession()->get('googlegroups');
-        } else {
+        $groups = $this->requestStack->getSession()->get('googlegroups', []);
+
+        if (!$groups) {
             $requestDetails = $this->ppscApiService->getRequestDetailsById($this->requestStack->getSession()->get('ppscRequestId'));
             $siteId = $requestDetails->siteId ?? null;
             $groups = $siteId ? [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId])] : [];
@@ -141,10 +142,10 @@ class UserProvider implements UserProviderInterface
         $userInfo = $this->userService->getUserInfo($salesforceUser);
         $sessionInfo = [
             'site' => $this->requestStack->getSession()->get('site'),
-            'awardee' => $this->requestStack->getSession()->get('awardee'),
-            'program' => $this->requestStack->getSession()->get('program'),
-            'managegroups' => $this->requestStack->getSession()->get('managegroups'),
-            'managegroupsnph' => $this->requestStack->getSession()->get('managegroupsnph')
+            'awardee' => null,
+            'program' => UserEntity::PROGRAM_HPO,
+            'managegroups' => [],
+            'managegroupsnph' => []
         ];
         return new User($salesforceUser, $groups, $userInfo, null, $sessionInfo);
     }
