@@ -3,8 +3,6 @@
 namespace App\EventListener;
 
 use App\Audit\Log;
-use App\Entity\FeatureNotification;
-use App\Entity\FeatureNotificationUserMap;
 use App\Entity\Notice;
 use App\Entity\User;
 use App\Service\LoggerService;
