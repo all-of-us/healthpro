@@ -5,6 +5,7 @@
     {% form_theme processForm 'form/simple_checkbox.html.twig' %}
 {% endif %}
 {% block title %}Process - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
     <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">

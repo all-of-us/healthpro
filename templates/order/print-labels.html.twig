@@ -1,5 +1,6 @@
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Print Labels - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'print_labels' } %}
     {% set orderRoute = readOnlyView ? 'read_order_' : 'order_' %}

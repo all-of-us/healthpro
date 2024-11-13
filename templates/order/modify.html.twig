@@ -1,5 +1,6 @@
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Order - Cancel - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% endif %}">
         <i class="fa fa-medkit" aria-hidden="true"></i>

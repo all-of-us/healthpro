@@ -4,6 +4,7 @@
     {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
 {% endif %}
 {% block title %}Finalize - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'finalize' } %}
     {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}

@@ -4,6 +4,7 @@
     {% form_theme collectForm 'form/simple_checkbox.html.twig' %}
 {% endif %}
 {% block title %}Collect - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'collect' } %}
     {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
