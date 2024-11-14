@@ -1,5 +1,6 @@
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Order - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>
@@ -115,7 +116,10 @@
         <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         <div class="pull-left order-check-cancel" id="continue" style="display:none;">
             <p>
-                <button type="submit" class="btn btn-primary">Continue</button>
+                <button type="submit" class="btn btn-primary">
+                    Continue
+                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
             </p>
         </div>
         <input type="hidden" name="show-blood-tubes" value="no"/>

@@ -8,7 +8,7 @@
     {% include 'review/_page_heading.html.twig' %}
 
     <div class="well today-filter-well" data-title="Filter">
-        {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
+        {{ form_start(todayFilterForm, { attr: { class: 'form-inline prevent-resubmit', autoComplete: 'off' } }) }}
         {{ form_errors(todayFilterForm) }}
         <div class="today-filter" align="center">
             {{ form_rest(todayFilterForm) }}

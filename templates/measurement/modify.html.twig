@@ -1,5 +1,6 @@
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Physical Measurements - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <div id="physicalmeasurement">
         <div class="page-header">
@@ -10,10 +11,10 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-8">
+        <div class="col-md-8 col-sm-7">
             {% include 'partials/participant-measurement-summary.html.twig' %}
         </div>
-        <div class="col-sm-4">
+        <div class="col-md-4 col-sm-5">
             {% include 'partials/participant-measurement-list.html.twig' %}
         </div>
     </div>
@@ -23,7 +24,10 @@
             {{ form_errors(measurementModifyForm) }}
             {{ form_rest(measurementModifyForm) }}
             <p>
-                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Physical Measurements</button>
+                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
+                    {{ type|capitalize }} Physical Measurements
+                    <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
             {{ form_end(measurementModifyForm) }}

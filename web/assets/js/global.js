@@ -77,6 +77,10 @@ $(document).ready(function () {
         } else {
             form.data("submitting", 1);
             form.find("button[type=submit], input[type=submit]").css("opacity", 0.5);
+            // Show the spinner
+            let $button = form.find("button[type=submit]:focus");
+            let $spinner = $button.find(".spinner-border");
+            $spinner.show();
         }
     });
     // If form submission is stopped by parsley, clear the submitting status and opacity
