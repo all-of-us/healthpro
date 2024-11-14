@@ -47,7 +47,10 @@
                 </small>
                 {% if measurement.id and not readOnlyView%}
                     {% if measurement.rdrId and (measurement.history is empty or measurement.history.type != 'cancel') %}
-                        <button type="submit" class="btn btn-sm btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">Amend</button>
+                        <button type="submit" class="btn btn-sm btn-warning" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">
+                            Amend
+                            <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                        </button>
                     {% endif %}
                     {% if measurement.canCancel %}
                         <a href="{{ path('measurement_modify', { participantId: participant.id, measurementId: measurement.id, type: 'cancel' }) }}" class="btn btn-sm btn-danger">Cancel Form</a>
@@ -111,10 +114,16 @@
                             </p>
                             <div class="row">
                                 <div class="col-xs-6">
-                                    <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Refusal</button>
+                                    <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="refusal" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
+                                        Refusal
+                                        <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                                    </button>
                                 </div>
                                 <div class="col-xs-6">
-                                    <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Urgent/Emergent Event</button>
+                                    <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-block btn-default" data-reason="emergency" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
+                                        Urgent/Emergent Event
+                                        <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -126,9 +135,15 @@
         {% if (not measurement or not measurement.rdrId) and not readOnlyView and not inactiveSiteFormDisabled %}
             <div id="evaluationAffixSave">
                 {% if not measurement or not measurement.finalizedTs %}
-                    <button type="submit" class="btn btn-primary btn-xs" name="save">Save</button>
+                    <button type="submit" class="btn btn-primary btn-xs" name="save">
+                        Save
+                        <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    </button>
                 {% endif %}
-                <button type="submit" class="btn btn-success btn-xs" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
+                <button type="submit" class="btn btn-success btn-xs" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
+                    Save and Finalize
+                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
             </div>
         {% endif %}
 
@@ -149,9 +164,15 @@
                 <a href="{{ path(participantRoute, { id: participant.id }) }}" class="btn btn-default">Cancel</a>
                 {% if not readOnlyView and not inactiveSiteFormDisabled %}
                     {% if not measurement or not measurement.finalizedTs %}
-                        <button type="submit" class="btn btn-primary" name="save">Save</button>
+                        <button type="submit" class="btn btn-primary" name="save">
+                            Save
+                            <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                        </button>
                     {% endif %}
-                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">Save and Finalize</button>
+                    <button type="submit" class="btn btn-success pull-right" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
+                        Save and Finalize
+                        <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    </button>
                 {% endif %}
             </p>
         {% endif %}

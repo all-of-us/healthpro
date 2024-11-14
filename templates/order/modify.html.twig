@@ -87,7 +87,10 @@
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
-                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Order</button>
+                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
+                    {{ type|capitalize }} Order
+                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
             {{ form_end(sampleModifyForm) }}

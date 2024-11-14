@@ -24,7 +24,10 @@
             {{ form_errors(measurementModifyForm) }}
             {{ form_rest(measurementModifyForm) }}
             <p>
-                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Physical Measurements</button>
+                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
+                    {{ type|capitalize }} Physical Measurements
+                    <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
             {{ form_end(measurementModifyForm) }}

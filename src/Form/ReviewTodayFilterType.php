@@ -53,6 +53,8 @@ class ReviewTodayFilterType extends AbstractType
                 ]
             ])
             ->add('Submit', Type\SubmitType::class, [
+                'label' => 'Submit <span class="spinner-border spinner-border-sm" style="display: none;"></span>',
+                'label_html' => true,
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
     }

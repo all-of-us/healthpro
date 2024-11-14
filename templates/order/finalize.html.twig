@@ -92,6 +92,7 @@
         <p>
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized
+                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
             </button>
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
