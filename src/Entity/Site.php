@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Security\User;
 
 #[ORM\Table(name: 'sites')]
 #[ORM\UniqueConstraint(name: 'site_id', columns: ['site_id'])]
@@ -322,5 +323,10 @@ class Site
         }
 
         return $this;
+    }
+
+    public static function getSiteSuffix($site): ?string
+    {
+        return str_replace(User::SITE_PREFIX, '', $site);
     }
 }
