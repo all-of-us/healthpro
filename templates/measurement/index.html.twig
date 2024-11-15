@@ -155,7 +155,7 @@
 
         {{ form_rest(measurementForm) }}
 
-        {% if measurement and measurement.rdrId %}
+        {% if (measurement and measurement.rdrId) or (measurement.history and measurement.history.type == 'cancel') %}
             <p>
                 <a href="{{ path(participantRoute, { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
             </p>
