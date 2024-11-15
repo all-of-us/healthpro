@@ -98,7 +98,7 @@
 {% endmacro %}
 
 {% macro displayModuleConsents(programSummaryAndOrderInfo, participant) %}
-    {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == 1) %}
+    {% for moduleNumber, module in programSummaryAndOrderInfo|filter((m, num) => num == 1) %}
         <ul class="list-group mb-2">
             {% if participant.module %}
                 <span class="nph-module-badge nph-module-{{ moduleNumber }}">NPH Module {{ moduleNumber }}</span>
