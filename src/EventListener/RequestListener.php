@@ -99,7 +99,8 @@ class RequestListener
             'timeout',
             'keep_alive',
             'client_timeout',
-            'agree_usage'
+            'agree_usage',
+            'login_openid_callback'
         ]));
     }
 
@@ -176,7 +177,7 @@ class RequestListener
     private function ignoreRoutes(): bool
     {
         return preg_match(
-            '/^\/(_profiler|_wdt|cron|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
+            '/^\/(_profiler|_wdt|cron|salesforce|ppsc|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
             $this->request->getPathInfo()
         );
     }
