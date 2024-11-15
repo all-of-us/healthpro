@@ -173,12 +173,14 @@ class DefaultController extends BaseController
         $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
-        if ($isSalesforceUser || $source === 'ppsc') {
-            if ($timeout) {
-                return $this->redirect('timeout?source=ppsc');
-            }
-            return $this->render('logout.html.twig');
+        // Redirects based on source and timeout conditions
+        if ($source === 'aou') {
+            return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
         }
+        if ($isSalesforceUser || $source === 'ppsc') {
+            return $timeout ? $this->redirect('timeout?source=ppsc') : $this->render('logout.html.twig');
+        }
+        // Default redirect
         return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
     }
 
