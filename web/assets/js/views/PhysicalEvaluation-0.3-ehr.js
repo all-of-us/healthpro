@@ -61,9 +61,6 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
     },
     displayEhrDate: function () {
         var self = this;
-        if (self.finalized) {
-            return;
-        }
         var sourceFields = [
             "blood-pressure-source",
             "height-source",
@@ -74,15 +71,17 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
         $.each(sourceFields, function (i, field) {
             if ($("[name='form[" + field + "]']:checked").val() === "ehr") {
                 $("." + field + ".ehr-date").show();
-                self.disableSecondThirdReadings(field, 1, true);
-                if (
-                    $.inArray(field, [
-                        "blood-pressure-source",
-                        "waist-circumference-source",
-                        "hip-circumference-source"
-                    ]) !== -1
-                ) {
-                    self.disableSecondThirdReadings(field, 2, true);
+                if (!self.finalized) {
+                    self.disableSecondThirdReadings(field, 1, true);
+                    if (
+                        $.inArray(field, [
+                            "blood-pressure-source",
+                            "waist-circumference-source",
+                            "hip-circumference-source"
+                        ]) !== -1
+                    ) {
+                        self.disableSecondThirdReadings(field, 2, true);
+                    }
                 }
             } else {
                 $("." + field + ".ehr-date").hide();
