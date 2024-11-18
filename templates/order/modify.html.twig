@@ -41,7 +41,13 @@
                         {% if order.getCollectedSamples and order.isPediatricOrder and '3.2' in order.getVersion %}
                             <td>{{ sample.label }}</td>
                         {% else %}
-                            <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
+                            <td>
+                                {% if order.type != constant('App\\Entity\\Order::ORDER_TYPE_SALIVA') %}
+                                    ({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]
+                                {% else %}
+                                    {{ sample.label }}
+                            {% endif %}
+                            </td>
                         {% endif %}
                         <td>
                             {% if sample.collected_checked is defined and sample.collected_ts is defined and sample.collected_ts is not empty %}
