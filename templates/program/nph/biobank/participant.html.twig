@@ -30,7 +30,7 @@
         <div class="row mt-2">
             <div class="col-md-12" role="tabpanel">
                 <ul class="nav nav-tabs" role="tablist">
-                    {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                    {% for moduleNumber, module in programSummaryAndOrderInfo|filter((m, num) => num == participant.module or num == 1) %}
                         {% if activeModule == moduleNumber %}
                             {% set tabActive = 'active' %}
                         {% else %}
@@ -44,7 +44,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12 participant-modules tab-content">
-                {% for moduleNumber, module in programSummaryAndOrderInfo if (moduleNumber == participant.module or moduleNumber == 1) %}
+                {% for moduleNumber, module in programSummaryAndOrderInfo|filter((m, num) => num == participant.module or num == 1) %}
                     {% if activeModule == moduleNumber %}
                         {% set modulePanelDisplay = 'show active' %}
                     {% else %}
@@ -171,7 +171,7 @@
                                                                                     {% for sampleType, sampleInfo in timepoint['timePointInfo'] %}
                                                                                         {% if sampleInfo['numberSamples'] is not empty and not displayDietColorWarning %}
                                                                                             {% for sampleCode, sample in sampleInfo %}
-                                                                                                {% for orderid, numberSamples in sampleInfo['numberSamples'] if not displayDietColorWarning %}
+                                                                                                {% for orderid, numberSamples in sampleInfo['numberSamples']|filter((n, id) => not displayDietColorWarning) %}
                                                                                                     {% if sample[orderid] is defined and sample[orderid] is iterable and sample[orderid]['oldVisitType'] is not empty %}
                                                                                                         {% set displayDietColorWarning = true %}
                                                                                                     {% endif %}

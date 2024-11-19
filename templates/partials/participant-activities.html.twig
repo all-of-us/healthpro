@@ -112,7 +112,7 @@
             </p>
             {% for field, label in samples %}
                 {% set break = false %}
-                {% for sampleAlias in samplesAlias if not break %}
+                {% for sampleAlias in samplesAlias|filter((s) => not break) %}
                     {% if attribute(sampleAlias, field) is defined  and attribute(participant, 'sampleStatus' ~ attribute(sampleAlias, field)) == 'RECEIVED' %}
                         {% set field = attribute(sampleAlias, field) %}
                         {% set break = true %}
