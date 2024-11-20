@@ -144,9 +144,8 @@ class NphParticipant
         }
         // Fallback check if most recent module is 1
         $moduleMap = [
-            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3,
             '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2,
-            '/module1_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 1,
+            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3
         ];
 
         foreach ($moduleMap as $pattern => $moduleNumber) {
@@ -165,8 +164,8 @@ class NphParticipant
     private function getParticipantMostRecentModule(array $nphEnrollmentStatus): int
     {
         $moduleMap = [
-            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3,
-            '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2
+            '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2,
+            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3
         ];
 
         $mostRecentModule = 1;
