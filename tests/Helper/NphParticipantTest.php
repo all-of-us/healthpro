@@ -52,7 +52,7 @@ class NphParticipantTest extends TestCase
                     (object)['value' => 'module2_complete'],
                     (object)['value' => 'module3_dietAssigned'],
                 ],
-                3,
+                2,
             ],
         ];
     }
