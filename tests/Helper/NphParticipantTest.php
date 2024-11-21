@@ -52,7 +52,57 @@ class NphParticipantTest extends TestCase
                     (object)['value' => 'module2_complete'],
                     (object)['value' => 'module3_dietAssigned'],
                 ],
+                2,
+            ],
+            'multiple_statuses_match_time' => [
+                [
+                    (object)[
+                        'time' => '2023-07-13T22:09:10',
+                        'value' => 'nph_referred',
+                    ],
+                    (object)[
+                        'time' => '2023-07-13T22:09:10',
+                        'value' => 'module3_dietAssigned',
+                    ],
+                    (object)[
+                        'time' => '2023-07-13T23:09:10',
+                        'value' => 'module2_dietAssigned',
+                    ],
+                    (object)[
+                        'time' => '2023-07-19T23:15:10',
+                        'value' => 'module3_eligibilityConfirmed',
+                    ],
+                    (object)[
+                        'time' => '2023-07-18T23:15:10',
+                        'value' => 'module2_eligibilityConfirmed',
+                    ]
+                ],
                 3,
+            ],
+            'multiple_statuses_match_equal_time' => [
+                [
+                    (object)[
+                        'time' => '2023-07-13T22:09:10',
+                        'value' => 'nph_referred',
+                    ],
+                    (object)[
+                        'time' => '2023-07-13T22:09:10',
+                        'value' => 'module3_dietAssigned',
+                    ],
+                    (object)[
+                        'time' => '2023-07-13T23:09:10',
+                        'value' => 'module2_dietAssigned',
+                    ],
+                    (object)[
+                        'time' => '2023-07-18T23:15:10',
+                        'value' => 'module3_eligibilityConfirmed',
+                    ],
+                    (object)[
+                        'time' => '2023-07-18T23:15:10',
+                        'value' => 'module2_eligibilityConfirmed',
+                    ]
+                ],
+                2,
             ],
         ];
     }
