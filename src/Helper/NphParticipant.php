@@ -181,7 +181,7 @@ class NphParticipant
             foreach ($moduleMap as $pattern => $moduleNumber) {
                 if (preg_match($pattern, $value)) {
                     // Check if this status is most recent
-                    if ($mostRecentTime === null || $time > $mostRecentTime) {
+                    if ($mostRecentTime === null || $time > $mostRecentTime || ($time == $mostRecentTime && $moduleNumber < $mostRecentModule)) {
                         $mostRecentTime = $time;
                         $mostRecentModule = $moduleNumber;
                     }
