@@ -13,4 +13,64 @@ $(document).ready(function () {
     }
 
     $("#review_today_filter_start_date, #review_today_filter_end_date").pmiDateTimePicker({ format: "MM/DD/YYYY" });
+
+    const checkCellData = (cells) =>
+        cells.map((cell) => {
+            let cellContent = cell.textContent.trim();
+            if (cell.getAttribute("data-order-id")) {
+                cellContent = cell.getAttribute("data-order-id")
+            }
+            return cellContent;
+        });
+
+    const generateCSV = (exportType) => {
+        const csv = [];
+
+        const headerRow = [];
+        const $headers = $("table thead th");
+        $headers.each((index, th) => {
+            const $th = $(th);
+            const headerText = $th.data("header");
+            if (headerText) {
+                headerRow.push(headerText);
+            }
+        });
+        csv.push(headerRow.join(","));
+
+        const $rows = $("table tbody tr");
+
+        $rows.each((index, row) => {
+            if ($(row).hasClass("sf-ajax-request")) {
+                return;
+            }
+            const rowData = [];
+            const cells = [...row.querySelectorAll("td")];
+            const rowDataEntry = [];
+            rowDataEntry.push(...checkCellData(cells));
+            rowData.push(rowDataEntry.join(","));
+            csv.push(rowData.join(","));
+        });
+        const csvContent = csv.join("\n");
+
+        // Create a download link and trigger the download
+        const link = document.createElement("a");
+        link.href = `data:text/csv;charset=utf-8,${encodeURI(csvContent)}`;
+        link.target = "_blank";
+        const currentDate = new Date().toISOString().split("T")[0];
+        link.download = `${exportType}_${currentDate}.csv`;
+        link.click();
+    };
+
+    $("#export_btn").on("click", function () {
+        const exportType = $(this).data('export-type');
+        new PmiConfirmModal({
+            title: "Attention",
+            msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
+            isHTML: true,
+            onTrue: function () {
+                generateCSV(exportType);
+            },
+            btnTextTrue: "Accept"
+        });
+    });
 });

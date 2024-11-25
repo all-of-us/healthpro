@@ -1,22 +1,30 @@
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+{% if samples is not empty %}
+    <div class="text-right">
+        <button data-export-type="{{ exportType|default('Table') }}" class="btn btn-xs btn-default export" id="export_btn">
+            <i class="fa fa-download" aria-hidden="true"></i> Export
+        </button>
+    </div>
+{% endif %}
+<br>
 <table class="table table-bordered table-small">
     <thead>
     <tr>
-        <th>Site</th>
-        <th>Biobank ID</th>
-        <th>Module</th>
-        <th>Visit</th>
-        <th>Timepoint</th>
-        <th>Order ID</th>
-        <th>Samples</th>
-        <th>Sample ID</th>
-        <th>Created <span class="badge" id="created_ts">0</span></th>
-        <th>Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
-        <th>Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
+        <th data-header="Site">Site</th>
+        <th data-header="Biobank ID">Biobank ID</th>
+        <th data-header="Module">Module</th>
+        <th data-header="Visit">Visit</th>
+        <th data-header="Timepoint">Timepoint</th>
+        <th data-header="Order ID">Order ID</th>
+        <th data-header="Samples">Samples</th>
+        <th data-header="Sample ID">Sample ID</th>
+        <th data-header="Created">Created <span class="badge" id="created_ts">0</span></th>
+        <th data-header="Collected">Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
+        <th data-header="Aliquoted and Finalized">Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
         {% if modifiedOrdersView is defined %}
-            <th>Modified</th>
+            <th data-header="Modified">Modified</th>
         {% endif %}
-        <th>Status</th>
+        <th data-header="Status">Status</th>
     </tr>
     </thead>
     <tbody>
@@ -27,7 +35,7 @@
             <td>{{ sample.module }}</td>
             <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
             <td>{{ sample.timepoint }}</td>
-            <td>
+            <td data-order-id="{{ sample.orderId }}">
                 <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
             </td>
             <td>{{ sample.sampleCode }}</td>
