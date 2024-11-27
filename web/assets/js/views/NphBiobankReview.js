@@ -1,9 +1,43 @@
 $(document).ready(function () {
     const tableSelector = $("table");
-    let defaultSortColumn = tableSelector.data("default-sort-column") ?? 8;
-    tableSelector.DataTable({
+    const exportTableType = tableSelector.data("export-table-type");
+    const defaultSortColumn = tableSelector.data("default-sort-column") ?? 8;
+    const currentDate = new Date().toISOString().split("T")[0];
+    let reviewTable = tableSelector.DataTable({
         order: [[defaultSortColumn, "desc"]],
-        pageLength: 25
+        pageLength: 25,
+        dom: "lBfrtip",
+        buttons: [
+            {
+                extend: "csv",
+                text: "Export CSV",
+                filename: `${exportTableType}_${currentDate}`,
+                exportOptions: {
+                    modifier: {
+                        search: "none" // This ensures that all rows, including those hidden by search, are included in the export
+                    },
+                    columns: ":visible",
+                    format: {
+                        // body: function (data, row, column, node) {
+                        //     // Remove leading/trailing spaces and replace inner multiple spaces with a single space for all data
+                        //     return data.trim();
+                        // },
+                        header: function (data, column, node) {
+                            // Remove badge or other HTML elements inside the header for export
+                            let modifiedHeader = $(node).data("header") || data;
+                            return modifiedHeader.trim();
+                        }
+                    }
+                },
+                visible: false
+            }
+        ]
+    });
+
+    reviewTable.button(".buttons-csv").nodes().hide();
+
+    $("#review_export_all").on("click", function () {
+        reviewTable.button(".buttons-csv").trigger(); // Trigger CSV export manually
     });
 
     const dateTypes = ["created_ts", "collected_ts", "finalized_ts"];
@@ -28,7 +62,7 @@ $(document).ready(function () {
 
             // Combine cell content with label text
             if (labelTexts) {
-                cellContent = `${cellContent} (${labelTexts})`.trim();
+                cellContent = `${cellContent} ${labelTexts}`.trim();
             }
 
             if (cell.getAttribute("data-order-id")) {
@@ -70,27 +104,18 @@ $(document).ready(function () {
         const link = document.createElement("a");
         link.href = `data:text/csv;charset=utf-8,${encodeURI(csvContent)}`;
         link.target = "_blank";
-        const currentDate = new Date();
-        const datePart = currentDate.toISOString().split("T")[0].replace(/-/g, "");
-        const timePart = currentDate.toISOString().split("T")[1].slice(0, 8).replace(":", "");
-        const formattedDate = `${datePart}-${timePart}`;
-        link.download = `${exportType}_${formattedDate}.csv`;
+        link.download = `${exportType}_${currentDate}.csv`;
         link.click();
     };
 
-    $(".export").on("click", function () {
+    $("#review_export").on("click", function () {
         const exportType = $(this).data("export-type");
-        const exportCategory = $(this).data("export-category");
         new PmiConfirmModal({
             title: "Attention",
             msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
             isHTML: true,
             onTrue: function () {
-                if (exportCategory === "all") {
-                    window.location.href = "/nph/biobank/review/export?exportType=" + exportType;
-                } else {
-                    generateCSV(exportType);
-                }
+                generateCSV(exportType);
             },
             btnTextTrue: "Accept"
         });

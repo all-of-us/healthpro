@@ -21,13 +21,16 @@
     </div>
     {% if samples is not empty %}
         <div class="text-right">
-            <button data-export-type="DietPeriodAudit" data-export-category="current" class="btn btn-xs btn-default export">
+            <button data-export-type="DietPeriodAudit" class="btn btn-xs btn-default" id="review_export">
                 <i class="fa fa-download" aria-hidden="true"></i> Export
+            </button>
+            <button class="btn btn-xs btn-default" id="review_export_all">
+                <i class="fa fa-download" aria-hidden="true"></i> Export All
             </button>
         </div>
         <br>
     {% endif %}
-    <table class="table table-bordered table-small" data-default-sort-column="6">
+    <table class="table table-bordered table-small" data-default-sort-column="6" data-export-table-type="DietPeriodAudit">
         <thead>
         <tr>
             <th data-header="Site">Site</th>
