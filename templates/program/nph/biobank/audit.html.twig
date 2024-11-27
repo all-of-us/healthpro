@@ -19,17 +19,25 @@
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
+    {% if samples is not empty %}
+        <div class="text-right">
+            <button data-export-type="DietPeriodAudit" data-export-category="current" class="btn btn-xs btn-default export">
+                <i class="fa fa-download" aria-hidden="true"></i> Export
+            </button>
+        </div>
+        <br>
+    {% endif %}
     <table class="table table-bordered table-small" data-default-sort-column="6">
         <thead>
         <tr>
-            <th>Site</th>
-            <th>Biobank ID</th>
-            <th>User</th>
-            <th>Module Impacted</th>
-            <th>Diet Period Impacted</th>
-            <th>Bypass Type</th>
-            <th>Bypass Time</th>
-            <th>Status</th>
+            <th data-header="Site">Site</th>
+            <th data-header="Biobank ID">Biobank ID</th>
+            <th data-header="User">User</th>
+            <th data-header="Module Impacted">Module Impacted</th>
+            <th data-header="Diet Period Impacted">Diet Period Impacted</th>
+            <th data-header="Bypass Type">Bypass Type</th>
+            <th data-header="Bypass Time">Bypass Time</th>
+            <th data-header="Status">Status</th>
         </tr>
         </thead>
         <tbody>

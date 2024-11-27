@@ -19,21 +19,29 @@
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
+    {% if samples is not empty %}
+        <div class="text-right">
+            <button data-export-type="DowntimeOrders" data-export-category="current" class="btn btn-xs btn-default export">
+                <i class="fa fa-download" aria-hidden="true"></i> Export
+            </button>
+        </div>
+        <br>
+    {% endif %}
     <table class="table table-bordered table-small" data-default-sort-column="3">
         <thead>
         <tr>
-            <th>Site</th>
-            <th>Biobank ID</th>
-            <th>User</th>
-            <th>Downtime Created</th>
-            <th>Order Generation Time</th>
-            <th>Module</th>
-            <th>Visit</th>
-            <th>Timepoint</th>
-            <th>Order ID</th>
-            <th>Samples</th>
-            <th>Sample ID</th>
-            <th>Status</th>
+            <th data-header="Site">Site</th>
+            <th data-header="Biobank ID">Biobank ID</th>
+            <th data-header="User">User</th>
+            <th data-header="Downtime Created">Downtime Created</th>
+            <th data-header="Order Generation Time">Order Generation Time</th>
+            <th data-header="Module">Module</th>
+            <th data-header="Visit">Visit</th>
+            <th data-header="Timepoint">Timepoint</th>
+            <th data-header="Order ID">Order ID</th>
+            <th data-header="Samples">Samples</th>
+            <th data-header="Sample ID">Sample ID</th>
+            <th data-header="Status">Status</th>
         </tr>
         </thead>
         <tbody>
@@ -51,12 +59,12 @@
                 <td>{{ sample.module }}</td>
                 <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
                 <td>{{ sample.timepoint }}</td>
-                <td>
+                <td data-order-id="{{ sample.orderId }}">
                     <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
                 </td>
                 <td>{{ sample.sampleCode }}</td>
                 <td>{{ sample.sampleId }}</td>
-                <td>{{ macros.displayBiobankSampleStatus(sample) }} <span class="label label-primary">Downtime</span></td>
+                <td>{{ macros.displayBiobankSampleStatus(sample) }} <label class="label label-primary">Downtime</label></td>
             </tr>
         {% endfor %}
         </tbody>
