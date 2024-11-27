@@ -166,7 +166,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->where('ns.modifiedTs >= :startDate or no.createdTs >= :startDate or ns.finalizedTs >= :startDate or ns.collectedTs >= :startDate')
             ->andWhere('ns.modifiedTs <= :endDate or no.createdTs <= :endDate or ns.finalizedTs <= :endDate or ns.collectedTs <= :endDate')
             ->setParameters(['startDate' => $startDate, 'endDate' => $endDate])
-            ->addOrderBy('no.orderId', 'DESC');
+            ->addOrderBy('no.createdTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -179,7 +179,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.nphSamples', 'ns')
             ->join('no.user', 'u')
             ->where('ns.finalizedTs is NULL')
-            ->addOrderBy('no.orderId', 'DESC');
+            ->addOrderBy('no.createdTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -193,7 +193,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->join('no.user', 'u')
             ->where('ns.modifyType = :modifyType')
             ->setParameter('modifyType', NphSample::UNLOCK)
-            ->addOrderBy('no.orderId', 'DESC');
+            ->addOrderBy('no.createdTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -209,7 +209,7 @@ class NphOrderRepository extends ServiceEntityRepository
             ->where('ns.modifyType is not NULL')
             ->andWhere('ns.modifiedTs >= :endDate')
             ->setParameter('endDate', $endDate)
-            ->addOrderBy('no.orderId', 'DESC');
+            ->addOrderBy('no.createdTs', 'DESC');
         return $queryBuilder->getQuery()->getResult();
     }
 

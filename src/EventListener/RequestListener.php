@@ -109,7 +109,8 @@ class RequestListener
         $route = $this->request->attributes->get('_route');
         return (in_array($route, [
             'help_sopFile',
-            'aliquot_instructions_file'
+            'aliquot_instructions_file',
+            'nph_biobank_review_export'
         ]));
     }
 

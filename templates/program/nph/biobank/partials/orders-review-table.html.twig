@@ -1,8 +1,11 @@
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% if samples is not empty %}
     <div class="text-right">
-        <button data-export-type="{{ exportType|default('Table') }}" class="btn btn-xs btn-default export" id="export_btn">
+        <button data-export-type="{{ exportType|default('Table') }}" data-export-category="current" class="btn btn-xs btn-default export">
             <i class="fa fa-download" aria-hidden="true"></i> Export
+        </button>
+        <button data-export-type="{{ exportType|default('Table') }}" data-export-category="all" class="btn btn-xs btn-default export">
+            <i class="fa fa-download" aria-hidden="true"></i> Export All
         </button>
     </div>
 {% endif %}
