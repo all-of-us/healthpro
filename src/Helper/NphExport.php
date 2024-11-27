@@ -46,7 +46,7 @@ class NphExport
         return $exportHeaders;
     }
 
-    public static function displayDateAndTimezone(?\DateTime $time, ?string $timezoneId, ?string $userTimeZoneId): string
+    public static function displayDateAndTimezone(?\DateTime $time, ?string $timezoneId, ?int $userTimeZoneId): string
     {
         if (!$time) {
             return '';
