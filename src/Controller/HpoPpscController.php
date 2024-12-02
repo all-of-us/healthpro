@@ -50,4 +50,10 @@ class HpoPpscController extends BaseController
             'isDVType' => $isDVType
         ]);
     }
+
+    #[Route(path: '/ppsc/invalid-site', name: 'ppsc_invalid_site')]
+    public function ppscInvalidSiteAction(): Response
+    {
+        return $this->render('/program/hpo/ppsc/invalid-site.html.twig');
+    }
 }
