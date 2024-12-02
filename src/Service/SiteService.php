@@ -410,16 +410,18 @@ class SiteService
         if (!$user || !$user->belongsToSite($email)) {
             return false;
         }
-        $siteGroup = $user->getSite($email);
-        $site = $this->em->getRepository(Site::class)->findOneBy([
-            'deleted' => 0,
-            'googleGroup' => $siteGroup->id,
-        ]);
-        if (!$site) {
-            return false;
-        }
-        if (empty($site->getMayolinkAccount())) {
-            return false;
+        if (!$this->env->isLocal()) {
+            $siteGroup = $user->getSite($email);
+            $site = $this->em->getRepository(Site::class)->findOneBy([
+                'deleted' => 0,
+                'googleGroup' => $siteGroup->id,
+            ]);
+            if (!$site) {
+                return false;
+            }
+            if (empty($site->getMayolinkAccount())) {
+                return false;
+            }
         }
         return true;
     }
