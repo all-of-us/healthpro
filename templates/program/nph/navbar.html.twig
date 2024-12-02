@@ -146,7 +146,7 @@
                     {% endif %}
                     {% if app.session.get('program') is not null %}
                         <li class="dropdown">
-                            <a href="{{ path('help_home') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help <span class="caret"></span></a>
+                            <a href="{{ path('help_nph') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ nphResources.program_mop }}" target="_blank"><i class="fa fa-files-o" aria-hidden="true"></i> Program MOPs</a></li>
                                 <li><a href="{{ path('help_nph_faq') }}"><i class="fa fa-question-circle" aria-hidden="true"></i> Technical FAQs</a></li>
@@ -162,7 +162,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ path('settings') }}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
-                            <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                            <li><a href="{{ path('logout', { source: 'aou' }) }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
                         </ul>
                     </li>
                 {% endif %}

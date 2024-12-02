@@ -1,9 +1,10 @@
-{% extends 'render-base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% if order.type != 'saliva' %}
     {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
 {% endif %}
 {% block title %}Finalize - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'finalize' } %}
     {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}
@@ -86,12 +87,17 @@
         {{ form_errors(finalizeForm.finalizedNotes) }}
     </div>
     {{ form_rest(finalizeForm) }}
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.disabled and not readOnlyView and not inactiveSiteFormDisabled  %}
         <p>
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized
+                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
             </button>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
+    {% else %}
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
     {% endif %}
     {{ form_end(finalizeForm) }}
     {% if order.status == 'unlock' %}

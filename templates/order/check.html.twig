@@ -1,15 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Order - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             New Biobank order
-            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
         </h2>
     </div>
-
-    {% include 'partials/participant-dl.html.twig' %}
 
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
@@ -115,10 +113,13 @@
                 <strong>Please select whether the participant would like to continue with a full Biobank order or a modified order with {{ siteType == 'dv' ? 'urine only' : 'urine only and a saliva order' }}.</strong>
             </span>
         </div>
-        <div id="continue" style="display:none;">
-            <br/>
+        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        <div class="pull-left order-check-cancel" id="continue" style="display:none;">
             <p>
-                <button type="submit" class="btn btn-primary">Continue</button>
+                <button type="submit" class="btn btn-primary">
+                    Continue
+                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
             </p>
         </div>
         <input type="hidden" name="show-blood-tubes" value="no"/>

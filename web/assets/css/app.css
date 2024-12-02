@@ -55,6 +55,9 @@ label.control-label.required::after {
 .nav-tabs li.active a {
     font-weight: bold;
 }
+.navbar-site-name {
+    margin-right: 2px;
+}
 .text-center img.img-responsive {
     margin-left: auto;
     margin-right: auto;
@@ -302,6 +305,9 @@ label.label-normal {
 }
 #problem-details {
     margin: 20px auto;
+}
+.blood-donor-cancel {
+    margin-left: 8px;
 }
 
 /* Participant page */
@@ -681,6 +687,9 @@ table.table-samples td {
 .submission-label {
     margin-right: 10px;
 }
+.order-check-cancel {
+    margin-right: 8px;
+}
 
 /* Help */
 .help-footer {
@@ -984,4 +993,28 @@ table.table-samples td {
 
 .aou-blue {
     color: #363272;
+}
+
+/* Spinner animation */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: .2em;
+}
+
+.spinner-border {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: text-bottom;
+    border: .25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    -webkit-animation: spinner-border .75s linear infinite;
+    animation: spinner-border .75s linear infinite;
+}
+
+@keyframes spinner-border {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

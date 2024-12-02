@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends app.session.get('ppscRequestId') is not empty ? 'program/hpo/ppsc/base.html.twig' : 'base.html.twig' %}
 {% block title %}Settings - {% endblock %}
 {% block body %}
     <div class="row">
@@ -9,7 +9,12 @@
             {{ form_start(settingsForm, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
                 {{ form_errors(settingsForm) }}
                 {{ form_widget(settingsForm) }}
-                <p><button type="submit" class="btn btn-primary">Update Settings</button></p>
+                <p>
+                    <button type="submit" class="btn btn-primary">
+                        Update Settings
+                        <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    </button>
+                </p>
             {{ form_end(settingsForm) }}
         </div>
     </div>

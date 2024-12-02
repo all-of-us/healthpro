@@ -3,8 +3,6 @@
 namespace App\EventListener;
 
 use App\Audit\Log;
-use App\Entity\FeatureNotification;
-use App\Entity\FeatureNotificationUserMap;
 use App\Entity\Notice;
 use App\Entity\User;
 use App\Service\LoggerService;
@@ -80,8 +78,6 @@ class RequestListener
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
         }
-
-        $this->checkFeatureNotifications();
     }
 
     public function onKernelFinishRequest()
@@ -103,7 +99,8 @@ class RequestListener
             'timeout',
             'keep_alive',
             'client_timeout',
-            'agree_usage'
+            'agree_usage',
+            'login_openid_callback'
         ]));
     }
 
@@ -111,11 +108,7 @@ class RequestListener
     {
         $route = $this->request->attributes->get('_route');
         return (in_array($route, [
-            'workqueue_export',
             'help_sopFile',
-            'on_site_patient_status_export',
-            'on_site_incentive_tracking_export',
-            'on_site_id_verification_export',
             'aliquot_instructions_file'
         ]));
     }
@@ -143,24 +136,6 @@ class RequestListener
         }
 
         $this->twig->addGlobal('global_notices', $activeNotices);
-    }
-
-    private function checkFeatureNotifications(): void
-    {
-        $activeNotifications = $this->em->getRepository(FeatureNotification::class)->getActiveNotifications();
-        $this->twig->addGlobal('global_notifications', $activeNotifications);
-
-        $userNotificationIds = $activeNotifications ? $this->em->getRepository(FeatureNotificationUserMap::class)
-            ->getUserNotificationIds($this->userService->getUserEntity()) : null;
-        $this->twig->addGlobal('user_notification_ids', $userNotificationIds);
-
-        $notificationsCount = 0;
-        foreach ($activeNotifications as $activeNotification) {
-            if (!in_array($activeNotification->getId(), $userNotificationIds)) {
-                $notificationsCount++;
-            }
-        }
-        $this->twig->addGlobal('notifications_count', $notificationsCount);
     }
 
     private function checkProgramSelect()
@@ -202,7 +177,7 @@ class RequestListener
     private function ignoreRoutes(): bool
     {
         return preg_match(
-            '/^\/(_profiler|_wdt|cron|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
+            '/^\/(_profiler|_wdt|cron|salesforce|ppsc|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
             $this->request->getPathInfo()
         );
     }

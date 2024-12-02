@@ -77,6 +77,10 @@ $(document).ready(function () {
         } else {
             form.data("submitting", 1);
             form.find("button[type=submit], input[type=submit]").css("opacity", 0.5);
+            // Show the spinner
+            let $button = form.find("button[type=submit]:focus");
+            let $spinner = $button.find(".spinner-border");
+            $spinner.show();
         }
     });
     // If form submission is stopped by parsley, clear the submitting status and opacity
@@ -113,28 +117,6 @@ $(document).ready(function () {
                 // suppress unsaved warning when user is being logged out
                 PMI.markSaved();
                 window.location = opt.redirUrl;
-            }
-        });
-    }
-
-    /*************************************************************************
-     * Display system usage agreement when user first logs in
-     ************************************************************************/
-    if (!PMI.isUsageAgreed) {
-        new PmiConfirmModal({
-            title: "FISMA MODERATE ENVIRONMENT",
-            dialogClass: "modal-lg",
-            titleClass: "text-danger",
-            isHTML: true,
-            msg: pmiGetTpl("pmiSystemUsageTpl")(),
-            btnTextTrue: "Agree",
-            onTrue: function (modal) {
-                $.post(PMI.path.agreeUsage, {
-                    csrf_token: modal.$("#csrf_token").val()
-                });
-            },
-            onFalse: function () {
-                window.location = PMI.path.logout;
             }
         });
     }
@@ -396,4 +378,26 @@ $(document).ready(function () {
             });
         }
     });
+
+    /*************************************************************************
+     * Display system usage agreement when user first logs in
+     ************************************************************************/
+    if (!PMI.isUsageAgreed) {
+        new PmiConfirmModal({
+            title: "FISMA MODERATE ENVIRONMENT",
+            dialogClass: "modal-lg",
+            titleClass: "text-danger",
+            isHTML: true,
+            msg: pmiGetTpl("pmiSystemUsageTpl")(),
+            btnTextTrue: "Agree",
+            onTrue: function (modal) {
+                $.post(PMI.path.agreeUsage, {
+                    csrf_token: modal.$("#csrf_token").val()
+                });
+            },
+            onFalse: function () {
+                window.location = PMI.path.logout;
+            }
+        });
+    }
 });

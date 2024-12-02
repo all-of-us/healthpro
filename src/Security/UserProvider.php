@@ -2,10 +2,14 @@
 
 namespace App\Security;
 
+use App\Entity\Site;
+use App\Entity\User as UserEntity;
 use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
 use App\Service\MockGoogleGroupsService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\UserService;
+use Google\Service\Directory\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -21,18 +25,49 @@ class UserProvider implements UserProviderInterface
     private $mockGoogleGroups;
     private $env;
     private $params;
+    private $ppscApiService;
 
-    public function __construct(UserService $userService, RequestStack $requestStack, GoogleGroupsService $googleGroups, MockGoogleGroupsService $mockGoogleGroups, EnvironmentService $env, ParameterBagInterface $params)
-    {
+    public function __construct(
+        UserService $userService,
+        RequestStack $requestStack,
+        GoogleGroupsService $googleGroups,
+        MockGoogleGroupsService $mockGoogleGroups,
+        EnvironmentService $env,
+        ParameterBagInterface $params,
+        PpscApiService $ppscApiService
+    ) {
         $this->userService = $userService;
         $this->requestStack = $requestStack;
         $this->googleGroups = $googleGroups;
         $this->mockGoogleGroups = $mockGoogleGroups;
         $this->env = $env;
         $this->params = $params;
+        $this->ppscApiService = $ppscApiService;
     }
 
     public function loadUserByUsername($username): UserInterface
+    {
+        if ($this->requestStack->getSession()->get('loginType') === \App\Entity\User::SALESFORCE) {
+            return $this->loadSalesforceUser($username);
+        }
+        return $this->loadGoogleUser($username);
+    }
+
+    public function refreshUser(UserInterface $user): UserInterface
+    {
+        if (!$user instanceof User) {
+            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
+        }
+
+        return $this->loadUserByUsername($user->getUsername());
+    }
+
+    public function supportsClass($class): bool
+    {
+        return User::class === $class;
+    }
+
+    private function loadGoogleUser($username): UserInterface
     {
         $googleUser = $this->userService->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
@@ -88,17 +123,31 @@ class UserProvider implements UserProviderInterface
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
 
-    public function refreshUser(UserInterface $user): UserInterface
+    private function loadSalesforceUser($username): UserInterface
     {
-        if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
+        $salesforceUser = $this->userService->getSalesforceUser();
+        if (!$salesforceUser || strcasecmp($salesforceUser->getEmail(), $username) !== 0) {
+            throw new AuthenticationException("User $username is not logged in!");
         }
 
-        return $this->loadUserByUsername($user->getUsername());
-    }
+        $groups = $this->requestStack->getSession()->get('googlegroups', []);
 
-    public function supportsClass($class): bool
-    {
-        return User::class === $class;
+        if (!$groups) {
+            $requestDetails = $this->ppscApiService->getRequestDetailsById($this->requestStack->getSession()->get('ppscRequestId'));
+            $siteId = $requestDetails->siteId ? Site::getSiteSuffix($requestDetails->siteId) : null;
+            $groups = $siteId ? [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId])] : [];
+            $this->requestStack->getSession()->set('googlegroups', $groups);
+            $this->requestStack->getSession()->set('managegroups', []);
+            $this->requestStack->getSession()->set('managegroupsnph', []);
+        }
+        $userInfo = $this->userService->getUserInfo($salesforceUser);
+        $sessionInfo = [
+            'site' => $this->requestStack->getSession()->get('site'),
+            'awardee' => null,
+            'program' => UserEntity::PROGRAM_HPO,
+            'managegroups' => [],
+            'managegroupsnph' => []
+        ];
+        return new User($salesforceUser, $groups, $userInfo, null, $sessionInfo);
     }
 }

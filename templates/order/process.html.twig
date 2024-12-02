@@ -1,10 +1,11 @@
-{% extends 'render-base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% import 'macros/form-render.html.twig' as formRender %}
 {% if order.type != 'saliva' %}
     {% form_theme processForm 'form/simple_checkbox.html.twig' %}
 {% endif %}
 {% block title %}Process - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
     <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">
@@ -38,7 +39,7 @@
         {{ form_errors(processForm.processedNotes) }}
     </div>
     {{ form_rest(processForm) }}
-
+    {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
         <p>
             <button type="submit" class="btn btn-primary">
@@ -47,8 +48,12 @@
                 {% else %}
                     Save and mark as processed
                 {% endif %}
+                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
             </button>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
         </p>
+    {% else %}
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
     {% endif %}
     {{ form_end(processForm) }}
     {% if order.status == 'unlock' %}

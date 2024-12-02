@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Today - Daily Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
@@ -8,7 +8,7 @@
     {% include 'review/_page_heading.html.twig' %}
 
     <div class="well today-filter-well" data-title="Filter">
-        {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
+        {{ form_start(todayFilterForm, { attr: { class: 'form-inline prevent-resubmit', autoComplete: 'off' } }) }}
         {{ form_errors(todayFilterForm) }}
         <div class="today-filter" align="center">
             {{ form_rest(todayFilterForm) }}
@@ -32,13 +32,10 @@
         <tr>
             <th rowspan="2">Participant ID</th>
             <th rowspan="2">Name</th>
-            <th colspan="2" class="text-center td-left-border" style="background-color: #f9f9f9">On-Site Details</th>
             <th colspan="3" class="text-center td-left-border" style="background-color: #f9f9f9">Physical Measurement</th>
             <th colspan="9" class="text-center td-left-border" style="background-color: #f9f9f9">Biobank Order</th>
         </tr>
         <tr>
-            <th class="td-left-border">ID Verification <span class="badge badge-success" id="idVerification_created_ts"></span></th>
-            <th class="td-left-border">Incentive <span class="badge badge-success" id="incentive_created_ts"></span></th>
             <th class="td-left-border">Status</th>
             <th>Created <span class="badge" id="measurement_created_ts"></span></th>
             <th>Finalized <span class="badge badge-success" id="measurement_finalized_ts"></span></th>
@@ -58,11 +55,11 @@
             {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount, participant.idVerificationsCount) %}
             {% set rowSpan = 'rowspan =' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
-                {% set isPediatricParticipant = participant.participant is defined and participant.participant.isPediatric ? true : false %}
+                {% set isPediatricParticipant = participant.participant is defined and participant.participant is not empty and participant.participant.isPediatric ? true : false %}
                 <tr>
                     {% if i == 0 %}
                         <td {{ rowSpan }} class="align-middle" data-participant-id="{{ id }}">
-                            <a href="{{ path('participant', { id: id }) }}" class="participant-id">{{ id }}</a>
+                            {{ id }}
                             {% if isPediatricParticipant %}
                                 <i class="fa fa-child child-icon"></i>
                             {% endif %}
@@ -70,7 +67,7 @@
                         {% if participant.participant is defined %}
                             <td {{ rowSpan }} class="align-middle">
                                 {% if participant.participant %}
-                                    <a href="{{ path('participant', { id: id }) }}">{{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}</a>
+                                    {{ participant.participant.lastName|default('') }}, {{ participant.participant.firstName|default('') }}
                                 {% else %}
                                     {{ missingName }}
                                 {% endif %}
@@ -82,33 +79,6 @@
                             </td>
                         {% endif %}
                     {% endif %}
-                    {% set idVerification = participant.idVerifications[i] is defined ? participant.idVerifications[i] : '' %}
-                    <td class="td-left-border text-center" data-column-type="on_site">
-                        {% if idVerification['created_ts'] is defined and idVerification['created_ts'] is not empty %}
-                            {% set statusText = 'ID Verified ' ~ idVerification['created_ts']|date('n/j/Y g:ia', app.user.timezone) %}
-                            <span data-date-type="idVerification_created_ts" data-on-site-date="{{ idVerification['created_ts']|date('n/j/Y g:ia', app.user.timezone) }}">
-                                <i class="fa fa-user-check fa-lg text-success" aria-hidden="true" data-toggle="tooltip"
-                                   data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
-                            </span>
-                        {% else %}
-                            <i class="fa fa-user-times fa-lg text-danger" aria-hidden="true" data-toggle="tooltip"
-                               data-container="body" data-placement="bottom" title="ID Not Verified"></i>
-                        {% endif %}
-                    </td>
-                    {% set incentive = participant.incentives[i] is defined ? participant.incentives[i] : '' %}
-                    <td class="td-left-border text-center" data-column-type="on_site">
-                        {% if incentive['created_ts'] is defined and incentive['created_ts'] is not empty %}
-                            {% set statusText = 'Incentive Received ' ~ incentive['created_ts']|date('m/d/Y') %}
-                            <span data-date-type="incentive_created_ts" data-on-site-date="{{ incentive['created_ts']|date('m/d/Y') }}">
-                                <i class="fa fa-hand-holding-usd fa-lg text-success" aria-hidden="true"
-                                   data-toggle="tooltip"
-                                    data-container="body" data-placement="bottom" title="{{ statusText }}"></i>
-                            </span>
-                        {% else %}
-                            <i class="fa fa-hand-holding fa-lg text-danger" aria-hidden="true" data-toggle="tooltip"
-                               data-container="body" data-placement="bottom" title="Incentive Not Received"></i>
-                        {% endif %}
-                    </td>
                     {% set physicalMeasurement = participant.physicalMeasurements[i] is defined ? participant.physicalMeasurements[i] : '' %}
                     <td class="td-left-border">
                         {{ today.displayLink(physicalMeasurement, 'status', id) }}

@@ -1,15 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Order - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <div class="page-header">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             New Biobank order
-            <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
         </h2>
     </div>
-
-    {% include 'partials/participant-dl.html.twig' %}
 
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#">Safety Check</a></li>
@@ -188,10 +186,13 @@
             Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.  If the participant can provide adult samples, saliva and urine collection is permissible and can be initiated by selecting Continue.
             </span>
         </div>
-        <div id="continue" style="display:none;">
-            <br/>
+        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default" id="order_check_cancel">Cancel</a>
+        <div class="pull-left order-check-cancel" id="continue" style="display:none;">
             <p>
-                <button type="submit" class="btn btn-primary">Continue</button>
+                <button type="submit" class="btn btn-primary">
+                    Continue
+                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
             </p>
         </div>
         <input type="hidden" class="sampleTypes" id="blood" name="show-blood-tubes" value="no"/>

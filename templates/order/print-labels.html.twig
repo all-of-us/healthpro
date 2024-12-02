@@ -1,10 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Print Labels - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'print_labels' } %}
     {% set orderRoute = readOnlyView ? 'read_order_' : 'order_' %}
     <div class="row">
-        <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
             {% if order.printedTs and errorMessage is empty %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -29,6 +30,8 @@
                 </div>
                 <div class="text-center">
                     <a href="{{ path(orderRoute ~ 'collect', { participantId: participant.id, orderId: order.id }) }}" class="btn btn-primary">Next</a>
+                    {% set routePrefix = readOnlyView ? 'read_' : '' %}
+                    <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
                     <br><br>
                 </div>
             {% else %}
@@ -40,6 +43,7 @@
                         {{ errorMessage|default('Error loading labels.') }}
                     </div>
                 </div>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
             {% endif %}
         </div>
     </div>

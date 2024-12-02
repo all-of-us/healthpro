@@ -1,15 +1,14 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Order - Cancel - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% endif %}">
         <i class="fa fa-medkit" aria-hidden="true"></i>
         {{ type|capitalize }} Biobank Order
-        <small><a href="{{ path('participant', { id: participant.id }) }}">{{ participant.lastName }}, {{ participant.firstName }}</a></small>
     </h2>
 
-    {% include 'partials/participant-dl.html.twig' %}
     <div class="row">
-        <div class="col-sm-8">
+        <div class="col-md-8 col-sm-7">
             <table class="table">
                 <thead>
                 <tr>
@@ -42,7 +41,13 @@
                         {% if order.getCollectedSamples and order.isPediatricOrder and '3.2' in order.getVersion %}
                             <td>{{ sample.label }}</td>
                         {% else %}
-                            <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
+                            <td>
+                                {% if order.type != constant('App\\Entity\\Order::ORDER_TYPE_SALIVA') %}
+                                    ({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]
+                                {% else %}
+                                    {{ sample.label }}
+                            {% endif %}
+                            </td>
                         {% endif %}
                         <td>
                             {% if sample.collected_checked is defined and sample.collected_ts is defined and sample.collected_ts is not empty %}
@@ -78,7 +83,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-sm-4">
+        <div class="col-md-4 col-sm-5">
             {% include 'partials/participant-orders-list.html.twig' %}
         </div>
     </div>
@@ -88,7 +93,10 @@
             {{ form_errors(sampleModifyForm) }}
             {{ form_rest(sampleModifyForm) }}
             <p>
-                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">{{ type|capitalize }} Order</button>
+                <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
+                    {{ type|capitalize }} Order
+                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
             </p>
             {{ form_end(sampleModifyForm) }}

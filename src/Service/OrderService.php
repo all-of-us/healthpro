@@ -8,7 +8,8 @@ use App\Entity\Order;
 use App\Entity\OrderHistory;
 use App\Entity\Site;
 use App\Entity\User;
-use App\Helper\Participant;
+use App\Helper\PpscParticipant;
+use App\Service\Ppsc\PpscApiService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
@@ -17,11 +18,7 @@ use Symfony\Component\Form\FormInterface;
 
 class OrderService
 {
-    public const ORDER_CANCEL_STATUS = 'CANCELLED';
-    public const ORDER_RESTORE_STATUS = 'UNSET';
-    public const ORDER_EDIT_STATUS = 'AMENDED';
-
-    protected $rdrApiService;
+    protected PpscApiService $ppscApiService;
     protected $params;
     protected $em;
     protected $mayolinkOrderService;
@@ -33,7 +30,7 @@ class OrderService
     protected $participant;
 
     public function __construct(
-        RdrApiService $rdrApiService,
+        PpscApiService $ppscApiService,
         ParameterBagInterface $params,
         EntityManagerInterface $em,
         MayolinkOrderService $mayolinkOrderService,
@@ -41,7 +38,7 @@ class OrderService
         SiteService $siteService,
         LoggerService $loggerService
     ) {
-        $this->rdrApiService = $rdrApiService;
+        $this->ppscApiService = $ppscApiService;
         $this->params = $params;
         $this->em = $em;
         $this->mayolinkOrderService = $mayolinkOrderService;
@@ -50,7 +47,7 @@ class OrderService
         $this->loggerService = $loggerService;
     }
 
-    public function loadSamplesSchema($order, Participant $participant = null, Measurement $physicalMeasurement = null)
+    public function loadSamplesSchema($order, PpscParticipant $participant = null, Measurement $physicalMeasurement = null)
     {
         $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order', 'pediatric_order_samples_version']);
         $this->order = $order;
@@ -67,16 +64,16 @@ class OrderService
         return $this->participant;
     }
 
-    public function createOrder($participantId, $orderObject)
+    public function createOrder(string $participantId, \stdClass $orderObject): string|bool
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/BiobankOrder", $orderObject);
+            $response = $this->ppscApiService->post("participants/{$participantId}/biobank-orders", $orderObject);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
+            if (is_object($result) && isset($result->healthProOrderId)) {
+                return $result->healthProOrderId;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -85,18 +82,12 @@ class OrderService
     public function editOrder($orderObject)
     {
         try {
-            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->put(
-                "rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}",
-                $orderObject,
-                ['headers' => ['If-Match' => $result->meta->versionId]]
-            );
-            $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->status) && $result->status === self::ORDER_EDIT_STATUS) {
+            $response = $this->ppscApiService->put("participants/{$this->participant->id}/biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            if ($response->getStatusCode() === 200) {
                 return true;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -105,13 +96,14 @@ class OrderService
     public function getOrdersByParticipant($participantId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
+            // Currently, PPSC API doesn't support this
+            $response = $this->ppscApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->data)) {
                 return $result->data;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return [];
         }
         return [];
@@ -120,7 +112,8 @@ class OrderService
     public function getOrders(array $query = []): array
     {
         try {
-            $response = $this->rdrApiService->get('rdr/v1/BiobankOrder', [
+            // Currently, PPSC API doesn't support this
+            $response = $this->ppscApiService->get('rdr/v1/BiobankOrder', [
                 'query' => $query
             ]);
             $result = json_decode($response->getBody()->getContents());
@@ -128,28 +121,21 @@ class OrderService
                 return $result->data;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return [];
         }
         return [];
     }
 
-    public function cancelRestoreOrder($type, $orderObject)
+    public function cancelRestoreOrder($orderObject)
     {
         try {
-            $result = $this->getOrder($this->participant->id, $this->order->getRdrId());
-            $response = $this->rdrApiService->patch(
-                "rdr/v1/Participant/{$this->participant->id}/BiobankOrder/{$this->order->getRdrId()}",
-                $orderObject,
-                ['headers' => ['If-Match' => $result->meta->versionId]]
-            );
-            $result = json_decode($response->getBody()->getContents());
-            $rdrStatus = $type === Order::ORDER_CANCEL ? self::ORDER_CANCEL_STATUS : self::ORDER_RESTORE_STATUS;
-            if (is_object($result) && isset($result->status) && $result->status === $rdrStatus) {
+            $response = $this->ppscApiService->patch("participants/{$this->participant->id}/biobank-orders/{$this->order->getRdrId()}", $orderObject);
+            if ($response->getStatusCode() === 200) {
                 return true;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -158,13 +144,13 @@ class OrderService
     public function getOrder($participantId, $orderId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder/{$orderId}");
+            $response = $this->ppscApiService->get("participants/{$participantId}/biobank-orders/{$orderId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -218,7 +204,7 @@ class OrderService
     public function cancelRestoreRdrOrder($type, $reason)
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
-        return $this->cancelRestoreOrder($type, $order);
+        return $this->cancelRestoreOrder($order);
     }
 
     public function getCancelRestoreRdrObject($type, $reason)
@@ -472,7 +458,7 @@ class OrderService
         $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
         if (!$rdrId) {
             // Check for rdr id conflict error code
-            if ($this->rdrApiService->getLastErrorCode() === 409) {
+            if ($this->ppscApiService->getLastErrorCode() === 409) {
                 $rdrOrder = $this->getOrder($this->order->getParticipantId(), $this->order->getMayoId());
                 // Check if order exists in RDR
                 if (!empty($rdrOrder) && $rdrOrder->id === $this->order->getMayoId()) {
@@ -597,6 +583,11 @@ class OrderService
     {
         // Get order object from RDR
         $object = $this->getOrder($this->participant->id, $this->order->getRdrId());
+
+        if ($object === false) {
+            return false;
+        }
+
         //Update samples
         if (!empty($object->samples)) {
             foreach ($object->samples as $sample) {

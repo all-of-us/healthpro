@@ -44,18 +44,23 @@ class UserService
         return $this->requestStack->getSession()->get('googleUser');
     }
 
+    public function getSalesforceUser()
+    {
+        return $this->requestStack->getSession()->get('salesforceUser');
+    }
+
     public function canMockLogin()
     {
         return $this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth');
     }
 
-    public function getUserInfo($googleUser)
+    public function getUserInfo($oauthUser)
     {
         $attempts = 0;
         $maxAttempts = 3;
         do {
             try {
-                $user = $this->em->getRepository(User::class)->findOneBy(['email' => $googleUser->getEmail()]);
+                $user = $this->em->getRepository(User::class)->findOneBy(['email' => $oauthUser->getEmail()]);
                 break;
             } catch (\Exception $e) {
                 if ($attempts == 2) {
@@ -66,8 +71,11 @@ class UserService
         } while ($attempts < $maxAttempts);
         if (empty($user)) {
             $user = new User();
-            $user->setEmail($googleUser->getEmail());
-            $user->setGoogleId($googleUser->getUserId());
+            $user->setEmail($oauthUser->getEmail());
+            $user->setGoogleId($oauthUser->getUserId());
+            if ($oauthUser->getTimezone()) {
+                $user->setTimezone($oauthUser->getTimezone());
+            }
             $this->em->persist($user);
             $this->em->flush();
         }

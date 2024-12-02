@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Modified Measurements - Daily Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
@@ -24,7 +24,7 @@
                 {% set isPediatricForm = "peds" in measurement.version %}
                 <tr>
                     <td>
-                        <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant_id }}</a>
+                        {{ measurement.participant_id }}
                         {% if isPediatricForm %}
                             <i class="fa fa-child child-icon"></i>
                         {% endif %}
@@ -32,7 +32,7 @@
                     {% if measurement.participant is defined %}
                         <td class="align-middle">
                             {% if measurement.participant %}
-                                <a href="{{ path('measurement', { participantId: measurement.participant_id, measurementId: measurement.id }) }}">{{ measurement.participant.lastName|default('') }}, {{ measurement.participant.firstName|default('') }}</a>
+                               {{ measurement.participant.lastName|default('') }}, {{ measurement.participant.firstName|default('') }}
                             {% else %}
                                 {{ missingName }}
                             {% endif %}

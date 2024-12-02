@@ -2,6 +2,8 @@
 
 namespace App\Helper;
 
+use DateTime;
+
 /**
  * Define magic properties to fix phpstan errors
  * @property string $email
@@ -135,10 +137,15 @@ class NphParticipant
         if ($nphEnrollmentStatus === null) {
             return 1;
         }
+        // Get most recent module based on time
+        $mostRecentModule = $this->getParticipantMostRecentModule($nphEnrollmentStatus);
+        if ($mostRecentModule !== 1) {
+            return $mostRecentModule;
+        }
+        // Fallback check if most recent module is 1
         $moduleMap = [
-            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3,
             '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2,
-            '/module1_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 1,
+            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3
         ];
 
         foreach ($moduleMap as $pattern => $moduleNumber) {
@@ -151,6 +158,39 @@ class NphParticipant
         }
 
         return 1;
+    }
+
+
+    private function getParticipantMostRecentModule(array $nphEnrollmentStatus): int
+    {
+        $moduleMap = [
+            '/module2_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 2,
+            '/module3_(complete|dietAssigned|eligibilityConfirmed|consented)/' => 3
+        ];
+
+        $mostRecentModule = 1;
+        $mostRecentTime = null;
+
+        foreach ($nphEnrollmentStatus as $status) {
+            $value = $status->value ?? '';
+            $rawTime = $status->time ?? null;
+            if ($rawTime === null) {
+                continue;
+            }
+            $time = new DateTime($rawTime);
+            foreach ($moduleMap as $pattern => $moduleNumber) {
+                if (preg_match($pattern, $value)) {
+                    // Check if this status is most recent
+                    if ($mostRecentTime === null || $time > $mostRecentTime || ($time == $mostRecentTime && $moduleNumber < $mostRecentModule)) {
+                        $mostRecentTime = $time;
+                        $mostRecentModule = $moduleNumber;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return $mostRecentModule;
     }
 
     private function getModuleDietStatus(int $module): array

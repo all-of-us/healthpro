@@ -1,5 +1,6 @@
-{% extends 'base.html.twig' %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Print Requisition - Order {{ order.orderId }} - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'print_requisition' } %}
     {% set orderRoute = readOnlyView ? 'read_order_' : 'order_' %}
@@ -40,6 +41,8 @@
                     This order was finalized as an empty order and was not submitted to the Biobank. If this was done in error, create a new order with the original order information and please submit a Support Center ticket to the Biobank with the 2 order IDs.
                 </div>
             {% endif %}
+            {% set routePrefix = readOnlyView ? 'read_' : '' %}
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
         </div>
     </div>
 {% endblock %}

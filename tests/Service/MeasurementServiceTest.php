@@ -7,6 +7,7 @@ use App\Entity\Site;
 use App\Form\SiteType;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
@@ -73,7 +74,7 @@ class MeasurementServiceTest extends ServiceTestCase
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(RequestStack::class),
             static::getContainer()->get(UserService::class),
-            static::getContainer()->get(RdrApiService::class),
+            static::getContainer()->get(PpscApiService::class),
             $mockSiteService,
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(LoggerService::class),

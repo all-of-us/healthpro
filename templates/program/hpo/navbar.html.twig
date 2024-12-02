@@ -95,39 +95,6 @@
             {% endif %}
         </div>
         <div class="collapse navbar-collapse" id="pmi-navbar-collapse">
-            <ul class="nav navbar-nav">
-                {% if not currentRoleNav %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') %}
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Lookup <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ path('participants') }}"><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</a></li>
-                                <li><a href="{{ path('orders') }}"><i class="fa fa-medkit" aria-hidden="true"></i> Biobank Order Lookup</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Review <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ path('review_today') }}"><i class="fa fa-list" aria-hidden="true"></i> Daily Review</a></li>
-                                <li><a href="{{ path('deceased_reports_index') }}"><i class="fa fa-hourglass-o" aria-hidden="true"></i> Deceased Participants</a></li>
-                                <li><a href="{{ path('on_site_id_verification') }}"><i class="fa fa-clipboard-list" aria-hidden="true"></i> On-Site Details Reporting</a></li>
-                            </ul>
-                        </li>
-                        {% if app.session.get('siteEntity') and app.session.get('siteEntity').organization %}
-                            <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
-                        {% endif %}
-                    {% endif %}
-                    {% if is_granted('ROLE_AWARDEE') and app.session.get('awardee') and siteInfo.superUserAwardees %}
-                        <li><a href="{{ path('workqueue_index') }}">Work Queues</a></li>
-                    {% endif %}
-                    {% if is_granted('ROLE_USER') and app.session.get('site') and app.session.get('orderType') == 'dv' and reportKitUrl %}
-                        <li><a data-href="{{ reportKitUrl }}" class="external-link">Report Kit Problem</a></li>
-                    {% endif %}
-                {% endif %}
-                {% if is_granted('ROLE_MANAGE_USERS') and app.session.get('program') is not null %}
-                    <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-                {% endif %}
-            </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     {% if not currentRoleNav %}
@@ -149,36 +116,11 @@
                             </li>
                         {% endif %}
                     {% endif %}
-
-                    {% if app.session.get('program') is not null %}
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-bell" aria-hidden="true"></i>
-                                {% if notifications_count > 0 %}
-                                    <span class="badge badge-notify" id="notifications_count">{{ notifications_count }}</span>
-                                {% endif %}
-                            </a>
-                            {% include '/partials/notifications-dropdown.html.twig' %}
-                        </li>
-                    <li class="dropdown">
-                        <a href="{{ path('help_home') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-question-circle" aria-hidden="true"></i> Help <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{{ path('help_videos') }}"><i class="fa fa-film" aria-hidden="true"></i> Training Videos</a></li>
-                            <li><a href="{{ path('help_faq') }}"><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</a></li>
-                            <li><a href="{{ path('help_sop') }}"><i class="fa fa-file-text-o" aria-hidden="true"></i> All of Us℠ SOPs</a></li>
-                            <li><a href="{{ confluenceResources.ops_data_api }}" target="_blank"><i class="fa fa-files-o" aria-hidden="true"></i> OpsData API Resources</a></li>
-                            <li><a href="{{ confluenceResources.data_dictionaries }}" target="_blank"><i class="fa fa-table" aria-hidden="true"></i> HealthPro Data Dictionaries</a></li>
-                            <li><a href="{{ confluenceResources.release_notes }}" target="_blank"><i class="fa fa-sticky-note" aria-hidden="true"></i> HealthPro Release Notes</a></li>
-                            <li><a href="{{ feedback_url }}" target="_blank"><i class="fa fa-comment-dots" aria-hidden="true"></i> Submit Feedback</a></li>
-                            <li><a href="{{ report_technical_issue_url }}" target="_blank"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Report Technical Issue</a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
                     <li class="dropdown">
                         <a href="{{ path('settings') }}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> {{ app.user.email|default('') }} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ path('settings') }}"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
-                            <li><a href="{{ path('logout') }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                            <li><a href="{{ path('logout', { source: 'aou' }) }}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
                         </ul>
                     </li>
                 {% endif %}

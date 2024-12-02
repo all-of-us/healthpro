@@ -68,6 +68,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
     {
         try {
             $user = $this->auth->processAuth($credentials['state'], $credentials['code']);
+            $this->requestStack->getSession()->set('loginType', null);
         } catch (Exception $e) {
             throw new AuthenticationException();
         }

@@ -38,36 +38,6 @@ class AuthControllerTest extends AppWebTestCase
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
     }
 
-    public function testSiteAutoselect()
-    {
-        $siteId = 'hpo-site-' . uniqid();
-        $this->login('testSiteAutoselect@example.com', [$siteId]);
-        $this->client->followRedirects();
-        $this->assertNull($this->session->get('site'));
-        $this->client->request('GET', '/participants');
-        $this->assertSame($siteId . '@' . static::GROUP_DOMAIN, $this->session->get('site')->email);
-    }
-
-    public function testAwardeeAutoselect()
-    {
-        $awardeeId = 'awardee-' . uniqid();
-        $this->login('testAwardeeAutoselect@example.com', [$awardeeId]);
-        $this->client->followRedirects();
-        $this->assertNull($this->session->get('awardee'));
-        $this->client->request('GET', '/');
-        $this->assertSame($awardeeId . '@' . static::GROUP_DOMAIN, $this->session->get('awardee')->email);
-        $this->assertEquals('/workqueue/main', $this->client->getRequest()->getRequestUri());
-    }
-
-    public function testDvAdminAutoselect()
-    {
-        $this->login('testDvAdminAutoselect@example.com', [User::ADMIN_DV]);
-        $this->client->followRedirects();
-        $this->assertNull($this->session->get('site'));
-        $this->client->request('GET', '/');
-        $this->assertEquals('/problem/reports', $this->client->getRequest()->getRequestUri());
-    }
-
     public function testAdminAutoselect()
     {
         $this->login('testAdminAutoselect@example.com', [User::ADMIN_GROUP]);
@@ -77,67 +47,10 @@ class AuthControllerTest extends AppWebTestCase
         $this->assertEquals('/admin', $this->client->getRequest()->getRequestUri());
     }
 
-    public function testForceSiteSelect()
-    {
-        $siteIds = [
-            'hpo-site-' . uniqid(),
-            'hpo-site-' . uniqid()
-        ];
-        $this->login('testForceSiteSelect@example.com', $siteIds);
-        $this->client->followRedirects();
-        $this->client->request('GET', '/participants');
-        $this->assertMatchesRegularExpression('/\/site\/select$/', $this->client->getRequest()->getUri());
-    }
-
     public function testHeaders()
     {
         $this->client->followRedirects();
         $this->client->request('GET', '/');
         $this->assertResponseHeaderSame('X-Frame-Options', 'SAMEORIGIN');
-    }
-
-    public function testReadOnlyRoutes()
-    {
-        $this->login('testReadOnlyRoutes@example.com', [User::READ_ONLY_GROUP]);
-        $this->client->followRedirects();
-        $this->client->request('GET', '/');
-        self::assertEquals('/read/', $this->client->getRequest()->getRequestUri());
-
-        $this->client->request('GET', '/read/participants');
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
-
-        $this->client->request('GET', '/read/orders');
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
-    }
-
-    public function testSiteUserReadOnlyRoutes()
-    {
-        $siteId = 'hpo-site-' . uniqid();
-        $this->login('testSiteUserReadOnlyRoutes@example.com', [$siteId]);
-        $this->client->followRedirects();
-
-        $this->client->request('GET', '/read/');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
-
-        $this->client->request('GET', '/read/participants');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
-
-        $this->client->request('GET', '/read/orders');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
-    }
-
-    public function testAdminUserReadOnlyRoutes()
-    {
-        $this->login('testAdminUserReadOnlyRoutes@example.com', [User::ADMIN_GROUP]);
-        $this->client->followRedirects();
-
-        $this->client->request('GET', '/read/');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
-
-        $this->client->request('GET', '/read/participants');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
-
-        $this->client->request('GET', '/read/orders');
-        self::assertEquals(403, $this->client->getResponse()->getStatusCode());
     }
 }

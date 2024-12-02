@@ -50,7 +50,7 @@
             <tr><th>Attribute</th><th>Old</th><th>New</th></tr>
             </thead>
             <tbody>
-            {% for key, value in site.old if site.old[key] != site.new[key] %}
+            {% for key, value in site.old|filter((v, k) => v != site.new[k]) %}
                 <tr>
                     <td>{{ key }}</td>
                     <td class="text-danger">{{ site.old[key] }}</td>

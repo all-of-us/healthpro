@@ -12,7 +12,8 @@
     {% set title = 'Unexpected Error' %}
     {% set description = 'Sorry, an error has occurred.' %}
 {% endif %}
-{% extends 'base.html.twig' %}
+{% set isPpscRoute = app.request.requesturi starts with '/ppsc' %}
+{% extends app.session.get('ppscRequestId') is not empty or isPpscRoute ? 'program/hpo/ppsc/base.html.twig' : 'base.html.twig' %}
 {% block title %}{{ title }} - {% endblock %}
 {% block body %}
     <h2>{{ title }}</h2>

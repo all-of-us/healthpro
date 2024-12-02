@@ -323,4 +323,9 @@ class Site
 
         return $this;
     }
+
+    public static function getSiteSuffix($site): ?string
+    {
+        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
+    }
 }

@@ -11,6 +11,7 @@ use App\Entity\MeasurementHistory;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Entity\ZScores;
+use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -20,7 +21,7 @@ class MeasurementService
     protected $em;
     protected $requestStack;
     protected $userService;
-    protected $rdrApiService;
+    protected PpscApiService $ppscApiService;
     protected $siteService;
     protected $params;
     protected $measurement;
@@ -30,7 +31,7 @@ class MeasurementService
         EntityManagerInterface $em,
         RequestStack $requestStack,
         UserService $userService,
-        RdrApiService $rdrApiService,
+        PpscApiService $ppscApiService,
         SiteService $siteService,
         ParameterBagInterface $params,
         LoggerService $loggerService
@@ -38,7 +39,7 @@ class MeasurementService
         $this->em = $em;
         $this->requestStack = $requestStack;
         $this->userService = $userService;
-        $this->rdrApiService = $rdrApiService;
+        $this->ppscApiService = $ppscApiService;
         $this->siteService = $siteService;
         $this->params = $params;
         $this->loggerService = $loggerService;
@@ -75,13 +76,13 @@ class MeasurementService
     public function createMeasurement($participantId, $fhir)
     {
         try {
-            $response = $this->rdrApiService->post("rdr/v1/Participant/{$participantId}/PhysicalMeasurements", $fhir);
+            $response = $this->ppscApiService->post("participants/{$participantId}/physical-measurements", $fhir);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->id)) {
-                return $result->id;
+            if (is_object($result) && isset($result->drcId)) {
+                return $result->drcId;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -90,13 +91,13 @@ class MeasurementService
     public function getMeasurmeent($participantId, $measurementId)
     {
         try {
-            $response = $this->rdrApiService->get("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}");
+            $response = $this->ppscApiService->get("participants/{$participantId}/physical-measurements/{$measurementId}");
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -152,7 +153,7 @@ class MeasurementService
     public function cancelRestoreRdrMeasurement($type, $reason)
     {
         $measurementRdrObject = $this->getCancelRestoreRdrObject($type, $reason);
-        return $this->cancelRestoreMeasurement($type, $this->measurement->getParticipantId(), $this->measurement->getRdrId(), $measurementRdrObject);
+        return $this->cancelRestoreMeasurement($this->measurement->getParticipantId(), $this->measurement->getRdrId(), $measurementRdrObject);
     }
 
     public function getCancelRestoreRdrObject($type, $reason)
@@ -167,23 +168,15 @@ class MeasurementService
         return $obj;
     }
 
-    public function cancelRestoreMeasurement($type, $participantId, $measurementId, $measurementJson)
+    public function cancelRestoreMeasurement($participantId, $measurementId, $measurementJson)
     {
         try {
-            $response = $this->rdrApiService->patch("rdr/v1/Participant/{$participantId}/PhysicalMeasurements/{$measurementId}", $measurementJson);
-            $result = json_decode($response->getBody()->getContents());
-
-            // Check RDR response
-            $rdrStatus = $type === Measurement::EVALUATION_CANCEL ? Measurement::EVALUATION_CANCEL_STATUS : Measurement::EVALUATION_RESTORE_STATUS;
-            if (is_object($result) && is_array($result->entry)) {
-                foreach ($result->entry as $entries) {
-                    if (strtolower($entries->resource->resourceType) === 'composition') {
-                        return $entries->resource->status === $rdrStatus ? true : false;
-                    }
-                }
+            $response = $this->ppscApiService->patch("participants/{$participantId}/physical-measurements/{$measurementId}", $measurementJson);
+            if ($response->getStatusCode() === 200) {
+                return true;
             }
         } catch (\Exception $e) {
-            $this->rdrApiService->logException($e);
+            $this->ppscApiService->logException($e);
             return false;
         }
         return false;
@@ -261,7 +254,7 @@ class MeasurementService
 
     public function getLastError()
     {
-        return $this->rdrApiService->getLastError();
+        return $this->ppscApiService->getLastError();
     }
 
     public function inactiveSiteFormDisabled(): bool

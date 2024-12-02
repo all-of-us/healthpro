@@ -31,4 +31,9 @@ class GoogleUser
     {
         return $this->getId();
     }
+
+    public function getTimezone()
+    {
+        return null;
+    }
 }
