@@ -341,6 +341,11 @@ class Site
 
     public static function getSiteSuffix($site): ?string
     {
-        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
+        $prefix = \App\Security\User::SITE_PREFIX;
+        // Check if the prefix exists at the start of the string
+        if (str_starts_with($site, $prefix)) {
+            return substr($site, strlen($prefix));
+        }
+        return $site;
     }
 }
