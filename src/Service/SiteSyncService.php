@@ -85,6 +85,7 @@ class SiteSyncService
                     $siteData->setGoogleGroup($siteId); // backwards compatibility
                     $siteData->setOrganization($awardee->id); // backwards compatibility
                     $siteData->setSiteId($siteId);
+                    $siteData->setRdrSiteId($site->id);
                     $siteData->setOrganizationId($organization->id);
                     $siteData->setAwardeeId($awardee->id);
                     if ($this->env->isProd()) {
