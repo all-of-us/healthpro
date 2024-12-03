@@ -214,7 +214,7 @@ class OrderService
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
         $user = $this->order->getOrderUser($this->userService->getUser());
-        $site = $this->order->getOrderSite($this->siteService->getSiteId());
+        $site = $this->order->getOrderSite($this->siteService->getRdrSite($this->siteService->getSiteId()));
         $obj->{$statusType . 'Info'} = $this->order->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -454,7 +454,12 @@ class OrderService
 
     public function createRdrOrder()
     {
-        $orderRdrObject = $this->order->getRdrObject();
+        $orderRdrObject = $this->order->getRdrObject(
+            $this->siteService->getRdrSite($this->order->getSite()),
+            $this->siteService->getRdrSite($this->order->getCollectedSite()),
+            $this->siteService->getRdrSite($this->order->getProcessedSite()),
+            $this->siteService->getRdrSite($this->order->getFinalizedSite())
+        );
         $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
         if (!$rdrId) {
             // Check for rdr id conflict error code
@@ -478,7 +483,13 @@ class OrderService
 
     public function editRdrOrder()
     {
-        $orderRdrObject = $this->order->getEditRdrObject();
+        $orderRdrObject = $this->order->getEditRdrObject(
+            $this->siteService->getRdrSite($this->order->getSite()),
+            $this->siteService->getRdrSite($this->order->getCollectedSite()),
+            $this->siteService->getRdrSite($this->order->getProcessedSite()),
+            $this->siteService->getRdrSite($this->order->getFinalizedSite()),
+            $this->siteService->getRdrSite($this->order->getHistory()->getSite())
+        );
         $status = $this->editOrder($orderRdrObject);
         if ($status) {
             return $this->createOrderHistory(Order::ORDER_EDIT);

@@ -223,6 +223,11 @@ class PpscParticipant
         if (!$site) {
             return null;
         }
-        return str_replace(User::SITE_PREFIX, '', $site);
+        $prefix = User::SITE_PREFIX;
+        // Check if the prefix exists at the start of the string
+        if (str_starts_with($site, $prefix)) {
+            return substr($site, strlen($prefix));
+        }
+        return $site;
     }
 }

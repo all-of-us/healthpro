@@ -4,7 +4,6 @@ namespace App\Model\Measurement;
 
 use App\Entity\Measurement;
 use App\Helper\Util;
-use App\Security\User;
 use DateTimeZone;
 use stdClass;
 
@@ -300,11 +299,11 @@ class Fhir
                 'extension' => [
                     [
                         'url' => 'http://terminology.pmi-ops.org/StructureDefinition/authored-location',
-                        'valueString' => 'Location/' . User::SITE_PREFIX . $this->createdSite
+                        'valueString' => 'Location/' . $this->createdSite
                     ],
                     [
                         'url' => 'http://terminology.pmi-ops.org/StructureDefinition/finalized-location',
-                        'valueString' => 'Location/' . User::SITE_PREFIX . $this->finalizedSite
+                        'valueString' => 'Location/' . $this->finalizedSite
                     ]
                 ],
             ]

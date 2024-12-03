@@ -132,11 +132,13 @@ class MeasurementsController extends BaseController
                             $measurement->setFinalizedUser($currentUser);
                             $measurement->setFinalizedSite($this->siteService->getSiteId());
                             // Send final evaluation to RDR and store resulting id
+                            $createdSite = $this->siteService->getRdrSite($measurement->getSite());
+                            $finalizedSite = $this->siteService->getRdrSite($measurement->getFinalizedSiteInfo());
                             if ($measurement != null && $measurement->getParentId() != null) {
                                 $parentEvaluation = $this->em->getRepository(Measurement::class)->find($measurement->getParentId());
-                                $fhir = $measurement->getFhir($now, $parentEvaluation->getRdrId());
+                                $fhir = $measurement->getFhir($now, $createdSite, $finalizedSite, $parentEvaluation->getRdrId());
                             } else {
-                                $fhir = $measurement->getFhir($now);
+                                $fhir = $measurement->getFhir($now, $createdSite, $finalizedSite);
                             }
                             if ($rdrEvalId = $this->measurementService->createMeasurement($participant->id, $fhir)) {
                                 $measurement->setRdrId($rdrEvalId);
@@ -479,7 +481,9 @@ class MeasurementsController extends BaseController
                 $parentRdrId = $parentMeasurement->getRdrId();
             }
         }
-        $fhir = $measurement->getFhir($date, $parentRdrId);
+        $createdSite = $this->siteService->getRdrSite($measurement->getSite());
+        $finalizedSite = $this->siteService->getRdrSite($measurement->getFinalizedSiteInfo());
+        $fhir = $measurement->getFhir($date, $createdSite, $finalizedSite, $parentRdrId);
         if ($isTest) {
             $fhir = \App\Tests\Entity\MeasurementTest::getNormalizedFhir($fhir);
             $response = new JsonResponse($fhir);

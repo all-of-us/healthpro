@@ -147,19 +147,19 @@ class OrderTest extends KernelTestCase
         // HPO order
         $order = $this->createOrder($orderData);
         $order->loadSamplesSchema();
-        $this->assertEquals('Patient/P123456789', $order->getRdrObject()->subject);
+        $this->assertEquals('Patient/P123456789', $order->getRdrObject('test', 'test', 'test', 'test')->subject);
         // Assert createdInfo
-        $this->assertEquals('test@example.com', $order->getRdrObject()->createdInfo['author']['value']);
-        $this->assertEquals('hpo-site-test', $order->getRdrObject()->createdInfo['site']['value']);
+        $this->assertEquals('test@example.com', $order->getRdrObject('test', 'test', 'test', 'test')->createdInfo['author']['value']);
+        $this->assertEquals('test', $order->getRdrObject('test', 'test', 'test', 'test')->createdInfo['site']['value']);
         // Assert identifiers orderId and mayoId
-        $this->assertEquals('0123456789', $order->getRdrObject()->identifier[0]['value']);
-        $this->assertEquals('WEB123456789', $order->getRdrObject()->identifier[1]['value']);
+        $this->assertEquals('0123456789', $order->getRdrObject('test', 'test', 'test', 'test')->identifier[0]['value']);
+        $this->assertEquals('WEB123456789', $order->getRdrObject('test', 'test', 'test', 'test')->identifier[1]['value']);
         // Assert processed sample codes (swinging_bucket)
-        $this->assertEquals('1SST8', $order->getRdrObject()->samples[0]['test']);
-        $this->assertEquals('1PST8', $order->getRdrObject()->samples[1]['test']);
+        $this->assertEquals('1SST8', $order->getRdrObject('test', 'test', 'test', 'test')->samples[0]['test']);
+        $this->assertEquals('1PST8', $order->getRdrObject('test', 'test', 'test', 'test')->samples[1]['test']);
         // Assert processingRequired
-        $this->assertEquals('1', $order->getRdrObject()->samples[0]['processingRequired']);
-        $this->assertEquals('1', $order->getRdrObject()->samples[1]['processingRequired']);
+        $this->assertEquals('1', $order->getRdrObject('test', 'test', 'test', 'test')->samples[0]['processingRequired']);
+        $this->assertEquals('1', $order->getRdrObject('test', 'test', 'test', 'test')->samples[1]['processingRequired']);
 
         // DV order
         $orderData['type'] = 'kit';
@@ -167,8 +167,8 @@ class OrderTest extends KernelTestCase
         $order = $this->createOrder($orderData);
         $order->loadSamplesSchema();
         // Assert processed sample codes (fixed_angle)
-        $this->assertEquals('2SST8', $order->getRdrObject()->samples[0]['test']);
-        $this->assertEquals('2PST8', $order->getRdrObject()->samples[1]['test']);
+        $this->assertEquals('2SST8', $order->getRdrObject('test', 'test', 'test', 'test')->samples[0]['test']);
+        $this->assertEquals('2PST8', $order->getRdrObject('test', 'test', 'test', 'test')->samples[1]['test']);
 
 
         // Version 3.2
@@ -177,9 +177,9 @@ class OrderTest extends KernelTestCase
         $order = $this->createOrder($orderData);
         $order->loadSamplesSchema();
         // Assert processed sample codes (swinging_bucket)
-        $this->assertEquals('1SST8', $order->getRdrObject()->samples[0]['test']);
-        $this->assertEquals('1PS4A', $order->getRdrObject()->samples[1]['test']);
-        $this->assertEquals('1PS4B', $order->getRdrObject()->samples[2]['test']);
+        $this->assertEquals('1SST8', $order->getRdrObject('test', 'test', 'test', 'test')->samples[0]['test']);
+        $this->assertEquals('1PS4A', $order->getRdrObject('test', 'test', 'test', 'test')->samples[1]['test']);
+        $this->assertEquals('1PS4B', $order->getRdrObject('test', 'test', 'test', 'test')->samples[2]['test']);
 
         // DV order
         $orderData['type'] = 'kit';
@@ -187,9 +187,9 @@ class OrderTest extends KernelTestCase
         $order = $this->createOrder($orderData);
         $order->loadSamplesSchema();
         // Assert processed sample codes (fixed_angle)
-        $this->assertEquals('2SST8', $order->getRdrObject()->samples[0]['test']);
-        $this->assertEquals('2PS4A', $order->getRdrObject()->samples[1]['test']);
-        $this->assertEquals('2PS4B', $order->getRdrObject()->samples[2]['test']);
+        $this->assertEquals('2SST8', $order->getRdrObject('test', 'test', 'test', 'test')->samples[0]['test']);
+        $this->assertEquals('2PS4A', $order->getRdrObject('test', 'test', 'test', 'test')->samples[1]['test']);
+        $this->assertEquals('2PS4B', $order->getRdrObject('test', 'test', 'test', 'test')->samples[2]['test']);
     }
 
     public function testEditRdrObject()
@@ -210,11 +210,11 @@ class OrderTest extends KernelTestCase
             ],
             'site' => [
                 'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => 'hpo-site-test'
+                'value' => 'test'
             ]
         ];
-        $this->assertEquals('Test reason', $order->getEditRdrObject()->amendedReason);
-        $this->assertEquals($amendedInfo, $order->getEditRdrObject()->amendedInfo);
+        $this->assertEquals('Test reason', $order->getEditRdrObject('test', 'test', 'test', 'test', 'test')->amendedReason);
+        $this->assertEquals($amendedInfo, $order->getEditRdrObject('test', 'test', 'test', 'test', 'test')->amendedInfo);
     }
 
     public function testHpoOrdersSampleIds()
