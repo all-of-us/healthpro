@@ -395,6 +395,20 @@ class SiteService
         return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
     }
 
+    public function getRdrSite($siteId)
+    {
+        if (!$siteId) {
+            return $siteId;
+        }
+        $site = $this->em->getRepository(Site::class)->findOneBy([
+            'googleGroup' => $siteId
+        ]);
+        if ($site && $site->getRdrSiteId()) {
+            return $site->getRdrSiteId();
+        }
+        return \App\Security\User::SITE_PREFIX . $siteId;
+    }
+
     protected function setNewRoles($user)
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
@@ -460,19 +474,5 @@ class SiteService
             (in_array('ROLE_ADMIN', $user->getRoles()) && in_array('ROLE_NPH_BIOBANK', $user->getRoles())) ||
             (in_array('ROLE_NPH_ADMIN', $user->getRoles()) && in_array('ROLE_BIOBANK', $user->getRoles()))
         );
-    }
-
-    public function getRdrSite($siteId)
-    {
-        if (!$siteId) {
-            return $siteId;
-        }
-        $site = $this->em->getRepository(Site::class)->findOneBy([
-            'googleGroup' => $siteId
-        ]);
-        if ($site && $site->getRdrSiteId()) {
-            return $site->getRdrSiteId();
-        }
-        return \App\Security\User::SITE_PREFIX . $siteId;
     }
 }

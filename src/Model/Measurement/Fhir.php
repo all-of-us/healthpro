@@ -4,7 +4,6 @@ namespace App\Model\Measurement;
 
 use App\Entity\Measurement;
 use App\Helper\Util;
-use App\Security\User;
 use DateTimeZone;
 use stdClass;
 
