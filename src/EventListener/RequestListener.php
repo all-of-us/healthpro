@@ -161,6 +161,9 @@ class RequestListener
                 || $this->authorizationChecker->isGranted('ROLE_AWARDEE')
             )) {
             if (!$this->siteService->autoSwitchSite() && !$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
+                if ($this->requestStack->getSession()->get('program') === User::PROGRAM_HPO) {
+                    return new RedirectResponse('/ppsc/invalid-site');
+                }
                 return new RedirectResponse('/site/select');
             }
         }
@@ -177,7 +180,7 @@ class RequestListener
     private function ignoreRoutes(): bool
     {
         return preg_match(
-            '/^\/(_profiler|_wdt|cron|salesforce|ppsc|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
+            '/^\/(_profiler|_wdt|cron|salesforce|ppsc\/invalid-site|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
             $this->request->getPathInfo()
         );
     }

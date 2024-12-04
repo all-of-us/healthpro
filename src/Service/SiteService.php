@@ -395,6 +395,20 @@ class SiteService
         return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
     }
 
+    public function getRdrSite($siteId)
+    {
+        if (!$siteId) {
+            return $siteId;
+        }
+        $site = $this->em->getRepository(Site::class)->findOneBy([
+            'googleGroup' => $siteId
+        ]);
+        if ($site && $site->getRdrSiteId()) {
+            return $site->getRdrSiteId();
+        }
+        return \App\Security\User::SITE_PREFIX . $siteId;
+    }
+
     protected function setNewRoles($user)
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
@@ -410,7 +424,7 @@ class SiteService
         if (!$user || !$user->belongsToSite($email)) {
             return false;
         }
-        if ($this->env->isStable() || $this->env->isProd()) {
+        if (!$this->env->isLocal()) {
             $siteGroup = $user->getSite($email);
             $site = $this->em->getRepository(Site::class)->findOneBy([
                 'deleted' => 0,
@@ -419,8 +433,7 @@ class SiteService
             if (!$site) {
                 return false;
             }
-            if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
-                // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
+            if (empty($site->getMayolinkAccount())) {
                 return false;
             }
         }

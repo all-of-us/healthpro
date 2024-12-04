@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
+use App\Security\User;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -85,6 +86,7 @@ class SiteSyncService
                     $siteData->setGoogleGroup($siteId); // backwards compatibility
                     $siteData->setOrganization($awardee->id); // backwards compatibility
                     $siteData->setSiteId($siteId);
+                    $siteData->setRdrSiteId($site->id);
                     $siteData->setOrganizationId($organization->id);
                     $siteData->setAwardeeId($awardee->id);
                     if ($this->env->isProd()) {
@@ -299,6 +301,14 @@ class SiteSyncService
 
     private static function getSiteSuffix($site)
     {
-        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
+        if (empty($site)) {
+            return $site;
+        }
+        $prefix = User::SITE_PREFIX;
+        // Check if the prefix exists at the start of the string
+        if (str_starts_with($site, $prefix)) {
+            return substr($site, strlen($prefix));
+        }
+        return $site;
     }
 }

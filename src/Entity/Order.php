@@ -998,7 +998,7 @@ class Order
         }
     }
 
-    public function getRdrObject()
+    public function getRdrObject($createdSite, $collectedSite, $processedSite, $finalizedSite)
     {
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->getParticipantId();
@@ -1031,19 +1031,19 @@ class Order
             ];
         }
         $createdUser = $this->getOrderUser($this->getUser());
-        $createdSite = $this->getOrderSite($this->getSite());
+        $createdSite = $this->getOrderSite($createdSite);
         $collectedUser = $this->getOrderUser($this->getCollectedUser());
-        $collectedSite = $this->getOrderSite($this->getCollectedSite());
+        $collectedSite = $this->getOrderSite($collectedSite);
         // Set processed user and site info to collected for saliva orders
         if ($this->getType() !== 'saliva') {
             $processedUser = $this->getOrderUser($this->getProcessedUser());
-            $processedSite = $this->getOrderSite($this->getProcessedSite());
+            $processedSite = $this->getOrderSite($processedSite);
         } else {
             $processedUser = $collectedUser;
             $processedSite = $collectedSite;
         }
         $finalizedUser = $this->getOrderUser($this->getFinalizedUser());
-        $finalizedSite = $this->getOrderSite($this->getFinalizedSite());
+        $finalizedSite = $this->getOrderSite($finalizedSite);
         $obj->createdInfo = $this->getOrderUserSiteData($createdUser, $createdSite);
         $obj->collectedInfo = $this->getOrderUserSiteData($collectedUser, $collectedSite);
         $obj->processedInfo = $this->getOrderUserSiteData($processedUser, $processedSite);
@@ -1065,12 +1065,12 @@ class Order
         return $obj;
     }
 
-    public function getEditRdrObject()
+    public function getEditRdrObject($createdSite, $collectedSite, $processedSite, $finalizedSite, $siteId)
     {
-        $obj = $this->getRdrObject();
+        $obj = $this->getRdrObject($createdSite, $collectedSite, $processedSite, $finalizedSite);
         $obj->amendedReason = $this->getHistory()->getReason();
         $user = $this->getOrderUser($this->getHistory()->getUser());
-        $site = $this->getOrderSite($this->getHistory()->getSite());
+        $site = $this->getOrderSite($siteId);
         $obj->amendedInfo = $this->getOrderUserSiteData($user, $site);
         return $obj;
     }
@@ -1086,8 +1086,7 @@ class Order
 
     public function getOrderSite($site)
     {
-        $site = $site ?: $this->getSite();
-        return \App\Security\User::SITE_PREFIX . $site;
+        return $site ?: $this->getSite();
     }
 
     public function getOrderUserSiteData($user, $site)
