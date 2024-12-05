@@ -298,17 +298,4 @@ class SiteSyncService
         }
         return $sitesById;
     }
-
-    private static function getSiteSuffix($site)
-    {
-        if (empty($site)) {
-            return $site;
-        }
-        $prefix = User::SITE_PREFIX;
-        // Check if the prefix exists at the start of the string
-        if (str_starts_with($site, $prefix)) {
-            return substr($site, strlen($prefix));
-        }
-        return $site;
-    }
 }
