@@ -299,11 +299,11 @@ class Fhir
                 'extension' => [
                     [
                         'url' => 'http://terminology.pmi-ops.org/StructureDefinition/authored-location',
-                        'valueString' => 'Location/' . $this->createdSite
+                        'valueString' => 'Location/' . User::SITE_PREFIX . $this->createdSite
                     ],
                     [
                         'url' => 'http://terminology.pmi-ops.org/StructureDefinition/finalized-location',
-                        'valueString' => 'Location/' . $this->finalizedSite
+                        'valueString' => 'Location/' . User::SITE_PREFIX . $this->finalizedSite
                     ]
                 ],
             ]
