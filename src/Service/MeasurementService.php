@@ -163,7 +163,7 @@ class MeasurementService
         $obj->status = $statusType;
         $obj->reason = $reason;
         $user = $this->userService->getUser()->getUsername();
-        $site = $this->siteService->getSiteIdWithPrefix();
+        $site = $this->siteService->getSiteId();
         $obj->{$statusType . 'Info'} = $this->getMeasurementUserSiteData($user, $site);
         return $obj;
     }
