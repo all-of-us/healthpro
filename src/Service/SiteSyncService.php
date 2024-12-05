@@ -73,7 +73,7 @@ class SiteSyncService
                     $sitesCount++;
                     $existingArray = false;
                     $primaryId = null;
-                    $siteId = self::getSiteSuffix($site->id);
+                    $siteId = $site->id;
                     if (array_key_exists($siteId, $existingSites)) {
                         $existingArray = $this->normalizer->normalize($existingSites[$siteId], null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         $siteData = $existingSites[$siteId];

@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use App\Entity\Site;
 use App\Entity\User as UserEntity;
 use App\Service\EnvironmentService;
 use App\Service\GoogleGroupsService;
@@ -134,8 +133,8 @@ class UserProvider implements UserProviderInterface
 
         if (!$groups) {
             $requestDetails = $this->ppscApiService->getRequestDetailsById($this->requestStack->getSession()->get('ppscRequestId'));
-            $siteId = $requestDetails->siteId ? Site::getSiteSuffix($requestDetails->siteId) : null;
-            $groups = $siteId ? [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId])] : [];
+            $siteId = strtolower($requestDetails->siteId) ?: null;
+            $groups = $siteId ? [new Group(['email' => User::SITE_PREFIX . $siteId, 'name' => $siteId, 'id' => $siteId])] : [];
             $this->requestStack->getSession()->set('googlegroups', $groups);
             $this->requestStack->getSession()->set('managegroups', []);
             $this->requestStack->getSession()->set('managegroupsnph', []);

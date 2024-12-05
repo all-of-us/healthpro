@@ -2,8 +2,6 @@
 
 namespace App\Helper;
 
-use App\Security\User;
-
 class PpscParticipant
 {
     public \DateTime|null $cacheTime;
@@ -156,7 +154,7 @@ class PpscParticipant
         $this->sex = $participant->sex ?? null;
         $this->deceasedStatus = $participant->deceasedStatus ?? null;
         if (isset($participant->biospecimenSourceSite)) {
-            $this->biospecimenSourceSite = $this->getSiteId($participant->biospecimenSourceSite);
+            $this->biospecimenSourceSite = $participant->biospecimenSourceSite;
         }
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
@@ -216,18 +214,5 @@ class PpscParticipant
         $yearsInMonths = $diff->y * 12;
         $months = $diff->m;
         return $yearsInMonths + $months;
-    }
-
-    private function getSiteId($site): string|null
-    {
-        if (!$site) {
-            return null;
-        }
-        $prefix = User::SITE_PREFIX;
-        // Check if the prefix exists at the start of the string
-        if (str_starts_with($site, $prefix)) {
-            return substr($site, strlen($prefix));
-        }
-        return $site;
     }
 }

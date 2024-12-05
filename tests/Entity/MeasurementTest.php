@@ -128,10 +128,10 @@ class MeasurementTest extends KernelTestCase
     {
         $measurementArray = [
             'user' => $this->getUser(),
-            'site' => 'test-site1',
+            'site' => 'hpo-site-test-site1',
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
-            'finalizedSite' => 'test-site2',
+            'finalizedSite' => 'hpo-site-test-site2',
             'data' => $jsonData,
             'version' => '0.3.3'
         ];
@@ -153,10 +153,10 @@ class MeasurementTest extends KernelTestCase
     {
         $measurementArray = [
             'user' => $this->getUser(),
-            'site' => 'test-site1',
+            'site' => 'hpo-site-test-site1',
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
-            'finalizedSite' => 'test-site2',
+            'finalizedSite' => 'hpo-site-test-site2',
             'data' => $jsonData,
             'version' => '0.3.3-blood-donor'
         ];
@@ -176,10 +176,10 @@ class MeasurementTest extends KernelTestCase
     {
         $measurementArray = [
             'user' => $this->getUser(),
-            'site' => 'test-site1',
+            'site' => 'hpo-site-test-site1',
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
-            'finalizedSite' => 'test-site2',
+            'finalizedSite' => 'hpo-site-test-site2',
             'data' => $jsonData,
             'version' => '0.3.3-ehr'
         ];

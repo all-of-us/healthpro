@@ -241,9 +241,7 @@ class MeasurementService
                 $parentRdrId = $parentMeasurement->getRdrId();
             }
         }
-        $createdSite = $this->siteService->getRdrSite($this->measurement->getSite());
-        $finalizedSite = $this->siteService->getRdrSite($this->measurement->getFinalizedSiteInfo());
-        $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $createdSite, $finalizedSite, $parentRdrId);
+        $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $parentRdrId);
         $rdrId = $this->createMeasurement($this->measurement->getParticipantId(), $fhir);
         if (!empty($rdrId)) {
             $this->measurement->setRdrId($rdrId);

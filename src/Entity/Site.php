@@ -24,6 +24,9 @@ class Site
     private $siteId;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $rdrSiteId;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $organizationId;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -111,6 +114,18 @@ class Site
     public function setSiteId(?string $siteId): self
     {
         $this->siteId = $siteId;
+
+        return $this;
+    }
+
+    public function getRdrSiteId(): ?string
+    {
+        return $this->rdrSiteId;
+    }
+
+    public function setRdrSiteId(?string $rdrSiteId): self
+    {
+        $this->rdrSiteId = $rdrSiteId;
 
         return $this;
     }

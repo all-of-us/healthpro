@@ -58,7 +58,7 @@ class OrderTest extends KernelTestCase
         }
         return [
             'user' => $this->getUser(),
-            'site' => 'test',
+            'site' => 'hpo-site-test',
             'createdTs' => new \DateTime('2021-01-01 08:00:00'),
             'participantId' => 'P123456789',
             'rdrId' => 'WEB123456789',
@@ -210,7 +210,7 @@ class OrderTest extends KernelTestCase
             ],
             'site' => [
                 'system' => 'https://www.pmi-ops.org/site-id',
-                'value' => 'hpo-site-test'
+                'value' => 'test'
             ]
         ];
         $this->assertEquals('Test reason', $order->getEditRdrObject()->amendedReason);
