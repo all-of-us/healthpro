@@ -163,8 +163,7 @@ class MeasurementService
         $obj->status = $statusType;
         $obj->reason = $reason;
         $user = $this->userService->getUser()->getUsername();
-        $currentSite = $this->siteService->getSiteId();
-        $site = $this->siteService->getRdrSite($currentSite);
+        $site = $this->siteService->getSiteId();
         $obj->{$statusType . 'Info'} = $this->getMeasurementUserSiteData($user, $site);
         return $obj;
     }
@@ -242,9 +241,7 @@ class MeasurementService
                 $parentRdrId = $parentMeasurement->getRdrId();
             }
         }
-        $createdSite = $this->siteService->getRdrSite($this->measurement->getSite());
-        $finalizedSite = $this->siteService->getRdrSite($this->measurement->getFinalizedSiteInfo());
-        $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $createdSite, $finalizedSite, $parentRdrId);
+        $fhir = $this->measurement->getFhir($this->measurement->getFinalizedTs(), $parentRdrId);
         $rdrId = $this->createMeasurement($this->measurement->getParticipantId(), $fhir);
         if (!empty($rdrId)) {
             $this->measurement->setRdrId($rdrId);

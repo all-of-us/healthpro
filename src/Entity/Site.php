@@ -338,17 +338,4 @@ class Site
 
         return $this;
     }
-
-    public static function getSiteSuffix($site): ?string
-    {
-        if (empty($site)) {
-            return $site;
-        }
-        $prefix = \App\Security\User::SITE_PREFIX;
-        // Check if the prefix exists at the start of the string
-        if (str_starts_with($site, $prefix)) {
-            return substr($site, strlen($prefix));
-        }
-        return $site;
-    }
 }

@@ -6,7 +6,6 @@ use App\Audit\Log;
 use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
-use App\Security\User;
 use Doctrine\ORM\EntityManagerInterface;
 use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -73,7 +72,7 @@ class SiteSyncService
                     $sitesCount++;
                     $existingArray = false;
                     $primaryId = null;
-                    $siteId = self::getSiteSuffix($site->id);
+                    $siteId = $site->id;
                     if (array_key_exists($siteId, $existingSites)) {
                         $existingArray = $this->normalizer->normalize($existingSites[$siteId], null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         $siteData = $existingSites[$siteId];
@@ -297,18 +296,5 @@ class SiteSyncService
             $sitesById[$site->getGoogleGroup()] = $site;
         }
         return $sitesById;
-    }
-
-    private static function getSiteSuffix($site)
-    {
-        if (empty($site)) {
-            return $site;
-        }
-        $prefix = User::SITE_PREFIX;
-        // Check if the prefix exists at the start of the string
-        if (str_starts_with($site, $prefix)) {
-            return substr($site, strlen($prefix));
-        }
-        return $site;
     }
 }

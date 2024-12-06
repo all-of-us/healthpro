@@ -14,7 +14,6 @@ use App\Entity\WeightForLength0To23Months;
 use App\Entity\WeightForLength23MonthsTo5Years;
 use App\Entity\ZScores;
 use App\Exception\MissingSchemaException;
-use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -22,13 +21,11 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 class MeasurementTest extends KernelTestCase
 {
     private EntityManagerInterface $em;
-    private SiteService $siteService;
 
     public function setup(): void
     {
         self::bootKernel();
         $this->em = static::$container->get(EntityManagerInterface::class);
-        $this->siteService = static::$container->get(SiteService::class);
 
     }
     protected function getUser()
@@ -131,19 +128,17 @@ class MeasurementTest extends KernelTestCase
     {
         $measurementArray = [
             'user' => $this->getUser(),
-            'site' => 'test-site1',
+            'site' => 'hpo-site-test-site1',
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
-            'finalizedSite' => 'test-site2',
+            'finalizedSite' => 'hpo-site-test-site2',
             'data' => $jsonData,
             'version' => '0.3.3'
         ];
         $measurement = $this->createMeasurement($measurementArray);
         $measurement->loadFromAObject($this->getUser()->getEmail(), $measurementArray['finalizedSite']);
-        $createdSite = $this->siteService->getRdrSite($measurement->getSite());
-        $finalizedSite = $this->siteService->getRdrSite($measurement->getFinalizedSiteInfo());
-        $measurement->getFhir($measurementArray['ts'], $createdSite, $finalizedSite);
-        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts'], $createdSite, $finalizedSite));
+        $measurement->getFhir($measurementArray['ts']);
+        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
 
         // using string to string method so that diff is output (file to string just shows entire object)
@@ -158,19 +153,17 @@ class MeasurementTest extends KernelTestCase
     {
         $measurementArray = [
             'user' => $this->getUser(),
-            'site' => 'test-site1',
+            'site' => 'hpo-site-test-site1',
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
-            'finalizedSite' => 'test-site2',
+            'finalizedSite' => 'hpo-site-test-site2',
             'data' => $jsonData,
             'version' => '0.3.3-blood-donor'
         ];
         $measurement = $this->createMeasurement($measurementArray);
         $measurement->loadFromAObject($this->getUser()->getEmail(), $measurementArray['finalizedSite']);
         $measurement->addBloodDonorProtocolModificationForRemovedFields();
-        $createdSite = $this->siteService->getRdrSite($measurement->getSite());
-        $finalizedSite = $this->siteService->getRdrSite($measurement->getFinalizedSiteInfo());
-        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts'], $createdSite, $finalizedSite));
+        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
         $this->assertJsonStringEqualsJsonString(file_get_contents(dirname(__DIR__) . '/' . $filename), $json);
@@ -183,18 +176,16 @@ class MeasurementTest extends KernelTestCase
     {
         $measurementArray = [
             'user' => $this->getUser(),
-            'site' => 'test-site1',
+            'site' => 'hpo-site-test-site1',
             'ts' => new \DateTime('2017-01-01', new \DateTimeZone('UTC')),
             'participantId' => 'P10000001',
-            'finalizedSite' => 'test-site2',
+            'finalizedSite' => 'hpo-site-test-site2',
             'data' => $jsonData,
             'version' => '0.3.3-ehr'
         ];
         $measurement = $this->createMeasurement($measurementArray);
         $measurement->loadFromAObject($this->getUser()->getEmail(), $measurementArray['finalizedSite']);
-        $createdSite = $this->siteService->getRdrSite($measurement->getSite());
-        $finalizedSite = $this->siteService->getRdrSite($measurement->getFinalizedSiteInfo());
-        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts'], $createdSite, $finalizedSite));
+        $fhir = self::getNormalizedFhir($measurement->getFhir($measurementArray['ts']));
         $json = json_encode($fhir, JSON_PRETTY_PRINT);
         // using string to string method so that diff is output (file to string just shows entire object)
         $this->assertJsonStringEqualsJsonString(file_get_contents(dirname(__DIR__) . '/' . $filename), $json);

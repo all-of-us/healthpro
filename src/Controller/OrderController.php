@@ -746,12 +746,7 @@ class OrderController extends BaseController
                 $object = ['error' => 'Order does not have rdr_id'];
             }
         } else {
-            $object = $order->getRdrObject(
-                $this->siteService->getRdrSite($order->getSite()),
-                $this->siteService->getRdrSite($order->getCollectedSite()),
-                $this->siteService->getRdrSite($order->getProcessedSite()),
-                $this->siteService->getRdrSite($order->getFinalizedSite())
-            );
+            $object = $order->getRdrObject();
         }
         $response = new JsonResponse($object);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
