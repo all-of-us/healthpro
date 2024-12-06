@@ -332,6 +332,9 @@ class User implements UserInterface
                 // Prevent admin group from being added to the sites list as it has the same site prefix.
                 if ($id !== self::NPH_ADMIN_GROUP) {
                     $id = str_replace($sitePrefix, '', $id);
+                    if ($siteType === self::HPO_TYPE && method_exists($group, 'getId') && !empty($group->getId())) {
+                        $id = $group->getId();
+                    }
                     $sites[] = (object) [
                         'email' => $group->getEmail(),
                         'name' => $group->getName(),

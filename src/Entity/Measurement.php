@@ -353,11 +353,6 @@ class Measurement
         return $this;
     }
 
-    public function getFinalizedSiteInfo()
-    {
-        return $this->finalizedSiteInfo;
-    }
-
     public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
     {
         if (empty($this->currentVersion) && empty($this->version)) {
@@ -418,7 +413,7 @@ class Measurement
         }
     }
 
-    public function getFhir($datetime, $createdSite, $finalizedSite, $parentRdr = null)
+    public function getFhir($datetime, $parentRdr = null)
     {
         $fhir = new Fhir([
             'data' => $this->fieldData,
@@ -428,9 +423,9 @@ class Measurement
             'datetime' => $datetime,
             'parent_rdr' => $parentRdr,
             'created_user' => $this->getUser()->getEmail(),
-            'created_site' => $createdSite,
+            'created_site' => $this->getSite(),
             'finalized_user' => $this->finalizedUserEmail,
-            'finalized_site' => $finalizedSite,
+            'finalized_site' => $this->finalizedSiteInfo,
             'summary' => $this->getSummary()
         ]);
         return $fhir->toObject();
