@@ -5,8 +5,8 @@
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Details</h2>
     </div>
     <div class="row">
-        <div class="display-none" id="currentStep" data-current-step="{{ currentStep|json_encode|raw }}"></div>
-        <div class="display-none" id="collectedSamples" data-collected-samples="{{ collectedSamples|json_encode|raw }}"></div>
+        <div class="display-none" id="currentStep" data-current-step="{{ currentStep }}"></div>
+        <div class="display-none" id="collectedSamples" data-collected-samples="{{ collectedSamples|json_encode }}"></div>
         <div class="col-sm-6">
             <dl class="dl-horizontal">
                 {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_AWARDEE') %}
