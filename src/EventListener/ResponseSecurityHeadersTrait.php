@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait ResponseSecurityHeadersTrait
 {
-    private static string $frameAncestors = "*.my.site.com *.my.salesforce.com *.vf.force.com *.lightning.force.com *.joinallofus.org";
+    private static string $frameAncestors = '*.my.site.com *.my.salesforce.com *.vf.force.com *.lightning.force.com *.joinallofus.org';
 
     public function addSecurityHeaders(Response $response, ParameterBagInterface $params)
     {

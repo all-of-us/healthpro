@@ -18,7 +18,11 @@ $(document).ready(function () {
         var collectedSamples = $("#collectedSamples").data("collected-samples");
         $('input[name="biobank_order[finalizedSamples][]"]').each(function () {
             //Select samples that are unchecked and not disabled
-            if ($(this).prop("checked") === false && collectedSamples && $.inArray($(this).val(), collectedSamples) !== -1) {
+            if (
+                $(this).prop("checked") === false &&
+                collectedSamples &&
+                $.inArray($(this).val(), collectedSamples) !== -1
+            ) {
                 message =
                     "Warning: At least one sample that was collected and processed (as applicable) was not finalized. Are you sure you wish to continue?";
                 return false;
