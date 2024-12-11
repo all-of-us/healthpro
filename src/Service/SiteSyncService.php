@@ -72,7 +72,7 @@ class SiteSyncService
                     $sitesCount++;
                     $existingArray = false;
                     $primaryId = null;
-                    $siteId = self::getSiteSuffix($site->id);
+                    $siteId = $site->id;
                     if (array_key_exists($siteId, $existingSites)) {
                         $existingArray = $this->normalizer->normalize($existingSites[$siteId], null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         $siteData = $existingSites[$siteId];
@@ -85,6 +85,7 @@ class SiteSyncService
                     $siteData->setGoogleGroup($siteId); // backwards compatibility
                     $siteData->setOrganization($awardee->id); // backwards compatibility
                     $siteData->setSiteId($siteId);
+                    $siteData->setRdrSiteId($site->id);
                     $siteData->setOrganizationId($organization->id);
                     $siteData->setAwardeeId($awardee->id);
                     if ($this->env->isProd()) {
@@ -295,10 +296,5 @@ class SiteSyncService
             $sitesById[$site->getGoogleGroup()] = $site;
         }
         return $sitesById;
-    }
-
-    private static function getSiteSuffix($site)
-    {
-        return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 }

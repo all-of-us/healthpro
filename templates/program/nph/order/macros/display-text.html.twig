@@ -103,12 +103,8 @@
             {% if participant.module %}
                 <span class="nph-module-badge nph-module-{{ moduleNumber }}">NPH Module {{ moduleNumber }}</span>
             {% endif %}
-            {% if participant.moduleConsents[moduleNumber] is defined %}
-                {% if moduleNumber == 1 %}
-                    <li class="list-group-item">{{ _self.displayHairNailOptin(participant) }}</li>
-                {% endif %}
-            {% else %}
-                <li class="list-group-item"></li>
+            {% if moduleNumber == 1 %}
+                <li class="list-group-item">{{ _self.displayHairNailOptin(participant) }}</li>
             {% endif %}
         </ul>
     {% endfor %}
@@ -136,5 +132,5 @@
             <i class="fa fa-times text-danger"  title="The participant has <u>not</u> opted into hair and nail collections" data-bs-html="true" data-bs-toggle="tooltip" data-bs-container="body" aria-hidden="true"></i>
             <strong>Hair & Nail Opt-In</strong>
         {% endif %}
-        {{ participant.module1TissueConsentTime|date('m/d/Y') }}
+        {{ participant.module1TissueConsentTime ? participant.module1TissueConsentTime|date('m/d/Y') : '--' }}
 {% endmacro %}

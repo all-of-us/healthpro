@@ -410,7 +410,7 @@ class SiteService
         if (!$user || !$user->belongsToSite($email)) {
             return false;
         }
-        if ($this->env->isStable() || $this->env->isProd()) {
+        if (!$this->env->isLocal()) {
             $siteGroup = $user->getSite($email);
             $site = $this->em->getRepository(Site::class)->findOneBy([
                 'deleted' => 0,
@@ -419,8 +419,7 @@ class SiteService
             if (!$site) {
                 return false;
             }
-            if (empty($site->getMayolinkAccount()) && $site->getAwardeeId() !== 'TEST') {
-                // Site is invalid if it doesn't have a MayoLINK account id, unless it is in the TEST awardee
+            if (empty($site->getMayolinkAccount())) {
                 return false;
             }
         }

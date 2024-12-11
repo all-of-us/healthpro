@@ -2,12 +2,16 @@
 
 namespace App\EventListener;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 trait ResponseSecurityHeadersTrait
 {
-    public function addSecurityHeaders(Response $response)
+    private static string $frameAncestors = '*.my.site.com *.my.salesforce.com *.vf.force.com *.lightning.force.com *.joinallofus.org';
+
+    public function addSecurityHeaders(Response $response, ParameterBagInterface $params)
     {
+        $frameAncestors = $params->has('frame_ancestors') ? $params->get('frame_ancestors') : self::$frameAncestors;
         // prevent clickjacking attacks
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
 
@@ -26,7 +30,7 @@ trait ResponseSecurityHeadersTrait
 
             . " img-src www.google-analytics.com 'self' data:;" // allow Google Analytcs, self, and data: urls for img src
 
-            . " frame-ancestors 'self' *.my.site.com *.my.salesforce.com *.vf.force.com *.lightning.force.com"; // accomplishes the same as the X-Frame-Options header above
+            . " frame-ancestors 'self' $frameAncestors"; // accomplishes the same as the X-Frame-Options header above
 
         $response->headers->set('Content-Security-Policy', $contentSecurityPolicy);
 

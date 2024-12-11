@@ -1086,8 +1086,7 @@ class Order
 
     public function getOrderSite($site)
     {
-        $site = $site ?: $this->getSite();
-        return \App\Security\User::SITE_PREFIX . $site;
+        return $site ?: $this->getSite();
     }
 
     public function getOrderUserSiteData($user, $site)
