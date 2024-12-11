@@ -47,6 +47,9 @@ class PpscApiService
 
     public function getRequestDetailsById($requestId): \stdClass|null
     {
+        if (empty($requestId)) {
+            return null;
+        }
         try {
             $token = $this->getAccessToken();
             $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
