@@ -40,18 +40,6 @@ $(document).ready(function () {
 
     reviewTable.button(".buttons-csv").nodes().hide();
 
-    $("#review_export_all").on("click", function () {
-        new PmiConfirmModal({
-            title: "Attention",
-            msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
-            isHTML: true,
-            onTrue: function () {
-                reviewTable.button(".buttons-csv").trigger();
-            },
-            btnTextTrue: "Accept"
-        });
-    });
-
     const dateTypes = ["created_ts", "collected_ts", "finalized_ts"];
 
     for (const dateType of dateTypes) {
@@ -106,16 +94,35 @@ $(document).ready(function () {
         link.click();
     };
 
-    $("#review_export").on("click", function () {
-        const exportType = $(this).data("export-type");
+    const showExportModal = (exportAction) => {
         new PmiConfirmModal({
             title: "Attention",
             msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
             isHTML: true,
-            onTrue: function () {
-                generateCSV(exportType);
+            onTrue: () => {
+                $.ajax({
+                    url: "/nph/biobank/review/export/log",
+                    method: "GET",
+                    data: { exportType: exportTableType },
+                    error: (xhr, status, error) => {
+                        console.error("AJAX request failed:", status, error);
+                    }
+                });
+                exportAction();
             },
             btnTextTrue: "Accept"
+        });
+    };
+
+    $("#review_export_all").on("click", () => {
+        showExportModal(() => {
+            reviewTable.button(".buttons-csv").trigger();
+        });
+    });
+
+    $("#review_export").on("click", () => {
+        showExportModal(() => {
+            generateCSV(exportTableType);
         });
     });
 });
