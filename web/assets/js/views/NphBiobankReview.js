@@ -22,14 +22,14 @@ $(document).ready(function () {
                         body: function (data, row, column, node) {
                             let dataRowValue = $(node).data("row");
                             if (dataRowValue !== undefined && dataRowValue !== null) {
-                                return String(dataRowValue).replace(/\s+/g, ' ').trim();
+                                return String(dataRowValue).replace(/\s+/g, " ").trim();
                             }
-                            return data.replace(/\s+/g, ' ').trim();
+                            return data.replace(/\s+/g, " ").trim();
                         },
                         header: function (data, column, node) {
                             // Remove badge or other HTML elements inside the header for export
                             let modifiedHeader = $(node).data("header") || data;
-                            return modifiedHeader.replace(/\s+/g, ' ').trim();
+                            return modifiedHeader.replace(/\s+/g, " ").trim();
                         }
                     }
                 },
@@ -64,9 +64,9 @@ $(document).ready(function () {
         cells.map((cell) => {
             const dataRowValue = cell.getAttribute("data-row");
             if (dataRowValue !== null) {
-                return dataRowValue.replace(/\s+/g, ' ').trim();
+                return dataRowValue.replace(/\s+/g, " ").trim();
             }
-            return cell.textContent.replace(/\s+/g, ' ').trim();
+            return cell.textContent.replace(/\s+/g, " ").trim();
         });
 
     const generateCSV = (exportType) => {

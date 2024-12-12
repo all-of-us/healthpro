@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
@@ -17,19 +16,15 @@ use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Form\ReviewTodayFilterType;
 use App\Helper\NphDietPeriodStatus;
-use App\Helper\NphExport;
-use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
-use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/nph/biobank')]
@@ -197,55 +192,6 @@ class NphBiobankController extends BaseController
             'samples' => $samples,
             'todayFilterForm' => $todayFilterForm->createView(),
             'displayMessage' => $displayMessage
-        ]);
-    }
-
-    #[Route(path: '/review/export', name: 'nph_biobank_review_export')]
-    public function exportAction(Request $request, LoggerService $loggerService, SiteService $siteService): StreamedResponse
-    {
-        $exportType = $request->query->get('exportType');
-        $samples = NphExport::getReviewExportSamples($exportType, $this->em->getRepository(NphOrder::class), $this->getSecurityUser()->getTimeZone());
-        $exportType = $request->query->get('exportType');
-        $exportHeaders = NphExport::getReviewExportHeaders($exportType);
-        $userTimeZoneId = $this->getUserEntity()->getTimezoneId();
-        $stream = function () use (
-            $exportHeaders,
-            $siteService,
-            $samples,
-            $userTimeZoneId,
-            $exportType
-        ) {
-            $output = fopen('php://output', 'w');
-            fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, $exportHeaders);
-            foreach ($samples as $sample) {
-                $row = [
-                    $siteService->getNphSiteDisplayName($sample['site']),
-                    $sample['biobankId'],
-                    $sample['module'],
-                    NphOrder::VISIT_DISPLAY_NAME_MAPPER[$sample['visitPeriod']],
-                    $sample['timepoint'],
-                    $sample['orderId'],
-                    $sample['sampleCode'],
-                    $sample['sampleId'],
-                    NphExport::displayDateAndTimezone($sample['createdTs'], $sample['createdTimezoneId'], $userTimeZoneId),
-                    NphExport::displayDateAndTimezone($sample['collectedTs'], $sample['collectedTimezoneId'], $userTimeZoneId),
-                    NphExport::displayDateAndTimezone($sample['finalizedTs'], $sample['finalizedTimezoneId'], $userTimeZoneId),
-                ];
-                if ($exportType === NphExport::EXPORT_RECENT_MODIFIED_TYPE) {
-                    $row[] = NphExport::displayDateAndTimezone($sample['modifiedTs'], $sample['modifiedTimezoneId'], $userTimeZoneId);
-                }
-                $row[] = NphExport::displayBiobankSampleStatus($sample);
-                fputcsv($output, $row);
-            }
-            unset($samples);
-            fclose($output);
-        };
-        $filename = "{$exportType}_" . date('Ymd-His') . '.csv';
-        $loggerService->log(Log::NPH_BIOBANK_DAILY_REVIEW_EXPORT, ['site' => $siteService->getSiteId()]);
-        return new StreamedResponse($stream, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
         ]);
     }
 
