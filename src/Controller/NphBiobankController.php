@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Audit\Log;
 use App\Entity\NphAliquot;
 use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
@@ -16,13 +17,16 @@ use App\Form\OrderLookupIdType;
 use App\Form\ParticipantLookupBiobankIdType;
 use App\Form\ReviewTodayFilterType;
 use App\Helper\NphDietPeriodStatus;
+use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantReviewService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\Nph\NphProgramSummaryService;
+use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -442,6 +446,14 @@ class NphBiobankController extends BaseController
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
             'allowResubmit' => $isFormDisabled && $sample->getModifyType() !== NphSample::UNLOCK
         ]);
+    }
+
+    #[Route(path: '/review/export/log', name: 'nph_biobank_review_export_log')]
+    public function exportAction(Request $request, LoggerService $loggerService, SiteService $siteService): ?Response
+    {
+        $exportType = $request->get('exportType');
+        $loggerService->log(Log::NPH_BIOBANK_DAILY_REVIEW_EXPORT, ['site' => $siteService->getSiteId(), 'exportType' => $exportType]);
+        return new JsonResponse(['success' => true]);
     }
 
     private function getDateRangeFilterForm(Request $request): array
