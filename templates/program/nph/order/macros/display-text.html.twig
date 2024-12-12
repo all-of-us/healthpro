@@ -49,14 +49,14 @@
     <span><span class="badge rounded-1 {{ labelClass }}">{{ status }}</span></span>
 {% endmacro %}
 
-{% macro displayDateAndTimezone(time, timezoneId) %}
+{% macro displayDateAndTimezone(time, timezoneId, displayIcon = true) %}
     {% if time %}
         {% if timezoneId %}
             {{ time|date('n/j/Y g:ia T', userTimezones[timezoneId]) }}
         {% else %}
             {{ time|date('n/j/Y g:ia', app.user.timezone) }}
         {% endif %}
-    {% else %}
+    {% elseif displayIcon %}
         <i class="fa fa-times text-danger" aria-hidden="true"></i>
     {% endif %}
 {% endmacro %}
@@ -78,7 +78,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro displayBiobankSampleStatus(nphSample) %}
+{% macro displayBiobankSampleStatus(nphSample, downtimeGenerated = null) %}
     {% set type = nphSample.modifyType %}
     {% set status = '' %}
     {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
@@ -94,7 +94,7 @@
     {% elseif nphSample.createdTs %}
         {% set status = 'Created' %}
     {% endif %}
-    {{ status }}
+    {{ status }} {% if downtimeGenerated %} (Downtime) {% endif %}
 {% endmacro %}
 
 {% macro displayModuleConsents(programSummaryAndOrderInfo, participant) %}

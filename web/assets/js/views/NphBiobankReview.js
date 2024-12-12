@@ -14,18 +14,22 @@ $(document).ready(function () {
                 filename: `${exportTableType}_${currentDate}`,
                 exportOptions: {
                     modifier: {
-                        search: "none" // This ensures that all rows, including those hidden by search, are included in the export
+                        search: "none",
+                        order: "applied"
                     },
                     columns: ":visible",
                     format: {
-                        // body: function (data, row, column, node) {
-                        //     // Remove leading/trailing spaces and replace inner multiple spaces with a single space for all data
-                        //     return data.trim();
-                        // },
+                        body: function (data, row, column, node) {
+                            let dataRowValue = $(node).data("row");
+                            if (dataRowValue !== undefined && dataRowValue !== null) {
+                                return String(dataRowValue).replace(/\s+/g, ' ').trim();
+                            }
+                            return data.replace(/\s+/g, ' ').trim();
+                        },
                         header: function (data, column, node) {
                             // Remove badge or other HTML elements inside the header for export
                             let modifiedHeader = $(node).data("header") || data;
-                            return modifiedHeader.trim();
+                            return modifiedHeader.replace(/\s+/g, ' ').trim();
                         }
                     }
                 },
@@ -37,7 +41,15 @@ $(document).ready(function () {
     reviewTable.button(".buttons-csv").nodes().hide();
 
     $("#review_export_all").on("click", function () {
-        reviewTable.button(".buttons-csv").trigger(); // Trigger CSV export manually
+        new PmiConfirmModal({
+            title: "Attention",
+            msg: 'The file you are about to download contains information that is sensitive and confidential. By clicking "accept" you agree not to distribute either the file or its contents, and to adhere to the <em>All of Us</em> Privacy and Trust Principles. A record of your acceptance will be stored at the Data and Research Center.',
+            isHTML: true,
+            onTrue: function () {
+                reviewTable.button(".buttons-csv").trigger();
+            },
+            btnTextTrue: "Accept"
+        });
     });
 
     const dateTypes = ["created_ts", "collected_ts", "finalized_ts"];
@@ -50,25 +62,11 @@ $(document).ready(function () {
 
     const checkCellData = (cells) =>
         cells.map((cell) => {
-            // Extract the text from <label> elements if they exist
-            const labelTexts = Array.from(cell.querySelectorAll("label"))
-                .map((label) => label.textContent.trim())
-                .join(" ");
-
-            // Get the cell's main text content (excluding <label> elements)
-            const clonedCell = cell.cloneNode(true);
-            clonedCell.querySelectorAll("label").forEach((label) => label.remove());
-            let cellContent = clonedCell.textContent.trim();
-
-            // Combine cell content with label text
-            if (labelTexts) {
-                cellContent = `${cellContent} ${labelTexts}`.trim();
+            const dataRowValue = cell.getAttribute("data-row");
+            if (dataRowValue !== null) {
+                return dataRowValue.replace(/\s+/g, ' ').trim();
             }
-
-            if (cell.getAttribute("data-order-id")) {
-                cellContent = cell.getAttribute("data-order-id");
-            }
-            return cellContent;
+            return cell.textContent.replace(/\s+/g, ' ').trim();
         });
 
     const generateCSV = (exportType) => {

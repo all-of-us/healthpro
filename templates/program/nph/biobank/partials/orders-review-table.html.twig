@@ -38,18 +38,18 @@
             <td>{{ sample.module }}</td>
             <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
             <td>{{ sample.timepoint }}</td>
-            <td data-order-id="{{ sample.orderId }}">
+            <td data-row="{{ sample.orderId }}">
                 <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
             </td>
             <td>{{ sample.sampleCode }}</td>
             <td>{{ sample.sampleId }}</td>
-            <td data-order="{{ sample.createdTs|date('Y-m-d H:i:s') }}"  {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
-            <td data-order="{{ sample.collectedTs|date('Y-m-d H:i:s') }}" {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
-            <td data-order="{{ sample.finalizedTs|date('Y-m-d H:i:s') }}" {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
+            <td data-row="{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId, false) }}" data-order="{{ sample.createdTs ? sample.createdTs|date('Y-m-d H:i:s') : null }}"  {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
+            <td data-row="{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId, false) }}" data-order="{{ sample.collectedTs ? sample.collectedTs|date('Y-m-d H:i:s') : null }}" {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
+            <td data-row="{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId, false) }}" data-order="{{ sample.finalizedTs ? sample.finalizedTs|date('Y-m-d H:i:s') : null }}" {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
             {% if modifiedOrdersView is defined %}
-                <td>{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
+                <td data-row="{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId, false) }}">{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
             {% endif %}
-            <td>
+            <td data-row="{{ macros.displayBiobankSampleStatus(sample, sample.DowntimeGenerated) }}">
                 {{ macros.displayBiobankSampleStatus(sample) }}
                 {% if sample.DowntimeGenerated %}
                     <label class="label label-primary">Downtime</label>

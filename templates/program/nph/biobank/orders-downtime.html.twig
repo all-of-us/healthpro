@@ -53,21 +53,21 @@
                 <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
                 <td>{{ sample.biobankId }}</td>
                 <td>{{ sample.email }}</td>
-                <td data-order="{{ sample.downtimeGeneratedTs ? sample.downtimeGeneratedTs|date('Y-m-d H:i:s') : null }}" >
+                <td data-row="{{ sample.downtimeGeneratedTs ? sample.downtimeGeneratedTs|date('Y-m-d H:i:s') : null }}" >
                     {{ macros.displayDateAndTimezone(sample.downtimeGeneratedTs, sample.createdTimezoneId) }}
                 </td>
-                <td data-order="{{ sample.createdTs ? sample.createdTs|date('Y-m-d H:i:s') : null }}" >
+                <td data-row="{{ sample.createdTs ? sample.createdTs|date('Y-m-d H:i:s') : null }}" >
                     {{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}
                 </td>
                 <td>{{ sample.module }}</td>
                 <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
                 <td>{{ sample.timepoint }}</td>
-                <td data-order-id="{{ sample.orderId }}">
+                <td data-row="{{ sample.orderId }}">
                     <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
                 </td>
                 <td>{{ sample.sampleCode }}</td>
                 <td>{{ sample.sampleId }}</td>
-                <td>{{ macros.displayBiobankSampleStatus(sample) }} <label class="label label-primary">Downtime</label></td>
+                <td data-row="{{ macros.displayBiobankSampleStatus(sample, true) }}">{{ macros.displayBiobankSampleStatus(sample) }} <label class="label label-primary">Downtime</label></td>
             </tr>
         {% endfor %}
         </tbody>

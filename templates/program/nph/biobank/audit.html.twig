@@ -59,10 +59,20 @@
                 {% else %}
                     Diet Period left incomplete and started next diet period.
                 {% endif %}</td>
-                <td data-order="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
+                <td data-row="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
                     {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
                 </td>
-                <td>{{ sample.IncompleteSamples }} Samples Incomplete
+                <td data-row="{{ sample.IncompleteSamples }} Samples Incomplete
+                    {% if sample.status is not defined %}
+                        (Bypassed)
+                    {% elseif sample.status == 0 and sample.previousStatus == 1 %}
+                        (Corrected)
+                    {% elseif sample.IncompleteSamples > 0 %}
+                        (Bypassed)
+                    {% else %}
+                        (Corrected)
+                    {% endif %}">
+                    {{ sample.IncompleteSamples }} Samples Incomplete
                     {% if sample.status is not defined %}
                         <label class="label label-danger">Bypassed</label>
                     {% elseif sample.status == 0 and sample.previousStatus == 1 %}
