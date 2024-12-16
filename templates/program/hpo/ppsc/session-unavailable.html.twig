@@ -1,0 +1,18 @@
+{% set bootstrapVersion = 5 %}
+{% extends 'program/hpo/ppsc/base.html.twig' %}
+{% block title %}Session Not Supported - {% endblock %}
+{% block bodycontainer %}container-fluid px-4{% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card border-danger-subtle mb-4">
+                <div class="card-header bg-danger-subtle">
+                    <h6 class="text-danger"><i class="fa fa-times-circle" aria-hidden="true"></i> Sessions Error</h6>
+                </div>
+                <div class="card-body">
+                    Unable to retrieve the request ID from the session.
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

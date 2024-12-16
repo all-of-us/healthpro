@@ -78,6 +78,10 @@ class RequestListener
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
         }
+
+        if ($this->request->attributes->get('_route') === 'login_openid_callback' && $sessionCheckResponse = $this->checkRequestIdInSession()) {
+            $event->setResponse($sessionCheckResponse);
+        }
     }
 
     public function onKernelFinishRequest()
@@ -220,5 +224,13 @@ class RequestListener
             $this->request && !preg_match('/^\/(login|_wdt)($|\/).*/', $this->request->getPathInfo()) &&
             !$this->isUpkeepRoute() &&
             !$this->isStreamingResponseRoute() && $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY');
+    }
+
+    private function checkRequestIdInSession()
+    {
+        $session = $this->requestStack->getSession();
+        if (!$session->has('ppscRequestId')) {
+            return new RedirectResponse('/ppsc/session-unavailable');
+        }
     }
 }
