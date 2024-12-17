@@ -23,8 +23,9 @@ class NoticeController extends BaseController
     #[Route(path: '/nph/admin/notices', name: 'nph_admin_notices')]
     public function index(Request $request, NoticeRepository $noticeRepository)
     {
-        $routePrefix = $request->attributes->get('_route') === 'nph_admin_notice' ? 'nph_' : '';
-        $notices = $noticeRepository->findBy([], ['id' => 'asc']);
+        $routePrefix = $request->attributes->get('_route') === 'nph_admin_notices' ? Notice::NPH_ROUTE_PREFIX : '';
+        $type = $routePrefix === Notice::NPH_ROUTE_PREFIX ? Notice::NPH_TYPE : Notice::AOU_TYPE;
+        $notices = $noticeRepository->findBy(['type' => $type], ['id' => 'asc']);
         return $this->render('notice/index.html.twig', [
             'notices' => $notices,
             'routePrefix' => $routePrefix
@@ -35,7 +36,7 @@ class NoticeController extends BaseController
     #[Route(path: '/nph/admin/notices/notice/{id}', name: 'nph_admin_notice')]
     public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id = null)
     {
-        $routePrefix = $request->attributes->get('_route') === 'nph_admin_notice' ? 'nph_' : '';
+        $routePrefix = $request->attributes->get('_route') === 'nph_admin_notice' ? Notice::NPH_ROUTE_PREFIX : '';
         if ($id) {
             $notice = $noticeRepository->find($id);
             if (!$notice) {
@@ -44,6 +45,8 @@ class NoticeController extends BaseController
         } else {
             $notice = new Notice();
             $notice->setStatus(true);
+            $type = $routePrefix === Notice::NPH_ROUTE_PREFIX ? Notice::NPH_TYPE : Notice::AOU_TYPE;
+            $notice->setType($type);
         }
 
         $form = $this->createForm(NoticeType::class, $notice, ['timezone' => $this->getSecurityUser()->getTimezone()]);
