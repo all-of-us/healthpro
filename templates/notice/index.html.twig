@@ -2,22 +2,22 @@
 {% block title %}Page Notices - {% endblock %}
 {% block body %}
     <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('admin_home') }}">Admin</a></li>
+        <li><a href="{{ path(routePrefix ~ 'home') }}">Home</a></li>
+        <li><a href="{{ path(routePrefix ~ 'admin_home') }}">Admin</a></li>
         <li class="active">Page Notices</li>
     </ol>
     <div class="page-header">
         <h2><i class="fa fa-info-circle" aria-hidden="true"></i> Page Notices</h2>
     </div>
     <p>
-        <a href="{{ path('admin_notice') }}" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Add Notice</a>
+        <a href="{{ path(routePrefix ~ 'admin_notice') }}" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Add Notice</a>
     </p>
     <table class="table table-striped table-hover dataTable" data-table-order="asc">
         <thead><tr><th>URL Pattern</th><th>Message</th><th>Take Down?</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
         <tbody>
         {% for notice in notices %}
             <tr>
-                <td><a href="{{ path('admin_notice', { id: notice.id }) }}">{{ notice.url }}</a></td>
+                <td><a href="{{ path(routePrefix ~ 'admin_notice', { id: notice.id }) }}">{{ notice.url }}</a></td>
                 <td>{{ notice.message|length > 100 ? notice.message|slice(0, 100) ~ '...' : notice.message  }}</td>
                 <td>{{ notice.fullPage ? 'Yes' : 'No' }}</td>
                 <td>{{ notice.startTs ? notice.startTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
