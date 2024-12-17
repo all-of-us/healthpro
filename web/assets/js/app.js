@@ -21,6 +21,11 @@ require("./bootstrap-session-timeout.js");
 require("corejs-typeahead");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
 
+// Include JSZip (needed for CSV export)
+require("jszip/dist/jszip.js");
+// Include the required file for exporting to CSV
+require("datatables.net-buttons/js/buttons.html5.js");
+
 // Most views are separate webpack entries except for:
 // Modals is needed on every page
 require("./views/Modals.js");

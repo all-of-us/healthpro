@@ -19,17 +19,28 @@
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
-    <table class="table table-bordered table-small" data-default-sort-column="6">
+    {% if samples is not empty %}
+        <div class="text-right">
+            <button data-export-type="DietPeriodAudit" class="btn btn-xs btn-default" id="review_export">
+                <i class="fa fa-download" aria-hidden="true"></i> Export
+            </button>
+            <button class="btn btn-xs btn-default" id="review_export_all">
+                <i class="fa fa-download" aria-hidden="true"></i> Export All
+            </button>
+        </div>
+        <br>
+    {% endif %}
+    <table class="table table-bordered table-small" data-default-sort-column="6" data-export-table-type="DietPeriodAudit">
         <thead>
         <tr>
-            <th>Site</th>
-            <th>Biobank ID</th>
-            <th>User</th>
-            <th>Module Impacted</th>
-            <th>Diet Period Impacted</th>
-            <th>Bypass Type</th>
-            <th>Bypass Time</th>
-            <th>Status</th>
+            <th data-header="Site">Site</th>
+            <th data-header="Biobank ID">Biobank ID</th>
+            <th data-header="User">User</th>
+            <th data-header="Module Impacted">Module Impacted</th>
+            <th data-header="Diet Period Impacted">Diet Period Impacted</th>
+            <th data-header="Bypass Type">Bypass Type</th>
+            <th data-header="Bypass Time">Bypass Time</th>
+            <th data-header="Status">Status</th>
         </tr>
         </thead>
         <tbody>
@@ -48,10 +59,20 @@
                 {% else %}
                     Diet Period left incomplete and started next diet period.
                 {% endif %}</td>
-                <td data-order="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
+                <td data-row="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
                     {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
                 </td>
-                <td>{{ sample.IncompleteSamples }} Samples Incomplete
+                <td data-row="{{ sample.IncompleteSamples }} Samples Incomplete
+                    {% if sample.status is not defined %}
+                        (Bypassed)
+                    {% elseif sample.status == 0 and sample.previousStatus == 1 %}
+                        (Corrected)
+                    {% elseif sample.IncompleteSamples > 0 %}
+                        (Bypassed)
+                    {% else %}
+                        (Corrected)
+                    {% endif %}">
+                    {{ sample.IncompleteSamples }} Samples Incomplete
                     {% if sample.status is not defined %}
                         <label class="label label-danger">Bypassed</label>
                     {% elseif sample.status == 0 and sample.previousStatus == 1 %}
