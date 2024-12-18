@@ -47,10 +47,8 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request): bool
     {
-        if ($this->params->has('enable_salesforce_login') &&
-            $this->params->get('enable_salesforce_login') &&
-            $request->attributes->get('_route') === 'login_openid_callback' &&
-            $this->requestStack->getSession()->has('ppscRequestId')) {
+        if ($this->params->has('enable_salesforce_login') && $this->params->get('enable_salesforce_login') &&
+            $request->attributes->get('_route') === 'login_openid_callback') {
             return true;
         }
         return false;
@@ -58,6 +56,11 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
 
     public function getCredentials(Request $request): ?string
     {
+        // Throw exception if request id is not present in session
+        if (empty($this->requestStack->getSession()->get('ppscRequestId'))) {
+            $this->authFailureReason = 'sessions';
+            throw new AuthenticationException();
+        }
         // Return the authorization code obtained from the OIDC provider's callback
         return $request->query->get('code');
     }
@@ -98,7 +101,9 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $template = 'error-auth-salesforce.html.twig';
-        if ($this->authFailureReason === 'groups') {
+        if ($this->authFailureReason === 'sessions') {
+            $template = 'error-auth-salesforce-session.html.twig';
+        } elseif ($this->authFailureReason === 'groups') {
             $template = 'error-auth-salesforce-groups.html.twig';
         }
         $response = new Response($this->twig->render($template, [

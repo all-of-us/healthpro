@@ -56,10 +56,4 @@ class HpoPpscController extends BaseController
     {
         return $this->render('/program/hpo/ppsc/invalid-site.html.twig');
     }
-
-    #[Route(path: '/ppsc/session-unavailable', name: 'ppsc_session_unavailable')]
-    public function ppscSessionUnavailable(): Response
-    {
-        return $this->render('error-auth-salesforce-session.html.twig');
-    }
 }
