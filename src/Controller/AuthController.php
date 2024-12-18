@@ -90,6 +90,12 @@ class AuthController extends BaseController
         Request $request,
         SessionInterface $session
     ): Response {
+        if (empty($request->query->get('requestId'))) {
+            return $this->render('error-auth-salesforce-request-id.html.twig');
+        }
+        if (empty($request->query->get('page'))) {
+            return $this->render('error-auth-salesforce-landing-page.html.twig');
+        }
         $this->get('security.token_storage')->setToken(null);
         $session->invalidate();
         $session->set('ppscRequestId', $request->query->get('requestId'));
