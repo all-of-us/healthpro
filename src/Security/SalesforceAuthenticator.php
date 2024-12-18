@@ -47,8 +47,10 @@ class SalesforceAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request): bool
     {
-        if ($this->params->has('enable_salesforce_login') && $this->params->get('enable_salesforce_login') &&
-            $request->attributes->get('_route') === 'login_openid_callback') {
+        if ($this->params->has('enable_salesforce_login') &&
+            $this->params->get('enable_salesforce_login') &&
+            $request->attributes->get('_route') === 'login_openid_callback' &&
+            $this->requestStack->getSession()->has('ppscRequestId')) {
             return true;
         }
         return false;
