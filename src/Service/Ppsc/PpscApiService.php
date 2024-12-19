@@ -47,6 +47,9 @@ class PpscApiService
 
     public function getRequestDetailsById($requestId): \stdClass|null
     {
+        if (empty($requestId)) {
+            return null;
+        }
         try {
             $token = $this->getAccessToken();
             $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
@@ -55,7 +58,7 @@ class PpscApiService
             $requestDetailsData = json_decode($response->getBody()->getContents());
             return $requestDetailsData ?? null;
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->logException($e);
             return null;
         }
     }
@@ -86,7 +89,7 @@ class PpscApiService
                 ]);
                 $participant = json_decode($response->getBody()->getContents());
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logException($e);
                 return null;
             }
             if ($participant && $cacheEnabled) {
@@ -130,7 +133,7 @@ class PpscApiService
             ]);
             return json_decode($response->getBody()->getContents(), true);
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->logException($e);
             return null;
         }
     }
@@ -158,7 +161,7 @@ class PpscApiService
             }
             return null;
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->logException($e);
             return null;
         }
     }
