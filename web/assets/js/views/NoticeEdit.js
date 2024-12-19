@@ -6,7 +6,7 @@ $(document).ready(function () {
         "Biobank Order Pages": "/ppsc/participant/*/order/*",
         "Physical Measurements": "/ppsc/participant/*/measurements*"
     };
-    if ($('form[name="notice"]').data('route') === 'nph_') {
+    if ($('form[name="notice"]').data("route") === "nph_") {
         urlOptions = {
             All: "/*",
             "Home Page": "/nph",
