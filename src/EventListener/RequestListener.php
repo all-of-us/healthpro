@@ -180,7 +180,7 @@ class RequestListener
     private function ignoreRoutes(): bool
     {
         return preg_match(
-            '/^\/(_profiler|_wdt|cron|salesforce|ppsc\/invalid-site|admin|nph\/admin|read|help|settings|problem|biobank|review|workqueue|site|login|site_select|program|access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
+            '/^\/(_profiler|_wdt|cron|salesforce|ppsc\/invalid-site|admin|nph\/admin|read|nph\/help|settings|problem|biobank|review|workqueue|site|login|site_select|program|nph\/access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
             $this->request->getPathInfo()
         );
     }

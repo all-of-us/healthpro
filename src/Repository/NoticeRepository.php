@@ -47,7 +47,8 @@ class NoticeRepository extends ServiceEntityRepository
     private static function patternToRegex($pattern)
     {
         $specialCases = [
-            '/ppsc/participant/p' => '/^\/ppsc\/participant\/[^\/]+$/i'
+            '/ppsc/participant/p' => '/^\/ppsc\/participant\/[^\/]+$/i',
+            '/nph/participant/p' => '/^\/nph\/participant\/[^\/]+$/i'
         ];
 
         // if pattern matches a special case, return the corresponding regex

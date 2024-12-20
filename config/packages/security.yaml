@@ -35,7 +35,7 @@ security:
         - { path: ^/workqueue($|\/).*, roles: [ROLE_USER, ROLE_AWARDEE] }
         - { path: ^/biobank\/\w+\/(order|quanum-order)\/\w+$, roles: [ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
         - { path: ^/biobank($|\/), roles: [ROLE_BIOBANK, ROLE_SCRIPPS] }
-        - { path: ^/access/manage($|\/).*, roles: [ROLE_MANAGE_USERS, ROLE_MANAGE_USERS_NPH] }
+        - { path: ^/nph/access/manage($|\/).*, roles: [ROLE_MANAGE_USERS_NPH] }
         - { path: ^/read($|\/).*, roles: ROLE_READ_ONLY }
         - { path: ^/(notification|notifications)($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
         - { path: ^/.*\S$, roles: ROLE_USER }

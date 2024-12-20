@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/access/manage')]
+#[Route(path: '/nph/access/manage')]
 class AccessManagementController extends BaseController
 {
     public const MEMBER_DOMAIN = '@pmi-ops.org';
