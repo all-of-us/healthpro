@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/help')]
+#[Route(path: '/nph/help')]
 class HelpController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -17,19 +17,19 @@ class HelpController extends BaseController
         parent::__construct($em);
     }
 
-    #[Route(path: '/nph', name: 'help_nph')]
+    #[Route(path: '/', name: 'help_nph')]
     public function nphAction(HelpService $helpService): Response
     {
         return $this->render('help/nph/index.html.twig');
     }
 
-    #[Route(path: '/nph/faq', name: 'help_nph_faq')]
+    #[Route(path: '/faq', name: 'help_nph_faq')]
     public function nphFaqAction(HelpService $helpService): Response
     {
         return $this->render('help/nph/faq.html.twig', ['faqs' => $helpService::$faqs]);
     }
 
-    #[Route(path: '/nph/sop/{id}/{language}', name: 'help_nph_sopView')]
+    #[Route(path: '/sop/{id}/{language}', name: 'help_nph_sopView')]
     public function nphSopViewAction($id, $language, HelpService $helpService): Response
     {
         $document = $helpService->getDocumentInfo($id, 'nph');
