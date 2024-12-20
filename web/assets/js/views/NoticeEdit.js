@@ -8,7 +8,7 @@ $(document).ready(function () {
     };
     if ($('form[name="notice"]').data("route") === "nph_") {
         urlOptions = {
-            All: "/*",
+            All: "/nph/*",
             "Home Page": "/nph",
             "Biospecimen Lookup": "/nph/orders",
             "Participant Summary": "/nph/participant/p",
