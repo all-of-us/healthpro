@@ -407,7 +407,7 @@ class NphBiobankController extends BaseController
 
         //Biobank Resubmit
         $notesData[$sampleCode . 'Notes'] = $sampleData[$sampleCode . 'Notes'] ?? null;
-        $sampleResubmitForm = $this->createForm(NphSampleResubmitType::class, $notesData, ['sample' => $sampleCode]);
+        $sampleResubmitForm = $this->createForm(NphSampleResubmitType::class, $notesData, ['sample' => $sampleCode, 'disabled' => !$sample->getRdrId()]);
         $sampleResubmitForm->handleRequest($request);
         if ($sampleResubmitForm->isSubmitted()) {
             $formData = $sampleResubmitForm->getData();
