@@ -2,19 +2,15 @@
 {% extends 'render-base.html.twig' %}
 {% block title %}Help - {% endblock %}
 {% block body %}
-    <nav class="my-5" aria-label="breadcrumb">
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
             <li class="breadcrumb-item active">Help</li>
         </ol>
     </nav>
-    <div class="page-header pb-1 mt-5 mb-4 border-bottom">
+    <div class="page-header pb-1 mt-2 mb-4 border-bottom">
         <h2><i class="fa fa-question-circle" aria-hidden="true"></i> Help and Training Resources</h2>
     </div>
-    <div class="page-header border-bottom">
-        {% include 'help/nph/helptext.html.twig' %}
-    </div>
-    <br>
     <div class="float-end">
         <a href="{{ nph_feedback_url }}" target="_blank" class="btn btn-sm btn-info">
             <i class="fa fa-comment-dots" aria-hidden="true"></i> Submit Feedback
@@ -23,7 +19,7 @@
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Report a Technical Issue
         </a>
     </div>
-    <p class="lead">What would you like to do today?</p>
+    <p class="lead text-muted">What would you like to do today?</p>
     <div class="row home-menu">
         <div class="col-sm-6 col-md-4">
             <a href="{{ nphResources.program_mop }}" target="_blank" class="btn btn-lg btn-block border w-100 text-dark">
@@ -50,6 +46,39 @@
             <a href="{{ nphResources.release_notes }}" target="_blank" class="btn btn-lg btn-block border w-100 text-dark">
                 <i class="fa fa-sticky-note" aria-hidden="true"></i> HealthPro Release Notes
             </a>
+        </div>
+    </div>
+    <div class="row">
+        <p class="lead text-muted">Contact</p>
+        <div class="col-sm-4 border-end">
+            <h6>NPH Helpdesk</h6>
+            <a href="mailto:NPH-Helpdesk@nutritionforprecisionhealth.org">NPH-Helpdesk@nutritionforprecisionhealth.org</a>
+            <ul>
+                <li>NPH REDCap related technical issues</li>
+                <li>Files incorrectly uploaded into NPH REDCap</li>
+                <li>Upstream syncing issues, such as consent not updating or participant not in system</li>
+                <li>Systems or data collection not related to HPRO biospecimen collection, such as resetting VAS survey answers</li>
+            </ul>
+        </div>
+        <div class="col-sm-4 border-end">
+            <h6>DRC Support (Technical Issues)</h6>
+            <a href="https://redcap.pmi-ops.org/surveys/?s=ND8RJL78X4YWTKRX" target="_blank">HealthPro Technical Issues Reporting Tool</a>
+            <ul>
+                <li>Error messages within the HealthPro application</li>
+                <li>HealthPro page not displaying as expected</li>
+                <li>Data entry issues occurring in the HealthPro application</li>
+                <li>HealthPro system is not loading, not displaying data, or is down</li>
+            </ul>
+        </div>
+        <div class="col-sm-4">
+            <h6>DRC Support (Access Issues)</h6>
+            <a href="mailto:drcsupport@vumc.org">drcsupport@vumc.org</a>
+            <p>The HealthPro administrator is the user's point of contact for all access issues and should escalate unresolved issues to DRC Support.</p>
+            <ul>
+                <li>Access denied errors when attempting to log into the HealthPro application</li>
+                <li>HealthPro user credential reactivation or user reinstatement</li>
+                <li>HealthPro admin staffing changes</li>
+            </ul>
         </div>
     </div>
 {% endblock %}
