@@ -6,7 +6,6 @@ $(document).ready(function () {
     let reviewTable = tableSelector.DataTable({
         order: [[defaultSortColumn, "desc"]],
         pageLength: 25,
-        dom: "lBfrtip",
         buttons: [
             {
                 extend: "csv",
@@ -51,10 +50,14 @@ $(document).ready(function () {
     const checkCellData = (cells) =>
         cells.map((cell) => {
             const dataRowValue = cell.getAttribute("data-row");
-            if (dataRowValue !== null) {
-                return dataRowValue.replace(/\s+/g, " ").trim();
+            let cellData = dataRowValue !== null
+                ? dataRowValue.replace(/\s+/g, " ").trim()
+                : cell.textContent.replace(/\s+/g, " ").trim();
+            // Escape commas and double quotes for CSV
+            if (cellData.includes(",") || cellData.includes('"')) {
+                cellData = `"${cellData.replace(/"/g, '""')}"`;
             }
-            return cell.textContent.replace(/\s+/g, " ").trim();
+            return cellData;
         });
 
     const generateCSV = (exportType) => {
