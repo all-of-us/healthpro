@@ -50,9 +50,10 @@ $(document).ready(function () {
     const checkCellData = (cells) =>
         cells.map((cell) => {
             const dataRowValue = cell.getAttribute("data-row");
-            let cellData = dataRowValue !== null
-                ? dataRowValue.replace(/\s+/g, " ").trim()
-                : cell.textContent.replace(/\s+/g, " ").trim();
+            let cellData =
+                dataRowValue !== null
+                    ? dataRowValue.replace(/\s+/g, " ").trim()
+                    : cell.textContent.replace(/\s+/g, " ").trim();
             // Escape commas and double quotes for CSV
             if (cellData.includes(",") || cellData.includes('"')) {
                 cellData = `"${cellData.replace(/"/g, '""')}"`;
