@@ -543,6 +543,7 @@ class NphOrderService
         $order = $sample->getNphOrder();
         $sampleData[$sampleCode . 'CollectedTs'] = $sample->getCollectedTs();
         $sampleData[$sampleCode . 'Notes'] = $sample->getFinalizedNotes();
+        $sampleData[$sampleCode . 'CollectedNotes'] = $sample->getCollectedNotes();
         if ($order->getOrderType() === NphOrder::TYPE_URINE || $order->getOrderType() === NphOrder::TYPE_24URINE) {
             if ($sample->getSampleMetaData()) {
                 $sampleMetadata = json_decode($sample->getSampleMetaData(), true);

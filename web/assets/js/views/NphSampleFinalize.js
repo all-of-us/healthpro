@@ -354,4 +354,56 @@ $(document).ready(function () {
     };
 
     $(".sample-finalize-form input").on("change", clearServerErrors);
+
+    const $notesTextarea = $(".collected-notes");
+    const $editButton = $("#collection_notes_edit");
+    const $saveButton = $("#collection_notes_save");
+    const $revertButton = $("#collection_notes_revert");
+    const sampleSelector = $('form[name="nph_sample_finalize"]');
+    const sampleId = sampleSelector.data("sample-id");
+    const csrfToken = $("#csrf_token_collected_notes").val();
+
+    // Store the original notes text
+    let originalNotes = $notesTextarea.val();
+
+    // Function to toggle edit mode
+    const toggleEditMode = (isEditing) => {
+        $notesTextarea.prop("disabled", !isEditing);
+        $editButton.toggle(!isEditing);
+        $saveButton.toggle(isEditing);
+        $revertButton.toggle(isEditing);
+    };
+
+    // Edit button functionality
+    $editButton.on("click", function () {
+        toggleEditMode(true);
+    });
+
+    // Save button functionality
+    $saveButton.on("click", function () {
+        const updatedNotes = $notesTextarea.val();
+        $.ajax({
+            url: "/nph/ajax/save/notes",
+            type: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken
+            },
+            data: { notes: updatedNotes, sampleId: sampleId },
+            success: function () {
+                originalNotes = updatedNotes;
+            },
+            error: function () {
+                alert("Failed to save notes. Please try again.");
+            },
+            complete: function () {
+                toggleEditMode(false);
+            }
+        });
+    });
+
+    // Revert button functionality
+    $revertButton.on("click", function () {
+        $notesTextarea.val(originalNotes);
+        toggleEditMode(false);
+    });
 });

@@ -271,6 +271,16 @@ class NphSampleFinalizeType extends NphOrderForm
             }
         }
 
+        $builder->add("{$sample}CollectedNotes", Type\TextareaType::class, [
+            'label' => 'Collection Notes',
+            'attr' => [
+                'class' => 'collected-notes',
+            ],
+            'required' => false,
+            'disabled' => true,
+            'constraints' => new Constraints\Type('string')
+        ]);
+
         // Placeholder field for displaying enter at least one aliquot message
         $builder->add('aliquotError', Type\CheckboxType::class, [
             'required' => false
