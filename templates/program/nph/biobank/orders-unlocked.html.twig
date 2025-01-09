@@ -4,7 +4,7 @@
 
 {% block body %}
     {% include 'program/nph/biobank/partials/review-page-heading.html.twig' %}
-    {% include 'program/nph/biobank/partials/orders-review-table.html.twig' %}
+    {% include 'program/nph/biobank/partials/orders-review-table.html.twig' with { exportType: 'UnlockedSamples' } %}
 {% endblock %}
 
 {% block pagejs %}

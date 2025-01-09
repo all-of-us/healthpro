@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: '/admin/notices')]
 class NoticeController extends BaseController
 {
     public function __construct(EntityManagerInterface $em)
@@ -20,18 +19,24 @@ class NoticeController extends BaseController
         parent::__construct($em);
     }
 
-    #[Route(path: '/', name: 'admin_notices')]
-    public function index(NoticeRepository $noticeRepository)
+    #[Route(path: '/admin/notices', name: 'admin_notices')]
+    #[Route(path: '/nph/admin/notices', name: 'nph_admin_notices')]
+    public function index(Request $request, NoticeRepository $noticeRepository)
     {
-        $notices = $noticeRepository->findBy([], ['id' => 'asc']);
+        $routePrefix = $request->attributes->get('_route') === 'nph_admin_notices' ? Notice::NPH_ROUTE_PREFIX : '';
+        $type = $routePrefix === Notice::NPH_ROUTE_PREFIX ? Notice::NPH_TYPE : Notice::AOU_TYPE;
+        $notices = $noticeRepository->findBy(['type' => $type], ['id' => 'asc']);
         return $this->render('notice/index.html.twig', [
             'notices' => $notices,
+            'routePrefix' => $routePrefix
         ]);
     }
 
-    #[Route(path: '/notice/{id}', name: 'admin_notice')]
+    #[Route(path: '/admin/notices/notice/{id}', name: 'admin_notice')]
+    #[Route(path: '/nph/admin/notices/notice/{id}', name: 'nph_admin_notice')]
     public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id = null)
     {
+        $routePrefix = $request->attributes->get('_route') === 'nph_admin_notice' ? Notice::NPH_ROUTE_PREFIX : '';
         if ($id) {
             $notice = $noticeRepository->find($id);
             if (!$notice) {
@@ -40,6 +45,8 @@ class NoticeController extends BaseController
         } else {
             $notice = new Notice();
             $notice->setStatus(true);
+            $type = $routePrefix === Notice::NPH_ROUTE_PREFIX ? Notice::NPH_TYPE : Notice::AOU_TYPE;
+            $notice->setType($type);
         }
 
         $form = $this->createForm(NoticeType::class, $notice, ['timezone' => $this->getSecurityUser()->getTimezone()]);
@@ -63,7 +70,7 @@ class NoticeController extends BaseController
                     $loggerService->log(Log::NOTICE_EDIT, $notice->getId());
                     $this->addFlash('success', 'Notice updated');
                 }
-                return $this->redirect($this->generateUrl('admin_notices'));
+                return $this->redirect($this->generateUrl($routePrefix . 'admin_notices'));
             }
             // Add a form-level error if there are none
             if (count($form->getErrors()) == 0) {
@@ -74,9 +81,10 @@ class NoticeController extends BaseController
         return $this->render('notice/edit.html.twig', [
             'notice' => $notice,
             'settings_return_url' => ($id === null)
-                ? $this->generateUrl('admin_notices')
-                : $this->generateUrl('admin_notice', ['id' => $id]),
-            'form' => $form->createView()
+                ? $this->generateUrl($routePrefix . 'admin_notices')
+                : $this->generateUrl($routePrefix . 'admin_notice', ['id' => $id]),
+            'form' => $form->createView(),
+            'routePrefix' => $routePrefix
         ]);
     }
 }

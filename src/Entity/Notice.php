@@ -8,6 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: 'App\Repository\NoticeRepository')]
 class Notice
 {
+    public const NPH_TYPE = 'nph';
+    public const AOU_TYPE = 'aou';
+    public const NPH_ROUTE_PREFIX = 'nph_';
+
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\GeneratedValue]
@@ -30,6 +34,9 @@ class Notice
 
     #[ORM\Column(name: 'status', type: 'boolean', nullable: false)]
     private $status = false;
+
+    #[ORM\Column(name: 'type', type: 'string', length: 50, nullable: true)]
+    private $type;
 
     public function getId(): ?int
     {
@@ -104,6 +111,18 @@ class Notice
     public function setStatus(bool $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
