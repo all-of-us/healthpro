@@ -368,7 +368,9 @@ $(document).ready(function () {
     const sampleId = sampleSelector.data("sample-id");
     const csrfToken = $("#csrf_token_collected_notes").val();
 
-    const $errorContainer = $("<div class='has-error' style='display: none; color: #a94442'>Please save or revert the collection notes</div>");
+    const $errorContainer = $(
+        "<div class='has-error' style='display: none; color: #a94442'>Please save or revert the collection notes</div>"
+    );
     $notesTextarea.after($errorContainer);
 
     // Store the original notes text
@@ -419,5 +421,9 @@ $(document).ready(function () {
     $revertButton.on("click", function () {
         $notesTextarea.val(originalNotes);
         toggleEditMode(false);
+    });
+
+    $("#collection_notes_help").on("click", function () {
+        $("#aliquot_collection_notes_modal").modal("show");
     });
 });
