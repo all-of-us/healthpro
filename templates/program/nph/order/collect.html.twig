@@ -46,7 +46,7 @@
                     {% if order.orderType == constant('TYPE_24URINE', order) %}
                         <th>Total Collection Volume</th>
                     {% endif %}
-                    <th>Notes</th>
+                    <th>Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help"></i></th>
                     <th>
                         {% if order.canCancel %}
                             <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
@@ -188,6 +188,7 @@
             {{ form_end(orderCollectForm) }}
         </div>
     </div>
+    {% include 'program/nph/order/partials/modals/collection-notes-help-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}

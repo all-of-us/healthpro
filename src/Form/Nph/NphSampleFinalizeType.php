@@ -272,7 +272,7 @@ class NphSampleFinalizeType extends NphOrderForm
         }
 
         $builder->add("{$sample}CollectedNotes", Type\TextareaType::class, [
-            'label' => 'Collection Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help"></i>',
+            'label' => 'Collection Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="aliquot_collection_notes_help"></i>',
             'attr' => [
                 'class' => 'collected-notes',
             ],

@@ -423,7 +423,7 @@ $(document).ready(function () {
         toggleEditMode(false);
     });
 
-    $("#collection_notes_help").on("click", function () {
+    $("#aliquot_collection_notes_help").on("click", function () {
         $("#aliquot_collection_notes_modal").modal("show");
     });
 });
