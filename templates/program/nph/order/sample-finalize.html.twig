@@ -402,15 +402,17 @@
                     <hr>
                     <div class="form-group">
                         <div class="pull-right">
-                            <button type="button" class="btn btn-warning btn-sm" id="collection_notes_edit">
-                                Edit
-                            </button>
-                            <button type="button" class="btn btn-success btn-sm" id="collection_notes_save" style="display: none">
-                                Save
-                            </button>
-                            <button type="button" class="btn btn-sm" id="collection_notes_revert" style="display: none">
-                                Revert
-                            </button>
+                            {% if not isFormDisabled %}
+                                <button type="button" class="btn btn-warning btn-sm" id="collection_notes_edit">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm" id="collection_notes_save" style="display: none">
+                                    Save
+                                </button>
+                                <button type="button" class="btn btn-sm" id="collection_notes_revert" style="display: none">
+                                    Revert
+                                </button>
+                            {% endif %}
                         </div>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token('save_notes') }}" id="csrf_token_collected_notes">
                         {{ form_label(sampleFinalizeForm[sampleCode ~ 'CollectedNotes']) }}
