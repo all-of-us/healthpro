@@ -1,6 +1,11 @@
 $(document).ready(function () {
     $("#sample_finalize_btn").on("click", function (e) {
         e.preventDefault();
+        if (isCollectedNotesEditing) {
+            $errorContainer.show();
+            $notesTextarea.parent().addClass("has-error");
+            return;
+        }
         if ($(".sample-finalize-form").parsley().validate()) {
             $("#confirmation_modal").modal("show");
         }
@@ -363,15 +368,24 @@ $(document).ready(function () {
     const sampleId = sampleSelector.data("sample-id");
     const csrfToken = $("#csrf_token_collected_notes").val();
 
+    const $errorContainer = $("<div class='has-error' style='display: none; color: #a94442'>Please save or revert the collection notes</div>");
+    $notesTextarea.after($errorContainer);
+
     // Store the original notes text
     let originalNotes = $notesTextarea.val();
+    let isCollectedNotesEditing = false;
 
     // Function to toggle edit mode
-    const toggleEditMode = (isEditing) => {
-        $notesTextarea.prop("disabled", !isEditing);
-        $editButton.toggle(!isEditing);
-        $saveButton.toggle(isEditing);
-        $revertButton.toggle(isEditing);
+    const toggleEditMode = (editing) => {
+        isCollectedNotesEditing = editing;
+        $notesTextarea.prop("disabled", !editing);
+        $editButton.toggle(!editing);
+        $saveButton.toggle(editing);
+        $revertButton.toggle(editing);
+        if (!editing) {
+            $errorContainer.hide();
+            $notesTextarea.parent().removeClass("has-error");
+        }
     };
 
     // Edit button functionality
