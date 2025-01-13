@@ -2,14 +2,14 @@
 {% extends 'base.html.twig' %}
 {% block title %}FAQs - {% endblock %}
 {% block body %}
-    <nav class="my-5" aria-label="breadcrumb">
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
             <li class="breadcrumb-item" aria-current="page"><a href="{{ path('help_nph') }}">Help</a></li>
             <li class="breadcrumb-item active">Technical FAQs</li>
         </ol>
     </nav>
-    <div class="page-header pb-1 mt-5 mb-4 border-bottom">
+    <div class="page-header pb-1 mt-2 mb-4 border-bottom">
         <h2><i class="fa fa-question-circle-o" aria-hidden="true"></i> Technical FAQs</h2>
     </div>
     <a href="{{ faqs.web_link }}" target="_blank" class="btn btn-primary">
