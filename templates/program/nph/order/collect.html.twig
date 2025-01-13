@@ -46,7 +46,7 @@
                     {% if order.orderType == constant('TYPE_24URINE', order) %}
                         <th>Total Collection Volume</th>
                     {% endif %}
-                    <th>Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help"></i></th>
+                    <th>Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help" role="button"></i></th>
                     <th>
                         {% if order.canCancel %}
                             <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,

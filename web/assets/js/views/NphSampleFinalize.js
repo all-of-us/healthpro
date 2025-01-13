@@ -290,6 +290,8 @@ $(document).ready(function () {
 
     $(".aliquot-volume").trigger("keyup");
 
+    PMI.hasChanges = false;
+
     $(".sample-cancel-checkbox").on("change", function () {
         handleSampleCancel(this);
     });
@@ -369,7 +371,7 @@ $(document).ready(function () {
     const csrfToken = $("#csrf_token_collected_notes").val();
 
     const $errorContainer = $(
-        "<div class='has-error' style='display: none; color: #a94442'>Please save or revert the collection notes</div>"
+        "<div class='text-danger' style='display: none;'>Please save or revert the collection notes</div>"
     );
     $notesTextarea.after($errorContainer);
 
