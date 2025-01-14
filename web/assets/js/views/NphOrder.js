@@ -106,4 +106,8 @@ $(document).ready(function () {
     $(document).on("click", "#confirm_btn", function () {
         $("#dlw_participantWeight").parsley().validate();
     });
+
+    $("#collection_notes_help").on("click", function () {
+        $("#collection_notes_modal").modal("show");
+    });
 });

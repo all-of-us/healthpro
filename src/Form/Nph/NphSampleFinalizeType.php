@@ -271,6 +271,17 @@ class NphSampleFinalizeType extends NphOrderForm
             }
         }
 
+        $builder->add("{$sample}CollectedNotes", Type\TextareaType::class, [
+            'label' => 'Collection Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="aliquot_collection_notes_help" role="button"></i>',
+            'attr' => [
+                'class' => 'collected-notes',
+            ],
+            'required' => false,
+            'disabled' => true,
+            'constraints' => new Constraints\Type('string'),
+            'label_html' => true
+        ]);
+
         // Placeholder field for displaying enter at least one aliquot message
         $builder->add('aliquotError', Type\CheckboxType::class, [
             'required' => false

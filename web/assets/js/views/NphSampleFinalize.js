@@ -1,6 +1,11 @@
 $(document).ready(function () {
     $("#sample_finalize_btn").on("click", function (e) {
         e.preventDefault();
+        if (isCollectedNotesEditing) {
+            $errorContainer.show();
+            $notesTextarea.parent().addClass("has-error");
+            return;
+        }
         if ($(".sample-finalize-form").parsley().validate()) {
             $("#confirmation_modal").modal("show");
         }
@@ -285,6 +290,8 @@ $(document).ready(function () {
 
     $(".aliquot-volume").trigger("keyup");
 
+    PMI.hasChanges = false;
+
     $(".sample-cancel-checkbox").on("change", function () {
         handleSampleCancel(this);
     });
@@ -354,4 +361,71 @@ $(document).ready(function () {
     };
 
     $(".sample-finalize-form input").on("change", clearServerErrors);
+
+    const $notesTextarea = $(".collected-notes");
+    const $editButton = $("#collection_notes_edit");
+    const $saveButton = $("#collection_notes_save");
+    const $revertButton = $("#collection_notes_revert");
+    const sampleSelector = $('form[name="nph_sample_finalize"]');
+    const sampleId = sampleSelector.data("sample-id");
+    const csrfToken = $("#csrf_token_collected_notes").val();
+
+    const $errorContainer = $(
+        "<div class='text-danger' style='display: none;'>Please save or revert the collection notes</div>"
+    );
+    $notesTextarea.after($errorContainer);
+
+    // Store the original notes text
+    let originalNotes = $notesTextarea.val();
+    let isCollectedNotesEditing = false;
+
+    // Function to toggle edit mode
+    const toggleEditMode = (editing) => {
+        isCollectedNotesEditing = editing;
+        $notesTextarea.prop("disabled", !editing);
+        $editButton.toggle(!editing);
+        $saveButton.toggle(editing);
+        $revertButton.toggle(editing);
+        if (!editing) {
+            $errorContainer.hide();
+            $notesTextarea.parent().removeClass("has-error");
+        }
+    };
+
+    // Edit button functionality
+    $editButton.on("click", function () {
+        toggleEditMode(true);
+    });
+
+    // Save button functionality
+    $saveButton.on("click", function () {
+        const updatedNotes = $notesTextarea.val();
+        $.ajax({
+            url: "/nph/ajax/save/notes",
+            type: "POST",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken
+            },
+            data: { notes: updatedNotes, sampleId: sampleId },
+            success: function () {
+                originalNotes = updatedNotes;
+            },
+            error: function () {
+                alert("Failed to save notes. Please try again.");
+            },
+            complete: function () {
+                toggleEditMode(false);
+            }
+        });
+    });
+
+    // Revert button functionality
+    $revertButton.on("click", function () {
+        $notesTextarea.val(originalNotes);
+        toggleEditMode(false);
+    });
+
+    $("#aliquot_collection_notes_help").on("click", function () {
+        $("#aliquot_collection_notes_modal").modal("show");
+    });
 });

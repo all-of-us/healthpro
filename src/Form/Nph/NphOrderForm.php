@@ -87,7 +87,7 @@ class NphOrderForm extends AbstractType
             ]);
         }
         $builder->add("{$sample}Notes", Type\TextareaType::class, [
-            'label' => 'Notes',
+            'label' => $formType === self::FORM_FINALIZE_TYPE ? 'Finalization Notes' : 'Notes',
             'required' => false,
             'constraints' => new Constraints\Type('string'),
             'disabled' => $disabled

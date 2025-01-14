@@ -402,6 +402,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $finalizedFormData = [
             "{$sampleCode}CollectedTs" => $collectedTs,
             "{$sampleCode}Notes" => 'Test',
+            "{$sampleCode}CollectedNotes" => null,
         ];
         if ($aliquots) {
             foreach ($aliquots as $aliquotCode => $aliquot) {
