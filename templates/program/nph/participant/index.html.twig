@@ -190,6 +190,8 @@
                                                             </div>
                                                         {% endif %}
                                                     </div>
+                                                    <button data-href="{{ path('quickView', { participantId: participant.id, module: moduleNumber }) }}" class="btn btn-primary btn-xs float-end quick-view-btn">Quick View</button>
+                                                    <br>
                                                     <hr>
                                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
                                                     {% if dietPeriodNumber == VisitCode|slice(0,7) %}
@@ -369,6 +371,12 @@
     </div>
     {% include 'partials/modals/participant-barcode.html.twig' %}
     {% include 'program/nph/participant/partials/sample-process-complete-modal.html.twig' %}
+    <div id="quick_view_modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-participant-summary') }}

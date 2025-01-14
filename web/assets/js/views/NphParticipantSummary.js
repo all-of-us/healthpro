@@ -148,4 +148,15 @@ $(document).ready(function () {
     if ($("#1VisitLMT").find(".no-orders-generate").length > 0) {
         $("#sample_process_box_LMT").hide();
     }
+
+    // Display history in modal window
+    let quickViewModal = $("#quick_view_modal");
+
+    $(".quick-view-btn").on("click", function (e) {
+        e.preventDefault();
+        $(quickViewModal).removeData("bs.modal");
+        // Load data from url
+        $("#quick_view_modal .modal-content").load($(this).attr("data-href"));
+        $(quickViewModal).modal("show");
+    });
 });

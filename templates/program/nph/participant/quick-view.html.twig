@@ -1,0 +1,41 @@
+<div class="modal-header">
+    <span class="aou-blue h5">Quick View <span class="text-muted h6">{{ participant.lastName }} {{ participant.firstName }} ({{ participant.id }})</span></span>
+    <span class="float-end h6">Module {{ module }}</span>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Visit</th>
+                    <th>Timepoint</th>
+                    <th>Order ID</th>
+                    <th>Sample</th>
+                    <th>Collection Sample ID</th>
+                    <th>Order Generation Time</th>
+                    <th>Collection Time</th>
+                    <th>Finalization Time</th>
+                    <th>Current Status</th>
+                </tr>
+                {% for order in orders %}
+                    {% for sample in order.nphSamples %}
+                        <tr>
+                            <td>{{ order.visitPeriod }}</td>
+                            <td>{{ order.timepoint }}</td>
+                            <td>{{ order.orderId }}</td>
+                            <td>{{ sample.sampleCode }}</td>
+                            <td>{{ sample.sampleId }}</td>
+                            <td>{{ order.createdTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
+                            <td>{{ sample.collectedTs ? sample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '' }}</td>
+                            <td>{{ sample.finalizedTs ? sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '' }}</td>
+                            <td></td>
+                            </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+</div>

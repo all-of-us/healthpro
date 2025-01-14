@@ -703,6 +703,18 @@ class NphOrderController extends BaseController
         return $this->json(['status' => true, 'message' => 'Notes saved successfully']);
     }
 
+    #[Route(path: '/participant/{participantId}/module/{module}', name: 'quickView')]
+    public function quickViewAction(string $participantId, string $module, NphParticipantSummaryService $nphNphParticipantSummaryService): Response
+    {
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        $orders = $this->em->getRepository(NphOrder::class)->findBy(['participantId' => $participantId, 'module' => $module]);
+        return $this->render('program/nph/participant/quick-view.html.twig', [
+            'orders' => $orders,
+            'module' => $module,
+            'participant' => $participant
+        ]);
+    }
+
     private function checkCrossSiteParticipant(string $participantSiteId): void
     {
         if ($participantSiteId !== $this->siteService->getSiteId()) {
