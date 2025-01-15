@@ -707,7 +707,8 @@ class NphOrderController extends BaseController
     public function quickViewAction(string $participantId, string $module, NphParticipantSummaryService $nphNphParticipantSummaryService): Response
     {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
-        $orders = $this->em->getRepository(NphOrder::class)->findBy(['participantId' => $participantId, 'module' => $module]);
+        $orders = $this->em->getRepository(NphOrder::class)->findBy(['participantId' => $participantId, 'module' =>
+            $module], ['visitPeriod' => 'ASC']);
         return $this->render('program/nph/participant/quick-view.html.twig', [
             'orders' => $orders,
             'module' => $module,
