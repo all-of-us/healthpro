@@ -1,3 +1,19 @@
+{% macro displaySampleStatus(nphSample) %}
+    {% set type = nphSample.modifyType %}
+    {% set status = '' %}
+    {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
+        {% set status = 'Cancelled' %}
+    {% elseif type == constant('App\\Entity\\NphSample::UNLOCK') %}
+        {% set status = 'Unlocked' %}
+    {% elseif nphSample.finalizedTs %}
+        {% set status = 'Finalized' %}
+    {% elseif nphSample.collectedTs %}
+        {% set status = 'Collected' %}
+    {% else %}
+        {% set status = 'Created' %}
+    {% endif %}
+    {{ status }}
+{% endmacro %}
 <div class="modal-header">
     <span class="aou-blue h5">
         Quick View
@@ -11,78 +27,70 @@
     <div class="row">
         <div class="col-md-12 text-center">
             <div class="accordion" id="accordionPeriods">
-                {% set currentPeriod = null %}
-                {% for order in orders %}
-                {% set period = order.visitPeriod|split('Period') %}
-                {% if period|length > 1 %}
-                    {% set periodName = 'Period ' ~ period[1]|replace({'Diet': '', 'DLW': '', 'DSMT': '', 'LMT': ''}) %}
-                {% else %}
-                    {% set periodName = order.visitPeriod %}
-                {% endif %}
-
-                {% if periodName != currentPeriod %}
-                {% if currentPeriod is not null %}
-                    <!-- Closing the previous accordion-item -->
-                    </tbody>
-                    </table>
-                    </div> <!-- Closes the accordion-body for the previous period -->
-                    </div> <!-- Closes the accordion-collapse for the previous period -->
-                    </div> <!-- Closes the accordion-item for the previous period -->
-                {% endif %}
-
-                <!-- Collapsible Section for Each Period -->
-                <div class="accordion-item border-bottom">
-                    <h2 class="accordion-header" id="heading{{ loop.index }}">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
-                                aria-controls="collapse{{ loop.index }}">
-                            {{ periodName }}
-                        </button>
-                    </h2>
-                    <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}">
-                        <div class="accordion-body">
-                            <table class="table table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>Visit</th>
-                                    <th>Timepoint</th>
-                                    <th>Order ID</th>
-                                    <th>Sample</th>
-                                    <th>Collection Sample ID</th>
-                                    <th>Order Generation Time</th>
-                                    <th>Collection Time</th>
-                                    <th>Finalization Time</th>
-                                    <th>Current Status</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% set currentPeriod = periodName %}
-                                {% endif %}
-
-                                {% for sample in order.nphSamples %}
+                {% set modulePeriods = ['Period1', 'Period2', 'Period3'] %}
+                {% for period in modulePeriods %}
+                    <div class="accordion-item border-bottom">
+                        <h2 class="accordion-header" id="heading{{ period }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ period }}" aria-expanded="false" aria-controls="collapse{{ period }}">
+                                {{ period }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ period }}" class="accordion-collapse collapse" aria-labelledby="heading{{ period }}" data-bs-parent="#accordionPeriods">
+                            <div class="accordion-body">
+                                <table class="table table-bordered table-small">
+                                    <thead>
                                     <tr>
-                                        <td>{{ order.visitPeriod }}</td>
-                                        <td>{{ order.timepoint }}</td>
-                                        <td>{{ order.orderId }}</td>
-                                        <td>{{ sample.sampleCode }}</td>
-                                        <td>{{ sample.sampleId }}</td>
-                                        <td>{{ order.createdTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
-                                        <td>{{ sample.collectedTs ? sample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '' }}</td>
-                                        <td>{{ sample.finalizedTs ? sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '' }}</td>
-                                        <td></td>
+                                        <th>Visit</th>
+                                        <th>Timepoint</th>
+                                        <th>Order ID</th>
+                                        <th>Sample</th>
+                                        <th>Collection Sample ID</th>
+                                        <th>Order Generation Time</th>
+                                        <th>Collection Time</th>
+                                        <th>Finalization Time</th>
+                                        <th>Current Status</th>
                                     </tr>
-                                {% endfor %}
-                                {% endfor %}
-
-                                {% if currentPeriod is not null %}
-                                <!-- Closing the final accordion-item and collapsible section for the last period -->
-                                </tbody>
-                            </table>
-                        </div> <!-- Closes the accordion-body for the last period -->
-                    </div> <!-- Closes the accordion-collapse for the last period -->
-                </div> <!-- Closes the accordion-item for the last period -->
-                {% endif %}
-            </div> <!-- Closes the accordion container -->
+                                    </thead>
+                                    <tbody>
+                                    {% for visit, timepoints in visitTimePointSamples %}
+                                        {% if visit starts with period %}
+                                            {% set visitSuffix = visit|split(period)|last %}
+                                            {% for timepoint, samples in timepoints %}
+                                                {% for sampleCode, sampleDescription in samples %}
+                                                    {% set matchedOrder = null %}
+                                                    {% set matchedSample = null %}
+                                                    {% for order in orders %}
+                                                        {% if order.visitPeriod == visit and order.timepoint == timepoint %}
+                                                            {% for nphSample in order.nphSamples %}
+                                                                {% if nphSample.sampleCode == sampleCode %}
+                                                                    {% set matchedOrder = order %}
+                                                                    {% set matchedSample = nphSample %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <tr>
+                                                        <td>{{ visitSuffix }} Visit</td>
+                                                        <td>{{ timepoint }}</td>
+                                                        <td>{{ matchedOrder ? matchedOrder.orderId : '--' }}</td>
+                                                        <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
+                                                        <td>{{ sampleDescription }}</td>
+                                                        <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                        <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                        <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                        <td>{{ matchedSample ? _self.displaySampleStatus(matchedSample) : 'Not Created' }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>

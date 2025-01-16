@@ -703,16 +703,28 @@ class NphOrderController extends BaseController
         return $this->json(['status' => true, 'message' => 'Notes saved successfully']);
     }
 
-    #[Route(path: '/participant/{participantId}/module/{module}', name: 'quickView')]
-    public function quickViewAction(string $participantId, string $module, NphParticipantSummaryService $nphNphParticipantSummaryService): Response
-    {
+    #[Route(path: '/participant/{participantId}/module/{module}/view', name: 'quickView')]
+    public function quickViewAction(
+        string $participantId,
+        string $module,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        NphOrderService $nphOrderService
+    ): Response {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
         $orders = $this->em->getRepository(NphOrder::class)->findBy(['participantId' => $participantId, 'module' =>
             $module], ['visitPeriod' => 'ASC']);
+        $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
+        $visits = $moduleClass::getVisitTypes();
+        $visitTimePointSamples = [];
+        foreach ($visits as $visitKey => $visitValue) {
+            $nphOrderService->loadModules($module, $visitKey, $participantId, $participant->biobankId);
+            $visitTimePointSamples[$visitKey] = $nphOrderService->getTimePointSamples();
+        }
         return $this->render('program/nph/participant/quick-view.html.twig', [
             'orders' => $orders,
             'module' => $module,
-            'participant' => $participant
+            'participant' => $participant,
+            'visitTimePointSamples' => $visitTimePointSamples
         ]);
     }
 
