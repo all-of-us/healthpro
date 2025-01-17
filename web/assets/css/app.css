@@ -1051,3 +1051,13 @@ table.table-samples td {
     display: inline-block !important;
     margin-left: 5px;
 }
+
+.quick-view-accordion .accordion-button {
+    background-color: #f9f9f9;
+}
+
+.quick-view-accordion .accordion-button:focus {
+    box-shadow: none;
+    border: none;
+    color: inherit;
+}
