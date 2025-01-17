@@ -1143,7 +1143,7 @@ class NphOrderService
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $visits = $moduleClass::getVisitTypes();
         $visitTimePointSamples = [];
-        foreach ($visits as $visitKey => $visitValue) {
+        foreach (array_keys($visits) as $visitKey) {
             $this->loadModules($module, $visitKey, $participantId, $biobankId);
             $visitTimePointSamples[$visitKey] = $this->getTimePointSamples();
         }
@@ -1155,7 +1155,7 @@ class NphOrderService
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
         $visits = $moduleClass::getVisitTypes();
         $timePoints = [];
-        foreach ($visits as $visitKey => $visitValue) {
+        foreach (array_keys($visits) as $visitKey) {
             $this->loadModules($module, $visitKey, $participantId, $biobankId);
             $timePoints[] = $this->getTimePoints();
         }
