@@ -149,14 +149,26 @@ $(document).ready(function () {
         $("#sample_process_box_LMT").hide();
     }
 
-    // Display history in modal window
+    // Display samples quick view in modal window
     let quickViewModal = $("#quick_view_modal");
 
     $(".quick-view-btn").on("click", function (e) {
         e.preventDefault();
         $(quickViewModal).removeData("bs.modal");
+
+        // Show loading spinner in modal
+        let modalContent = $("#quick_view_modal .modal-content");
+        modalContent.html(
+            '<div class="d-flex justify-content-center align-items-center" style="height: 200px;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+        );
+
         // Load data from url
-        $("#quick_view_modal .modal-content").load($(this).attr("data-href"));
+        modalContent.load($(this).attr("data-href"), function () {
+            // Hide the loading spinner after the content is loaded
+            $(this).find(".spinner-border").remove();
+        });
+
+        // Show modal
         $(quickViewModal).modal("show");
     });
 });
