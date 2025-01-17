@@ -1,19 +1,26 @@
 {% macro displaySampleStatus(nphSample) %}
-    {% set type = nphSample.modifyType %}
-    {% set status = '' %}
-    {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
-        {% set status = 'Cancelled' %}
-    {% elseif type == constant('App\\Entity\\NphSample::UNLOCK') %}
-        {% set status = 'Unlocked' %}
+    {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
+        {{ 'Cancelled' }}
     {% elseif nphSample.finalizedTs %}
-        {% set status = 'Finalized' %}
+        {{ 'Finalized' }}
     {% elseif nphSample.collectedTs %}
-        {% set status = 'Collected' %}
+        {{ 'Collected' }}
     {% else %}
-        {% set status = 'Created' %}
+        {{ 'Created' }}
     {% endif %}
-    {{ status }}
 {% endmacro %}
+{% macro getStatusSortValue(nphSample) %}
+    {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
+        {{ 1 }}
+    {% elseif nphSample.finalizedTs %}
+        {{ 4 }}
+    {% elseif nphSample.collectedTs %}
+        {{ 3 }}
+    {% else %}
+        {{ 2 }}
+    {% endif %}
+{% endmacro %}
+
 <div class="modal-header">
     <span class="aou-blue h5">
         Quick View
@@ -37,7 +44,7 @@
                         </h2>
                         <div id="collapse{{ period }}" class="accordion-collapse collapse" aria-labelledby="heading{{ period }}" data-bs-parent="#accordionPeriods">
                             <div class="accordion-body">
-                                <table class="table table-bordered table-small">
+                                <table class="table table-bordered table-small quick-view-table">
                                     <thead>
                                     <tr>
                                         <th>Visit</th>
@@ -78,7 +85,7 @@
                                                         <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
                                                         <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
                                                         <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
-                                                        <td>{{ matchedSample ? _self.displaySampleStatus(matchedSample) : 'Not Created' }}</td>
+                                                        <td data-order="{{ matchedSample ? _self.getStatusSortValue(matchedSample) : 0 }}">{{ matchedSample ? _self.displaySampleStatus(matchedSample) : '--' }}</td>
                                                     </tr>
                                                 {% endfor %}
                                             {% endfor %}
