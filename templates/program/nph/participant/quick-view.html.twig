@@ -39,7 +39,7 @@
                     <div class="accordion-item border-bottom">
                         <h2 class="accordion-header" id="heading{{ period }}">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ period }}" aria-expanded="false" aria-controls="collapse{{ period }}">
-                                {{ module == 1 ? 'Module 1' : 'Diet ' ~ period|replace({'Period': 'Period '}) }}
+                                <span class="fw-bold">{{ module == 1 ? 'Module 1' : 'Diet ' ~ period|replace({'Period': 'Period '}) }}</span>
                             </button>
                         </h2>
                         <div id="collapse{{ period }}" class="accordion-collapse collapse" aria-labelledby="heading{{ period }}" data-bs-parent="#accordionPeriods">
