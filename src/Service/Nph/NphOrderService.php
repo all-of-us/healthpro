@@ -1138,6 +1138,36 @@ class NphOrderService
         $this->em->flush();
     }
 
+    public function getModuleVisitTimePointSamples(string $module, string $participantId, string $biobankId): array
+    {
+        $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
+        $visits = $moduleClass::getVisitTypes();
+        $visitTimePointSamples = [];
+        foreach ($visits as $visitKey => $visitValue) {
+            $this->loadModules($module, $visitKey, $participantId, $biobankId);
+            $visitTimePointSamples[$visitKey] = $this->getTimePointSamples();
+        }
+        return $visitTimePointSamples;
+    }
+
+    public function getModuleTimePoints(string $module, string $participantId, string $biobankId): array
+    {
+        $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
+        $visits = $moduleClass::getVisitTypes();
+        $timePoints = [];
+        foreach ($visits as $visitKey => $visitValue) {
+            $this->loadModules($module, $visitKey, $participantId, $biobankId);
+            $timePoints[] = $this->getTimePoints();
+        }
+        $uniqueTimePoints = [];
+        foreach ($timePoints as $timePoint) {
+            foreach ($timePoint as $key => $value) {
+                $uniqueTimePoints[$key] = $value;
+            }
+        }
+        return $uniqueTimePoints;
+    }
+
 
     private function generateOrderSummaryArray(array $nphOrder): array
     {

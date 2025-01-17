@@ -27,12 +27,12 @@
     <div class="row">
         <div class="col-md-12 text-center">
             <div class="accordion" id="accordionPeriods">
-                {% set modulePeriods = ['Period1', 'Period2', 'Period3'] %}
+                {% set modulePeriods = module == 1 ? ['LMT'] : ['Period1', 'Period2', 'Period3'] %}
                 {% for period in modulePeriods %}
                     <div class="accordion-item border-bottom">
                         <h2 class="accordion-header" id="heading{{ period }}">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ period }}" aria-expanded="false" aria-controls="collapse{{ period }}">
-                                {{ period }}
+                                {{ module == 1 ? 'Module 1' : 'Diet ' ~ period|replace({'Period': 'Period '}) }}
                             </button>
                         </h2>
                         <div id="collapse{{ period }}" class="accordion-collapse collapse" aria-labelledby="heading{{ period }}" data-bs-parent="#accordionPeriods">
@@ -54,7 +54,7 @@
                                     <tbody>
                                     {% for visit, timepoints in visitTimePointSamples %}
                                         {% if visit starts with period %}
-                                            {% set visitSuffix = visit|split(period)|last %}
+                                            {% set visitSuffix = module == 1 ? 'LMT' : visit|split(period)|last %}
                                             {% for timepoint, samples in timepoints %}
                                                 {% for sampleCode, sampleDescription in samples %}
                                                     {% set matchedOrder = null %}
@@ -71,10 +71,10 @@
                                                     {% endfor %}
                                                     <tr>
                                                         <td>{{ visitSuffix }} Visit</td>
-                                                        <td>{{ timepoint }}</td>
+                                                        <td>{{ timePointsInfo[timepoint] }}</td>
                                                         <td>{{ matchedOrder ? matchedOrder.orderId : '--' }}</td>
-                                                        <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
                                                         <td>{{ sampleDescription }}</td>
+                                                        <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
                                                         <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
                                                         <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
                                                         <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
