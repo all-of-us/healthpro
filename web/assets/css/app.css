@@ -1056,7 +1056,7 @@ table.table-samples td {
     background-color: #f9f9f9;
 }
 
-.quick-view-accordion .accordion-button:focus {
+.quick-view-accordion .accordion-button:focus, .quick-view-accordion .accordion-button:not(.collapsed) {
     box-shadow: none;
     border: none;
     color: inherit;
