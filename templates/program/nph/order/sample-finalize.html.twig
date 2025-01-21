@@ -462,9 +462,16 @@
     {% include 'program/nph/order/partials/sample-finalize-confirmation-modal.html.twig' %}
     {% include 'program/nph/order/partials/sample-finalize-confirmation-resubmit-modal.html.twig' %}
     {% include 'program/nph/order/partials/modals/aliquot-collection-notes-help-modal.html.twig' %}
+    <div id="quick_view_modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog custom-modal-size">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
     {{ encore_entry_script_tags('nph-sample-finalize') }}
     {{ encore_entry_script_tags('nph-order-modify') }}
+    {{ encore_entry_script_tags('nph-quick-view') }}
 {% endblock %}

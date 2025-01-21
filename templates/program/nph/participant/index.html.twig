@@ -190,7 +190,7 @@
                                                             </div>
                                                         {% endif %}
                                                     </div>
-                                                    <button data-href="{{ path('quickView', { participantId: participant.id, module: moduleNumber }) }}" class="btn btn-primary btn-xs float-end quick-view-btn"><i class="fa fa-eye"></i> Quick View</button>
+                                                    <button data-href="{{ path('quickView', { participantId: participant.id, module: moduleNumber, bootstrapVersion: 5 }) }}" class="btn btn-primary btn-xs float-end quick-view-btn"><i class="fa fa-eye"></i> Quick View</button>
                                                     <br>
                                                     <hr>
                                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
@@ -380,4 +380,5 @@
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-participant-summary') }}
+    {{ encore_entry_script_tags('nph-quick-view') }}
 {% endblock %}

@@ -1061,3 +1061,31 @@ table.table-samples td {
     border: none;
     color: inherit;
 }
+
+.quick-view-accordion .panel-title > a:after {
+    content: "\f078";
+    font-family: "Font Awesome 5 Free", serif;
+    font-weight: 900;
+    float: right;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.quick-view-accordion .panel-title > a:not(.collapsed):after {
+    transform: rotate(180deg);
+}
+
+.quick-view-panel-heading {
+    text-align: left;
+}
+
+.quick-view-panel-title > a:hover,
+.quick-view-panel-title > a:focus {
+    text-decoration: none;
+}
+
+.custom-modal-size {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}

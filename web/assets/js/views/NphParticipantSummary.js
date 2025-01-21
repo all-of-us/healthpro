@@ -148,47 +148,4 @@ $(document).ready(function () {
     if ($("#1VisitLMT").find(".no-orders-generate").length > 0) {
         $("#sample_process_box_LMT").hide();
     }
-
-    // Display samples quick view in modal window
-    let quickViewModal = $("#quick_view_modal");
-
-    $(".quick-view-btn").on("click", function (e) {
-        e.preventDefault();
-        $(quickViewModal).removeData("bs.modal");
-
-        // Show loading spinner in modal
-        let modalContent = $("#quick_view_modal .modal-content");
-        modalContent.html(
-            '<div class="d-flex justify-content-center align-items-center" style="height: 200px;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
-        );
-
-        // Load data from url
-        modalContent.load($(this).attr("data-href"), function () {
-            // Hide the loading spinner after the content is loaded
-            $(this).find(".spinner-border").remove();
-
-            // Initialize DataTable
-            initializeDataTable();
-        });
-
-        // Show modal
-        $(quickViewModal).modal("show");
-    });
-
-    const initializeDataTable = () => {
-        $("table.quick-view-table").DataTable({
-            order: [[8, "desc"]],
-            pageLength: 1000,
-            lengthMenu: [[1000], [1000]], // Disable the entries dropdown
-            searching: false,
-            paging: false,
-            info: false,
-            columnDefs: [
-                {
-                    targets: [0, 1, 2, 3, 4, 5, 6, 7],
-                    orderable: false
-                }
-            ]
-        });
-    };
 });
