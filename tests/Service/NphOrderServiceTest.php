@@ -874,6 +874,35 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
     }
 
+    public function testGetModuleVisitTimePointSamples(): void
+    {
+        $visitTimePointSamples = $this->service->getModuleVisitTimePointSamples(1, 'P0000000010', 'T10000000');
+        // Check top-level key
+        $this->assertArrayHasKey('LMT', $visitTimePointSamples);
+        // Check the structure under 'LMT'
+        $expectedKeys = [
+            'preLMT', 'minus15min', 'minus5min', '15min',
+            '30min', '60min', '90min', '120min',
+            '180min', '240min', 'postLMT'
+        ];
+        foreach ($expectedKeys as $key) {
+            $this->assertArrayHasKey($key, $visitTimePointSamples['LMT']);
+        }
+    }
+
+    public function testGetModuleTimePoints(): void
+    {
+        $timePoints = $this->service->getModuleTimePoints(1, 'P0000000010', 'T10000000');
+        $expectedKeys = [
+            'preLMT', 'minus15min', 'minus5min', '15min',
+            '30min', '60min', '90min', '120min',
+            '180min', '240min', 'postLMT'
+        ];
+        foreach ($expectedKeys as $key) {
+            $this->assertArrayHasKey($key, $timePoints);
+        }
+    }
+
     private function getGuzzleResponse($data): Response
     {
         return new Response(200, ['Content-Type' => 'application/json'], $data);

@@ -1,0 +1,195 @@
+{% macro displaySampleStatus(nphSample) %}
+    {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
+        {{ 'Cancelled' }}
+    {% elseif nphSample.finalizedTs %}
+        {{ 'Finalized' }}
+    {% elseif nphSample.collectedTs %}
+        {{ 'Collected' }}
+    {% else %}
+        {{ 'Created' }}
+    {% endif %}
+{% endmacro %}
+{% macro getStatusSortValue(nphSample) %}
+    {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
+        {{ 1 }}
+    {% elseif nphSample.finalizedTs %}
+        {{ 4 }}
+    {% elseif nphSample.collectedTs %}
+        {{ 3 }}
+    {% else %}
+        {{ 2 }}
+    {% endif %}
+{% endmacro %}
+
+{% if bootstrapVersion == 5 %}
+    <div class="modal-header">
+        <span class="aou-blue h5">
+            Quick View
+            <span class="text-muted h6">
+                {{ participant.lastName }} {{ participant.firstName }} ({{ participant.id }})
+            </span>
+        </span>
+        <span class="float-end h6">Module {{ module }}</span>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="accordion quick-view-accordion" id="accordionPeriods">
+                    {% set modulePeriods = module == 1 ? ['LMT'] : ['Period1', 'Period2', 'Period3'] %}
+                    {% for period in modulePeriods %}
+                        <div class="accordion-item border-bottom">
+                            <h2 class="accordion-header" id="heading{{ period }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ period }}" aria-expanded="false" aria-controls="collapse{{ period }}">
+                                    <span class="fw-bold">{{ module == 1 ? 'Module 1' : 'Diet ' ~ period|replace({'Period': 'Period '}) }}</span>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ period }}" class="accordion-collapse collapse" aria-labelledby="heading{{ period }}" data-bs-parent="#accordionPeriods">
+                                <div class="accordion-body">
+                                    <table class="table table-bordered table-small quick-view-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Visit</th>
+                                            <th>Timepoint</th>
+                                            <th>Order ID</th>
+                                            <th>Sample</th>
+                                            <th>Collection Sample ID</th>
+                                            <th>Order Generation Time</th>
+                                            <th>Collection Time</th>
+                                            <th>Finalization Time</th>
+                                            <th>Current Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for visit, timepoints in visitTimePointSamples %}
+                                            {% if visit starts with period %}
+                                                {% set visitSuffix = module == 1 ? 'LMT' : visit|split(period)|last %}
+                                                {% for timepoint, samples in timepoints %}
+                                                    {% for sampleCode, sampleDescription in samples %}
+                                                        {% set matchedOrder = null %}
+                                                        {% set matchedSample = null %}
+                                                        {% for order in orders %}
+                                                            {% if order.visitPeriod == visit and order.timepoint == timepoint %}
+                                                                {% for nphSample in order.nphSamples %}
+                                                                    {% if nphSample.sampleCode == sampleCode %}
+                                                                        {% set matchedOrder = order %}
+                                                                        {% set matchedSample = nphSample %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <tr>
+                                                            <td>{{ visitSuffix }} Visit</td>
+                                                            <td>{{ timePointsInfo[timepoint] }}</td>
+                                                            <td>{{ matchedOrder ? matchedOrder.orderId : '--' }}</td>
+                                                            <td>{{ sampleDescription }}</td>
+                                                            <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
+                                                            <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                            <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                            <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                            <td data-order="{{ matchedSample ? _self.getStatusSortValue(matchedSample) : 0 }}">{{ matchedSample ? _self.displaySampleStatus(matchedSample) : '--' }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+    </div>
+{% else %}
+    <div class="modal-header">
+        <span class="aou-blue h4">
+            Quick View
+            <span class="text-muted h5">
+                {{ participant.lastName }} {{ participant.firstName }} ({{ participant.id }})
+            </span>
+        </span>
+        <span class="pull-right h5">Module {{ module }}</span>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="panel-group quick-view-accordion" id="accordionPeriods">
+                    {% set modulePeriods = module == 1 ? ['LMT'] : ['Period1', 'Period2', 'Period3'] %}
+                    {% for period in modulePeriods %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading quick-view-panel-heading" role="tab" id="heading{{ period }}">
+                                <h4 class="panel-title quick-view-panel-title">
+                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordionPeriods" href="#collapse{{ period }}" aria-expanded="false" aria-controls="collapse{{ period }}">
+                                        {{ module == 1 ? 'Module 1' : 'Diet ' ~ period|replace({'Period': 'Period '}) }}
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse{{ period }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ period }}">
+                                <div class="panel-body">
+                                    <table class="table table-bordered table-small quick-view-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Visit</th>
+                                            <th>Timepoint</th>
+                                            <th>Order ID</th>
+                                            <th>Sample</th>
+                                            <th>Collection Sample ID</th>
+                                            <th>Order Generation Time</th>
+                                            <th>Collection Time</th>
+                                            <th>Finalization Time</th>
+                                            <th>Current Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <!-- Loop to render table rows -->
+                                        {% for visit, timepoints in visitTimePointSamples %}
+                                            {% if visit starts with period %}
+                                                {% set visitSuffix = module == 1 ? 'LMT' : visit|split(period)|last %}
+                                                {% for timepoint, samples in timepoints %}
+                                                    {% for sampleCode, sampleDescription in samples %}
+                                                        {% set matchedOrder = null %}
+                                                        {% set matchedSample = null %}
+                                                        {% for order in orders %}
+                                                            {% if order.visitPeriod == visit and order.timepoint == timepoint %}
+                                                                {% for nphSample in order.nphSamples %}
+                                                                    {% if nphSample.sampleCode == sampleCode %}
+                                                                        {% set matchedOrder = order %}
+                                                                        {% set matchedSample = nphSample %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <tr>
+                                                            <td>{{ visitSuffix }} Visit</td>
+                                                            <td>{{ timePointsInfo[timepoint] }}</td>
+                                                            <td>{{ matchedOrder ? matchedOrder.orderId : '--' }}</td>
+                                                            <td>{{ sampleDescription }}</td>
+                                                            <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
+                                                            <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                            <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                            <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                            <td data-order="{{ matchedSample ? _self.getStatusSortValue(matchedSample) : 0 }}">{{ matchedSample ? _self.displaySampleStatus(matchedSample) : '--' }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+    </div>
+{% endif %}

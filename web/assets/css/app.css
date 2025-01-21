@@ -1018,3 +1018,74 @@ table.table-samples td {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Quick view table custom classes*/
+.quick-view-table.dataTable,
+.quick-view-table.dataTable td {
+    border: 1px solid #dee2e6;
+}
+
+.quick-view-table th.sorting::after {
+    content: "\f0dc" !important;
+    font-family: "Font Awesome 5 Free", serif !important;
+    font-weight: 900;
+    font-size: 14px;
+    display: inline-block !important;
+    margin-left: 5px;
+}
+
+.quick-view-table th.sorting_asc::after {
+    content: "\f0de" !important;
+    font-family: "Font Awesome 5 Free", serif !important;
+    font-weight: 900;
+    font-size: 14px;
+    display: inline-block !important;
+    margin-left: 5px;
+}
+
+.quick-view-table th.sorting_desc::after {
+    content: "\f0dd" !important;
+    font-family: "Font Awesome 5 Free", serif !important;
+    font-weight: 900;
+    font-size: 14px;
+    display: inline-block !important;
+    margin-left: 5px;
+}
+
+.quick-view-accordion .accordion-button {
+    background-color: #f9f9f9;
+}
+
+.quick-view-accordion .accordion-button:focus, .quick-view-accordion .accordion-button:not(.collapsed) {
+    box-shadow: none;
+    border: none;
+    color: inherit;
+}
+
+.quick-view-accordion .panel-title > a:after {
+    content: "\f078";
+    font-family: "Font Awesome 5 Free", serif;
+    font-weight: 900;
+    float: right;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.quick-view-accordion .panel-title > a:not(.collapsed):after {
+    transform: rotate(180deg);
+}
+
+.quick-view-panel-heading {
+    text-align: left;
+}
+
+.quick-view-panel-title > a:hover,
+.quick-view-panel-title > a:focus {
+    text-decoration: none;
+}
+
+.custom-modal-size {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}

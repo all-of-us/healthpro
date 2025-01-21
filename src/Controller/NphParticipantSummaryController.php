@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\NphDlw;
 use App\Entity\NphGenerateOrderWarningLog;
+use App\Entity\NphOrder;
 use App\Entity\NphSampleProcessingStatus;
 use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Form\Nph\NphGenerateOrderWarningLogType;
@@ -118,6 +119,27 @@ class NphParticipantSummaryController extends BaseController
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,
+        ]);
+    }
+
+    #[Route(path: '/{participantId}/module/{module}/bootstrap/{bootstrapVersion}/view/', name: 'quickView')]
+    public function quickViewAction(
+        string $participantId,
+        string $module,
+        string $bootstrapVersion,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        NphOrderService $nphOrderService
+    ): Response {
+        $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        $orders = $this->em->getRepository(NphOrder::class)->findBy(['participantId' => $participantId, 'module' =>
+            $module], ['visitPeriod' => 'ASC']);
+        return $this->render('program/nph/participant/quick-view.html.twig', [
+            'orders' => $orders,
+            'module' => $module,
+            'bootstrapVersion' => $bootstrapVersion,
+            'participant' => $participant,
+            'visitTimePointSamples' => $nphOrderService->getModuleVisitTimePointSamples($module, $participantId, $participant->biobankId),
+            'timePointsInfo' => $nphOrderService->getModuleTimePoints($module, $participantId, $participant->biobankId)
         ]);
     }
 }
