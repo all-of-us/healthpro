@@ -6,7 +6,7 @@
 {% import 'review/_macros.html.twig' as today %}
 
 {% block body %}
-    {% form_theme todayFilterForm 'bootstrap_5_layout.html.twig' %}
+    {% form_theme todayFilterForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'program/nph/review/page_heading.html.twig' %}
     <div class="card today-filter-well" data-title="Filter">
         <div class="card-body">
@@ -18,19 +18,23 @@
                         <label for="{{ todayFilterForm.start_date.vars.id }}" class="form-label mb-0 me-2 align-middle required fw-bold">Start Date</label>
                         <div>
                             {{ form_widget(todayFilterForm.start_date, { attr: { class: 'form-control' } }) }}
-                            {{ form_errors(todayFilterForm.start_date) }}
                         </div>
                     </div>
                     <div class="col-auto d-flex align-items-center">
                         <label for="{{ todayFilterForm.end_date.vars.id }}" class="form-label mb-0 me-2 align-middle fw-bold">End Date</label>
                         <div>
                             {{ form_widget(todayFilterForm.end_date, { attr: { class: 'form-control' } }) }}
-                            {{ form_errors(todayFilterForm.end_date) }}
                         </div>
                     </div>
                     <div class="col-auto d-flex align-items-center">
                         {{ form_widget(todayFilterForm.Submit, { attr: { class: 'btn btn-primary' } }) }}
                         <a href="{{ path('nph_review_today') }}" class="btn btn-secondary ms-2">Reset</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form_errors(todayFilterForm.start_date) }}
+                        {{ form_errors(todayFilterForm.end_date) }}
                     </div>
                 </div>
             </div>

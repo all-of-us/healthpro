@@ -1,3 +1,7 @@
+a {
+    text-decoration: none;
+}
+
 .btn-xs {
     padding: 1px 5px;
     font-size: 12px;
@@ -105,12 +109,7 @@
 }
 
 .invalid-feedback {
-    background-color: #f2dede;
     color: #a94442;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    padding: 15px;
     font-size: 0.9rem;
 }
 
