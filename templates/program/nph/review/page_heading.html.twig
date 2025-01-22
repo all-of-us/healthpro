@@ -1,10 +1,16 @@
-<div class="page-header">
+<div class="page-header mb-4 border-bottom">
     <h2><i class="fa fa-list" aria-hidden="true"></i> Daily Review</h2>
 </div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
-    <li role="presentation"{% if current_route == 'nph_review_today' %}class="active"{% endif %}><a href="{{ path('nph_review_today') }}">Today's Participants</a></li>
-    <li role="presentation"{% if current_route == 'nph_review_unfinalized' %}class="active"{% endif %}><a href="{{ path('nph_review_unfinalized') }}">Unfinalized Samples</a></li>
-    <li role="presentation"{% if current_route == 'nph_review_recently_modified' %}class="active"{% endif %}><a href="{{ path('nph_review_recently_modified') }}">Recently Modified</a></li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_route == 'nph_review_today' %}active{% endif %}" href="{{ path('nph_review_today') }}">Today's Participants</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_route == 'nph_review_unfinalized' %}active{% endif %}" href="{{ path('nph_review_unfinalized') }}">Unfinalized Samples</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if current_route == 'nph_review_recently_modified' %}active{% endif %}" href="{{ path('nph_review_recently_modified') }}">Recently Modified</a>
+    </li>
 </ul>
 <br />
