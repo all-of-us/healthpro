@@ -15,14 +15,14 @@
             <div class="today-filter text-center">
                 <div class="row justify-content-center align-items-center gx-3">
                     <div class="col-auto d-flex align-items-center">
-                        <label for="{{ todayFilterForm.start_date.vars.id }}" class="form-label mb-0 me-2 align-middle required fw-bold">Start Date:</label>
+                        <label for="{{ todayFilterForm.start_date.vars.id }}" class="form-label mb-0 me-2 align-middle required fw-bold">Start Date</label>
                         <div>
                             {{ form_widget(todayFilterForm.start_date, { attr: { class: 'form-control' } }) }}
                             {{ form_errors(todayFilterForm.start_date) }}
                         </div>
                     </div>
                     <div class="col-auto d-flex align-items-center">
-                        <label for="{{ todayFilterForm.end_date.vars.id }}" class="form-label mb-0 me-2 align-middle fw-bold">End Date:</label>
+                        <label for="{{ todayFilterForm.end_date.vars.id }}" class="form-label mb-0 me-2 align-middle fw-bold">End Date</label>
                         <div>
                             {{ form_widget(todayFilterForm.end_date, { attr: { class: 'form-control' } }) }}
                             {{ form_errors(todayFilterForm.end_date) }}
