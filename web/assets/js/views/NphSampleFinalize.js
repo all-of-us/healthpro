@@ -371,7 +371,7 @@ $(document).ready(function () {
     const csrfToken = $("#csrf_token_collected_notes").val();
 
     const $errorContainer = $(
-        "<div class='text-danger' style='display: none;'>Please save or revert the collection notes</div>"
+        "<div class='text-danger' style='display: none;'><i class='fa fa-exclamation-circle'></i> Please save or revert the collection notes</div>"
     );
     $notesTextarea.after($errorContainer);
 
