@@ -8,7 +8,6 @@ use App\Entity\Site;
 use App\Form\BiobankOrderType;
 use App\Form\OrderLookupType;
 use App\Form\ParticipantLookupBiobankIdType;
-use App\Service\BiobankOrderFinalizeNotificationService;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\OrderService;
@@ -103,7 +102,7 @@ class BiobankController extends BaseController
     }
 
     #[Route(path: '/{biobankId}/order/{orderId}', name: 'biobank_order')]
-    public function orderAction(string $biobankId, int $orderId, Request $request, BiobankOrderFinalizeNotificationService $biobankOrderFinalizeNotificationService): Response
+    public function orderAction(string $biobankId, int $orderId, Request $request): Response
     {
         $participant = $this->ppscApiService->getParticipantByBiobankId($biobankId);
         if (empty($participant)) {
@@ -191,15 +190,6 @@ class BiobankController extends BaseController
                             $this->em->persist($order);
                             $this->em->flush();
                             $this->loggerService->log(Log::ORDER_EDIT, $orderId);
-
-                            // Send email to site user
-                            $info = [
-                                'participantId' => $participant->id,
-                                'biobankId' => $biobankId,
-                                'orderId' => $order->getOrderId()
-                            ];
-                            $emails = !empty($site) ? $site->getEmail() : '';
-                            $biobankOrderFinalizeNotificationService->sendEmails($info, $emails);
                         } else {
                             $this->addFlash('error', $result['errorMessage']);
                         }

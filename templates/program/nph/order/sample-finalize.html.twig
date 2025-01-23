@@ -216,7 +216,7 @@
                     {% else  %}
                         {% set formClasses = 'sample-finalize-form warn-unsaved disable-enter prevent-resubmit' %}
                     {% endif %}
-                    {{ form_start(sampleFinalizeForm, { attr: { class: formClasses} }) }}
+                    {{ form_start(sampleFinalizeForm, { attr: { class: formClasses, 'data-sample-id': sample.sampleId } }) }}
                     {{ form_errors(sampleFinalizeForm) }}
                     <div class="form-group {% if not sampleFinalizeForm[sampleCode ~'CollectedTs'].vars.valid %}
                             has-error{% endif %}">
@@ -400,6 +400,25 @@
                     {% endif %}
                     <div style="display: none">{{ form_widget(sampleFinalizeForm['aliquotError']) }}</div>
                     <hr>
+                    <div class="form-group">
+                        <div class="pull-right pb-2">
+                            {% if not isFormDisabled %}
+                                <button type="button" class="btn btn-warning btn-xs" id="collection_notes_edit">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-success btn-xs" id="collection_notes_save" style="display: none">
+                                    Save
+                                </button>
+                                <button type="button" class="btn btn-xs" id="collection_notes_revert" style="display: none">
+                                    Revert
+                                </button>
+                            {% endif %}
+                        </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token('save_notes') }}" id="csrf_token_collected_notes">
+                        {{ form_label(sampleFinalizeForm[sampleCode ~ 'CollectedNotes']) }}
+                        {{ form_widget(sampleFinalizeForm[sampleCode ~ 'CollectedNotes']) }}
+                        {{ form_errors(sampleFinalizeForm[sampleCode ~ 'CollectedNotes']) }}
+                    </div>
                     <div class="form-group" {% if allowResubmit %} style="display: none" {% endif %}>
                         {{ form_label(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
@@ -442,9 +461,17 @@
     </div>
     {% include 'program/nph/order/partials/sample-finalize-confirmation-modal.html.twig' %}
     {% include 'program/nph/order/partials/sample-finalize-confirmation-resubmit-modal.html.twig' %}
+    {% include 'program/nph/order/partials/modals/aliquot-collection-notes-help-modal.html.twig' %}
+    <div id="quick_view_modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog custom-modal-size">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}
     {{ encore_entry_script_tags('nph-sample-finalize') }}
     {{ encore_entry_script_tags('nph-order-modify') }}
+    {{ encore_entry_script_tags('nph-quick-view') }}
 {% endblock %}

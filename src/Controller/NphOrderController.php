@@ -31,6 +31,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 #[Route(path: '/nph')]
 class NphOrderController extends BaseController
@@ -678,6 +680,27 @@ class NphOrderController extends BaseController
             ]);
         }
         return $this->json(!$stool);
+    }
+
+    #[Route(path: '/ajax/save/notes', name: 'save_collection_notes')]
+    public function aliquotSaveCollectionNotes(Request $request, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    {
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$csrfToken || !$csrfTokenManager->isTokenValid(new CsrfToken('save_notes', $csrfToken))) {
+            return $this->json(['status' => false, 'message' => 'Invalid CSRF token'], 403);
+        }
+        $sampleId = $request->get('sampleId');
+        $sample = $this->em->getRepository(NphSample::class)->findOneBy([
+            'sampleId' => $sampleId,
+        ]);
+        $collectedNotes = $request->get('notes');
+        if (empty($sample) || empty($collectedNotes)) {
+            return $this->json(['status' => false, 'message' => 'Invalid input']);
+        }
+        $sample->setCollectedNotes($collectedNotes);
+        $this->em->persist($sample);
+        $this->em->flush();
+        return $this->json(['status' => true, 'message' => 'Notes saved successfully']);
     }
 
     private function checkCrossSiteParticipant(string $participantSiteId): void
