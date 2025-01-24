@@ -1,0 +1,15 @@
+<div class="modal fade" id="aliquot_mop_modal" tabindex="-1" aria-labelledby="aliquotMopModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Aliquoting Instructions</h4>
+            </div>
+            <div class="modal-body">
+                <iframe class="pdf" name="pdf" src="{{ path('aliquot_instructions_file', { id: sampleOrderType  }) }}#view=FitH"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
