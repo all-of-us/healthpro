@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block title %}Today - Daily Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
@@ -5,21 +6,45 @@
 {% import 'review/_macros.html.twig' as today %}
 
 {% block body %}
+    {% form_theme todayFilterForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'program/nph/review/page_heading.html.twig' %}
-    <div class="well today-filter-well" data-title="Filter">
-        {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
-        {{ form_errors(todayFilterForm) }}
-        <div class="today-filter" align="center">
-            {{ form_rest(todayFilterForm) }}
-            <div class="form-group">
-                <a href="{{ path('nph_review_today') }}" class="btn btn-default">Reset</a>
+    <div class="card today-filter-well" data-title="Filter">
+        <div class="card-body">
+            {{ form_start(todayFilterForm, { attr: { class: 'w-100', autoComplete: 'off' } }) }}
+            {{ form_errors(todayFilterForm) }}
+            <div class="today-filter text-center">
+                <div class="row justify-content-center align-items-center gx-3">
+                    <div class="col-auto d-flex align-items-center">
+                        <label for="{{ todayFilterForm.start_date.vars.id }}" class="form-label mb-0 me-2 align-middle required fw-bold">Start Date</label>
+                        <div>
+                            {{ form_widget(todayFilterForm.start_date, { attr: { class: 'form-control' } }) }}
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        <label for="{{ todayFilterForm.end_date.vars.id }}" class="form-label mb-0 me-2 align-middle fw-bold">End Date</label>
+                        <div>
+                            {{ form_widget(todayFilterForm.end_date, { attr: { class: 'form-control' } }) }}
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        {{ form_widget(todayFilterForm.Submit, { attr: { class: 'btn btn-primary' } }) }}
+                        <a href="{{ path('nph_review_today') }}" class="btn btn-secondary ms-2">Reset</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form_errors(todayFilterForm.start_date) }}
+                        {{ form_errors(todayFilterForm.end_date) }}
+                    </div>
+                </div>
             </div>
+            {{ form_end(todayFilterForm) }}
         </div>
-        {{ form_end(todayFilterForm) }}
     </div>
-    <div class="text-center text-warning">
+    <div class="text-center text-warning mt-3">
         <strong>{{ displayMessage }}</strong>
     </div>
+
     <table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('nph_review_participant_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
         <thead>
         <tr>
@@ -33,9 +58,9 @@
             <th>Samples</th>
             <th>Sample ID</th>
             <th>Created By</th>
-            <th>Created <span class="badge">{{ createdCount }}</span></th>
-            <th>Collected <span class="badge badge-warning">{{ collectedCount }}</span></th>
-            <th>Aliquoted and Finalized <span class="badge badge-success">{{ finalizedCount }}</span></th>
+            <th>Created <span class="badge bg-secondary">{{ createdCount }}</span></th>
+            <th>Collected <span class="badge bg-warning">{{ collectedCount }}</span></th>
+            <th>Aliquoted and Finalized <span class="badge bg-success">{{ finalizedCount }}</span></th>
         </tr>
         </thead>
         <tbody>
