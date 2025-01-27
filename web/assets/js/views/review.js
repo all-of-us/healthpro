@@ -38,8 +38,4 @@ $(document).ready(function () {
                 }
             });
     });
-
-    $(
-        "#form_start_date, #form_end_date, #review_today_filter_start_date, #review_today_filter_end_date"
-    ).pmiDateTimePicker({ format: "MM/DD/YYYY" });
 });
