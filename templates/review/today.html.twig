@@ -42,15 +42,14 @@
             {{ form_end(todayFilterForm) }}
         </div>
     </div>
-    <div class="text-center text-warning">
-        <strong>{{ displayMessage }}</strong>
-    </div>
-    <div class="text-end">
+    <div class="text-end mt-2">
         <button data-href="" class="btn btn-sm btn-outline-secondary export" id="export_btn">
             <i class="fas fa-download"></i> Export
         </button>
     </div>
-    <br>
+    <div class="text-center text-warning mt-2">
+        <strong>{{ displayMessage }}</strong>
+    </div>
     <table class="table table-bordered table-sm table-review" id="table-today" data-name-lookup-url="{{ path('participant_review_name_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
         <thead>
         <tr>
