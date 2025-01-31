@@ -428,4 +428,8 @@ $(document).ready(function () {
     $("#aliquot_collection_notes_help").on("click", function () {
         $("#aliquot_collection_notes_modal").modal("show");
     });
+
+    $("#aliquot_mop_expand").on("click", function () {
+        $("#aliquot_mop_modal").modal("show");
+    });
 });
