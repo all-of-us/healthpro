@@ -1,16 +1,17 @@
+{% set bootstrapVersion = 5 %}
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
 {% block body %}
-    <div class="page-header">
+    {% form_theme sampleIdForm 'bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom mb-2">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot {{ biobankView ? 'Lookup' : 'Samples' }}</h2>
     </div>
     <div class="row">
         <div class="col-sm-6 col-md-5">
             {{ form_start(sampleIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
-            {{ form_widget(sampleIdForm) }}
-            <p>
-                <button type="submit" class="btn btn-primary">Go</button>
-            </p>
+            <label for="{{ sampleIdForm.sampleId.vars.id }}" class="form-label fw-bold mb-0">{{ form_label(sampleIdForm.sampleId) }}</label>
+            {{ form_widget(sampleIdForm.sampleId) }}
+            <button type="submit" class="btn btn-primary mt-2">Go</button>
             {{ form_end(sampleIdForm) }}
         </div>
     </div>
