@@ -1,20 +1,24 @@
+{% set bootstrapVersion = 5 %}
 {% extends app.session.get('ppscRequestId') is not empty ? 'program/hpo/ppsc/base.html.twig' : 'base.html.twig' %}
 {% block title %}Settings - {% endblock %}
 {% block body %}
+    {% form_theme settingsForm 'bootstrap_5_layout.html.twig' %}
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <div class="page-header">
+        <div class="col-md-6 offset-md-3">
+            <div class="page-header border-bottom mb-2">
                 <h2>Settings</h2>
             </div>
             {{ form_start(settingsForm, { attr: { class: 'warn-unsaved prevent-resubmit' } }) }}
                 {{ form_errors(settingsForm) }}
                 {{ form_widget(settingsForm) }}
-                <p>
-                    <button type="submit" class="btn btn-primary">
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary btn-small">
                         Update Settings
-                        <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                        {% if app.session.get('ppscRequestId') is not empty %}
+                            <span class="spinner-border spinner-border-sm-bs5 ms-2" style="display: none;"></span>
+                        {% endif %}
                     </button>
-                </p>
+                </div>
             {{ form_end(settingsForm) }}
         </div>
     </div>
