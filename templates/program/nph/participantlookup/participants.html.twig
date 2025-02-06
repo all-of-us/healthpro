@@ -6,6 +6,7 @@
     {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
     {% form_theme emailForm 'bootstrap_5_layout.html.twig' %}
     {% form_theme phoneForm 'bootstrap_5_layout.html.twig' %}
+    {% form_theme biobankIdForm 'bootstrap_5_layout.html.twig' %}
     <div class="page-header border-bottom">
         <h2><i class="fa fa-user" aria-hidden="true"></i> Participant Lookup</h2>
     </div>
@@ -18,10 +19,19 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </p>
             {{ form_end(searchForm) }}
+            <hr/>
+
+            <h3><i class="fa fa-list-ol" aria-hidden="true"></i> Find by BID</h3>
+            {{ form_start(biobankIdForm, { attr: { class: 'prevent-resubmit' } }) }}
+            {{ form_widget(biobankIdForm) }}
+            <p>
+                <button type="submit" class="btn btn-primary">Go</button>
+            </p>
+            {{ form_end(biobankIdForm) }}
         </div>
 
         <div class="col-sm-6">
-            <h3><i class="fa fa-list-ol" aria-hidden="true"></i> Find by ID</h3>
+            <h3><i class="fa fa-list-ol" aria-hidden="true"></i> Find by PID</h3>
             {{ form_start(idForm, { attr: { class: 'prevent-resubmit' } }) }}
             {{ form_widget(idForm) }}
             <p>
