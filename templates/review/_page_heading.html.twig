@@ -1,12 +1,22 @@
-<div class="page-header">
-  <h2><i class="fa fa-list" aria-hidden="true"></i> Daily Review</h2>
+<div class="page-header mb-4 border-bottom">
+  <h2><i class="fas fa-list"></i> Daily Review</h2>
 </div>
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
-  <li role="presentation"{% if current_route == 'review_today' %}class="active"{% endif %}><a href="{{ path('review_today') }}">Today's Participants</a></li>
-  <li role="presentation"{% if current_route == 'participant_review_unfinalized_orders' %}class="active"{% endif %}><a href="{{ path('participant_review_unfinalized_orders') }}">Unfinalized Biobank Orders</a></li>
-  <li role="presentation"{% if current_route == 'participant_review_unfinalized_measurements' %}class="active"{% endif %}><a href="{{ path('participant_review_unfinalized_measurements') }}">Unfinalized Physical Measurements</a></li>
-  <li role="presentation"{% if current_route == 'participant_review_modified_orders' %}class="active"{% endif %}><a href="{{ path('participant_review_modified_orders') }}">Recently Modified Biobank Orders</a></li>
-  <li role="presentation"{% if current_route == 'participant_review_modified_measurements' %}class="active"{% endif %}><a href="{{ path('participant_review_modified_measurements') }}">Recently Modified Physical Measurements</a></li>
+  <li class="nav-item">
+    <a class="nav-link{% if current_route == 'review_today' %} active{% endif %}" href="{{ path('review_today') }}">Today's Participants</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{% if current_route == 'participant_review_unfinalized_orders' %} active{% endif %}" href="{{ path('participant_review_unfinalized_orders') }}">Unfinalized Biobank Orders</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{% if current_route == 'participant_review_unfinalized_measurements' %} active{% endif %}" href="{{ path('participant_review_unfinalized_measurements') }}">Unfinalized Physical Measurements</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{% if current_route == 'participant_review_modified_orders' %} active{% endif %}" href="{{ path('participant_review_modified_orders') }}">Recently Modified Biobank Orders</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link{% if current_route == 'participant_review_modified_measurements' %} active{% endif %}" href="{{ path('participant_review_modified_measurements') }}">Recently Modified Physical Measurements</a>
+  </li>
 </ul>
 <br />

@@ -183,6 +183,9 @@
                         Aliquot PDF
                     </a>
                     <div class="collapse in" id="aliquot_instructions">
+                        <div class="pull-left">
+                            <a role="button" id="aliquot_mop_expand"><i class="fa fa-expand-arrows-alt"></i> Expand</a>
+                        </div>
                         <div class="text-right">
                             {% set sampleOrderType = order.orderType %}
                             {% if sampleOrderType == 'stool2' %}
@@ -462,6 +465,7 @@
     {% include 'program/nph/order/partials/sample-finalize-confirmation-modal.html.twig' %}
     {% include 'program/nph/order/partials/sample-finalize-confirmation-resubmit-modal.html.twig' %}
     {% include 'program/nph/order/partials/modals/aliquot-collection-notes-help-modal.html.twig' %}
+    {% include 'program/nph/order/partials/modals/aliquot-mop-modal.html.twig' %}
     <div id="quick_view_modal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog custom-modal-size">
             <div class="modal-content">

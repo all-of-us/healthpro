@@ -13,9 +13,12 @@ $(document).ready(function () {
         $("#" + dateType).html($("[data-date-type=" + dateType + "]").length);
     }
 
-    $(
-        "#form_start_date, #form_end_date, #review_today_filter_start_date, #review_today_filter_end_date"
-    ).pmiDateTimePicker({ format: "MM/DD/YYYY" });
+    document.querySelectorAll("#review_today_filter_start_date, #review_today_filter_end_date").forEach((element) => {
+        bs5DateTimepicker(element, {
+            format: "MM/dd/yyyy",
+            clock: false
+        });
+    });
 
     const escapeCSVValue = (value) => {
         if (value.includes(",") || value.includes('"')) {

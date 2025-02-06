@@ -77,9 +77,15 @@ class NphReviewController extends BaseController
             if (!$todayFilterForm->isValid()) {
                 $todayFilterForm->addError(new FormError('Please correct the errors below'));
                 return $this->render('program/nph/review/today.html.twig', [
-                    'participants' => [],
+                    'controller_name' => 'NphReviewController',
                     'todayFilterForm' => $todayFilterForm->createView(),
-                    'displayMessage' => ''
+                    'displayMessage' => '',
+                    'samples' => [],
+                    'timezone' => $this->getSecurityUser()->getTimeZone(),
+                    'collectedCount' => 0,
+                    'finalizedCount' => 0,
+                    'createdCount' => 0,
+                    'rowCounts' => 0
                 ]);
             }
         }
