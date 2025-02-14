@@ -8,7 +8,7 @@ window.tempusDominus = require("@eonasdan/tempus-dominus/dist/js/tempus-dominus.
 require("parsleyjs/dist/parsley.js");
 require("./parsley-validator.js"); // customized parsley validator
 require("datatables.net/js/jquery.dataTables.js");
-require("datatables.net-bs/js/dataTables.bootstrap.js");
+require("datatables.net-bs5/js/dataTables.bootstrap5.js");
 require("datatables.net-responsive/js/dataTables.responsive.js");
 require("datatables.net-responsive-bs/js/responsive.bootstrap.js");
 require("datatables.net-buttons/js/dataTables.buttons.js");
@@ -31,7 +31,7 @@ require("bootstrap5/dist/css/bootstrap.css");
 require("@fortawesome/fontawesome-free/css/all.css");
 require("@fortawesome/fontawesome-free/css/v4-shims.css");
 require("@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css");
-require("datatables.net-bs/css/dataTables.bootstrap.css");
+require("datatables.net-bs5/css/dataTables.bootstrap5.css");
 require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
 require("datatables.net-buttons-bs/css/buttons.bootstrap.css");
 require("bootstrap-toggle/css/bootstrap-toggle.css");
