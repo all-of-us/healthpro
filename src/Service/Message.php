@@ -3,11 +3,13 @@
 namespace App\Service;
 
 use App\Mail\Mandrill;
+use App\Mail\Sendgrid;
 
 class Message
 {
     public const MANDRILL = 2;
     public const LOG_ONLY = 3;
+    public const SENDGRID = 4;
     public const TEST_SUB_PREFIX = '[TEST] ';
 
     protected $env;
@@ -27,11 +29,12 @@ class Message
         $this->logger = $logger;
         $this->twig = $twig;
         $this->params = $params;
-        if ($this->params->has('mail_method') && $this->params->get('mail_method') === 'mandrill') {
-            $this->method = self::MANDRILL;
-        } else {
-            $this->method = self::LOG_ONLY;
-        }
+        $mailMethod = $this->params->has('mail_method') ? $this->params->get('mail_method') : null;
+        $this->method = match ($mailMethod) {
+            'mandrill' => self::MANDRILL,
+            'sendgrid' => self::SENDGRID,
+            default => self::LOG_ONLY,
+        };
         $this->from = $this->getDefaultSender();
     }
 
@@ -98,8 +101,24 @@ class Message
                 try {
                     $mandrill->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
-                    $this->logger->error('Error sending Mandrill message');
-                    $this->logger->error($e->getMessage());
+                    error_log($e->getMessage());
+                }
+                break;
+
+            case self::SENDGRID:
+                $this->localLog('Sendgrid');
+                $tags = [
+                    'healthpro',
+                    $this->env->determineEnv()
+                ];
+                if ($this->template) {
+                    $tags[] = $this->template;
+                }
+                $sendgrid = new Sendgrid($this->params->get('sendgrid_key'));
+                try {
+                    $sendgrid->send($this->to, $this->from, $this->subject, $this->content, $tags);
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
                 }
                 break;
 
