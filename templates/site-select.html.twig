@@ -1,10 +1,11 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block title %}Choose Site - {% endblock %}
 {% block body %}
     {% if siteEmail is not defined %}
         {% set siteEmail = app.session.get('site') ? app.session.get('site').email : '' %}
     {% endif %}
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-md-6 col-md-offset-3">
             <div class="alert alert-info">
                 <i class="fa fa-info-circle"></i>
@@ -12,8 +13,8 @@
             </div>
             <form id="siteSelector" method="POST" action="{{ path('site_select') }}">
                 <div class="form-group">
-                    <label>Choose Site</label>
-                    <select class="form-control" name="site">
+                    <label class="form-label">Choose Site</label>
+                    <select class="form-select" name="site">
                         {% set sites = isCurrentProgramHpo() ? app.user.sites : app.user.nphSites %}
                         {% for site in sites %}
                             <option value="{{ site.email }}"{{ (siteEmail == site.email) ? ' selected' : '' }} >
@@ -29,7 +30,7 @@
                     </select>
                 </div>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token('siteSelect') }}"/>
-                <button type="submit" class="btn btn-primary">Continue</button>
+                <button type="submit" class="btn btn-primary mt-2">Continue</button>
             </form>
         </div>
     </div>

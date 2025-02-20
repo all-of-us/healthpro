@@ -1,7 +1,11 @@
 <div class="row">
     <div class="col-md-4">
         <div><strong>Name</strong></div>
-        <div>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }}</div>
+        <div>
+            <a role="button" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">
+                {{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }}
+            </a>
+        </div>
     </div>
     <div class="col-md-4">
         <div><strong>Participant ID</strong></div>

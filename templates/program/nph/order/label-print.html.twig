@@ -60,6 +60,7 @@
                     {% endfor %}
                 {% endfor %}
             </table>
+            <a class="btn btn-primary" role="button" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Return to Participant</a>
         </div>
         <div class="col-sm-6" style="height: 600px">
             <div class="panel panel-default">
@@ -81,8 +82,6 @@
             </div>
         </div>
     </div>
-    <a class="btn btn-primary" role="button"
-       href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Close</a>
 {% endblock %}
 
 {% block pagejs %}

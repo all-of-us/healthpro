@@ -1,26 +1,29 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %}Sites - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('nph_admin_home') }}">Admin</a></li>
-        <li class="active">Site Management</li>
-    </ol>
-    <div class="pull-right">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('nph_admin_home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('nph_admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item active">Site Management</li>
+        </ol>
+    </nav>
+    <div class="float-end">
         {% if not sync %}
             <a href="{{ path('nph_admin_site') }}" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i>
                 Add Site
             </a>
         {% endif %}
     </div>
-    <div class="page-header">
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management</h2>
     </div>
     <br/>
     {% if sites|length > 0 %}
-        <table class="table table-striped table-hover datatable" data-table-scroll-x="true" data-table-order-column="1" data-table-order="asc">
+        <table class="table table-striped table-hover datatable" data-table-order-column="1" data-table-order="asc">
             <thead>
             <tr>
                 <th>ID</th>

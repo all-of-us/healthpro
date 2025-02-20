@@ -1,24 +1,28 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %} {{ site ? 'Edit Site' : 'Create Site' }} - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('nph_admin_home') }}">Admin</a></li>
-        <li><a href="{{ path('nph_admin_sites') }}">Site Management</a></li>
-        <li class="active">{{ site ? 'Edit' : 'Create' }} Site</li>
-    </ol>
-    <div class="page-header">
+    {% form_theme siteForm 'bootstrap_5_layout.html.twig' %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('nph_admin_home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('nph_admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('nph_admin_sites') }}">Site Management</a></li>
+            <li class="breadcrumb-item active">{{ site ? 'Edit' : 'Create' }} Site</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> {{ site ? 'Edit' : 'Create' }} Site</h2>
     </div>
-    <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-6">
             {{ form_start(siteForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(siteForm) }}
             {{ form_rest(siteForm) }}
             <button type="submit" class="btn btn-primary">Save Site</button>
-            <a class="btn btn-default" href="{{ path('nph_admin_sites') }}">Cancel</a>
+            <a class="btn btn-secondary" href="{{ path('nph_admin_sites') }}">Cancel</a>
             {% if site %}
-                <button type="submit" name="delete" class="btn btn-danger pull-right confirm">Delete Site</button>
+                <button type="submit" name="delete" class="btn btn-danger float-end confirm">Delete Site</button>
             {% endif %}
             {{ form_end(siteForm) }}
             <br>

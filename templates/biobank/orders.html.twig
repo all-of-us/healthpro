@@ -1,10 +1,12 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'biobank/base.html.twig' %}
 {% block title %}Orders - {% endblock %}
 {% block body %}
-    <div class="page-header">
+    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Lookup</h2>
     </div>
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-sm-6 col-md-5">
             <h3><i class="fa fa-barcode" aria-hidden="true"></i> Find by ID</h3>
             {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
