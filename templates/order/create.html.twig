@@ -1,10 +1,11 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% form_theme createForm 'form/simple_checkbox.html.twig' %}
-{% block title %}Order - {% endblock %}
+{% block title %}Order Create - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    <div class="page-header">
+    <div class="page-header mb-4 border-bottom">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             New Biobank order
@@ -12,8 +13,8 @@
     </div>
 
     <ul class="nav nav-tabs">
-        <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
-        <li role="presentation" class="active"><a href="#">Create</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Create</a></li>
         {% if app.session.get('orderType')  == 'dv' %}
             {% set steps = ['Collect', 'Process', 'Finalize'] %}
         {% elseif isPediatricOrder %}
@@ -22,7 +23,7 @@
             {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% endif %}
         {% for step in steps %}
-            <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">{{ step }}</a></li>
         {% endfor %}
     </ul>
     <br />
@@ -33,11 +34,11 @@
         <div class="row row-equal-height">
             {% if app.session.get('orderType') == 'hpo' and not isPediatricOrder %}
                 <div class="col-sm-6 col-md-6 {% if app.session.get('siteType') == 'dv' %} col-sm-offset-3 col-md-offset-3 {% endif %}">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title text-center">HPO Biobank Order</h3>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title text-center">HPO Biobank Order</h5>
                         </div>
-                        <div class="panel-body">
+                        <div class="card-body">
                             <div class="text-center">
                                 <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
                                     <p>Create an order for all {{ samplesInfo|length }} All of Us℠ biospecimens</p>
@@ -89,11 +90,11 @@
             {% endif %}
             {% if app.session.get('orderType') == 'dv' %}
                 <div class="col-sm-8 col-sm-offset-2">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title text-center">DV Biobank Order</h3>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title text-center">DV Biobank Order</h5>
                         </div>
-                        <div class="panel-body">
+                        <div class="card-body">
                             <p class="text-center">Register an All of Us℠ Biospecimen Kit</p>
                             {% if not showBloodTubes %}
                                 <p class="text-center text-warning">
@@ -119,11 +120,11 @@
             {% endif %}
             {% if app.session.get('siteType') != 'dv' and not isPediatricOrder %}
                 <div class="col-sm-6 col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title text-center">Saliva Biobank Order</h3>
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title text-center">Saliva Biobank Order</h5>
                         </div>
-                        <div class="panel-body text-center">
+                        <div class="card-body text-center">
                             {% if showSalivaTubes %}
                                 <p>
                                     {{ salivaInstructions }}
@@ -147,8 +148,8 @@
                 {% include 'order/partials/create-pediatric.html.twig' %}
             {% endif %}
         </div>
-        <p class="text-center">
-            <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        <p class="text-center mt-2">
+            <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
         {{ form_rest(createForm) }}
         <input type="hidden" name="show-blood-tubes" value="{{ showBloodTubes ? 'yes' : 'no' }}" />

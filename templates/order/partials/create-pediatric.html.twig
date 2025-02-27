@@ -1,11 +1,11 @@
 {% if app.session.get('orderType') == 'hpo' %}
     {% if showBloodTubes and showPediatricBloodTubes %}
     <div class="col-sm-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">Pediatric Blood Order</h3>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Pediatric Blood Order</h5>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="text-center">
                     <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
                         <p>Create a pediatric blood biospecimen order.</p>
@@ -22,11 +22,11 @@
     </div>
     {% endif %}
     <div class="col-sm-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">Pediatric Urine Order</h3>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Pediatric Urine Order</h5>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="text-center">
                     <div id="customize-off">
                         <p>Create a pediatric urine biospecimen order.</p>
@@ -43,11 +43,11 @@
     </div>
     {% if showSalivaTubes %}
     <div class="col-sm-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">Pediatric Saliva Order</h3>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Pediatric Saliva Order</h5>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="text-center">
                     <div id="customize-off">
                         <p>Create a pediatric saliva biospecimen order.</p>
