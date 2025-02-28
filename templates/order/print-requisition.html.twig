@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Print Requisition - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
@@ -5,7 +6,7 @@
     {% include 'order/header.html.twig' with { active: 'print_requisition' } %}
     {% set orderRoute = readOnlyView ? 'read_order_' : 'order_' %}
     <div class="row">
-        <div class="col-sm-10 col-md-offset-1">
+        <div class="col-sm-10 offset-md-1">
             {% if order.status == 'edit' or order.status == 'unlock' %}
                 <div class="alert alert-warning" role="alert">
                     {% if order.status == 'edit' %}
@@ -15,14 +16,14 @@
                     {% endif %}
                 </div>
             {% elseif order.mayoId is not empty %}
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+                <div class="card">
+                    <div class="card-header">
                         {% if not readOnlyView  %}
-                            <a class="pull-right" href="{{ path(orderRoute ~ 'requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                            <a class="float-end" href="{{ path(orderRoute ~ 'requisition_pdf', { participantId: participant.id, orderId: order.id }) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
                         {% endif %}
-                        <h3 class="panel-title">Requisition</h3>
+                        <h5 class="card-title">Requisition</h5>
                     </div>
-                    <div class="panel-body">
+                    <div class="card-body">
                         <div id="requisition-loading-widget" class="text-center hidden-ie">
                             <p id="requisition-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
                             <p id="requisition-loaded">
@@ -42,7 +43,7 @@
                 </div>
             {% endif %}
             {% set routePrefix = readOnlyView ? 'read_' : '' %}
-            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary mt-2 mb-4">Return to In-Person Enrollment</a>
         </div>
     </div>
 {% endblock %}

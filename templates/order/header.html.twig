@@ -10,7 +10,7 @@
         This order has expired and can no longer be updated.
     </div>
 {% endif %}
-<div class="page-header">
+<div class="mb-4 border-bottom">
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
         {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
@@ -124,15 +124,15 @@
     {% endif %}
 {% endif %}
 <ul class="nav nav-tabs">
-    <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
-    <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
     {% set nextEnabled = true %}
     {% set previousStep = false %}
     {% for step, column in steps %}
         {% set path = column[0]|replace({' ' : '_'}) %}
         {% if (step == 'print_labels' and (order.disabled or order.status == 'unlock')) or (step == 'print_requisition' and order.status == 'cancel') %}
-            <li role="presentation" class="disabled">
-                <a href="#">
+            <li role="presentation" class="nav-item">
+                <a class="nav-link disabled" href="#">
                     {% if step == 'print_labels' %}
                         <i class="fa fa-check-circle" aria-hidden="true"></i>
                     {% endif %}
@@ -140,8 +140,8 @@
                 </a>
             </li>
         {% elseif nextEnabled %}
-            <li role="presentation"{% if active == step %} class="active"{% endif %}>
-                <a href="{{ path(routePrefix ~ 'order_' ~ path, params) }}">
+            <li role="presentation" class="nav-item">
+                <a class="nav-link {% if active == step %} active {% endif %}" href="{{ path(routePrefix ~ 'order_' ~ path, params) }}">
                     {% if attribute(order, column[1]~'Ts') %}
                         {% if step == 'process' and processTabClass is defined %}
                             <i class="{{ processTabClass }}" aria-hidden="true"></i>
@@ -156,7 +156,7 @@
             </li>
         {% else %}
             {% set title = previousStep|capitalize ~ " time must be set to continue" %}
-            <li role="presentation" class="disabled"><a href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0]|title }}</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0]|title }}</a></li>
         {% endif %}
         {% set previousStep = column[1] %}
     {% endfor %}
