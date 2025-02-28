@@ -129,7 +129,10 @@ class OrderType extends AbstractType
                 'disabled' => $disabled,
                 'view_timezone' => $options['timeZone'],
                 'model_timezone' => 'UTC',
-                'constraints' => $constraints
+                'constraints' => $constraints,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
             ]);
         }
         if (!empty($samples)) {

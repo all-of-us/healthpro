@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% if order.type != 'saliva' %}
@@ -6,6 +7,7 @@
 {% block title %}Collect - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% form_theme collectForm 'bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'collect' } %}
     {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {% if updatedTubes == true %}
@@ -67,19 +69,19 @@
     {{ form_rest(collectForm) }}
     {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled and order.type != constant('TUBE_SELECTION_TYPE', order) %}
-        <p>
+        <p class="mt-2 mb-4">
             <button type="submit" class="btn btn-primary" name="save">
                 {% if order.collectedTs %}
                     Update
                 {% else %}
                     Save and mark as collected
                 {% endif %}
-                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
             </button>
-            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary mt-2 mb-4">Cancel</a>
     {% endif %}
     {{ form_end(collectForm) }}
     {% if order.status == 'unlock' %}
@@ -149,7 +151,7 @@
                     <img src="{{ asset('img/aou/order/OCD-100.jpg') }}" style="height: 50px" alt="OCD-100 Tube">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -157,6 +159,6 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub') }}
+    {{ encore_entry_script_tags('order-sub-bs5') }}
     {{ encore_entry_script_tags('order-collect') }}
 {% endblock %}

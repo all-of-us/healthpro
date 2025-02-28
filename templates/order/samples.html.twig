@@ -5,7 +5,7 @@
                 {% if showCheckAll or app.request.get('_route') == 'order_finalize' %}
                     <thead>
                     <tr>
-                        <th><input type="checkbox" id="checkall" {% if showCheckAll is empty or app.request.get('_route') starts with 'read_' %} disabled="disabled" {% endif %}></th>
+                        <th><input class="form-check-input" type="checkbox" id="checkall" {% if showCheckAll is empty or app.request.get('_route') starts with 'read_' %} disabled="disabled" {% endif %}></th>
                         <th colspan="4">Check all</th>
                         {% if app.request.get('_route') == 'order_finalize' %}
                             <th><span class="header-collected">Collected</span></th>

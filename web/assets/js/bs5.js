@@ -8,6 +8,9 @@ $(document).ready(function () {
         const options = {
             useCurrent: false,
             display: {
+                components: {
+                    clock: false
+                },
                 icons: {
                     type: "icons",
                     time: "fa fa-clock",
@@ -20,7 +23,8 @@ $(document).ready(function () {
                     clear: "fa fa-trash",
                     close: "fa fa-times"
                 }
-            }
+            },
+            restrictions: {}
         };
         if (params.hasOwnProperty("format")) {
             options.localization = {
@@ -36,6 +40,15 @@ $(document).ready(function () {
             options.display.components = {
                 clock: params["clock"]
             };
+        }
+        if (params.hasOwnProperty("sideBySide")) {
+            options.display.sideBySide = params["sideBySide"];
+        }
+        if (params.hasOwnProperty("maxDate")) {
+            options.restrictions.maxDate = params["maxDate"];
+        }
+        if (params.hasOwnProperty("useCurrent")) {
+            options.useCurrent = params["useCurrent"];
         }
         new tempusDominus.TempusDominus(element, options);
     };
