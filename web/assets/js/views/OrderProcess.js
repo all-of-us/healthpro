@@ -67,7 +67,7 @@ $(document).ready(function () {
                 sideBySide: true,
                 useCurrent: true
             });
-            $("#order_processedSamplesTs_" + sample).addClass("input-sm")
+            $("#order_processedSamplesTs_" + sample).addClass("input-sm");
         });
         $("#order_processedSamplesTs").remove();
 

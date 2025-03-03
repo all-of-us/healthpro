@@ -27,7 +27,7 @@ $(document).ready(function () {
                     today: true,
                     clear: true,
                     close: true
-                },
+                }
             },
             restrictions: {}
         };
