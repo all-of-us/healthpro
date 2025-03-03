@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% import 'macros/form-render.html.twig' as formRender %}
@@ -7,6 +8,7 @@
 {% block title %}Process - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% form_theme processForm 'bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
     <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">
     {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form' } }) }}
@@ -48,12 +50,12 @@
                 {% else %}
                     Save and mark as processed
                 {% endif %}
-                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
             </button>
-            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
     {% endif %}
     {{ form_end(processForm) }}
     {% if order.status == 'unlock' %}
@@ -65,6 +67,6 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub') }}
+    {{ encore_entry_script_tags('order-sub-bs5') }}
     {{ encore_entry_script_tags('order-process') }}
 {% endblock %}

@@ -22,7 +22,12 @@ $(document).ready(function () {
                     today: "fa fa-calendar-check",
                     clear: "fa fa-trash",
                     close: "fa fa-times"
-                }
+                },
+                buttons: {
+                    today: true,
+                    clear: true,
+                    close: true
+                },
             },
             restrictions: {}
         };
