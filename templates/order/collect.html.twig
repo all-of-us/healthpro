@@ -7,7 +7,6 @@
 {% block title %}Collect - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% form_theme collectForm 'bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'collect' } %}
     {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {% if updatedTubes == true %}

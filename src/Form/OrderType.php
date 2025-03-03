@@ -199,7 +199,7 @@ class OrderType extends AbstractType
                 'disabled' => $disabled,
                 'entry_options' => [
                     'widget' => 'single_text',
-                    'format' => 'M/d/yyyy h:mm a',
+                    'format' => 'MM/dd/yyyy h:mm a',
                     'html5' => false,
                     'view_timezone' => $options['timeZone'],
                     'model_timezone' => 'UTC',

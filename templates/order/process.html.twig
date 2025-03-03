@@ -8,7 +8,6 @@
 {% block title %}Process - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% form_theme processForm 'bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
     <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">
     {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form' } }) }}
