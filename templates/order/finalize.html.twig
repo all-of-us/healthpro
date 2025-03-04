@@ -31,7 +31,7 @@
         {% endif %}
         {{ form_errors(finalizeForm.finalizedSamples) }}
         {% if finalizeForm.sampleShippingMethod is defined %}
-            {{ form_label(finalizeForm.sampleShippingMethod) }}
+            <label class="form-label required">{{ finalizeForm.sampleShippingMethod.vars.label }}</label>
             <span class="toggle-help-text" id="toggleShippingHelpModal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
             </span>
@@ -117,7 +117,7 @@
                     <p>A tracking number is not required for sites who use a courier service to ship biospecimen kits to the Biobank.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

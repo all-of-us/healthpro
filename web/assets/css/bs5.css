@@ -125,23 +125,10 @@ a {
     color: #6f42c1;
 }
 
-.aou-order-form label, .aou-order-form .col-form-label {
-    display: inline-block;
-    max-width: 100%;
-    margin-bottom: 5px;
-    margin-top: 10px;
+.aou-order-form .col-form-label, .aou-order-form .form-label {
     font-weight: 700;
 }
 
-.aou-order-form label.label-normal {
-    display: inline;
-    margin: 0;
-    font-weight: normal;
-}
-.aou-order-form .checkbox label {
-    font-weight: 400;
-    margin: 0;
-}
 .aou-order-form .form-check-input {
     border-color: #7a8086
 }

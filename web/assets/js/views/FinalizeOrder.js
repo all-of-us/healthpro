@@ -184,6 +184,7 @@ $(document).ready(function () {
     handleShippingFields();
 
     $("#toggleShippingHelpModal").on("click", function () {
-        $("#shipping_method_help_modal").modal();
+        let helpModal = new bootstrap.Modal($("#shipping_method_help_modal"));
+        helpModal.show();
     });
 });
