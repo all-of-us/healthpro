@@ -131,7 +131,8 @@ class OrderType extends AbstractType
                 'model_timezone' => 'UTC',
                 'constraints' => $constraints,
                 'attr' => [
-                    'autocomplete' => 'off'
+                    'autocomplete' => 'off',
+                    'class' => 'form-control-sm'
                 ]
             ]);
         }
@@ -270,10 +271,16 @@ class OrderType extends AbstractType
                     'disabled' => $disabled,
                     'invalid_message' => 'Tracking numbers must match.',
                     'first_options' => [
-                        'label' => 'FedEx or UPS tracking number'
+                        'label' => 'FedEx or UPS tracking number',
+                        'attr' => [
+                            'class' => 'form-control-sm'
+                        ]
                     ],
                     'second_options' => [
                         'label' => 'Verify tracking number',
+                        'attr' => [
+                            'class' => 'form-control-sm'
+                        ]
                     ],
                     'required' => false,
                     'error_mapping' => [

@@ -42,7 +42,7 @@
     {{ form_rest(processForm) }}
     {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
-        <p>
+        <p class="mt-2 mb-4">
             <button type="submit" class="btn btn-primary">
                 {% if order.processedTs %}
                     Update
@@ -54,7 +54,7 @@
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary mt-2">Cancel</a>
     {% endif %}
     {{ form_end(processForm) }}
     {% if order.status == 'unlock' %}

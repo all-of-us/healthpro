@@ -63,11 +63,11 @@
                 <div class="col-6" id="fedex-barcode" style="display:none">
                     <div class="form-group">
                         <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
-                        <input type="text" id="fedex_barcode_first" class="form-control">
+                        <input type="text" id="fedex_barcode_first" class="form-control form-control-sm">
                     </div>
                     <div class="form-group">
                         <label class="control-label" for="fedex_barcode_second">Verify barcode</label>
-                        <input type="text" id="fedex_barcode_second" class="form-control">
+                        <input type="text" id="fedex_barcode_second" class="form-control form-control-sm">
                     </div>
                 </div>
                 <div class="col-12" id="fedex-number">
@@ -98,7 +98,7 @@
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Return to In-Person Enrollment</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary mt-2 mb-4">Return to In-Person Enrollment</a>
     {% endif %}
     {{ form_end(finalizeForm) }}
     {% if order.status == 'unlock' %}

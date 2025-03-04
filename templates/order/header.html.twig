@@ -97,9 +97,9 @@
                 {% endif %}
                 {# TODO: Replace with class constants #}
                 {% if activeStep == 'finalized' and order.submissionTs %}
-                    <h4 class="pull-right submission-label">
-                        <span class="label label-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
-                    </h4>
+                    <h5 class="float-end">
+                        <span class="badge badge-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    </h5>
                 {% endif %}
             </div>
         {% endif %}
