@@ -18,9 +18,13 @@ $(document).ready(function () {
                 .detach()
                 .appendTo(checkBoxDiv)
                 .css("margin", "5px 0 15px 20px");
-            $("#order_processedSamplesTs_" + sample)
-                .addClass("input-sm")
-                .pmiDateTimePicker();
+            let orderProcessedTs = document.querySelector("#order_processedSamplesTs_" + sample);
+            bs5DateTimepicker(orderProcessedTs, {
+                clock: true,
+                sideBySide: true,
+                useCurrent: true
+            });
+            $("#order_processedSamplesTs_" + sample).addClass("input-sm");
 
             // Display processed sample time error messages
             if ($('form[name="order"] .alert-danger').length == 0) {
@@ -47,19 +51,23 @@ $(document).ready(function () {
                 }
             }
             var checkBoxTr = $(this).closest("tr");
-            var timeTd = $('<td colspan="4">');
+            var timeTd = $('<td colspan="5">');
             var timeTr = $("<tr><td></td></tr>");
             var sample = $(this).val();
             $("#order_processedSamplesTs_" + sample)
-                .closest(".form-group")
+                .closest(".form-control")
                 .detach()
                 .css("margin-bottom", "10px")
                 .appendTo(timeTd);
             timeTr.append(timeTd);
             checkBoxTr.after(timeTr);
-            $("#order_processedSamplesTs_" + sample)
-                .addClass("input-sm")
-                .pmiDateTimePicker();
+            let orderProcessedTs = document.querySelector("#order_processedSamplesTs_" + sample);
+            bs5DateTimepicker(orderProcessedTs, {
+                clock: true,
+                sideBySide: true,
+                useCurrent: true
+            });
+            $("#order_processedSamplesTs_" + sample).addClass("form-control-sm");
         });
         $("#order_processedSamplesTs").remove();
 
