@@ -133,6 +133,10 @@ a {
     border-color: #7a8086
 }
 
+.aou-order-form .form-check-input[disabled] ~ .form-check-label, .aou-order-form .form-check-input:disabled ~ .form-check-label {
+    opacity: 1;
+}
+
 .form-control[readonly] {
     background-color: #eeeeee;
     opacity: 1;
