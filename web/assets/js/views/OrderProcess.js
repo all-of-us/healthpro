@@ -55,7 +55,7 @@ $(document).ready(function () {
             var timeTr = $("<tr><td></td></tr>");
             var sample = $(this).val();
             $("#order_processedSamplesTs_" + sample)
-                .closest(".form-group")
+                .closest(".form-control")
                 .detach()
                 .css("margin-bottom", "10px")
                 .appendTo(timeTd);

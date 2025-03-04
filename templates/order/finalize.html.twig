@@ -7,7 +7,7 @@
 {% block title %}Finalize - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% form_theme finalizeForm 'custom_order_form_layout.html.twig' %}
+    {% form_theme finalizeForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'finalize' } %}
     {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form aou-order-form' } }) }}
     {{ form_errors(finalizeForm) }}
