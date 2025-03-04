@@ -138,6 +138,10 @@ a {
     margin: 0;
     font-weight: normal;
 }
+.aou-order-form .checkbox label {
+    font-weight: 400;
+    margin: 0;
+}
 
 .form-control[readonly] {
     background-color: #eeeeee;

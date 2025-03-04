@@ -1,0 +1,15 @@
+{% block form_errors %}
+    {% if errors|length > 0 %}
+        {% if form is not rootform %}
+<div class="invalid-feedback d-block">
+    {% else %}
+    <div class="alert alert-danger mt-2">
+        {% endif %}
+        <ul class="list-unstyled mb-0">
+            {% for error in errors %}
+                <li><i class="fa fa-exclamation-circle"></i> {{ error.message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+{% endblock form_errors %}
