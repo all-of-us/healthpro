@@ -85,25 +85,30 @@ $(document).ready(function () {
         }
     }
 
-    $("#order_finalizedTs").pmiDateTimePicker();
+    let orderFinalizeTss = document.querySelector("#order_finalizedTs");
+    bs5DateTimepicker(orderFinalizeTss, {
+        clock: true,
+        sideBySide: true,
+        useCurrent: true
+    });
 
     new PMI.views["OrderSubPage"]({
         el: $("body")
     });
 
     $("#enable-number").on("click", function () {
-        $("#enable-number").parent().addClass("active");
-        $("#enable-barcode").parent().removeClass("active");
+        $("#enable-number").addClass("active");
+        $("#enable-barcode").removeClass("active");
         $("#fedex-barcode").hide();
-        $("#fedex-number").removeClass("col-xs-6").addClass("col-xs-12");
+        $("#fedex-number").removeClass("col-6").addClass("col-12");
         $("#fedex-number input").attr("readonly", false);
         return false;
     });
     $("#enable-barcode").on("click", function () {
-        $("#enable-barcode").parent().addClass("active");
-        $("#enable-number").parent().removeClass("active");
+        $("#enable-barcode").addClass("active");
+        $("#enable-number").removeClass("active");
         $("#fedex-barcode").show();
-        $("#fedex-number").removeClass("col-xs-12").addClass("col-xs-6");
+        $("#fedex-number").removeClass("col-12").addClass("col-6");
         $("#fedex-number input").attr("readonly", true);
         return false;
     });

@@ -51,7 +51,7 @@ $(document).ready(function () {
                 }
             }
             var checkBoxTr = $(this).closest("tr");
-            var timeTd = $('<td colspan="4">');
+            var timeTd = $('<td colspan="5">');
             var timeTr = $("<tr><td></td></tr>");
             var sample = $(this).val();
             $("#order_processedSamplesTs_" + sample)
@@ -67,7 +67,7 @@ $(document).ready(function () {
                 sideBySide: true,
                 useCurrent: true
             });
-            $("#order_processedSamplesTs_" + sample).addClass("input-sm");
+            $("#order_processedSamplesTs_" + sample).addClass("form-control-sm");
         });
         $("#order_processedSamplesTs").remove();
 

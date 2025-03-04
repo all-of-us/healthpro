@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% if order.type != 'saliva' %}
@@ -7,7 +8,7 @@
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'finalize' } %}
-    {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}
+    {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form aou-order-form' } }) }}
     {{ form_errors(finalizeForm) }}
 
     <div class="form-group{% if not finalizeForm.finalizedTs.vars.valid %} has-error{% endif %}" id="order_finalize"
@@ -48,18 +49,18 @@
         {% endif %}
         <div id="shipping_fields" {% if order.hideTrackingFieldByDefault %} style="display:none;" {% endif %}>
             <ul class="nav nav-tabs">
-                <li role="presentation" class="active"><a href="#" id="enable-number">
+                <li role="presentation" class="nav-item"><a class="nav-link active" href="#" id="enable-number">
                         <i class="fa fa-keyboard-o" aria-hidden="true"></i>
                         Enter tracking number
                     </a></li>
-                <li role="presentation"><a href="#" id="enable-barcode">
+                <li role="presentation" class="nav-item"><a class="nav-link" href="#" id="enable-barcode">
                         <i class="fa fa-barcode" aria-hidden="true"></i>
                         Scan barcode
                     </a></li>
             </ul>
             <br />
             <div class="row">
-                <div class="col-xs-6" id="fedex-barcode" style="display:none">
+                <div class="col-6" id="fedex-barcode" style="display:none">
                     <div class="form-group">
                         <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
                         <input type="text" id="fedex_barcode_first" class="form-control">
@@ -69,7 +70,7 @@
                         <input type="text" id="fedex_barcode_second" class="form-control">
                     </div>
                 </div>
-                <div class="col-xs-12" id="fedex-number">
+                <div class="col-12" id="fedex-number">
                     {{ form_row(finalizeForm.fedexTracking) }}
                 </div>
             </div>
@@ -89,15 +90,15 @@
     {{ form_rest(finalizeForm) }}
     {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.disabled and not readOnlyView and not inactiveSiteFormDisabled  %}
-        <p>
+        <p class="mt-2 mb-4">
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized
-                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
             </button>
-            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Return to In-Person Enrollment</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Return to In-Person Enrollment</a>
     {% endif %}
     {{ form_end(finalizeForm) }}
     {% if order.status == 'unlock' %}
@@ -123,6 +124,6 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub') }}
+    {{ encore_entry_script_tags('order-sub-bs5') }}
     {{ encore_entry_script_tags('order-finalize') }}
 {% endblock %}

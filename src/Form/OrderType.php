@@ -209,9 +209,12 @@ class OrderType extends AbstractType
                             'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
                         ])
+                    ],
+                    'attr' => [
+                        'autocomplete' => 'off'
                     ]
                 ],
-                'required' => false
+                'required' => false,
             ]);
             // Display centrifuge type for kit orders only
             if ($options['order']->getType() === 'kit') {

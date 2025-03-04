@@ -10,7 +10,7 @@
 {% block body %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
     <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">
-    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form' } }) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form aou-order-form' } }) }}
     {{ form_errors(processForm) }}
     {% if processForm.processedSamples is defined %}
         <div class="form-group{% if not processForm.processedSamples.vars.valid %} has-error{% endif %}">

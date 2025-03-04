@@ -124,3 +124,22 @@ a {
 .text-purple {
     color: #6f42c1;
 }
+
+.aou-order-form label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.aou-order-form label.label-normal {
+    display: inline;
+    margin: 0;
+    font-weight: normal;
+}
+
+.form-control[readonly] {
+    background-color: #eeeeee;
+    opacity: 1;
+}
