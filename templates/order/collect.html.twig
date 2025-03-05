@@ -7,8 +7,9 @@
 {% block title %}Collect - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% form_theme collectForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'collect' } %}
-    {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+    {{ form_start(collectForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit aou-order-form' } }) }}
     {% if updatedTubes == true %}
         <input type="hidden" hidden="hidden" id="tubesChanged" name="tubesChanged" value="true">
     {% endif %}

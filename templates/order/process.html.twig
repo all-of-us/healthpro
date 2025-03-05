@@ -8,9 +8,10 @@
 {% block title %}Process - Order {{ order.orderId }} - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% form_theme processForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'order/header.html.twig' with { active: 'process' } %}
     <div id="order_process" data-order-type="{{ order.type }}" data-order-finalized="{{ order.finalizedTs ? 1 : 0 }}">
-    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form' } }) }}
+    {{ form_start(processForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit process-form aou-order-form' } }) }}
     {{ form_errors(processForm) }}
     {% if processForm.processedSamples is defined %}
         <div class="form-group{% if not processForm.processedSamples.vars.valid %} has-error{% endif %}">
@@ -42,7 +43,7 @@
     {{ form_rest(processForm) }}
     {% set routePrefix = readOnlyView ? 'read_' : '' %}
     {% if not order.formDisabled and not readOnlyView and not inactiveSiteFormDisabled %}
-        <p>
+        <p class="mt-2 mb-4">
             <button type="submit" class="btn btn-primary">
                 {% if order.processedTs %}
                     Update
@@ -54,7 +55,7 @@
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary mt-2">Cancel</a>
     {% endif %}
     {{ form_end(processForm) }}
     {% if order.status == 'unlock' %}
