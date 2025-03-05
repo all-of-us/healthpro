@@ -123,13 +123,16 @@ class OrderType extends AbstractType
             $builder->add("{$options['step']}Ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'required' => false,
                 'disabled' => $disabled,
                 'view_timezone' => $options['timeZone'],
                 'model_timezone' => 'UTC',
-                'constraints' => $constraints
+                'constraints' => $constraints,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
             ]);
         }
         if (!empty($samples)) {
@@ -196,7 +199,7 @@ class OrderType extends AbstractType
                 'disabled' => $disabled,
                 'entry_options' => [
                     'widget' => 'single_text',
-                    'format' => 'M/d/yyyy h:mm a',
+                    'format' => 'MM/dd/yyyy h:mm a',
                     'html5' => false,
                     'view_timezone' => $options['timeZone'],
                     'model_timezone' => 'UTC',

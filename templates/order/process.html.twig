@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% import 'order/samples.html.twig' as samples %}
 {% import 'macros/form-render.html.twig' as formRender %}
@@ -48,12 +49,12 @@
                 {% else %}
                     Save and mark as processed
                 {% endif %}
-                <span class="spinner-border spinner-border-sm" style="display: none;"></span>
+                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
             </button>
-            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+            <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
     {% else %}
-        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-default">Cancel</a>
+        <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
     {% endif %}
     {{ form_end(processForm) }}
     {% if order.status == 'unlock' %}
@@ -65,6 +66,6 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub') }}
+    {{ encore_entry_script_tags('order-sub-bs5') }}
     {{ encore_entry_script_tags('order-process') }}
 {% endblock %}
