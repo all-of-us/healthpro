@@ -180,7 +180,7 @@ class MeasurementRepository extends ServiceEntityRepository
                 continue;
             }
             $measurementData = json_decode($result->getData(), true);
-            if ($measurementData['weight'] && $measurementData['weight'][0] > 0) {
+            if ($measurementData['weight'] && isset($measurementData['weight'][0]) && $measurementData['weight'][0] > 0) {
                 return $result;
             }
         }

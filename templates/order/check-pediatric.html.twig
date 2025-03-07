@@ -1,8 +1,9 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
-{% block title %}Order - {% endblock %}
+{% block title %}Order Safety Checks - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    <div class="page-header">
+    <div class="page-header mb-4 border-bottom">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             New Biobank order
@@ -10,20 +11,20 @@
     </div>
 
     <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="#">Safety Check</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Safety Check</a></li>
         {% if siteType == 'dv' %}
             {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
         {% else %}
             {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% endif %}
         {% for step in steps %}
-            <li role="presentation" class="disabled"><a href="#">{{ step }}</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">{{ step }}</a></li>
         {% endfor %}
     </ul>
     <br/>
     <div id="weightDiv">
     {% if app.session.get('orderType') == constant('App\\Security\\User::HPO_TYPE') %}
-        <button type="button" class="btn btn-outline-primary" id="peds_urine_only">Bypass and create a <b>urine only</b> order <i class="fa fa-arrow-right"></i></button>
+        <button type="button" class="btn btn-outline-primary mb-2" id="peds_urine_only">Bypass and create a <b>urine only</b> order <i class="fa fa-arrow-right"></i></button>
     {% endif %}
     {% if weightMeasurement is null %}
         <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
@@ -46,47 +47,43 @@
             </p>
         </div>
     {%  elseif weightMeasurement.finalizedTs|date('Y-m-d') != "now"|date('Y-m-d') %}
-        <h4>Please confirm the participant's weight is accurate prior to biospecimen collection.</h4>
+        <h5>Please confirm the participant's weight is accurate prior to biospecimen collection.</h5>
         <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> The participant's weight measurement was taken more than 1 day ago. Please recapture the weight to proceed.</span>
         <div class="col-md-12">
             <div class="col-md-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
-                    <div class="panel-body">
+                <div class="card">
+                    <div class="card-header text-white bg-primary">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
+                    <div class="card-body">
                         <span class="center-block text-center">{{ measurementData.weight.kg }} Kg ({{ measurementData.weight.lb }} lbs)</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            <p>
-                <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
-            </p>
+        <div class="col-md-12 mt-2">
+            <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
         </div>
     {% else %}
-        <h4>Please confirm the participant's weight is accurate prior to biospecimen collection. Click confirm if the participant's weight is accurate. Click Amend to edit the weight captured on today's
-            physical measurements form.</h4>
+        <h5>Please confirm the participant's weight is accurate prior to biospecimen collection. Click confirm if the participant's weight is accurate. Click Amend to edit the weight captured on today's
+            physical measurements form.</h5>
         <div class="col-md-12">
             <div class="col-md-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
-                    <div class="panel-body">
+                <div class="card">
+                    <div class="card-header text-white bg-primary">Weight Captured: {{ weightMeasurement.finalizedTs|date('n/j/Y', app.user.timezone) }}</div>
+                    <div class="card-body">
                         <span class="center-block text-center">{{ measurementData.weight.kg }} Kg ({{ measurementData.weight.lb }} lbs)</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-12" id="weightConfirmButtons">
-            <p>
-                <a href="#" id="weightConfirm" class="btn btn-primary">Confirm</a>
-                <a href="{{ path('measurement', {'participantId': participant.id, 'measurementId': measurementId, 'type': 'peds-weight', 'copy': true}) }}" class="btn btn-warning">Amend</a>
-            </p>
+        <div class="col-md-12 mt-2" id="weightConfirmButtons">
+            <a href="#" id="weightConfirm" class="btn btn-primary">Confirm</a>
+            <a href="{{ path('measurement', {'participantId': participant.id, 'measurementId': measurementId, 'type': 'peds-weight', 'copy': true}) }}" class="btn btn-warning">Amend</a>
         </div>
     {% endif %}
     </div>
     <span id="weightConfirmText" class="text-success" style="display: none"><i class="fa fa-check"></i> Weight Confirmed</span>
-    <form method="post" action="{{ path('order_create', {'participantId': participant.id}) }}" id="safety-checks" class="prevent-resubmit">
-        <div class="question" id="first-qn" style="display: none">
+    <form method="post" action="{{ path('order_create', {'participantId': participant.id}) }}" id="safety-checks" class="prevent-resubmit mb-2">
+        <div class="mt-2 question" id="first-qn" style="display: none">
             <h4>Has your child had a blood transfusion in the past 6 months?</h4>
             <div class="radio">
                 <label><input type="radio" name="first-qn" data-show-target="#transfusion-qn"/> Yes</label>
@@ -95,7 +92,7 @@
                 <label><input type="radio" name="first-qn" data-show-target="#bd-qn"/> No</label>
             </div>
         </div>
-            <div class="question" id="transfusion-qn" style="display: none">
+            <div class="mt-2 question" id="transfusion-qn" style="display: none">
                 <h4>Please select the specific type of blood transfusion:</h4>
                 <div class="checkbox">
                     <label><input type="checkbox" data-vis-toggle="#info-text-1,#continue,#order-info-text" data-samples="urine"/> Whole blood transfusion</label>
@@ -107,7 +104,7 @@
                     <label><input type="checkbox" data-vis-toggle="#plas-qn"/> Plasma, Platelet, or Cryoprecipitate transfusion</label>
                 </div>
             </div>
-            <div class="question" id="rbc-qn" style="display: none">
+            <div class="mt-2 question" id="rbc-qn" style="display: none">
                 <h4>Has it been at least 2 months since participant's RBC transfusion?</h4>
                 <div class="radio">
                     <label><input type="radio" name="rbc-qn" data-show-target="#bd-qn"/> Yes</label>
@@ -116,7 +113,7 @@
                     <label><input type="radio" name="rbc-qn" data-show-target="#info-text-2,#continue,#order-info-text" data-samples="saliva,urine"/> No</label>
                 </div>
             </div>
-        <div class="question" id="plas-qn" style="display: none">
+        <div class="mt-2 question" id="plas-qn" style="display: none">
             <h4>Has it been at least a week since transfusion?</h4>
             <div class="radio">
                 <label><input type="radio" name="plas-qn" data-show-target="#bd-qn"/> Yes</label>
@@ -125,7 +122,7 @@
                 <label><input type="radio" name="plas-qn" data-show-target="#info-text-6,#continue,#order-info-text" data-samples="saliva,urine"/> No</label>
             </div>
         </div>
-            <div class="question" id="bd-qn" style="display: none">
+            <div class="mt-2 question" id="bd-qn" style="display: none">
                 <h4>Has your child had their blood drawn within the past 8 weeks?</h4>
                 <div class="radio">
                     <label><input type="radio" name="bd-qn" data-show-target="#draw-amount-qn"/> Yes</label>
@@ -134,8 +131,8 @@
                     <label><input type="radio" name="bd-qn" data-show-target="#syncope-qn"/> No</label>
                 </div>
             </div>
-        <div style="display:none;" class="question" id="draw-amount-qn">
-            <h4><i class="fa fa-xs fa-question-circle clickable text-info" data-toggle="modal" data-target="#pediatric-blood-draw-modal" id="pediatric-blood-question"></i>
+        <div style="display:none;" class="mt-2 question" id="draw-amount-qn">
+            <h4><i class="fa fa-xs fa-question-circle clickable text-info" data-bs-toggle="modal" data-bs-target="#pediatric-blood-draw-modal" id="pediatric-blood-question"></i>
                 Does the amount of blood drawn during the participant’s previous draw AND the amount of blood to be drawn for AoU exceed the lesser of 50 ml or 3ml per kg in an 8 week period?
                 </h4>
             <div class="radio">
@@ -148,7 +145,7 @@
                 <label><input type="radio" name="draw-amount-qn" data-show-target="#info-text-4,#continue,#order-info-text" data-samples="saliva,urine"/> Unsure</label>
             </div>
         </div>
-        <div class="question" style="display:none;" id="syncope-qn">
+        <div class="mt-2 question" style="display:none;" id="syncope-qn">
             <h4>Has your child had any problems with a blood draw, like becoming pale or other bad reactions?</h4>
             <div class="radio">
                 <label><input type="radio" name="syncope-qn" data-show-target="#partial-order-qn,#info-text-5,#order-info-text"/> Yes</label>
@@ -157,7 +154,7 @@
                 <label><input type="radio" name="syncope-qn" data-show-target="#continue" data-samples="saliva,urine,blood"/> No</label>
             </div>
         </div>
-        <div class="question" style="display:none;" id="partial-order-qn">
+        <div class="mt-2 question" style="display:none;" id="partial-order-qn">
             <h4>Would you like to continue with the full Biobank order or a modified order with urine and saliva only?</h4>
             <div class="radio">
                 <label><input type="radio" name="partial-order-qn" data-show-target="#continue,#info-text-5,#order-info-text" data-samples="saliva,urine,blood"/> Full Biobank Order</label>
@@ -166,7 +163,7 @@
                 <label><input type="radio" name="partial-order-qn" data-show-target="#continue,#info-text-5,#order-info-text" data-samples="saliva,urine"/> Modified Order- Urine and Saliva Only</label>
             </div>
         </div>
-        <div class="alert alert-danger" style="display:none;" id="order-info-text">
+        <div class="mt-2 alert alert-danger" style="display:none;" id="order-info-text">
             <span id="info-text-1" class="warning" style="display: none">
                 Participants may not have blood drawn and/or saliva collected if they have received Whole Blood Transfusion previously. If the participant can provide an adult sample, urine collection is permissible and can be initiated by selecting Continue.<br>
             </span>
@@ -186,14 +183,12 @@
             Participants may not have blood drawn if they have received Plasma, Platelet, Cryoprecipitate transfusion in the past week.  If the participant can provide adult samples, saliva and urine collection is permissible and can be initiated by selecting Continue.
             </span>
         </div>
-        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default" id="order_check_cancel">Cancel</a>
-        <div class="pull-left order-check-cancel" id="continue" style="display:none;">
-            <p>
-                <button type="submit" class="btn btn-primary">
-                    Continue
-                    <span class="spinner-border spinner-border-sm" style="display: none;"></span>
-                </button>
-            </p>
+        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary mt-1" id="order_check_cancel">Cancel</a>
+        <div class="float-start order-check-cancel mt-1" id="continue" style="display:none;">
+            <button type="submit" class="btn btn-primary">
+                Continue
+                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+            </button>
         </div>
         <input type="hidden" class="sampleTypes" id="blood" name="show-blood-tubes" value="no"/>
         <input type="hidden" class="sampleTypes" id="saliva" name="show-saliva-tubes" value="no"/>

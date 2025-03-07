@@ -1,6 +1,6 @@
 {% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
-{% block title %}Order - {% endblock %}
+{% block title %}Order Safety Checks - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     <div class="page-header mb-4 border-bottom">
@@ -24,7 +24,7 @@
     <br/>
 
     <h4>In the past week has the participant donated blood (e.g. Blood Bank, Red Cross), platelets, or plasma?</h4>
-    <form method="post" action="{{ path('order_create', { participantId: participant.id }) }}" id="safety-checks" class="prevent-resubmit">
+    <form method="post" action="{{ path('order_create', { participantId: participant.id }) }}" id="safety-checks" class="prevent-resubmit mb-2">
         <div class="radio">
             <label><input type="radio" name="donate" value="yes"/> Yes</label>
         </div>

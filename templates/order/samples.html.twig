@@ -1,7 +1,7 @@
 {% macro form_widget(form, showCheckAll, samplesInfo, version, order, isCustom) %}
     <div class="row">
         <div class="{% if app.request.get('_route') != 'order_create' %} col-sm-8 {% else %} col-sm-12 {% endif %}">
-            <table id="{{ form.vars.id }}" class="table table-condensed table-auto-width table-samples">
+            <table id="{{ form.vars.id }}" class="table table-sm table-auto-width table-samples table-borderless">
                 {% if showCheckAll or app.request.get('_route') == 'order_finalize' %}
                     <thead>
                     <tr>

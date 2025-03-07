@@ -123,13 +123,17 @@ class OrderType extends AbstractType
             $builder->add("{$options['step']}Ts", Type\DateTimeType::class, [
                 'label' => $tsLabel,
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'required' => false,
                 'disabled' => $disabled,
                 'view_timezone' => $options['timeZone'],
                 'model_timezone' => 'UTC',
-                'constraints' => $constraints
+                'constraints' => $constraints,
+                'attr' => [
+                    'autocomplete' => 'off',
+                    'class' => 'form-control-sm'
+                ]
             ]);
         }
         if (!empty($samples)) {
@@ -196,7 +200,7 @@ class OrderType extends AbstractType
                 'disabled' => $disabled,
                 'entry_options' => [
                     'widget' => 'single_text',
-                    'format' => 'M/d/yyyy h:mm a',
+                    'format' => 'MM/dd/yyyy h:mm a',
                     'html5' => false,
                     'view_timezone' => $options['timeZone'],
                     'model_timezone' => 'UTC',
@@ -206,9 +210,12 @@ class OrderType extends AbstractType
                             'value' => $constraintDateTime,
                             'message' => 'Timestamp cannot be in the future'
                         ])
+                    ],
+                    'attr' => [
+                        'autocomplete' => 'off'
                     ]
                 ],
-                'required' => false
+                'required' => false,
             ]);
             // Display centrifuge type for kit orders only
             if ($options['order']->getType() === 'kit') {
@@ -264,10 +271,16 @@ class OrderType extends AbstractType
                     'disabled' => $disabled,
                     'invalid_message' => 'Tracking numbers must match.',
                     'first_options' => [
-                        'label' => 'FedEx or UPS tracking number'
+                        'label' => 'FedEx or UPS tracking number',
+                        'attr' => [
+                            'class' => 'form-control-sm'
+                        ]
                     ],
                     'second_options' => [
                         'label' => 'Verify tracking number',
+                        'attr' => [
+                            'class' => 'form-control-sm'
+                        ]
                     ],
                     'required' => false,
                     'error_mapping' => [

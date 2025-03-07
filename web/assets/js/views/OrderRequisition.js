@@ -1,5 +1,9 @@
 $(document).ready(function () {
     $("#requisition-loaded").hide();
+    if ($('iframe[name="requisition"]')[0].contentWindow.document.readyState === "complete") {
+        $("#requisition-loading").hide();
+        $("#requisition-loaded").show();
+    }
     $("iframe[name=requisition]").on("load", function () {
         try {
             if (typeof window.requisition.print === "function") {

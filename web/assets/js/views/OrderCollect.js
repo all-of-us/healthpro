@@ -5,7 +5,15 @@ $(document).ready(function () {
     $("#order_collectedSamples input:checkbox").on("change", function () {
         checkAllToggle(this);
     });
-    $("#order_collectedTs").pmiDateTimePicker();
+
+    const orderCollectedTs = document.querySelector("#order_collectedTs");
+
+    bs5DateTimepicker(orderCollectedTs, {
+        clock: true,
+        sideBySide: true,
+        useCurrent: true
+    });
+
     new PMI.views["OrderSubPage"]({
         el: $("body")
     });

@@ -1,18 +1,18 @@
 {% if app.session.get('orderType') == 'hpo' %}
     {% if showBloodTubes and showPediatricBloodTubes %}
     <div class="col-sm-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">Pediatric Blood Order</h3>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Pediatric Blood Order</h5>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="text-center">
                     <div id="customize-off" {% if showCustom %} style="display:none"{% endif %}>
                         <p>Create a pediatric blood biospecimen order.</p>
                         <p>
                             <button type="submit" name="blood" class="btn btn-primary">
                                 Create
-                                <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                                <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                             </button>
                         </p>
                     </div>
@@ -22,18 +22,18 @@
     </div>
     {% endif %}
     <div class="col-sm-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">Pediatric Urine Order</h3>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Pediatric Urine Order</h5>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="text-center">
                     <div id="customize-off">
                         <p>Create a pediatric urine biospecimen order.</p>
                         <p>
                             <button type="submit" name="urine" class="btn btn-primary">
                                 Create
-                                <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                                <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                             </button>
                         </p>
                     </div>
@@ -42,19 +42,19 @@
         </div>
     </div>
     {% if showSalivaTubes %}
-    <div class="col-sm-6 col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">Pediatric Saliva Order</h3>
+    <div class="col-sm-6 col-md-6 mt-2">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Pediatric Saliva Order</h5>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="text-center">
                     <div id="customize-off">
                         <p>Create a pediatric saliva biospecimen order.</p>
                         <p>
                             <button type="submit" name="saliva" class="btn btn-primary">
                                 Create
-                                <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                                <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                             </button>
                         </p>
                     </div>

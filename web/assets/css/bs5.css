@@ -124,3 +124,20 @@ a {
 .text-purple {
     color: #6f42c1;
 }
+
+.aou-order-form .col-form-label, .aou-order-form .form-label {
+    font-weight: 700;
+}
+
+.aou-order-form .form-check-input {
+    border-color: #7a8086
+}
+
+.aou-order-form .form-check-input[disabled] ~ .form-check-label, .aou-order-form .form-check-input:disabled ~ .form-check-label {
+    opacity: 1;
+}
+
+.form-control[readonly] {
+    background-color: #eeeeee;
+    opacity: 1;
+}

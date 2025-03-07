@@ -10,7 +10,7 @@
         This order has expired and can no longer be updated.
     </div>
 {% endif %}
-<div class="page-header">
+<div class="mb-4 border-bottom">
     <h2>
         <i class="fa fa-medkit" aria-hidden="true"></i>
         {{ order.createdTs|date('n/j/Y', app.user.timezone) }}
@@ -53,7 +53,7 @@
         </div>
         {% endif %}
         {% if app.session.get('orderType') == 'dv'and reportKitUrl and order.type == 'kit' %}
-            <button type="button" data-href="{{ reportKitUrl }}" class="btn btn-danger pull-right external-link">Report Kit Problem</button>
+            <button type="button" data-href="{{ reportKitUrl }}" class="btn btn-danger float-end external-link">Report Kit Problem</button>
         {% endif %}
     {% endif %}
 </p>
@@ -89,7 +89,7 @@
                 <strong>An error occurred while finalizing this order. {% if order.status != 'cancel' %} Please try again. {% endif %}</strong>
             </div>
         {% else %}
-            <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
+            <div class="{% if order.rdrId is empty %} alert alert-secondary {% else %} alert alert-success well-sm {% endif %}">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                 <strong {% if attribute(order, 'biobankFinalized') and attribute(order, activeStep~'User') is empty %} class="text-danger" {% endif %}>{{ activeStep|capitalize }} by {{ attribute(order, activeStep~'User').id is defined and attribute(order, activeStep~'User').id is not empty ? attribute(order, activeStep~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, activeStep~'Site')) }}</strong>
                 {% if order.biobankFinalized and attribute(order, activeStep~'User') is empty %}
@@ -97,9 +97,9 @@
                 {% endif %}
                 {# TODO: Replace with class constants #}
                 {% if activeStep == 'finalized' and order.submissionTs %}
-                    <h4 class="pull-right submission-label">
-                        <span class="label label-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
-                    </h4>
+                    <h5 class="float-end">
+                        <span class="badge badge-success">Order Submitted: {{ order.submissionTs|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                    </h5>
                 {% endif %}
             </div>
         {% endif %}
@@ -124,15 +124,15 @@
     {% endif %}
 {% endif %}
 <ul class="nav nav-tabs">
-    <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
-    <li role="presentation" class="disabled"><a href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
+    <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
     {% set nextEnabled = true %}
     {% set previousStep = false %}
     {% for step, column in steps %}
         {% set path = column[0]|replace({' ' : '_'}) %}
         {% if (step == 'print_labels' and (order.disabled or order.status == 'unlock')) or (step == 'print_requisition' and order.status == 'cancel') %}
-            <li role="presentation" class="disabled">
-                <a href="#">
+            <li role="presentation" class="nav-item">
+                <a class="nav-link disabled" href="#">
                     {% if step == 'print_labels' %}
                         <i class="fa fa-check-circle" aria-hidden="true"></i>
                     {% endif %}
@@ -140,8 +140,8 @@
                 </a>
             </li>
         {% elseif nextEnabled %}
-            <li role="presentation"{% if active == step %} class="active"{% endif %}>
-                <a href="{{ path(routePrefix ~ 'order_' ~ path, params) }}">
+            <li role="presentation" class="nav-item">
+                <a class="nav-link {% if active == step %} active {% endif %}" href="{{ path(routePrefix ~ 'order_' ~ path, params) }}">
                     {% if attribute(order, column[1]~'Ts') %}
                         {% if step == 'process' and processTabClass is defined %}
                             <i class="{{ processTabClass }}" aria-hidden="true"></i>
@@ -156,7 +156,7 @@
             </li>
         {% else %}
             {% set title = previousStep|capitalize ~ " time must be set to continue" %}
-            <li role="presentation" class="disabled"><a href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0]|title }}</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0]|title }}</a></li>
         {% endif %}
         {% set previousStep = column[1] %}
     {% endfor %}
@@ -174,7 +174,7 @@
             </div>
             <div class="modal-footer">
                 <a class="btn btn-primary" id="unlock-continue">Continue</a>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -194,7 +194,7 @@
                 <p class="text-danger">NOTE: Do not include any personal identifiers of the participant, including name, DOB, phone number, etc.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
