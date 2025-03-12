@@ -1,5 +1,15 @@
 $(document).ready(function () {
-    $("#notice_start_ts, #notice_end_ts").pmiDateTimePicker();
+    const startEndDates = ["notice_start_ts", "notice_end_ts"];
+
+    startEndDates.forEach(id => {
+        const element = document.querySelector(`#${id}`);
+        bs5DateTimepicker(element, {
+            clock: true,
+            sideBySide: true,
+            useCurrent: true
+        });
+    });
+
     let urlOptions = {
         All: "/*",
         "In-Person Enrollment": "/ppsc/participant/p",
