@@ -1,7 +1,7 @@
 $(document).ready(function () {
     const startEndDates = ["notice_start_ts", "notice_end_ts"];
 
-    startEndDates.forEach(id => {
+    startEndDates.forEach((id) => {
         const element = document.querySelector(`#${id}`);
         bs5DateTimepicker(element, {
             clock: true,
