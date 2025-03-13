@@ -109,7 +109,7 @@ $(document).ready(function () {
     }
 
     $("#show_saliva_tube_help_modal").on("click", function () {
-        $("#saliva_tube_help_modal").modal();
+        new bootstrap.Modal($("#saliva_tube_help_modal")).show();
     });
 
     $("input:checkbox").on("change", function () {
