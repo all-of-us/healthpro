@@ -197,7 +197,10 @@ $(document).ready(function () {
         showHideDowntimeCreatedTs();
         let dateSelector = $("#nph_order_createdTs");
         let currentValue = dateSelector.val();
-        $("#nph_order_createdTs").pmiDateTimePicker({
+        bs5DateTimepicker(document.querySelector("#nph_order_createdTs"), {
+            clock: true,
+            sideBySide: true,
+            useCurrent: true,
             maxDate: new Date()
         });
         dateSelector.val(currentValue);
