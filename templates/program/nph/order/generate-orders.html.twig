@@ -24,17 +24,26 @@
             {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
                 'order_create_form' } }) }}
             {{ form_errors(orderForm) }}
-            <div class="row">
-                <div style="margin-bottom: 25px">
-                <span class="alert p-2" style="background-color: #343A40; color: white">
-                    Check if the order occurred during a system downtime.
-                    {{ form_widget(orderForm['downtime_generated']) }}
-                </span>
-                    <div >
+            <div class="row mt-3">
+                <div class="col-sm-8">
+                    <label>Select the collection sample and timepoints:</label>
+                    <span class="alert p-2 bg-primary text-white">
+                        {{ form_widget(orderForm['checkAll']) }}
+                        Check All
+                    </span>
+                    <div {% if not orderForm['checkAll'].vars.valid %} class="has-error" {% endif %}>
+                        {{ form_errors(orderForm['checkAll']) }}
                     </div>
                 </div>
+                <div class="col-sm-4">
+                    <strong>Downtime or Delayed Order?</strong>
+                    <span class="alert p-2 bg-primary text-white">
+                        Enter Downtime
+                        {{ form_widget(orderForm['downtime_generated']) }}
+                    </span>
+                </div>
             </div>
-            <div class="row">
+            <div class="row mt-4">
                 <div class="col-sm-3{% if not orderForm['downtime_generated'].vars.valid %} has-error {% endif %}" style="margin-bottom: 25px; display: none;" id="downtime-created-ts">
                     {{ form_errors(orderForm['downtime_generated']) }}
                     <label>Order Generation Time<sup>{{ downtimeOrders['orderInfo']|length + 1 }}</sup></label>
@@ -50,18 +59,6 @@
                             {{order['orderUser']}}</sub>
                     </div>
                 {% endfor %}
-            </div>
-            <div class="row">
-                <div>
-                    <label>Select the collection sample and timepoints:</label>
-                    <span class="alert p-2 bg-primary text-white">
-                    {{ form_widget(orderForm['checkAll']) }}
-                    Check All
-                </span>
-                </div>
-                <div {% if not orderForm['checkAll'].vars.valid %} class="has-error" {% endif %}>
-                    {{ form_errors(orderForm['checkAll']) }}
-                </div>
             </div>
             <div class="masonry-container mt-4">
             {% for timePoint, orderSamples in timePointSamples %}
