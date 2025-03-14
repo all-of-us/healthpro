@@ -24,7 +24,7 @@ $(document).ready(function () {
     $("#order_orderVersion").on("change", function () {
         let orderForm = $('form[name="order"]');
         if ($(orderForm).find("input:checked").length > 0) {
-            $("#tube_change_warning_modal").modal();
+            new bootstrap.Modal($("#tube_help_modaltube_change_warning_modal")).show();
         } else {
             TriggerTubeUpdate();
         }
@@ -61,7 +61,7 @@ $(document).ready(function () {
         }
     }
     $("#tube_help_modal_toggle").on("click", function (e) {
-        $("#tube_help_modal").modal();
+        new bootstrap.Modal($("#tube_help_modal")).show();
     });
 
     checkAllToggle();
@@ -75,7 +75,7 @@ $(document).ready(function () {
         $(this).closest(".has-error").removeClass("has-error");
         $(this).siblings(".help-block").children().remove();
         if ($("#order_collectedSamples").find("input:checkbox:checked").length > 0) {
-            $("#saliva_tube_change_warning_modal").modal("show");
+            new bootstrap.Modal($("#saliva_tube_change_warning_modal")).show();
         } else {
             toggleSalivaTubes($(this));
         }
@@ -101,7 +101,7 @@ $(document).ready(function () {
             $("#collectedSamplesFormGroup").hide();
             return;
         }
-        let checkboxDiv = $(`input[value="${selectedValue}"]`).parents("div.checkbox");
+        let checkboxDiv = $(`input[value="${selectedValue}"]`).parents("div.form-check");
         checkboxDiv.show();
         checkboxDiv.siblings().hide();
         $("#collectedSamplesFormGroup").show();
@@ -109,7 +109,7 @@ $(document).ready(function () {
     }
 
     $("#show_saliva_tube_help_modal").on("click", function () {
-        $("#saliva_tube_help_modal").modal();
+        new bootstrap.Modal($("#saliva_tube_help_modal")).show();
     });
 
     $("input:checkbox").on("change", function () {

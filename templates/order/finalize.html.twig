@@ -62,12 +62,12 @@
             <br />
             <div class="row">
                 <div class="col-6" id="fedex-barcode" style="display:none">
-                    <div class="form-group">
-                        <label class="control-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
+                    <div class="mb-3">
+                        <label class="form-label" for="fedex_barcode_first">FedEx or UPS barcode</label>
                         <input type="text" id="fedex_barcode_first" class="form-control form-control-sm">
                     </div>
-                    <div class="form-group">
-                        <label class="control-label" for="fedex_barcode_second">Verify barcode</label>
+                    <div class="mb-3">
+                        <label class="form-label" for="fedex_barcode_second">Verify barcode</label>
                         <input type="text" id="fedex_barcode_second" class="form-control form-control-sm">
                     </div>
                 </div>
@@ -103,7 +103,7 @@
     {% endif %}
     {{ form_end(finalizeForm) }}
     {% if order.status == 'unlock' %}
-        {{ form_start(revertForm, { 'action': path('order_revert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
+        {{ form_start(revertForm, { 'action': path('order_revert', { participantId: participant.id, orderId: order.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit mb-4' }}) }}
         {{ form_errors(revertForm) }}
         {{ form_end(revertForm) }}
     {% endif %}
