@@ -63,9 +63,9 @@
                     {{ form_errors(orderForm['checkAll']) }}
                 </div>
             </div>
-            <div class="row mt-4">
+            <div class="masonry-container mt-4">
             {% for timePoint, orderSamples in timePointSamples %}
-                <div class="col-md-4 mb-2">
+                <div class="masonry-item">
                     <div class="card timepoint-panel">
                         <div class="card-header">
                             <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
@@ -97,10 +97,10 @@
                     </div>
                 </div>
             {% endfor %}
-                <div class="col-sm-12">
-                    <a class="btn btn-secondary" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
-                    {{ form_widget(orderForm.validate) }}
-                </div>
+            </div>
+            <div class="mt-2">
+                <a class="btn btn-secondary" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
+                {{ form_widget(orderForm.validate) }}
             </div>
             {{ form_rest(orderForm) }}
             {{ form_end(orderForm) }}
