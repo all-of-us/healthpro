@@ -1,18 +1,22 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block title %}Edit Notice - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path(routePrefix ~ 'home') }}">Home</a></li>
-        <li><a href="{{ path(routePrefix ~ 'admin_home') }}">Admin</a></li>
-        <li><a href="{{ path(routePrefix ~ 'admin_notices') }}">Page Notices</a></li>
-        <li class="active">{{ notice.id ? 'Edit' : 'Create' }} Page Notice</li>
-    </ol>
-    <div class="page-header">
+    {% form_theme form 'bootstrap_5_layout.html.twig' %}
+    <nav class="mt-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path(routePrefix ~ 'home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path(routePrefix ~ 'admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ path(routePrefix ~ 'admin_notices') }}">Page Notices</a></li>
+            <li class="breadcrumb-item active">{{ notice.id ? 'Edit' : 'Create' }} Page Notice</li>
+        </ol>
+    </nav>
+    <div class="page-header pb-1 mb-3 border-bottom">
         <h2><i class="fa fa-info-circle" aria-hidden="true"></i> {{ notice.id ? 'Edit' : 'Create' }} Page Notice</h2>
     </div>
     <div class="row">
-        <div class="col-sm-8 col-sm-offset-2">
-            {{ form_start(form, { attr: { class: 'warn-unsaved prevent-resubmit', 'data-route': routePrefix } }) }}
+        <div class="col-sm-8 offset-sm-2">
+            {{ form_start(form, { attr: { class: 'warn-unsaved prevent-resubmit page-notice-form', 'data-route': routePrefix } }) }}
             {{ form_errors(form) }}
 
             {{ form_row(form.status) }}
@@ -26,11 +30,11 @@
                 </ul>
             </div>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Timing</h3>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Timing</h5>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <p><strong>Your time zone</strong>: {{ timezone_display(app.user.info.timezone)|default('Not set!') }} <a href="{{ path('settings', { return: settings_return_url }) }}" class="small">change</a></p>
                     {{ form_rest(form) }}
                     <div class="alert alert-info">
@@ -43,11 +47,11 @@
                     </div>
                 </div>
             </div>
-            <p>
+            <p class="my-3">
                 <button type="submit" class="btn btn-primary">Save</button>
-                <a class="btn btn-default" href="{{ path(routePrefix ~ 'admin_notices') }}">Cancel</a>
+                <a class="btn btn-secondary" href="{{ path(routePrefix ~ 'admin_notices') }}">Cancel</a>
                 {% if notice.id is defined and notice.id is not empty %}
-                    <button type="submit" name="delete" class="btn btn-danger pull-right confirm">Delete</button>
+                    <button type="submit" name="delete" class="btn btn-danger float-end confirm">Delete</button>
                 {% endif %}
             </p>
             {{ form_end(form) }}

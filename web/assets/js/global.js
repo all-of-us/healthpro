@@ -227,7 +227,7 @@ $(document).ready(function () {
      ************************************************************************/
     $.fn.dropdownOther = function (choices) {
         var self = this;
-        var select = $('<select class="form-control">');
+        var select = $('<select class="form-select">');
         var optionSelected = false;
         var other = $('<option value="">-- Other --</option>');
         select.append(other);

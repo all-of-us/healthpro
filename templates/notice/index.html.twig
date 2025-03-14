@@ -1,12 +1,15 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block title %}Page Notices - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path(routePrefix ~ 'home') }}">Home</a></li>
-        <li><a href="{{ path(routePrefix ~ 'admin_home') }}">Admin</a></li>
-        <li class="active">Page Notices</li>
-    </ol>
-    <div class="page-header">
+    <nav class="mt-4" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path(routePrefix ~ 'home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path(routePrefix ~ 'admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item active">Page Notices</li>
+        </ol>
+    </nav>
+    <div class="page-header pb-1 mb-3 border-bottom">
         <h2><i class="fa fa-info-circle" aria-hidden="true"></i> Page Notices</h2>
     </div>
     <p>
@@ -24,9 +27,9 @@
                 <td>{{ notice.endTs ? notice.endTs|date('n/j/Y g:ia', app.user.timezone) }}</td>
                 <td>
                     {% if notice.status %}
-                        <span class="label label-success">Enabled</span>
+                        <span class="badge bg-success">Enabled</span>
                     {% else %}
-                        <span class="label label-default">Disabled</span>
+                        <span class="badge bg-secondary">Disabled</span>
                     {% endif %}
                 </td>
             </tr>
