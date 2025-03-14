@@ -142,6 +142,10 @@ a {
     opacity: 1;
 }
 
+.page-notice-form .form-check {
+    padding-left: 0;
+}
+
 .masonry-container {
     column-count: 3;
     column-gap: 1rem;

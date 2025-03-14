@@ -326,7 +326,10 @@ class OrderType extends AbstractType
                     if ($value === 0) {
                         $context->buildViolation('Please select a saliva tube type')->addViolation();
                     }
-                })
+                }),
+                'attr' => [
+                    'class' => 'form-select-sm'
+                ]
             ]);
         }
         return $builder->getForm();

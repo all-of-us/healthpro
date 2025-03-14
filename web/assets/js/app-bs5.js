@@ -13,7 +13,7 @@ require("datatables.net-responsive/js/dataTables.responsive.js");
 require("datatables.net-responsive-bs/js/responsive.bootstrap.js");
 require("jsbarcode/dist/barcodes/JsBarcode.code128.min.js");
 require("inputmask/dist/jquery.inputmask.bundle.js");
-require("bootstrap-toggle/js/bootstrap-toggle.js");
+require("bootstrap5-toggle/js/bootstrap5-toggle.jquery.min");
 require("./bootstrap-session-timeout-bs5.js");
 require("corejs-typeahead");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
@@ -30,7 +30,7 @@ require("@fortawesome/fontawesome-free/css/v4-shims.css");
 require("@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css");
 require("datatables.net-bs5/css/dataTables.bootstrap5.css");
 require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
-require("bootstrap-toggle/css/bootstrap-toggle.css");
+require("bootstrap5-toggle/css/bootstrap5-toggle.min.css");
 require("../css/app.css");
 require("../css/bs5.css");
 
