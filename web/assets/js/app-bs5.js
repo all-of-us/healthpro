@@ -16,7 +16,7 @@ require("inputmask/dist/jquery.inputmask.bundle.js");
 require("bootstrap5-toggle/js/bootstrap5-toggle.jquery.min");
 require("./bootstrap-session-timeout-bs5.js");
 require("corejs-typeahead");
-require("masonry-layout");
+window.Masonry = require("masonry-layout");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
 
 // Most views are separate webpack entries except for:
