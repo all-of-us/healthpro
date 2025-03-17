@@ -26,7 +26,7 @@
             {{ form_errors(orderForm) }}
             <div class="row mt-3">
                 <div class="col-sm-8">
-                    <label>Select the collection sample and timepoints:</label>
+                    <label class="fw-bold">Select the collection sample and timepoints:</label>
                     <span class="alert p-2 bg-primary text-white">
                         {{ form_widget(orderForm['checkAll']) }}
                         Check All
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4">
-                    <strong>Downtime or Delayed Order?</strong>
+                    <label class="fw-bold">Downtime or Delayed Order?</label>
                     <span class="alert p-2 bg-primary text-white">
                         Enter Downtime
                         {{ form_widget(orderForm['downtime_generated']) }}
@@ -60,13 +60,13 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="masonry-container mt-4">
+            <div class="row mt-4" data-masonry='{"percentPosition": true }'>
             {% for timePoint, orderSamples in timePointSamples %}
-                <div class="masonry-item">
+                <div class="col-md-4 mb-3">
                     <div class="card timepoint-panel">
                         <div class="card-header">
                             <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
-                            <label class="form-label">{{ orderForm[timePoint].vars.label }}</label>
+                            <label class="form-label fw-bold">{{ orderForm[timePoint].vars.label }}</label>
                         </div>
                         {% if module == 1 and constant('App\\Entity\\NphSample::SAMPLE_STOOL') in orderSamples|keys %}
                             {% if participant.module1TissueConsentStatus == constant('OPTIN_DENY', participant) %}

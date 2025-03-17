@@ -145,14 +145,3 @@ a {
 .page-notice-form .form-check {
     padding-left: 0;
 }
-
-.masonry-container {
-    column-count: 3;
-    column-gap: 1rem;
-}
-
-.masonry-item {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 1rem;
-}
