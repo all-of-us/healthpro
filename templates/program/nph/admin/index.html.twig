@@ -1,28 +1,31 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %}Admin - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('nph_admin_home') }}">Home</a></li>
-        <li class="active">Admin</li>
-    </ol>
-    <div class="page-header">
+    <nav class="my-2" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('nph_admin_home') }}">Home</a></li>
+            <li class="breadcrumb-item active">Admin</li>
+        </ol>
+    </nav>
+    <div class="page-header pb-1 mt-4 mb-4 border-bottom">
         <h2><i class="fa fa-cog" aria-hidden="true"></i> Admin</h2>
     </div>
 
     <div class="row home-menu">
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_admin_sites') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_admin_sites') }}" class="btn btn-lg btn-block border w-100 text-dark">
                 <i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management
             </a>
         </div>
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_admin_notices') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_admin_notices') }}" class="btn btn-lg btn-block border w-100 text-dark">
                 <i class="fa fa-info-circle" aria-hidden="true"></i> Page Notices
             </a>
         </div>
     </div>
 
-    <div class="text-center small" style="margin-top: 100px;">
+    <div class="text-center small mt-5">
         <strong>Debug tools:</strong>
         <a href="{{ path('nph_admin_debug_participants') }}">Participant Summary Lookup</a>
     </div>
