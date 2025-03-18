@@ -1,9 +1,10 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% import 'program/nph/order/samples.html.twig' as samples %}
 {% block title %} Generate Orders - {% endblock %}
-{% form_theme orderForm 'form/simple_checkbox.html.twig' %}
+{% form_theme orderForm 'form/simple_checkbox-bs5.html.twig' %}
 {% block body %}
-    <div class="page-header">
+    <div class="page-header border-bottom mb-2">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             Generate Orders and Print Labels
@@ -23,18 +24,27 @@
             {{ form_start(orderForm, { attr: { class: 'disable-enter prevent-resubmit', id:
                 'order_create_form' } }) }}
             {{ form_errors(orderForm) }}
-            <div class="row">
-                <div style="margin-bottom: 25px">
-                <span class="well-sm" style="background-color: #343A40; color: white">
-                    Check if the order occurred during a system downtime.
-                    {{ form_widget(orderForm['downtime_generated']) }}
-                </span>
-                    <div >
+            <div class="row mt-3">
+                <div class="col-sm-8">
+                    <label class="fw-bold">Select the collection sample and timepoints:</label>
+                    <span class="alert p-2 bg-primary text-white">
+                        {{ form_widget(orderForm['checkAll']) }}
+                        Check All
+                    </span>
+                    <div {% if not orderForm['checkAll'].vars.valid %} class="has-error" {% endif %}>
+                        {{ form_errors(orderForm['checkAll']) }}
                     </div>
                 </div>
+                <div class="col-sm-4">
+                    <label class="fw-bold">Downtime or Delayed Order?</label>
+                    <span class="alert p-2 bg-primary text-white">
+                        Enter Downtime
+                        {{ form_widget(orderForm['downtime_generated']) }}
+                    </span>
+                </div>
             </div>
-            <div class="row">
-                <div class="col-sm-3{% if not orderForm['downtime_generated'].vars.valid %} has-error {% endif %}" style="margin-bottom: 25px"  hidden="hidden" id="downtime-created-ts">
+            <div class="row mt-4">
+                <div class="col-sm-3{% if not orderForm['downtime_generated'].vars.valid %} has-error {% endif %}" style="margin-bottom: 25px; display: none;" id="downtime-created-ts">
                     {{ form_errors(orderForm['downtime_generated']) }}
                     <label>Order Generation Time<sup>{{ downtimeOrders['orderInfo']|length + 1 }}</sup></label>
                     {{ form_widget(orderForm['createdTs']) }}
@@ -50,27 +60,13 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="row">
-                <div>
-                    <label>Select the collection sample and timepoints:</label>
-                    <span class="well-sm bg-primary">
-                    {{ form_widget(orderForm['checkAll']) }}
-                    Check All
-                </span>
-                </div>
-                <div {% if not orderForm['checkAll'].vars.valid %} class="has-error" {% endif %}>
-                    {{ form_errors(orderForm['checkAll']) }}
-                </div>
-            </div>
-
-            <br>
-            <div class="row">
+            <div class="row mt-4" data-masonry='{"percentPosition": true }' id="nph_samples_masonry">
             {% for timePoint, orderSamples in timePointSamples %}
-                <div class="col-sm-4">
-                    <div class="panel panel-default timepoint-panel">
-                        <div class="panel-heading">
+                <div class="col-md-4 mb-3">
+                    <div class="card timepoint-panel">
+                        <div class="card-header">
                             <input type="checkbox" class="timepointCheckAll" id="timepoint_{{ timePoint }}" data-timepoint="{{ timePoint }}">
-                            {{ form_label(orderForm[timePoint]) }}
+                            <label class="form-label fw-bold">{{ orderForm[timePoint].vars.label }}</label>
                         </div>
                         {% if module == 1 and constant('App\\Entity\\NphSample::SAMPLE_STOOL') in orderSamples|keys %}
                             {% if participant.module1TissueConsentStatus == constant('OPTIN_DENY', participant) %}
@@ -90,7 +86,7 @@
                                 </div>
                             {% endif %}
                         {% endif %}
-                        <div class="panel-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
+                        <div class="card-body timepoint-samples" id="timepoint_samples_{{ timePoint }}"
                              data-timepoint="{{ timePoint }}">
                             {{ samples.form_widget(orderForm, timePoint, nailSamples, stoolSamples, samplesOrderIds,
                                 participant.id, module, visit, samplesStatus, downtimeOrders) }}
@@ -98,10 +94,10 @@
                     </div>
                 </div>
             {% endfor %}
-                <div class="col-sm-12">
-                    <a class="btn btn-default" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
-                    {{ form_widget(orderForm.validate) }}
-                </div>
+            </div>
+            <div class="mt-2">
+                <a class="btn btn-secondary" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Cancel</a>
+                {{ form_widget(orderForm.validate) }}
             </div>
             {{ form_rest(orderForm) }}
             {{ form_end(orderForm) }}
@@ -113,7 +109,7 @@
         <div class="col-sm-12">
             <div>
                 <label>Review Timepoints and Collection Samples</label>
-                <span class="alert well-sm nph-samples-badge pull-right text-white">
+                <span class="badge nph-samples-badge float-end text-white fs-6 mb-2 p-2">
                     Total # of Samples
                     <span class="badge badge-light" id="samples_count">0</span>
                 </span>
@@ -128,7 +124,7 @@
                 <tbody>
                 </tbody>
             </table>
-            <button type="button" class="btn btn-default" id="order_review_back_btn">Back</button>
+            <button type="button" class="btn btn-secondary" id="order_review_back_btn">Back</button>
             <button type="button" class="btn btn-primary" id="order_generate_btn">
                 Generate Orders and Print Labels
             </button>

@@ -28,6 +28,7 @@
         "jquery": "^3.6.0",
         "jsbarcode": "^3.11.5",
         "jszip": "^3.10.1",
+        "masonry-layout": "^4.2.2",
         "parsleyjs": "^2.9.0",
         "underscore": "^1.13.1"
     },
