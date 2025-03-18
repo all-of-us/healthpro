@@ -207,7 +207,7 @@ class PediatricsReportService
                         $ageRange[0],
                         $ageRange[1]
                     );
-                $tempRow[$ageText] = $measurements[0]['count(*)'];
+                $tempRow[$ageText] = $measurements[0]['participant_count'];
             }
             $csvData[] = [$field, $tempRow['<1'], $tempRow['1-3'], $tempRow['4-6']];
         }

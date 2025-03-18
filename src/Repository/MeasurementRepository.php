@@ -234,29 +234,21 @@ class MeasurementRepository extends ServiceEntityRepository
     public function getMeasurementsForPediatrictotalsReport(\DateTime $startDate, \DateTime $endDate, string $field, int $minAge, int $maxAge)
     {
         $query = '
-        select count(*) from(
-                 SELECT JSON_EXTRACT(data, :jsonField0) as field1,
-                        JSON_EXTRACT(data, :jsonField1) as field2,
-                        JSON_EXTRACT(data, :jsonField2) as field3
+        select count(DISTINCT participant_id) as participant_count from(
+                 SELECT participant_id,
+                        JSON_EXTRACT(data, :jsonField0) as field1,
+                        JSON_EXTRACT(data, :jsonField1) as field2
                  from evaluations
-                 where finalized_ts >= :startDate
-                   and finalized_ts <= :endDate
-                   and age_in_months >= :minAge
+                 where age_in_months >= :minAge
                    and age_in_months <= :maxAge
              ) jsonvalues
-        where field1 is not null or field2 is not null or field3 is not null';
+        where field1 is not null and field2 is not null';
         $fieldString0 = "$.\"$field\"[0]";
         $fieldString1 = "$.\"$field\"[1]";
-        $fieldString2 = "$.\"$field\"[2]";
-        $startTime = $startDate->format('Y-m-d');
-        $endTime = $endDate->format('Y-m-d');
         $em = $this->getEntityManager();
         $stmt = $em->getConnection()->prepare($query);
         $stmt->bindParam('jsonField0', $fieldString0, ParameterType::STRING);
         $stmt->bindParam('jsonField1', $fieldString1, ParameterType::STRING);
-        $stmt->bindParam('jsonField2', $fieldString2, ParameterType::STRING);
-        $stmt->bindParam('startDate', $startTime, ParameterType::STRING);
-        $stmt->bindParam('endDate', $endTime, ParameterType::STRING);
         $stmt->bindParam('minAge', $minAge, ParameterType::INTEGER);
         $stmt->bindParam('maxAge', $maxAge, ParameterType::INTEGER);
         $result = $stmt->executeQuery();
