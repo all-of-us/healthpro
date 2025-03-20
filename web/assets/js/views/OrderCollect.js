@@ -65,52 +65,6 @@ $(document).ready(function () {
     });
 
     checkAllToggle();
-    toggleSalivaTubes($("#order_salivaTubeSelection"));
-    if ($("#tubesChanged").length > 0) {
-        PMI.enableUnsavedPrompt();
-        PMI.hasChanges = true;
-    }
-
-    $("#order_salivaTubeSelection").on("change", function () {
-        $(this).closest(".has-error").removeClass("has-error");
-        $(this).siblings(".help-block").children().remove();
-        if ($("#order_collectedSamples").find("input:checkbox:checked").length > 0) {
-            new bootstrap.Modal($("#saliva_tube_change_warning_modal")).show();
-        } else {
-            toggleSalivaTubes($(this));
-        }
-    });
-
-    $("#saliva_tube_modal_trigger_update").on("click", function () {
-        $("#saliva_tube_change_warning_modal").modal("hide");
-        $("#order_collectedSamples").find("input:checkbox:checked").prop("checked", false);
-        toggleSalivaTubes($("#order_salivaTubeSelection"));
-    });
-
-    $("#order_salivaTubeSelection").on("focus", function () {
-        $(this).data("previousValue", $(this).val());
-    });
-
-    $("#rollback_saliva_selection").on("click", function () {
-        $("#saliva_tube_change_warning_modal").modal("hide");
-        $("#order_salivaTubeSelection").val($("#order_salivaTubeSelection").data("previousValue"));
-    });
-    function toggleSalivaTubes() {
-        let selectedValue = $("#order_salivaTubeSelection").val();
-        if (selectedValue === "0") {
-            $("#collectedSamplesFormGroup").hide();
-            return;
-        }
-        let checkboxDiv = $(`input[value="${selectedValue}"]`).parents("div.form-check");
-        checkboxDiv.show();
-        checkboxDiv.siblings().hide();
-        $("#collectedSamplesFormGroup").show();
-        $("#collectedNotesFormGroup").show();
-    }
-
-    $("#show_saliva_tube_help_modal").on("click", function () {
-        new bootstrap.Modal($("#saliva_tube_help_modal")).show();
-    });
 
     $("input:checkbox").on("change", function () {
         $(this).closest(".has-error").removeClass("has-error");

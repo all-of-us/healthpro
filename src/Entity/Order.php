@@ -31,6 +31,8 @@ class Order
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
     public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2', '2SAL0'];
     public const TUBE_SELECTION_TYPE = 'tubeSelect';
+    public const PEDIATRIC_SALIVA_SAMPLE_DEFAULT = '1SAL2';
+    public const PEDIATRIC_SALIVA_SAMPLE_HIDE = '2SAL0';
 
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', 'PS04A', 'PS04B'];
 
@@ -1590,13 +1592,7 @@ class Order
 
     public function getPediatricSalivaSamples(): array
     {
-        $samples = [];
-        foreach ($this->salivaSamples as $sample) {
-            if (in_array($sample, self::PEDIATRIC_SALIVA_SAMPLES)) {
-                $samples[] = $sample;
-            }
-        }
-        return $samples;
+        return [self::PEDIATRIC_SALIVA_SAMPLE_DEFAULT];
     }
 
     public function isPediatricOrder(): bool
