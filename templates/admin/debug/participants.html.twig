@@ -1,12 +1,16 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %}Participants - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('admin_home') }}">Admin</a></li>
-        <li class="active">Participant Summary Lookup</li>
-    </ol>
-    <div class="page-header">
+    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
+    <nav class="my-2" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item active">Participant Summary Lookup</li>
+        </ol>
+    </nav>
+    <div class="page-header pb-1 mt-4 mb-4 border-bottom">
         <h2><i class="fa fa-user" aria-hidden="true"></i> Participant Summary Lookup</h2>
     </div>
     <div class="row">

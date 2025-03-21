@@ -1,13 +1,16 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %}Participants - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('admin_home') }}">Admin</a></li>
-        <li><a href="{{ path('admin_debug_participants') }}">Participant Summary Lookup</a></li>
-        <li class="active">{{ participant.participantId|default('Participant') }}</li>
-    </ol>
-    <div class="page-header">
+    <nav class="my-2" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_debug_participants') }}">Participant Summary Lookup</a></li>
+            <li class="breadcrumb-item active">{{ participant.participantId|default('Participant') }}</li>
+        </ol>
+    </nav>
+    <div class="page-header pb-1 mt-4 mb-4 border-bottom">
         <h2><i class="fa fa-user" aria-hidden="true"></i> RDR Participant Summary Details</h2>
     </div>
     <table class="table table-bordered table-striped">

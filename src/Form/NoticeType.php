@@ -20,9 +20,11 @@ class NoticeType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'data-toggle' => 'toggle',
-                    'data-on' => 'Enable',
-                    'data-off' => 'Disable',
-                    'data-onstyle' => 'success'
+                    'data-onlabel' => 'Enable',
+                    'data-offlabel' => 'Disable',
+                    'data-onstyle' => 'success',
+                    'data-offstyle' => 'secondary'
+
                 ]
             ])
             ->add('url', Type\TextType::class, [
@@ -64,24 +66,30 @@ class NoticeType extends AbstractType
                 'required' => false,
                 'label' => 'Start Time (optional)',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'view_timezone' => $options['timezone'],
                 'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\Type('datetime')
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ]
             ])
             ->add('end_ts', Type\DateTimeType::class, [
                 'required' => false,
                 'label' => 'End Time (optional)',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'view_timezone' => $options['timezone'],
                 'model_timezone' => 'UTC',
                 'constraints' => [
                     new Constraints\Type('datetime')
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ]
             ]);
 

@@ -74,9 +74,13 @@ $(document).ready(function () {
         $("#samples_count").html(samplesCount);
     }
 
+    const samplesMasonryElements = document.querySelector("#nph_samples_masonry");
+    const samplesMasonry = new Masonry(samplesMasonryElements);
+
     $("#order_review_back_btn").on("click", function () {
         orderCreateSelector.show();
         orderReviewSelector.hide();
+        samplesMasonry.layout();
     });
 
     $("#order_generate_btn").on("click", function () {
@@ -197,7 +201,10 @@ $(document).ready(function () {
         showHideDowntimeCreatedTs();
         let dateSelector = $("#nph_order_createdTs");
         let currentValue = dateSelector.val();
-        $("#nph_order_createdTs").pmiDateTimePicker({
+        bs5DateTimepicker(document.querySelector("#nph_order_createdTs"), {
+            clock: true,
+            sideBySide: true,
+            useCurrent: true,
             maxDate: new Date()
         });
         dateSelector.val(currentValue);
