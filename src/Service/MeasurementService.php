@@ -267,6 +267,26 @@ class MeasurementService
         return !$this->siteService->isActiveSite();
     }
 
+    public function backfillMeasurementsSexAtBirth(): void
+    {
+        $measurements = $this->em->getRepository(Measurement::class)->getMissingSexAtBirthPediatricMeasurements();
+        foreach ($measurements as $measurement) {
+            $participantId = $measurement->getParticipantId();
+            try {
+                $participant = $this->ppscApiService->getParticipantById($participantId);
+                if ($participant === null || !isset($participant->sexAtBirth)) {
+                    error_log("API error: Could not retrieve participant sexAtBirth for participant ID: " . $participantId);
+                    continue;
+                }
+                $measurement->setSexAtBirth($participant->sexAtBirth);
+                $this->em->persist($measurement);
+            } catch (\Exception $e) {
+                $this->ppscApiService->logException($e);
+            }
+        }
+        $this->em->flush();
+    }
+
     protected function getMeasurementUserSiteData($user, $site)
     {
         return [
