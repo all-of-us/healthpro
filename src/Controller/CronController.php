@@ -6,6 +6,7 @@ use App\Cache\DatastoreAdapter;
 use App\Entity\Order;
 use App\Service\BiobankNightlyReportService;
 use App\Service\HFHRepairService;
+use App\Service\MeasurementService;
 use App\Service\Nph\NphDietPeriodStatusService;
 use App\Service\Nph\NphDlwBackfillService;
 use App\Service\PediatricsReportService;
@@ -201,6 +202,13 @@ class CronController extends BaseController
     public function backfillNphDlw(NphDlwBackfillService $backfill)
     {
         $backfill->backfillNphDlw();
+        return $this->json(['success' => true]);
+    }
+
+    #[Route(path: '/backfill-pediatrics-measurements-sex-at-birth', name: 'cron_backfill_pediatrics_measurements_sex_at_birth')]
+    public function backfillPediatricMeasurementsSexAtBirth(MeasurementService $measurementService): Response
+    {
+        $measurementService->backfillMeasurementsSexAtBirth();
         return $this->json(['success' => true]);
     }
 }
