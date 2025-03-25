@@ -62,12 +62,15 @@ class NphSampleRepository extends ServiceEntityRepository
 
         // Define sort orders
         $sortOrders = [
+            'o.visitPeriod' => ['LMT', 'Period1Diet', 'Period1DLW', 'Period1DSMT', 'Period1LMT'],
             'o.timepoint' => [
+                'day0', 'day2', 'day12', 'day0PreDoseA', 'day1PreDoseB', 'day1PostDoseC', 'day1PostDoseD',
+                'day6E', 'day7F', 'day13G', 'day14F',
                 'preLMT', 'preDSMT', 'minus15min', 'minus5min', '15min', '30min',
-                '60min', '90min', '120min', '180min', '240min', 'postLMT', 'postDSMT', 'day0'
+                '60min', '90min', '120min', '180min', '240min', 'postLMT', 'postDSMT',
             ],
-            'o.orderType' => ['urine', 'saliva', 'hair', 'nail', 'stool', 'blood'],
-            's.sampleCode' => ['ST1', 'ST2', 'ST3', 'ST4', 'SST8P5', 'LIHP1', 'EDTA10', 'P800']
+            'o.orderType' => ['blood', 'urine', 'saliva', 'saliva3', 'hair', 'nail', 'stool'],
+            's.sampleCode' => ['ST1', 'ST2', 'ST3', 'ST4', 'SST8P5', 'LIHP1', 'EDTA10', '1SST4', 'LIH4', 'EDTA4' . 'P800']
         ];
 
         // Generate case expressions for sorting
