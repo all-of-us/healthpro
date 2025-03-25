@@ -69,7 +69,7 @@ class NphSampleRepository extends ServiceEntityRepository
                 'preLMT', 'preDSMT', 'minus15min', 'minus5min', '15min', '30min',
                 '60min', '90min', '120min', '180min', '240min', 'postLMT', 'postDSMT',
             ],
-            'o.orderType' => ['blood', 'urine', 'saliva', 'saliva3', 'hair', 'nail', 'stool'],
+            'o.orderType' => ['blood', 'urine', 'saliva', 'saliva3', 'hair', 'nail', 'stool', 'stool2'],
             's.sampleCode' => ['ST1', 'ST2', 'ST3', 'ST4', 'SST8P5', 'LIHP1', 'EDTA10', '1SST4', 'LIH4', 'EDTA4' . 'P800']
         ];
 
