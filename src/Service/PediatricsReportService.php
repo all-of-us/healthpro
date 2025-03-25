@@ -39,6 +39,20 @@ class PediatricsReportService
         'waist-circumference'
     ];
 
+    private const MEASUREMENTS_TOTAL_CSV_HEADERS = [
+        '',
+        'Unique PPTs w/ Complete Measurements', 'Unique PPTs w/ Complete Measurements', 'Unique PPTs w/ Complete Measurements',
+        'Unique PPTs w/ any Measurements', 'Unique PPTs w/ any Measurements', 'Unique PPTs w/ any Measurements',
+        'Unique PPTs with third measurement taken', 'Unique PPTs with third measurement taken', 'Unique PPTs with third measurement taken'
+    ];
+
+    private const MEASUREMENTS_TOTAL_CSV_SUBHEADERS = [
+        'Measurement Type',
+        '<1 year', '1-3 years', '4-6 years',
+        '<1 year', '1-3 years', '4-6 years',
+        '<1 year', '1-3 years', '4-6 years'
+    ];
+
     protected EntityManagerInterface $em;
     protected GcsBucketService $gcsBucketService;
     protected EnvironmentService $env;
@@ -193,24 +207,41 @@ class PediatricsReportService
         $this->generateCSVReport($csvData, 'Active_Alerts_Report-' . date('Ymd-His') . '.csv');
     }
 
-    public function generateMeasurementTotalsReport(\DateTime $startDate, \DateTime $endDate): void
+    public function generateMeasurementTotalsReport(): void
     {
-        $csvData[] = array_merge(['Measurement Type'], array_keys(self::DEVIATION_AGE_RANGES));
-        $tempRow = [];
+        // Define CSV headers
+        $csvData[] = ['Report Date', date('m/d/Y')];
+        $csvData[] = self::MEASUREMENTS_TOTAL_CSV_HEADERS;
+        $csvData[] = self::MEASUREMENTS_TOTAL_CSV_SUBHEADERS;
+
         foreach (self::TOTALS_COUNTS_FIELDS as $field) {
-            foreach (self::DEVIATION_AGE_RANGES as $ageText => $ageRange) {
-                $measurements = $this->em->getRepository(Measurement::class)
-                    ->getMeasurementsForPediatrictotalsReport(
-                        $startDate,
-                        $endDate,
-                        $field,
-                        $ageRange[0],
-                        $ageRange[1]
-                    );
-                $tempRow[$ageText] = $measurements[0]['participant_count'];
+            $tempRow = [$field];
+
+            // Fetch all three categories of data at once per age range
+            foreach (self::DEVIATION_AGE_RANGES as $ageRange) {
+                $completeMeasurements = $this->em->getRepository(Measurement::class)
+                    ->getCompleteMeasurementsForPediatrictotalsReport($field, $ageRange[0], $ageRange[1]);
+
+                $tempRow[] = $completeMeasurements[0]['participant_count'] ?? 0;
             }
-            $csvData[] = [$field, $tempRow['<1'], $tempRow['1-3'], $tempRow['4-6']];
+
+            foreach (self::DEVIATION_AGE_RANGES as $ageRange) {
+                $anyMeasurements = $this->em->getRepository(Measurement::class)
+                    ->getAnyMeasurementsForPediatrictotalsReport($field, $ageRange[0], $ageRange[1]);
+
+                $tempRow[] = $anyMeasurements[0]['participant_count'] ?? 0;
+            }
+
+            foreach (self::DEVIATION_AGE_RANGES as $ageRange) {
+                $thirdMeasurements = $this->em->getRepository(Measurement::class)
+                    ->getThridMeasurementsForPediatrictotalsReport($field, $ageRange[0], $ageRange[1]);
+
+                $tempRow[] = $thirdMeasurements[0]['participant_count'] ?? 0;
+            }
+
+            $csvData[] = $tempRow;
         }
+
         $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
     }
 

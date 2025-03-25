@@ -231,13 +231,22 @@ class MeasurementRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function getMeasurementsForPediatrictotalsReport(\DateTime $startDate, \DateTime $endDate, string $field, int $minAge, int $maxAge)
+    public function getCompleteMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
     {
         $query = '
         select count(DISTINCT participant_id) as participant_count from(
-                 SELECT participant_id,
-                        JSON_EXTRACT(data, :jsonField0) as field1,
-                        JSON_EXTRACT(data, :jsonField1) as field2
+                 SELECT 
+                     participant_id,
+                    CASE 
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField0)) = "null" THEN NULL
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField0)) = "false" THEN NULL
+                        ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField0))
+                    END AS field1,
+                    CASE 
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1)) = "null" THEN NULL
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1)) = "false" THEN NULL
+                        ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1))
+                    END AS field2
                  from evaluations
                  where age_in_months >= :minAge
                    and age_in_months <= :maxAge
@@ -249,6 +258,72 @@ class MeasurementRepository extends ServiceEntityRepository
         $stmt = $em->getConnection()->prepare($query);
         $stmt->bindParam('jsonField0', $fieldString0, ParameterType::STRING);
         $stmt->bindParam('jsonField1', $fieldString1, ParameterType::STRING);
+        $stmt->bindParam('minAge', $minAge, ParameterType::INTEGER);
+        $stmt->bindParam('maxAge', $maxAge, ParameterType::INTEGER);
+        $result = $stmt->executeQuery();
+        return $result->fetchAllAssociative();
+    }
+
+    public function getAnyMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
+    {
+        $query = '
+        select count(DISTINCT participant_id) as participant_count from(
+                 SELECT 
+                     participant_id,
+                    CASE 
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField0)) = "null" THEN NULL
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField0)) = "false" THEN NULL
+                        ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField0))
+                    END AS field1,
+                    CASE 
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1)) = "null" THEN NULL
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1)) = "false" THEN NULL
+                        ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1))
+                    END AS field2,
+                    CASE 
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2)) = "null" THEN NULL
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2)) = "false" THEN NULL
+                        ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2))
+                    END AS field3
+                 from evaluations
+                 where age_in_months >= :minAge
+                   and age_in_months <= :maxAge
+             ) jsonvalues
+        where field1 is not null or field2 is not null or field3 is not null';
+        $fieldString0 = "$.\"$field\"[0]";
+        $fieldString1 = "$.\"$field\"[1]";
+        $fieldString2 = "$.\"$field\"[2]";
+        $em = $this->getEntityManager();
+        $stmt = $em->getConnection()->prepare($query);
+        $stmt->bindParam('jsonField0', $fieldString0, ParameterType::STRING);
+        $stmt->bindParam('jsonField1', $fieldString1, ParameterType::STRING);
+        $stmt->bindParam('jsonField2', $fieldString2, ParameterType::STRING);
+        $stmt->bindParam('minAge', $minAge, ParameterType::INTEGER);
+        $stmt->bindParam('maxAge', $maxAge, ParameterType::INTEGER);
+        $result = $stmt->executeQuery();
+        return $result->fetchAllAssociative();
+    }
+
+    public function getThridMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
+    {
+        $query = '
+        select count(DISTINCT participant_id) as participant_count from(
+                 SELECT 
+                     participant_id,
+                    CASE 
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2)) = "null" THEN NULL
+                        WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2)) = "false" THEN NULL
+                        ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2))
+                    END AS field3
+                 from evaluations
+                 where age_in_months >= :minAge
+                   and age_in_months <= :maxAge
+             ) jsonvalues
+        where field3 is not null';
+        $fieldString2 = "$.\"$field\"[2]";
+        $em = $this->getEntityManager();
+        $stmt = $em->getConnection()->prepare($query);
+        $stmt->bindParam('jsonField2', $fieldString2, ParameterType::STRING);
         $stmt->bindParam('minAge', $minAge, ParameterType::INTEGER);
         $stmt->bindParam('maxAge', $maxAge, ParameterType::INTEGER);
         $result = $stmt->executeQuery();
