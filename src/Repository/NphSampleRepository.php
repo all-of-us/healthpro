@@ -20,35 +20,6 @@ class NphSampleRepository extends ServiceEntityRepository
         parent::__construct($registry, NphSample::class);
     }
 
-    // /**
-    //  * @return NphSample[] Returns an array of NphSample objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('n.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-     */
-
-    /*
-    public function findOneBySomeField($value): ?NphSample
-    {
-        return $this->createQueryBuilder('n')
-            ->andWhere('n.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-     */
-
     public function findActiveSampleCodes(NphOrder $order, $site)
     {
         return $this->createQueryBuilder('s')
@@ -75,19 +46,45 @@ class NphSampleRepository extends ServiceEntityRepository
 
     public function findActiveSamplesByParticipantId(string $participantId, string $module): array
     {
-        $sampleIds = $this->createQueryBuilder('s')
-            ->select('s.id')
+        $qb = $this->createQueryBuilder('s');
+        $qb
             ->join('s.nphOrder', 'o')
-            ->andWhere('o.participantId = :participantId')
+            ->where('o.participantId = :participantId')
             ->andWhere('o.module = :module')
-            ->andWhere('s.modifyType IN (:types) or s.modifyType is null')
+            ->andWhere('s.modifyType IN (:types) OR s.modifyType IS NULL')
             ->setParameters([
                 'participantId' => $participantId,
                 'module' => $module,
                 'types' => [NphSample::RESTORE, NphSample::UNLOCK, NphSample::EDITED, NphSample::REVERT]
-            ])
-            ->getQuery()
-            ->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR_COLUMN);
-        return $this->findBy(['id' => $sampleIds]);
+            ]);
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        // Define sort orders
+        $sortOrders = [
+            'o.timepoint' => [
+                'preLMT', 'preDSMT', 'minus15min', 'minus5min', '15min', '30min',
+                '60min', '90min', '120min', '180min', '240min', 'postLMT', 'postDSMT', 'day0'
+            ],
+            'o.orderType' => ['urine', 'saliva', 'hair', 'nail', 'stool', 'blood'],
+            's.sampleCode' => ['ST1', 'ST2', 'ST3', 'ST4', 'SST8P5', 'LIHP1', 'EDTA10', 'P800']
+        ];
+
+        // Generate case expressions for sorting
+        foreach ($sortOrders as $field => $orderList) {
+            $qb->addOrderBy($this->buildCaseExpression($connection, $field, $orderList), 'ASC');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    private function buildCaseExpression($connection, string $field, array $orderList): string
+    {
+        $cases = [];
+        foreach ($orderList as $index => $value) {
+            $quotedValue = $connection->quote($value);
+            $cases[] = "WHEN $field = $quotedValue THEN $index";
+        }
+        return 'CASE ' . implode(' ', $cases) . ' ELSE 999 END';
     }
 }
