@@ -190,7 +190,7 @@ class PediatricsReportService
                     $alertsData[$ageText]['Height/Length'][$heightAlert]++;
                 }
                 if (!empty($waistAlert)) {
-                    //$alertsData[$ageText]['Waist Circumference'][$waistAlert]++;
+                    $alertsData[$ageText]['Waist Circumference'][$waistAlert]++;
                 }
             }
         }
@@ -263,9 +263,9 @@ class PediatricsReportService
                 'pME5c' => 0,
                 'pME5d' => 0,
                 'pME6' => 0,
+                'pME6a' => 0,
                 'pME6b' => 0,
                 'pME6c' => 0,
-                'pME6d' => 0,
                 'pSC19' => 0,
                 'pSC20' => 0,
                 'pSC21' => 0,
@@ -304,6 +304,10 @@ class PediatricsReportService
                 'pSC3' => 0,
                 'pSC4' => 0,
                 'pSC5' => 0
+            ],
+            'Waist Circumference' => [
+                'pSC12' => 0,
+                'pSC13' => 0
             ]
         ];
     }
@@ -366,13 +370,13 @@ class PediatricsReportService
             case 2:
                 return 'pME6';
             case 1:
-                return 'pME6b';
+                return 'pME6a';
         }
         switch ($centile1Count) {
             case 2:
-                return 'pME6c';
+                return 'pME6b';
             case 1:
-                return 'pME6d';
+                return 'pME6c';
         }
         if ($ageInMonths <= 35) {
             $heartRateLessThan85 = 0;
