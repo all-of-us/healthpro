@@ -133,17 +133,7 @@ class CronController extends BaseController
     #[Route(path: '/pediatrics-report-active-alerts', name: 'cron_pediatrics_report_active_alerts')]
     public function pediatricsReportActiveAlertsReportAction(PediatricsReportService $pediatricsReport, ParameterBagInterface $params): Response
     {
-        if ($params->has('startDate')) {
-            $startDate = new \DateTime($params->get('startDate'));
-        } else {
-            $startDate = new \DateTime('first day of 3 months ago');
-        }
-        if ($params->has('endDate')) {
-            $endDate = new \DateTime($params->get('endDate'));
-        } else {
-            $endDate = new \DateTime('last day of last month');
-        }
-        $pediatricsReport->generateActiveAlertReport($startDate, $endDate);
+        $pediatricsReport->generateActiveAlertReport();
         return $this->json(['success' => true]);
     }
 

@@ -53,6 +53,13 @@ class PediatricsReportService
         '<1 year', '1-3 years', '4-6 years'
     ];
 
+    private const ALERTS_CSV_HEADERS = [
+        'alert',
+        '<1 year',
+        '1-3 years',
+        '4-6 years',
+    ];
+
     protected EntityManagerInterface $em;
     protected GcsBucketService $gcsBucketService;
     protected EnvironmentService $env;
@@ -127,7 +134,7 @@ class PediatricsReportService
         $this->generateCSVReport($evaluationsTotalData, 'Protocol_Deviations_Report-' . date('Ymd-His') . '.csv');
     }
 
-    public function generateActiveAlertReport(\DateTime $startDate, \DateTime $endDate): void
+    public function generateActiveAlertReport(): void
     {
         $csvData = [];
         $heartRateAgeCharts = $this->em->getRepository(HeartRateAge::class)->getChartsData();
@@ -136,8 +143,6 @@ class PediatricsReportService
             $alertsData[$ageText] = $this->buildBlankAlertArray();
             $measurements = $this->em->getRepository(Measurement::class)
                 ->getActiveAlertsReportData(
-                    $startDate,
-                    $endDate,
                     $ageRange[0],
                     $ageRange[1]
                 );
@@ -146,18 +151,21 @@ class PediatricsReportService
              */
             foreach ($measurements as $measurement) {
                 $measurementData = json_decode($measurement->getData(), true);
-                $participant = $this->ppscApiService->getParticipantById($measurement->getParticipantId());
+                $sexAtBirth = $measurement->getSexAtBirth();
+                if (empty($sexAtBirth)) {
+                    continue;
+                }
                 $growthChartsByAge = $measurement->getGrowthChartsByAge((int) $measurement->getAgeInMonths());
-                $headCircumferenceChart = $growthChartsByAge['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['headCircumferenceForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
-                $weightChart = $growthChartsByAge['weightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['weightForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
-                $weightForLengthChart = $growthChartsByAge['weightForLengthCharts'] ? $this->em->getRepository($growthChartsByAge['weightForLengthCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
-                $bmiChart = $growthChartsByAge['bmiForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['bmiForAgeCharts'])->getChartsData($participant->sexAtBirth) : []; // @phpstan-ignore-line
+                $headCircumferenceChart = $growthChartsByAge['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['headCircumferenceForAgeCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
+                $weightChart = $growthChartsByAge['weightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['weightForAgeCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
+                $weightForLengthChart = $growthChartsByAge['weightForLengthCharts'] ? $this->em->getRepository($growthChartsByAge['weightForLengthCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
+                $bmiChart = $growthChartsByAge['bmiForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['bmiForAgeCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
                 $heartRateAlert = $this->getHeartRateAlert($measurementData, $measurement->getAgeInMonths(), $heartRateAgeCharts);
-                $headCircumferenceAlert = $this->getHeadCircumferenceAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $participant->sexAtBirth, $headCircumferenceChart);
+                $headCircumferenceAlert = $this->getHeadCircumferenceAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $sexAtBirth, $headCircumferenceChart);
                 $irregularHeartRhythmAlert = $this->getIrregularHeartRhythmAlert($measurementData);
-                $weightAlert = $this->getWeightAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $weightChart, $participant->sexAtBirth);
-                $weightForLengthAlert = $this->getWeightForLengthAlert($measurement, $measurementData, $weightForLengthChart, $participant->sexAtBirth);
-                $bmiAlert = $this->getBMIAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $bmiChart, $participant->sexAtBirth);
+                $weightAlert = $this->getWeightAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $weightChart, $sexAtBirth);
+                $weightForLengthAlert = $this->getWeightForLengthAlert($measurement, $measurementData, $weightForLengthChart, $sexAtBirth);
+                $bmiAlert = $this->getBMIAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $bmiChart, $sexAtBirth);
                 $heightAlert = $this->getHeightAlert($measurementData, $measurement->getAgeInMonths());
                 $waistAlert = $this->getWaistAlert($measurementData, $measurement->getAgeInMonths());
                 if (!empty($heartRateAlert)) {
@@ -182,27 +190,28 @@ class PediatricsReportService
                     $alertsData[$ageText]['Height/Length'][$heightAlert]++;
                 }
                 if (!empty($waistAlert)) {
-                    $alertsData[$ageText]['Waist Circumference'][$waistAlert]++;
+                    //$alertsData[$ageText]['Waist Circumference'][$waistAlert]++;
                 }
             }
         }
-        $csvData[] = array_merge(['alert'], array_keys(self::DEVIATION_AGE_RANGES));
-        $tempRowAlerts = [];
-        $tempRowUnder1 = [];
-        $tempRow1to3 = [];
-        $tempRow4to6 = [];
-        foreach ($alertsData['<1'] as $alertData) {
-            foreach ($alertData as $alert => $alertCount) {
-                $tempRowAlerts[] = $alert;
-                $tempRowUnder1[] = $alertCount;
-                $tempRow1to3[] = $alertCount;
-                $tempRow4to6[] = $alertCount;
+        // Define CSV headers
+        $csvData[] = ['Report Date', date('m/d/Y')];
+        $csvData[] = self::ALERTS_CSV_HEADERS;
+
+
+        $tempRows = [];
+        $ageRanges = array_keys(self::DEVIATION_AGE_RANGES);
+
+        // Collect all unique alert codes
+        foreach ($ageRanges as $ageRange) {
+            foreach ($alertsData[$ageRange] as $alertData) {
+                foreach ($alertData as $alert => $alertCount) {
+                    $tempRows[$alert][$ageRange] = $alertCount;
+                }
             }
         }
-        $index = 0;
-        foreach ($tempRowAlerts as $alert) {
-            $csvData[] = [$tempRowAlerts[$index], $tempRowUnder1[$index], $tempRow1to3[$index], $tempRow4to6[$index]];
-            $index++;
+        foreach ($tempRows as $alert => $alertCounts) {
+            $csvData[] = array_merge([$alert], array_values($alertCounts));
         }
         $this->generateCSVReport($csvData, 'Active_Alerts_Report-' . date('Ymd-His') . '.csv');
     }

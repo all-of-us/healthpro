@@ -216,15 +216,11 @@ class MeasurementRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function getActiveAlertsReportData($startDate, $endDate, $minAge, $maxAge): array
+    public function getActiveAlertsReportData($minAge, $maxAge): array
     {
         $query = $this->createQueryBuilder('m')
-            ->andWhere('m.finalizedTs >= :startDate')
-            ->andWhere('m.finalizedTs <= :endDate')
             ->andWhere('m.ageInMonths >= :minAge')
             ->andWhere('m.ageInMonths <= :maxAge')
-            ->setParameter('startDate', $startDate)
-            ->setParameter('endDate', $endDate)
             ->setParameter('minAge', $minAge)
             ->setParameter('maxAge', $maxAge)
             ->getQuery();
