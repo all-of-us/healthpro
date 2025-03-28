@@ -5,6 +5,7 @@ namespace App\Service\Ppsc;
 use App\Helper\PpscParticipant;
 use App\HttpClient;
 use App\Service\EnvironmentService;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -82,16 +83,29 @@ class PpscApiService
             }
         }
         if (!$participant) {
+            $token = $this->getAccessToken();
             try {
-                $token = $this->getAccessToken();
-                $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
-                    'headers' => ['Authorization' => 'Bearer ' . $token]
-                ]);
-                $participant = json_decode($response->getBody()->getContents());
+                // First attempt
+                $participant = $this->fetchParticipant($participantId, $token);
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401) {
+                    // Retry once with a new token
+                    $token = $this->getAccessToken(true);
+                    try {
+                        $participant = $this->fetchParticipant($participantId, $token);
+                    } catch (\Exception $retryException) {
+                        $this->logException($retryException);
+                        return null;
+                    }
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
             } catch (\Exception $e) {
                 $this->logException($e);
                 return null;
             }
+
             if ($participant && $cacheEnabled) {
                 $participant->cacheTime = new \DateTime();
                 $cacheItem = $cache->getItem($cacheKey);
@@ -138,11 +152,26 @@ class PpscApiService
         }
     }
 
-    public function getAccessToken(): string|null
+    public function getAccessToken(bool $refresh = false): string|null
     {
-        if ($this->accessToken) {
-            return $this->accessToken;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $cacheKey = 'ppsc_access_token';
+        $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
+
+        // If refresh is not forced, try to get the token from the cache.
+        if (!$refresh) {
+            try {
+                $cacheItem = $cache->getItem($cacheKey);
+                if ($cacheItem->isHit()) {
+                    $this->accessToken = $cacheItem->get();
+                    return $this->accessToken;
+                }
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+            }
         }
+
+        // Request a new token if none is cached or if we are refreshing.
         try {
             $response = $this->client->request('POST', $this->tokenUrl, [
                 'headers' => [
@@ -157,6 +186,18 @@ class PpscApiService
             $data = json_decode($response->getBody()->getContents(), true);
             if (isset($data['access_token'])) {
                 $this->accessToken = $data['access_token'];
+
+                // Cache the token using the expires_in value (in seconds) as TTL.
+                try {
+                    $cacheItem = $cache->getItem($cacheKey);
+                    // It is best practice to subtract a few seconds to account for any latency.
+                    $ttl = isset($data['expires_in']) ? intval($data['expires_in']) - 5 : 3600;
+                    $cacheItem->expiresAfter($ttl);
+                    $cacheItem->set($this->accessToken);
+                    $cache->save($cacheItem);
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                }
                 return $this->accessToken;
             }
             return null;
@@ -223,6 +264,15 @@ class PpscApiService
     public function getLastErrorCode()
     {
         return $this->lastErrorCode;
+    }
+
+    private function fetchParticipant(string $participantId, string $token)
+    {
+        $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
+            'headers' => ['Authorization' => 'Bearer ' . $token]
+        ]);
+
+        return json_decode($response->getBody()->getContents());
     }
 
     private function getParams($field): string|null
