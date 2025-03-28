@@ -85,8 +85,6 @@ class Measurement
 
     private array $growthCharts = [];
 
-    private int $sexAtBirth;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -136,6 +134,9 @@ class Measurement
 
     #[ORM\Column(type: 'float', nullable: true)]
     private $ageInMonths;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $sexAtBirth;
 
     public function getId(): ?int
     {
