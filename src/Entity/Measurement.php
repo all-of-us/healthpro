@@ -737,6 +737,12 @@ class Measurement
             'bmiForAgeCharts' => [
                 BmiForAge5YearsAndUp::class => [60, 240]
             ],
+            'bloodPressureSystolicHeightChart' => [
+                BloodPressureSystolicHeightPercentile::class => [0, 240]
+            ],
+            'bloodPressureDiastolicHeightChart' => [
+                BloodPressureDiastolicHeightPercentile::class => [0, 240]
+            ],
         ];
 
         $selectedGrowthCharts = array_fill_keys(array_keys($growthChartsByAgeList), null);
@@ -751,6 +757,17 @@ class Measurement
         }
 
         return $selectedGrowthCharts;
+    }
+
+    public function calculateMeanFromValues($values): ?float
+    {
+        if (count($values) > 0) {
+            if (count($values) === 3) {
+                $this->calculateThreeValuesMean($values);
+            }
+            return array_sum($values) / count($values);
+        }
+        return null;
     }
 
     protected function normalizeData($type = null)
