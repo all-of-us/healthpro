@@ -215,7 +215,7 @@ class PpscApiService
                 try {
                     $cacheItem = $cache->getItem($cacheKey);
                     // Subtract a few seconds to account for any latency.
-                    $ttl = isset($data['expires_in']) ? intval($data['expires_in']) - 10 : 3600;
+                    $ttl = isset($data['expires_in']) ? intval($data['expires_in']) - 10 : 1800;
                     $cacheItem->expiresAfter($ttl);
                     $cacheItem->set($this->accessToken);
                     $cache->save($cacheItem);
