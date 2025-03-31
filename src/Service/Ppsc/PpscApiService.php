@@ -231,16 +231,33 @@ class PpscApiService
         }
     }
 
-    public function get(string $path, array $params = []): ResponseInterface
+    public function get(string $path, array $params = []): ?ResponseInterface
     {
         $token = $this->getAccessToken();
-        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
-        return $this->client->request('GET', $this->endpoint . $path, $params);
+        $retry = true;
+
+        while (true) {
+            try {
+                $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+                return $this->client->request('GET', $this->endpoint . $path, $params);
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
+        }
     }
 
     public function post(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
-        $token = $this->getAccessToken();
+        $token = $this->getAccessToken(true);
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('POST', $this->endpoint . $path, $params);
@@ -248,7 +265,7 @@ class PpscApiService
 
     public function put(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
-        $token = $this->getAccessToken();
+        $token = $this->getAccessToken(true);
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('PUT', $this->endpoint . $path, $params);
@@ -256,7 +273,7 @@ class PpscApiService
 
     public function patch(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
-        $token = $this->getAccessToken();
+        $token = $this->getAccessToken(true);
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('PATCH', $this->endpoint . $path, $params);
