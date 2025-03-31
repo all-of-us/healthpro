@@ -84,28 +84,24 @@ class PpscApiService
         }
         if (!$participant) {
             $token = $this->getAccessToken();
-            try {
-                // First attempt
-                $participant = $this->fetchParticipant($participantId, $token);
-            } catch (ClientException $e) {
-                if ($e->getResponse()->getStatusCode() === 401) {
-                    // Retry once with a new token
-                    $token = $this->getAccessToken(true);
-                    try {
-                        $participant = $this->fetchParticipant($participantId, $token);
-                    } catch (\Exception $retryException) {
-                        $this->logException($retryException);
+            $retry = true;
+            while (true) {
+                try {
+                    $participant = $this->fetchParticipantById($participantId, $token);
+                    break;
+                } catch (ClientException $e) {
+                    if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                        $token = $this->getAccessToken(true);
+                        $retry = false;
+                    } else {
+                        $this->logException($e);
                         return null;
                     }
-                } else {
+                } catch (\Exception $e) {
                     $this->logException($e);
                     return null;
                 }
-            } catch (\Exception $e) {
-                $this->logException($e);
-                return null;
             }
-
             if ($participant && $cacheEnabled) {
                 $participant->cacheTime = new \DateTime();
                 $cacheItem = $cache->getItem($cacheKey);
@@ -122,17 +118,26 @@ class PpscApiService
 
     public function getParticipantByBiobankId(string $biobankId): PpscParticipant|null
     {
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'participants?bioBankId=' . $biobankId, [
-                'headers' => ['Authorization' => 'Bearer ' . $token]
-            ]);
-            $participant = json_decode($response->getBody()->getContents());
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
+        $token = $this->getAccessToken();
+        $retry = true;
+        while (true) {
+            try {
+                $participant = $this->fetchParticipantByBiobankId($biobankId, $token);
+                break;
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
         }
-        if ($participant) {
+        if (!empty($participant)) {
             return new PpscParticipant($participant);
         }
         return null;
@@ -140,15 +145,23 @@ class PpscApiService
 
     public function getRawParticipantById(string $participantId): array|null
     {
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
-                'headers' => ['Authorization' => 'Bearer ' . $token]
-            ]);
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (\Exception $e) {
-            $this->logException($e);
-            return null;
+        $token = $this->getAccessToken();
+        $retry = true;
+        while (true) {
+            try {
+                return $this->fetchParticipantById($participantId, $token, true);
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
         }
     }
 
@@ -266,9 +279,18 @@ class PpscApiService
         return $this->lastErrorCode;
     }
 
-    private function fetchParticipant(string $participantId, string $token)
+    private function fetchParticipantById(string $participantId, string $token, bool $associative = false)
     {
         $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
+            'headers' => ['Authorization' => 'Bearer ' . $token]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), $associative);
+    }
+
+    private function fetchParticipantByBiobankId(string $biobankId, string $token)
+    {
+        $response = $this->client->request('GET', $this->endpoint . 'participants?bioBankId=' . $biobankId, [
             'headers' => ['Authorization' => 'Bearer ' . $token]
         ]);
 
