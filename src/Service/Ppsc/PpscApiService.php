@@ -51,16 +51,27 @@ class PpscApiService
         if (empty($requestId)) {
             return null;
         }
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
-                'headers' => ['Authorization' => 'Bearer ' . $token]
-            ]);
-            $requestDetailsData = json_decode($response->getBody()->getContents());
-            return $requestDetailsData ?? null;
-        } catch (\Exception $e) {
-            $this->logException($e);
-            return null;
+        $token = $this->getAccessToken();
+        $retry = true;
+        while (true) {
+            try {
+                $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
+                    'headers' => ['Authorization' => 'Bearer ' . $token]
+                ]);
+                $requestDetailsData = json_decode($response->getBody()->getContents());
+                return $requestDetailsData ?? null;
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
         }
     }
 
@@ -203,8 +214,8 @@ class PpscApiService
                 // Cache the token using the expires_in value (in seconds) as TTL.
                 try {
                     $cacheItem = $cache->getItem($cacheKey);
-                    // It is best practice to subtract a few seconds to account for any latency.
-                    $ttl = isset($data['expires_in']) ? intval($data['expires_in']) - 5 : 3600;
+                    // Subtract a few seconds to account for any latency.
+                    $ttl = isset($data['expires_in']) ? intval($data['expires_in']) - 10 : 3600;
                     $cacheItem->expiresAfter($ttl);
                     $cacheItem->set($this->accessToken);
                     $cache->save($cacheItem);
