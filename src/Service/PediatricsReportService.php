@@ -406,7 +406,7 @@ class PediatricsReportService
         string $alert3,
         string $alert4
     ): string {
-        if (!isset($measurementData[$bpKey])) {
+        if ($ageInMonths < 13 || !isset($measurementData[$bpKey])) {
             return '';
         }
 
@@ -518,11 +518,13 @@ class PediatricsReportService
             $heartRateOver175 = 0;
             $heartRateOver200 = 0;
             foreach ($heartRates as $heartRate) {
-                if ($heartRate > 175) {
-                    $heartRateOver175++;
-                }
-                if ($heartRate > 200) {
-                    $heartRateOver200++;
+                if (!empty($heartRate)) {
+                    if ($heartRate > 175) {
+                        $heartRateOver175++;
+                    }
+                    if ($heartRate > 200) {
+                        $heartRateOver200++;
+                    }
                 }
             }
             if ($heartRateOver200 > 0) {
@@ -535,8 +537,10 @@ class PediatricsReportService
         if ($ageInMonths > 1 && $ageInMonths < 6) {
             $heartRateOver175 = 0;
             foreach ($heartRates as $heartRate) {
-                if ($heartRate > 175) {
-                    $heartRateOver175++;
+                if (!empty($heartRate)) {
+                    if ($heartRate > 175) {
+                        $heartRateOver175++;
+                    }
                 }
             }
             if ($heartRateOver175 > 1) {
@@ -549,11 +553,13 @@ class PediatricsReportService
         $centile1Count = 0;
         $centile99Count = 0;
         foreach ($heartRates as $heartRate) {
-            if ($heartRate < $heartCentiles['centile1']) {
-                $centile1Count++;
-            }
-            if ($heartRate > $heartCentiles['centile99']) {
-                $centile99Count++;
+            if (!empty($heartRate)) {
+                if ($heartRate < $heartCentiles['centile1']) {
+                    $centile1Count++;
+                }
+                if ($heartRate > $heartCentiles['centile99']) {
+                    $centile99Count++;
+                }
             }
         }
         switch ($centile99Count) {
@@ -572,11 +578,13 @@ class PediatricsReportService
             $heartRateLessThan85 = 0;
             $heartRateOver205 = 0;
             foreach ($heartRates as $heartRate) {
-                if ($heartRate < 85) {
-                    $heartRateLessThan85++;
-                }
-                if ($heartRate > 205) {
-                    $heartRateOver205++;
+                if (!empty($heartRate)) {
+                    if ($heartRate < 85) {
+                        $heartRateLessThan85++;
+                    }
+                    if ($heartRate > 205) {
+                        $heartRateOver205++;
+                    }
                 }
             }
             if ($heartRateLessThan85 >= 1) {
@@ -585,35 +593,21 @@ class PediatricsReportService
             if ($heartRateOver205 >= 1) {
                 return 'pSC20';
             }
-        } elseif ($ageInMonths > 35 && $ageInMonths <= 83) {
+        }
+        if ($ageInMonths >= 36 && $ageInMonths <= 83) {
             $heartRateLessThan60 = 0;
-            $heartRateOver200 = 0;
+            $heartRateOver140 = 0;
             foreach ($heartRates as $heartRate) {
-                if ($heartRate < 60) {
-                    $heartRateLessThan60++;
-                }
-                if ($heartRate > 200) {
-                    $heartRateOver200++;
+                if (!empty($heartRate)) {
+                    if ($heartRate < 60) {
+                        $heartRateLessThan60++;
+                    }
+                    if ($heartRate > 140) {
+                        $heartRateOver140++;
+                    }
                 }
             }
             if ($heartRateLessThan60 >= 1) {
-                return 'pSC19';
-            }
-            if ($heartRateOver200 >= 1) {
-                return 'pSC20';
-            }
-        } elseif ($ageInMonths > 83) {
-            $heartRateLessThan50 = 0;
-            $heartRateOver140 = 0;
-            foreach ($heartRates as $heartRate) {
-                if ($heartRate < 50) {
-                    $heartRateLessThan50++;
-                }
-                if ($heartRate > 140) {
-                    $heartRateOver140++;
-                }
-            }
-            if ($heartRateLessThan50 >= 1) {
                 return 'pSC21';
             }
             if ($heartRateOver140 >= 1) {
@@ -639,7 +633,7 @@ class PediatricsReportService
             }
         }
 
-        if ($ageInMonths <= 24) {
+        if ($ageInMonths < 36) {
             foreach ($headCircumferenceChart as $chart) {
                 $overRangeCount = 0;
                 foreach ($headCircumferences as $headCircumference) {
@@ -657,13 +651,14 @@ class PediatricsReportService
                     return 'pME7a';
                 }
             }
-        } else {
             foreach ($headCircumferences as $headCircumference) {
-                if ($headCircumference < 29) {
-                    return 'pSC10';
-                }
-                if ($headCircumference > 55) {
-                    return 'pSC11';
+                if (!empty($headCircumference)) {
+                    if ($headCircumference < 29) {
+                        return 'pSC10';
+                    }
+                    if ($headCircumference > 55) {
+                        return 'pSC11';
+                    }
                 }
             }
         }
@@ -699,20 +694,24 @@ class PediatricsReportService
         }
         if ($ageInMonths <= 35) {
             foreach ($weights as $weight) {
-                if ($weight < 1) {
-                    return 'pSC6';
-                }
-                if ($weight > 18) {
-                    return 'pSC7';
+                if (!empty($weight)) {
+                    if ($weight < 1) {
+                        return 'pSC6';
+                    }
+                    if ($weight > 18) {
+                        return 'pSC7';
+                    }
                 }
             }
         } elseif ($ageInMonths >= 36 && $ageInMonths <= 83) {
             foreach ($weights as $weight) {
-                if ($weight < 7) {
-                    return 'pSC8';
-                }
-                if ($weight > 35) {
-                    return 'pSC9';
+                if (!empty($weight)) {
+                    if ($weight < 7) {
+                        return 'pSC8';
+                    }
+                    if ($weight > 35) {
+                        return 'pSC9';
+                    }
                 }
             }
         }
@@ -760,7 +759,7 @@ class PediatricsReportService
                 if (!empty($weight)) {
                     $zScore = $measurement->calculateZScore($weight, $chart['L'], $chart['M'], $chart['S']);
                     $percentile = $measurement->calculatePercentile($zScore, $this->zScores);
-                    if ($percentile < 2.3) {
+                    if ($percentile !== null && $percentile < 2.3) {
                         $underRangeCount++;
                     }
                 }
@@ -834,25 +833,27 @@ class PediatricsReportService
     {
         $heights = array_key_exists('height', $measurementData) ? $measurementData['height'] : [];
         foreach ($heights as $height) {
-            if ($height >= 0.0 && $height <= 2.3) {
-                return 'pSC1';
-            }
+            if (!empty($height)) {
+                if ($height >= 0.0 && $height <= 2.3) {
+                    return 'pSC1';
+                }
 
-            if ($ageInMonths <= 35) {
-                if ($height < 42) {
-                    return 'pSC2';
+                if ($ageInMonths <= 35) {
+                    if ($height < 42) {
+                        return 'pSC2';
+                    }
+                    if ($height > 109) {
+                        return 'pSC3';
+                    }
                 }
-                if ($height > 109) {
-                    return 'pSC3';
-                }
-            }
 
-            if ($ageInMonths > 35 && $ageInMonths <= 83) {
-                if ($height < 80) {
-                    return 'pSC4';
-                }
-                if ($height > 134) {
-                    return 'pSC5';
+                if ($ageInMonths > 35 && $ageInMonths <= 83) {
+                    if ($height < 80) {
+                        return 'pSC4';
+                    }
+                    if ($height > 134) {
+                        return 'pSC5';
+                    }
                 }
             }
         }
@@ -862,12 +863,14 @@ class PediatricsReportService
     {
         $waistCircumferences = array_key_exists('waist-circumference', $measurementData) ? $measurementData['waist-circumference'] : [];
         foreach ($waistCircumferences as $waistCircumference) {
-            if ($ageInMonths >= 24 && $ageInMonths <= 83) {
-                if ($waistCircumference < 38) {
-                    return 'pSC12';
-                }
-                if ($waistCircumference > 92) {
-                    return 'pSC13';
+            if (!empty($waistCircumference)) {
+                if ($ageInMonths >= 24 && $ageInMonths <= 83) {
+                    if ($waistCircumference < 38) {
+                        return 'pSC12';
+                    }
+                    if ($waistCircumference > 92) {
+                        return 'pSC13';
+                    }
                 }
             }
         }
