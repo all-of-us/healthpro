@@ -275,5 +275,10 @@ $(document).ready(function () {
 
     if ($(".stoolKit2-checkbox").is(":checked")) {
         $("#stoolKit2Samples").collapse("show");
+        samplesMasonry.layout();
     }
+
+    const optionalStoolKitSel = document.getElementById("stoolKit2Samples");
+    optionalStoolKitSel.addEventListener("shown.bs.collapse", () => samplesMasonry.layout());
+    optionalStoolKitSel.addEventListener("hidden.bs.collapse", () => samplesMasonry.layout());
 });

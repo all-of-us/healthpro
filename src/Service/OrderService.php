@@ -98,6 +98,9 @@ class OrderService
         try {
             // Currently, PPSC API doesn't support this
             $response = $this->ppscApiService->get("rdr/v1/Participant/{$participantId}/BiobankOrder");
+            if (!$response) {
+                return [];
+            }
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->data)) {
                 return $result->data;
@@ -116,6 +119,9 @@ class OrderService
             $response = $this->ppscApiService->get('rdr/v1/BiobankOrder', [
                 'query' => $query
             ]);
+            if (!$response) {
+                return [];
+            }
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && is_array($result->data)) {
                 return $result->data;
@@ -145,6 +151,9 @@ class OrderService
     {
         try {
             $response = $this->ppscApiService->get("participants/{$participantId}/biobank-orders/{$orderId}");
+            if (!$response) {
+                return false;
+            }
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;

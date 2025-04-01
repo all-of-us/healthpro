@@ -94,6 +94,9 @@ class MeasurementService
     {
         try {
             $response = $this->ppscApiService->get("participants/{$participantId}/physical-measurements/{$measurementId}");
+            if (!$response) {
+                return false;
+            }
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->id)) {
                 return $result;

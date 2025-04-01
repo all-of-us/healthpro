@@ -5,6 +5,7 @@ namespace App\Service\Ppsc;
 use App\Helper\PpscParticipant;
 use App\HttpClient;
 use App\Service\EnvironmentService;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -50,16 +51,27 @@ class PpscApiService
         if (empty($requestId)) {
             return null;
         }
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
-                'headers' => ['Authorization' => 'Bearer ' . $token]
-            ]);
-            $requestDetailsData = json_decode($response->getBody()->getContents());
-            return $requestDetailsData ?? null;
-        } catch (\Exception $e) {
-            $this->logException($e);
-            return null;
+        $token = $this->getAccessToken();
+        $retry = true;
+        while (true) {
+            try {
+                $response = $this->client->request('GET', $this->endpoint . 'requests/' . $requestId, [
+                    'headers' => ['Authorization' => 'Bearer ' . $token]
+                ]);
+                $requestDetailsData = json_decode($response->getBody()->getContents());
+                return $requestDetailsData ?? null;
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
         }
     }
 
@@ -82,15 +94,24 @@ class PpscApiService
             }
         }
         if (!$participant) {
-            try {
-                $token = $this->getAccessToken();
-                $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
-                    'headers' => ['Authorization' => 'Bearer ' . $token]
-                ]);
-                $participant = json_decode($response->getBody()->getContents());
-            } catch (\Exception $e) {
-                $this->logException($e);
-                return null;
+            $token = $this->getAccessToken();
+            $retry = true;
+            while (true) {
+                try {
+                    $participant = $this->fetchParticipantById($participantId, $token);
+                    break;
+                } catch (ClientException $e) {
+                    if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                        $token = $this->getAccessToken(true);
+                        $retry = false;
+                    } else {
+                        $this->logException($e);
+                        return null;
+                    }
+                } catch (\Exception $e) {
+                    $this->logException($e);
+                    return null;
+                }
             }
             if ($participant && $cacheEnabled) {
                 $participant->cacheTime = new \DateTime();
@@ -108,17 +129,26 @@ class PpscApiService
 
     public function getParticipantByBiobankId(string $biobankId): PpscParticipant|null
     {
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'participants?bioBankId=' . $biobankId, [
-                'headers' => ['Authorization' => 'Bearer ' . $token]
-            ]);
-            $participant = json_decode($response->getBody()->getContents());
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            return null;
+        $token = $this->getAccessToken();
+        $retry = true;
+        while (true) {
+            try {
+                $participant = $this->fetchParticipantByBiobankId($biobankId, $token);
+                break;
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
         }
-        if ($participant) {
+        if (!empty($participant)) {
             return new PpscParticipant($participant);
         }
         return null;
@@ -126,23 +156,46 @@ class PpscApiService
 
     public function getRawParticipantById(string $participantId): array|null
     {
-        try {
-            $token = $this->getAccessToken();
-            $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
-                'headers' => ['Authorization' => 'Bearer ' . $token]
-            ]);
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (\Exception $e) {
-            $this->logException($e);
-            return null;
+        $token = $this->getAccessToken();
+        $retry = true;
+        while (true) {
+            try {
+                return $this->fetchParticipantById($participantId, $token, true);
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
         }
     }
 
-    public function getAccessToken(): string|null
+    public function getAccessToken(bool $refresh = false): string|null
     {
-        if ($this->accessToken) {
-            return $this->accessToken;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $cacheKey = 'ppsc_access_token';
+        $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
+
+        // If refresh is not forced, try to get the token from the cache.
+        if (!$refresh) {
+            try {
+                $cacheItem = $cache->getItem($cacheKey);
+                if ($cacheItem->isHit()) {
+                    $this->accessToken = $cacheItem->get();
+                    return $this->accessToken;
+                }
+            } catch (\Exception $e) {
+                error_log($e->getMessage());
+            }
         }
+
+        // Request a new token if none is cached or if we are refreshing.
         try {
             $response = $this->client->request('POST', $this->tokenUrl, [
                 'headers' => [
@@ -157,6 +210,18 @@ class PpscApiService
             $data = json_decode($response->getBody()->getContents(), true);
             if (isset($data['access_token'])) {
                 $this->accessToken = $data['access_token'];
+
+                // Cache the token using the expires_in value (in seconds) as TTL.
+                try {
+                    $cacheItem = $cache->getItem($cacheKey);
+                    // Subtract a few seconds to account for any latency.
+                    $ttl = isset($data['expires_in']) ? intval($data['expires_in']) - 10 : 1800;
+                    $cacheItem->expiresAfter($ttl);
+                    $cacheItem->set($this->accessToken);
+                    $cache->save($cacheItem);
+                } catch (\Exception $e) {
+                    error_log($e->getMessage());
+                }
                 return $this->accessToken;
             }
             return null;
@@ -166,16 +231,33 @@ class PpscApiService
         }
     }
 
-    public function get(string $path, array $params = []): ResponseInterface
+    public function get(string $path, array $params = []): ?ResponseInterface
     {
         $token = $this->getAccessToken();
-        $params['headers'] = ['Authorization' => 'Bearer ' . $token];
-        return $this->client->request('GET', $this->endpoint . $path, $params);
+        $retry = true;
+
+        while (true) {
+            try {
+                $params['headers'] = ['Authorization' => 'Bearer ' . $token];
+                return $this->client->request('GET', $this->endpoint . $path, $params);
+            } catch (ClientException $e) {
+                if ($e->getResponse()->getStatusCode() === 401 && $retry) {
+                    $token = $this->getAccessToken(true);
+                    $retry = false;
+                } else {
+                    $this->logException($e);
+                    return null;
+                }
+            } catch (\Exception $e) {
+                $this->logException($e);
+                return null;
+            }
+        }
     }
 
     public function post(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
-        $token = $this->getAccessToken();
+        $token = $this->getAccessToken(true);
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('POST', $this->endpoint . $path, $params);
@@ -183,7 +265,7 @@ class PpscApiService
 
     public function put(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
-        $token = $this->getAccessToken();
+        $token = $this->getAccessToken(true);
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('PUT', $this->endpoint . $path, $params);
@@ -191,7 +273,7 @@ class PpscApiService
 
     public function patch(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
-        $token = $this->getAccessToken();
+        $token = $this->getAccessToken(true);
         $params['headers'] = ['Authorization' => 'Bearer ' . $token];
         $params['json'] = $body;
         return $this->client->request('PATCH', $this->endpoint . $path, $params);
@@ -223,6 +305,24 @@ class PpscApiService
     public function getLastErrorCode()
     {
         return $this->lastErrorCode;
+    }
+
+    private function fetchParticipantById(string $participantId, string $token, bool $associative = false)
+    {
+        $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
+            'headers' => ['Authorization' => 'Bearer ' . $token]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), $associative);
+    }
+
+    private function fetchParticipantByBiobankId(string $biobankId, string $token)
+    {
+        $response = $this->client->request('GET', $this->endpoint . 'participants?bioBankId=' . $biobankId, [
+            'headers' => ['Authorization' => 'Bearer ' . $token]
+        ]);
+
+        return json_decode($response->getBody()->getContents());
     }
 
     private function getParams($field): string|null
