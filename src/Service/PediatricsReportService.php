@@ -385,14 +385,12 @@ class PediatricsReportService
                 'pSC2' => 0,
                 'pSC3' => 0,
                 'pSC4' => 0,
-                'pSC5' => 0
+                'pSC5' => 0,
+                'pSC14' => 0
             ],
             'Waist Circumference' => [
                 'pSC12' => 0,
                 'pSC13' => 0
-            ],
-            'Height' => [
-                'pSC14' => 0
             ]
         ];
     }
@@ -868,6 +866,10 @@ class PediatricsReportService
         $heights = array_key_exists('height', $measurementData) ? $measurementData['height'] : [];
         foreach ($heights as $height) {
             if (!empty($height)) {
+                if ($height > 228) {
+                    return 'pSC14';
+                }
+
                 if ($height >= 0.0 && $height <= 2.3) {
                     return 'pSC1';
                 }
@@ -888,10 +890,6 @@ class PediatricsReportService
                     if ($height > 134) {
                         return 'pSC5';
                     }
-                }
-
-                if ($height > 228) {
-                    return 'pSC14';
                 }
             }
         }
