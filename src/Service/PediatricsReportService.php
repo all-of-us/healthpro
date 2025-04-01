@@ -163,6 +163,7 @@ class PediatricsReportService
                 $heightForAgeChart = $growthChartsByAge['heightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['heightForAgeCharts'])->getChartsData($sexAtBirth) : [];
                 $bloodPressureSystolicHeightChart = $growthChartsByAge['bloodPressureSystolicHeightChart'] ? $this->em->getRepository($growthChartsByAge['bloodPressureSystolicHeightChart'])->getChartsData($sexAtBirth) : [];
                 $bloodPressureSystolicAlert = $this->getBloodPressureSystolicAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $sexAtBirth, $heightForAgeChart, $bloodPressureSystolicHeightChart);
+                $bloodPressureDiastolicAlert = $this->getBloodPressureDiastolicAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $sexAtBirth, $heightForAgeChart, $bloodPressureSystolicHeightChart);
                 $heartRateAlert = $this->getHeartRateAlert($measurementData, $measurement->getAgeInMonths(), $heartRateAgeCharts);
                 $headCircumferenceAlert = $this->getHeadCircumferenceAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $sexAtBirth, $headCircumferenceChart);
                 $irregularHeartRhythmAlert = $this->getIrregularHeartRhythmAlert($measurementData);
@@ -197,6 +198,9 @@ class PediatricsReportService
                 }
                 if (!empty($bloodPressureSystolicAlert)) {
                     $alertsData[$ageText]['Blood Pressure Systolic'][$bloodPressureSystolicAlert]++;
+                }
+                if (!empty($bloodPressureDiastolicAlert)) {
+                    $alertsData[$ageText]['Blood Pressure Diastolic'][$bloodPressureDiastolicAlert]++;
                 }
             }
         }
@@ -260,6 +264,54 @@ class PediatricsReportService
         $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
     }
 
+    public function getBloodPressureSystolicAlert(
+        $measurement,
+        array $measurementData,
+        int $ageInMonths,
+        int $sexAtBirth,
+        array $heightForAgeChart,
+        array $bloodPressureSystolicHeightChart
+    ): string {
+        return $this->getBloodPressureAlert(
+            $measurement,
+            $measurementData,
+            $ageInMonths,
+            $sexAtBirth,
+            $heightForAgeChart,
+            $bloodPressureSystolicHeightChart,
+            'blood-pressure-systolic',
+            140,
+            'pME1c',
+            'pME1',
+            'pME1b',
+            'pME1d'
+        );
+    }
+
+    public function getBloodPressureDiastolicAlert(
+        $measurement,
+        array $measurementData,
+        int $ageInMonths,
+        int $sexAtBirth,
+        array $heightForAgeChart,
+        array $bloodPressureSystolicHeightChart
+    ): string {
+        return $this->getBloodPressureAlert(
+            $measurement,
+            $measurementData,
+            $ageInMonths,
+            $sexAtBirth,
+            $heightForAgeChart,
+            $bloodPressureSystolicHeightChart,
+            'blood-pressure-diastolic',
+            90,
+            'pME2c',
+            'pME2',
+            'pME2b',
+            'pME2d'
+        );
+    }
+
     private function buildBlankAlertArray(): array
     {
         return [
@@ -267,7 +319,9 @@ class PediatricsReportService
                 'pME1' => 0,
                 'pME1b' => 0,
                 'pME1c' => 0,
-                'pME1d' => 0,
+                'pME1d' => 0
+            ],
+            'Blood Pressure Diastolic' => [
                 'pME2' => 0,
                 'pME2b' => 0,
                 'pME2c' => 0,
@@ -328,71 +382,76 @@ class PediatricsReportService
         ];
     }
 
-    private function getBloodPressureSystolicAlert($measurement, array $measurementData, int $ageInMonths, int $sexAtBirth, array $heightForAgeChart, array $bloodPressureSystolicHeightChart): string
+    private function getLMSValues(array $heightForAgeChart, int $ageInMonths, int $sexAtBirth): array
     {
-        if (!array_key_exists('blood-pressure-systolic', $measurementData)) {
-            return '';
-        }
-        $heights = $measurementData['height'];
-        $heightMean = $measurement->calculateMeanFromValues($heights);
-        $lmsValues = [];
-
         foreach ($heightForAgeChart as $item) {
             if ($item['sex'] == $sexAtBirth && floor($item['month']) == $ageInMonths) {
-                $lmsValues['L'] = $item['L'];
-                $lmsValues['M'] = $item['M'];
-                $lmsValues['S'] = $item['S'];
+                return ['L' => $item['L'], 'M' => $item['M'], 'S' => $item['S']];
             }
         }
+        return [];
+    }
+
+    private function getBloodPressureAlert(
+        $measurement,
+        array $measurementData,
+        int $ageInMonths,
+        int $sexAtBirth,
+        array $heightForAgeChart,
+        array $bloodPressureChart,
+        string $bpKey,
+        int $optionalThreshold1,
+        string $alert1,
+        string $alert2,
+        string $alert3,
+        string $alert4
+    ): string {
+        if (!isset($measurementData[$bpKey])) {
+            return '';
+        }
+
+        $heights = $measurementData['height'];
+        $heightMean = $measurement->calculateMeanFromValues($heights);
+        $lmsValues = $this->getLMSValues($heightForAgeChart, $ageInMonths, $sexAtBirth);
+
+        if (empty($lmsValues)) {
+            return '';
+        }
+
         $zScore = $measurement->calculateZScore($heightMean, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
         $heightPercentile = $measurement->calculatePercentile($zScore, $this->zScores);
-        $heightPercentileField = 'heightPer5';
-        if ($heightPercentile) {
-            $nearestPercentile = $this->roundDownToNearestPercentile($heightPercentile);
-            $heightPercentileField = 'heightPer' . $nearestPercentile;
-        }
-        $maxValue95PercentilePlus12Or140 = $this->getMaxValueForPercentile(
-            12,
-            $sexAtBirth,
-            $heightPercentileField,
-            $bloodPressureSystolicHeightChart,
-            $ageInMonths,
-            140
-        );
-        $maxValue95PercentilePlus30 = $this->getMaxValueForPercentile(
-            30,
-            $sexAtBirth,
-            $heightPercentileField,
-            $bloodPressureSystolicHeightChart,
-            $ageInMonths
-        );
+        $heightPercentileField = 'heightPer' . ($heightPercentile ? $this->roundDownToNearestPercentile($heightPercentile) : '5');
 
-        $bloodPressureSystolics = $measurementData['blood-pressure-systolic'];
-        $bpOver95PercentilePlus12Or140 = 0;
-        $bpOver95PercentilePlus30 = 0;
-        foreach ($bloodPressureSystolics as $bloodPressureSystolic) {
-            if (!empty($bloodPressureSystolic)) {
-                if ($bloodPressureSystolic >= $maxValue95PercentilePlus12Or140) {
-                    $bpOver95PercentilePlus12Or140++;
+        $maxValue1 = $this->getMaxValueForPercentile(12, $sexAtBirth, $heightPercentileField, $bloodPressureChart, $ageInMonths, $optionalThreshold1);
+        $maxValue2 = $this->getMaxValueForPercentile(30, $sexAtBirth, $heightPercentileField, $bloodPressureChart, $ageInMonths);
+
+        $count1 = 0;
+        $count2 = 0;
+
+        foreach ($measurementData[$bpKey] as $bp) {
+            if (!empty($bp)) {
+                if ($bp >= $maxValue1) {
+                    $count1++;
                 }
-                if ($bloodPressureSystolic >= $maxValue95PercentilePlus30) {
-                    $bpOver95PercentilePlus30++;
+                if ($bp >= $maxValue2) {
+                    $count2++;
                 }
             }
         }
-        if ($bpOver95PercentilePlus12Or140 === 1) {
-            return 'pME1c';
+
+        if ($count1 === 1) {
+            return $alert1;
         }
-        if ($bpOver95PercentilePlus12Or140 >= 2) {
-            return 'pME1';
+        if ($count1 >= 2) {
+            return $alert2;
+        }
+        if ($count2 === 1) {
+            return $alert3;
+        }
+        if ($count2 >= 2) {
+            return $alert4;
         }
 
-        if ($bpOver95PercentilePlus30 === 1) {
-            return 'pME1b';
-        }
-        if ($bpOver95PercentilePlus30 >= 2) {
-            return 'pME1d';
-        }
         return '';
     }
 
