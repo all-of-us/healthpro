@@ -284,7 +284,11 @@ class PediatricsReportService
             'pME1c',
             'pME1',
             'pME1b',
-            'pME1d'
+            'pME1d',
+            'pSC15',
+            'pSC16',
+            88,
+            126
         );
     }
 
@@ -308,7 +312,11 @@ class PediatricsReportService
             'pME2c',
             'pME2',
             'pME2b',
-            'pME2d'
+            'pME2d',
+            'pSC17',
+            'pSC18',
+            45,
+            86
         );
     }
 
@@ -319,13 +327,17 @@ class PediatricsReportService
                 'pME1' => 0,
                 'pME1b' => 0,
                 'pME1c' => 0,
-                'pME1d' => 0
+                'pME1d' => 0,
+                'pSC15' => 0,
+                'pSC16' => 0
             ],
             'Blood Pressure Diastolic' => [
                 'pME2' => 0,
                 'pME2b' => 0,
                 'pME2c' => 0,
-                'pME2d' => 0
+                'pME2d' => 0,
+                'pSC17' => 0,
+                'pSC18' => 0
             ],
             'Heart Rate' => [
                 'pME5' => 0,
@@ -378,6 +390,9 @@ class PediatricsReportService
             'Waist Circumference' => [
                 'pSC12' => 0,
                 'pSC13' => 0
+            ],
+            'Height' => [
+                'pSC14' => 0
             ]
         ];
     }
@@ -404,52 +419,71 @@ class PediatricsReportService
         string $alert1,
         string $alert2,
         string $alert3,
-        string $alert4
+        string $alert4,
+        string $alert5,
+        string $alert6,
+        int $sanityCheckWarning1,
+        int $sanityCheckWarning2
     ): string {
-        if ($ageInMonths < 13 || !isset($measurementData[$bpKey])) {
+        if (!isset($measurementData[$bpKey])) {
             return '';
         }
 
-        $heights = $measurementData['height'];
-        $heightMean = $measurement->calculateMeanFromValues($heights);
-        $lmsValues = $this->getLMSValues($heightForAgeChart, $ageInMonths, $sexAtBirth);
+        if ($ageInMonths < 13) {
+            $heights = $measurementData['height'];
+            $heightMean = $measurement->calculateMeanFromValues($heights);
+            $lmsValues = $this->getLMSValues($heightForAgeChart, $ageInMonths, $sexAtBirth);
 
-        if (empty($lmsValues)) {
-            return '';
-        }
+            if (empty($lmsValues)) {
+                return '';
+            }
 
-        $zScore = $measurement->calculateZScore($heightMean, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
-        $heightPercentile = $measurement->calculatePercentile($zScore, $this->zScores);
-        $heightPercentileField = 'heightPer' . ($heightPercentile ? $this->roundDownToNearestPercentile($heightPercentile) : '5');
+            $zScore = $measurement->calculateZScore($heightMean, $lmsValues['L'], $lmsValues['M'], $lmsValues['S']);
+            $heightPercentile = $measurement->calculatePercentile($zScore, $this->zScores);
+            $heightPercentileField = 'heightPer' . ($heightPercentile ? $this->roundDownToNearestPercentile($heightPercentile) : '5');
 
-        $maxValue1 = $this->getMaxValueForPercentile(12, $sexAtBirth, $heightPercentileField, $bloodPressureChart, $ageInMonths, $optionalThreshold1);
-        $maxValue2 = $this->getMaxValueForPercentile(30, $sexAtBirth, $heightPercentileField, $bloodPressureChart, $ageInMonths);
+            $maxValue1 = $this->getMaxValueForPercentile(12, $sexAtBirth, $heightPercentileField, $bloodPressureChart, $ageInMonths, $optionalThreshold1);
+            $maxValue2 = $this->getMaxValueForPercentile(30, $sexAtBirth, $heightPercentileField, $bloodPressureChart, $ageInMonths);
 
-        $count1 = 0;
-        $count2 = 0;
+            $count1 = 0;
+            $count2 = 0;
 
-        foreach ($measurementData[$bpKey] as $bp) {
-            if (!empty($bp)) {
-                if ($bp >= $maxValue1) {
-                    $count1++;
+            foreach ($measurementData[$bpKey] as $bp) {
+                if (!empty($bp)) {
+                    if ($bp >= $maxValue1) {
+                        $count1++;
+                    }
+                    if ($bp >= $maxValue2) {
+                        $count2++;
+                    }
                 }
-                if ($bp >= $maxValue2) {
-                    $count2++;
-                }
+            }
+
+            if ($count1 === 1) {
+                return $alert1;
+            }
+            if ($count1 >= 2) {
+                return $alert2;
+            }
+            if ($count2 === 1) {
+                return $alert3;
+            }
+            if ($count2 >= 2) {
+                return $alert4;
             }
         }
 
-        if ($count1 === 1) {
-            return $alert1;
-        }
-        if ($count1 >= 2) {
-            return $alert2;
-        }
-        if ($count2 === 1) {
-            return $alert3;
-        }
-        if ($count2 >= 2) {
-            return $alert4;
+        if ($ageInMonths >= 36 && $ageInMonths <= 83) {
+            foreach ($measurementData[$bpKey] as $bp) {
+                if (!empty($bp)) {
+                    if ($bp < $sanityCheckWarning1) {
+                        return $alert5;
+                    }
+                    if ($bp > $sanityCheckWarning2) {
+                        return $alert6;
+                    }
+                }
+            }
         }
 
         return '';
@@ -854,6 +888,10 @@ class PediatricsReportService
                     if ($height > 134) {
                         return 'pSC5';
                     }
+                }
+
+                if ($height > 228) {
+                    return 'pSC14';
                 }
             }
         }
