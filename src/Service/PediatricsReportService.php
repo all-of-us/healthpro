@@ -271,8 +271,8 @@ class PediatricsReportService
                 $weightChart = $growthChartsByAge['weightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['weightForAgeCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
                 $weightForLengthChart = $growthChartsByAge['weightForLengthCharts'] ? $this->em->getRepository($growthChartsByAge['weightForLengthCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
                 $bmiChart = $growthChartsByAge['bmiForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['bmiForAgeCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
-                $heightForAgeChart = $growthChartsByAge['heightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['heightForAgeCharts'])->getChartsData($sexAtBirth) : [];
-                $bloodPressureSystolicHeightChart = $growthChartsByAge['bloodPressureSystolicHeightChart'] ? $this->em->getRepository($growthChartsByAge['bloodPressureSystolicHeightChart'])->getChartsData($sexAtBirth) : [];
+                $heightForAgeChart = $growthChartsByAge['heightForAgeCharts'] ? $this->em->getRepository($growthChartsByAge['heightForAgeCharts'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
+                $bloodPressureSystolicHeightChart = $growthChartsByAge['bloodPressureSystolicHeightChart'] ? $this->em->getRepository($growthChartsByAge['bloodPressureSystolicHeightChart'])->getChartsData($sexAtBirth) : []; // @phpstan-ignore-line
                 $bloodPressureSystolicAlert = $this->getBloodPressureSystolicAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $sexAtBirth, $heightForAgeChart, $bloodPressureSystolicHeightChart);
                 $bloodPressureDiastolicAlert = $this->getBloodPressureDiastolicAlert($measurement, $measurementData, $measurement->getAgeInMonths(), $sexAtBirth, $heightForAgeChart, $bloodPressureSystolicHeightChart);
                 $heartRateAlert = $this->getHeartRateAlert($measurementData, $measurement->getAgeInMonths(), $heartRateAgeCharts);
@@ -385,7 +385,7 @@ class PediatricsReportService
     public function getBloodPressureSystolicAlert(
         $measurement,
         array $measurementData,
-        int $ageInMonths,
+        float $ageInMonths,
         int $sexAtBirth,
         array $heightForAgeChart,
         array $bloodPressureSystolicHeightChart
@@ -413,7 +413,7 @@ class PediatricsReportService
     public function getBloodPressureDiastolicAlert(
         $measurement,
         array $measurementData,
-        int $ageInMonths,
+        float $ageInMonths,
         int $sexAtBirth,
         array $heightForAgeChart,
         array $bloodPressureSystolicHeightChart
@@ -523,7 +523,7 @@ class PediatricsReportService
         ];
     }
 
-    private function getLMSValues(array $heightForAgeChart, int $ageInMonths, int $sexAtBirth): array
+    private function getLMSValues(array $heightForAgeChart, float $ageInMonths, int $sexAtBirth): array
     {
         foreach ($heightForAgeChart as $item) {
             if ($item['sex'] == $sexAtBirth && floor($item['month']) == $ageInMonths) {
@@ -536,7 +536,7 @@ class PediatricsReportService
     private function getBloodPressureAlert(
         $measurement,
         array $measurementData,
-        int $ageInMonths,
+        float $ageInMonths,
         int $sexAtBirth,
         array $heightForAgeChart,
         array $bloodPressureChart,
@@ -653,7 +653,7 @@ class PediatricsReportService
         return $maxValue;
     }
 
-    private function getAgeInYears(?int $ageInMonths): ?int
+    private function getAgeInYears(?float $ageInMonths): ?int
     {
         if ($ageInMonths === null) {
             return null;
