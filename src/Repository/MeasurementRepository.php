@@ -191,9 +191,9 @@ class MeasurementRepository extends ServiceEntityRepository
     {
         $query = 'SELECT count(*) as count, q.modification as modificationType FROM
                     (
-                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath1)) AS modification FROM evaluations where age_in_months > :minAge1 and age_in_months < :maxAge1 UNION ALL
-                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath2)) AS modification FROM evaluations where age_in_months > :minAge2 and age_in_months < :maxAge2 UNION ALL
-                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath3)) AS modification FROM evaluations where age_in_months > :minAge3 and age_in_months < :maxAge3
+                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath1)) AS modification FROM evaluations where age_in_months >= :minAge1 and age_in_months <= :maxAge1 UNION ALL
+                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath2)) AS modification FROM evaluations where age_in_months >= :minAge2 and age_in_months <= :maxAge2 UNION ALL
+                        SELECT JSON_UNQUOTE(JSON_EXTRACT(data, :jsonPath3)) AS modification FROM evaluations where age_in_months >= :minAge3 and age_in_months <= :maxAge3
                     ) q
                     WHERE q.modification IS NOT NULL
                     AND q.modification <> \'\'
