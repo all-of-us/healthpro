@@ -187,7 +187,7 @@ class MeasurementRepository extends ServiceEntityRepository
         return null;
     }
 
-    public function getProtocolModificationCount($startDate, $endDate, $modificationType, $minAge, $maxAge): array
+    public function getProtocolModificationCount($modificationType, $minAge, $maxAge): array
     {
         $query = 'SELECT count(*) as count, q.modification as modificationType FROM
                     (

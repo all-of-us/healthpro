@@ -103,34 +103,49 @@ class PediatricsReportService
         return $csvData;
     }
 
-    public function generateDeviationReport(\DateTime $startDate, \DateTime $endDate): void
+    public function generateDeviationReport(): void
     {
         $evaluationsTotalData = [];
-        foreach (self::DEVIATION_AGE_RANGES as $ageRange) {
-            $newAgeRange = true;
-            foreach (self::DEVIATION_FIELDS as $field) {
+        $evaluationsTotalData[] = ['Report Date', date('m/d/Y')];
+        $evaluationsTotalData[] = ['']; // Empty row for spacing
+
+        foreach (self::DEVIATION_FIELDS as $field) {
+            $headerRow = ['Protocol Deviations for ' . $this->formatFieldName($field)];
+            $evaluationsTotalData[] = $headerRow;
+
+            // Prepare storage for all modifications found across age ranges
+            $modificationCounts = [];
+            $ageHeaders = ['Modification Type'];
+
+            foreach (self::DEVIATION_AGE_RANGES as $ageLabel => $ageRange) {
+                $ageHeaders[] = "Count ($ageLabel years)";
+
                 $evaluations = $this->em->getRepository(Measurement::class)
-                    ->getProtocolModificationCount(
-                        $startDate,
-                        $endDate,
-                        $field,
-                        $ageRange[0],
-                        $ageRange[1]
-                    );
-                if ($newAgeRange) {
-                    $evaluationsTotalData[] = ["Protocol Deviations for age ranges {$ageRange[0]} to ${ageRange[1]} for field $field"];
-                    $evaluationsTotalData[] = ['Modification Type', 'Count'];
-                    $newAgeRange = false;
-                }
+                    ->getProtocolModificationCount($field, $ageRange[0], $ageRange[1]);
+
                 if (!empty($evaluations)) {
                     foreach ($evaluations as $evaluation) {
-                        if (!empty($evaluation)) {
-                            $evaluationsTotalData[] = [$evaluation['modificationType'], $evaluation['count']];
-                        }
+                        $modType = $this->formatModificationType($evaluation['modificationType']);
+                        $modificationCounts[$modType][$ageLabel] = $evaluation['count'];
                     }
                 }
             }
+
+            // Append Age Range Headers
+            $evaluationsTotalData[] = $ageHeaders;
+
+            // Add collected data row-wise
+            foreach ($modificationCounts as $modType => $counts) {
+                $row = [$modType];
+                foreach (array_keys(self::DEVIATION_AGE_RANGES) as $ageLabel) {
+                    $row[] = $counts[$ageLabel] ?? 0; // Fill empty slots with zero
+                }
+                $evaluationsTotalData[] = $row;
+            }
+
+            $evaluationsTotalData[] = ['']; // Empty row for spacing
         }
+
         $this->generateCSVReport($evaluationsTotalData, 'Protocol_Deviations_Report-' . date('Ymd-His') . '.csv');
     }
 
@@ -325,6 +340,24 @@ class PediatricsReportService
             45,
             86
         );
+    }
+
+    private function formatFieldName(string $field): string
+    {
+        return ucwords(str_replace('-', ' ', str_replace('-protocol-modification', '', $field)));
+    }
+
+    private function formatModificationType(string $modType): string
+    {
+        $mapping = [
+            'clothing-not-removed' => 'Clothing not removed',
+            'hair-style' => 'Hair style',
+            'parental-refusal' => 'Parental refusal',
+            'child-dissenting-behavior' => 'Child dissenting behavior',
+            'urgent-emergent-event' => 'Urgent/Emergent event',
+            'other' => 'Other'
+        ];
+        return $mapping[$modType] ?? ucfirst(str_replace('-', ' ', $modType));
     }
 
     private function buildBlankAlertArray(): array
