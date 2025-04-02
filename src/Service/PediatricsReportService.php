@@ -204,10 +204,10 @@ class PediatricsReportService
                 }
             }
         }
-        // Define CSV headers
-        $csvData[] = ['Report Date', date('m/d/Y')];
-        $csvData[] = self::ALERTS_CSV_HEADERS;
-
+        $csvHeaders = [
+            ['Report Date', date('m/d/Y')],
+            self::ALERTS_CSV_HEADERS
+        ];
 
         $tempRows = [];
         $ageRanges = array_keys(self::DEVIATION_AGE_RANGES);
@@ -224,15 +224,12 @@ class PediatricsReportService
             $csvData[] = array_merge([$alert], array_values($alertCounts));
         }
 
-        // Extract the first two elements to keep them at the top
-        $fixedEntries = array_splice($csvData, 0, 2);
-
-        // Sort the remaining entries by the first index using natural order comparison
+        // Sort the entries by the first index using natural order comparison
         usort($csvData, function ($a, $b) {
             return strnatcmp($a[0], $b[0]);
         });
 
-        $csvData = array_merge($fixedEntries, $csvData);
+        $csvData = array_merge($csvHeaders, $csvData);
         $this->generateCSVReport($csvData, 'Active_Alerts_Report-' . date('Ymd-His') . '.csv');
     }
 
