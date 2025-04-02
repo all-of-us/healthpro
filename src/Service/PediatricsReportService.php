@@ -21,8 +21,8 @@ class PediatricsReportService
     ];
 
     public const DEVIATION_FIELDS = [
-        'weight-protocol-modification',
         'height-protocol-modification',
+        'weight-protocol-modification',
         'head-circumference-protocol-modification',
         'waist-circumference-protocol-modification',
         'blood-pressure-protocol-modification'
@@ -37,6 +37,96 @@ class PediatricsReportService
         'weight',
         'height',
         'waist-circumference'
+    ];
+
+    public const DEVIATION_MODIFICATION_TYPES = [
+        'height-protocol-modification' => [
+            '1=Height is more than measuring device range',
+            '2=Hair style',
+            '3= Uses a wheelchair',
+            '4=Unable to stand in a straight position',
+            '5=Parental refusal',
+            '6=Child dissenting behavior',
+            '7=Other'
+        ],
+        'weight-protocol-modification' => [
+            '1=Weight is more than weight measuring range',
+            '2=Weight is less than weight measuring range',
+            '3=Can’t balance on scale',
+            '4=Uses a wheelchair',
+            '5=Parental refusal',
+            '6=Child dissenting behavior',
+            '7=Clothing not removed',
+            '8=Dirty diaper',
+            '9=Other'
+        ],
+        'waist-circumference-protocol-modification' => [
+            '1 = waist is more than waist measuring device',
+            '2 = clothing not removed',
+            '3 = colostomy bag',
+            '4 = parental refusal',
+            '5 = child dissenting behavior',
+            '6 = other'
+        ],
+        'head-circumference-protocol-modification' => [
+            '1 = head is more than measuring device',
+            '2 = hair style',
+            '3 = parental refusal',
+            '4 = child dissenting behavior',
+            '5 = other'
+        ],
+        'blood-pressure-protocol-modification' => [
+            '1 = Parental refusal',
+            '2 = Child dissenting behavior',
+            '3= Crying',
+            '4 = Urgent/Emergent event',
+            '5 = Other'
+        ]
+    ];
+
+    public const MODIFICATION_TYPE_MAPPING = [
+        'height-protocol-modification' => [
+            'height-more-than-device-range' => '1=Height is more than measuring device range',
+            'hair-style' => '2=Hair style',
+            'uses-wheelchair' => '3= Uses a wheelchair',
+            'unable-to-stand-straight' => '4=Unable to stand in a straight position',
+            'parental-refusal' => '5=Parental refusal',
+            'child-dissenting-behavior' => '6=Child dissenting behavior',
+            'other' => '7=Other'
+        ],
+        'weight-protocol-modification' => [
+            'weight-more-than-range' => '1=Weight is more than weight measuring range',
+            'weight-less-than-range' => '2=Weight is less than weight measuring range',
+            'cant-balance-on-scale' => '3=Can’t balance on scale',
+            'uses-wheelchair' => '4=Uses a wheelchair',
+            'parental-refusal' => '5=Parental refusal',
+            'child-dissenting-behavior' => '6=Child dissenting behavior',
+            'clothing-not-removed' => '7=Clothing not removed',
+            'dirty-diaper' => '8=Dirty diaper',
+            'other' => '9=Other'
+        ],
+        'waist-circumference-protocol-modification' => [
+            'waist-more-than-device-range' => '1 = waist is more than waist measuring device',
+            'clothing-not-removed' => '2 = clothing not removed',
+            'colostomy-bag' => '3 = colostomy bag',
+            'parental-refusal' => '4 = parental refusal',
+            'child-dissenting-behavior' => '5 = child dissenting behavior',
+            'other' => '6 = other'
+        ],
+        'head-circumference-protocol-modification' => [
+            'head-more-than-device-range' => '1 = head is more than measuring device',
+            'hair-style' => '2 = hair style',
+            'parental-refusal' => '3 = parental refusal',
+            'child-dissenting-behavior' => '4 = child dissenting behavior',
+            'other' => '5 = other'
+        ],
+        'blood-pressure-protocol-modification' => [
+            'parental-refusal' => '1 = Parental refusal',
+            'child-dissenting-behavior' => '2 = Child dissenting behavior',
+            'crying' => '3= Crying',
+            'urgent-emergent-event' => '4 = Urgent/Emergent event',
+            'other' => '5 = Other'
+        ]
     ];
 
     private const MEASUREMENTS_TOTAL_CSV_HEADERS = [
@@ -117,6 +207,11 @@ class PediatricsReportService
             $modificationCounts = [];
             $ageHeaders = ['Modification Type'];
 
+            // Prepopulate modification counts with zero values
+            foreach (self::DEVIATION_MODIFICATION_TYPES[$field] as $modType) {
+                $modificationCounts[$modType] = array_fill_keys(array_keys(self::DEVIATION_AGE_RANGES), 0);
+            }
+
             foreach (self::DEVIATION_AGE_RANGES as $ageLabel => $ageRange) {
                 $ageHeaders[] = "Count ($ageLabel years)";
 
@@ -125,8 +220,10 @@ class PediatricsReportService
 
                 if (!empty($evaluations)) {
                     foreach ($evaluations as $evaluation) {
-                        $modType = $this->formatModificationType($evaluation['modificationType']);
-                        $modificationCounts[$modType][$ageLabel] = $evaluation['count'];
+                        $modType = $this->formatModificationType($evaluation['modificationType'], $field);
+                        if (isset($modificationCounts[$modType])) {
+                            $modificationCounts[$modType][$ageLabel] = $evaluation['count'];
+                        }
                     }
                 }
             }
@@ -138,7 +235,7 @@ class PediatricsReportService
             foreach ($modificationCounts as $modType => $counts) {
                 $row = [$modType];
                 foreach (array_keys(self::DEVIATION_AGE_RANGES) as $ageLabel) {
-                    $row[] = $counts[$ageLabel] ?? 0; // Fill empty slots with zero
+                    $row[] = $counts[$ageLabel] ?? 0; // Retain prepopulated zero values
                 }
                 $evaluationsTotalData[] = $row;
             }
@@ -347,17 +444,9 @@ class PediatricsReportService
         return ucwords(str_replace('-', ' ', str_replace('-protocol-modification', '', $field)));
     }
 
-    private function formatModificationType(string $modType): string
+    private function formatModificationType(string $modType, string $field): string
     {
-        $mapping = [
-            'clothing-not-removed' => 'Clothing not removed',
-            'hair-style' => 'Hair style',
-            'parental-refusal' => 'Parental refusal',
-            'child-dissenting-behavior' => 'Child dissenting behavior',
-            'urgent-emergent-event' => 'Urgent/Emergent event',
-            'other' => 'Other'
-        ];
-        return $mapping[$modType] ?? ucfirst(str_replace('-', ' ', $modType));
+        return self::MODIFICATION_TYPE_MAPPING[$field][$modType] ?? ucfirst(str_replace('-', ' ', $modType));
     }
 
     private function buildBlankAlertArray(): array
@@ -957,6 +1046,9 @@ class PediatricsReportService
     {
         // Create a temporary stream to hold the CSV data
         $tempStream = fopen('php://temp', 'w');
+
+        // Add UTF-8 BOM to prevent character encoding issues (especially for Excel)
+        fprintf($tempStream, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
         foreach ($csvData as $row) {
             fputcsv($tempStream, $row);
