@@ -738,10 +738,10 @@ class Measurement
                 BmiForAge5YearsAndUp::class => [60, 240]
             ],
             'bloodPressureSystolicHeightChart' => [
-                BloodPressureSystolicHeightPercentile::class => [0, 240]
+                BloodPressureSystolicHeightPercentile::class => [0, 204]
             ],
             'bloodPressureDiastolicHeightChart' => [
-                BloodPressureDiastolicHeightPercentile::class => [0, 240]
+                BloodPressureDiastolicHeightPercentile::class => [0, 204]
             ],
         ];
 
