@@ -23,8 +23,8 @@ class PediatricsReportService
     public const DEVIATION_FIELDS = [
         'height-protocol-modification',
         'weight-protocol-modification',
-        'head-circumference-protocol-modification',
         'waist-circumference-protocol-modification',
+        'head-circumference-protocol-modification',
         'blood-pressure-protocol-modification'
     ];
 
@@ -197,7 +197,6 @@ class PediatricsReportService
     {
         $evaluationsTotalData = [];
         $evaluationsTotalData[] = ['Report Date', date('m/d/Y')];
-        $evaluationsTotalData[] = ['']; // Empty row for spacing
 
         foreach (self::DEVIATION_FIELDS as $field) {
             $headerRow = ['Protocol Deviations for ' . $this->formatFieldName($field)];
