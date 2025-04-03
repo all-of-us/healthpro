@@ -262,4 +262,16 @@ class MeasurementRepository extends ServiceEntityRepository
         $result = $stmt->executeQuery();
         return $result->fetchAllAssociative();
     }
+
+    public function getMissingSexAtBirthPediatricMeasurements(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.sexAtBirth is null')
+            ->andWhere('m.version like :version')
+            ->setParameter('version', '%peds%')
+            ->setMaxResults(10)
+            ->orderBy('m.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -5,6 +5,8 @@ namespace App\Tests\Service;
 use App\Entity\Measurement;
 use App\Entity\Site;
 use App\Form\SiteType;
+use App\Helper\PpscParticipant;
+use App\Repository\MeasurementRepository;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\Ppsc\PpscApiService;
@@ -102,6 +104,66 @@ class MeasurementServiceTest extends ServiceTestCase
             'Parent ID, inactive site: expect false' => [123, false, false],
             'No parent ID, active site: expect false' => [null, true, false],
             'Parent ID, active site: expect false' => [123, true, false]
+        ];
+    }
+
+    /**
+     * @dataProvider backfillMeasurementsProvider
+     */
+    public function testBackfillMeasurementsSexAtBirth($participantData, $expectsSetSexAtBirth, $expectsPersist)
+    {
+        $measurement = $this->createMock(Measurement::class);
+        $measurement->method('getParticipantId')->willReturn('123');
+
+        $repository = $this->createMock(MeasurementRepository::class);
+        $repository->method('getMissingSexAtBirthPediatricMeasurements')->willReturn([$measurement]);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getRepository')->willReturn($repository);
+
+        $ppscApiService = $this->createMock(PpscApiService::class);
+        $ppscApiService->method('getParticipantById')->willReturn($participantData);
+
+        if ($expectsSetSexAtBirth) {
+            $measurement->expects($this->once())->method('setSexAtBirth')->with($participantData->sexAtBirth);
+        } else {
+            $measurement->expects($this->never())->method('setSexAtBirth');
+        }
+
+        if ($expectsPersist) {
+            $entityManager->expects($this->once())->method('persist')->with($measurement);
+        } else {
+            $entityManager->expects($this->never())->method('persist');
+        }
+
+        $entityManager->expects($this->once())->method('flush');
+
+        $measurementService = new MeasurementService(
+            $entityManager,
+            static::getContainer()->get(RequestStack::class),
+            static::getContainer()->get(UserService::class),
+            $ppscApiService,
+            static::getContainer()->get(SiteService::class),
+            static::getContainer()->get(ParameterBagInterface::class),
+            static::getContainer()->get(LoggerService::class)
+        );
+
+        $measurementService->backfillMeasurementsSexAtBirth();
+    }
+
+    public function backfillMeasurementsProvider(): array
+    {
+        return [
+            'Valid sexAtBirth data' => [
+                new PpscParticipant((object) ['sexAtBirth' => 1]),
+                true,  // Expects setSexAtBirth
+                true   // Expects persist
+            ],
+            'Null participant data' => [
+                null,
+                false,
+                false
+            ],
         ];
     }
 }
