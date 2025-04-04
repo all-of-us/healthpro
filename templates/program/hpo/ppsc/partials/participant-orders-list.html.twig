@@ -10,7 +10,7 @@
 
 <div class="card">
     <div class="card-header">
-        {% if isActiveSite %}
+        {% if isActiveSite and type is not defined %}
             {% set orderCheckRoute = 'order_check' %}
             {% if participant.isPediatric %}
                 {% set orderCheckRoute = 'order_check_pediatric' %}
@@ -33,47 +33,51 @@
                    class="text-start btn btn-block btn-lg border w-100  {% if orderId is defined and order.id == orderId %} btn-warning {% else %} {% endif %}">
                     <div class="row">
                         <div class="col-sm-6 border-end">
-                            <strong class="fs-6 text-muted">{{ order.createdTs|date('D n/j/Y', app.user.timezone) }}</strong><br>
+                            <span class="d-block pb-2"><strong class="fs-6 text-muted">{{ order.createdTs|date('D n/j/Y', app.user.timezone) }}</strong></span>
                             <small class="text-muted">
-                                <small class="fs-xs">Status</small><br>
+                                {% set badgeText = '' %}
                                 {% set historyType = order.history.type is defined ? order.history.type : '' %}
                                 {% if historyType == 'cancel' %}
-                                    <span class="badge bg-danger">Cancelled</span> <span
-                                        class="fs-sm d-block d-block">{{ _self.displayDateTime(order.history, 'created') }}</span>
+                                    {% set badgeText = '<span class="badge bg-danger">Cancelled</span>' %}
+                                    <span class="fs-sm d-block d-block">{{ _self.displayDateTime(order.history, 'created') }}</span>
                                 {% elseif not order.finalizedTs and not order.version and order.type != constant('TUBE_SELECTION_TYPE', order) %}
-                                    <span class="badge bg-danger">Expired</span>
+                                    {% set badgeText = '<span class="badge bg-danger">Expired</span>' %}
                                 {% elseif historyType == 'unlock' %}
-                                    <span class="badge bg-primary">Unlocked for editing</span> <span
-                                        class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created') }}</span>
+                                    {% set badgeText = '<span class="badge bg-primary">Unlocked for editing</span>' %}
+                                    <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created') }}</span>
                                 {% elseif historyType == 'edit' %}
-                                    <span class="badge bg-success">Edited &amp; Finalized</span> <span
-                                        class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created') }}</span>
+                                    {% set badgeText = '<span class="badge bg-success">Edited &amp; Finalized</span>' %}
+                                    <span class="fs-sm d-block">{{ _self.displayDateTime(order.history, 'created') }}</span>
                                 {% elseif order.finalizedTs and order.rdrId %}
                                     {% if order.biobankFinalized %}
-                                        <span class="badge bg-warning">Biobank Finalized</span>
+                                        {% set badgeText = '<span class="badge bg-warning">Biobank Finalized</span>' %}
                                     {% else %}
-                                        <span class="badge bg-success">Finalized</span>
+                                        {% set badgeText = '<span class="badge bg-success">Finalized</span>' %}
                                     {% endif %}
                                     <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'finalized') }}</span>
                                 {% elseif order.processedTs %}
-                                    <span class="badge bg-info">Processed</span> <span
-                                        class="fs-sm d-block">{{ _self.displayDateTime(order, 'processed') }}</span>
+                                    {% set badgeText = '<span class="badge bg-info">Processed</span>' %}
+                                    <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'processed') }}</span>
                                 {% elseif order.collectedTs %}
-                                    <span class="badge bg-secondary">Collected</span> <span
-                                        class="fs-sm d-block">{{ _self.displayDateTime(order, 'collected') }}</span>
+                                    {% set badgeText = '<span class="badge bg-secondary">Collected</span>' %}
+                                    <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'collected') }}</span>
                                 {% else %}
-                                    <span class="badge bg-secondary">Created</span> <span
-                                        class="fs-sm d-block">{{ _self.displayDateTime(order, 'created') }}</span>
+                                    {% set badgeText = '<span class="badge bg-secondary">Created</span>' %}
+                                    <span class="fs-sm d-block">{{ _self.displayDateTime(order, 'created') }}</span>
                                 {% endif %}
                             </small>
                         </div>
                         <div class="col-sm-6 text-muted position-relative">
-                            <small class="fs-sm"><strong>Order ID: {{ order.orderId }}</strong></small><br>
-                            <small class="fs-xs">Order Type</small><br>
-                            <small class="fs-sm">{{ order.orderTypeDisplayText }}</small>
+                            <div class="fs-sm pb-1"><strong>Order ID: {{ order.orderId }}</strong></div>
+                            <div class="fs-xs pb-1">Order Type</div>
+                            <div class="fs-sm">{{ order.orderTypeDisplayText }}</div>
                             {% if order.pediatricOrder %}
                                 <span class="fa fa-child child-icon pediatric-order-indicator"></span>
                             {% endif %}
+                        </div>
+                        <div>
+                            <span class="d-block fs-xs text-muted">Status</span>
+                            <small>{{ badgeText|raw }}</small>
                         </div>
                     </div>
                 </a>
