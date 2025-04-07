@@ -2,6 +2,8 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\BloodPressureDiastolicHeightPercentile;
+use App\Entity\BloodPressureSystolicHeightPercentile;
 use App\Entity\BmiForAge5YearsAndUp;
 use App\Entity\HeadCircumferenceForAge0To36Months;
 use App\Entity\HeightForAge0To23Months;
@@ -263,6 +265,8 @@ class MeasurementTest extends KernelTestCase
                 'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
                 'weightForLengthCharts' => WeightForLength0To23Months::class,
                 'bmiForAgeCharts' => null,
+                'bloodPressureSystolicHeightChart' => BloodPressureSystolicHeightPercentile::class,
+                'bloodPressureDiastolicHeightChart' => BloodPressureDiastolicHeightPercentile::class
             ]],
             [12, [
                 'weightForAgeCharts' => WeightForAge0To23Months::class,
@@ -270,6 +274,8 @@ class MeasurementTest extends KernelTestCase
                 'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
                 'weightForLengthCharts' => WeightForLength0To23Months::class,
                 'bmiForAgeCharts' => null,
+                'bloodPressureSystolicHeightChart' => BloodPressureSystolicHeightPercentile::class,
+                'bloodPressureDiastolicHeightChart' => BloodPressureDiastolicHeightPercentile::class
             ]],
             [25, [
                 'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
@@ -277,6 +283,8 @@ class MeasurementTest extends KernelTestCase
                 'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
                 'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
                 'bmiForAgeCharts' => null,
+                'bloodPressureSystolicHeightChart' => BloodPressureSystolicHeightPercentile::class,
+                'bloodPressureDiastolicHeightChart' => BloodPressureDiastolicHeightPercentile::class
             ]],
             [60, [
                 'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
@@ -284,6 +292,8 @@ class MeasurementTest extends KernelTestCase
                 'headCircumferenceForAgeCharts' => null,
                 'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
                 'bmiForAgeCharts' => BmiForAge5YearsAndUp::class,
+                'bloodPressureSystolicHeightChart' => BloodPressureSystolicHeightPercentile::class,
+                'bloodPressureDiastolicHeightChart' => BloodPressureDiastolicHeightPercentile::class
             ]],
         ];
     }
