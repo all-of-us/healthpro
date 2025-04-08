@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
@@ -32,6 +33,13 @@ class AppExtension extends AbstractExtension
             new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
             new TwigFunction('display_message', [$this, 'displayMessage'])
+        ];
+    }
+
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('to_fixed', [$this, 'toFixed']),
         ];
     }
 
@@ -91,5 +99,17 @@ class AppExtension extends AbstractExtension
             default:
                 return $message;
         }
+    }
+
+    public function toFixed($number): string
+    {
+        // Match Javascript tofixed function
+        // Multiply by 10 to shift decimal, floor it to remove excess decimals, and then divide by 10 to restore
+        $roundedNumber = floor($number * 10) / 10;
+        // If the number is still the same after truncating, we round it normally
+        if ($number - $roundedNumber >= 0.05) {
+            $roundedNumber += 0.1;
+        }
+        return number_format($roundedNumber, 1);
     }
 }

@@ -11,7 +11,7 @@
             <tr>
                 <th>Height</th>
                 {% if summary.height is defined %}
-                    <td>{{ summary.height.cm|number_format(1) }} cm</td>
+                    <td>{{ summary.height.cm|to_fixed }} cm</td>
                     <td>{{ summary.height.ftin }}</td>
                 {% else %}
                     <td colspan="2">--</td>
@@ -20,8 +20,8 @@
             <tr>
                 <th>Weight</th>
                 {% if summary.weight is defined %}
-                    <td>{{ summary.weight.kg|number_format(1) }} kg</td>
-                    <td>{{ summary.weight.lb|number_format(1) }} lb</td>
+                    <td>{{ summary.weight.kg|to_fixed }} kg</td>
+                    <td>{{ summary.weight.lb|to_fixed }} lb</td>
                 {% else %}
                     <td colspan="2">--</td>
                 {% endif %}
@@ -34,8 +34,8 @@
                 <tr>
                     <th>Head Circumference</th>
                     {% if summary.head is defined and summary.head is not empty %}
-                        <td>{{ summary.head.cm|number_format(1) }} cm</td>
-                        <td>{{ summary.head.in|number_format(1) }} in</td>
+                        <td>{{ summary.head.cm|to_fixed }} cm</td>
+                        <td>{{ summary.head.in|to_fixed }} in</td>
                     {% else %}
                         <td colspan="2">--</td>
                     {% endif %}
@@ -45,8 +45,8 @@
                 <tr>
                     <th>Hip Circumference</th>
                     {% if summary.hip is defined %}
-                        <td>{{ summary.hip.cm|number_format(1) }} cm</td>
-                        <td>{{ summary.hip.in|number_format(1) }} in</td>
+                        <td>{{ summary.hip.cm|to_fixed }} cm</td>
+                        <td>{{ summary.hip.in|to_fixed }} in</td>
                     {% else %}
                         <td colspan="2">--</td>
                     {% endif %}
@@ -55,8 +55,8 @@
             <tr>
                 <th>Waist Circumference</th>
                 {% if summary.waist is defined %}
-                    <td>{{ summary.waist.cm|number_format(1) }} cm</td>
-                    <td>{{ summary.waist.in|number_format(1) }} in</td>
+                    <td>{{ summary.waist.cm|to_fixed }} cm</td>
+                    <td>{{ summary.waist.in|to_fixed }} in</td>
                 {% else %}
                     <td colspan="2">--</td>
                 {% endif %}

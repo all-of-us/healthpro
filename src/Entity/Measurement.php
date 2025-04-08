@@ -318,6 +318,15 @@ class Measurement
         return $this;
     }
 
+    public function getAgeInYears(): ?int
+    {
+        if ($this->getAgeInMonths() === null) {
+            return null;
+        }
+
+        return (int) floor($this->getAgeInMonths() / 12);
+    }
+
     public function getAgeInMonths(): ?float
     {
         return $this->ageInMonths;

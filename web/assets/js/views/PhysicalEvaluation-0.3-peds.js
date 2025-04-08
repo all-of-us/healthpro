@@ -107,6 +107,7 @@ let viewExtension = Backbone.View.extend({
                     this.calculateWeightForLengthPercentileMaleFemale();
                 } else {
                     mean = mean ? parseFloat(mean) : "";
+                    // Calculates Growth Percentile for Weight and Height/Length
                     this.calculatePercentileMaleFemale(percentileField, mean);
                 }
             });
