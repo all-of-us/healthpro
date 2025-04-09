@@ -446,6 +446,11 @@ class Measurement
         return $this->isPediatricForm() ? $this->getPediatricSummary() : $this->getAdultSummary();
     }
 
+    public function getSummaryView(): array
+    {
+        return $this->isPediatricForm() ? $this->getPediatricSummaryView() : $this->getAdultSummaryView();
+    }
+
     public function canCancel()
     {
         return $this->getHistoryType() !== self::EVALUATION_CANCEL
@@ -992,6 +997,116 @@ class Measurement
         }
         if (isset($this->fieldData->{'heart-rate'})) {
             if ($heartrate = $this->calculatePediatricMean('heart-rate')) {
+                $summary['heartrate'] = $heartrate;
+            }
+        }
+        return $summary;
+    }
+
+    private function getAdultSummaryView(): array
+    {
+        $summary = [];
+        if ($this->fieldData->height) {
+            $summary['height'] = [
+                'cm' => $this->fieldData->height,
+                'ftin' => self::cmToFtIn($this->fieldData->height)
+            ];
+        }
+        if ($this->fieldData->weight) {
+            $summary['weight'] = [
+                'kg' => $this->fieldData->weight,
+                'lb' => self::kgToLb($this->fieldData->weight)
+            ];
+        }
+        if ($this->fieldData->weight && $this->fieldData->height) {
+            $summary['bmi'] = Util::jsToFixed(self::calculateBmi(
+                Util::jsToFixed($this->fieldData->height, 1),
+                Util::jsToFixed($this->fieldData->weight, 1),
+                1
+            ));
+        }
+        if ($hip = Util::jsToFixed($this->calculateMean('hip-circumference'), 1)) {
+            $summary['hip'] = [
+                'cm' => $hip,
+                'in' => self::cmToIn($hip)
+            ];
+        }
+        if ($waist = Util::jsToFixed($this->calculateMean('waist-circumference'), 1)) {
+            $summary['waist'] = [
+                'cm' => $waist,
+                'in' => self::cmToIn($waist)
+            ];
+        }
+        $systolic = Util::jsToFixed($this->calculateMean('blood-pressure-systolic'), 1);
+        $diastolic = Util::jsToFixed($this->calculateMean('blood-pressure-diastolic'), 1);
+        if ($systolic && $diastolic) {
+            $summary['bloodpressure'] = [
+                'systolic' => $systolic,
+                'diastolic' => $diastolic
+            ];
+        }
+        if ($heartrate = Util::jsToFixed($this->calculateMean('heart-rate'), 1)) {
+            $summary['heartrate'] = $heartrate;
+        }
+        return $summary;
+    }
+
+    private function getPediatricSummaryView(): array
+    {
+        $summary = [];
+        if (isset($this->fieldData->{'height'})) {
+            if ($height = Util::jsToFixed($this->calculatePediatricMean('height'), 1)) {
+                $summary['height'] = [
+                    'cm' => $height,
+                    'ftin' => self::cmToFtIn($height)
+                ];
+                $this->addGrowthPercentileForAge($summary, $height, 'growth-percentile-height-for-age', 'heightForAgeCharts');
+            }
+        }
+        if ($weight = Util::jsToFixed($this->calculatePediatricMean('weight'), 1)) {
+            $summary['weight'] = [
+                'kg' => $weight,
+                'lb' => self::kgToLb($weight)
+            ];
+            $this->addGrowthPercentileForAge($summary, $weight, 'growth-percentile-weight-for-age', 'weightForAgeCharts');
+        }
+        if ($weight && !empty($height)) {
+            $this->addGrowthPercentileForLength($summary, $height, $weight, 'growth-percentile-weight-for-length', 'weightForLengthCharts');
+            if ($this->schema->displayBmi) {
+                $summary['bmi'] = Util::jsToFixed(self::calculateBmi($height, $weight), 1);
+                $this->addGrowthPercentileForAge($summary, $summary['bmi'], 'growth-percentile-bmi-for-age', 'bmiForAgeCharts');
+            }
+        }
+        $circumferenceFields = [
+            'hip' => 'hip-circumference',
+            'waist' => 'waist-circumference',
+            'head' => 'head-circumference'
+        ];
+
+        foreach ($circumferenceFields as $key => $circumferenceField) {
+            if (isset($this->fieldData->{$circumferenceField}) && $mean = Util::jsToFixed($this->calculatePediatricMean($circumferenceField), 1)) {
+                $summary[$key] = [
+                    'cm' => $mean,
+                    'in' => self::cmToIn($mean)
+                ];
+                if ($key === 'head') {
+                    $this->addGrowthPercentileForAge($summary, $mean, 'growth-percentile-head-circumference-for-age', 'headCircumferenceForAgeCharts');
+                }
+            }
+        }
+
+        if (isset($this->fieldData->{'blood-pressure-systolic'})) {
+            $systolic = Util::jsToFixed($this->calculatePediatricMean('blood-pressure-systolic'), 1);
+            $diastolic = Util::jsToFixed($this->calculatePediatricMean('blood-pressure-diastolic'), 1);
+            if ($systolic && $diastolic) {
+                $summary['bloodpressure'] = [
+                    'systolic' => $systolic,
+                    'diastolic' => $diastolic
+                ];
+            }
+        }
+        if (isset($this->fieldData->{'heart-rate'})) {
+            if ($heartrate = Util::jsToFixed($this->calculatePediatricMean('heart-rate'), 1)) {
                 $summary['heartrate'] = $heartrate;
             }
         }

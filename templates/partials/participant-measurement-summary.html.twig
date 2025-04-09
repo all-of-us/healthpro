@@ -28,7 +28,7 @@
             </tr>
             <tr>
                 <th>BMI</th>
-                <td colspan="2">{{ summary.bmi is defined ? summary.bmi|number_format(1) : '--' }}</td>
+                <td colspan="2">{{ summary.bmi is defined ? summary.bmi|to_fixed : '--' }}</td>
             </tr>
             {% if measurement.isPediatricForm %}
                 <tr>

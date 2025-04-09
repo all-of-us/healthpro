@@ -52,7 +52,9 @@ class MeasurementService
         $measurement->setCurrentVersion($version);
         $this->loadFromAObject($measurement);
         if ($measurement->isPediatricForm()) {
-            $growthChartsData = $this->getGrowthChartsData($participant->sexAtBirth, $participant->ageInMonths);
+            $sexAtBirth = $measurement->getSexAtBirth() ?? $participant->sexAtBirth;
+            $ageInMonths = $measurement->getAgeInMonths() ?? $participant->ageInMonths;
+            $growthChartsData = $this->getGrowthChartsData($sexAtBirth, $ageInMonths);
             $measurement->setGrowthCharts($growthChartsData);
             if ($measurement->getSexAtBirth() === null) {
                 $measurement->setSexAtBirth($participant->sexAtBirth);

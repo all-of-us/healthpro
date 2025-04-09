@@ -65,4 +65,16 @@ class Util
         }
         return $result;
     }
+
+    public static function jsToFixed($number, $decimals = 0): string
+    {
+        // Match Javascript tofixed function
+        // Multiply by 10 to shift decimal, floor it to remove excess decimals, and then divide by 10 to restore
+        $roundedNumber = floor($number * 10) / 10;
+        // If the number is still the same after truncating, we round it normally
+        if ($number - $roundedNumber >= 0.05) {
+            $roundedNumber += 0.1;
+        }
+        return number_format($roundedNumber, $decimals);
+    }
 }

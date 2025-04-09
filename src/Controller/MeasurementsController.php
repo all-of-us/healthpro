@@ -410,7 +410,7 @@ class MeasurementsController extends BaseController
         return $this->render('measurement/summary.html.twig', [
             'participant' => $participant,
             'measurement' => $measurement,
-            'summary' => $measurement->getSummary()
+            'summary' => $measurement->getSummaryView()
         ]);
     }
 
