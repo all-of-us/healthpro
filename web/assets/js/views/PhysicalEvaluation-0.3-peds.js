@@ -81,7 +81,7 @@ let viewExtension = Backbone.View.extend({
                 },
                 0
             );
-            mean = phpRound(sum / values.length,1);
+            mean = phpRound(sum / values.length, 1);
             if (field === "heart-rate") {
                 mean = Math.round(mean);
             }
@@ -196,11 +196,11 @@ let viewExtension = Backbone.View.extend({
             const numerator = Math.pow(X / M, L) - 1;
             const denominator = L * S;
             if (denominator !== 0) {
-                return parseFloat(phpRound(numerator / denominator,2));
+                return parseFloat(phpRound(numerator / denominator, 2));
             }
         } else {
             if (S !== 0) {
-                return parseFloat(phpRound(Math.log(X / M) / S,2));
+                return parseFloat(phpRound(Math.log(X / M) / S, 2));
             }
         }
     },
@@ -228,10 +228,10 @@ let viewExtension = Backbone.View.extend({
                     Object.is(0, zScore["Z"]) || zScore["Z"] > 0
                         ? zScore["Z"] + decimalPoint
                         : zScore["Z"] - decimalPoint;
-                if (z === parseFloat(phpRound(newZValue,2))) {
+                if (z === parseFloat(phpRound(newZValue, 2))) {
                     let percentile = zScore[index] * 100;
                     if (percentile < 3) {
-                        percentile = phpRound(percentile,1);
+                        percentile = phpRound(percentile, 1);
                         if (percentile % 1 !== 0) {
                             return percentile;
                         }
@@ -292,7 +292,7 @@ let viewExtension = Backbone.View.extend({
         this.$("#bmi-warning").text("");
         if (height && weight) {
             let bmi = weight / ((height / 100) * (height / 100));
-            bmi = phpRound(bmi,1);
+            bmi = phpRound(bmi, 1);
             const bmiElement = this.$("#bmi");
             bmiElement.html("<strong>" + bmi + "</strong>");
             bmiElement.attr("data-bmi", bmi);
@@ -380,7 +380,7 @@ let viewExtension = Backbone.View.extend({
                 difference = 5;
                 break;
         }
-        if (first > 0 && second > 0 && phpRound(Math.abs(first - second),2) > difference) {
+        if (first > 0 && second > 0 && phpRound(Math.abs(first - second), 2) > difference) {
             this.$(".panel-" + field + "-3").show();
         } else {
             this.$(".panel-" + field + "-3").hide();
@@ -473,16 +473,16 @@ let viewExtension = Backbone.View.extend({
         field.find("span.help-block ul li").remove();
     },
     kgToLb: function (kg) {
-        return phpRound(parseFloat(kg) * 2.2046,1);
+        return phpRound(parseFloat(kg) * 2.2046, 1);
     },
     cmToIn: function (cm) {
-        return phpRound(parseFloat(cm) * 0.3937,1);
+        return phpRound(parseFloat(cm) * 0.3937, 1);
     },
     lbToKg: function (lb) {
-        return phpRound(parseFloat(lb) / 2.2046,1);
+        return phpRound(parseFloat(lb) / 2.2046, 1);
     },
     inToCm: function (inches) {
-        return phpRound(parseFloat(inches) / 0.3937,1);
+        return phpRound(parseFloat(inches) / 0.3937, 1);
     },
     convert: function (type, val) {
         switch (type) {
@@ -491,7 +491,7 @@ let viewExtension = Backbone.View.extend({
             case "ftin":
                 let inches = this.cmToIn(val);
                 let feet = Math.floor(inches / 12);
-                inches = phpRound(inches % 12,1);
+                inches = phpRound(inches % 12, 1);
                 return feet + "ft " + inches + "in";
             case "lb":
                 return this.kgToLb(val) + " lb";
@@ -1097,7 +1097,7 @@ let viewExtension = Backbone.View.extend({
     validateHeightWeight: function (height, weight) {
         if (height && weight) {
             let bmi = weight / ((height / 100) * (height / 100));
-            bmi = phpRound(bmi,1);
+            bmi = phpRound(bmi, 1);
             if (bmi < 5 || bmi > 125) {
                 return false;
             }
