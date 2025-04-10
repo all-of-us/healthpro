@@ -3,13 +3,11 @@
 namespace App\Twig;
 
 use App\Drc\CodeBook;
-use App\Helper\Util;
 use App\Service\TimezoneService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
@@ -34,13 +32,6 @@ class AppExtension extends AbstractExtension
             new TwigFunction('timezone_display', [$this, 'timezoneDisplay']),
             new TwigFunction('codebook_display', [$this, 'getCodeBookDisplay']),
             new TwigFunction('display_message', [$this, 'displayMessage'])
-        ];
-    }
-
-    public function getFilters(): array
-    {
-        return [
-            new TwigFilter('to_fixed', [$this, 'toFixed']),
         ];
     }
 
@@ -100,10 +91,5 @@ class AppExtension extends AbstractExtension
             default:
                 return $message;
         }
-    }
-
-    public function toFixed($number): string
-    {
-        return Util::jsToFixed($number, 1);
     }
 }
