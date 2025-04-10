@@ -491,7 +491,7 @@ let viewExtension = Backbone.View.extend({
             case "ftin":
                 let inches = this.cmToIn(val);
                 let feet = Math.floor(inches / 12);
-                inches = phpRound(inches % 12, 1);
+                inches = phpRound(inches % 12);
                 return feet + "ft " + inches + "in";
             case "lb":
                 return this.kgToLb(val) + " lb";
