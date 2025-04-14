@@ -400,4 +400,11 @@ $(document).ready(function () {
             }
         });
     }
+
+    window.phpRound = (number, precision = 0) => {
+        const factor = 10 ** precision;
+        const shifted = number * factor;
+        const rounded = shifted >= 0 ? Math.floor(shifted + 0.5) : Math.ceil(shifted - 0.5);
+        return rounded / factor;
+    };
 });

@@ -318,6 +318,15 @@ class Measurement
         return $this;
     }
 
+    public function getAgeInYears(): ?int
+    {
+        if ($this->getAgeInMonths() === null) {
+            return null;
+        }
+
+        return (int) floor($this->getAgeInMonths() / 12);
+    }
+
     public function getAgeInMonths(): ?float
     {
         return $this->ageInMonths;
@@ -666,6 +675,7 @@ class Measurement
     public function calculateZScore(float $X, float $L, float $M, float $S): float
     {
         if ($L != 0) {
+            $X = round($X, 1);
             $numerator = pow($X / $M, $L) - 1;
             $denominator = $L * $S;
             if ($denominator != 0) {
@@ -949,7 +959,9 @@ class Measurement
         if ($weight && !empty($height)) {
             $this->addGrowthPercentileForLength($summary, $height, $weight, 'growth-percentile-weight-for-length', 'weightForLengthCharts');
             if ($this->schema->displayBmi) {
-                $summary['bmi'] = round(self::calculateBmi($height, $weight), 1);
+                $height = round($height, 1);
+                $weight = round($weight, 1);
+                $summary['bmi'] = self::calculateBmi($height, $weight);
                 $this->addGrowthPercentileForAge($summary, $summary['bmi'], 'growth-percentile-bmi-for-age', 'bmiForAgeCharts');
             }
         }

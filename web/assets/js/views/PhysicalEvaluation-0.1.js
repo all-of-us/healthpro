@@ -54,7 +54,7 @@ PMI.views["PhysicalEvaluation-0.1"] = Backbone.View.extend({
                 }
             });
         if (count > 0) {
-            var mean = (sum / count).toFixed(1);
+            var mean = phpRound(sum / count, 1);
             this.$("#mean-" + field).html('<span class="label label-primary">Average: ' + mean + "</span>");
             if (this.conversions[field]) {
                 var converted = this.convert(this.conversions[field], mean);
@@ -70,7 +70,7 @@ PMI.views["PhysicalEvaluation-0.1"] = Backbone.View.extend({
         var weight = parseFloat(this.$("#form_weight").val());
         if (height && weight) {
             var bmi = weight / ((height / 100) * (height / 100));
-            bmi = bmi.toFixed(1);
+            bmi = phpRound(bmi, 1);
             this.$("#bmi").html('<span class="label label-primary">BMI: ' + bmi + "</span>");
         } else {
             this.$("#bmi").html("");
@@ -80,10 +80,10 @@ PMI.views["PhysicalEvaluation-0.1"] = Backbone.View.extend({
         this.$("span.help-block ul li").remove();
     },
     kgToLb: function (kg) {
-        return (parseFloat(kg) * 2.2046).toFixed(1);
+        return phpRound(parseFloat(kg) * 2.2046, 1);
     },
     cmToIn: function (cm) {
-        return (parseFloat(cm) * 0.3937).toFixed(1);
+        return phpRound(parseFloat(cm) * 0.3937, 1);
     },
     convert: function (type, val) {
         switch (type) {
@@ -92,7 +92,7 @@ PMI.views["PhysicalEvaluation-0.1"] = Backbone.View.extend({
             case "ftin":
                 var inches = this.cmToIn(val);
                 var feet = Math.floor(inches / 12);
-                inches = (inches % 12).toFixed();
+                inches = phpRound(inches % 12);
                 return feet + "ft " + inches + "in";
             case "lb":
                 return this.kgToLb(val) + " lb";
