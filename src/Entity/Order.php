@@ -1663,14 +1663,17 @@ class Order
 
     protected function getModifiedRequestedSamples()
     {
-        if ($this->getType() == 'saliva') {
+        $requestedSamples = $this->getRequestedSamples();
+        $decodedSamples = $requestedSamples ? json_decode($requestedSamples) : null;
+        $hasValidRequestedSamples = is_array($decodedSamples);
+        if ($this->getType() === self::ORDER_TYPE_SALIVA) {
+            if ($this->isPediatricOrder() && $hasValidRequestedSamples) {
+                return array_intersect($this->salivaSamples, $decodedSamples);
+            }
             return $this->salivaSamples;
         }
-        if ($this->getRequestedSamples() &&
-            ($requestedArray = json_decode($this->getRequestedSamples())) &&
-            is_array($requestedArray)
-        ) {
-            return array_intersect($this->samples, $requestedArray);
+        if ($hasValidRequestedSamples) {
+            return array_intersect($this->samples, $decodedSamples);
         }
         return $this->samples;
     }
