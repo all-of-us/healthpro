@@ -1,61 +1,66 @@
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% if samples is not empty %}
-    <div class="text-right">
-        <button data-export-type="{{ exportType|default('Table') }}" class="btn btn-xs btn-default" id="review_export">
-            <i class="fa fa-download" aria-hidden="true"></i> Export
-        </button>
-        <button class="btn btn-xs btn-default" id="review_export_all">
-            <i class="fa fa-download" aria-hidden="true"></i> Export All
-        </button>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="float-end">
+                <button data-export-type="{{ exportType|default('Table') }}" class="btn btn-xs btn-secondary" id="review_export">
+                    <i class="fa fa-download" aria-hidden="true"></i> Export
+                </button>
+                <button class="btn btn-xs btn-secondary" id="review_export_all">
+                    <i class="fa fa-download" aria-hidden="true"></i> Export All
+                </button>
+            </div>
+        </div>
     </div>
 {% endif %}
-<br>
-<table class="table table-bordered table-small" data-export-table-type="{{ exportType|default('Table') }}">
-    <thead>
-    <tr>
-        <th data-header="Site">Site</th>
-        <th data-header="Biobank ID">Biobank ID</th>
-        <th data-header="Module">Module</th>
-        <th data-header="Visit">Visit</th>
-        <th data-header="Timepoint">Timepoint</th>
-        <th data-header="Order ID">Order ID</th>
-        <th data-header="Samples">Samples</th>
-        <th data-header="Sample ID">Sample ID</th>
-        <th data-header="Created">Created <span class="badge" id="created_ts">0</span></th>
-        <th data-header="Collected">Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
-        <th data-header="Aliquoted and Finalized">Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
-        {% if modifiedOrdersView is defined %}
-            <th data-header="Modified">Modified</th>
-        {% endif %}
-        <th data-header="Status">Status</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for sample in samples %}
+<div class="mt-2">
+    <table class="table table-bordered table-small mt-2 dataTable" data-export-table-type="{{ exportType|default('Table') }}">
+        <thead>
         <tr>
-            <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
-            <td>{{ sample.biobankId }}</td>
-            <td>{{ sample.module }}</td>
-            <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
-            <td>{{ sample.timepoint }}</td>
-            <td data-row="{{ sample.orderId }}">
-                <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
-            </td>
-            <td>{{ sample.sampleCode }}</td>
-            <td>{{ sample.sampleId }}</td>
-            <td data-row="{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId, false) }}" data-order="{{ sample.createdTs ? sample.createdTs|date('Y-m-d H:i:s') : null }}"  {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
-            <td data-row="{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId, false) }}" data-order="{{ sample.collectedTs ? sample.collectedTs|date('Y-m-d H:i:s') : null }}" {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
-            <td data-row="{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId, false) }}" data-order="{{ sample.finalizedTs ? sample.finalizedTs|date('Y-m-d H:i:s') : null }}" {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
+            <th data-header="Site">Site</th>
+            <th data-header="Biobank ID">Biobank ID</th>
+            <th data-header="Module">Module</th>
+            <th data-header="Visit">Visit</th>
+            <th data-header="Timepoint">Timepoint</th>
+            <th data-header="Order ID">Order ID</th>
+            <th data-header="Samples">Samples</th>
+            <th data-header="Sample ID">Sample ID</th>
+            <th data-header="Created">Created <span class="badge" id="created_ts">0</span></th>
+            <th data-header="Collected">Collected <span class="badge badge-warning" id="collected_ts">0</span></th>
+            <th data-header="Aliquoted and Finalized">Aliquoted and Finalized <span class="badge badge-success" id="finalized_ts">0</span></th>
             {% if modifiedOrdersView is defined %}
-                <td data-row="{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId, false) }}">{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
+                <th data-header="Modified">Modified</th>
             {% endif %}
-            <td data-row="{{ macros.displayBiobankSampleStatus(sample, sample.DowntimeGenerated) }}">
-                {{ macros.displayBiobankSampleStatus(sample) }}
-                {% if sample.DowntimeGenerated %}
-                    <label class="label label-primary">Downtime</label>
-                {% endif %}
-            </td>
+            <th data-header="Status">Status</th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for sample in samples %}
+            <tr>
+                <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
+                <td>{{ sample.biobankId }}</td>
+                <td>{{ sample.module }}</td>
+                <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
+                <td>{{ sample.timepoint }}</td>
+                <td data-row="{{ sample.orderId }}">
+                    <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
+                </td>
+                <td>{{ sample.sampleCode }}</td>
+                <td>{{ sample.sampleId }}</td>
+                <td data-row="{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId, false) }}" data-order="{{ sample.createdTs ? sample.createdTs|date('Y-m-d H:i:s') : null }}"  {% if sample.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.createdTs, sample.createdTimezoneId) }}</td>
+                <td data-row="{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId, false) }}" data-order="{{ sample.collectedTs ? sample.collectedTs|date('Y-m-d H:i:s') : null }}" {% if sample.collectedTs %} data-date-type="collected_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.collectedTs, sample.collectedTimezoneId) }}</td>
+                <td data-row="{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId, false) }}" data-order="{{ sample.finalizedTs ? sample.finalizedTs|date('Y-m-d H:i:s') : null }}" {% if sample.finalizedTs %} data-date-type="finalized_ts" {% endif %}>{{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}</td>
+                {% if modifiedOrdersView is defined %}
+                    <td data-row="{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId, false) }}">{{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}</td>
+                {% endif %}
+                <td data-row="{{ macros.displayBiobankSampleStatus(sample, sample.DowntimeGenerated) }}">
+                    {{ macros.displayBiobankSampleStatus(sample) }}
+                    {% if sample.DowntimeGenerated %}
+                        <label class="badge bg-primary">Downtime</label>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

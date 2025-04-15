@@ -1,91 +1,120 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/nph/biobank/base.html.twig' %}
 {% block title %}Audit - Biobank Orders - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 
 {% block body %}
+    {% form_theme todayFilterForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'program/nph/biobank/partials/review-page-heading.html.twig' %}
-    <div class="well today-filter-well" data-title="Filter by Bypass Date">
-        {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
-        {{ form_errors(todayFilterForm) }}
-        <div class="today-filter text-center">
-            {{ form_rest(todayFilterForm) }}
-            <div class="form-group">
-                <a href="{{ path('nph_biobank_orders_audit') }}" class="btn btn-default">Reset</a>
+    <div class="card today-filter-well" data-title="Filter by Bypass Date">
+        <div class="card-body">
+            {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
+            {{ form_errors(todayFilterForm) }}
+            <div class="today-filter text-center">
+                <div class="row justify-content-center align-items-center gx-3">
+                    <div class="col-auto d-flex align-items-center">
+                        <label for="{{ todayFilterForm.start_date.vars.id }}" class="form-label mb-0 me-2 align-middle required fw-bold">Start Date</label>
+                        <div>
+                            {{ form_widget(todayFilterForm.start_date, { attr: { class: 'form-control' } }) }}
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        <label for="{{ todayFilterForm.end_date.vars.id }}" class="form-label mb-0 me-2 align-middle fw-bold">End Date</label>
+                        <div>
+                            {{ form_widget(todayFilterForm.end_date, { attr: { class: 'form-control' } }) }}
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        {{ form_widget(todayFilterForm.Submit, { attr: { class: 'btn btn-primary' } }) }}
+                        <a href="{{ path('nph_biobank_orders_audit') }}" class="btn btn-secondary ms-2">Reset</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form_errors(todayFilterForm.start_date) }}
+                        {{ form_errors(todayFilterForm.end_date) }}
+                    </div>
+                </div>
             </div>
+            {{ form_end(todayFilterForm) }}
         </div>
-        {{ form_end(todayFilterForm) }}
     </div>
     <div class="text-center text-warning">
         <strong>{{ displayMessage }}</strong>
     </div>
     {% if samples is not empty %}
-        <div class="text-right">
-            <button data-export-type="DietPeriodAudit" class="btn btn-xs btn-default" id="review_export">
-                <i class="fa fa-download" aria-hidden="true"></i> Export
-            </button>
-            <button class="btn btn-xs btn-default" id="review_export_all">
-                <i class="fa fa-download" aria-hidden="true"></i> Export All
-            </button>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="float-end">
+                    <button data-export-type="DietPeriodAudit" class="btn btn-xs btn-secondary" id="review_export">
+                        <i class="fa fa-download" aria-hidden="true"></i> Export
+                    </button>
+                    <button class="btn btn-xs btn-secondary" id="review_export_all">
+                        <i class="fa fa-download" aria-hidden="true"></i> Export All
+                    </button>
+                </div>
+            </div>
         </div>
-        <br>
     {% endif %}
-    <table class="table table-bordered table-small" data-default-sort-column="6" data-export-table-type="DietPeriodAudit">
-        <thead>
-        <tr>
-            <th data-header="Site">Site</th>
-            <th data-header="Biobank ID">Biobank ID</th>
-            <th data-header="User">User</th>
-            <th data-header="Module Impacted">Module Impacted</th>
-            <th data-header="Diet Period Impacted">Diet Period Impacted</th>
-            <th data-header="Bypass Type">Bypass Type</th>
-            <th data-header="Bypass Time">Bypass Time</th>
-            <th data-header="Status">Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for sample in samples %}
+    <div class="mt-2">
+        <table class="table table-bordered table-small mt-2" data-default-sort-column="6" data-export-table-type="DietPeriodAudit">
+            <thead>
             <tr>
-                <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
-                <td>{{ sample.biobankId }}</td>
-                <td>{{ sample.user.email }}</td>
-                <td>{{ sample.module }}</td>
-                <td>{{ sample.period|replace({"Period": "Period "}) }}</td>
-                <td>
-                {% if sample.modifyType is not defined %}
-                    Diet Period marked complete before all samples finalized or cancelled.
-                {% elseif sample.modifyType == 'unfinalized' %}
-                    Diet Period marked complete before all samples finalized or cancelled.
-                {% else %}
-                    Diet Period left incomplete and started next diet period.
-                {% endif %}</td>
-                <td data-row="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
-                    {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
-                </td>
-                <td data-row="{{ sample.IncompleteSamples }} Samples Incomplete
-                    {% if sample.status is not defined %}
-                        (Bypassed)
-                    {% elseif sample.status == 0 and sample.previousStatus == 1 %}
-                        (Corrected)
-                    {% elseif sample.IncompleteSamples > 0 %}
-                        (Bypassed)
-                    {% else %}
-                        (Corrected)
-                    {% endif %}">
-                    {{ sample.IncompleteSamples }} Samples Incomplete
-                    {% if sample.status is not defined %}
-                        <label class="label label-danger">Bypassed</label>
-                    {% elseif sample.status == 0 and sample.previousStatus == 1 %}
-                        <label class="label label-success">Corrected</label>
-                    {% elseif sample.IncompleteSamples > 0 %}
-                        <label class="label label-danger">Bypassed</label>
-                    {% else %}
-                        <label class="label label-success">Corrected</label>
-                    {% endif %}</td>
+                <th data-header="Site">Site</th>
+                <th data-header="Biobank ID">Biobank ID</th>
+                <th data-header="User">User</th>
+                <th data-header="Module Impacted">Module Impacted</th>
+                <th data-header="Diet Period Impacted">Diet Period Impacted</th>
+                <th data-header="Bypass Type">Bypass Type</th>
+                <th data-header="Bypass Time">Bypass Time</th>
+                <th data-header="Status">Status</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for sample in samples %}
+                <tr>
+                    <td>{{ siteInfo.getNphSiteDisplayName(sample.site) }}</td>
+                    <td>{{ sample.biobankId }}</td>
+                    <td>{{ sample.user.email }}</td>
+                    <td>{{ sample.module }}</td>
+                    <td>{{ sample.period|replace({"Period": "Period "}) }}</td>
+                    <td>
+                    {% if sample.modifyType is not defined %}
+                        Diet Period marked complete before all samples finalized or cancelled.
+                    {% elseif sample.modifyType == 'unfinalized' %}
+                        Diet Period marked complete before all samples finalized or cancelled.
+                    {% else %}
+                        Diet Period left incomplete and started next diet period.
+                    {% endif %}</td>
+                    <td data-row="{{ sample.modifiedTs ? sample.modifiedTs|date('Y-m-d H:i:s') : null }}" >
+                        {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
+                    </td>
+                    <td data-row="{{ sample.IncompleteSamples }} Samples Incomplete
+                        {% if sample.status is not defined %}
+                            (Bypassed)
+                        {% elseif sample.status == 0 and sample.previousStatus == 1 %}
+                            (Corrected)
+                        {% elseif sample.IncompleteSamples > 0 %}
+                            (Bypassed)
+                        {% else %}
+                            (Corrected)
+                        {% endif %}">
+                        {{ sample.IncompleteSamples }} Samples Incomplete
+                        {% if sample.status is not defined %}
+                            <label class="badge bg-danger">Bypassed</label>
+                        {% elseif sample.status == 0 and sample.previousStatus == 1 %}
+                            <label class="badge bg-success">Corrected</label>
+                        {% elseif sample.IncompleteSamples > 0 %}
+                            <label class="badge bg-danger">Bypassed</label>
+                        {% else %}
+                            <label class="badge bg-success">Corrected</label>
+                        {% endif %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-biobank-review') }}
