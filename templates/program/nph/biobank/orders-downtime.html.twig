@@ -95,7 +95,7 @@
                     </td>
                     <td>{{ sample.sampleCode }}</td>
                     <td>{{ sample.sampleId }}</td>
-                    <td data-row="{{ macros.displayBiobankSampleStatus(sample, true) }}">{{ macros.displayBiobankSampleStatus(sample) }} <label class="label label-primary">Downtime</label></td>
+                    <td data-row="{{ macros.displayBiobankSampleStatus(sample, true) }}">{{ macros.displayBiobankSampleStatus(sample) }} <label class="badge bg-primary">Downtime</label></td>
                 </tr>
             {% endfor %}
             </tbody>

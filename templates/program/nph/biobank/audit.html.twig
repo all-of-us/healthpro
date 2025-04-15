@@ -102,13 +102,13 @@
                         {% endif %}">
                         {{ sample.IncompleteSamples }} Samples Incomplete
                         {% if sample.status is not defined %}
-                            <label class="label label-danger">Bypassed</label>
+                            <label class="badge bg-danger">Bypassed</label>
                         {% elseif sample.status == 0 and sample.previousStatus == 1 %}
-                            <label class="label label-success">Corrected</label>
+                            <label class="badge bg-success">Corrected</label>
                         {% elseif sample.IncompleteSamples > 0 %}
-                            <label class="label label-danger">Bypassed</label>
+                            <label class="badge bg-danger">Bypassed</label>
                         {% else %}
-                            <label class="label label-success">Corrected</label>
+                            <label class="badge bg-success">Corrected</label>
                         {% endif %}</td>
                 </tr>
             {% endfor %}
