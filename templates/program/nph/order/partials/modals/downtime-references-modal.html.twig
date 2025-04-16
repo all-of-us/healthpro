@@ -1,0 +1,59 @@
+<div class="modal fade" id="downtime-references-modal" tabindex="-1" role="dialog" aria-labelledby="downtime-references-modal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-question-circle text-primary"></i>
+                    Downtime Help
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="accordion" id="accordionDowntime">
+                            <div class="accordion-item border-bottom">
+                                <h2 class="accordion-header" id="downtime-usage-guide-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#downtime-usage-guide-collapse" aria-expanded="false" aria-controls="downtime-usage-guide-collapse">
+                                        Downtime Usage Guide
+                                    </button>
+                                </h2>
+                                <div id="downtime-usage-guide-collapse" class="accordion-collapse collapse" aria-labelledby="downtime-usage-guide-heading" data-bs-parent="#accordionDowntime">
+                                    <div class="accordion-body">
+                                        <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: 'NPH-Downtime-Usage-Guide', language: 'en', documentGroup: 'nph' }) }}#view=FitH"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="downtime-video-tutorial-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#downtime-video-tutorial-collapse" aria-expanded="false" aria-controls="downtime-video-tutorial-collapse">
+                                        Video Tutorial
+                                    </button>
+                                </h2>
+                                <div id="downtime-video-tutorial-collapse" class="accordion-collapse collapse" aria-labelledby="downtime-video-tutorial-heading" data-bs-parent="#accordionDowntime">
+                                    <div class="accordion-body">
+                                        <iframe class="pdf embed-responsive-item" frameborder="0" allow="autoplay; encrypted-media" src="https://www.youtube.com/embed/wE-sZoPCfdk?modestbranding=1&rel=0" allowfullscreen></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="downtime-procedure-sop-heading">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#downtime-procedure-sop-collapse" aria-expanded="false" aria-controls="downtime-procedure-sop-collapse">
+                                        NPH HPRO Downtime Procedure SOP
+                                    </button>
+                                </h2>
+                                <div id="downtime-procedure-sop-collapse" class="accordion-collapse collapse" aria-labelledby="downtime-procedure-sop-heading" data-bs-parent="#accordionDowntime">
+                                    <div class="accordion-body row">
+                                        <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: 'NPH HPRO Downtime Procedure SOP', language: 'en', documentGroup: 'nph' }) }}#view=FitH"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

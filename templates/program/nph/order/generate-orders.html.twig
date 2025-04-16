@@ -37,7 +37,10 @@
                 </div>
                 <div class="col-sm-5">
                     <div class="float-end">
-                        <label class="fw-bold">Downtime or Delayed Order?</label>
+                        <label class="fw-bold">
+                            <i class="fa fa-question-circle text-primary" aria-hidden="true" role="button" data-bs-toggle="modal" data-bs-target="#downtime-references-modal"></i>
+                            Downtime or Delayed Order?
+                        </label>
                         <span class="alert p-2 bg-primary text-white">
                             {{ form_widget(orderForm['downtime_generated']) }}
                             Enter Downtime
@@ -135,6 +138,7 @@
     <br>
     {% include 'program/nph/order/partials/modals/downtime-warning-modal.html.twig' %}
     {% include 'program/nph/order/partials/modals/optional-stool-kit-warning-modal.html.twig' %}
+    {% include 'program/nph/order/partials/modals/downtime-references-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order-create') }}
