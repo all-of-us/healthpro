@@ -165,13 +165,13 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         field.find("span.help-block ul li").remove();
     },
     kgToLb: function (kg) {
-        return (parseFloat(kg) * 2.2046).toFixed(1);
+        return phpRound(parseFloat(kg) * 2.2046, 1);
     },
     cmToIn: function (cm) {
-        return (parseFloat(cm) * 0.3937).toFixed(1);
+        return phpRound(parseFloat(cm) * 0.3937, 1);
     },
     lbToKg: function (lb) {
-        return (parseFloat(lb) / 2.2046).toFixed(1);
+        return phpRound(parseFloat(lb) / 2.2046, 1);
     },
     convert: function (type, val) {
         switch (type) {
@@ -180,7 +180,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
             case "ftin":
                 var inches = this.cmToIn(val);
                 var feet = Math.floor(inches / 12);
-                inches = (inches % 12).toFixed();
+                inches = phpRound(inches % 12);
                 return feet + "ft " + inches + "in";
             case "lb":
                 return this.kgToLb(val) + " lb";

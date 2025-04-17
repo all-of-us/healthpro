@@ -7,10 +7,13 @@ require("backbone/backbone.js");
 window.tempusDominus = require("@eonasdan/tempus-dominus/dist/js/tempus-dominus.min");
 require("parsleyjs/dist/parsley.js");
 require("./parsley-validator.js"); // customized parsley validator
+// Include the required file for exporting to CSV
+require("datatables.net-buttons/js/buttons.html5.js");
 require("datatables.net/js/jquery.dataTables.js");
 require("datatables.net-bs5/js/dataTables.bootstrap5.js");
 require("datatables.net-responsive/js/dataTables.responsive.js");
 require("datatables.net-responsive-bs/js/responsive.bootstrap.js");
+require("datatables.net-buttons/js/dataTables.buttons.js");
 require("jsbarcode/dist/barcodes/JsBarcode.code128.min.js");
 require("inputmask/dist/jquery.inputmask.bundle.js");
 require("bootstrap5-toggle/js/bootstrap5-toggle.jquery.min");

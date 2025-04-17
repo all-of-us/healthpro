@@ -1597,7 +1597,7 @@ class Fhir
                 ],
                 [
                     'code' => 'weight-mean',
-                    'display' => 'Computed weight circumference, mean of closest two measures',
+                    'display' => 'Computed weight, mean of closest two measures',
                     'system' => 'http://terminology.pmi-ops.org/CodeSystem/physical-measurements'
                 ]
             ]

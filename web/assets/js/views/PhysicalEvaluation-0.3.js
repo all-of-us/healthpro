@@ -93,7 +93,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 },
                 0
             );
-            var mean = (sum / values.length).toFixed(1);
+            var mean = phpRound(sum / values.length, 1);
             this.$("#mean-" + field).html("<strong>" + mean + "</strong>");
             if (this.conversions[field]) {
                 var converted = this.convert(this.conversions[field], mean);
@@ -120,7 +120,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         }
         if (height && weight) {
             var bmi = weight / ((height / 100) * (height / 100));
-            bmi = bmi.toFixed(1);
+            bmi = phpRound(bmi, 1);
             this.$("#bmi").html("<strong>" + bmi + "</strong>");
             if (bmi < 15 || bmi > 50) {
                 this.$("#bmi-warning").text("Please verify that the height and weight are correct");
@@ -312,16 +312,16 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         field.find("span.help-block ul li").remove();
     },
     kgToLb: function (kg) {
-        return (parseFloat(kg) * 2.2046).toFixed(1);
+        return phpRound(parseFloat(kg) * 2.2046, 1);
     },
     cmToIn: function (cm) {
-        return (parseFloat(cm) * 0.3937).toFixed(1);
+        return phpRound(parseFloat(cm) * 0.3937, 1);
     },
     lbToKg: function (lb) {
-        return (parseFloat(lb) / 2.2046).toFixed(1);
+        return phpRound(parseFloat(lb) / 2.2046, 1);
     },
     inToCm: function (inches) {
-        return (parseFloat(inches) / 0.3937).toFixed(1);
+        return phpRound(parseFloat(inches) / 0.3937, 1);
     },
     convert: function (type, val) {
         switch (type) {
@@ -330,7 +330,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
             case "ftin":
                 var inches = this.cmToIn(val);
                 var feet = Math.floor(inches / 12);
-                inches = (inches % 12).toFixed();
+                inches = phpRound(inches % 12);
                 return feet + "ft " + inches + "in";
             case "lb":
                 return this.kgToLb(val) + " lb";
@@ -656,7 +656,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
     validateHeightWeight: function (height, weight) {
         if (height && weight) {
             var bmi = weight / ((height / 100) * (height / 100));
-            bmi = bmi.toFixed(1);
+            bmi = phpRound(bmi, 1);
             if (bmi < 5 || bmi > 125) {
                 return false;
             }

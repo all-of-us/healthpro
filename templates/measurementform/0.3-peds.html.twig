@@ -126,23 +126,23 @@
                     </div>
                     <div class="panel-body">
                         <div class="row row-no-gutters lead">
-                            <div class="col-sm-3">Weight</div>
-                            <div class="col-sm-9">
-                                {{ growthMacros.displayGrowthPercentile('weight-for-age', participant.sexAtBirth) }}
+                            <div>Weight</div>
+                            <div>
+                                {{ growthMacros.displayGrowthPercentile('weight-for-age', sexAtBirth) }}
                             </div>
                         </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
                         <div class="row row-no-gutters lead">
-                            <div class="col-sm-5">Height/Length</div>
-                            <div class="col-sm-7">
-                                {{ growthMacros.displayGrowthPercentile('height-for-age', participant.sexAtBirth) }}
+                            <div>Height/Length</div>
+                            <div>
+                                {{ growthMacros.displayGrowthPercentile('height-for-age', sexAtBirth) }}
                             </div>
                         </div>
                         {% if schema.displayWeightForLength == true %}
                             <div class="row row-no-gutters lead">
-                                <div class="col-sm-6">Weight-for-Length</div>
-                                <div class="col-sm-6">
-                                    {{ growthMacros.displayGrowthPercentile('weight-for-length', participant.sexAtBirth) }}
+                                <div>Weight-for-Length</div>
+                                <div>
+                                    {{ growthMacros.displayGrowthPercentile('weight-for-length', sexAtBirth) }}
                                 </div>
                             </div>
                             <div id="weight-for-length-warning" class="metric-warnings text-warning"></div>
@@ -167,9 +167,9 @@
                             </p>
                             <div id="bmi-warning" class="metric-warnings text-warning"></div>
                             <div class="row row-no-gutters lead">
-                                <div class="col-sm-5">BMI Percentile</div>
-                                <div class="col-sm-7">
-                                    {{ growthMacros.displayGrowthPercentile('bmi-for-age', participant.sexAtBirth) }}
+                                <div>BMI Percentile</div>
+                                <div>
+                                    {{ growthMacros.displayGrowthPercentile('bmi-for-age', sexAtBirth) }}
                                 </div>
                             </div>
                             <div id="bmi-for-age-warning" class="metric-warnings text-warning"></div>
@@ -329,9 +329,9 @@
                     <div class="panel-body">
                         {% if schema.fields['head-circumference-protocol-modification'] is defined %}
                             <div class="row row-no-gutters lead">
-                                <div class="col-sm-6">Head Circumference</div>
-                                <div class="col-sm-6">
-                                    {{ growthMacros.displayGrowthPercentile('head-circumference-for-age', participant.sexAtBirth) }}
+                                <div>Head Circumference</div>
+                                <div>
+                                    {{ growthMacros.displayGrowthPercentile('head-circumference-for-age', sexAtBirth) }}
                                 </div>
                             </div>
                         {% endif %}
