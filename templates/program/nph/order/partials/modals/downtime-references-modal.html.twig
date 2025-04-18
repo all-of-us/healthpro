@@ -18,8 +18,11 @@
                                     </button>
                                 </h2>
                                 <div id="downtime-usage-guide-collapse" class="accordion-collapse collapse" aria-labelledby="downtime-usage-guide-heading" data-bs-parent="#accordionDowntime">
-                                    <div class="accordion-body">
-                                        <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: 'NPH-Downtime-Usage-Guide', language: 'en', documentGroup: 'nph' }) }}#view=FitH"></iframe>
+                                    <div class="accordion-body downtime-media-src" data-media-src="{{ path('help_sopFile', { id: 'NPH-Downtime-Usage-Guide', language: 'en', documentGroup: 'nph' }) }}#view=FitH">
+                                        <div class="spinner-border text-primary loading-spinner" role="status" style="display: none;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <iframe class="pdf" name="pdf" src=""></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -30,8 +33,11 @@
                                     </button>
                                 </h2>
                                 <div id="downtime-video-tutorial-collapse" class="accordion-collapse collapse" aria-labelledby="downtime-video-tutorial-heading" data-bs-parent="#accordionDowntime">
-                                    <div class="accordion-body">
-                                        <iframe class="embed-responsive-item w-100 video" frameborder="0" allow="autoplay; encrypted-media" src="https://www.youtube.com/embed/vyHrkt_GG7w?modestbranding=1&rel=0" allowfullscreen></iframe>
+                                    <div class="accordion-body downtime-media-src" data-media-src="https://www.youtube.com/embed/{{ downtimeVideoSrc }}/?modestbranding=1&rel=0">
+                                        <div class="spinner-border text-primary loading-spinner" role="status" style="display: none;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <iframe id="nph_downtime_video_iframe" class="embed-responsive-item w-100 video" frameborder="0" allow="autoplay; encrypted-media" src="" allowfullscreen></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -42,8 +48,11 @@
                                     </button>
                                 </h2>
                                 <div id="downtime-procedure-sop-collapse" class="accordion-collapse collapse" aria-labelledby="downtime-procedure-sop-heading" data-bs-parent="#accordionDowntime">
-                                    <div class="accordion-body row">
-                                        <iframe class="pdf" name="pdf" src="{{ path('help_sopFile', { id: 'NPH HPRO Downtime Procedure SOP', language: 'en', documentGroup: 'nph' }) }}#view=FitH"></iframe>
+                                    <div class="accordion-body downtime-media-src" data-media-src="{{ path('help_sopFile', { id: 'NPH HPRO Downtime Procedure SOP', language: 'en', documentGroup: 'nph' }) }}#view=FitH">
+                                        <div class="spinner-border text-primary loading-spinner" role="status" style="display: none;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <iframe class="pdf" name="pdf" src=""></iframe>
                                     </div>
                                 </div>
                             </div>

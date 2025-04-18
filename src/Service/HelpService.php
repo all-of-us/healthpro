@@ -286,6 +286,10 @@ class HelpService
         ]
     ];
 
+    public static array $nphVideoPlaylists = [
+        'downtime-reference' => 'vyHrkt_GG7w'
+    ];
+
     public static $videoPlaylists = [
         'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
