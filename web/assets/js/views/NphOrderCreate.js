@@ -279,6 +279,29 @@ $(document).ready(function () {
     }
 
     const optionalStoolKitSel = document.getElementById("stoolKit2Samples");
-    optionalStoolKitSel.addEventListener("shown.bs.collapse", () => samplesMasonry.layout());
-    optionalStoolKitSel.addEventListener("hidden.bs.collapse", () => samplesMasonry.layout());
+    if (optionalStoolKitSel) {
+        optionalStoolKitSel.addEventListener("shown.bs.collapse", () => samplesMasonry.layout());
+        optionalStoolKitSel.addEventListener("hidden.bs.collapse", () => samplesMasonry.layout());
+    }
+
+    $(document).on("shown.bs.modal", "#downtime-references-modal", function () {
+        $(".downtime-media-src").each(function () {
+            const $container = $(this);
+            const mediaSrc = $container.data("media-src");
+            const $iframe = $container.find("iframe");
+            const $spinner = $container.find(".loading-spinner");
+            if ($iframe.attr("src") !== mediaSrc) {
+                $spinner.show();
+                $iframe
+                    .off("load") // prevent stacking multiple load events
+                    .on("load", () => $spinner.hide())
+                    .attr("src", mediaSrc);
+            }
+        });
+    });
+
+    $(document).on("hidden.bs.modal", "#downtime-references-modal", function () {
+        // Stop video
+        $("#nph_downtime_video_iframe").attr("src", "");
+    });
 });

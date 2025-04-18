@@ -23,6 +23,10 @@ iframe.pdf {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+iframe.video {
+    height: 500px;
+}
 #flash-notices {
     margin-top: -10px;
     margin-bottom: 15px;

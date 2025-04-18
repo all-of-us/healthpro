@@ -271,9 +271,23 @@ class HelpService
                     'title' => 'NPH HealthPro Application SOP',
                     'filename' => 'NPH HealthPro Application SOP.pdf',
                     'languages' => ['es']
+                ],
+                'NPH HPRO Downtime Procedure SOP' => [
+                    'title' => 'NPH HPRO Downtime Procedure SOP',
+                    'filename' => 'NPH HPRO Downtime Procedure SOP.pdf',
+                    'languages' => ['es']
+                ],
+                'NPH-Downtime-Usage-Guide' => [
+                    'title' => 'Downtime Usage Guide',
+                    'filename' => 'Downtime Usage Guide.pdf',
+                    'languages' => ['es']
                 ]
             ]
         ]
+    ];
+
+    public static array $nphVideoPlaylists = [
+        'downtime-reference' => 'vyHrkt_GG7w'
     ];
 
     public static $videoPlaylists = [

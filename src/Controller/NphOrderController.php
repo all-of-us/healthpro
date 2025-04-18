@@ -119,7 +119,8 @@ class NphOrderController extends BaseController
             'bloodSamples' => $nphOrderService->getSamplesByType(NphOrder::TYPE_BLOOD),
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
             'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
-            'showPreview' => $showPreview
+            'showPreview' => $showPreview,
+            'downtimeVideoSrc' => HelpService::$nphVideoPlaylists['downtime-reference']
         ]);
     }
 
