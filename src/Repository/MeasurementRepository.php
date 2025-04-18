@@ -227,6 +227,26 @@ class MeasurementRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function createTempEvaluationTable(): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $createTempTable = '
+            CREATE TEMPORARY TABLE IF NOT EXISTS temp_measurements_reports AS
+            SELECT * FROM evaluations
+            WHERE version LIKE :version
+        ';
+        $conn->executeStatement($createTempTable, [
+            'version' => '%peds%'
+        ]);
+    }
+
+    public function deleteTempEvaluationTable(): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $dropTempTable = 'DROP TEMPORARY TABLE IF EXISTS temp_measurements_reports';
+        $conn->executeStatement($dropTempTable);
+    }
+
     public function getCompleteMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
     {
         $query = '
@@ -243,7 +263,7 @@ class MeasurementRepository extends ServiceEntityRepository
                         WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1)) = "false" THEN NULL
                         ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField1))
                     END AS field2
-                 from evaluations
+                 from temp_measurements_reports
                  where age_in_months >= :minAge
                    and age_in_months <= :maxAge
              ) jsonvalues
@@ -281,7 +301,7 @@ class MeasurementRepository extends ServiceEntityRepository
                         WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2)) = "false" THEN NULL
                         ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2))
                     END AS field3
-                 from evaluations
+                 from temp_measurements_reports
                  where age_in_months >= :minAge
                    and age_in_months <= :maxAge
              ) jsonvalues
@@ -311,7 +331,7 @@ class MeasurementRepository extends ServiceEntityRepository
                         WHEN JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2)) = "false" THEN NULL
                         ELSE JSON_UNQUOTE(JSON_EXTRACT(data, :jsonField2))
                     END AS field3
-                 from evaluations
+                 from temp_measurements_reports
                  where age_in_months >= :minAge
                    and age_in_months <= :maxAge
              ) jsonvalues
