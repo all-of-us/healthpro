@@ -351,6 +351,8 @@ class PediatricsReportService
         $csvData[] = self::MEASUREMENTS_TOTAL_CSV_HEADERS;
         $csvData[] = self::MEASUREMENTS_TOTAL_CSV_SUBHEADERS;
 
+        $this->em->getRepository(Measurement::class)->createTempEvaluationTable();
+
         foreach (self::TOTALS_COUNTS_FIELDS as $field) {
             $tempRow = [$field];
 
@@ -380,6 +382,8 @@ class PediatricsReportService
         }
 
         $this->generateCSVReport($csvData, 'Measurements_Report-' . date('Ymd-His') . '.csv');
+
+        $this->em->getRepository(Measurement::class)->deleteTempEvaluationTable();
     }
 
     public function getBloodPressureSystolicAlert(
