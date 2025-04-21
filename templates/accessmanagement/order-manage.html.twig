@@ -1,0 +1,116 @@
+{% set bootstrapVersion = 5 %}
+{% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
+{% block title %}Orders - {% endblock %}
+{% block body %}
+    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom">
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Management</h2>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-4 col-md-4">
+            <h3>Find by Order ID</h3>
+            <p class="fst-italic">Search for an order ID to view the associated collection page.</p>
+            {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
+            {{ form_widget(idForm) }}
+            <button type="submit" class="btn btn-primary">Go</button>
+            {{ form_end(idForm) }}
+        </div>
+        {% if order is defined %}
+            <div class="col-sm-8 col-md-8">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="border-bottom">
+                            {% include 'program/nph/order/partials/order-manage-participant-details.html.twig' %}
+                        </div>
+                        {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+                        {{ form_errors(orderCollectForm) }}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
+                                    <div class="form-group {% if not orderCollectForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
+                                        {{ form_label(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                                        {{ form_widget(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                                        {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <table class="table table-samples table-borderless">
+                            <thead>
+                            <tr>
+                                <th>Collection Sample</th>
+                                <th>Collection Volume</th>
+                                <th>Notes</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, nphSample in order.nphSamples %}
+                                {% if nphSample.modifyType in [constant('CANCEL', nphSample), constant('UNLOCK', nphSample)] %}
+                                    <tr>
+                                        <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% if order.orderType == constant('TYPE_24URINE', order) %}
+                                    {% include 'program/nph/order/partials/order-collect-urine24.html.twig' %}
+                                {% else %}
+                                    <tr class="row-samples">
+                                        <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+                                            class="has-error"{% endif %}>
+                                            {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
+                                            {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+                                            {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
+                                                <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
+                                            {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
+                                                <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
+                                            {% elseif nphSample.finalizedTs is not empty %}
+                                                <p class="text-success"><i class="fa fa-check-circle"></i>
+                                                    {{ macros.displayCollectAliquotStatus(nphSample) }}
+                                                </p>
+                                            {% endif %}
+                                        </td>
+                                        {% if orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
+                                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
+                                                class="has-error"{% endif %}>
+                                                {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                                {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                            </td>
+                                        {% endif %}
+                                        <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                                            class="has-error"{% endif %}>
+                                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                                            {% if index == order.nphSamples|length - 1 %}
+                                                <small class="text-warning">
+                                                    Comments entered in this field are transmitted to the Biobank via reconciliation
+                                                    reporting.
+                                                    <br>
+                                                    Do not enter any participant identifying information here.
+                                                </small>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
+                                    class="has-error"{% endif %}>{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
+                        {{ form_rest(orderCollectForm) }}
+                        <div class="form-group">
+                            {% if not order.isDisabled %}
+                                <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
+                            {% endif %}
+                            <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
+                               class="btn btn-secondary">Cancel</a>
+                        </div>
+                        {{ form_end(orderCollectForm) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

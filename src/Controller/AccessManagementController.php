@@ -3,12 +3,17 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphOrder;
 use App\Form\GroupMemberType;
+use App\Form\Nph\NphOrderCollect;
+use App\Form\OrderLookupIdType;
 use App\Form\RemoveGroupMemberType;
 use App\Service\AccessManagementService;
 use App\Service\ContextTemplateService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
+use App\Service\Nph\NphOrderService;
+use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -179,5 +184,73 @@ class AccessManagementController extends BaseController
             'member' => $member,
             'removeGoupMemberForm' => $removeGoupMemberForm->createView()
         ]);
+    }
+
+    #[Route(path: '/order/manage/{orderId}', name: 'order_manage', defaults: ['orderId' => null])]
+    public function orderManageAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
+    {
+        $idForm = $this->createForm(OrderLookupIdType::class, null);
+        $idForm->handleRequest($request);
+        if ($orderId) {
+            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $orderId
+            ]);
+            $participant = $nphParticipantSummaryService->getParticipantById($order->getParticipantId());
+            if (!$participant) {
+                throw $this->createNotFoundException('Participant not found.');
+            }
+
+            $nphOrderService->loadModules(
+                $order->getModule(),
+                $order->getVisitPeriod(),
+                $participant->id,
+                $participant->biobankId
+            );
+            $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+            $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+            $oderCollectForm = $this->createForm(
+                NphOrderCollect::class,
+                $orderCollectionData,
+                ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
+                    $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
+                    , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()]
+            );
+            $oderCollectForm->handleRequest($request);
+            if ($oderCollectForm->isSubmitted()) {
+                $formData = $oderCollectForm->getData();
+                if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                    $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+                }
+                if ($oderCollectForm->isValid()) {
+                    if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                        $this->addFlash('success', 'Order collection saved');
+                    } else {
+                        $this->addFlash('error', 'Order collection failed');
+                    }
+                } else {
+                    $oderCollectForm->addError(new FormError('Please correct the errors below'));
+                }
+            }
+
+            return $this->render('accessmanagement/order-manage.html.twig', [
+                'idForm' => $idForm->createView(),
+                'order' => $order,
+                'participant' => $participant,
+                'orderCollectForm' => $oderCollectForm->createView(),
+                'timePoints' => $nphOrderService->getTimePoints(),
+                'samples' => $nphOrderService->getSamples()
+            ]);
+        }
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
+            $orderId = $idForm->get('orderId')->getData();
+            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $orderId
+            ]);
+            if ($order) {
+                return $this->redirectToRoute('order_manage', ['orderId' => $orderId]);
+            }
+            $this->addFlash('error', 'Order ID not found');
+        }
+        return $this->render('accessmanagement/order-manage.html.twig', ['idForm' => $idForm->createView()]);
     }
 }
