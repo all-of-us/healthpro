@@ -245,7 +245,7 @@ class AccessManagementController extends BaseController
                 }
             }
 
-            return $this->render('accessmanagement/order-manage.html.twig', [
+            return $this->render('program/nph/accessmanagement/order-manage.html.twig', [
                 'idForm' => $idForm->createView(),
                 'order' => $order,
                 'participant' => $participant,
