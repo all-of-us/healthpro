@@ -36,4 +36,8 @@ $(document).ready(function () {
         $resubmitBtn.hide();
         $resubmitCancelBtn.hide();
     });
+
+    $resubmitBtn.on("click", function () {
+        $("#order_resubmit_confirmation_modal").modal("show");
+    });
 });

@@ -128,6 +128,7 @@
             </div>
         {% endif %}
     </div>
+    {% include 'accessmanagement/modal/order-resubmit-confirmation-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order-management') }}
