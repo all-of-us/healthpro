@@ -85,8 +85,7 @@
                                             {% endif %}
                                         </td>
                                         {% if orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
-                                            <td style="position: relative" {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}
-                                                class="has-error"{% endif %}>
+                                            <td style="position: relative" class="w-25 {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}has-error{% endif %}">
                                                 {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                                                 {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                                             </td>

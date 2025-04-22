@@ -1,4 +1,12 @@
 $(document).ready(function () {
+    document.querySelectorAll(".order-ts").forEach((element) => {
+        bs5DateTimepicker(element, {
+            clock: true,
+            sideBySide: true,
+            useCurrent: true
+        });
+    });
+
     const $form = $('form[name="nph_order_collect"]');
     const $fields = $form.find("input, textarea");
     const $editBtn = $("#order_edit_btn");
