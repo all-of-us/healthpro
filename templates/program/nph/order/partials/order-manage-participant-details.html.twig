@@ -12,10 +12,10 @@
             <div class="float-end">
                 <strong class="text-primary">
                     Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
-                    | {{ order.orderId}}
+                    | {{ order.getOrderTypeDisplayName}}
                 </strong><br>
                 <strong>Order ID</strong>
-                {{ order.orderType }}
+                {{ order.orderId }}
             </div>
         </div>
     </div>

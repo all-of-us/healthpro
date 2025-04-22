@@ -15,6 +15,30 @@ class NphOrderCollect extends NphOrderForm
         $samples = $options['samples'];
         $orderType = $options['orderType'];
         $sampleIndex = 1;
+
+        if ($options['showOrderGenerationTimeField']) {
+            $constraints = $this->getDateTimeConstraints();
+            array_push(
+                $constraints,
+                new Constraints\NotBlank([
+                    'message' => 'Order Generation time is required'
+                ])
+            );
+            $builder->add("{$orderType}GenerationTs", Type\DateTimeType::class, [
+                'required' => false,
+                'constraints' => $constraints,
+                'label' => 'Order Generation Time',
+                'widget' => 'single_text',
+                'format' => 'M/d/yyyy h:mm a',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => $options['timeZone'],
+                'attr' => [
+                    'class' => 'order-ts',
+                ]
+            ]);
+        }
+
         foreach ($samples as $sampleCode => $sample) {
             $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
             $builder->add($sampleCode, Type\CheckboxType::class, [
@@ -37,11 +61,11 @@ class NphOrderCollect extends NphOrderForm
             $sampleIndex++;
         }
 
-        if ($orderType === NphOrder::TYPE_URINE || $orderType === NphOrder::TYPE_24URINE) {
+        if ($options['showMetadataFields'] && ($orderType === NphOrder::TYPE_URINE || $orderType === NphOrder::TYPE_24URINE)) {
             $this->addUrineMetadataFields($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
         }
 
-        if ($orderType === NphOrder::TYPE_24URINE) {
+        if ($options['showVolumeFields'] && $orderType === NphOrder::TYPE_24URINE) {
             $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields']);
         }
 
@@ -68,7 +92,9 @@ class NphOrderCollect extends NphOrderForm
                     'readonly' => $options['disableStoolCollectedTs']
                 ]
             ]);
-            $this->addStoolMetadataFields($builder, $options['timeZone'], $orderType, $options['disableMetadataFields'], false, NphOrderForm::FORM_COLLECT_TYPE);
+            if ($options['showMetadataFields']) {
+                $this->addStoolMetadataFields($builder, $options['timeZone'], $orderType, $options['disableMetadataFields'], false, NphOrderForm::FORM_COLLECT_TYPE);
+            }
         }
 
         // Placeholder field for displaying select at least one sample error message
@@ -88,7 +114,10 @@ class NphOrderCollect extends NphOrderForm
             'disableMetadataFields' => null,
             'disableStoolCollectedTs' => null,
             'orderCreatedTs' => null,
-            'biobankView' => false
+            'biobankView' => false,
+            'showOrderGenerationTimeField' => false,
+            'showMetadataFields' => true,
+            'showVolumeFields' => true
         ]);
     }
 }

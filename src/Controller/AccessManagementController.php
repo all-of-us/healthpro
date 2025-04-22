@@ -186,11 +186,21 @@ class AccessManagementController extends BaseController
         ]);
     }
 
-    #[Route(path: '/order/manage/{orderId}', name: 'order_manage', defaults: ['orderId' => null])]
+    #[Route(path: '/order/manage/{orderId}', name: 'nph_order_manage', defaults: ['orderId' => null])]
     public function orderManageAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $idForm = $this->createForm(OrderLookupIdType::class, null);
         $idForm->handleRequest($request);
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
+            $orderId = $idForm->get('orderId')->getData();
+            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $orderId
+            ]);
+            if ($order) {
+                return $this->redirectToRoute('nph_order_manage', ['orderId' => $orderId]);
+            }
+            $this->addFlash('error', 'Order ID not found');
+        }
         if ($orderId) {
             $order = $this->em->getRepository(NphOrder::class)->findOneBy([
                 'orderId' => $orderId
@@ -208,12 +218,15 @@ class AccessManagementController extends BaseController
             );
             $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
             $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+            foreach ($sampleLabelsIds as &$sampleLabelsId) {
+                $sampleLabelsId['disabled'] = false;
+            }
             $oderCollectForm = $this->createForm(
                 NphOrderCollect::class,
                 $orderCollectionData,
                 ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                    $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
-                    , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()]
+                    $this->getSecurityUser()->getTimezone(), 'showOrderGenerationTimeField' => true, 'showMetadataFields' => false, 'showVolumeFields' =>
+                    false, 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
             );
             $oderCollectForm->handleRequest($request);
             if ($oderCollectForm->isSubmitted()) {
@@ -240,16 +253,6 @@ class AccessManagementController extends BaseController
                 'timePoints' => $nphOrderService->getTimePoints(),
                 'samples' => $nphOrderService->getSamples()
             ]);
-        }
-        if ($idForm->isSubmitted() && $idForm->isValid()) {
-            $orderId = $idForm->get('orderId')->getData();
-            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
-                'orderId' => $orderId
-            ]);
-            if ($order) {
-                return $this->redirectToRoute('order_manage', ['orderId' => $orderId]);
-            }
-            $this->addFlash('error', 'Order ID not found');
         }
         return $this->render('accessmanagement/order-manage.html.twig', ['idForm' => $idForm->createView()]);
     }

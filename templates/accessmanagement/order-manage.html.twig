@@ -1,13 +1,21 @@
 {% set bootstrapVersion = 5 %}
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Orders - {% endblock %}
 {% block body %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+            <li class="breadcrumb-item active">Order Management</li>
+        </ol>
+    </nav>
     {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
     <div class="page-header border-bottom">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Management</h2>
     </div>
     <br>
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-sm-4 col-md-4">
             <h3>Find by Order ID</h3>
             <p class="fst-italic">Search for an order ID to view the associated collection page.</p>
@@ -17,19 +25,24 @@
             {{ form_end(idForm) }}
         </div>
         {% if order is defined %}
-            <div class="col-sm-8 col-md-8">
+            <div class="col-sm-8 col-md-8 border-start">
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="border-bottom">
                             {% include 'program/nph/order/partials/order-manage-participant-details.html.twig' %}
                         </div>
-                        {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+                        {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit', disabled: 'disabled'} }) }}
                         {{ form_errors(orderCollectForm) }}
-                        <div class="row">
+                        <div class="row my-2">
                             <div class="col-sm-6">
+                                <div class="form-group {% if not orderCollectForm[order.orderType ~ 'GenerationTs'].vars.valid %} has-error {% endif %}">
+                                    <label class="fw-bold">{{ orderCollectForm[order.orderType ~ 'GenerationTs'].vars.label }}</label>
+                                    {{ form_widget(orderCollectForm[order.orderType ~ 'GenerationTs']) }}
+                                    {{ form_errors(orderCollectForm[order.orderType ~ 'GenerationTs']) }}
+                                </div>
                                 {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
                                     <div class="form-group {% if not orderCollectForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
-                                        {{ form_label(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                                        <label class="fw-bold">{{ orderCollectForm[order.orderType ~ 'CollectedTs'].vars.label }}</label>
                                         {{ form_widget(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
                                         {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
                                     </div>
@@ -40,7 +53,9 @@
                             <thead>
                             <tr>
                                 <th>Collection Sample</th>
-                                <th>Collection Volume</th>
+                                {% if order.orderType != constant('TYPE_STOOL', order) and order.orderType != constant('TYPE_STOOL_2', order) %}
+                                    <th>Collection Time</th>
+                                {% endif %}
                                 <th>Notes</th>
                             </tr>
                             </thead>
@@ -101,11 +116,12 @@
                         <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
                         {{ form_rest(orderCollectForm) }}
                         <div class="form-group">
-                            {% if not order.isDisabled %}
-                                <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
-                            {% endif %}
-                            <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                               class="btn btn-secondary">Cancel</a>
+                            <button type="button" class="btn btn-warning" id="order_edit_btn">Edit</button>
+                            <button type="button" class="btn btn-outline-secondary" id="order_edit_cancel_btn">Cancel</button>
+                            <button type="button" class="btn btn-success" id="order_resubmit_btn" style="display: none;">Resubmit</button>
+                            <a href="{{ path('nph_order_manage', { orderId: order.orderId }) }}"
+                               class="btn btn-outline-secondary" id="order_resubmit_cancel_btn" style="display: none;">Cancel</a>
+
                         </div>
                         {{ form_end(orderCollectForm) }}
                     </div>
@@ -113,4 +129,7 @@
             </div>
         {% endif %}
     </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order-management') }}
 {% endblock %}
