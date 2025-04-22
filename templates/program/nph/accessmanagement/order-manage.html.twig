@@ -37,6 +37,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group {% if not orderCollectForm[order.orderType ~ 'GenerationTs'].vars.valid %} has-error {% endif %}">
                                     <label class="fw-bold">{{ orderCollectForm[order.orderType ~ 'GenerationTs'].vars.label }}</label>
+                                    <i class="fa fa-question-circle text-primary" data-bs-toggle="modal" data-bs-target="#order_generation_help_modal" type="button"></i>
                                     {{ form_widget(orderCollectForm[order.orderType ~ 'GenerationTs']) }}
                                     {{ form_errors(orderCollectForm[order.orderType ~ 'GenerationTs']) }}
                                 </div>
@@ -128,6 +129,7 @@
             </div>
         {% endif %}
     </div>
+    {% include 'program/nph/accessmanagement/modal/order-generation-help-modal.html.twig' %}
     {% include 'program/nph/accessmanagement/modal/order-resubmit-confirmation-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}

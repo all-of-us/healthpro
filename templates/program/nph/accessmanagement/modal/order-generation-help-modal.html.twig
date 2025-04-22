@@ -1,0 +1,21 @@
+<div class="modal fade" id="order_generation_help_modal" tabindex="-1" aria-labelledby="orderGenerationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-exclamation-circle text-primary"></i> Order Generation Time</h5>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger"><i class="fa fa-exclamation-triangle"></i> Editing the order generation time will update the order generation time for ALL samples within this order.</p>
+                <ul>
+                    <li>The order generation time should indicate the time the order should have been created in the HPRO system, i.e. when labels should have been generated before collections. The order generation time must be BEFORE the collection time.</li>
+                    <li>All order generation time updates are subject to auditing by the Biobank.</li>
+                    <li>Updated data for unfinalized samples will be saved. Updated data for finalized samples will be re-finalized.</li>
+                    <li>Order generation time can only be updated by a HealthPro admin.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
