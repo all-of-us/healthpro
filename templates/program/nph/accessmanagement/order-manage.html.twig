@@ -31,7 +31,7 @@
                         <div class="border-bottom">
                             {% include 'program/nph/order/partials/order-manage-participant-details.html.twig' %}
                         </div>
-                        {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit', disabled: 'disabled'} }) }}
+                        {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit warn-unsaved'} }) }}
                         {{ form_errors(orderCollectForm) }}
                         <div class="row my-2">
                             <div class="col-sm-6">
@@ -117,7 +117,8 @@
                         {{ form_rest(orderCollectForm) }}
                         <div class="form-group">
                             <button type="button" class="btn btn-warning" id="order_edit_btn">Edit</button>
-                            <button type="button" class="btn btn-outline-secondary" id="order_edit_cancel_btn">Cancel</button>
+                            <a href="{{ path('nph_order_manage') }}"
+                               class="btn btn-outline-secondary" id="order_edit_cancel_btn">Cancel</a>
                             <button type="button" class="btn btn-success" id="order_resubmit_btn" style="display: none;">Resubmit</button>
                             <a href="{{ path('nph_order_manage', { orderId: order.orderId }) }}"
                                class="btn btn-outline-secondary" id="order_resubmit_cancel_btn" style="display: none;">Cancel</a>

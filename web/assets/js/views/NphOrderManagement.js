@@ -19,22 +19,18 @@ $(document).ready(function () {
     $resubmitBtn.hide();
 
     $editBtn.on("click", function () {
-        $fields.prop("disabled", false);
+        $fields.each(function () {
+            const $field = $(this);
+            if ($field.is(':checkbox') && $field.is(':checked')) {
+                $field.prop('disabled', true);
+            } else {
+                $field.prop('disabled', false);
+            }
+        });
         $editBtn.hide();
         $editCancelBtn.hide();
         $resubmitBtn.show();
         $resubmitCancelBtn.show();
-    });
-
-    $editCancelBtn.on("click", function () {
-        // Clear form data manually
-        $form.find('input[type="text"], textarea').val("");
-        $form.find('input[type="checkbox"]').prop("checked", false);
-
-        $editBtn.show();
-        $editCancelBtn.show();
-        $resubmitBtn.hide();
-        $resubmitCancelBtn.hide();
     });
 
     $resubmitBtn.on("click", function () {

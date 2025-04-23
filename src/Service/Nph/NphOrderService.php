@@ -402,6 +402,7 @@ class NphOrderService
     {
         $orderCollectionData = [];
         $orderType = $order->getOrderType();
+        $orderCollectionData[$orderType . 'GenerationTs'] = $order->getCreatedTs();
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $orderCollectionData[$orderType . 'CollectedTs'] = $order->getCollectedTs();
         }

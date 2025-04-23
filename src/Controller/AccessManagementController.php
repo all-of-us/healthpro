@@ -254,6 +254,6 @@ class AccessManagementController extends BaseController
                 'samples' => $nphOrderService->getSamples()
             ]);
         }
-        return $this->render('accessmanagement/order-manage.html.twig', ['idForm' => $idForm->createView()]);
+        return $this->render('program/nph/accessmanagement/order-manage.html.twig', ['idForm' => $idForm->createView()]);
     }
 }
