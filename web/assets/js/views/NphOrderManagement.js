@@ -40,7 +40,14 @@ $(document).ready(function () {
     });
 
     $resubmitFinalizeBtn.on("click", function () {
-        $orderResubmitConfirmationModal.modal("hide");
+        $(this).prop("disabled", true);
+        $fields.each(function () {
+            const $field = $(this);
+            if ($field.is(":checkbox") && $field.is(":checked")) {
+                $field.prop("disabled", false);
+            }
+        });
+        PMI.hasChanges = false;
         $form.submit();
     });
 });

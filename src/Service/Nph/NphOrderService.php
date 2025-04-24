@@ -399,7 +399,7 @@ class NphOrderService
         }
     }
 
-    public function saveAdminOrderEdits(array $formData, NphOrder $order): ?NphOrder
+    public function saveAdminOrderEdits(array $formData, NphOrder $order): bool
     {
         try {
             $orderType = $order->getOrderType();
@@ -428,23 +428,31 @@ class NphOrderService
             $originalOrderGenerationTimezoneId = $order->getCreatedTimezoneId();
             if ($oldOrderEditLog = $this->em->getRepository(NphAdminOrderEditLog::class)->findOneBy(['orderId' =>
                 $order->getOrderId()])) {
-                $originalOrderGenerationTs = $oldOrderEditLog->getOriginalOrderGenerationTime();
+                $originalOrderGenerationTs = $oldOrderEditLog->getOriginalOrderGenerationTs();
                 $originalOrderGenerationTimezoneId = $oldOrderEditLog->getOriginalOrderGenerationTimezoneId();
             }
+            // Update order generation time
+            $order->setCreatedTs($formData[$orderType . 'GenerationTs']);
+            $order->setCreatedTimezoneId($this->getTimezoneid());
+            $this->em->persist($order);
+            $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+
             $orderEditLog = new NphAdminOrderEditLog();
             $orderEditLog->setUser($this->user);
             $orderEditLog->setOrderId($order->getOrderId());
             $orderEditLog->setOriginalOrderGenerationTs($originalOrderGenerationTs);
             $orderEditLog->setOriginalOrderGenerationTimezoneId($originalOrderGenerationTimezoneId);
             $orderEditLog->setUpdatedOrderGenerationTs($formData[$orderType . 'GenerationTs']);
-            $orderEditLog->setOriginalOrderGenerationTimezoneId($this->getTimezoneid());
+            $orderEditLog->setUpdatedOrderGenerationTimezoneId($this->getTimezoneid());
             $orderEditLog->setCreatedTs(new DateTime());
             $orderEditLog->setCreatedTimezoneId($this->getTimezoneid());
             $this->em->persist($orderEditLog);
             $this->em->flush();
-            return $order;
+            $this->loggerService->log(Log::NPH_ADMIN_ORDER_EDIT_LOG_CREATE, $orderEditLog->getId());
+            return true;
         } catch (\Exception $e) {
-            return null;
+            return false;
         }
     }
 

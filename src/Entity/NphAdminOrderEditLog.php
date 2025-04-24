@@ -6,7 +6,6 @@ use App\Repository\NphAdminOrderEditLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: 'nph_admin_orders_edit_log')]
 #[ORM\Entity(repositoryClass: NphAdminOrderEditLogRepository::class)]
 class NphAdminOrderEditLog
 {
