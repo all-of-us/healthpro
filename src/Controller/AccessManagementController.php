@@ -186,8 +186,8 @@ class AccessManagementController extends BaseController
         ]);
     }
 
-    #[Route(path: '/order/manage/{orderId}', name: 'nph_order_manage', defaults: ['orderId' => null])]
-    public function orderManageAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
+    #[Route(path: '/order/manage/lookup', name: 'nph_order_manage_lookup')]
+    public function orderManageLookupAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
     {
         $idForm = $this->createForm(OrderLookupIdType::class, null);
         $idForm->handleRequest($request);
@@ -201,59 +201,62 @@ class AccessManagementController extends BaseController
             }
             $this->addFlash('error', 'Order ID not found');
         }
-        if ($orderId) {
-            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
-                'orderId' => $orderId
-            ]);
-            $participant = $nphParticipantSummaryService->getParticipantById($order->getParticipantId());
-            if (!$participant) {
-                throw $this->createNotFoundException('Participant not found.');
-            }
+        return $this->render('program/nph/accessmanagement/order-manage-lookup.html.twig', ['idForm' => $idForm->createView()]);
+    }
 
-            $nphOrderService->loadModules(
-                $order->getModule(),
-                $order->getVisitPeriod(),
-                $participant->id,
-                $participant->biobankId
-            );
-            $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
-            $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
-            foreach ($sampleLabelsIds as &$sampleLabelsId) {
-                $sampleLabelsId['disabled'] = false;
-            }
-            $oderCollectForm = $this->createForm(
-                NphOrderCollect::class,
-                $orderCollectionData,
-                ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                    $this->getSecurityUser()->getTimezone(), 'showOrderGenerationTimeField' => true, 'showMetadataFields' => false, 'showVolumeFields' =>
-                    false, 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
-            );
-            $oderCollectForm->handleRequest($request);
-            if ($oderCollectForm->isSubmitted()) {
-                $formData = $oderCollectForm->getData();
-                if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
-                    $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
-                }
-                if ($oderCollectForm->isValid()) {
-                    if ($nphOrderService->saveOrderCollection($formData, $order)) {
-                        $this->addFlash('success', 'Order collection saved');
-                    } else {
-                        $this->addFlash('error', 'Order collection failed');
-                    }
-                } else {
-                    $oderCollectForm->addError(new FormError('Please correct the errors below'));
-                }
-            }
-
-            return $this->render('program/nph/accessmanagement/order-manage.html.twig', [
-                'idForm' => $idForm->createView(),
-                'order' => $order,
-                'participant' => $participant,
-                'orderCollectForm' => $oderCollectForm->createView(),
-                'timePoints' => $nphOrderService->getTimePoints(),
-                'samples' => $nphOrderService->getSamples()
-            ]);
+    #[Route(path: '/order/manage/{orderId}', name: 'nph_order_manage')]
+    public function orderManageAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
+    {
+        $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+            'orderId' => $orderId
+        ]);
+        $participant = $nphParticipantSummaryService->getParticipantById($order->getParticipantId());
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
         }
-        return $this->render('program/nph/accessmanagement/order-manage.html.twig', ['idForm' => $idForm->createView()]);
+
+        $nphOrderService->loadModules(
+            $order->getModule(),
+            $order->getVisitPeriod(),
+            $participant->id,
+            $participant->biobankId
+        );
+        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+        foreach ($sampleLabelsIds as &$sampleLabelsId) {
+            $sampleLabelsId['disabled'] = false;
+        }
+        $oderCollectForm = $this->createForm(
+            NphOrderCollect::class,
+            $orderCollectionData,
+            ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
+                $this->getSecurityUser()->getTimezone(), 'showOrderGenerationTimeField' => true, 'showMetadataFields' => false, 'showVolumeFields' =>
+                false, 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
+        );
+        $oderCollectForm->handleRequest($request);
+        if ($oderCollectForm->isSubmitted()) {
+            $formData = $oderCollectForm->getData();
+            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+            }
+            if ($oderCollectForm->isValid()) {
+                if ($nphOrderService->saveOrderCollection($formData, $order)) {
+                    $this->addFlash('success', 'Order collection saved');
+                } else {
+                    $this->addFlash('error', 'Order collection failed');
+                }
+            } else {
+                $oderCollectForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+        $idForm = $this->createForm(OrderLookupIdType::class, null);
+        return $this->render('program/nph/accessmanagement/order-manage.html.twig', [
+            'idForm' => $idForm->createView(),
+            'order' => $order,
+            'participant' => $participant,
+            'orderCollectForm' => $oderCollectForm->createView(),
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples()
+        ]);
     }
 }

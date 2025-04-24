@@ -1,0 +1,23 @@
+{% set bootstrapVersion = 5 %}
+{% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+{% block title %}Orders - {% endblock %}
+{% block body %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+            <li class="breadcrumb-item active">Order Management</li>
+        </ol>
+    </nav>
+    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom">
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Management</h2>
+    </div>
+    <br>
+    <div class="row mb-4">
+        <div class="col-sm-4 col-md-4">
+            {% include 'program/nph/accessmanagement/partials/order-lookup.html.twig' %}
+        </div>
+    </div>
+{% endblock %}

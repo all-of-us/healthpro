@@ -17,12 +17,7 @@
     <br>
     <div class="row mb-4">
         <div class="col-sm-4 col-md-4">
-            <h3>Find by Order ID</h3>
-            <p class="fst-italic">Search for an order ID to view the associated collection page.</p>
-            {{ form_start(idForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
-            {{ form_widget(idForm) }}
-            <button type="submit" class="btn btn-primary">Go</button>
-            {{ form_end(idForm) }}
+            {% include 'program/nph/accessmanagement/partials/order-lookup.html.twig' %}
         </div>
         {% if order is defined %}
             <div class="col-sm-8 col-md-8 border-start">
@@ -117,7 +112,7 @@
                         {{ form_rest(orderCollectForm) }}
                         <div class="form-group">
                             <button type="button" class="btn btn-warning" id="order_edit_btn">Edit</button>
-                            <a href="{{ path('nph_order_manage') }}"
+                            <a href="{{ path('nph_order_manage_lookup') }}"
                                class="btn btn-outline-secondary" id="order_edit_cancel_btn">Cancel</a>
                             <button type="button" class="btn btn-success" id="order_resubmit_btn" style="display: none;">Resubmit</button>
                             <a href="{{ path('nph_order_manage', { orderId: order.orderId }) }}"
