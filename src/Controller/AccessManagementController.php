@@ -236,14 +236,11 @@ class AccessManagementController extends BaseController
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
             $formData = $oderCollectForm->getData();
-            if ($nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
-                $oderCollectForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
-            }
             if ($oderCollectForm->isValid()) {
-                if ($nphOrderService->saveOrderCollection($formData, $order)) {
-                    $this->addFlash('success', 'Order collection saved');
+                if ($nphOrderService->saveAdminOrderEdits($formData, $order)) {
+                    $this->addFlash('success', 'Sample(s) resubmitted');
                 } else {
-                    $this->addFlash('error', 'Order collection failed');
+                    $this->addFlash('error', 'Sample(s) resubmission failed');
                 }
             } else {
                 $oderCollectForm->addError(new FormError('Please correct the errors below'));

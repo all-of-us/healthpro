@@ -23,13 +23,22 @@ class NphAdminOrderEditLog
     private ?User $user = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $originalOrderGenerationTime = null;
+    private ?\DateTimeInterface $originalOrderGenerationTs = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedOrderGenerationTime = null;
+    private ?\DateTimeInterface $updatedOrderGenerationTs = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdTs = null;
+
+    #[ORM\Column]
+    private ?int $originalOrderGenerationTimezoneId = null;
+
+    #[ORM\Column]
+    private ?int $updatedOrderGenerationTimezoneId = null;
+
+    #[ORM\Column]
+    private ?int $createdTimezoneId = null;
 
     public function getId(): ?int
     {
@@ -60,26 +69,26 @@ class NphAdminOrderEditLog
         return $this;
     }
 
-    public function getOriginalOrderGenerationTime(): ?\DateTimeInterface
+    public function getOriginalOrderGenerationTs(): ?\DateTimeInterface
     {
-        return $this->originalOrderGenerationTime;
+        return $this->originalOrderGenerationTs;
     }
 
-    public function setOriginalOrderGenerationTime(\DateTimeInterface $originalOrderGenerationTime): static
+    public function setOriginalOrderGenerationTs(\DateTimeInterface $originalOrderGenerationTs): static
     {
-        $this->originalOrderGenerationTime = $originalOrderGenerationTime;
+        $this->originalOrderGenerationTs = $originalOrderGenerationTs;
 
         return $this;
     }
 
-    public function getUpdatedOrderGenerationTime(): ?\DateTimeInterface
+    public function getUpdatedOrderGenerationTs(): ?\DateTimeInterface
     {
-        return $this->updatedOrderGenerationTime;
+        return $this->updatedOrderGenerationTs;
     }
 
-    public function setUpdatedOrderGenerationTime(\DateTimeInterface $updatedOrderGenerationTime): static
+    public function setUpdatedOrderGenerationTs(\DateTimeInterface $updatedOrderGenerationTs): static
     {
-        $this->updatedOrderGenerationTime = $updatedOrderGenerationTime;
+        $this->updatedOrderGenerationTs = $updatedOrderGenerationTs;
 
         return $this;
     }
@@ -92,6 +101,42 @@ class NphAdminOrderEditLog
     public function setCreatedTs(\DateTimeInterface $createdTs): static
     {
         $this->createdTs = $createdTs;
+
+        return $this;
+    }
+
+    public function getOriginalOrderGenerationTimezoneId(): ?int
+    {
+        return $this->originalOrderGenerationTimezoneId;
+    }
+
+    public function setOriginalOrderGenerationTimezoneId(int $originalOrderGenerationTimezoneId): static
+    {
+        $this->originalOrderGenerationTimezoneId = $originalOrderGenerationTimezoneId;
+
+        return $this;
+    }
+
+    public function getUpdatedOrderGenerationTimezoneId(): ?int
+    {
+        return $this->updatedOrderGenerationTimezoneId;
+    }
+
+    public function setUpdatedOrderGenerationTimezoneId(int $updatedOrderGenerationTimezoneId): static
+    {
+        $this->updatedOrderGenerationTimezoneId = $updatedOrderGenerationTimezoneId;
+
+        return $this;
+    }
+
+    public function getCreatedTimezoneId(): ?int
+    {
+        return $this->createdTimezoneId;
+    }
+
+    public function setCreatedTimezoneId(int $createdTimezoneId): static
+    {
+        $this->createdTimezoneId = $createdTimezoneId;
 
         return $this;
     }

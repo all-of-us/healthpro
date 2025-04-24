@@ -13,6 +13,8 @@ $(document).ready(function () {
     const $editCancelBtn = $("#order_edit_cancel_btn");
     const $resubmitBtn = $("#order_resubmit_btn");
     const $resubmitCancelBtn = $("#order_resubmit_cancel_btn");
+    const $resubmitFinalizeBtn = $("#order_resubmit_finalize_btn");
+    const $orderResubmitConfirmationModal = $("#order_resubmit_confirmation_modal");
 
     // Initially, disable all form fields and hide the submit/resubmit button
     $fields.prop("disabled", true);
@@ -21,10 +23,10 @@ $(document).ready(function () {
     $editBtn.on("click", function () {
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(':checkbox') && $field.is(':checked')) {
-                $field.prop('disabled', true);
+            if ($field.is(":checkbox") && $field.is(":checked")) {
+                $field.prop("disabled", true);
             } else {
-                $field.prop('disabled', false);
+                $field.prop("disabled", false);
             }
         });
         $editBtn.hide();
@@ -34,6 +36,11 @@ $(document).ready(function () {
     });
 
     $resubmitBtn.on("click", function () {
-        $("#order_resubmit_confirmation_modal").modal("show");
+        $orderResubmitConfirmationModal.modal("show");
+    });
+
+    $resubmitFinalizeBtn.on("click", function () {
+        $orderResubmitConfirmationModal.modal("hide");
+        $form.submit();
     });
 });

@@ -3,6 +3,7 @@
 namespace App\Service\Nph;
 
 use App\Audit\Log;
+use App\Entity\NphAdminOrderEditLog;
 use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphGenerateOrderWarningLog;
@@ -392,6 +393,55 @@ class NphOrderService
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
             }
+            return $order;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function saveAdminOrderEdits(array $formData, NphOrder $order): ?NphOrder
+    {
+        try {
+            $orderType = $order->getOrderType();
+            foreach ($order->getNphSamples() as $nphSample) {
+                $sampleCode = $nphSample->getSampleCode();
+                if (isset($formData[$sampleCode])) {
+                    if ($formData[$sampleCode]) {
+                        $collectedTs = $orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2 ?
+                            $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                        $nphSample->setCollectedTs($collectedTs);
+                        $nphSample->setCollectedTimezoneId($this->getTimezoneid());
+                        $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+                    } else {
+                        $nphSample->setCollectedUser(null);
+                        $nphSample->setCollectedSite(null);
+                        $nphSample->setCollectedTs(null);
+                        $nphSample->setCollectedTimezoneId(null);
+                        $nphSample->setCollectedNotes(null);
+                    }
+                }
+                $this->em->persist($nphSample);
+                $this->em->flush();
+                $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
+            }
+            $originalOrderGenerationTs = $order->getCreatedTs();
+            $originalOrderGenerationTimezoneId = $order->getCreatedTimezoneId();
+            if ($oldOrderEditLog = $this->em->getRepository(NphAdminOrderEditLog::class)->findOneBy(['orderId' =>
+                $order->getOrderId()])) {
+                $originalOrderGenerationTs = $oldOrderEditLog->getOriginalOrderGenerationTime();
+                $originalOrderGenerationTimezoneId = $oldOrderEditLog->getOriginalOrderGenerationTimezoneId();
+            }
+            $orderEditLog = new NphAdminOrderEditLog();
+            $orderEditLog->setUser($this->user);
+            $orderEditLog->setOrderId($order->getOrderId());
+            $orderEditLog->setOriginalOrderGenerationTs($originalOrderGenerationTs);
+            $orderEditLog->setOriginalOrderGenerationTimezoneId($originalOrderGenerationTimezoneId);
+            $orderEditLog->setUpdatedOrderGenerationTs($formData[$orderType . 'GenerationTs']);
+            $orderEditLog->setOriginalOrderGenerationTimezoneId($this->getTimezoneid());
+            $orderEditLog->setCreatedTs(new DateTime());
+            $orderEditLog->setCreatedTimezoneId($this->getTimezoneid());
+            $this->em->persist($orderEditLog);
+            $this->em->flush();
             return $order;
         } catch (\Exception $e) {
             return null;
