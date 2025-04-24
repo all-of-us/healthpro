@@ -403,6 +403,21 @@ class NphOrderService
     {
         try {
             $orderType = $order->getOrderType();
+            $originalOrderGenerationTs = $order->getCreatedTs();
+            $originalOrderGenerationTimezoneId = $order->getCreatedTimezoneId();
+            if ($oldOrderEditLog = $this->em->getRepository(NphAdminOrderEditLog::class)->findOneBy(['orderId' => $order->getOrderId()])) {
+                $originalOrderGenerationTs = $oldOrderEditLog->getOriginalOrderGenerationTs();
+                $originalOrderGenerationTimezoneId = $oldOrderEditLog->getOriginalOrderGenerationTimezoneId();
+            }
+
+            // Update order generation time
+            $order->setCreatedTs($formData[$orderType . 'GenerationTs']);
+            $order->setCreatedTimezoneId($this->getTimezoneid());
+            $this->em->persist($order);
+            $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+
+            // Update sample collection time
             foreach ($order->getNphSamples() as $nphSample) {
                 $sampleCode = $nphSample->getSampleCode();
                 if (isset($formData[$sampleCode])) {
@@ -423,21 +438,12 @@ class NphOrderService
                 $this->em->persist($nphSample);
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
+                if ($nphSample->getRdrId()) {
+                    $this->sendToRdr($nphSample, NphSample::UNLOCK, false, true);
+                }
             }
-            $originalOrderGenerationTs = $order->getCreatedTs();
-            $originalOrderGenerationTimezoneId = $order->getCreatedTimezoneId();
-            if ($oldOrderEditLog = $this->em->getRepository(NphAdminOrderEditLog::class)->findOneBy(['orderId' =>
-                $order->getOrderId()])) {
-                $originalOrderGenerationTs = $oldOrderEditLog->getOriginalOrderGenerationTs();
-                $originalOrderGenerationTimezoneId = $oldOrderEditLog->getOriginalOrderGenerationTimezoneId();
-            }
-            // Update order generation time
-            $order->setCreatedTs($formData[$orderType . 'GenerationTs']);
-            $order->setCreatedTimezoneId($this->getTimezoneid());
-            $this->em->persist($order);
-            $this->em->flush();
-            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
 
+            // Log entry
             $orderEditLog = new NphAdminOrderEditLog();
             $orderEditLog->setUser($this->user);
             $orderEditLog->setOrderId($order->getOrderId());
@@ -1526,8 +1532,12 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
-    private function sendToRdr(NphSample $sample, ?string $modifyType = null, bool $biobankUser = false): bool
-    {
+    private function sendToRdr(
+        NphSample $sample,
+        ?string $modifyType = null,
+        bool $biobankUser = false,
+        bool $adminUser = false
+    ): bool {
         $order = $sample->getNphOrder();
         $modifyType = $modifyType ?? $sample->getModifyType();
         if ($modifyType === NphSample::UNLOCK) {
@@ -1538,6 +1548,9 @@ class NphOrderService
                 if ($biobankUser) {
                     $sample->setModifiedSite($sample->getFinalizedSite());
                     $sample->setModifyReason(NphSample::BIOBANK_MODIFY_REASON);
+                } elseif ($adminUser) {
+                    $sample->setModifiedSite($sample->getFinalizedSite());
+                    $sample->setModifyReason(NphSample::NPH_ADMIN_MODIFY_REASON);
                 } else {
                     $sample->setModifiedSite($this->site ?? $sample->getFinalizedSite());
                 }
