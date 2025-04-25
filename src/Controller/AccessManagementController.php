@@ -223,18 +223,24 @@ class AccessManagementController extends BaseController
         );
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order, true);
-        foreach ($sampleLabelsIds as &$sampleLabelsId) {
-            $sampleLabelsId['disabled'] = false;
-        }
+        $orderType = $order->getOrderType();
         $oderGenerationForm = $this->createForm(
             NphAdminOrderGenerationType::class,
             $orderCollectionData,
-            ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
+            ['samples' => $sampleLabelsIds, 'orderType' => $orderType, 'timeZone' =>
                 $this->getSecurityUser()->getTimezone(), 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
         );
         $oderGenerationForm->handleRequest($request);
         if ($oderGenerationForm->isSubmitted()) {
             $formData = $oderGenerationForm->getData();
+            if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
+                if (!empty($formData["{$orderType}CollectedTs"]) && $nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                    $oderGenerationForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+                }
+                if (empty($formData["{$orderType}CollectedTs"]) && $nphOrderService->isAtLeastOneSampleChecked($formData, $order) === true) {
+                    $oderGenerationForm["{$orderType}CollectedTs"]->addError(new FormError('Collection time is required'));
+                }
+            }
             if ($oderGenerationForm->isValid()) {
                 if ($nphOrderService->saveAdminOrderEdits($formData, $order)) {
                     $this->addFlash('success', 'Sample(s) resubmitted');

@@ -49,6 +49,7 @@ class NphAdminOrderGenerationType extends NphOrderForm
                 ],
                 'attr' => [
                     'data-sample-id' => $sample['id'],
+                    'data-sample-finalized' => $sample['finalized']
                 ],
                 'disabled' => $sample['disabled']
             ]);
@@ -85,9 +86,6 @@ class NphAdminOrderGenerationType extends NphOrderForm
 
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $constraints = $this->getDateTimeConstraints();
-            $constraints[] = new Constraints\NotBlank([
-                'message' => 'Collection time is required'
-            ]);
             $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
             $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
                 'required' => true,
@@ -104,6 +102,11 @@ class NphAdminOrderGenerationType extends NphOrderForm
                 ]
             ]);
         }
+
+        // Placeholder field for displaying select at least one sample error message
+        $builder->add('samplesCheckAll', Type\CheckboxType::class, [
+            'required' => false
+        ]);
 
         return $builder->getForm();
     }

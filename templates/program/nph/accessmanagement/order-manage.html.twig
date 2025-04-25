@@ -102,8 +102,13 @@
                                     </tr>
                                 {% endif %}
                             {% endfor %}
+                            <tr>
+                                <td colspan="3" {% if not orderGenerationForm['samplesCheckAll'].vars.valid %}
+                                    class="has-error"{% endif %}>{{ form_errors(orderGenerationForm['samplesCheckAll']) }}</td>
+                            </tr>
                             </tbody>
                         </table>
+                        <div style="display: none">{{ form_widget(orderGenerationForm['samplesCheckAll']) }}</div>
                         {{ form_rest(orderGenerationForm) }}
                         <div class="form-group">
                             <button type="button" class="btn btn-warning" id="order_edit_btn">Edit</button>

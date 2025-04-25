@@ -23,7 +23,7 @@ $(document).ready(function () {
     $editBtn.on("click", function () {
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(":checkbox") && $field.is(":checked")) {
+            if ($field.is(":checkbox") && $field.data("sample-finalized")) {
                 $field.prop("disabled", true);
             } else {
                 $field.prop("disabled", false);
@@ -43,7 +43,7 @@ $(document).ready(function () {
         $(this).prop("disabled", true);
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(":checkbox") && $field.is(":checked")) {
+            if ($field.is(":checkbox") && $field.data("sample-finalized")) {
                 $field.prop("disabled", false);
             }
         });
