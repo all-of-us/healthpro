@@ -50,4 +50,8 @@ $(document).ready(function () {
         PMI.hasChanges = false;
         $form.submit();
     });
+
+    if ($form.find(".has-error").length) {
+        $editBtn.trigger("click");
+    }
 });
