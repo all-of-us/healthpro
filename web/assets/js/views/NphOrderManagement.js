@@ -15,6 +15,7 @@ $(document).ready(function () {
     const $resubmitCancelBtn = $("#order_resubmit_cancel_btn");
     const $resubmitFinalizeBtn = $("#order_resubmit_finalize_btn");
     const $orderResubmitConfirmationModal = $("#order_resubmit_confirmation_modal");
+    const $orderTs = $(".order-ts");
 
     // Initially, disable all form fields and hide the submit/resubmit button
     $fields.prop("disabled", true);
@@ -51,7 +52,12 @@ $(document).ready(function () {
         $form.submit();
     });
 
+    $orderTs.on("change", function () {
+        PMI.hasChanges = true;
+    });
+
     if ($form.find(".has-error").length) {
+        PMI.hasChanges = true;
         $editBtn.trigger("click");
     }
 });
