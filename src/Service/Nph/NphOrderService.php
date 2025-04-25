@@ -402,6 +402,8 @@ class NphOrderService
 
     public function saveAdminOrderEdits(array $formData, NphOrder $order): bool
     {
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
         try {
             $orderType = $order->getOrderType();
             $originalOrderGenerationTs = $order->getCreatedTs();
@@ -457,8 +459,10 @@ class NphOrderService
             $this->em->persist($orderEditLog);
             $this->em->flush();
             $this->loggerService->log(Log::NPH_ADMIN_ORDER_EDIT_LOG_CREATE, $orderEditLog->getId());
+            $connection->commit();
             return true;
         } catch (\Exception $e) {
+            $connection->rollBack();
             return false;
         }
     }
