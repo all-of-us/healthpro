@@ -439,7 +439,7 @@ class NphOrderService
                 $this->em->persist($nphSample);
                 $this->em->flush();
                 $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
-                if ($nphSample->getRdrId()) {
+                if ($nphSample->getRdrId() && $nphSample->getModifyType() !== NphSample::CANCEL) {
                     $this->sendToRdr($nphSample, NphSample::UNLOCK, false, true);
                 }
             }
