@@ -58,7 +58,8 @@ class NphAdminOrderGenerationType extends NphOrderForm
                     $context->buildViolation('Collection time is required')->addViolation();
                 }
             });
-            if ($options['orderType'] !== NphOrder::TYPE_STOOL && $options['orderType'] !== NphOrder::TYPE_STOOL_2) {
+            if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2) {
+                $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
                 $builder->add("{$sampleCode}CollectedTs", Type\DateTimeType::class, [
                     'required' => false,
                     'label' => 'Collection Time',
@@ -84,13 +85,10 @@ class NphAdminOrderGenerationType extends NphOrderForm
 
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $constraints = $this->getDateTimeConstraints();
-            array_push(
-                $constraints,
-                new Constraints\NotBlank([
-                    'message' => 'Collection time is required'
-                ]),
-                $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs'])
-            );
+            $constraints[] = new Constraints\NotBlank([
+                'message' => 'Collection time is required'
+            ]);
+            $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
             $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
                 'required' => true,
                 'constraints' => $constraints,
@@ -121,5 +119,17 @@ class NphAdminOrderGenerationType extends NphOrderForm
             'orderCreatedTs' => null,
             'biobankView' => false
         ]);
+    }
+
+    private function getCollectionGenerationTimeConstraints(string $orderType): Constraints\Callback
+    {
+        return new Constraints\Callback(function ($value, $context) use ($orderType) {
+            $formData = $context->getRoot()->getData();
+            if (!empty($formData["{$orderType}GenerationTs"]) && !empty($value)) {
+                if ($value <= $formData["{$orderType}GenerationTs"]) {
+                    $context->buildViolation('Collection time must be after order generation time')->addViolation();
+                }
+            }
+        });
     }
 }
