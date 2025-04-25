@@ -222,7 +222,7 @@ class AccessManagementController extends BaseController
             $participant->biobankId
         );
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
-        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order, true);
         foreach ($sampleLabelsIds as &$sampleLabelsId) {
             $sampleLabelsId['disabled'] = false;
         }

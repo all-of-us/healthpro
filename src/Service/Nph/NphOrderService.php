@@ -462,11 +462,13 @@ class NphOrderService
         }
     }
 
-    public function getExistingOrderCollectionData(NphOrder $order): array
+    public function getExistingOrderCollectionData(NphOrder $order, bool $setOrderGenerationTs = false): array
     {
         $orderCollectionData = [];
         $orderType = $order->getOrderType();
-        $orderCollectionData[$orderType . 'GenerationTs'] = $order->getCreatedTs();
+        if ($setOrderGenerationTs) {
+            $orderCollectionData[$orderType . 'GenerationTs'] = $order->getCreatedTs();
+        }
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $orderCollectionData[$orderType . 'CollectedTs'] = $order->getCollectedTs();
         }
