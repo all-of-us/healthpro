@@ -7,7 +7,7 @@ $(document).ready(function () {
         });
     });
 
-    const $form = $('form[name="nph_order_collect"]');
+    const $form = $('form[name="nph_admin_order_generation"]');
     const $fields = $form.find("input, textarea");
     const $editBtn = $("#order_edit_btn");
     const $editCancelBtn = $("#order_edit_cancel_btn");

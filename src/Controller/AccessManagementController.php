@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\NphOrder;
 use App\Form\GroupMemberType;
-use App\Form\Nph\NphOrderCollect;
+use App\Form\Nph\NphAdminOrderGenerationType;
 use App\Form\OrderLookupIdType;
 use App\Form\RemoveGroupMemberType;
 use App\Service\AccessManagementService;
@@ -226,24 +226,23 @@ class AccessManagementController extends BaseController
         foreach ($sampleLabelsIds as &$sampleLabelsId) {
             $sampleLabelsId['disabled'] = false;
         }
-        $oderCollectForm = $this->createForm(
-            NphOrderCollect::class,
+        $oderGenerationForm = $this->createForm(
+            NphAdminOrderGenerationType::class,
             $orderCollectionData,
             ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
-                $this->getSecurityUser()->getTimezone(), 'showOrderGenerationTimeField' => true, 'showMetadataFields' => false, 'showVolumeFields' =>
-                false, 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
+                $this->getSecurityUser()->getTimezone(), 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
         );
-        $oderCollectForm->handleRequest($request);
-        if ($oderCollectForm->isSubmitted()) {
-            $formData = $oderCollectForm->getData();
-            if ($oderCollectForm->isValid()) {
+        $oderGenerationForm->handleRequest($request);
+        if ($oderGenerationForm->isSubmitted()) {
+            $formData = $oderGenerationForm->getData();
+            if ($oderGenerationForm->isValid()) {
                 if ($nphOrderService->saveAdminOrderEdits($formData, $order)) {
                     $this->addFlash('success', 'Sample(s) resubmitted');
                 } else {
                     $this->addFlash('error', 'Sample(s) resubmission failed');
                 }
             } else {
-                $oderCollectForm->addError(new FormError('Please correct the errors below'));
+                $oderGenerationForm->addError(new FormError('Please correct the errors below'));
             }
         }
         $idForm = $this->createForm(OrderLookupIdType::class, null);
@@ -251,7 +250,7 @@ class AccessManagementController extends BaseController
             'idForm' => $idForm->createView(),
             'order' => $order,
             'participant' => $participant,
-            'orderCollectForm' => $oderCollectForm->createView(),
+            'orderGenerationForm' => $oderGenerationForm->createView(),
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples()
         ]);

@@ -8,13 +8,32 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
-class NphOrderCollect extends NphOrderForm
+class NphAdminOrderGenerationType extends NphOrderForm
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $samples = $options['samples'];
         $orderType = $options['orderType'];
         $sampleIndex = 1;
+
+        $constraints = $this->getDateTimeConstraints();
+        $constraints[] = new Constraints\NotBlank([
+            'message' => 'Order Generation time is required'
+        ]);
+        $builder->add("{$orderType}GenerationTs", Type\DateTimeType::class, [
+            'required' => false,
+            'constraints' => $constraints,
+            'label' => 'Order Generation Time',
+            'widget' => 'single_text',
+            'format' => 'MM/dd/yyyy h:mm a',
+            'html5' => false,
+            'model_timezone' => 'UTC',
+            'view_timezone' => $options['timeZone'],
+            'attr' => [
+                'class' => 'order-ts',
+            ]
+        ]);
+
         foreach ($samples as $sampleCode => $sample) {
             $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
             $builder->add($sampleCode, Type\CheckboxType::class, [
@@ -33,16 +52,34 @@ class NphOrderCollect extends NphOrderForm
                 ],
                 'disabled' => $sample['disabled']
             ]);
-            $this->addCollectedTimeAndNoteFields($builder, $options, $sampleCode, $sample['disabled'], 'collect');
+            $constraints = $this->getDateTimeConstraints();
+            $constraints[] = new Constraints\Callback(function ($value, $context) use ($sampleCode) {
+                if (empty($value) && $context->getRoot()[$sampleCode]->getData() === true) {
+                    $context->buildViolation('Collection time is required')->addViolation();
+                }
+            });
+            if ($options['orderType'] !== NphOrder::TYPE_STOOL && $options['orderType'] !== NphOrder::TYPE_STOOL_2) {
+                $builder->add("{$sampleCode}CollectedTs", Type\DateTimeType::class, [
+                    'required' => false,
+                    'label' => 'Collection Time',
+                    'widget' => 'single_text',
+                    'format' => 'MM/dd/yyyy h:mm a',
+                    'html5' => false,
+                    'model_timezone' => 'UTC',
+                    'view_timezone' => $options['timeZone'],
+                    'constraints' => $constraints,
+                    'attr' => [
+                        'class' => 'order-ts',
+                        'readonly' => $options['disableStoolCollectedTs']
+                    ]
+                ]);
+            }
+            $builder->add("{$sampleCode}Notes", Type\TextareaType::class, [
+                'label' => 'Notes',
+                'required' => false,
+                'constraints' => new Constraints\Type('string')
+            ]);
             $sampleIndex++;
-        }
-
-        if ($orderType === NphOrder::TYPE_URINE || $orderType === NphOrder::TYPE_24URINE) {
-            $this->addUrineMetadataFields($builder, $options['disableMetadataFields'], NphOrderForm::FORM_COLLECT_TYPE);
-        }
-
-        if ($orderType === NphOrder::TYPE_24URINE) {
-            $this->addUrineTotalCollectionVolume($builder, $options['disableMetadataFields']);
         }
 
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
@@ -59,7 +96,7 @@ class NphOrderCollect extends NphOrderForm
                 'constraints' => $constraints,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'model_timezone' => 'UTC',
                 'view_timezone' => $options['timeZone'],
@@ -68,13 +105,7 @@ class NphOrderCollect extends NphOrderForm
                     'readonly' => $options['disableStoolCollectedTs']
                 ]
             ]);
-            $this->addStoolMetadataFields($builder, $options['timeZone'], $orderType, $options['disableMetadataFields'], false, NphOrderForm::FORM_COLLECT_TYPE);
         }
-
-        // Placeholder field for displaying select at least one sample error message
-        $builder->add('samplesCheckAll', Type\CheckboxType::class, [
-            'required' => false
-        ]);
 
         return $builder->getForm();
     }

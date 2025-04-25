@@ -26,21 +26,21 @@
                         <div class="border-bottom">
                             {% include 'program/nph/order/partials/order-manage-participant-details.html.twig' %}
                         </div>
-                        {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit warn-unsaved'} }) }}
-                        {{ form_errors(orderCollectForm) }}
+                        {{ form_start(orderGenerationForm, { attr: { class: 'disable-enter prevent-resubmit warn-unsaved'} }) }}
+                        {{ form_errors(orderGenerationForm) }}
                         <div class="row my-2">
                             <div class="col-sm-6">
-                                <div class="form-group {% if not orderCollectForm[order.orderType ~ 'GenerationTs'].vars.valid %} has-error {% endif %}">
-                                    <label class="fw-bold">{{ orderCollectForm[order.orderType ~ 'GenerationTs'].vars.label }}</label>
+                                <div class="form-group {% if not orderGenerationForm[order.orderType ~ 'GenerationTs'].vars.valid %} has-error {% endif %}">
+                                    <label class="fw-bold">{{ orderGenerationForm[order.orderType ~ 'GenerationTs'].vars.label }}</label>
                                     <i class="fa fa-question-circle text-primary" data-bs-toggle="modal" data-bs-target="#order_generation_help_modal" type="button"></i>
-                                    {{ form_widget(orderCollectForm[order.orderType ~ 'GenerationTs']) }}
-                                    {{ form_errors(orderCollectForm[order.orderType ~ 'GenerationTs']) }}
+                                    {{ form_widget(orderGenerationForm[order.orderType ~ 'GenerationTs']) }}
+                                    {{ form_errors(orderGenerationForm[order.orderType ~ 'GenerationTs']) }}
                                 </div>
                                 {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
-                                    <div class="form-group {% if not orderCollectForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
-                                        <label class="fw-bold">{{ orderCollectForm[order.orderType ~ 'CollectedTs'].vars.label }}</label>
-                                        {{ form_widget(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
-                                        {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
+                                    <div class="form-group {% if not orderGenerationForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
+                                        <label class="fw-bold">{{ orderGenerationForm[order.orderType ~ 'CollectedTs'].vars.label }}</label>
+                                        {{ form_widget(orderGenerationForm[order.orderType ~ 'CollectedTs']) }}
+                                        {{ form_errors(orderGenerationForm[order.orderType ~ 'CollectedTs']) }}
                                     </div>
                                 {% endif %}
                             </div>
@@ -66,10 +66,10 @@
                                     {% include 'program/nph/order/partials/order-collect-urine24.html.twig' %}
                                 {% else %}
                                     <tr class="row-samples">
-                                        <td {% if not orderCollectForm[nphSample.sampleCode].vars.valid %}
+                                        <td {% if not orderGenerationForm[nphSample.sampleCode].vars.valid %}
                                             class="has-error"{% endif %}>
-                                            {{ form_widget(orderCollectForm[nphSample.sampleCode]) }}
-                                            {{ form_errors(orderCollectForm[nphSample.sampleCode]) }}
+                                            {{ form_widget(orderGenerationForm[nphSample.sampleCode]) }}
+                                            {{ form_errors(orderGenerationForm[nphSample.sampleCode]) }}
                                             {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
                                                 <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
                                             {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
@@ -80,16 +80,16 @@
                                                 </p>
                                             {% endif %}
                                         </td>
-                                        {% if orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
-                                            <td style="position: relative" class="w-25 {% if not orderCollectForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}has-error{% endif %}">
-                                                {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
-                                                {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                        {% if orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
+                                            <td style="position: relative" class="w-25 {% if not orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}has-error{% endif %}">
+                                                {{ form_widget(orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                                {{ form_errors(orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs']) }}
                                             </td>
                                         {% endif %}
-                                        <td {% if not orderCollectForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                                        <td {% if not orderGenerationForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
                                             class="has-error"{% endif %}>
-                                            {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
-                                            {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                                            {{ form_widget(orderGenerationForm[nphSample.sampleCode ~ 'Notes']) }}
+                                            {{ form_errors(orderGenerationForm[nphSample.sampleCode ~ 'Notes']) }}
                                             {% if index == order.nphSamples|length - 1 %}
                                                 <small class="text-warning">
                                                     Comments entered in this field are transmitted to the Biobank via reconciliation
@@ -102,14 +102,9 @@
                                     </tr>
                                 {% endif %}
                             {% endfor %}
-                            <tr>
-                                <td colspan="3" {% if not orderCollectForm['samplesCheckAll'].vars.valid %}
-                                    class="has-error"{% endif %}>{{ form_errors(orderCollectForm['samplesCheckAll']) }}</td>
-                            </tr>
                             </tbody>
                         </table>
-                        <div style="display: none">{{ form_widget(orderCollectForm['samplesCheckAll']) }}</div>
-                        {{ form_rest(orderCollectForm) }}
+                        {{ form_rest(orderGenerationForm) }}
                         <div class="form-group">
                             <button type="button" class="btn btn-warning" id="order_edit_btn">Edit</button>
                             <a href="{{ path('nph_order_manage_lookup') }}"
@@ -119,7 +114,7 @@
                                class="btn btn-outline-secondary" id="order_resubmit_cancel_btn" style="display: none;">Cancel</a>
 
                         </div>
-                        {{ form_end(orderCollectForm) }}
+                        {{ form_end(orderGenerationForm) }}
                     </div>
                 </div>
             </div>
