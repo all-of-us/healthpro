@@ -2,11 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\NphAdminOrderEditLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: NphAdminOrderEditLogRepository::class)]
+#[ORM\Entity]
 class NphAdminOrderEditLog
 {
     #[ORM\Id]
@@ -15,29 +14,29 @@ class NphAdminOrderEditLog
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $orderId = null;
+    private string $orderId;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    private User $user;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $originalOrderGenerationTs = null;
+    private \DateTimeInterface $originalOrderGenerationTs;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedOrderGenerationTs = null;
+    private \DateTimeInterface $updatedOrderGenerationTs;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdTs = null;
+    private \DateTimeInterface $createdTs;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $originalOrderGenerationTimezoneId = null;
 
     #[ORM\Column]
-    private ?int $updatedOrderGenerationTimezoneId = null;
+    private int $updatedOrderGenerationTimezoneId;
 
     #[ORM\Column]
-    private ?int $createdTimezoneId = null;
+    private int $createdTimezoneId;
 
     public function getId(): ?int
     {
