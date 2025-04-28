@@ -35,9 +35,9 @@
                         <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <div class="form-group">
-                        <label>Order Generation Time</label>
+                        <label data-toggle="tooltip" title="Order generation time can only be edited by a HealthPro admin within Management Tools.">Order Generation Time</label>
                         <input type="text" class="form-control" value="{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}" disabled>
                     </div>
                 </div>
