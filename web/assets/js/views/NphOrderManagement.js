@@ -1,10 +1,13 @@
 $(document).ready(function () {
     document.querySelectorAll(".order-ts").forEach((element) => {
+        const originalValue = element.value;
+        element.value = "";
         bs5DateTimepicker(element, {
             clock: true,
             sideBySide: true,
             useCurrent: true
         });
+        element.value = originalValue;
     });
 
     const $form = $('form[name="nph_admin_order_generation"]');
