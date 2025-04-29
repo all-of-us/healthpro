@@ -13,7 +13,7 @@
     </div>
     {% if order.downtimeGenerated() %}
     <div class="alert bg-success well-sm margin-top-15 text-success">
-        <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone)}}] </span>
+        <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.</span>
     </div>
     {% endif %}
     <div class="row">
