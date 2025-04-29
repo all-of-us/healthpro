@@ -80,6 +80,7 @@ Encore
     .addEntry("nph-biobank-review", "./web/assets/js/views/NphBiobankReview.js")
     .addEntry("nph-dlw", "./web/assets/js/views/NphDlw.js")
     .addEntry("nph-quick-view", "./web/assets/js/views/NphQuickView.js")
+    .addEntry("nph-order-management", "./web/assets/js/views/NphOrderManagement.js")
 
     .splitEntryChunks()
     .enableSingleRuntimeChunk()

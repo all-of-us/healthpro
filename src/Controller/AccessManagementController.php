@@ -3,12 +3,17 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphOrder;
 use App\Form\GroupMemberType;
+use App\Form\Nph\NphAdminOrderGenerationType;
+use App\Form\OrderLookupIdType;
 use App\Form\RemoveGroupMemberType;
 use App\Service\AccessManagementService;
 use App\Service\ContextTemplateService;
 use App\Service\GoogleGroupsService;
 use App\Service\LoggerService;
+use App\Service\Nph\NphOrderService;
+use App\Service\Nph\NphParticipantSummaryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -178,6 +183,82 @@ class AccessManagementController extends BaseController
             'group' => $group,
             'member' => $member,
             'removeGoupMemberForm' => $removeGoupMemberForm->createView()
+        ]);
+    }
+
+    #[Route(path: '/order/manage/lookup', name: 'nph_order_manage_lookup')]
+    public function orderManageLookupAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
+    {
+        $idForm = $this->createForm(OrderLookupIdType::class, null);
+        $idForm->handleRequest($request);
+        if ($idForm->isSubmitted() && $idForm->isValid()) {
+            $orderId = $idForm->get('orderId')->getData();
+            $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+                'orderId' => $orderId
+            ]);
+            if ($order) {
+                return $this->redirectToRoute('nph_order_manage', ['orderId' => $orderId]);
+            }
+            $this->addFlash('error', 'Order ID not found');
+        }
+        return $this->render('program/nph/accessmanagement/order-manage-lookup.html.twig', ['idForm' => $idForm->createView()]);
+    }
+
+    #[Route(path: '/order/manage/{orderId}', name: 'nph_order_manage')]
+    public function orderManageAction(?string $orderId, Request $request, NphParticipantSummaryService $nphParticipantSummaryService, NphOrderService $nphOrderService): Response
+    {
+        $order = $this->em->getRepository(NphOrder::class)->findOneBy([
+            'orderId' => $orderId
+        ]);
+        $participant = $nphParticipantSummaryService->getParticipantById($order->getParticipantId());
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+
+        $nphOrderService->loadModules(
+            $order->getModule(),
+            $order->getVisitPeriod(),
+            $participant->id,
+            $participant->biobankId
+        );
+        $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
+        $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order, true);
+        $orderType = $order->getOrderType();
+        $oderGenerationForm = $this->createForm(
+            NphAdminOrderGenerationType::class,
+            $orderCollectionData,
+            ['samples' => $sampleLabelsIds, 'orderType' => $orderType, 'timeZone' =>
+                $this->getSecurityUser()->getTimezone(), 'disableStoolCollectedTs' => false, 'orderCreatedTs' => $order->getCreatedTs()]
+        );
+        $oderGenerationForm->handleRequest($request);
+        if ($oderGenerationForm->isSubmitted()) {
+            $formData = $oderGenerationForm->getData();
+            if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
+                if (!empty($formData["{$orderType}CollectedTs"]) && $nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
+                    $oderGenerationForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
+                }
+                if (empty($formData["{$orderType}CollectedTs"]) && $nphOrderService->isAtLeastOneSampleChecked($formData, $order) === true) {
+                    $oderGenerationForm["{$orderType}CollectedTs"]->addError(new FormError('Collection time is required'));
+                }
+            }
+            if ($oderGenerationForm->isValid()) {
+                if ($nphOrderService->saveAdminOrderEdits($formData, $order)) {
+                    $this->addFlash('success', 'Sample(s) resubmitted');
+                } else {
+                    $this->addFlash('error', 'Sample(s) resubmission failed');
+                }
+            } else {
+                $oderGenerationForm->addError(new FormError('Please correct the errors below'));
+            }
+        }
+        $idForm = $this->createForm(OrderLookupIdType::class, null);
+        return $this->render('program/nph/accessmanagement/order-manage.html.twig', [
+            'idForm' => $idForm->createView(),
+            'order' => $order,
+            'participant' => $participant,
+            'orderGenerationForm' => $oderGenerationForm->createView(),
+            'timePoints' => $nphOrderService->getTimePoints(),
+            'samples' => $nphOrderService->getSamples()
         ]);
     }
 }

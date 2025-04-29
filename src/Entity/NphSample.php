@@ -22,6 +22,7 @@ class NphSample
     public const SAMPLE_STOOL_2 = 'STOOL2';
     public const STOOL_TIMEPOINTS = ['preLMT', 'preDSMT'];
     public const BIOBANK_MODIFY_REASON = 'biobank';
+    public const NPH_ADMIN_MODIFY_REASON = 'admin';
 
     private const RDR_MICROLITER_UNITS = [
         'μL' => 'uL'

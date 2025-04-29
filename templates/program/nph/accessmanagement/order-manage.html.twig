@@ -1,0 +1,133 @@
+{% set bootstrapVersion = 5 %}
+{% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+{% block title %}Orders - {% endblock %}
+{% block body %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+            <li class="breadcrumb-item active">Order Management</li>
+        </ol>
+    </nav>
+    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom">
+        <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Management</h2>
+    </div>
+    <br>
+    <div class="row mb-4">
+        <div class="col-sm-4 col-md-4">
+            {% include 'program/nph/accessmanagement/partials/order-lookup.html.twig' %}
+        </div>
+        {% if order is defined %}
+            <div class="col-sm-8 col-md-8 border-start">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="border-bottom">
+                            {% include 'program/nph/order/partials/order-manage-participant-details.html.twig' %}
+                        </div>
+                        {{ form_start(orderGenerationForm, { attr: { class: 'disable-enter prevent-resubmit warn-unsaved'} }) }}
+                        {{ form_errors(orderGenerationForm) }}
+                        <div class="row my-2">
+                            <div class="col-sm-6">
+                                <div class="form-group {% if not orderGenerationForm[order.orderType ~ 'GenerationTs'].vars.valid %} has-error {% endif %}">
+                                    <label class="fw-bold">{{ orderGenerationForm[order.orderType ~ 'GenerationTs'].vars.label }}</label>
+                                    <i class="fa fa-question-circle text-primary" data-bs-toggle="modal" data-bs-target="#order_generation_help_modal" type="button"></i>
+                                    {{ form_widget(orderGenerationForm[order.orderType ~ 'GenerationTs']) }}
+                                    {{ form_errors(orderGenerationForm[order.orderType ~ 'GenerationTs']) }}
+                                </div>
+                                {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
+                                    <div class="form-group {% if not orderGenerationForm[order.orderType ~ 'CollectedTs'].vars.valid %} has-error {% endif %}">
+                                        <label class="fw-bold">{{ orderGenerationForm[order.orderType ~ 'CollectedTs'].vars.label }}</label>
+                                        {{ form_widget(orderGenerationForm[order.orderType ~ 'CollectedTs']) }}
+                                        {{ form_errors(orderGenerationForm[order.orderType ~ 'CollectedTs']) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <table class="table table-samples table-borderless">
+                            <thead>
+                            <tr>
+                                <th>Collection Sample</th>
+                                {% if order.orderType != constant('TYPE_STOOL', order) and order.orderType != constant('TYPE_STOOL_2', order) %}
+                                    <th>Collection Time</th>
+                                {% endif %}
+                                <th>Notes</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for index, nphSample in order.nphSamples %}
+                                {% if nphSample.modifyType in [constant('CANCEL', nphSample), constant('UNLOCK', nphSample)] %}
+                                    <tr>
+                                        <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% if order.orderType == constant('TYPE_24URINE', order) %}
+                                    {% include 'program/nph/order/partials/order-collect-urine24.html.twig' %}
+                                {% else %}
+                                    <tr class="row-samples">
+                                        <td {% if not orderGenerationForm[nphSample.sampleCode].vars.valid %}
+                                            class="has-error"{% endif %}>
+                                            {{ form_widget(orderGenerationForm[nphSample.sampleCode]) }}
+                                            {{ form_errors(orderGenerationForm[nphSample.sampleCode]) }}
+                                            {% if nphSample.modifyType == constant('UNLOCK', nphSample) %}
+                                                <p class="text-warning"><i class="fa fa-exclamation-triangle"></i> Unlocked for editing</p>
+                                            {% elseif nphSample.modifyType == constant('CANCEL', nphSample) %}
+                                                <p class="text-danger"><i class="fa fa-times"></i> Cancelled</p>
+                                            {% elseif nphSample.finalizedTs is not empty %}
+                                                <p class="text-success"><i class="fa fa-check-circle"></i>
+                                                    {{ macros.displayCollectAliquotStatus(nphSample) }}
+                                                </p>
+                                            {% endif %}
+                                        </td>
+                                        {% if orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs'] is defined %}
+                                            <td style="position: relative" class="w-25 {% if not orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs'].vars.valid %}has-error{% endif %}">
+                                                {{ form_widget(orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                                {{ form_errors(orderGenerationForm[nphSample.sampleCode ~ 'CollectedTs']) }}
+                                            </td>
+                                        {% endif %}
+                                        <td {% if not orderGenerationForm[nphSample.sampleCode ~ 'Notes'].vars.valid %}
+                                            class="has-error"{% endif %}>
+                                            {{ form_widget(orderGenerationForm[nphSample.sampleCode ~ 'Notes']) }}
+                                            {{ form_errors(orderGenerationForm[nphSample.sampleCode ~ 'Notes']) }}
+                                            {% if index == order.nphSamples|length - 1 %}
+                                                <small class="text-warning">
+                                                    Comments entered in this field are transmitted to the Biobank via reconciliation
+                                                    reporting.
+                                                    <br>
+                                                    Do not enter any participant identifying information here.
+                                                </small>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td colspan="3" {% if not orderGenerationForm['samplesCheckAll'].vars.valid %}
+                                    class="has-error"{% endif %}>{{ form_errors(orderGenerationForm['samplesCheckAll']) }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div style="display: none">{{ form_widget(orderGenerationForm['samplesCheckAll']) }}</div>
+                        {{ form_rest(orderGenerationForm) }}
+                        <div class="form-group">
+                            <button type="button" class="btn btn-warning" id="order_edit_btn">Edit</button>
+                            <a href="{{ path('nph_order_manage_lookup') }}"
+                               class="btn btn-outline-secondary" id="order_edit_cancel_btn">Cancel</a>
+                            <button type="button" class="btn btn-success" id="order_resubmit_btn" style="display: none;">Resubmit</button>
+                            <a href="{{ path('nph_order_manage', { orderId: order.orderId }) }}"
+                               class="btn btn-outline-secondary" id="order_resubmit_cancel_btn" style="display: none;">Cancel</a>
+
+                        </div>
+                        {{ form_end(orderGenerationForm) }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {% include 'program/nph/accessmanagement/modal/order-generation-help-modal.html.twig' %}
+    {% include 'program/nph/accessmanagement/modal/order-resubmit-confirmation-modal.html.twig' %}
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-order-management') }}
+{% endblock %}

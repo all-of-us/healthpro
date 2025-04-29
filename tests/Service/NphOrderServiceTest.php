@@ -159,7 +159,8 @@ class NphOrderServiceTest extends ServiceTestCase
         $expectedSampleLabelAndIds[$sampleCode] = [
             'label' => $sampleLabel,
             'id' => $sampleId,
-            'disabled' => false
+            'disabled' => false,
+            'finalized' => 0
         ];
         $this->assertSame($expectedSampleLabelAndIds, $this->service->getSamplesWithLabelsAndIds($nphOrder->getNphSamples()));
     }
@@ -338,6 +339,61 @@ class NphOrderServiceTest extends ServiceTestCase
             ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 1, 'LMT'],
             ['preDSMT', 'blood', 'LIH4', $collectedTs, 'Test Notes 7', 3, 'Period1DSMT'],
             ['postDSMT', 'urine', 'URINE', $collectedTs, 'Test Notes 8', 3, 'Period1DSMT', $urineMetaData]
+        ];
+    }
+
+    /**
+     * @dataProvider adminOrderEditsDataProvider
+     */
+    public function testSaveAdminOrderEdits(
+        string $timePoint,
+        string $orderType,
+        string $sampleCode,
+        \DateTime $collectedTs,
+        string $notes,
+        int $module,
+        string $visit,
+        array $metaData = [],
+    ): void {
+        // Module 1
+        $this->service->loadModules($module, $visit, 'P0000000008', 'T10000000');
+        if ($orderType === NphOrder::TYPE_STOOL) {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType, 'KIT-000000001');
+            $nphSample = $this->service->createSample($sampleCode, $nphOrder, '1000000005', 'T0000000001');
+        } else {
+            $nphOrder = $this->service->createOrder($timePoint, $orderType);
+            $nphSample = $this->service->createSample($sampleCode, $nphOrder, '1000000005');
+        }
+        $collectedField = $orderType === NphOrder::TYPE_STOOL ? $orderType . 'CollectedTs' : $sampleCode . 'CollectedTs';
+        $generationTs = new \DateTime('2025-04-27');
+        $collectionFormData = [
+            "{$orderType}GenerationTs" => $generationTs,
+            $collectedField => $collectedTs,
+            $sampleCode => true,
+            "{$sampleCode}Notes" => $notes
+        ];
+        if ($orderType === NphOrder::TYPE_URINE || $orderType === NphOrder::TYPE_STOOL) {
+            foreach ($metaData as $type => $data) {
+                $collectionFormData[$type] = $data;
+            }
+        }
+        $this->service->saveAdminOrderEdits($collectionFormData, $nphOrder);
+        $this->assertSame($collectedTs, $nphSample->getCollectedTs());
+        $this->assertSame($notes, $nphSample->getCollectedNotes());
+        $this->assertSame($collectionFormData, $this->service->getExistingOrderCollectionData($nphOrder, true));
+    }
+
+    public function adminOrderEditsDataProvider(): array
+    {
+        $collectedTs = new \DateTime('2025-04-28');
+        return [
+            ['preLMT', 'urine', 'URINES', $collectedTs, 'Test Notes 1', 1, 'LMT'],
+            ['preLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 2', 1, 'LMT'],
+            ['preLMT', 'stool', 'ST1', $collectedTs, 'Test Notes 3', 1, 'LMT'],
+            ['30min', 'blood', 'SST8P5', $collectedTs, 'Test Notes 4', 1, 'LMT'],
+            ['postLMT', 'saliva', 'SALIVA', $collectedTs, 'Test Notes 5', 1, 'LMT'],
+            ['preDSMT', 'blood', 'LIH4', $collectedTs, 'Test Notes 7', 3, 'Period1DSMT'],
+            ['postDSMT', 'urine', 'URINE', $collectedTs, 'Test Notes 8', 3, 'Period1DSMT']
         ];
     }
 
