@@ -1,0 +1,101 @@
+{% set bootstrapVersion = 5 %}
+{% extends 'program/nph/biobank/base.html.twig' %}
+{% block title %}Downtime - Biobank Orders - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% import 'program/nph/order/macros/display-text.html.twig' as macros %}
+
+{% block body %}
+    {% form_theme todayFilterForm 'custom_bootstrap_5_layout.html.twig' %}
+    {% include 'program/nph/biobank/partials/review-page-heading.html.twig' %}
+    <div class="card today-filter-well" data-title="Filter by Date Edited">
+        <div class="card-body">
+            {{ form_start(todayFilterForm, { attr: { class: 'form-inline', autoComplete: 'off' } }) }}
+            {{ form_errors(todayFilterForm) }}
+            <div class="today-filter text-center">
+                <div class="row justify-content-center align-items-center gx-3">
+                    <div class="col-auto d-flex align-items-center">
+                        <label for="{{ todayFilterForm.start_date.vars.id }}" class="form-label mb-0 me-2 align-middle required fw-bold">Start Date</label>
+                        <div>
+                            {{ form_widget(todayFilterForm.start_date, { attr: { class: 'form-control' } }) }}
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        <label for="{{ todayFilterForm.end_date.vars.id }}" class="form-label mb-0 me-2 align-middle fw-bold">End Date</label>
+                        <div>
+                            {{ form_widget(todayFilterForm.end_date, { attr: { class: 'form-control' } }) }}
+                        </div>
+                    </div>
+                    <div class="col-auto d-flex align-items-center">
+                        {{ form_widget(todayFilterForm.Submit, { attr: { class: 'btn btn-primary' } }) }}
+                        <a href="{{ path('nph_biobank_admin_orders_generation_audit') }}" class="btn btn-secondary ms-2">Reset</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ form_errors(todayFilterForm.start_date) }}
+                        {{ form_errors(todayFilterForm.end_date) }}
+                    </div>
+                </div>
+            </div>
+            {{ form_end(todayFilterForm) }}
+        </div>
+    </div>
+    <div class="text-center text-warning">
+        <strong>{{ displayMessage }}</strong>
+    </div>
+    {% if orderGenerationEditLogs is not empty %}
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="float-end">
+                    <button data-export-type="DowntimeOrders" class="btn btn-xs btn-secondary" id="review_export">
+                        <i class="fa fa-download" aria-hidden="true"></i> Export
+                    </button>
+                    <button class="btn btn-xs btn-secondary" id="review_export_all">
+                        <i class="fa fa-download" aria-hidden="true"></i> Export All
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="mt-2">
+        <table class="table table-bordered table-small mt-2" data-default-sort-column="3" data-export-table-type="DownTimeOrders">
+            <thead>
+            <tr>
+                <th data-header="Site">Site</th>
+                <th data-header="Biobank ID">Biobank ID</th>
+                <th data-header="User">User</th>
+                <th data-header="Module">Module</th>
+                <th data-header="Visit">Visit</th>
+                <th data-header="Timepoint">Timepoint</th>
+                <th data-header="Order ID">Order ID</th>
+                <th data-header="Original Order Generation Time">Original Order Generation Time</th>
+                <th data-header="Updated Order Generation Time">Updated Order Generation Time</th>
+                <th data-header="Date Edited">Date Edited</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for orderLog in orderGenerationEditLogs %}
+                <tr>
+                    <td>{{ siteInfo.getNphSiteDisplayName(orderLog.site) }}</td>
+                    <td>{{ orderLog.biobankId }}</td>
+                    <td>{{ orderLog.email }}</td>
+                    <td>{{ orderLog.module }}</td>
+                    <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[orderLog.visitPeriod] }}</td>
+                    <td>{{ orderLog.timepoint }}</td>
+                    <td data-row="{{ orderLog.orderId }}">
+                        <a href="{{ path('nph_biobank_order_collect', {biobankId: orderLog.biobankId, orderId: orderLog.orderId}) }}">{{ orderLog.orderId }}</a>
+                    </td>
+                    <td data-row="{{ macros.displayDateAndTimezone(orderLog.originalOrderGenerationTs, orderLog.originalOrderGenerationTimezoneId, false) }}" data-order="{{ orderLog.originalOrderGenerationTs ? orderLog.originalOrderGenerationTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.originalOrderGenerationTs %} data-date-type="original_order_generation_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.originalOrderGenerationTs, orderLog.originalOrderGenerationTimezoneId) }}</td>
+                    <td data-row="{{ macros.displayDateAndTimezone(orderLog.updatedOrderGenerationTs, orderLog.originalOrderGenerationTimezoneId, false) }}" data-order="{{ orderLog.updatedOrderGenerationTs ? orderLog.updatedOrderGenerationTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.updatedOrderGenerationTs %} data-date-type="updated_order_generation_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.updatedOrderGenerationTs, orderLog.updatedOrderGenerationTimezoneId) }}</td>
+                    <td data-row="{{ macros.displayDateAndTimezone(orderLog.createdTs, orderLog.createdTimezoneId, false) }}" data-order="{{ orderLog.createdTs ? orderLog.createdTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.createdTs, orderLog.createdTimezoneId) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block pagejs %}
+    {{ encore_entry_script_tags('nph-biobank-review') }}
+{% endblock %}
