@@ -35,7 +35,11 @@ class NphAdminOrderGenerationType extends NphOrderForm
             ]
         ]);
 
+        $hasAtLeastOneFinalizedSample = false;
         foreach ($samples as $sampleCode => $sample) {
+            if ($sample['finalized']) {
+                $hasAtLeastOneFinalizedSample = true;
+            }
             $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
             $builder->add($sampleCode, Type\CheckboxType::class, [
                 'label' => $sampleLabel,
@@ -56,11 +60,9 @@ class NphAdminOrderGenerationType extends NphOrderForm
             ]);
             $constraints = $this->getDateTimeConstraints();
             if ($sample['finalized']) {
-                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sampleCode) {
-                    if (empty($value) && $context->getRoot()[$sampleCode]->getData() === true) {
-                        $context->buildViolation('Collection time is required')->addViolation();
-                    }
-                });
+                $constraints[] = new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]);
             }
             if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2) {
                 $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
@@ -94,9 +96,14 @@ class NphAdminOrderGenerationType extends NphOrderForm
 
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $constraints = $this->getDateTimeConstraints();
+            if ($hasAtLeastOneFinalizedSample) {
+                $constraints[] = new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]);
+            }
             $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
             $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
-                'required' => true,
+                'required' => false,
                 'constraints' => $constraints,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
