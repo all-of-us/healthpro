@@ -77,7 +77,6 @@ class NphAdminOrderGenerationType extends NphOrderForm
                     'constraints' => $constraints,
                     'attr' => [
                         'class' => 'order-ts',
-                        'readonly' => $options['disableStoolCollectedTs'],
                         'data-sample-cancelled' => $sample['cancelled'],
                         'autocomplete' => 'off'
                     ]
@@ -113,7 +112,6 @@ class NphAdminOrderGenerationType extends NphOrderForm
                 'view_timezone' => $options['timeZone'],
                 'attr' => [
                     'class' => 'order-ts',
-                    'readonly' => $options['disableStoolCollectedTs'],
                     'autocomplete' => 'off'
                 ]
             ]);

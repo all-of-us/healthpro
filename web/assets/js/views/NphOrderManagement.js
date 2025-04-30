@@ -49,6 +49,10 @@ $(document).ready(function () {
             if ($field.is(":checkbox")) {
                 $field.prop("disabled", false);
             }
+            if ($field.data("sample-cancelled")) {
+                $field.prop("disabled", false);
+                $field.prop("readonly", true);
+            }
         });
         PMI.hasChanges = false;
         $form.submit();
