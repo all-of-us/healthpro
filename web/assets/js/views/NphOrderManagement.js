@@ -4,8 +4,7 @@ $(document).ready(function () {
         element.value = "";
         bs5DateTimepicker(element, {
             clock: true,
-            sideBySide: true,
-            useCurrent: true
+            sideBySide: true
         });
         element.value = originalValue;
     });
@@ -27,7 +26,7 @@ $(document).ready(function () {
     $editBtn.on("click", function () {
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(":checkbox") && $field.data("sample-finalized")) {
+            if ($field.is(":checkbox") || $field.data("sample-cancelled")) {
                 $field.prop("disabled", true);
             } else {
                 $field.prop("disabled", false);
@@ -47,7 +46,7 @@ $(document).ready(function () {
         $(this).prop("disabled", true);
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(":checkbox") && $field.data("sample-finalized")) {
+            if ($field.is(":checkbox")) {
                 $field.prop("disabled", false);
             }
         });
