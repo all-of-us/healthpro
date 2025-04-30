@@ -133,7 +133,8 @@ class NphOrderService
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
                 'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL,
-                'cancelled' => $sampleObj->getModifyType() === NphSample::CANCEL ? 1 : 0
+                'cancelled' => $sampleObj->getModifyType() === NphSample::CANCEL ? 1 : 0,
+                'finalized' => $sampleObj->getFinalizedTs() ? 1 : 0
             ];
         }
         return $sampleLabels;

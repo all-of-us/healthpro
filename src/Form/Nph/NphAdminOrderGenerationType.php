@@ -55,6 +55,13 @@ class NphAdminOrderGenerationType extends NphOrderForm
                 ]
             ]);
             $constraints = $this->getDateTimeConstraints();
+            if ($sample['finalized']) {
+                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sampleCode) {
+                    if (empty($value) && $context->getRoot()[$sampleCode]->getData() === true) {
+                        $context->buildViolation('Collection time is required')->addViolation();
+                    }
+                });
+            }
             if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2) {
                 $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
                 $builder->add("{$sampleCode}CollectedTs", Type\DateTimeType::class, [
