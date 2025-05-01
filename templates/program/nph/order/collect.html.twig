@@ -13,7 +13,7 @@
     </div>
     {% if order.downtimeGenerated() %}
     <div class="alert bg-success well-sm margin-top-15 text-success">
-        <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone)}}] </span>
+        <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.</span>
     </div>
     {% endif %}
     <div class="row">
@@ -33,6 +33,12 @@
                         <label>Scan or manually check all successfully collected samples:</label>
                         <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID">
                         <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label data-toggle="tooltip" title="Order generation time can only be edited by a HealthPro admin within Management Tools.">Order Generation Time</label>
+                        <input type="text" class="form-control" value="{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}" disabled>
                     </div>
                 </div>
             </div>

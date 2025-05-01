@@ -1,0 +1,22 @@
+<div class="panel-heading clearfix">
+    <div class="row">
+        <div class="col-sm-6">
+            <strong>Name</strong>
+            {{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }} <br>
+            <strong>Participant ID</strong> {{ participant.id }} <br>
+            <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
+            <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
+            <strong>DOB</strong> {{ participant.dob ? participant.dob|date('n/j/Y') : '--' }} <br>
+        </div>
+        <div class="col-sm-6">
+            <div class="float-end">
+                <strong class="text-primary">
+                    Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
+                    | {{ order.getOrderTypeDisplayName}}
+                </strong><br>
+                <strong>Order ID</strong>
+                {{ order.orderId }}
+            </div>
+        </div>
+    </div>
+</div>

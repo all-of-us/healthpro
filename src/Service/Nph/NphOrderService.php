@@ -3,6 +3,7 @@
 namespace App\Service\Nph;
 
 use App\Audit\Log;
+use App\Entity\NphAdminOrderEditLog;
 use App\Entity\NphAliquot;
 use App\Entity\NphDlw;
 use App\Entity\NphGenerateOrderWarningLog;
@@ -131,7 +132,9 @@ class NphOrderService
             $sampleLabels[$sampleObj->getSampleCode()] = [
                 'label' => $samples[$sampleObj->getSampleCode()],
                 'id' => $sampleObj->getSampleId(),
-                'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL
+                'disabled' => $sampleObj->getFinalizedTs() || $sampleObj->getModifyType() === NphSample::CANCEL,
+                'cancelled' => $sampleObj->getModifyType() === NphSample::CANCEL ? 1 : 0,
+                'finalized' => $sampleObj->getFinalizedTs() ? 1 : 0
             ];
         }
         return $sampleLabels;
@@ -398,10 +401,80 @@ class NphOrderService
         }
     }
 
-    public function getExistingOrderCollectionData(NphOrder $order): array
+    public function saveAdminOrderEdits(array $formData, NphOrder $order): bool
+    {
+        $connection = $this->em->getConnection();
+        $connection->beginTransaction();
+        try {
+            $orderType = $order->getOrderType();
+            $originalOrderGenerationTs = $order->getCreatedTs();
+            $originalOrderGenerationTimezoneId = $order->getCreatedTimezoneId();
+            if ($oldOrderEditLog = $this->em->getRepository(NphAdminOrderEditLog::class)->findOneBy(['orderId' => $order->getOrderId()])) {
+                $originalOrderGenerationTs = $oldOrderEditLog->getOriginalOrderGenerationTs();
+                $originalOrderGenerationTimezoneId = $oldOrderEditLog->getOriginalOrderGenerationTimezoneId();
+            }
+
+            // Update order generation time
+            $order->setCreatedTs($formData[$orderType . 'GenerationTs']);
+            $order->setCreatedTimezoneId($this->getTimezoneid());
+            $this->em->persist($order);
+            $this->em->flush();
+            $this->loggerService->log(Log::NPH_ORDER_UPDATE, $order->getId());
+
+            // Update sample collection time
+            foreach ($order->getNphSamples() as $nphSample) {
+                $sampleCode = $nphSample->getSampleCode();
+                if (isset($formData[$sampleCode])) {
+                    if ($formData[$sampleCode]) {
+                        $collectedTs = $orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2 ?
+                            $formData[$orderType . 'CollectedTs'] : $formData[$sampleCode . 'CollectedTs'];
+                        $nphSample->setCollectedTs($collectedTs);
+                        $nphSample->setCollectedTimezoneId($this->getTimezoneid());
+                        $nphSample->setCollectedNotes($formData[$sampleCode . 'Notes']);
+                    } else {
+                        $nphSample->setCollectedUser(null);
+                        $nphSample->setCollectedSite(null);
+                        $nphSample->setCollectedTs(null);
+                        $nphSample->setCollectedTimezoneId(null);
+                        $nphSample->setCollectedNotes(null);
+                    }
+                }
+                $this->em->persist($nphSample);
+                $this->em->flush();
+                $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $nphSample->getId());
+                if ($nphSample->getRdrId() && $nphSample->getModifyType() !== NphSample::CANCEL) {
+                    $this->sendToRdr($nphSample, NphSample::UNLOCK, false, true);
+                }
+            }
+
+            // Log entry
+            $orderEditLog = new NphAdminOrderEditLog();
+            $orderEditLog->setUser($this->user);
+            $orderEditLog->setOrderId($order->getOrderId());
+            $orderEditLog->setOriginalOrderGenerationTs($originalOrderGenerationTs);
+            $orderEditLog->setOriginalOrderGenerationTimezoneId($originalOrderGenerationTimezoneId);
+            $orderEditLog->setUpdatedOrderGenerationTs($formData[$orderType . 'GenerationTs']);
+            $orderEditLog->setUpdatedOrderGenerationTimezoneId($this->getTimezoneid());
+            $orderEditLog->setCreatedTs(new DateTime());
+            $orderEditLog->setCreatedTimezoneId($this->getTimezoneid());
+            $this->em->persist($orderEditLog);
+            $this->em->flush();
+            $this->loggerService->log(Log::NPH_ADMIN_ORDER_EDIT_LOG_CREATE, $orderEditLog->getId());
+            $connection->commit();
+            return true;
+        } catch (\Exception $e) {
+            $connection->rollBack();
+            return false;
+        }
+    }
+
+    public function getExistingOrderCollectionData(NphOrder $order, bool $setOrderGenerationTs = false): array
     {
         $orderCollectionData = [];
         $orderType = $order->getOrderType();
+        if ($setOrderGenerationTs) {
+            $orderCollectionData[$orderType . 'GenerationTs'] = $order->getCreatedTs();
+        }
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $orderCollectionData[$orderType . 'CollectedTs'] = $order->getCollectedTs();
         }
@@ -1467,8 +1540,12 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
-    private function sendToRdr(NphSample $sample, ?string $modifyType = null, bool $biobankUser = false): bool
-    {
+    private function sendToRdr(
+        NphSample $sample,
+        ?string $modifyType = null,
+        bool $biobankUser = false,
+        bool $adminUser = false
+    ): bool {
         $order = $sample->getNphOrder();
         $modifyType = $modifyType ?? $sample->getModifyType();
         if ($modifyType === NphSample::UNLOCK) {
@@ -1479,6 +1556,9 @@ class NphOrderService
                 if ($biobankUser) {
                     $sample->setModifiedSite($sample->getFinalizedSite());
                     $sample->setModifyReason(NphSample::BIOBANK_MODIFY_REASON);
+                } elseif ($adminUser) {
+                    $sample->setModifiedSite($sample->getFinalizedSite());
+                    $sample->setModifyReason(NphSample::NPH_ADMIN_MODIFY_REASON);
                 } else {
                     $sample->setModifiedSite($this->site ?? $sample->getFinalizedSite());
                 }
