@@ -17,6 +17,25 @@
     {% endif %}
 {% endmacro %}
 
+{% macro displayModifyBannerMessageBs5(obj, displayTimezone = false) %}
+    {% if obj.modifyType == 'cancel' %}
+        <div class="alert alert-danger">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <strong>
+                Cancelled by {{ _self.displayModifiedInfo(obj, displayTimezone) }}
+            </strong>
+            <span class="d-block"><strong>Reason:</strong> {{ obj.modifyReasonDisplayText }}</span>
+        </div>
+    {% elseif obj.modifyType == 'unlock' %}
+        <div class="alert alert-warning">
+            <strong>
+                Unlocked for editing by {{ _self.displayModifiedInfo(obj, displayTimezone) }}
+            </strong>
+            <span class="d-block"><strong>Reason:</strong> {{ obj.modifyReasonDisplayText }}</span>
+        </div>
+    {% endif %}
+{% endmacro %}
+
 {% macro displayModifiedInfo(obj, displayTimezone = false) %}
     {{ obj.modifiedUser.email|default('Unknown') }} at {{ siteInfo.siteDisplayName(obj.modifiedSite) }} on
     {% if displayTimezone %}

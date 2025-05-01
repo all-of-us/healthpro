@@ -233,14 +233,6 @@ class AccessManagementController extends BaseController
         $oderGenerationForm->handleRequest($request);
         if ($oderGenerationForm->isSubmitted()) {
             $formData = $oderGenerationForm->getData();
-            if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
-                if (!empty($formData["{$orderType}CollectedTs"]) && $nphOrderService->isAtLeastOneSampleChecked($formData, $order) === false) {
-                    $oderGenerationForm['samplesCheckAll']->addError(new FormError('Please select at least one sample'));
-                }
-                if (empty($formData["{$orderType}CollectedTs"]) && $nphOrderService->isAtLeastOneSampleChecked($formData, $order) === true) {
-                    $oderGenerationForm["{$orderType}CollectedTs"]->addError(new FormError('Collection time is required'));
-                }
-            }
             if ($oderGenerationForm->isValid()) {
                 if ($nphOrderService->saveAdminOrderEdits($formData, $order)) {
                     $this->addFlash('success', 'Sample(s) resubmitted');

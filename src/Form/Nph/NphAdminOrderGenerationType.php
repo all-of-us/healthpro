@@ -31,10 +31,15 @@ class NphAdminOrderGenerationType extends NphOrderForm
             'view_timezone' => $options['timeZone'],
             'attr' => [
                 'class' => 'order-ts',
+                'autocomplete' => 'off'
             ]
         ]);
 
+        $hasAtLeastOneFinalizedSample = false;
         foreach ($samples as $sampleCode => $sample) {
+            if ($sample['finalized']) {
+                $hasAtLeastOneFinalizedSample = true;
+            }
             $sampleLabel = "({$sampleIndex}) {$sample['label']} ({$sample['id']})";
             $builder->add($sampleCode, Type\CheckboxType::class, [
                 'label' => $sampleLabel,
@@ -49,16 +54,16 @@ class NphAdminOrderGenerationType extends NphOrderForm
                 ],
                 'attr' => [
                     'data-sample-id' => $sample['id'],
-                    'data-sample-finalized' => $sample['finalized']
-                ],
-                'disabled' => $sample['disabled']
+                    'data-sample-cancelled' => $sample['cancelled'],
+                    'checked' => true
+                ]
             ]);
             $constraints = $this->getDateTimeConstraints();
-            $constraints[] = new Constraints\Callback(function ($value, $context) use ($sampleCode) {
-                if (empty($value) && $context->getRoot()[$sampleCode]->getData() === true) {
-                    $context->buildViolation('Collection time is required')->addViolation();
-                }
-            });
+            if ($sample['finalized']) {
+                $constraints[] = new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]);
+            }
             if ($orderType !== NphOrder::TYPE_STOOL && $orderType !== NphOrder::TYPE_STOOL_2) {
                 $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
                 $builder->add("{$sampleCode}CollectedTs", Type\DateTimeType::class, [
@@ -72,23 +77,32 @@ class NphAdminOrderGenerationType extends NphOrderForm
                     'constraints' => $constraints,
                     'attr' => [
                         'class' => 'order-ts',
-                        'readonly' => $options['disableStoolCollectedTs']
+                        'data-sample-cancelled' => $sample['cancelled'],
+                        'autocomplete' => 'off'
                     ]
                 ]);
             }
             $builder->add("{$sampleCode}Notes", Type\TextareaType::class, [
                 'label' => 'Notes',
                 'required' => false,
-                'constraints' => new Constraints\Type('string')
+                'constraints' => new Constraints\Type('string'),
+                'attr' => [
+                    'data-sample-cancelled' => $sample['cancelled'],
+                ]
             ]);
             $sampleIndex++;
         }
 
         if ($orderType === NphOrder::TYPE_STOOL || $orderType === NphOrder::TYPE_STOOL_2) {
             $constraints = $this->getDateTimeConstraints();
+            if ($hasAtLeastOneFinalizedSample) {
+                $constraints[] = new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]);
+            }
             $constraints[] = $this->getCollectionGenerationTimeConstraints($orderType);
             $builder->add("{$orderType}CollectedTs", Type\DateTimeType::class, [
-                'required' => true,
+                'required' => false,
                 'constraints' => $constraints,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
@@ -98,7 +112,7 @@ class NphAdminOrderGenerationType extends NphOrderForm
                 'view_timezone' => $options['timeZone'],
                 'attr' => [
                     'class' => 'order-ts',
-                    'readonly' => $options['disableStoolCollectedTs']
+                    'autocomplete' => 'off'
                 ]
             ]);
         }

@@ -59,7 +59,7 @@
                             {% for index, nphSample in order.nphSamples %}
                                 {% if nphSample.modifyType in [constant('CANCEL', nphSample), constant('UNLOCK', nphSample)] %}
                                     <tr>
-                                        <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
+                                        <td colspan="4">{{ macros.displayModifyBannerMessageBs5(nphSample) }}</td>
                                     </tr>
                                 {% endif %}
                                 {% if order.orderType == constant('TYPE_24URINE', order) %}

@@ -1,10 +1,12 @@
 $(document).ready(function () {
     document.querySelectorAll(".order-ts").forEach((element) => {
+        const originalValue = element.value;
+        element.value = "";
         bs5DateTimepicker(element, {
             clock: true,
-            sideBySide: true,
-            useCurrent: true
+            sideBySide: true
         });
+        element.value = originalValue;
     });
 
     const $form = $('form[name="nph_admin_order_generation"]');
@@ -24,7 +26,7 @@ $(document).ready(function () {
     $editBtn.on("click", function () {
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(":checkbox") && $field.data("sample-finalized")) {
+            if ($field.is(":checkbox") || $field.data("sample-cancelled")) {
                 $field.prop("disabled", true);
             } else {
                 $field.prop("disabled", false);
@@ -44,8 +46,12 @@ $(document).ready(function () {
         $(this).prop("disabled", true);
         $fields.each(function () {
             const $field = $(this);
-            if ($field.is(":checkbox") && $field.data("sample-finalized")) {
+            if ($field.is(":checkbox")) {
                 $field.prop("disabled", false);
+            }
+            if ($field.data("sample-cancelled")) {
+                $field.prop("disabled", false);
+                $field.prop("readonly", true);
             }
         });
         PMI.hasChanges = false;
