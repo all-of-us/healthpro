@@ -108,7 +108,7 @@ class NphAdminOrderEditLog
         return $this->originalOrderGenerationTimezoneId;
     }
 
-    public function setOriginalOrderGenerationTimezoneId(int $originalOrderGenerationTimezoneId): static
+    public function setOriginalOrderGenerationTimezoneId(?int $originalOrderGenerationTimezoneId): static
     {
         $this->originalOrderGenerationTimezoneId = $originalOrderGenerationTimezoneId;
 
