@@ -214,7 +214,7 @@ class NphBiobankController extends BaseController
                 ]);
             }
         }
-        $orderGenerationEditLogs = $this->em->getRepository(NphAdminOrderEditLog::class)->getOrderEditLogs();
+        $orderGenerationEditLogs = $this->em->getRepository(NphAdminOrderEditLog::class)->getOrderEditLogs($startDate, $endDate);
         return $this->render('program/nph/biobank/admin-orders-generation-audit.html.twig', [
             'orderGenerationEditLogs' => $orderGenerationEditLogs,
             'todayFilterForm' => $todayFilterForm->createView(),
