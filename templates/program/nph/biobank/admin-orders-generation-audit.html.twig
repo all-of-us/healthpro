@@ -57,8 +57,8 @@
             </div>
         </div>
     {% endif %}
-    <div class="mt-2">
-        <table class="table table-bordered table-small mt-2" data-default-sort-column="3" data-export-table-type="DownTimeOrders">
+    <div class="mt-2 mb-4">
+        <table class="table table-bordered table-small mt-2" data-default-sort-column="3" data-export-table-type="OrderGenerationAudit">
             <thead>
             <tr>
                 <th data-header="Site">Site</th>
@@ -83,10 +83,10 @@
                     <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[orderLog.visitPeriod] }}</td>
                     <td>{{ orderLog.timepoint }}</td>
                     <td data-row="{{ orderLog.orderId }}">
-                        <a href="{{ path('nph_biobank_order_collect', {biobankId: orderLog.biobankId, orderId: orderLog.orderId}) }}">{{ orderLog.orderId }}</a>
+                        <a href="{{ path('nph_biobank_order_collect', {biobankId: orderLog.biobankId, orderId: orderLog.id}) }}">{{ orderLog.orderId }}</a>
                     </td>
                     <td data-row="{{ macros.displayDateAndTimezone(orderLog.originalOrderGenerationTs, orderLog.originalOrderGenerationTimezoneId, false) }}" data-order="{{ orderLog.originalOrderGenerationTs ? orderLog.originalOrderGenerationTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.originalOrderGenerationTs %} data-date-type="original_order_generation_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.originalOrderGenerationTs, orderLog.originalOrderGenerationTimezoneId) }}</td>
-                    <td data-row="{{ macros.displayDateAndTimezone(orderLog.updatedOrderGenerationTs, orderLog.originalOrderGenerationTimezoneId, false) }}" data-order="{{ orderLog.updatedOrderGenerationTs ? orderLog.updatedOrderGenerationTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.updatedOrderGenerationTs %} data-date-type="updated_order_generation_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.updatedOrderGenerationTs, orderLog.updatedOrderGenerationTimezoneId) }}</td>
+                    <td data-row="{{ macros.displayDateAndTimezone(orderLog.updatedOrderGenerationTs, orderLog.updatedOrderGenerationTimezoneId, false) }}" data-order="{{ orderLog.updatedOrderGenerationTs ? orderLog.updatedOrderGenerationTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.updatedOrderGenerationTs %} data-date-type="updated_order_generation_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.updatedOrderGenerationTs, orderLog.updatedOrderGenerationTimezoneId) }}</td>
                     <td data-row="{{ macros.displayDateAndTimezone(orderLog.createdTs, orderLog.createdTimezoneId, false) }}" data-order="{{ orderLog.createdTs ? orderLog.createdTs|date('Y-m-d H:i:s') : null }}"  {% if orderLog.createdTs %} data-date-type="created_ts" {% endif %}>{{ macros.displayDateAndTimezone(orderLog.createdTs, orderLog.createdTimezoneId) }}</td>
                 </tr>
             {% endfor %}

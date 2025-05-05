@@ -28,7 +28,7 @@ class NphAdminOrderEditLogRepository extends ServiceEntityRepository
     public function getOrderEditLogs(?DateTime $startDate = null, ?DateTime $endDate = null): array
     {
         $queryBuilder = $this->createQueryBuilder('na')
-            ->select('no.site, no.biobankId, no.module, no.visitPeriod, no.timepoint, no.orderId, na.originalOrderGenerationTs, na.originalOrderGenerationTimezoneId, na.updatedOrderGenerationTs, na.updatedOrderGenerationTimezoneId, na.createdTs, na.createdTimezoneId, u.email')
+            ->select('no.id, no.site, no.biobankId, no.module, no.visitPeriod, no.timepoint, no.orderId, na.originalOrderGenerationTs, na.originalOrderGenerationTimezoneId, na.updatedOrderGenerationTs, na.updatedOrderGenerationTimezoneId, na.createdTs, na.createdTimezoneId, u.email')
             ->leftJoin(NphOrder::class, 'no', Join::WITH, 'na.orderId = no.orderId')
             ->leftJoin(User::class, 'u', Join::WITH, 'na.user = u.id');
         if ($startDate && $endDate) {
