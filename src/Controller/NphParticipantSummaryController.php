@@ -11,6 +11,7 @@ use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Form\Nph\NphGenerateOrderWarningLogType;
 use App\Form\Nph\NphSampleProcessCompleteType;
 use App\Helper\NphDietPeriodStatus;
+use App\Nph\Order\Nomenclature;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -119,6 +120,7 @@ class NphParticipantSummaryController extends BaseController
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,
+            'dietMapper' => Nomenclature::$dietMapper
         ]);
     }
 
