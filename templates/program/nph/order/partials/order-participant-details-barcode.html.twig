@@ -4,7 +4,7 @@
     </div>
     <div class="col-sm-4 text-center">
         <strong class="text-primary">
-            Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }} | {{ order
+            Module {{ order.module }} | {{ modulePeriodVisitMapper[order.module~'_'~order.visitPeriod]|default(order.visitDisplayName) }} | {{ timePoints[order.timepoint] }} | {{ order
             .getOrderTypeDisplayName() }}
         </strong>
         <div><svg id="order-barcode"></svg></div>

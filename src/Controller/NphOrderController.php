@@ -16,6 +16,7 @@ use App\Form\Nph\NphSampleModifyBulkType;
 use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
 use App\HttpClient;
+use App\Nph\Order\Nomenclature;
 use App\Nph\Order\Samples;
 use App\Service\EnvironmentService;
 use App\Service\HelpService;
@@ -120,7 +121,8 @@ class NphOrderController extends BaseController
             'samplesOrderIds' => $nphOrderService->getSamplesWithOrderIds(),
             'samplesStatus' => $nphOrderService->getSamplesWithStatus(),
             'showPreview' => $showPreview,
-            'downtimeVideoSrc' => HelpService::$nphVideoPlaylists['downtime-reference']
+            'downtimeVideoSrc' => HelpService::$nphVideoPlaylists['downtime-reference'],
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
         ]);
     }
 
@@ -175,6 +177,7 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
         ]);
     }
 
@@ -344,7 +347,9 @@ class NphOrderController extends BaseController
             'visitDiet' => $nphOrderService->getVisitDiet(),
             'order' => $order,
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
-            'allowResubmit' => false
+            'allowResubmit' => false,
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
+
         ]);
     }
 

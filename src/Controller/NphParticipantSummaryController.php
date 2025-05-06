@@ -120,7 +120,7 @@ class NphParticipantSummaryController extends BaseController
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,
-            'dietMapper' => Nomenclature::$dietMapper
+            'moduleVisitMapper' => Nomenclature::$moduleVisitMapper
         ]);
     }
 
