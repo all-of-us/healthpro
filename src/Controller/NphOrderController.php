@@ -494,7 +494,8 @@ class NphOrderController extends BaseController
             'type' => $type,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'samplesMetadata' => $nphOrderService->getSamplesMetadata($order)
+            'samplesMetadata' => $nphOrderService->getSamplesMetadata($order),
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
         ]);
     }
 
