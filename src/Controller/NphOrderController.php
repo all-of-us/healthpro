@@ -368,7 +368,8 @@ class NphOrderController extends BaseController
                 'visit' => $visit,
                 'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
                 'sampleCount' => $orderInfo['sampleCount'],
-                'sampleGroup' => $sampleGroup]
+                'sampleGroup' => $sampleGroup,
+                'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper]
         );
     }
 
@@ -649,7 +650,8 @@ class NphOrderController extends BaseController
             'visitDisplayName' => NphOrder::VISIT_DISPLAY_NAME_MAPPER[$visit],
             'disabled' => $disabled,
             'dlwInfo' => $dlwObject,
-            'form' => $dlwForm->createView()
+            'form' => $dlwForm->createView(),
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
         ]);
     }
 
