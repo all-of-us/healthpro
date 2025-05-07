@@ -194,7 +194,8 @@
                                                     <br>
                                                     <hr>
                                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                                                    {% if dietPeriodNumber == VisitCode|slice(0,7) %}
+                                                    {% set dietVisitCode = moduleNumber == 1 ? VisitCode|slice(0,3) : VisitCode|slice(0,7)  %}
+                                                    {% if dietPeriodNumber == dietVisitCode %}
                                                         {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
                                                             {% set visitDiet = visit['visitDiet'] %}
                                                             {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}

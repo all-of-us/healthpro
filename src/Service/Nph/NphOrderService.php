@@ -1078,7 +1078,7 @@ class NphOrderService
     public function getModuleDietPeriodsStatus(string $participantId, string $participantModule): array
     {
         $moduleDietPeriodsStatus = [
-            1 => ['LMT' => 'not_started'],
+            1 => ['LMT' => 'not_started', 'LMTStool' => 'not_started'],
             2 => ['Period1' => 'not_started',
                 'Period2' => 'not_started',
                 'Period3' => 'not_started'],

@@ -14,21 +14,27 @@ class Module1 extends Samples
         'LMT' => 'LMT'
     ];
 
-    private static array $visitDietMapper = [
+    private static array $visitTypeWithStool = [
+        'LMTStool' => 'LMTStool',
         'LMT' => 'LMT'
+    ];
+
+    private static array $visitDietMapper = [
+        'LMT' => 'LMT',
+        'LMTStool' => 'LMT'
     ];
 
     public function __construct($visit)
     {
         parent::__construct(self::$module, $visit);
-        if (!in_array($visit, array_keys(self::$visitTypes))) {
+        if (!in_array($visit, array_keys(self::$visitTypeWithStool))) {
             throw new \Exception('Visit Type not supported');
         }
     }
 
     public static function getVisitTypes(): array
     {
-        return self::$visitTypes;
+        return self::$visitTypeWithStool;
     }
 
     public static function getVisitDiet(string $visitType): string

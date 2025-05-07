@@ -25,17 +25,21 @@ class NphOrder
     public const TYPE_MODULE_3_SALIVA = 'saliva3';
     public const IN_PERSON_VISIT_DISPLAY_NAME_MAPPER = [
         'LMT' => 'LMT',
+        'LMTStool' => 'LMT',
         'Period1Diet' => 'Diet',
         'Period1DLW' => 'DLW',
         'Period1DSMT' => 'DSMT',
+        'Period1DSMTStool' => 'DSMTStool',
         'Period1LMT' => 'LMT',
         'Period2Diet' => 'Diet',
         'Period2DLW' => 'DLW',
         'Period2DSMT' => 'DSMT',
+        'Period2DSMTStool' => 'DSMTStool',
         'Period2LMT' => 'LMT',
         'Period3Diet' => 'Diet',
         'Period3DLW' => 'DLW',
         'Period3DSMT' => 'DSMT',
+        'Period3DSMTStool' => 'DSMTStool',
         'Period3LMT' => 'LMT',
     ];
     public const VISIT_DISPLAY_NAME_MAPPER = [
