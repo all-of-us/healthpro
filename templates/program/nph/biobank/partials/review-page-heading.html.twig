@@ -4,10 +4,11 @@
 {% set current_route = app.request.get('_route') %}
 <ul class="nav nav-tabs">
     <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_today' %}active{% endif %}" href="{{ path('nph_biobank_orders_today') }}">Today's Biobank Orders</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_unfinalized' %}active"{% endif %}" href="{{ path('nph_biobank_orders_unfinalized') }}">Unfinalized Samples</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_unlocked' %}active"{% endif %}" href="{{ path('nph_biobank_orders_unlocked') }}">Unlocked Samples</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_recently_modified' %}active"{% endif %}" href="{{ path('nph_biobank_orders_recently_modified') }}">Recently Modified Samples</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_downtime' %}active"{% endif %}" href="{{ path('nph_biobank_orders_downtime') }}">Downtime Orders</a></li>
-    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_audit' %} active"{% endif %}" href="{{ path('nph_biobank_orders_audit') }}">Diet Period Audit</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_unfinalized' %}active{% endif %}" href="{{ path('nph_biobank_orders_unfinalized') }}">Unfinalized Samples</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_unlocked' %}active{% endif %}" href="{{ path('nph_biobank_orders_unlocked') }}">Unlocked Samples</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_recently_modified' %}active{% endif %}" href="{{ path('nph_biobank_orders_recently_modified') }}">Recently Modified Samples</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_downtime' %}active{% endif %}" href="{{ path('nph_biobank_orders_downtime') }}">Downtime Orders</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_orders_audit' %} active{% endif %}" href="{{ path('nph_biobank_orders_audit') }}">Diet Period Audit</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'nph_biobank_admin_orders_generation_audit' %} active{% endif %}" href="{{ path('nph_biobank_admin_orders_generation_audit') }}">Order Generation Audit</a></li>
 </ul>
 <br />

@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Repository\NphAdminOrderEditLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: NphAdminOrderEditLogRepository::class)]
 class NphAdminOrderEditLog
 {
     #[ORM\Id]

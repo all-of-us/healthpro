@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\NphAdminOrderEditLog;
 use App\Entity\NphAliquot;
 use App\Entity\NphGenerateOrderWarningLog;
 use App\Entity\NphOrder;
@@ -194,6 +195,28 @@ class NphBiobankController extends BaseController
         $samples = $this->em->getRepository(NphOrder::class)->getDowntimeOrders($startDate, $endDate);
         return $this->render('/program/nph/biobank/orders-downtime.html.twig', [
             'samples' => $samples,
+            'todayFilterForm' => $todayFilterForm->createView(),
+            'displayMessage' => $displayMessage
+        ]);
+    }
+
+    #[Route(path: '/review/admin/orders/generation/audit', name: 'nph_biobank_admin_orders_generation_audit')]
+    public function adminOrdersGenerationAction(Request $request): Response
+    {
+        [$startDate, $endDate, $displayMessage, $todayFilterForm] = $this->getDateRangeFilterForm($request);
+        if ($todayFilterForm->isSubmitted()) {
+            if (!$todayFilterForm->isValid()) {
+                $todayFilterForm->addError(new FormError('Please correct the errors below'));
+                return $this->render('program/nph/biobank/audit.html.twig', [
+                    'samples' => [],
+                    'todayFilterForm' => $todayFilterForm->createView(),
+                    'displayMessage' => $displayMessage
+                ]);
+            }
+        }
+        $orderGenerationEditLogs = $this->em->getRepository(NphAdminOrderEditLog::class)->getOrderEditLogs($startDate, $endDate);
+        return $this->render('program/nph/biobank/admin-orders-generation-audit.html.twig', [
+            'orderGenerationEditLogs' => $orderGenerationEditLogs,
             'todayFilterForm' => $todayFilterForm->createView(),
             'displayMessage' => $displayMessage
         ]);
