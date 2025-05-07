@@ -15,7 +15,7 @@
         </div>
         <div class="col-sm-6">
             <div class="alert well-sm text-white nph-module-badge nph-module-{{ module }}">Module | NPH Module {{ module }}</div>
-            <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ visitDisplayName }}</div>
+            <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ modulePeriodVisitMapper[module~'_'~visit]|default(visitDisplayName) }}</div>
         </div>
     </div>
     <div class="row" style="padding-top: 2em">
