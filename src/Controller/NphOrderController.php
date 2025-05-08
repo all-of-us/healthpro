@@ -68,9 +68,14 @@ class NphOrderController extends BaseController
         if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod, $participant->module)) {
             throw $this->createNotFoundException('Orders cannot be generated for this diet.');
         }
-        $timePointSamples = $nphOrderService->getTimePointSamples();
+        if ($request->get('orderType') === NphOrder::TYPE_STOOL) {
+            $timePointSamples = $nphOrderService->getStoolSamples();
+            $ordersData = $nphOrderService->getExistingOrdersDataWithOnlyStoolSamples();
+        } else {
+            $timePointSamples = $nphOrderService->getNonStoolSamples();
+            $ordersData = $nphOrderService->getExistingOrdersDataWithOutStoolSamples();
+        }
         $timePoints = $nphOrderService->getTimePoints();
-        $ordersData = $nphOrderService->getExistingOrdersData();
         $stoolSamples = array_merge($nphOrderService->getSamplesByType('stool'), $nphOrderService->getSamplesByType('stool2'));
         $oderForm = $this->createForm(
             NphOrderType::class,
