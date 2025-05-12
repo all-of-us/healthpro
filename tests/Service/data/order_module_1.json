@@ -99,6 +99,81 @@
       "URINES": "Spot Urine"
     }
   },
+  "timePointNonStoolSamples": {
+    "preLMT": {
+      "URINES": "Spot Urine",
+      "SALIVA": "Saliva",
+      "HAIR": "Hair",
+      "NAILB": "Big Toenails",
+      "NAILL": "Other Toenails"
+    },
+    "minus15min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "minus5min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "15min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "30min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "60min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "90min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "120min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "180min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "240min": {
+      "SST8P5": "8.5 mL SST",
+      "LIHP1": "6 mL Li Hep",
+      "EDTA10": "10 mL EDTA",
+      "P800": "2 mL P800"
+    },
+    "postLMT": {
+      "URINES": "Spot Urine"
+    }
+  },
+  "timePointStoolSamples": {
+    "preLMT": {
+      "STOOL": "Stool",
+      "ST1": "95% Ethanol Tube 1",
+      "ST2": "95% Ethanol Tube 2",
+      "ST3": "DNA/RNA Shield Tube 1",
+      "ST4": "DNA/RNA Shield Tube 2"
+    }
+  },
   "nailSamples": [
     "NAILB",
     "NAILL"
@@ -138,6 +213,44 @@
     ],
     "postLMT": [
       "URINES"
+    ],
+    "stoolKit": "KIT-000000001",
+    "ST1": "T0000000001",
+    "ST2": "T0000000002",
+    "ST3": "T0000000003",
+    "ST4": "T0000000004",
+    "downtime_generated": "false",
+    "createdTs": "2023-11-21 15:42:20.111251"
+  },
+  "formDataWithoutStoolSamples": {
+    "preLMT": [
+      "URINES",
+      "SALIVA",
+      "HAIR",
+      "NAILB",
+      "NAILL"
+    ],
+    "30min": [
+      "SST8P5",
+      "LIHP1",
+      "EDTA10",
+      "P800"
+    ],
+    "240min": [
+      "SST8P5",
+      "LIHP1",
+      "EDTA10",
+      "P800"
+    ],
+    "postLMT": [
+      "URINES"
+    ],
+    "downtime_generated": "false",
+    "createdTs": "2023-11-21 15:42:20.111251"
+  },
+  "formDataWithOnlyStoolSamples": {
+    "preLMT": [
+      "STOOL"
     ],
     "stoolKit": "KIT-000000001",
     "ST1": "T0000000001",
