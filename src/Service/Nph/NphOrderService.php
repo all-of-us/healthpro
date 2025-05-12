@@ -1299,7 +1299,7 @@ class NphOrderService
         $timePointSamples = $this->getTimePointSamples();
         foreach ($timePointSamples as $timePoint => $samples) {
             if (in_array($timePoint, NphOrder::$stoolVisits)) {
-                foreach ($samples as $sampleKey => $sample) {
+                foreach (array_keys($samples) as $sampleKey) {
                     if (in_array($sampleKey, NphSample::$stoolSamples)) {
                         unset($timePointSamples[$timePoint][$sampleKey]);
                     }
