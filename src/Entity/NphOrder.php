@@ -79,6 +79,7 @@ class NphOrder
         'preLMT' => 'Pre LMT',
         'postLMT' => 'Post LMT',
     ];
+
     private const TYPE_DISPLAY_OVERRIDE = [
         2 => [
             'urine' => 'Spot Urine'
@@ -92,6 +93,8 @@ class NphOrder
             'stool2' => 'Stool Kit 2'
         ],
     ];
+
+    public static array $stoolVisits = ['preLMT', 'preDSMT'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

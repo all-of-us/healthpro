@@ -53,6 +53,15 @@ class NphSample
         'unlock' => 'unlocked'
     ];
 
+    public static array $stoolSamples = [
+        'STOOL',
+        'ST1',
+        'ST2',
+        'ST3',
+        'ST4',
+        'stoolKit'
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]

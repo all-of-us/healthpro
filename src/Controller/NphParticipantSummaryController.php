@@ -102,7 +102,7 @@ class NphParticipantSummaryController extends BaseController
 
         $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
         $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
-
+        $combined = $nphProgramSummaryService->separateStoolSamples($combined);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,

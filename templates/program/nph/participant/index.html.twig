@@ -194,7 +194,8 @@
                                                     <br>
                                                     <hr>
                                                 {% for VisitCode, visit in programSummaryAndOrderInfo[moduleNumber] %}
-                                                    {% if dietPeriodNumber == VisitCode|slice(0,7) %}
+                                                    {% set dietVisitCode = moduleNumber == 1 ? VisitCode|slice(0,3) : VisitCode|slice(0,7)  %}
+                                                    {% if dietPeriodNumber == dietVisitCode %}
                                                         {% if VisitCode != 'sampleStatusCount' and VisitCode != 'moduleCreationSite' %}
                                                             {% set visitDiet = visit['visitDiet'] %}
                                                             {% set moduleDietStatus = 'module' ~ moduleNumber ~ 'DietPeriod' %}
@@ -217,8 +218,13 @@
                                                                                 {% set warningDisplayed = 1 %}
                                                                             {% endif %}
                                                                         {% endfor %}
+                                                                        {% set generateOrderVisitType = VisitCode|replace({'Stool': ''}) %}
+                                                                        {% set generateOrderType = 'other' %}
+                                                                        {% if VisitCode|slice(-5) == 'Stool' %}
+                                                                            {% set generateOrderType = 'stool' %}
+                                                                        {% endif %}
                                                                         <a class="btn btn-primary btn-xs m-0 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}" data-warning-displayed="{{ warningDisplayed }}"
-                                                                           role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                                           role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: generateOrderVisitType, orderType: generateOrderType}) }}">
                                                                             <i class="fa fa-plus-circle"></i> Generate Orders
                                                                         </a>
                                                                     {% endif %}
