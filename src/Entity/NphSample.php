@@ -59,7 +59,13 @@ class NphSample
         'ST2',
         'ST3',
         'ST4',
-        'stoolKit'
+        'STOOL2',
+        'ST5',
+        'ST6',
+        'ST7',
+        'ST8',
+        'stoolKit',
+        'stoolKit2'
     ];
 
     #[ORM\Id]
