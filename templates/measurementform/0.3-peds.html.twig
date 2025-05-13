@@ -103,14 +103,14 @@
                     </div>
                     <div class="panel-body">
                         <p class="lead">
-                            Weight
+                            Weight:
                             <span id="mean-weight"></span>
                             {{ schema.fields['weight'].unit }}
                             <span id="convert-weight"></span>
                             <small class="text-muted">(average of two closest measures)</small>
                         </p>
                         <p class="lead">
-                            Height/Length
+                            Height/Length:
                             <span id="mean-height"></span>
                             {{ schema.fields['height'].unit }}
                             <span id="convert-height"></span>
@@ -126,21 +126,21 @@
                     </div>
                     <div class="panel-body">
                         <div class="row row-no-gutters lead">
-                            <div>Weight</div>
+                            <div>Weight:</div>
                             <div>
                                 {{ growthMacros.displayGrowthPercentile('weight-for-age', sexAtBirth) }}
                             </div>
                         </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
                         <div class="row row-no-gutters lead">
-                            <div>Height/Length</div>
+                            <div>Height/Length:</div>
                             <div>
                                 {{ growthMacros.displayGrowthPercentile('height-for-age', sexAtBirth) }}
                             </div>
                         </div>
                         {% if schema.displayWeightForLength == true %}
                             <div class="row row-no-gutters lead">
-                                <div>Weight-for-Length</div>
+                                <div>Weight-for-Length:</div>
                                 <div>
                                     {{ growthMacros.displayGrowthPercentile('weight-for-length', sexAtBirth) }}
                                 </div>
@@ -329,7 +329,7 @@
                     <div class="panel-body">
                         {% if schema.fields['head-circumference-protocol-modification'] is defined %}
                             <div class="row row-no-gutters lead">
-                                <div>Head Circumference</div>
+                                <div>Head Circumference:</div>
                                 <div>
                                     {{ growthMacros.displayGrowthPercentile('head-circumference-for-age', sexAtBirth) }}
                                 </div>
