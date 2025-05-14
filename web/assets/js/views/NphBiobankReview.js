@@ -43,11 +43,17 @@ $(document).ready(function () {
 
     for (const dateType of dateTypes) {
         const dateTypeSelector = $(`#${dateType}`);
-        const columnIndex = dateTypeSelector.data('column-index');
+        const columnIndex = dateTypeSelector.data("column-index");
         const count = reviewTable
             .column(columnIndex)
             .data()
-            .filter(value => value !== null && value !== undefined && value.toString().trim() !== '' && value !=='<i class="fa fa-times text-danger" aria-hidden="true"></i>')
+            .filter(
+                (value) =>
+                    value !== null &&
+                    value !== undefined &&
+                    value.toString().trim() !== "" &&
+                    value !== '<i class="fa fa-times text-danger" aria-hidden="true"></i>'
+            )
             .count();
         dateTypeSelector.html(count);
     }
