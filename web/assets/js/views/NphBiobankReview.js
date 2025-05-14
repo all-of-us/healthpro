@@ -42,7 +42,14 @@ $(document).ready(function () {
     const dateTypes = ["created_ts", "collected_ts", "finalized_ts"];
 
     for (const dateType of dateTypes) {
-        $("#" + dateType).html($("[data-date-type=" + dateType + "]").length);
+        const dateTypeSelector = $(`#${dateType}`);
+        const columnIndex = dateTypeSelector.data('column-index');
+        const count = reviewTable
+            .column(columnIndex)
+            .data()
+            .filter(value => value !== null && value !== undefined && value.toString().trim() !== '' && value !=='<i class="fa fa-times text-danger" aria-hidden="true"></i>')
+            .count();
+        dateTypeSelector.html(count);
     }
 
     document.querySelectorAll("#review_today_filter_start_date, #review_today_filter_end_date").forEach((element) => {
