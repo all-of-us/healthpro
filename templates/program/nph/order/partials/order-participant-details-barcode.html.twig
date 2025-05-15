@@ -1,10 +1,10 @@
 <div class="row" id="order_info" data-order-id="{{ order.orderId }}">
-    <div class="col-sm-8">
+    <div class="col-sm-6">
         {% include 'program/nph/order/partials/participant-details.html.twig' %}
     </div>
-    <div class="col-sm-4 text-center">
+    <div class="col-sm-6 text-center">
         <strong class="text-primary">
-            Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }} | {{ order
+            Module {{ order.module }} | {{ modulePeriodVisitMapper[order.module~'_'~order.visitPeriod]|default(order.visitDisplayName) }} | {{ timePoints[order.timepoint] }} | {{ order
             .getOrderTypeDisplayName() }}
         </strong>
         <div><svg id="order-barcode"></svg></div>

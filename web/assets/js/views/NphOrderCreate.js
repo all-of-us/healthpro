@@ -147,6 +147,9 @@ $(document).ready(function () {
             checked: true,
             disabled: true
         });
+        $("#nph_order_downtime_generated").prop({
+            disabled: true
+        });
     }
 
     $(".timepoint-samples").each(function () {

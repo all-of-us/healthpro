@@ -47,7 +47,7 @@
         </div>
         <div class="col-md-6">
                 <strong class="text-primary right-float">
-                    Module {{ module }} | {{ visitDisplayName }} | DLW
+                    Module {{ module }} | {{ modulePeriodVisitMapper[module~'_'~visit]|default(visitDisplayName) }} | DLW
                 </strong>
         </div>
     </div>

@@ -11,7 +11,7 @@
     </div>
     <div class="col-sm-7 text-right">
         <strong class="text-primary">
-            Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
+            Module {{ order.module }} | {{ modulePeriodVisitMapper[order.module~'_'~order.visitPeriod]|default(order.visitDisplayName) }} | {{ timePoints[order.timepoint] }}
             | {{ samples[sampleCode]}}
         </strong><br>
         <strong>Order ID</strong>

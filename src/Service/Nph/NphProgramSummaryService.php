@@ -79,6 +79,54 @@ class NphProgramSummaryService
         return $combinedSummary;
     }
 
+    public function separateStoolSamples(array $combinedArray): array
+    {
+        foreach ($combinedArray as $index => $item) {
+            $newItem = []; // To make the Stool visits appear first, then original
+            foreach ($item as $key => $visitData) {
+                $stoolOnlyVisit = [
+                    'visitInfo' => [],
+                    'visitDisplayName' => $visitData['visitDisplayName'] ?? '',
+                    'visitDiet' => $visitData['visitDiet'] ?? '',
+                ];
+                $hasStool = false;
+                if (is_array($visitData) && isset($visitData['visitInfo'])) {
+                    foreach ($visitData['visitInfo'] as $timePoint => $timePointData) {
+                        if (in_array($timePoint, ['preLMT', 'preDSMT'], true)) {
+                            $stoolInfo = [];
+
+                            if (isset($timePointData['timePointInfo']['stool'])) {
+                                $stoolInfo['stool'] = $timePointData['timePointInfo']['stool'];
+                                unset($combinedArray[$index][$key]['visitInfo'][$timePoint]['timePointInfo']['stool']);
+                            }
+
+                            if (isset($timePointData['timePointInfo']['stool2'])) {
+                                $stoolInfo['stool2'] = $timePointData['timePointInfo']['stool2'];
+                                unset($combinedArray[$index][$key]['visitInfo'][$timePoint]['timePointInfo']['stool2']);
+                            }
+
+                            if (!empty($stoolInfo)) {
+                                $hasStool = true;
+                                $stoolOnlyVisit['visitInfo'][$timePoint] = [
+                                    'timePointInfo' => $stoolInfo,
+                                    'timePointDisplayName' => $timePointData['timePointDisplayName'] ?? '',
+                                ];
+                            }
+                        }
+                    }
+                }
+                if ($hasStool) {
+                    $newItem[$key . 'Stool'] = $stoolOnlyVisit;
+                }
+                // Add the original visit after the stool variant
+                $newItem[$key] = $combinedArray[$index][$key];
+            }
+            $combinedArray[$index] = $newItem;
+        }
+        return $combinedArray;
+    }
+
+
     private function getModuleSummary($module): array
     {
         $moduleSummary = [];

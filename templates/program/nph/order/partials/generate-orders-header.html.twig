@@ -4,6 +4,6 @@
     </div>
     <div class="col-sm-3">
         <div class="alert text-white ps-3 nph-module-badge nph-module-{{ module }}">Module | NPH Module {{ module }}</div>
-        <div class="alert text-white nph-visit nph-visit-badge">Visit | {{ visitDisplayName }}</div>
+        <div class="alert text-white nph-visit nph-visit-badge">Visit | {{ modulePeriodVisitMapper[module~'_'~visit]|default(visitDisplayName) }}</div>
     </div>
 </div>

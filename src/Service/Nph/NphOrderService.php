@@ -176,6 +176,43 @@ class NphOrderService
         return $ordersData;
     }
 
+    public function getExistingOrdersDataWithOutStoolSamples(): array
+    {
+        $ordersData = $this->getExistingOrdersData();
+        foreach ($ordersData as $sample => $data) {
+            if (in_array($sample, NphSample::$stoolSamples)) {
+                unset($ordersData[$sample]);
+            }
+            if (in_array($sample, NphOrder::$stoolVisits) && is_array($data)) {
+                foreach ($data as $key => $sampleKey) {
+                    if ($sampleKey === NphSample::SAMPLE_STOOL || $sampleKey === NphSample::SAMPLE_STOOL_2) {
+                        unset($ordersData[$sample][$key]);
+                    }
+                }
+            }
+        }
+        return $ordersData;
+    }
+
+    public function getExistingOrdersDataWithOnlyStoolSamples(): array
+    {
+        $ordersData = $this->getExistingOrdersData();
+        $stoolData = [];
+        foreach ($ordersData as $sample => $data) {
+            if (in_array($sample, NphSample::$stoolSamples)) {
+                $stoolData[$sample] = $data;
+            }
+            if (in_array($sample, NphOrder::$stoolVisits) && is_array($data)) {
+                foreach ($data as $key => $sampleValue) {
+                    if ($sampleValue === NphSample::SAMPLE_STOOL || $sampleValue === NphSample::SAMPLE_STOOL_2) {
+                        $stoolData[$sample][$key] = $sampleValue;
+                    }
+                }
+            }
+        }
+        return $stoolData;
+    }
+
     public function getSamplesWithOrderIds(): array
     {
         $samplesData = [];
@@ -1239,6 +1276,37 @@ class NphOrderService
             }
         }
         return $uniqueTimePoints;
+    }
+
+    public function getStoolSamples(): array
+    {
+        $timePointSamples = $this->getTimePointSamples();
+        $stoolTimePointSamples = [];
+        foreach ($timePointSamples as $timePoint => $samples) {
+            if (in_array($timePoint, NphOrder::$stoolVisits)) {
+                foreach ($samples as $sampleKey => $sample) {
+                    if (in_array($sampleKey, NphSample::$stoolSamples)) {
+                        $stoolTimePointSamples[$timePoint][$sampleKey] = $sample;
+                    }
+                }
+            }
+        }
+        return $stoolTimePointSamples;
+    }
+
+    public function getNonStoolSamples(): array
+    {
+        $timePointSamples = $this->getTimePointSamples();
+        foreach ($timePointSamples as $timePoint => $samples) {
+            if (in_array($timePoint, NphOrder::$stoolVisits)) {
+                foreach (array_keys($samples) as $sampleKey) {
+                    if (in_array($sampleKey, NphSample::$stoolSamples)) {
+                        unset($timePointSamples[$timePoint][$sampleKey]);
+                    }
+                }
+            }
+        }
+        return $timePointSamples;
     }
 
 

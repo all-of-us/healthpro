@@ -72,6 +72,8 @@ class NphOrderServiceTest extends ServiceTestCase
         // Module 1
         $this->service->loadModules(1, 'LMT', 'P0000000001', 'T10000000');
         $this->assertSame($this->module1Data['timePointSamples'], $this->service->getTimePointSamples());
+        $this->assertSame($this->module1Data['timePointNonStoolSamples'], $this->service->getNonStoolSamples());
+        $this->assertSame($this->module1Data['timePointStoolSamples'], $this->service->getStoolSamples());
         $this->assertSame($this->module1Data['timePoints'], $this->service->getTimePoints());
         $this->assertSame($this->module1Data['samples'], $this->service->getSamples());
 
@@ -206,6 +208,14 @@ class NphOrderServiceTest extends ServiceTestCase
         $orderData = $this->module1Data['formData'];
         unset($orderData['createdTs'], $orderData['downtime_generated']);
         $this->assertSame($orderData, $this->service->getExistingOrdersData());
+
+        $orderData = $this->module1Data['formDataWithoutStoolSamples'];
+        unset($orderData['createdTs'], $orderData['downtime_generated']);
+        $this->assertSame($orderData, $this->service->getExistingOrdersDataWithOutStoolSamples());
+
+        $orderData = $this->module1Data['formDataWithOnlyStoolSamples'];
+        unset($orderData['createdTs'], $orderData['downtime_generated']);
+        $this->assertEqualsCanonicalizing($orderData, $this->service->getExistingOrdersDataWithOnlyStoolSamples());
     }
 
     public function testGetSamplesWithOrderIds()

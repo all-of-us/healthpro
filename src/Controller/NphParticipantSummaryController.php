@@ -11,6 +11,7 @@ use App\Form\Nph\NphCrossSiteAgreeType;
 use App\Form\Nph\NphGenerateOrderWarningLogType;
 use App\Form\Nph\NphSampleProcessCompleteType;
 use App\Helper\NphDietPeriodStatus;
+use App\Nph\Order\Nomenclature;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
@@ -101,7 +102,7 @@ class NphParticipantSummaryController extends BaseController
 
         $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
         $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
-
+        $combined = $nphProgramSummaryService->separateStoolSamples($combined);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,
             'programSummaryAndOrderInfo' => $combined,
@@ -119,6 +120,7 @@ class NphParticipantSummaryController extends BaseController
             'cacheEnabled' => $cacheEnabled,
             'dlwSummary' => $dlwSummary,
             'sampleStatusCounts' => $sampleStatusCounts,
+            'moduleVisitMapper' => Nomenclature::$moduleVisitMapper
         ]);
     }
 
