@@ -215,7 +215,7 @@ class NphOrderServiceTest extends ServiceTestCase
 
         $orderData = $this->module1Data['formDataWithOnlyStoolSamples'];
         unset($orderData['createdTs'], $orderData['downtime_generated']);
-        $this->assertSame($orderData, $this->service->getExistingOrdersDataWithOnlyStoolSamples());
+        $this->assertEqualsCanonicalizing($orderData, $this->service->getExistingOrdersDataWithOnlyStoolSamples());
     }
 
     public function testGetSamplesWithOrderIds()

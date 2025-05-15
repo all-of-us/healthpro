@@ -185,7 +185,7 @@ class NphOrderService
             }
             if (in_array($sample, NphOrder::$stoolVisits) && is_array($data)) {
                 foreach ($data as $key => $sampleKey) {
-                    if ($sampleKey === NphSample::SAMPLE_STOOL) {
+                    if ($sampleKey === NphSample::SAMPLE_STOOL || $sampleKey === NphSample::SAMPLE_STOOL_2) {
                         unset($ordersData[$sample][$key]);
                     }
                 }
@@ -203,9 +203,9 @@ class NphOrderService
                 $stoolData[$sample] = $data;
             }
             if (in_array($sample, NphOrder::$stoolVisits) && is_array($data)) {
-                foreach ($data as $sampleValue) {
-                    if ($sampleValue === NphSample::SAMPLE_STOOL) {
-                        $stoolData[$sample] = [$sampleValue];
+                foreach ($data as $key => $sampleValue) {
+                    if ($sampleValue === NphSample::SAMPLE_STOOL || $sampleValue === NphSample::SAMPLE_STOOL_2) {
+                        $stoolData[$sample][$key] = $sampleValue;
                     }
                 }
             }
