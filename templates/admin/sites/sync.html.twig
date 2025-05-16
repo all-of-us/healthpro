@@ -1,84 +1,89 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %}Sites - {% endblock %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('admin_home') }}">Admin</a></li>
-        <li><a href="{{ path('admin_sites') }}">Site Management</a></li>
-        <li class="active">Sync Sites</li>
-    </ol>
-    <div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_sites') }}">Site Management</a></li>
+            <li class="breadcrumb-item active">Sync Sites</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Sync Sites</h2>
     </div>
 
-    <h3>Preview of sync changes</h3>
-    <ul>
-        <li>Delete: <strong>{{ preview.deleted|length }}</strong></li>
-        <li>Modify: <strong>{{ preview.modified|length }}</strong></li>
-        <li>Add: <strong>{{ preview.created|length }}</strong></li>
-    </ul>
+    <div class="my-4">
+        <h3>Preview of sync changes</h3>
+        <ul>
+            <li>Delete: <strong>{{ preview.deleted|length }}</strong></li>
+            <li>Modify: <strong>{{ preview.modified|length }}</strong></li>
+            <li>Add: <strong>{{ preview.created|length }}</strong></li>
+        </ul>
 
-    {% if form %}
-        {{ form_start(form) }}
-        {{ form_errors(form) }}
-        {{ form_rest(form) }}
-        <p>
-            <button type="submit" name="siteSync" class="btn btn-primary" onclick="return confirm('Are you sure? Please review the changes below.');" {% if not canSync %} disabled="disabled" {% endif %}><i class="fa fa-refresh" aria-hidden="true"></i> Perform Site Sync</button>
-            <button type="submit" name="awardeeOrgSync" class="btn btn-default pull-right"><i class="fa fa-refresh" aria-hidden="true"></i> Sync Organizations and Awardees</button>
-        </p>
-        {{ form_end(form) }}
-    {% else %}
-        <p>Preview is available but sites cannot be synced because the RDR Awardee API is disabled.</p>
-    {% endif %}
-    <hr />
-
-    <h3 class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Sites to be deleted</h3>
-    <ul>
-        {% for siteId in preview.deleted %}
-            <li>{{ siteId }}</li>
+        {% if form %}
+            {{ form_start(form) }}
+            {{ form_errors(form) }}
+            {{ form_rest(form) }}
+            <p>
+                <button type="submit" name="siteSync" class="btn btn-primary" onclick="return confirm('Are you sure? Please review the changes below.');" {% if not canSync %} disabled="disabled" {% endif %}><i class="fa fa-refresh" aria-hidden="true"></i> Perform Site Sync</button>
+                <button type="submit" name="awardeeOrgSync" class="btn btn-secondary float-end"><i class="fa fa-refresh" aria-hidden="true"></i> Sync Organizations and Awardees</button>
+            </p>
+            {{ form_end(form) }}
         {% else %}
-            No sites to be deleted
+            <p>Preview is available but sites cannot be synced because the RDR Awardee API is disabled.</p>
+        {% endif %}
+        <hr />
+
+        <h3 class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Sites to be deleted</h3>
+        <ul>
+            {% for siteId in preview.deleted %}
+                <li>{{ siteId }}</li>
+            {% else %}
+                No sites to be deleted
+            {% endfor %}
+        </ul>
+        <hr />
+
+        <h3 class="text-warning"><i class="fa fa-pencil" aria-hidden="true"></i> Sites to be modified</h3>
+        {% for site in preview.modified %}
+            <h4>{{ site.new.name }} <small>{{ site.new.siteId }}</small></h4>
+            <table class="table table-condensed table-bordered" style="width: auto">
+                <thead>
+                <tr><th>Attribute</th><th>Old</th><th>New</th></tr>
+                </thead>
+                <tbody>
+                {% for key, value in site.old|filter((v, k) => v != site.new[k]) %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td class="text-danger">{{ site.old[key] }}</td>
+                        <td class="text-success">{{ site.new[key] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            No modified sites
         {% endfor %}
-    </ul>
-    <hr />
+        <hr />
 
-    <h3 class="text-warning"><i class="fa fa-pencil" aria-hidden="true"></i> Sites to be modified</h3>
-    {% for site in preview.modified %}
-        <h4>{{ site.new.name }} <small>{{ site.new.siteId }}</small></h4>
-        <table class="table table-condensed table-bordered" style="width: auto">
-            <thead>
-            <tr><th>Attribute</th><th>Old</th><th>New</th></tr>
-            </thead>
-            <tbody>
-            {% for key, value in site.old|filter((v, k) => v != site.new[k]) %}
-                <tr>
-                    <td>{{ key }}</td>
-                    <td class="text-danger">{{ site.old[key] }}</td>
-                    <td class="text-success">{{ site.new[key] }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        No modified sites
-    {% endfor %}
-    <hr />
+        <h3 class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i> Sites to be added</h3>
+        {% for site in preview.created %}
+            <h5>{{ site.name }} <small class="text-muted">{{ site.siteId }}</small></h5>
+            <dl class="row justify-content-center">
+                {% for key, value in site %}
+                    {% if value is not empty %}
+                        <dt class="col-sm-3"><span class="float-end">{{ key }}</span></dt>
+                        <dd class="col-sm-9">{{ value }}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>
+        {% else %}
+            <p>No new sites</p>
+        {% endfor %}
 
-    <h3 class="text-success"><i class="fa fa-plus-circle" aria-hidden="true"></i> Sites to be added</h3>
-    {% for site in preview.created %}
-        <h4>{{ site.name }} <small>{{ site.siteId }}</small></h4>
-        <dl class="dl-horizontal">
-            {% for key, value in site %}
-                {% if value is not empty %}
-                    <dt>{{ key }}</dt>
-                    <dd>{{ value }}</dd>
-                {% endif %}
-            {% endfor %}
-        </dl>
-    {% else %}
-        <p>No new sites</p>
-    {% endfor %}
-
-    <div align="center"><a class="btn btn-default" href="{{ path('admin_sites') }}">Cancel</a></div>
+        <div class="text-center"><a class="btn btn-secondary" href="{{ path('admin_sites') }}">Cancel</a></div>
+    </div>
 
 {% endblock %}
