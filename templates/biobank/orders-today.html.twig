@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'biobank/base.html.twig' %}
 {% block title %}Today - Daily Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
@@ -6,17 +7,13 @@
 {% import 'macros/display-text.html.twig' as macros %}
 
 {% block body %}
-    <div class="page-header">
-        <h2><i class="fa fa-list" aria-hidden="true"></i> Daily Review</h2>
-    </div>
     {% include 'biobank/partials/participant-review-tabs.html.twig' %}
-    <br/>
     {% if is_granted('ROLE_SCRIPPS') %}
         {% set orderCol = 4 %}
     {% else %}
         {% set orderCol = 3 %}
     {% endif %}
-    <table class="table table-striped table-bordered table-small dataTable" id="table-today" data-table-page-length="25" data-table-order="desc" data-table-order-column="{{ orderCol }}">
+    <table class="table table-striped table-bordered table-small mt-2 datatable" id="table-today" data-table-page-length="25" data-table-order="desc" data-table-order-column="{{ orderCol }}">
         <thead>
         <tr>
             {% if is_granted('ROLE_SCRIPPS') %}

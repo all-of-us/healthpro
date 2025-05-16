@@ -1,7 +1,10 @@
 {% set current_route = app.request.attributes.get('_route') %}
-<ul class="nav nav-tabs">
-    <li role="presentation" {% if current_route == 'biobank_orders_today' %}class="active"{% endif %}><a href="{{ path('biobank_orders_today') }}">Today's Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_orders_unfinalized' %}class="active"{% endif %}><a href="{{ path('biobank_orders_unfinalized') }}">Unfinalized Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_orders_unlocked' %}class="active"{% endif %}><a href="{{ path('biobank_orders_unlocked') }}">Unlocked Biobank Orders</a></li>
-    <li role="presentation" {% if current_route == 'biobank_orders_recentModify' %}class="active"{% endif %}><a href="{{ path('biobank_orders_recentModify') }}">Recently Modified Biobank Orders</a></li>
+<div class="page-header mb-4 border-bottom">
+    <h2><i class="fa fa-list" aria-hidden="true"></i> Daily Review</h2>
+</div>
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'biobank_orders_today' %}active{% endif %}" href="{{ path('biobank_orders_today') }}">Today's Biobank Orders</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'biobank_orders_unfinalized' %}active{% endif %}" href="{{ path('biobank_orders_unfinalized') }}">Unfinalized Biobank Orders</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'biobank_orders_unlocked' %}active{% endif %}" href="{{ path('biobank_orders_unlocked') }}">Unlocked Biobank Orders</a></li>
+    <li class="nav-item" role="presentation"><a class="nav-link {% if current_route == 'biobank_orders_recentModify' %}active{% endif %}" href="{{ path('biobank_orders_recentModify') }}">Recently Modified Biobank Orders</a></li>
 </ul>
