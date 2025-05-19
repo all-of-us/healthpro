@@ -1,34 +1,38 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-        <li class="active">HealthPro Groups</li>
-    </ol>
-    <div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_user_groups') }}">Management Tools</a></li>
+            <li class="breadcrumb-item active">HealthPro Groups</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
-    <br/>
-    <table class="table table-striped table-hover table-bordered dataTable" data-table-order="asc">
-        <thead>
-        <tr>
-            <th>HealthPro Groups</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for group in app.session.get('managegroupsnph') %}
-            {% set groupInfo = app.user.site(group, 'nphSites') %}
-            {% if groupInfo is not null %}
+    <div class="my-4">
+        <table class="table table-striped table-hover table-bordered datatable my-2" data-table-order="asc">
+            <thead>
             <tr>
-                <td>
-                    <h4><a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ groupInfo.name }}</a></h4>
-                    <a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ group }}</a>
-                </td>
+                <th>HealthPro Groups</th>
             </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for group in app.session.get('managegroupsnph') %}
+                {% set groupInfo = app.user.site(group, 'nphSites') %}
+                {% if groupInfo is not null %}
+                <tr>
+                    <td>
+                        <h6><a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ groupInfo.name }}</a></h6>
+                        <a href="{{ path('access_manage_user_group', { groupId: groupInfo.id }) }}">{{ group }}</a>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block pagejs %}
