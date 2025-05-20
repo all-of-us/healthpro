@@ -30,9 +30,10 @@ $(document).ready(function () {
         showHideMemberLastDayField(removeReason);
     });
 
-    $("#remove_group_member_memberLastDay").pmiDateTimePicker({
-        format: "MM/DD/YYYY",
-        maxDate: new Date().setHours(23, 59, 59, 999),
-        useCurrent: false
+    let memberLastDay = document.querySelector("#remove_group_member_memberLastDay");
+    bs5DateTimepicker(memberLastDay, {
+        maxDate: new Date(),
+        format: "MM/dd/yyyy",
+        clock: false
     });
 });

@@ -1,23 +1,26 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-        <li><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
-        <li><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
-        <li class="active">Add Member</li>
-    </ol>
-    <div class="page-header">
+    {% form_theme groupMemberForm 'custom_bootstrap_5_layout.html.twig' %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
+            <li class="breadcrumb-item active">Add Member</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
-    <h3>{{ group.name }}</h3>
-    <br/>
+    <h4 class="mt-2 mb-4">{{ group.name }}</h4>
     <div class="row">
         <div class="col-sm-7">
-            <div class="page-header">
-                <h4 class="text-success"><i class="fa fa-user" aria-hidden="true"></i> Add Member</h4>
+            <div class="page-header border-bottom">
+                <h5 class="text-success"><i class="fa fa-user" aria-hidden="true"></i> Add Member</h5>
             </div>
-            <div class="alert alert-warning row">
+            <div class="alert alert-warning row mt-2">
                 <div class="col-sm-1 user-add-warning-icon">
                     <i class="fa fa-exclamation-triangle fa-lg"></i>
                 </div>
@@ -31,18 +34,17 @@
             {{ form_errors(groupMemberForm) }}
             {{ form_label(groupMemberForm.email) }}
             <div class="{% if groupMemberForm.email.vars.errors|length > 0 %} has-error {% endif %}">
-                <div class="input-group">
+                <div class="input-group mb-3">
                     {{ form_widget(groupMemberForm.email) }}
-                    <div class="input-group-addon">@pmi-ops.org</div>
+                    <span class="input-group-text" id="basic-addon2">@pmi-ops.org</span>
                 </div>
                 {{ form_errors(groupMemberForm.email) }}
             </div>
-            <br/>
             {{ form_rest(groupMemberForm) }}
-            <p>
+            <div class="my-2">
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
-            </p>
+                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-secondary">Cancel</a>
+            </div>
             {{ form_end(groupMemberForm) }}
         </div>
     </div>

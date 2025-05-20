@@ -4,12 +4,12 @@ $(document).ready(function () {
         let order = $(this).data("table-order") ? $(this).data("table-order") : "desc";
         let orderColumn = $(this).data("table-order-column") ? $(this).data("table-order-column") : 0;
         let scrollX = $(this).data("table-scroll-x") ? $(this).data("table-scroll-x") : false;
-        let columnDefs = $(this).data("table-column-defs") ? JSON.parse($(this).data("table-column-defs")) : {};
+        let columnDefs = $(this).data("table-column-defs") || {};
         $(this).DataTable({
             order: [[orderColumn, order]],
             scrollX: scrollX,
             pageLength: pageLength,
-            columnDefs: columnDefs
+            columnDefs: [columnDefs]
         });
     });
 });

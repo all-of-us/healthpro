@@ -1,22 +1,25 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li class="active">Management Tools</li>
-    </ol>
-    <div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item active">Management Tools</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-users-cog" aria-hidden="true"></i> Management Tools</h2>
     </div>
-    <div class="row home-menu row-equal-height">
+    <div class="row home-menu mt-4">
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('access_manage_user_groups') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('access_manage_user_groups') }}" class="btn btn-lg btn-block border w-100 text-dark">
                 <i class="fa fa-users" aria-hidden="true"></i>
                 User Management
                 <div class="description">View and manage your site's users.</div>
             </a>
         </div>
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_order_manage_lookup') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_order_manage_lookup') }}" class="btn btn-lg btn-block border w-100 text-dark">
                 <i class="fa fa-medkit" aria-hidden="true"></i>
                 Order Management
                 <div class="description">Manage order generation data for your site.</div>
