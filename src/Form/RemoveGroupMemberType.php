@@ -41,7 +41,7 @@ class RemoveGroupMemberType extends AbstractType
                 'label' => "Please select the member's last day",
                 'required' => false,
                 'html5' => false,
-                'format' => 'MM/dd/yyyy',
+                'format' => 'M/d/yyyy',
                 'attr' => ['autocomplete' => 'off'],
                 'constraints' => [
                     new Constraints\Type('datetime'),

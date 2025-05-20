@@ -2,7 +2,7 @@
 {% extends 'admin/base.html.twig' %}
 {% block title %} {{ site ? 'Edit Site' : 'Create Site' }} - {% endblock %}
 {% block body %}
-    {% form_theme siteForm 'bootstrap_5_layout.html.twig' %}
+    {% form_theme siteForm 'custom_bootstrap_5_layout.html.twig' %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item" aria-current="page"><a href="{{ path('nph_admin_home') }}">Home</a></li>

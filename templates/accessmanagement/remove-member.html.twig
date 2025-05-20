@@ -1,22 +1,24 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
-{% form_theme removeGoupMemberForm 'form/simple_checkbox_label.html.twig' %}
+{% form_theme removeGoupMemberForm 'custom_bootstrap_5_layout.html.twig' %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-        <li><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
-        <li><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
-        <li class="active">Remove Member</li>
-    </ol>
-    <div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_user_group', { groupId: group.id }) }}">{{ group.name }}</a></li>
+            <li class="breadcrumb-item active">Remove Member</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
-    <h3>{{ group.name }}</h3>
-    <br/>
+    <h4 class="mt-2 mb-4">{{ group.name }}</h4>
     <div class="row">
         <div class="col-sm-6">
-            <div class="page-header">
-                <h4 class="text-danger"><i class="fa fa-user" aria-hidden="true"></i> Remove Member</h4>
+            <div class="page-header border-bottom mb-2">
+                <h5 class="text-danger"><i class="fa fa-user" aria-hidden="true"></i> Remove Member</h5>
             </div>
             {{ form_start(removeGoupMemberForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             {{ form_errors(removeGoupMemberForm) }}
@@ -31,10 +33,10 @@
                     {{ form_widget(reason) }}
                     {% set programText = app.session.get('program') == constant('App\\Entity\\User::PROGRAM_NPH') ? 'NPH and AoU' : 'AoU and NPH' %}
                     {% if loop.index == 1 %}
-                        <i class="text-info small">Note: Member will be removed from all associated HealthPro groups. (This includes removal from all
+                        <i class="text-primary small">Note: Member will be removed from all associated HealthPro groups. (This includes removal from all
                             {{ programText }} groups, if applicable.)</i>
                     {% else %}
-                        <i class="text-info small">Note: Member will be removed from this group, but <u>maintain access</u> to HealthPro through other associated groups. (This includes maintaining access to all other
+                        <i class="text-primary small">Note: Member will be removed from this group, but <u>maintain access</u> to HealthPro through other associated groups. (This includes maintaining access to all other
                             {{ programText }} groups, if applicable.)</i>
                     {% endif %}
                 {% endfor %}
@@ -44,10 +46,10 @@
                 {{ form_row(removeGoupMemberForm.memberLastDay) }}
                 {{ form_row(removeGoupMemberForm.attestation) }}
             </div>
-            <p>
+            <div class="my-2">
                 <button type="submit" class="btn btn-primary" style="display:none">Submit</button>
-                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-default">Cancel</a>
-            </p>
+                <a href="{{ path('access_manage_user_group', { groupId: group.id }) }}" class="btn btn-secondary">Cancel</a>
+            </div>
             {{ form_end(removeGoupMemberForm) }}
         </div>
     </div>
