@@ -4,7 +4,12 @@ $(document).ready(function () {
         currentStep = "finalize";
     }
     // Switch tab to active step
-    $(".nav-tabs a[href='#" + currentStep + "']").tab("show");
+    let targetSelector = ".nav-tabs button[data-bs-target='#" + currentStep + "']";
+    let tabTriggerEl = $(targetSelector)[0];
+    if (tabTriggerEl) {
+        let tab = new bootstrap.Tab(tabTriggerEl);
+        tab.show();
+    }
 
     $("#checkall").on("change", function () {
         $("#biobank_order_finalizedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));
