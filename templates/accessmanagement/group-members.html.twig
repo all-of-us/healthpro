@@ -1,51 +1,57 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block body %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
-        <li><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
-        <li class="active">{{ group.name }}</li>
-    </ol>
-    <div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_dashboard') }}">Management Tools</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('access_manage_user_groups') }}">HealthPro Groups</a></li>
+            <li class="breadcrumb-item active">{{ group.name }}</li>
+        </ol>
+    </nav>
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-users" aria-hidden="true"></i> User Management</h2>
     </div>
-    <h3>{{ group.name }}</h3>
-    <div class="pull-right">
-        <a href="{{ path('access_manage_user_group_member', { groupId: group.id }) }}" class="btn btn-success"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Member</a>
-        <a href="{{ resetPasswordUrl }}" target="_blank" class="btn btn-primary">Reset Password <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
+    <h4 class="mt-2">{{ group.name }}</h4>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="float-end">
+                <a href="{{ path('access_manage_user_group_member', { groupId: group.id }) }}" class="btn btn-success"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Member</a>
+                <a href="{{ resetPasswordUrl }}" target="_blank" class="btn btn-primary">Reset Password <i class="fa fa-arrow-circle-right" aria-hidden="true"></i></a>
+            </div>
+        </div>
     </div>
-    <br/><br/><br/>
-    <table class="table table-striped table-hover table-bordered dataTable" data-table-page-length="25" data-table-order-column="0" data-table-order="asc" data-table-column-defs="{'targets': 2, 'orderable': 'false'}"a>
-        <thead>
-        <tr>
-            <th>Pmi-Ops Credentials</th>
-            <th>Role</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for member in members %}
-            {% if member.email is not empty %}
-                <tr>
-                    <td>{{ member.email }}</td>
-                    <td>{{ member.role }}</td>
-                    <td>
-                        {% if member.role == 'MEMBER' %}
-                            <a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-xs btn-danger">Remove</a>
-                        {% else %}
-                            <button class="btn btn-xs btn-default" disabled>Remove</button>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
-    <br/>
-    <div class="text-center">
-        {% include 'partials/drc-support-text.html.twig' %}
+    <div class="my-4">
+        <table class="table table-striped table-hover table-bordered datatable my-2" data-table-order-column="0" data-table-order="asc" data-table-column-defs='{{ { "targets": 2, "orderable": false }|json_encode|e("html_attr") }}'>
+            <thead>
+            <tr>
+                <th>Pmi-Ops Credentials</th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for member in members %}
+                {% if member.email is not empty %}
+                    <tr>
+                        <td>{{ member.email }}</td>
+                        <td>{{ member.role }}</td>
+                        <td>
+                            {% if member.role == 'MEMBER' %}
+                                <a href="{{ path('access_manage_user_group_remove_member', { groupId: group.id, memberId: member.id }) }}" class="btn btn-xs btn-danger">Remove</a>
+                            {% else %}
+                                <button class="btn btn-xs btn-default" disabled>Remove</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center mt-2">
+            {% include 'partials/drc-support-text.html.twig' %}
+        </div>
     </div>
-    <br>
 {% endblock %}
 
 {% block pagejs %}
