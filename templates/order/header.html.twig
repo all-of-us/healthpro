@@ -180,22 +180,4 @@
     </div>
 </div>
 
-<div class="modal fade" id="orderHelpModal" tabindex="-1" role="dialog" aria-labelledby="orderHelpModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p>The additional notes fields are designated to record events or deviations in the Biobank process.</p>
-                <p>Include the following in a note, if applicable: </p>
-                <ul>
-                    <li>A description of “what happened”. Examples of events include: a) which tubes were not collected, b) which tubes were partially filled, and c) whether there was a deviation in the collection order.</li>
-                    <li>An explanation of “why it happened”. Examples of reasons to explain the events described include: a) Difficult Draw, b) Faulty tubes or equipment, c) Incorrect technique.</li>
-                    <li>You may describe any medical conditions or health information of the participant affecting the blood collection or the processing of specimens.</li>
-                </ul>
-                <p class="text-danger">NOTE: Do not include any personal identifiers of the participant, including name, DOB, phone number, etc.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
+{% include 'order/partials/finalize-notes-modal.html.twig' %}

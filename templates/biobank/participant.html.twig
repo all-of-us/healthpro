@@ -1,22 +1,23 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'biobank/base.html.twig' %}
 {% block title %}Participant {{ participant.biobankId }} - {% endblock %}
 {% block body %}
-    <div class="page-header">
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-user" aria-hidden="true"></i> Participant Details</h2>
     </div>
-    <div class="row">
+    <div class="row mt-2">
         <div class="col-sm-6">
-            <dl class="dl-horizontal">
+            <dl class="row">
                 {% if is_granted('ROLE_SCRIPPS') %}
                     <dt>Participant ID</dt>
                     <dd>{{ participant.id }}</dd>
                 {% endif %}
-                <dt>Biobank ID</dt>
-                <dd>{{ participant.biobankId }}</dd>
-                <dt>Paired Organization</dt>
-                <dd>{{ participant.organization ? siteInfo.getOrganizationDisplayName(participant.organization) : '(not paired)' }}</dd>
-                <dt>AI/AN</dt>
-                <dd>
+                <dt class="col-sm-4">Biobank ID</dt>
+                <dd class="col-sm-8">{{ participant.biobankId }}</dd>
+                <dt class="col-sm-4">Paired Organization</dt>
+                <dd class="col-sm-8">{{ participant.organization ? siteInfo.getOrganizationDisplayName(participant.organization) : '(not paired)' }}</dd>
+                <dt class="col-sm-4">AI/AN</dt>
+                <dd class="col-sm-8">
                     {% if participant.isAIAN %}
                         Yes
                     {% else %}
@@ -26,10 +27,12 @@
             </dl>
         </div>
     </div>
-    <div role="tabpanel">
+    <div role="tabpanel" class="mb-4">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
-                <a href="#inperson" aria-controls="inperson" role="tab" data-toggle="tab">In-Person Enrollment</a>
+            <li role="presentation" class="nav-item">
+                <button class="nav-link active" aria-controls="inperson" role="tab" data-bs-toggle="tab" data-bs-target="#inperson">
+                    In-Person Enrollment
+                </button>
             </li>
         </ul>
         <br>
@@ -37,7 +40,7 @@
             <div role="tabpanel" class="tab-pane active" id="inperson">
                 {% if canViewOrders %}
                     <div class="row">
-                        <div class="col-sm-6 col-sm-offset-3">
+                        <div class="col-sm-6 offset-sm-3">
                             {% include 'partials/participant-orders-list.html.twig' %}
                         </div>
                     </div>
