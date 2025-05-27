@@ -117,8 +117,9 @@
             </div>
         </div>
     </div>
+    {% include 'order/partials/finalize-notes-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub') }}
+    {{ encore_entry_script_tags('order-sub-bs5') }}
     {{ encore_entry_script_tags('biobank-order') }}
 {% endblock %}

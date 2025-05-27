@@ -15,8 +15,6 @@ $(document).ready(function () {
         $("#biobank_order_finalizedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));
     });
 
-    $("#form_finalized_ts").pmiDateTimePicker();
-
     $('.finalize-form button[type="submit"]').on("click", function () {
         //Display warning message
         var message = "Are you sure you want to finalize this order?";
