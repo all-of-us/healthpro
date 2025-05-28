@@ -14,6 +14,8 @@ class VisitDLW extends TimePoints
         'day6E' => 'Day 6 E',
         'day7F' => 'Day 7 F',
         'day13G' => 'Day 13 G',
+        // The key should be day14H, but since we already have this key in our database, we will leave it as is.
+        // We are sending the right value Day 14 H to RDR
         'day14F' => 'Day 14 H'
     ];
 
