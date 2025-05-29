@@ -262,12 +262,19 @@ $(document).ready(function () {
         });
     }
 
+    let aliquotSamplesHeaderSelector = $("#aliquot_samples_header");
+    let aliquotSampleCode = aliquotSamplesHeaderSelector.data("sample-code");
+    let sampleUrine24 = aliquotSamplesHeaderSelector.data("sample-urine-24");
+
     $(".aliquot-ts, .freeze-ts").on("dp.change", function (event) {
         let collectedTsSelector = $('input[id*="CollectedTs"]');
         let orderCollectedTs = new Date(collectedTsSelector.val());
         let fieldTs = new Date($(this).val());
         let fieldType = $(this).data("field-type");
         let differenceCheck = 2;
+        if (aliquotSampleCode === sampleUrine24) {
+            differenceCheck = 8;
+        }
         if (fieldType === "freeze") {
             differenceCheck = 72;
         }
